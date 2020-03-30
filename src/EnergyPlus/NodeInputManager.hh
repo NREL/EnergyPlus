@@ -82,7 +82,7 @@ namespace NodeInputManager {
     extern bool GetNodeInputFlag;           // Flag to Get Node Input(s)
     extern Array1D_int NodeRef;             // Number of times a Node is "referenced"
     extern std::string CurCheckContextName; // Used in Uniqueness checks
-    extern Array1D_string UniqueNodeNames;  // used in uniqueness checks
+    extern Array1D<std::string> UniqueNodeNames;  // used in uniqueness checks
     extern int NumCheckNodes;               // Num of Unique nodes in check
     extern int MaxCheckNodes;               // Current "max" unique nodes in check
     extern bool NodeVarsSetup;              // Setup indicator of node vars for reporting (also that all nodes have been entered)
@@ -95,7 +95,7 @@ namespace NodeInputManager {
         // Members
         std::string Name;         // Name of this Node List
         int NumOfNodesInList;     // Number of Nodes in this Node List
-        Array1D_string NodeNames; // List of Names in this Node List
+        Array1D<std::string> NodeNames; // List of Names in this Node List
         Array1D_int NodeNumbers;  // Number of each Node (ref NodeNames) in this Node List
 
         // Default Constructor

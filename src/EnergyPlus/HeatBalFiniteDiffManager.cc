@@ -163,7 +163,7 @@ namespace HeatBalFiniteDiffManager {
 
     int const CrankNicholsonSecondOrder(1); // original CondFD scheme.  semi implicit, second order in time
     int const FullyImplicitFirstOrder(2);   // fully implicit scheme, first order in time.
-    Array1D_string const cCondFDSchemeType(2, {"CrankNicholsonSecondOrder", "FullyImplicitFirstOrder"});
+    Array1D<std::string> const cCondFDSchemeType(2, {"CrankNicholsonSecondOrder", "FullyImplicitFirstOrder"});
 
     Real64 const TempInitValue(23.0);   // Initialization value for Temperature
     Real64 const RhovInitValue(0.0115); // Initialization value for Rhov
@@ -256,8 +256,8 @@ namespace HeatBalFiniteDiffManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;                         // IO Status when calling get input subroutine
-        Array1D_string MaterialNames(3);    // Number of Material Alpha names defined
-        Array1D_string ConstructionName(3); // Name of Construction with CondFDsimplified
+        Array1D<std::string> MaterialNames(3);    // Number of Material Alpha names defined
+        Array1D<std::string> ConstructionName(3); // Name of Construction with CondFDsimplified
         int MaterNum;                       // Counter to keep track of the material number
         int MaterialNumAlpha;               // Number of material alpha names being passed
         int MaterialNumProp;                // Number of material properties being passed

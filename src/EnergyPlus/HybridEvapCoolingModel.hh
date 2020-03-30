@@ -135,18 +135,18 @@ namespace HybridEvapCoolingModel {
         int MODE_BLOCK_OFFSET_Number;
         int BLOCK_HEADER_OFFSET_Number;
         bool ValidPointer(int curve_pointer);
-        bool ValidateArrays(Array1D_string Alphas,
-                            Array1D_string cAlphaFields,
+        bool ValidateArrays(Array1D<std::string> Alphas,
+                            Array1D<std::string> cAlphaFields,
                             Array1D<Real64> Numbers,
-                            Array1D_string cNumericFields,
+                            Array1D<std::string> cNumericFields,
                             std::string cCurrentModuleObject);
         bool ParseMode(int ModeCounter,
                        std::vector<CMode> *OperatingModes,
                        Real64 ScalingFactor,
-                       Array1D_string Alphas,
-                       Array1D_string cAlphaFields,
+                       Array1D<std::string> Alphas,
+                       Array1D<std::string> cAlphaFields,
                        Array1D<Real64> Numbers,
-                       Array1D_string cNumericFields,
+                       Array1D<std::string> cNumericFields,
                        EPVector<bool> lAlphaBlanks,
                        std::string cCurrentModuleObject);
         void InitializeCurve(int curveType, int CurveID);
@@ -375,10 +375,10 @@ namespace HybridEvapCoolingModel {
                                             Real64 RequestedDehumidificationLoad,
                                             Real64 RequestedMoistureLoad,
                                             Real64 LatentRoomORZone);
-        bool ParseMode(Array1D_string Alphas,
-                       Array1D_string cAlphaFields,
+        bool ParseMode(Array1D<std::string> Alphas,
+                       Array1D<std::string> cAlphaFields,
                        Array1D<Real64> Numbers,
-                       Array1D_string cNumericFields,
+                       Array1D<std::string> cNumericFields,
                        EPVector<bool> lAlphaBlanks,
                        std::string cCurrentModuleObject);
         void

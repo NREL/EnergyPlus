@@ -124,7 +124,7 @@ namespace HighTempRadiantSystem {
         int SetptSchedPtr;                 // Schedule index for the zone setpoint temperature
         Real64 FracDistribPerson;          // Fraction of fraction radiant incident on a "person" in the space
         int TotSurfToDistrib;              // Total number of surfaces the heater sends radiation to
-        Array1D_string SurfaceName;        // Surface name in the list of surfaces heater sends radiation to
+        Array1D<std::string> SurfaceName;        // Surface name in the list of surfaces heater sends radiation to
         Array1D_int SurfacePtr;            // Surface number in the list of surfaces heater sends radiation to
         Array1D<Real64> FracDistribToSurf; // Fraction of fraction radiant incident on the surface
         // Other parameters
@@ -152,7 +152,7 @@ namespace HighTempRadiantSystem {
     struct HighTempRadSysNumericFieldData
     {
         // Members
-        Array1D_string FieldNames;
+        Array1D<std::string> FieldNames;
 
         // Default Constructor
         HighTempRadSysNumericFieldData()

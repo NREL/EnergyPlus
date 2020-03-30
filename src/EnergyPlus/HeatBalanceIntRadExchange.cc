@@ -1300,7 +1300,7 @@ namespace HeatBalanceIntRadExchange {
         int numinx1;
         int inx1;
         int inx2;
-        Array1D_string enclosureSurfaceNames;
+        Array1D<std::string> enclosureSurfaceNames;
 
         NoUserInputF = true;
         UserFZoneIndex = inputProcessor->getObjectItemNum("ZoneProperty:UserViewFactors:bySurfaceName", "zone_or_zonelist_name", EnclosureName);

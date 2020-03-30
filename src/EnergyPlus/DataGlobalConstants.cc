@@ -248,7 +248,7 @@ namespace DataGlobalConstants {
     int const iRT_OtherFuel2(1046);
     int const NumOfResourceTypes(46);
     int const ResourceTypeInitialOffset(1000); // to reach "ValidTypes"
-    Array1D_string const cRT_ValidTypes({0, NumOfResourceTypes},
+    Array1D<std::string> const cRT_ValidTypes({0, NumOfResourceTypes},
                                         {cRT_None,
                                          cRT_Electricity,
                                          cRT_Gas,

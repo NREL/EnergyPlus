@@ -128,11 +128,11 @@ namespace DataPlant {
     int const Press_FlowCorrection(3);      // Update pump flow rate based on pump curve
     int const Press_FlowSimulation(4);      // Full pressure network simulation
 
-    Array1D_string const PressureSimType(4, {"NONE", "PUMPPOWERCORRECTION", "LOOPFLOWCORRECTION", "PRESSURESIMULATION"});
+    Array1D<std::string> const PressureSimType(4, {"NONE", "PUMPPOWERCORRECTION", "LOOPFLOWCORRECTION", "PRESSURESIMULATION"});
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
     int const NumSimPlantEquipTypes(96);
-    Array1D_string const SimPlantEquipTypes(NumSimPlantEquipTypes,
+    Array1D<std::string> const SimPlantEquipTypes(NumSimPlantEquipTypes,
                                             {"BOILER:HOTWATER",
                                              "BOILER:STEAM",
                                              "CHILLER:ABSORPTION",
@@ -230,7 +230,7 @@ namespace DataPlant {
                                              "HEATPUMP:PLANTLOOP:EIR:COOLING",
                                              "HEATPUMP:PLANTLOOP:EIR:HEATING"});
 
-    Array1D_string const ccSimPlantEquipTypes(NumSimPlantEquipTypes,
+    Array1D<std::string> const ccSimPlantEquipTypes(NumSimPlantEquipTypes,
                                               {"Boiler:HotWater",
                                                "Boiler:Steam",
                                                "Chiller:Absorption",

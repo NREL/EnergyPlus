@@ -65,7 +65,7 @@ namespace DataPlant {
         int TotalOutletNodes;       // Number of outlet nodes for the splitter
         Array1D_int NodeNumOut;     // Node number for the outlet to the splitter
         Array1D_int BranchNumOut;   // Reference number for branch connected to splitter outlet
-        Array1D_string NodeNameOut; // Node name for the outlet to the splitter
+        Array1D<std::string> NodeNameOut; // Node name for the outlet to the splitter
 
         // Default Constructor
         SplitterData() : Exists(false), NodeNumIn(0), BranchNumIn(0), LevelIn(0), LevelOut(0), CorrMixIndex(0), TotalOutletNodes(0)

@@ -1098,11 +1098,11 @@ namespace BranchNodeConnections {
                           std::string const &ComponentName,
                           bool &IsParent,                    // true or false
                           int &NumInlets,
-                          Array1D_string &InletNodeNames,
+                          Array1D<std::string> &InletNodeNames,
                           Array1D_int &InletNodeNums,
                           Array1D_int &InletFluidStreams,
                           int &NumOutlets,
-                          Array1D_string &OutletNodeNames,
+                          Array1D<std::string> &OutletNodeNames,
                           Array1D_int &OutletNodeNums,
                           Array1D_int &OutletFluidStreams,
                           bool &ErrorsFound                  // set to true if errors found, unchanged otherwise
@@ -1193,11 +1193,11 @@ namespace BranchNodeConnections {
     void GetChildrenData(std::string const &ComponentType,
                          std::string const &ComponentName,
                          int &NumChildren,
-                         Array1D_string &ChildrenCType,
-                         Array1D_string &ChildrenCName,
-                         Array1D_string &InletNodeName,
+                         Array1D<std::string> &ChildrenCType,
+                         Array1D<std::string> &ChildrenCName,
+                         Array1D<std::string> &InletNodeName,
                          Array1D_int &InletNodeNum,
-                         Array1D_string &OutletNodeName,
+                         Array1D<std::string> &OutletNodeName,
                          Array1D_int &OutletNodeNum,
                          bool &ErrorsFound)
     {
@@ -1215,10 +1215,10 @@ namespace BranchNodeConnections {
         // Traverses CompSet structure.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string ChildCType;
-        Array1D_string ChildCName;
-        Array1D_string ChildInNodeName;
-        Array1D_string ChildOutNodeName;
+        Array1D<std::string> ChildCType;
+        Array1D<std::string> ChildCName;
+        Array1D<std::string> ChildInNodeName;
+        Array1D<std::string> ChildOutNodeName;
         Array1D_int ChildInNodeNum;
         Array1D_int ChildOutNodeNum;
         int Loop;

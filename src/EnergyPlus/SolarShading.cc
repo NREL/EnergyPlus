@@ -172,7 +172,7 @@ namespace SolarShading {
     int const PartialOverlap(4);
     int const TooManyVertices(5);
     int const TooManyFigures(6);
-    Array1D_string const
+    Array1D<std::string> const
         cOverLapStatus(6, {"No-Overlap", "1st-Surf-within-2nd", "2nd-Surf-within-1st", "Partial-Overlap", "Too-Many-Vertices", "Too-Many-Figures"});
 
     // DERIVED TYPE DEFINITIONS:
@@ -2798,7 +2798,7 @@ namespace SolarShading {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // MSG - for error message
-        static Array1D_string const MSG(4, {"misses", "", "within", "overlaps"});
+        static Array1D<std::string> const MSG(4, {"misses", "", "within", "overlaps"});
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -11588,7 +11588,7 @@ namespace SolarShading {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const MSG(4, {"misses", "", "within", "overlaps"});
+        static Array1D<std::string> const MSG(4, {"misses", "", "within", "overlaps"});
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

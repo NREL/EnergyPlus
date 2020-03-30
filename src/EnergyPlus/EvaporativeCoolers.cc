@@ -3659,10 +3659,10 @@ namespace EvaporativeCoolers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CurrentModuleObject; // Object type for getting and error messages
-        Array1D_string Alphas;           // Alpha items for object
+        Array1D<std::string> Alphas;           // Alpha items for object
         Array1D<Real64> Numbers;         // Numeric items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call

@@ -90,7 +90,7 @@ namespace DataRoomAirModel {
     int const RoomAirModel_UCSDUFI(6);        // UCSD UFAD interior zone model
     int const RoomAirModel_UCSDUFE(7);        // UCSD UFAD interior zone model
     int const RoomAirModel_AirflowNetwork(8); // Room Air model using AirflowNetwork
-    Array1D_string const ChAirModel({0, 8},
+    Array1D<std::string> const ChAirModel({0, 8},
                                     {"*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"});
 
     // Parameters to indicate air temperature coupling scheme

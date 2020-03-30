@@ -252,11 +252,11 @@ namespace WaterManager {
         static int alphaOffset(0);
         static int SurfNum(0);
         static std::string objNameMsg;
-        Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
+        Array1D<std::string> cAlphaFieldNames;
+        Array1D<std::string> cNumericFieldNames;
         EPVector<bool> lNumericFieldBlanks;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
+        Array1D<std::string> cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         static Real64 tmpMax(0.0);
@@ -1369,8 +1369,8 @@ namespace WaterManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int oldNumSupply;
-        Array1D_string oldSupplyCompNames;
-        Array1D_string oldSupplyCompTypes;
+        Array1D<std::string> oldSupplyCompNames;
+        Array1D<std::string> oldSupplyCompTypes;
         //  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
         TankIndex = UtilityRoutines::FindItemInList(TankName, WaterStorage);
@@ -1498,8 +1498,8 @@ namespace WaterManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int oldNumDemand;
-        Array1D_string oldDemandCompNames;
-        Array1D_string oldDemandCompTypes;
+        Array1D<std::string> oldDemandCompNames;
+        Array1D<std::string> oldDemandCompTypes;
         //  LOGICAL , SAVE    :: MyOneTimeFlag = .TRUE.
 
         TankIndex = UtilityRoutines::FindItemInList(TankName, WaterStorage);

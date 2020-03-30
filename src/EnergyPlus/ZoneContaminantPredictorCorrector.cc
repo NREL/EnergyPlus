@@ -262,7 +262,7 @@ namespace ZoneContaminantPredictorCorrector {
         static std::string const RoutineName("GetSourcesAndSinks: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string AlphaName;
+        Array1D<std::string> AlphaName;
         Array1D<Real64> IHGNumbers;
         Real64 SchMin;
         Real64 SchMax;

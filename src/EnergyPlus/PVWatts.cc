@@ -212,11 +212,11 @@ namespace PVWatts {
 
     PVWattsGenerator PVWattsGenerator::createFromIdfObj(int objNum)
     {
-        Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
+        Array1D<std::string> cAlphaFieldNames;
+        Array1D<std::string> cNumericFieldNames;
         EPVector<bool> lNumericFieldBlanks;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
+        Array1D<std::string> cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         const int maxAlphas = 6;  // from idd
         const int maxNumeric = 5; // from idd

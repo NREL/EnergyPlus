@@ -754,7 +754,7 @@ namespace SimulationManager {
         static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string Alphas(8);
+        Array1D<std::string> Alphas(8);
         Array1D<Real64> Number(4);
         int NumAlpha;
         int NumNumber;
@@ -2910,10 +2910,10 @@ namespace SimulationManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int Loop1;
-        Array1D_string ChildCType;
-        Array1D_string ChildCName;
-        Array1D_string ChildInNodeName;
-        Array1D_string ChildOutNodeName;
+        Array1D<std::string> ChildCType;
+        Array1D<std::string> ChildCName;
+        Array1D<std::string> ChildInNodeName;
+        Array1D<std::string> ChildOutNodeName;
         Array1D_int ChildInNodeNum;
         Array1D_int ChildOutNodeNum;
         int NumChildren;
@@ -3012,10 +3012,10 @@ namespace SimulationManager {
         Array1D<OutputProcessor::TimeStepType> IndexTypes;
         Array1D_int VarTypes;
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
-        Array1D_string VarNames;
+        Array1D<std::string> VarNames;
         Array1D_int ResourceTypes;
-        Array1D_string EndUses;
-        Array1D_string Groups;
+        Array1D<std::string> EndUses;
+        Array1D<std::string> Groups;
 
         ObjexxFCL::gio::write(OutputFileDebug, fmtA) << " CompSet,ComponentType,ComponentName,NumMeteredVariables";
         ObjexxFCL::gio::write(OutputFileDebug, fmtA) << " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType";

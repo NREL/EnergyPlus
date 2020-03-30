@@ -206,7 +206,7 @@ namespace HVACControllers {
     int const CoilType_Cooling(1);
     int const CoilType_Heating(2);
 
-    Array1D_string const
+    Array1D<std::string> const
         ControlVariableTypes({0, 4}, {"No control variable", "Temperature", "Humidity ratio", "Temperature and humidity ratio", "Flow rate"});
 
     // DERIVED TYPE DEFINITIONS
@@ -580,9 +580,9 @@ namespace HVACControllers {
         int AirLoopNum;            // DO index for each air loop
         bool ActuatorNodeNotFound; // true if no water coil inlet node match for actuator node
         Array1D<Real64> NumArray;
-        Array1D_string AlphArray;
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> AlphArray;
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         std::string CurrentModuleObject; // for ease in getting objects

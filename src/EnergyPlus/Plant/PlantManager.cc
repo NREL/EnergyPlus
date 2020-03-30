@@ -335,7 +335,7 @@ namespace EnergyPlus {
             int NumFluids;    // number of fluids in sim
             int PlantLoopNum;
             int CondLoopNum;
-            Array1D_string Alpha(18); // dimension to num of alpha fields in input
+            Array1D<std::string> Alpha(18); // dimension to num of alpha fields in input
             Array1D<Real64> Num(30);  // dimension to num of numeric data fields in input
             static bool ErrorsFound(false);
             std::string LoadingScheme;
@@ -782,12 +782,12 @@ namespace EnergyPlus {
 
             std::string LoopIdentifier;
 
-            static Array1D_string BranchNames;     // Branch names from GetBranchList call
-            static Array1D_string CompTypes;       // Branch names from GetBranchList call
-            static Array1D_string CompNames;       // Branch names from GetBranchList call
+            static Array1D<std::string> BranchNames;     // Branch names from GetBranchList call
+            static Array1D<std::string> CompTypes;       // Branch names from GetBranchList call
+            static Array1D<std::string> CompNames;       // Branch names from GetBranchList call
             static Array1D_int CompCtrls;          // Branch names from GetBranchList call
-            static Array1D_string InletNodeNames;  // Node names from GetBranchData call
-            static Array1D_string OutletNodeNames; // Node names from GetBranchData call
+            static Array1D<std::string> InletNodeNames;  // Node names from GetBranchData call
+            static Array1D<std::string> OutletNodeNames; // Node names from GetBranchData call
             static Array1D_int InletNodeNumbers;   // Node numbers from GetBranchData call
             static Array1D_int OutletNodeNumbers;  // Node numbers from GetBranchData call
             static EPVector<bool> SplitOutBranch;

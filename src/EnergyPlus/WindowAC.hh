@@ -65,7 +65,7 @@ namespace WindowAC {
     // MODULE PARAMETER DEFINITIONS
     extern int const WindowAC_UnitType;
     extern std::string const cWindowAC_UnitType;
-    extern Array1D_string const cWindowAC_UnitTypes;
+    extern Array1D<std::string> const cWindowAC_UnitTypes;
 
     // Compressor operation
     extern int const On;  // normal compressor operation
@@ -163,7 +163,7 @@ namespace WindowAC {
     struct WindACNumericFieldData
     {
         // Members
-        Array1D_string FieldNames;
+        Array1D<std::string> FieldNames;
 
         // Default Constructor
         WindACNumericFieldData()

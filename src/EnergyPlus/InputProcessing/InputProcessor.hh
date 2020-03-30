@@ -149,8 +149,8 @@ public:
                        int &Status,
                        Optional<EPVector<bool>> NumBlank = _,
                        Optional<EPVector<bool>> AlphaBlank = _,
-                       Optional<Array1D_string> AlphaFieldNames = _,
-                       Optional<Array1D_string> NumericFieldNames = _);
+                       Optional<Array1D<std::string>> AlphaFieldNames = _,
+                       Optional<Array1D<std::string>> NumericFieldNames = _);
 
     int getIDFObjNum(std::string const &Object, int const Number);
 
@@ -261,8 +261,8 @@ private:
                             int &NumNumbers,
                             Optional<EPVector<bool>> NumBlank = _,
                             Optional<EPVector<bool>> AlphaBlank = _,
-                            Optional<Array1D_string> AlphaFieldNames = _,
-                            Optional<Array1D_string> NumericFieldNames = _);
+                            Optional<Array1D<std::string>> AlphaFieldNames = _,
+                            Optional<Array1D<std::string>> NumericFieldNames = _);
 
     void setObjectItemValue(json const &ep_object,
                             json const &ep_schema_object,

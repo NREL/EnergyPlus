@@ -70,10 +70,10 @@ namespace ScheduleManager {
     // Data
     // MODULE PARAMETER DEFINITIONS
     extern int const MaxDayTypes;
-    extern Array1D_string const ValidDayTypes;
+    extern Array1D<std::string> const ValidDayTypes;
 
     extern int const NumScheduleTypeLimitUnitTypes;
-    extern Array1D_string const ScheduleTypeLimitUnitTypes;
+    extern Array1D<std::string> const ScheduleTypeLimitUnitTypes;
 
     extern int const ScheduleInput_year;
     extern int const ScheduleInput_compact;

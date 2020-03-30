@@ -2754,11 +2754,11 @@ namespace RuntimeLanguageProcessor {
         static int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
         static int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
         static int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
-        Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
+        Array1D<std::string> cAlphaFieldNames;
+        Array1D<std::string> cNumericFieldNames;
         EPVector<bool> lNumericFieldBlanks;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
+        Array1D<std::string> cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int ConstructNum;

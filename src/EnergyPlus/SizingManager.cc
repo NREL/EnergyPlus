@@ -2070,9 +2070,9 @@ namespace SizingManager {
         //  REAL(r64) :: CalcAmt
 
         std::string CurrentModuleObject; // for ease in getting objects
-        Array1D_string Alphas;           // Alpha input items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> Alphas;           // Alpha input items for object
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
@@ -2137,14 +2137,14 @@ namespace SizingManager {
 
     void ProcessInputOARequirements(std::string const &CurrentModuleObject,
                                     int const OAIndex,
-                                    Array1D_string const &Alphas,
+                                    Array1D<std::string> const &Alphas,
                                     int &NumAlphas,
                                     Array1D<Real64> const &Numbers,
                                     int &NumNumbers,
                                     EPVector<bool> const &EP_UNUSED(lNumericBlanks), // Unused
                                     EPVector<bool> const &lAlphaBlanks,
-                                    Array1D_string const &cAlphaFields,
-                                    Array1D_string const &EP_UNUSED(cNumericFields), // Unused
+                                    Array1D<std::string> const &cAlphaFields,
+                                    Array1D<std::string> const &EP_UNUSED(cNumericFields), // Unused
                                     bool &ErrorsFound                               // If errors found in input
     )
     {
@@ -2336,9 +2336,9 @@ namespace SizingManager {
         static bool ErrorsFound(false); // If errors detected in input
 
         std::string CurrentModuleObject; // for ease in getting objects
-        Array1D_string Alphas;           // Alpha input items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> Alphas;           // Alpha input items for object
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
@@ -2580,7 +2580,7 @@ namespace SizingManager {
         int Item1;
         int ZLItem;
         bool errFlag;
-        Array1D_string ZoneNames;
+        Array1D<std::string> ZoneNames;
         int NumZones;
         int NumZoneLists;
         int OAIndex;  // Index of design specification object
@@ -3147,7 +3147,7 @@ namespace SizingManager {
         }
     }
 
-    void GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames)
+    void GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D<std::string> &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4211,9 +4211,9 @@ namespace SizingManager {
         //  REAL(r64) :: CalcAmt
 
         std::string CurrentModuleObject; // for ease in getting objects
-        Array1D_string Alphas;           // Alpha input items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> Alphas;           // Alpha input items for object
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.

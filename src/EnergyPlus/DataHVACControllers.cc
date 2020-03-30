@@ -80,13 +80,13 @@ namespace DataHVACControllers {
     // MODULE PARAMETER DEFINITIONS:
 
     int const ControllerSimple_Type(1);
-    Array1D_string const ControllerTypes(1, std::string("Controller:WaterCoil"));
+    Array1D<std::string> const ControllerTypes(1, std::string("Controller:WaterCoil"));
 
     // Controller action used in modules HVACControllers and ZoneControllers
     int const iNoAction(0);
     int const iReverseAction(1);
     int const iNormalAction(2);
-    Array1D_string const ActionTypes({0, 2}, {"No action", "Reverse action", "Normal action"});
+    Array1D<std::string> const ActionTypes({0, 2}, {"No action", "Reverse action", "Normal action"});
 
     // Controller mode used in modules HVACControllers and ZoneControllers
     int const iModeWrongAction(-2); // Controller error. E.g., bad action
@@ -99,7 +99,7 @@ namespace DataHVACControllers {
 
     int const iFirstMode(iModeWrongAction); // First operating mode in range
     int const iLastMode(iModeMaxActive);    // Last operating mode in range
-    Array1D_string const ControllerModeTypes({-2, 4},
+    Array1D<std::string> const ControllerModeTypes({-2, 4},
                                              {"Wrong action mode",
                                               "No controller mode",
                                               "Off controller mode",

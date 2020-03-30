@@ -1132,7 +1132,7 @@ namespace RefrigeratedCase {
     {
         // Members
         std::string Name; // Name of walk in cooler
-        Array1D_string ZoneName;
+        Array1D<std::string> ZoneName;
         // Names of zones exchanging energy with cooler
         int CircFanSchedPtr;               // Index to the correct availability schedule
         int DefrostDripDownSchedPtr;       // Index to the correct fail-safe schedule

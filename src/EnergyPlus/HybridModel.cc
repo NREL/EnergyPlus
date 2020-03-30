@@ -114,9 +114,9 @@ namespace HybridModel {
         int ZonePtr;                     // Pointer to the zone
         int ZoneListPtr;                 // Pointer to the zone list
         std::string CurrentModuleObject; // to assist in getting input
-        Array1D_string cAlphaArgs(16);   // Alpha input items for object
-        Array1D_string cAlphaFieldNames(16);
-        Array1D_string cNumericFieldNames(16);
+        Array1D<std::string> cAlphaArgs(16);   // Alpha input items for object
+        Array1D<std::string> cAlphaFieldNames(16);
+        Array1D<std::string> cNumericFieldNames(16);
         Array1D<Real64> rNumericArgs(4); // Numeric input items for object
         int HybridModelStartMonth(0);    // Hybrid model start month
         int HybridModelStartDate(0);     // Hybrid model start date of month

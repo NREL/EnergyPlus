@@ -138,7 +138,7 @@ namespace Psychrometrics {
     int const NumPsychMonitors(19); // Parameterization of Number of psychrometric routines that
     std::string const blank_string;
 #ifdef EP_psych_stats
-    Array1D_string const PsyRoutineNames(NumPsychMonitors,
+    Array1D<std::string> const PsyRoutineNames(NumPsychMonitors,
                                          {"PsyTdpFnTdbTwbPb",
                                           "PsyRhFnTdbWPb",
                                           "PsyTwbFnTdbWPb",

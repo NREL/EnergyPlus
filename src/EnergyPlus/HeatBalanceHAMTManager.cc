@@ -259,9 +259,9 @@ namespace HeatBalanceHAMTManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Array1D_string AlphaArray;
-        Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
+        Array1D<std::string> AlphaArray;
+        Array1D<std::string> cAlphaFieldNames;
+        Array1D<std::string> cNumericFieldNames;
 
         EPVector<bool> lAlphaBlanks;
         EPVector<bool> lNumericBlanks;

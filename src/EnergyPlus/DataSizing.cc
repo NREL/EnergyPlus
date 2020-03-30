@@ -91,7 +91,7 @@ namespace DataSizing {
     int const OAFlowSum(5);
     int const OAFlowMax(6);
 
-    Array1D_string const cOAFlowMethodTypes(NumOAFlowMethods,
+    Array1D<std::string> const cOAFlowMethodTypes(NumOAFlowMethods,
                                             {"Flow/Person",
                                              "Flow/Zone",
                                              "Flow/Area",
@@ -307,8 +307,8 @@ namespace DataSizing {
     Real64 UnitaryHeatCap(0.0);                     // the heating capacity of a unitary system
     Array1D<Real64> ZoneSizThermSetPtHi;            // highest zone thermostat setpoint during zone sizing calcs
     Array1D<Real64> ZoneSizThermSetPtLo;            // lowest zone thermostat setpoint during zone sizing calcs
-    Array1D_string CoolPeakDateHrMin;               // date:hr:min of cooling peak
-    Array1D_string HeatPeakDateHrMin;               // date:hr:min of heating peak
+    Array1D<std::string> CoolPeakDateHrMin;               // date:hr:min of cooling peak
+    Array1D<std::string> HeatPeakDateHrMin;               // date:hr:min of heating peak
     char SizingFileColSep;                          // Character to separate columns in sizing outputs
     int DataDesicDehumNum(0);                       // index to desiccant dehumidifier
     bool DataDesicRegCoil(false);                   // TRUE if heating coil desiccant regeneration coil

@@ -89,8 +89,8 @@ namespace EconomicTariff {
     extern int const conversionGAL;
     extern int const conversionKGAL; // thousand gallons
 
-    extern Array1D_string const convEneStrings;
-    extern Array1D_string const convDemStrings;
+    extern Array1D<std::string> const convEneStrings;
+    extern Array1D<std::string> const convDemStrings;
 
     extern int const demandWindowQuarter;
     extern int const demandWindowHalf;
@@ -98,7 +98,7 @@ namespace EconomicTariff {
     extern int const demandWindowDay;
     extern int const demandWindowWeek;
 
-    extern Array1D_string const demWindowStrings;
+    extern Array1D<std::string> const demWindowStrings;
 
     extern int const buyFromUtility;
     extern int const sellToUtility;

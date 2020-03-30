@@ -296,9 +296,9 @@ namespace ZoneDehumidifier {
         static int NumNumbers(0);       // Number of Numbers to allocate arrays, then used for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        Array1D_string Alphas;          // Alpha input items for object
-        Array1D_string cAlphaFields;    // Alpha field names
-        Array1D_string cNumericFields;  // Numeric field names
+        Array1D<std::string> Alphas;          // Alpha input items for object
+        Array1D<std::string> cAlphaFields;    // Alpha field names
+        Array1D<std::string> cNumericFields;  // Numeric field names
         Array1D<Real64> Numbers;        // Numeric input items for object
         EPVector<bool> lAlphaBlanks;      // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;    // Logical array, numeric field input BLANK = .TRUE.

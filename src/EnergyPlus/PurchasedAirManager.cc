@@ -144,7 +144,7 @@ namespace PurchasedAirManager {
     int const LimitFlowRate(2);
     int const LimitCapacity(3);
     int const LimitFlowRateAndCapacity(4);
-    Array1D_string const cLimitType(4, {"NoLimit", "LimitFlowRate", "LimitCapacity", "LimitFlowRateAndCapacity"});
+    Array1D<std::string> const cLimitType(4, {"NoLimit", "LimitFlowRate", "LimitCapacity", "LimitFlowRateAndCapacity"});
     // Dehumidification and Humidification control type parameters
     int const None(1);
     int const ConstantSensibleHeatRatio(2);

@@ -139,9 +139,9 @@ namespace DataSurfaceLists {
         Real64 const SurfListMinFlowFrac(0.001);    // Minimum allowed flow fraction (to avoid divide by zero)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string Alphas;         // Alpha items for object
-        Array1D_string cAlphaFields;   // Alpha field names
-        Array1D_string cNumericFields; // Numeric field names
+        Array1D<std::string> Alphas;         // Alpha items for object
+        Array1D<std::string> cAlphaFields;   // Alpha field names
+        Array1D<std::string> cNumericFields; // Numeric field names
         int MaxAlphas;                 // Maximum number of alphas for these input keywords
         int MaxNumbers;                // Maximum number of numbers for these input keywords
         int NameConflict;              // Used to see if a surface name matches the name of a surface list (not allowed)

@@ -95,7 +95,7 @@ namespace OutputProcessor {
     extern int const MeterType_CustomDec;  // Type value for custom meters that decrement another meter
     extern int const MeterType_CustomDiff; // Type value for custom meters that difference another meter
 
-    extern Array1D_string const DayTypes;
+    extern Array1D<std::string> const DayTypes;
     extern int const UnitsStringLength;
 
     extern int const RVarAllocInc;
@@ -562,7 +562,7 @@ namespace OutputProcessor {
         std::string Name;        // End use category name
         std::string DisplayName; // Display name for output table
         int NumSubcategories;
-        Array1D_string SubcategoryName; // Array of subcategory names
+        Array1D<std::string> SubcategoryName; // Array of subcategory names
 
         // Default Constructor
         EndUseCategoryType() : NumSubcategories(0)
@@ -1017,9 +1017,9 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
                          Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
-                         Array1D_string &EndUses,                               // EndUses for each variable
-                         Array1D_string &Groups,                                // Groups for each variable
-                         Array1D_string &Names,                                 // Variable Names for each variable
+                         Array1D<std::string> &EndUses,                               // EndUses for each variable
+                         Array1D<std::string> &Groups,                                // Groups for each variable
+                         Array1D<std::string> &Names,                                 // Variable Names for each variable
                          int &NumFound                                          // Number Found
 );
 
@@ -1030,9 +1030,9 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,  // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,            // units from enum for each variable
                          Array1D_int &ResourceTypes,                             // ResourceTypes for each variable
-                         Array1D_string &EndUses,                                // EndUses for each variable
-                         Array1D_string &Groups,                                 // Groups for each variable
-                         Array1D_string &Names,                                  // Variable Names for each variable
+                         Array1D<std::string> &EndUses,                                // EndUses for each variable
+                         Array1D<std::string> &Groups,                                 // Groups for each variable
+                         Array1D<std::string> &Names,                                  // Variable Names for each variable
                          Array1D_int &VarIDs                                     // Variable Report Numbers
 );
 
@@ -1046,7 +1046,7 @@ void GetVariableKeyCountandType(std::string const &varName,            // Standa
 
 void GetVariableKeys(std::string const &varName, // Standard variable name
                      int const varType,          // 1=integer, 2=real, 3=meter
-                     Array1D_string &keyNames,   // Specific key name
+                     Array1D<std::string> &keyNames,   // Specific key name
                      Array1D_int &keyVarIndexes  // Array index for
 );
 

@@ -111,14 +111,14 @@ namespace SizingManager {
 
     void ProcessInputOARequirements(std::string const &cCurrentModuleObject,
                                     int const OAIndex,
-                                    Array1D_string const &cAlphaArgs,
+                                    Array1D<std::string> const &cAlphaArgs,
                                     int &NumAlphas,
                                     Array1D<Real64> const &rNumericArgs,
                                     int &NumNumbers,
                                     EPVector<bool> const &lNumericFieldBlanks, // Unused
                                     EPVector<bool> const &lAlphaFieldBlanks,
-                                    Array1D_string const &cAlphaFieldNames,
-                                    Array1D_string const &cNumericFieldNames, // Unused
+                                    Array1D<std::string> const &cAlphaFieldNames,
+                                    Array1D<std::string> const &cNumericFieldNames, // Unused
                                     bool &ErrorsFound                        // If errors found in input
     );
 
@@ -133,7 +133,7 @@ namespace SizingManager {
     void GetZoneSizingInput();
 
     void
-    GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
+    GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D<std::string> &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
 
     void GetSystemSizingInput();
 

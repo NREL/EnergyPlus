@@ -68,7 +68,7 @@ namespace HeatBalFiniteDiffManager {
 
     extern int const CrankNicholsonSecondOrder; // original CondFD scheme.  semi implicit, second order in time
     extern int const FullyImplicitFirstOrder;   // fully implicit scheme, first order in time.
-    extern Array1D_string const cCondFDSchemeType;
+    extern Array1D<std::string> const cCondFDSchemeType;
 
     extern Real64 const TempInitValue; // Initialization value for Temperature
     extern Real64 const RhovInitValue; // Initialization value for Rhov
@@ -91,7 +91,7 @@ namespace HeatBalFiniteDiffManager {
     struct ConstructionDataFD
     {
         // Members
-        Array1D_string Name; // Name of construction
+        Array1D<std::string> Name; // Name of construction
         Array1D<Real64> DelX;
         Array1D<Real64> TempStability;
         Array1D<Real64> MoistStability;

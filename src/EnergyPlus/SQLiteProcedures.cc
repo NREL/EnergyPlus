@@ -91,7 +91,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase()
         bool writeTabularDataToSQLite = false;
 
         if (numberOfSQLiteObjects == 1) {
-            Array1D_string alphas(5);
+            Array1D<std::string> alphas(5);
             int numAlphas;
             Array1D<Real64> numbers(2);
             int numNumbers;
@@ -1845,8 +1845,8 @@ void SQLite::createSQLiteDaylightMap(int const mapNum,
 }
 
 void SQLite::createSQLiteTabularDataRecords(Array2D_string const &body, // html table row, html table column
-                                            Array1D_string const &rowLabels,
-                                            Array1D_string const &columnLabels,
+                                            Array1D<std::string> const &rowLabels,
+                                            Array1D<std::string> const &columnLabels,
                                             std::string const &reportName,
                                             std::string const &reportForString,
                                             std::string const &tableName)

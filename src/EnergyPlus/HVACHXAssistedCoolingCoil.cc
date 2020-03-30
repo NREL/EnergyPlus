@@ -323,9 +323,9 @@ namespace HVACHXAssistedCoolingCoil {
         int CoolingCoilWaterInletNodeNum; // water coil water inlet node number used to find controller index
         int CoolingCoilOutletNodeNum;     // air outlet node number of cooling coil, used for warning messages
         std::string CurrentModuleObject;  // Object type for getting and error messages
-        Array1D_string AlphArray;         // Alpha input items for object
-        Array1D_string cAlphaFields;      // Alpha field names
-        Array1D_string cNumericFields;    // Numeric field names
+        Array1D<std::string> AlphArray;         // Alpha input items for object
+        Array1D<std::string> cAlphaFields;      // Alpha field names
+        Array1D<std::string> cNumericFields;    // Numeric field names
         Array1D<Real64> NumArray;         // Numeric input items for object
         EPVector<bool> lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.

@@ -114,10 +114,10 @@ namespace NodeInputManager {
     // The following is a module level flag because there are several possible "entries" into
     // this module that may need to get the Node Inputs.
     bool GetNodeInputFlag(true);     // Flag to Get Node Input(s)
-    Array1D_string TmpNodeID;        // Used to "reallocate" name arrays
+    Array1D<std::string> TmpNodeID;        // Used to "reallocate" name arrays
     Array1D_int NodeRef;             // Number of times a Node is "referenced"
     std::string CurCheckContextName; // Used in Uniqueness checks
-    Array1D_string UniqueNodeNames;  // used in uniqueness checks
+    Array1D<std::string> UniqueNodeNames;  // used in uniqueness checks
     int NumCheckNodes(0);            // Num of Unique nodes in check
     int MaxCheckNodes(0);            // Current "max" unique nodes in check
     bool NodeVarsSetup(false);       // Setup indicator of node vars for reporting (also that all nodes have been entered)
@@ -610,7 +610,7 @@ namespace NodeInputManager {
         int IOStatus;   // IOStatus for IDF item (not checked)
         int NCount;     // Actual number of node lists
         bool flagError; // true when error node list name should be output
-        Array1D_string cAlphas;
+        Array1D<std::string> cAlphas;
         Array1D<Real64> rNumbers;
 
         bool localErrorsFound(false);

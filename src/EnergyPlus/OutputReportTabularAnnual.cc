@@ -96,7 +96,7 @@ namespace OutputReportTabularAnnual {
         int numParams;            // Number of elements combined
         int numAlphas;            // Number of elements in the alpha array
         int numNums;              // Number of elements in the numeric array
-        Array1D_string alphArray; // character string data
+        Array1D<std::string> alphArray; // character string data
         Array1D<Real64> numArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
         // static bool ErrorsFound( false );
@@ -177,7 +177,7 @@ namespace OutputReportTabularAnnual {
         OutputProcessor::StoreType avgSumVar;
         OutputProcessor::TimeStepType stepTypeVar;
         OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
-        Array1D_string namesOfKeys;   // keyNames
+        Array1D<std::string> namesOfKeys;   // keyNames
         Array1D_int indexesForKeyVar; // keyVarIndexes
         std::list<std::string> allKeys;
 
@@ -635,9 +635,9 @@ namespace OutputReportTabularAnnual {
 
     void AnnualTable::writeTable(int unitsStyle)
     {
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
         Real64 veryLarge = 1.0E280;
         Real64 verySmall = -1.0E280;
@@ -929,9 +929,9 @@ namespace OutputReportTabularAnnual {
         }
         // for the new binning aggregation types create a second table of the bin ranges
         if (createBinRangeTable) {
-            Array1D_string colHeadRange;
+            Array1D<std::string> colHeadRange;
             Array1D_int colWidthRange;
-            Array1D_string rowHeadRange;
+            Array1D<std::string> rowHeadRange;
             Array2D_string tableBodyRange;
             colHeadRange.allocate(10);
             colWidthRange.allocate(10);

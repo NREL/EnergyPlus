@@ -2030,19 +2030,19 @@ namespace General {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static int const NumSingleChars(3);
-        static Array1D_string const SingleChars(NumSingleChars, {"/", ":", "-"});
+        static Array1D<std::string> const SingleChars(NumSingleChars, {"/", ":", "-"});
         static int const NumDoubleChars(6);
-        static Array1D_string const DoubleChars(NumDoubleChars,
+        static Array1D<std::string> const DoubleChars(NumDoubleChars,
                                                 {"ST ", "ND ", "RD ", "TH ", "OF ", "IN "}); // Need trailing spaces: Want thse only at end of words
-        static Array1D_string const Months(12, {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"});
-        static Array1D_string const Weekdays(7, {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"});
+        static Array1D<std::string> const Months(12, {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"});
+        static Array1D<std::string> const Weekdays(7, {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"});
         static std::string const Numbers("0123456789");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CurrentString;
         std::string::size_type Pos;
         int Loop;
-        Array1D_string Fields(3);
+        Array1D<std::string> Fields(3);
         int NumField1;
         int NumField2;
         int NumField3;

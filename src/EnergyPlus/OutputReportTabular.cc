@@ -277,7 +277,7 @@ namespace OutputReportTabular {
     std::ofstream htm_stream;                                                                                                    // HTML table stream
     std::ofstream xml_stream;                                                                                                    // XML table stream
     Array1D<std::ofstream *> TabularOutputFile(maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream}); // Table stream array
-    Array1D_string del(maxNumStyles);        // the delimiter to use
+    Array1D<std::string> del(maxNumStyles);        // the delimiter to use
     Array1D_int TableStyle(maxNumStyles, 0); // see list of parameters
 
     Real64 timeInYear(0.0);
@@ -314,9 +314,9 @@ namespace OutputReportTabular {
     Array2D_int meterNumEndUseBEPS(numResourceTypes, NumEndUses, 0);
     Array3D_int meterNumEndUseSubBEPS;
     // arrays that hold the names of the resource and end uses
-    Array1D_string resourceTypeNames(numResourceTypes);
-    Array1D_string sourceTypeNames(numSourceTypes);
-    Array1D_string endUseNames(NumEndUses);
+    Array1D<std::string> resourceTypeNames(numResourceTypes);
+    Array1D<std::string> sourceTypeNames(numSourceTypes);
+    Array1D<std::string> endUseNames(NumEndUses);
     // arrays that hold the actual values for the year
     Array1D<Real64> gatherTotalsBEPS(numResourceTypes, 0.0);
     Array1D<Real64> gatherTotalsBySourceBEPS(numResourceTypes, 0.0);
@@ -411,7 +411,7 @@ namespace OutputReportTabular {
     //(8)   Milliseconds (0-999)
 
     // Design day name storage
-    Array1D_string DesignDayName;
+    Array1D<std::string> DesignDayName;
     int DesignDayCount(0);
 
     // arrays related to pulse and load component reporting
@@ -572,7 +572,7 @@ namespace OutputReportTabular {
         unitsStyle = 0;
         numStyles = 0;
         TabularOutputFile = Array1D<std::ofstream *>(maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream});
-        del = Array1D_string(maxNumStyles);
+        del = Array1D<std::string>(maxNumStyles);
         TableStyle = Array1D_int(maxNumStyles, 0);
         timeInYear = 0.0;
         displayTabularBEPS = false;
@@ -852,7 +852,7 @@ namespace OutputReportTabular {
         int NumParams;            // Number of elements combined
         int NumAlphas;            // Number of elements in the alpha array
         int NumNums;              // Number of elements in the numeric array
-        Array1D_string AlphArray; // character string data
+        Array1D<std::string> AlphArray; // character string data
         Array1D<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
@@ -1095,7 +1095,7 @@ namespace OutputReportTabular {
         OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units enum
         // CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: NamesOfKeys      ! Specific key name
         // INTEGER, DIMENSION(:) , ALLOCATABLE                     :: IndexesForKeyVar ! Array index
-        Array1D_string UniqueKeyNames;
+        Array1D<std::string> UniqueKeyNames;
         int UniqueKeyCount;
         int iKey;
         int jUnique;
@@ -1563,7 +1563,7 @@ namespace OutputReportTabular {
         int NumParams;            // Number of elements combined
         int NumAlphas;            // Number of elements in the alpha array
         int NumNums;              // Number of elements in the numeric array
-        Array1D_string AlphArray; // character string data
+        Array1D<std::string> AlphArray; // character string data
         Array1D<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
         int iTable;
@@ -1572,7 +1572,7 @@ namespace OutputReportTabular {
         int found;
         Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
-        Array1D_string objNames;
+        Array1D<std::string> objNames;
         Array1D_int objVarIDs;
 
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
@@ -1782,7 +1782,7 @@ namespace OutputReportTabular {
         int NumParams;            // Number of elements combined
         int NumAlphas;            // Number of elements in the alpha array
         int NumNums;              // Number of elements in the numeric array
-        Array1D_string AlphArray; // character string data
+        Array1D<std::string> AlphArray; // character string data
         Array1D<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
 
@@ -1971,7 +1971,7 @@ namespace OutputReportTabular {
         int NumParams;
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        Array1D_string AlphArray;
+        Array1D<std::string> AlphArray;
         Array1D<Real64> NumArray;
         int IOStat; // IO Status when calling get input subroutine
         int iReport;
@@ -2402,7 +2402,7 @@ namespace OutputReportTabular {
         int NumParams;
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        Array1D_string AlphArray;
+        Array1D<std::string> AlphArray;
         Array1D<Real64> NumArray;
         int IOStat; // IO Status when calling get input subroutine
         int iReport;
@@ -6850,11 +6850,11 @@ namespace OutputReportTabular {
         //   converted prior to calling WriteTable.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead(16);
+        Array1D<std::string> rowHead(16);
         Array2D_string tableBody;
-        Array1D_string aggString(13);
+        Array1D<std::string> aggString(13);
         std::string curAggString;
         int iInput;
         int jTable;
@@ -7240,14 +7240,14 @@ namespace OutputReportTabular {
         int kMonth;
         int nCol;
         // main table
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead(39);
+        Array1D<std::string> rowHead(39);
         Array2D_string tableBody;
         // stat table
-        Array1D_string columnHeadStat(1);
+        Array1D<std::string> columnHeadStat(1);
         Array1D_int columnWidthStat(1);
-        Array1D_string rowHeadStat(6);
+        Array1D<std::string> rowHeadStat(6);
         Array2D_string tableBodyStat(1, 6);
 
         Real64 curIntervalStart;
@@ -7522,9 +7522,9 @@ namespace OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // all arrays are in the format: (row, column)
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
 
         // all arrays are in the format: (row, columnm)
@@ -8502,7 +8502,7 @@ namespace OutputReportTabular {
                 WriteSubtitle("End Uses By Subcategory");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
 
-                Array1D_string rowHeadTemp(rowHead);
+                Array1D<std::string> rowHeadTemp(rowHead);
                 // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
                 // for better sql queries
                 FillRowHead(rowHeadTemp);
@@ -8513,7 +8513,7 @@ namespace OutputReportTabular {
 
                 // Erase the SubCategory (first column), using slicing
                 Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
-                Array1D_string columnHeadTemp(columnHead({2, _, _}));
+                Array1D<std::string> columnHeadTemp(columnHead({2, _, _}));
 
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
@@ -9100,9 +9100,9 @@ namespace OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // all arrays are in the format: (row, column)
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
 
         // all arrays are in the format: (row, columnm)
@@ -9416,9 +9416,9 @@ namespace OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // all arrays are in the format: (row, column)
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
 
         // all arrays are in the format: (row, columnm)
@@ -9855,7 +9855,7 @@ namespace OutputReportTabular {
             WriteSubtitle("End Uses By Subcategory");
             WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
 
-            Array1D_string rowHeadTemp(rowHead);
+            Array1D<std::string> rowHeadTemp(rowHead);
             // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
             // for better sql queries
             FillRowHead(rowHeadTemp);
@@ -9866,7 +9866,7 @@ namespace OutputReportTabular {
 
             // Erase the SubCategory (first column), using slicing
             Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
-            Array1D_string columnHeadTemp(columnHead({2, _, _}));
+            Array1D<std::string> columnHeadTemp(columnHead({2, _, _}));
 
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
@@ -9975,9 +9975,9 @@ namespace OutputReportTabular {
         Array2D<Real64> TableBodyData(3, 10);
         Real64 RefBldgConstCost;   // holds interim value for construction component costs: reference bldg.
         Real64 CurntBldgConstCost; // holds interim value for construction component costs: current bldg.
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
         int item;    // do-loop counter for line items
         int NumRows; // number of rows in report table excluding table header
@@ -10272,9 +10272,9 @@ namespace OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // all arrays are in the format: (row, column)
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
 
         int iSurf;
@@ -11084,9 +11084,9 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Array1D_string columnHead(5);
+        Array1D<std::string> columnHead(5);
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
         static int numPeopleAdaptive(0);
         int i;
@@ -11146,9 +11146,9 @@ namespace OutputReportTabular {
     void WriteHeatEmissionTable()
     {
 
-        Array1D_string columnHead(6);
+        Array1D<std::string> columnHead(6);
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
 
         if (displayHeatEmissionsSummary) {
@@ -11210,16 +11210,16 @@ namespace OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // all arrays are in the format: (row, column)
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
         Array1D_int rowToUnqObjName;
         Array1D_int colHeadToColTag;
         int curNumColumns;
         int curNumRows;
         int curColumn;
-        Array1D_string uniqueObjectName;
+        Array1D<std::string> uniqueObjectName;
         EPVector<bool> useUniqueObjectName;
         int numUnqObjName;
         std::string curObjectName;
@@ -11430,14 +11430,14 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // all arrays are in the format: (row, column)
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
         Array1D_int colUnitConv;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
-        Array1D_string uniqueDesc;
+        Array1D<std::string> uniqueDesc;
         int numUniqueDesc;
-        Array1D_string uniqueObj;
+        Array1D<std::string> uniqueObj;
         int numUniqueObj;
         std::string curDesc;
         std::string curObj;
@@ -11672,9 +11672,9 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // all arrays are in the format: (row, column)
-        Array1D_string columnHead(1);
+        Array1D<std::string> columnHead(1);
         Array1D_int columnWidth(1);
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
         // CHARACTER(len=MaxNameLength),ALLOCATABLE, DIMENSION(:)     :: unique
         Array1D_int unique;
@@ -11806,9 +11806,9 @@ namespace OutputReportTabular {
     {
 
         if (displayEioSummary) {
-            Array1D_string columnHead;
+            Array1D<std::string> columnHead;
             Array1D_int columnWidth;
-            Array1D_string rowHead;
+            Array1D<std::string> rowHead;
             Array2D_string tableBody; // in the format: (row, column)
             Array1D_int colUnitConv;
 
@@ -13903,9 +13903,9 @@ namespace OutputReportTabular {
     {
         CompLoadTablesType curCompLoad;
         bool writeOutput;
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody; //(row, column)
 
         std::string reportName;
@@ -14356,8 +14356,8 @@ namespace OutputReportTabular {
     }
 
     void WriteTable(Array2S_string const body, // row,column
-                    const Array1D_string &rowLabels,
-                    const Array1D_string &columnLabels,
+                    const Array1D<std::string> &rowLabels,
+                    const Array1D<std::string> &columnLabels,
                     Array1D_int &widthColumn,
                     Optional_bool_const transposeXML,
                     Optional_string_const footnoteText)
@@ -14398,10 +14398,10 @@ namespace OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array2D_string colLabelMulti;
         std::string workColumn;
-        Array1D_string rowLabelTags;
-        Array1D_string columnLabelTags;
-        Array1D_string rowUnitStrings;
-        Array1D_string columnUnitStrings;
+        Array1D<std::string> rowLabelTags;
+        Array1D<std::string> columnLabelTags;
+        Array1D<std::string> rowUnitStrings;
+        Array1D<std::string> columnUnitStrings;
         Array2D_string bodyEsc;
 
         int numColLabelRows;
@@ -15087,7 +15087,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void FillRowHead(Array1D_string &rowHead)
+    void FillRowHead(Array1D<std::string> &rowHead)
     {
         // Forward fill the blanks in rowHead (eg End use column)
         std::string currentEndUseName;

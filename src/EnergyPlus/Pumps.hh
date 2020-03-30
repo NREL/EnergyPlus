@@ -83,7 +83,7 @@ namespace Pumps {
     extern int const PumpBank_VarSpeed;
     extern std::string const cPumpBank_ConSpeed;
     extern int const PumpBank_ConSpeed;
-    extern Array1D_string const cPumpTypes;
+    extern Array1D<std::string> const cPumpTypes;
 
     enum powerSizingMethodEnum
     {

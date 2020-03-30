@@ -136,12 +136,12 @@ namespace DataPlant {
     extern int const Press_PumpPowerCorrection; // Only updating the pump power
     extern int const Press_FlowCorrection;      // Update pump flow rate based on pump curve
     extern int const Press_FlowSimulation;      // Full pressure network simulation
-    extern Array1D_string const PressureSimType;
+    extern Array1D<std::string> const PressureSimType;
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
     extern int const NumSimPlantEquipTypes;
-    extern Array1D_string const SimPlantEquipTypes;
+    extern Array1D<std::string> const SimPlantEquipTypes;
 
-    extern Array1D_string const ccSimPlantEquipTypes;
+    extern Array1D<std::string> const ccSimPlantEquipTypes;
 
     extern Array1D_int const ValidLoopEquipTypes;
 

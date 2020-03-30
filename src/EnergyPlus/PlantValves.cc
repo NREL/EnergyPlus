@@ -169,7 +169,7 @@ namespace PlantValves {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                        // Item to be "gotten"
-        Array1D_string Alphas(6);        // Alpha items for object
+        Array1D<std::string> Alphas(6);        // Alpha items for object
         Array1D<Real64> Numbers(1);      // Numeric items for object
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call

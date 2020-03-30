@@ -159,7 +159,7 @@ namespace SystemAvailabilityManager {
     int const HybridVentCtrl_Close(2);    // Close windows or doors
 
     int const NumValidSysAvailManagerTypes(12);
-    Array1D_string const cValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
+    Array1D<std::string> const cValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
                                                     {"AvailabilityManager:Scheduled",
                                                      "AvailabilityManager:ScheduledOn",
                                                      "AvailabilityManager:ScheduledOff",
@@ -513,11 +513,11 @@ namespace SystemAvailabilityManager {
         static std::string const RoutineName("GetSysAvailManagerInputs: "); // include trailing blank
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
+        Array1D<std::string> cAlphaFieldNames;
+        Array1D<std::string> cNumericFieldNames;
         EPVector<bool> lNumericFieldBlanks;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
+        Array1D<std::string> cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
@@ -1420,11 +1420,11 @@ namespace SystemAvailabilityManager {
         // it for later retrieval of items from the Plant and Air Loops.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
+        Array1D<std::string> cAlphaFieldNames;
+        Array1D<std::string> cNumericFieldNames;
         EPVector<bool> lNumericFieldBlanks;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
+        Array1D<std::string> cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int NumAlphas;

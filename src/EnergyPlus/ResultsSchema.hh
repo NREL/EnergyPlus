@@ -226,8 +226,8 @@ namespace ResultsFramework {
         std::vector<std::vector<std::string>> Data;
 
         Table(Array2D_string const &body,
-              Array1D_string const &rowLabels,
-              Array1D_string const &columnLabels,
+              Array1D<std::string> const &rowLabels,
+              Array1D<std::string> const &columnLabels,
               std::string const &tableName,
               std::string const &footnoteText);
 
@@ -252,15 +252,15 @@ namespace ResultsFramework {
         ReportsCollection();
 
         void addReportTable(Array2D_string const &body,
-                            Array1D_string const &rowLabels,
-                            Array1D_string const &columnLabels,
+                            Array1D<std::string> const &rowLabels,
+                            Array1D<std::string> const &columnLabels,
                             std::string const &reportName,
                             std::string const &reportForString,
                             std::string const &tableName);
 
         void addReportTable(Array2D_string const &body,
-                            Array1D_string const &rowLabels,
-                            Array1D_string const &columnLabels,
+                            Array1D<std::string> const &rowLabels,
+                            Array1D<std::string> const &columnLabels,
                             std::string const &reportName,
                             std::string const &reportForString,
                             std::string const &tableName,

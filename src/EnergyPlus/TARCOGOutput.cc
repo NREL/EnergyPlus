@@ -230,7 +230,7 @@ namespace TARCOGOutput {
 
         // Locals
         Array1D_int DATE_TIME(8);
-        Array1D_string real_CLOCK(3);
+        Array1D<std::string> real_CLOCK(3);
 
         int i;
         int j;
@@ -745,7 +745,7 @@ namespace TARCOGOutput {
 
         // Locals
         Array1D_int DATE_TIME(8);
-        Array1D_string real_CLOCK(3);
+        Array1D<std::string> real_CLOCK(3);
 
         int i;
 
@@ -1011,7 +1011,7 @@ namespace TARCOGOutput {
         // character(len=*), intent (inout) :: ErrorMessage
 
         Array1D_int DATE_TIME(8);
-        Array1D_string real_CLOCK(3);
+        Array1D<std::string> real_CLOCK(3);
 
         int i;
 
@@ -1176,7 +1176,7 @@ namespace TARCOGOutput {
         int NumOfProvGasses;
 
         Array1D_int DATE_TIME(8);
-        Array1D_string real_CLOCK(3);
+        Array1D<std::string> real_CLOCK(3);
 
         static std::string dynFormat;
 

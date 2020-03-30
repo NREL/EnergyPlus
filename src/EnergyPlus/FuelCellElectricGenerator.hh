@@ -158,7 +158,7 @@ namespace FuelCellElectricGenerator {
         int IntakeRecoveryMode;
         int ConstituentMode; // how are air data input
         int NumConstituents;
-        Array1D_string ConstitName;
+        Array1D<std::string> ConstitName;
         Array1D<Real64> ConstitMolalFract;
         // Calculated values and input from elsewhere
         Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array

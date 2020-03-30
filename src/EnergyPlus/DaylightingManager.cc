@@ -10058,7 +10058,7 @@ namespace DaylightingManager {
 
         static EPVector<bool> FirstTimeMaps;
         static EPVector<bool> EnvrnPrint;
-        static Array1D_string SavedMnDy;
+        static Array1D<std::string> SavedMnDy;
         static Array2D_string RefPts;
         std::string MapNoString;
         std::string HrString;
@@ -11042,7 +11042,7 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_string cAlphas(1);
+        static Array1D<std::string> cAlphas(1);
         static Array1D<Real64> rNumerics;
         int NAlphas;
         int NNum;

@@ -167,7 +167,7 @@ namespace FaultsManager {
     //  Pressure sensor offset
     //  more
 
-    Array1D_string const cFaults(NumFaultTypes,
+    Array1D<std::string> const cFaults(NumFaultTypes,
                                  {"FaultModel:TemperatureSensorOffset:OutdoorAir",
                                   "FaultModel:HumiditySensorOffset:OutdoorAir",
                                   "FaultModel:EnthalpySensorOffset:OutdoorAir",
@@ -296,11 +296,11 @@ namespace FaultsManager {
         int NumAlphas;  // Number of Alphas for each GetobjectItem call
         int NumNumbers; // Number of Numbers for each GetobjectItem call
         int IOStatus;
-        Array1D_string cAlphaArgs(10); // Alpha input items for object
+        Array1D<std::string> cAlphaArgs(10); // Alpha input items for object
         EPVector<bool> lAlphaFieldBlanks(10, false);
         EPVector<bool> lNumericFieldBlanks(10, false);
-        Array1D_string cAlphaFieldNames(10);
-        Array1D_string cNumericFieldNames(10);
+        Array1D<std::string> cAlphaFieldNames(10);
+        Array1D<std::string> cNumericFieldNames(10);
         Array1D<Real64> rNumericArgs(10); // Numeric input items for object
         std::string cFaultCurrentObject;
 

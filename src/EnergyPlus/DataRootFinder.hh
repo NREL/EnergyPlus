@@ -105,7 +105,7 @@ namespace DataRootFinder {
     extern int const iMethodSecant;        // Step performed using secant method
     extern int const iMethodBrent;         // Step performed using Brent's method
     // Names for each solution method type
-    extern Array1D_string const SolutionMethodTypes;
+    extern Array1D<std::string> const SolutionMethodTypes;
 
     // DERIVED TYPE DEFINITIONS
     // Type declaration for the numerical controls.

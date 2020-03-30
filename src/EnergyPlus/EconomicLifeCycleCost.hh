@@ -168,7 +168,7 @@ namespace EconomicLifeCycleCost {
     extern Array1D<Real64> AfterTaxCashFlow;
     extern Array1D<Real64> AfterTaxPresentValue;
 
-    extern Array1D_string const MonthNames;
+    extern Array1D<std::string> const MonthNames;
 
     // arrays related to escalated energy costs
     extern Array1D<Real64> EscalatedTotEnergy; 

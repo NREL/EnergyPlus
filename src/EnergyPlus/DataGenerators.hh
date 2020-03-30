@@ -147,7 +147,7 @@ namespace DataGenerators {
         int CompPowerCurveID; // "pointer" to compressor power cubic curve
         Real64 CompPowerLossFactor;
         int NumConstituents; // number of constituents in fue supply
-        Array1D_string ConstitName;
+        Array1D<std::string> ConstitName;
         Array1D<Real64> ConstitMolalFract;
         // calculated data (except some for generic liquid)
         Array1D_int GasLibID;        // lookup ID in Gas Phase ThermoChemistry Structure Array

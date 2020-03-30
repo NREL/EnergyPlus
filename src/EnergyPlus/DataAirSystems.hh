@@ -166,7 +166,7 @@ namespace DataAirSystems {
         int TotalOutletNodes;       // Number of outlet nodes for the splitter
         Array1D_int NodeNumOut;     // Node numbers for the outlets to the splitter
         Array1D_int BranchNumOut;   // Reference numbers for branches connected to splitter outlet
-        Array1D_string NodeNameOut; // Node names for the outlets to the splitter
+        Array1D<std::string> NodeNameOut; // Node names for the outlets to the splitter
 
         // Default Constructor
         AirLoopSplitterData() : Exists(false), NodeNumIn(0), BranchNumIn(0), TotalOutletNodes(0)
@@ -185,7 +185,7 @@ namespace DataAirSystems {
         int TotalInletNodes;       // Number of inlet nodes for the mixer
         Array1D_int NodeNumIn;     // Node numbers for the inlets to the mixer
         Array1D_int BranchNumIn;   // Reference numbers for branches connected to mixer inlet
-        Array1D_string NodeNameIn; // Node names for the inlets to the mixer
+        Array1D<std::string> NodeNameIn; // Node names for the inlets to the mixer
 
         // Default Constructor
         AirLoopMixerData() : Exists(false), NodeNumOut(0), BranchNumOut(0), TotalInletNodes(0)
@@ -213,8 +213,8 @@ namespace DataAirSystems {
         Real64 DesignVolFlowRate;        // the design total supply air flow rate (m3/s)
         Real64 DesignReturnFlowFraction; // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
         int NumControllers;              // number of controllers on this air path
-        Array1D_string ControllerName;   // name of each controller on this system
-        Array1D_string ControllerType;   // type of each controller on this system
+        Array1D<std::string> ControllerName;   // name of each controller on this system
+        Array1D<std::string> ControllerType;   // type of each controller on this system
         Array1D_int ControllerIndex;
         EPVector<bool> CanBeLockedOutByEcono; // true if controller inactive
         // when the economizer is active

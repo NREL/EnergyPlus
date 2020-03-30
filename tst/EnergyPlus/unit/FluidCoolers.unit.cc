@@ -69,11 +69,11 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test1)
 
     using DataSizing::AutoSize;
     int StringArraySize = 20;
-    Array1D_string cNumericFieldNames;
+    Array1D<std::string> cNumericFieldNames;
     cNumericFieldNames.allocate(StringArraySize);
-    Array1D_string cAlphaFieldNames;
+    Array1D<std::string> cAlphaFieldNames;
     cAlphaFieldNames.allocate(StringArraySize);
-    Array1D_string AlphArray;
+    Array1D<std::string> AlphArray;
     AlphArray.allocate(StringArraySize);
     for (int i = 1; i <= StringArraySize; ++i) {
         cAlphaFieldNames(i) = "AlphaField";
@@ -135,11 +135,11 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test2)
 
     using DataSizing::AutoSize;
     int StringArraySize = 20;
-    Array1D_string cNumericFieldNames;
+    Array1D<std::string> cNumericFieldNames;
     cNumericFieldNames.allocate(StringArraySize);
-    Array1D_string cAlphaFieldNames;
+    Array1D<std::string> cAlphaFieldNames;
     cAlphaFieldNames.allocate(StringArraySize);
-    Array1D_string AlphArray;
+    Array1D<std::string> AlphArray;
     AlphArray.allocate(StringArraySize);
     for (int i = 1; i <= StringArraySize; ++i) {
         cAlphaFieldNames(i) = "AlphaField";
@@ -193,11 +193,11 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test3)
 {
     using DataSizing::AutoSize;
     int StringArraySize = 20;
-    Array1D_string cNumericFieldNames;
+    Array1D<std::string> cNumericFieldNames;
     cNumericFieldNames.allocate(StringArraySize);
-    Array1D_string cAlphaFieldNames;
+    Array1D<std::string> cAlphaFieldNames;
     cAlphaFieldNames.allocate(StringArraySize);
-    Array1D_string AlphArray;
+    Array1D<std::string> AlphArray;
     AlphArray.allocate(StringArraySize);
     for (int i = 1; i <= StringArraySize; ++i) {
         cAlphaFieldNames(i) = "AlphaField";
@@ -279,11 +279,11 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test5)
 {
     using DataSizing::AutoSize;
     int StringArraySize = 20;
-    Array1D_string cNumericFieldNames;
+    Array1D<std::string> cNumericFieldNames;
     cNumericFieldNames.allocate(StringArraySize);
-    Array1D_string cAlphaFieldNames;
+    Array1D<std::string> cAlphaFieldNames;
     cAlphaFieldNames.allocate(StringArraySize);
-    Array1D_string AlphArray;
+    Array1D<std::string> AlphArray;
     AlphArray.allocate(StringArraySize);
     for (int i = 1; i <= StringArraySize; ++i) {
         cAlphaFieldNames(i) = "AlphaField";

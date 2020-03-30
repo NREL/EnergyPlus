@@ -179,7 +179,7 @@ namespace SetPointManager {
     int const iCtrlVarType_MinMassFlow(9); // control Type 'MinimumMassFlowRate'
 
     int const NumValidCtrlTypes(9);
-    Array1D_string const cValidCtrlTypes(NumValidCtrlTypes,
+    Array1D<std::string> const cValidCtrlTypes(NumValidCtrlTypes,
                                          {"Temperature",
                                           "MaximumTemperature",
                                           "MinimumTemperature",
@@ -223,7 +223,7 @@ namespace SetPointManager {
     int const iSPMType_TESScheduled(30);
 
     int const NumValidSPMTypes(30);
-    Array1D_string const cValidSPMTypes(NumValidSPMTypes,
+    Array1D<std::string> const cValidSPMTypes(NumValidSPMTypes,
                                         {"SetpointManager:Scheduled",
                                          "SetpointManager:Scheduled:DualSetpoint",
                                          "SetpointManager:OutdoorAirReset",
@@ -580,11 +580,11 @@ namespace SetPointManager {
         static std::string const RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
+        Array1D<std::string> cAlphaFieldNames;
+        Array1D<std::string> cNumericFieldNames;
         EPVector<bool> lNumericFieldBlanks;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
+        Array1D<std::string> cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         static int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
@@ -7797,9 +7797,9 @@ namespace SetPointManager {
         Array1D<OutputProcessor::TimeStepType> IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar;        // units from enum for each variable
         Array1D_int ResourceTypes;                         // ResourceTypes for each variable
-        Array1D_string EndUses;                            // EndUses for each variable
-        Array1D_string Groups;                             // Groups for each variable
-        Array1D_string Names;                              // Variable Names for each variable
+        Array1D<std::string> EndUses;                            // EndUses for each variable
+        Array1D<std::string> Groups;                             // Groups for each variable
+        Array1D<std::string> Names;                              // Variable Names for each variable
         int NumVariables;
         int NumFound;
 

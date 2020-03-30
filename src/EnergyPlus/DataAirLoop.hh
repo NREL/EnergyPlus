@@ -134,7 +134,7 @@ namespace DataAirLoop {
         int StartTime;                   // cycle on time (in SimTimeSteps)
         int StopTime;                    // cycle off time (in SimTimeSteps)
         Real64 ReqSupplyFrac;            // required system flow rate (as a fraction)
-        Array1D_string AvailManagerName; // name of each availability manager
+        Array1D<std::string> AvailManagerName; // name of each availability manager
         Array1D_int AvailManagerType;    // type of availability manager
         Array1D_int AvailManagerNum;     // index for availability manager
 
@@ -256,14 +256,14 @@ namespace DataAirLoop {
         int NumSimpleControllers;     // number of CONTROLLER:SIMPLE objects in OA Sys controller list
         std::string OAControllerName; // OA controller name
         int OAControllerIndex;        // OA controller index in OAController
-        Array1D_string ComponentName;
-        Array1D_string ComponentType;
+        Array1D<std::string> ComponentName;
+        Array1D<std::string> ComponentType;
         Array1D_int ComponentType_Num; // Parameterized (see above) Component Types this
         // module can address
         Array1D_int ComponentIndex; // Which one in list -- updated by routines called from here
         std::vector<HVACSystemData *> compPointer;
-        Array1D_string ControllerName;
-        Array1D_string ControllerType;
+        Array1D<std::string> ControllerName;
+        Array1D<std::string> ControllerType;
         Array1D_int ControllerIndex; // Which one in list -- updated by routines called from here
         Array1D_int InletNodeNum;    // component inelt node number
         Array1D_int OutletNodeNum;   // component outelt node number

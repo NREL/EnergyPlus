@@ -135,7 +135,7 @@ namespace LowTempRadiantSystem {
         std::string SurfListName;        // Name of surface/surface list that is the radiant system
         int NumOfSurfaces;               // Number of surfaces included in this radiant system (coordinated control)
         Array1D_int SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
-        Array1D_string SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
+        Array1D<std::string> SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
         Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
         Real64 TotalSurfaceArea;         // Total surface area for all surfaces that are part of this radiant system
@@ -223,7 +223,7 @@ namespace LowTempRadiantSystem {
         std::string SurfListName;        // Name of surface/surface list that is the radiant system
         int NumOfSurfaces;               // Number of surfaces included in this radiant system (coordinated control)
         Array1D_int SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
-        Array1D_string SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
+        Array1D<std::string> SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
         Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
         Real64 TotalSurfaceArea;         // Total surface area for all surfaces that are part of this radiant system
@@ -340,7 +340,7 @@ namespace LowTempRadiantSystem {
         std::string SurfListName;         // Name of surface/surface list that is the radiant system
         int NumOfSurfaces;                // Number of surfaces included in this radiant system (coordinated control)
         Array1D_int SurfacePtr;           // Pointer to the surface(s) in the Surface derived type
-        Array1D_string SurfaceName;       // Name of surfaces that are the radiant system (can be one or more)
+        Array1D<std::string> SurfaceName;       // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfacePowerFrac; // Fraction of total power input to surface
         Real64 TotalSurfaceArea;          // Total surface area for all surfaces that are part of this radiant system
         Real64 MaxElecPower;              // Maximum electric power that can be supplied to surface, Watts
@@ -384,7 +384,7 @@ namespace LowTempRadiantSystem {
     struct ElecRadSysNumericFieldData
     {
         // Members
-        Array1D_string FieldNames;
+        Array1D<std::string> FieldNames;
 
         // Default Constructor
         ElecRadSysNumericFieldData()
@@ -395,7 +395,7 @@ namespace LowTempRadiantSystem {
     struct HydronicRadiantSysNumericFieldData
     {
         // Members
-        Array1D_string FieldNames;
+        Array1D<std::string> FieldNames;
 
         // Default Constructor
         HydronicRadiantSysNumericFieldData()

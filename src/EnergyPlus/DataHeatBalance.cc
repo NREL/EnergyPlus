@@ -137,7 +137,7 @@ namespace DataHeatBalance {
     int const ScreenEquivalentLayer(17);
     int const GapEquivalentLayer(18);
 
-    Array1D_string const cMaterialGroupType({-1, 18},
+    Array1D<std::string> const cMaterialGroupType({-1, 18},
                                             {"invalid",
                                              "Material/Material:NoMass",
                                              "Material:AirGap",
@@ -265,7 +265,7 @@ namespace DataHeatBalance {
     int const AllZones(2);
 
     int const NumZoneIntGainDeviceTypes(53);
-    Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
+    Array1D<std::string> const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                 {"PEOPLE",
                                                  "LIGHTS",
                                                  "ELECTRICEQUIPMENT",
@@ -323,7 +323,7 @@ namespace DataHeatBalance {
                                                                       // 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47
                                                                       // | 48 | 49 | 50 | 51 | 52 | 53
 
-    Array1D_string const ccZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
+    Array1D<std::string> const ccZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                   {"People",
                                                    "Lights",
                                                    "ElectricEquipment",

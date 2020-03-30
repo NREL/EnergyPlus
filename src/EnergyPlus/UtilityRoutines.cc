@@ -246,7 +246,7 @@ namespace UtilityRoutines {
         return Probe;
     }
 
-    int FindItem(std::string const &String, Array1D_string const &ListOfItems, int const NumItems)
+    int FindItem(std::string const &String, Array1D<std::string> const &ListOfItems, int const NumItems)
     {
 
         // FUNCTION INFORMATION:
@@ -327,7 +327,7 @@ namespace UtilityRoutines {
     }
 
     void VerifyName(std::string const &NameToVerify,
-                    Array1D_string const &NamesList,
+                    Array1D<std::string> const &NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
                     bool &IsBlank,

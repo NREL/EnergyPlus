@@ -88,7 +88,7 @@ namespace HVACControllers {
     extern int const CoilType_Cooling;
     extern int const CoilType_Heating;
 
-    extern Array1D_string const ControlVariableTypes;
+    extern Array1D<std::string> const ControlVariableTypes;
 
     // DERIVED TYPE DEFINITIONS
 

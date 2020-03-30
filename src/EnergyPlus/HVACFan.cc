@@ -378,11 +378,11 @@ namespace HVACFan {
         int IOStat;       // IO Status when calling get input subroutine
         bool errorsFound = false;
         std::string locCurrentModuleObject = "Fan:SystemModel";
-        Array1D_string alphaArgs;
-        Array1D_string alphaFieldNames;
+        Array1D<std::string> alphaArgs;
+        Array1D<std::string> alphaFieldNames;
         EPVector<bool> isAlphaFieldBlank;
         Array1D<Real64> numericArgs;
-        Array1D_string numericFieldNames;
+        Array1D<std::string> numericFieldNames;
         EPVector<bool> isNumericFieldBlank;
         int objectNum = inputProcessor->getObjectItemNum(locCurrentModuleObject, objectName);
         inputProcessor->getObjectDefMaxArgs(locCurrentModuleObject, numTotFields, numAlphas, numNums);

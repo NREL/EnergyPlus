@@ -2467,12 +2467,12 @@ namespace SystemReports {
         int PlantLoopNum;
 
         // Dimension GetChildrenData arrays
-        Array1D_string SubCompTypes;
-        Array1D_string SubCompNames;
-        Array1D_string InletNodeNames;
+        Array1D<std::string> SubCompTypes;
+        Array1D<std::string> SubCompNames;
+        Array1D<std::string> InletNodeNames;
         Array1D_int InletNodeNumbers;
         Array1D_int InletFluidStreams;
-        Array1D_string OutletNodeNames;
+        Array1D<std::string> OutletNodeNames;
         Array1D_int OutletNodeNumbers;
         Array1D_int OutletFluidStreams;
         int NumChildren;
@@ -2482,13 +2482,13 @@ namespace SystemReports {
         // Dimension GetMeteredVariables arrays
         Array1D_int VarIndexes;                            // Variable Numbers
         Array1D_int VarTypes;                              // Variable Types (1=integer, 2=real, 3=meter)
-        Array1D_string UnitsStrings;                       // UnitsStrings for each variable
+        Array1D<std::string> UnitsStrings;                       // UnitsStrings for each variable
         Array1D<OutputProcessor::TimeStepType> IndexTypes; // Variable Idx Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar;        // units from enum for each variable
         Array1D_int ResourceTypes;                         // ResourceTypes for each variable
-        Array1D_string EndUses;                            // EndUses for each variable
-        Array1D_string Groups;                             // Groups for each variable
-        Array1D_string Names;                              // Variable Names for each variable
+        Array1D<std::string> EndUses;                            // EndUses for each variable
+        Array1D<std::string> Groups;                             // Groups for each variable
+        Array1D<std::string> Names;                              // Variable Names for each variable
         int NumFound;                                      // Number Found
         int NumVariables;
         int NumLeft; // Counter for deeper components

@@ -148,7 +148,7 @@ namespace WindowAC {
     // MODULE PARAMETER DEFINITIONS
     int const WindowAC_UnitType(1);
     std::string const cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner");
-    Array1D_string const cWindowAC_UnitTypes(1, cWindowAC_UnitType);
+    Array1D<std::string> const cWindowAC_UnitTypes(1, cWindowAC_UnitType);
 
     // Compressor operation
     int const On(1);  // normal compressor operation
@@ -363,9 +363,9 @@ namespace WindowAC {
         Real64 FanVolFlow;               // Fan volumetric flow rate
         bool CoilNodeErrFlag;            // Used in error messages for mining coil outlet node number
         std::string CurrentModuleObject; // Object type for getting and error messages
-        Array1D_string Alphas;           // Alpha input items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> Alphas;           // Alpha input items for object
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.

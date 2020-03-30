@@ -181,7 +181,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
     // Note - order in routine must match order below
     //  Plus -- order in ListOfComponents array must be in sorted order.
     int const NumComponents(11);
-    static Array1D_string const ListOfComponents(NumComponents,
+    static Array1D<std::string> const ListOfComponents(NumComponents,
                                                  {"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",
                                                   "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
                                                   "COIL:HEATING:WATER",
@@ -1559,7 +1559,7 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
     std::string PrimaryAirLoopName; // Air Loop to which this supply air path is connected
     EPVector<bool> FoundSupplyPlenum;
     EPVector<bool> FoundZoneSplitter;
-    Array1D_string FoundNames;
+    Array1D<std::string> FoundNames;
     int NumErr(0); // Error Counter //Autodesk:Init Initialization added
     int BCount;
     int Found;
@@ -1852,7 +1852,7 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
     std::string PrimaryAirLoopName; // Air Loop to which this return air path is connected
     EPVector<bool> FoundReturnPlenum;
     EPVector<bool> FoundZoneMixer;
-    Array1D_string FoundNames;
+    Array1D<std::string> FoundNames;
     int NumErr; // Error Counter
     int BCount;
     int Found;

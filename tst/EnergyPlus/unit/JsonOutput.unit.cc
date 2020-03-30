@@ -316,11 +316,11 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
 TEST_F(EnergyPlusFixture, JsonOutput_TableInfo)
 {
 
-    Array1D_string rowLabels(2);
+    Array1D<std::string> rowLabels(2);
     rowLabels(1) = "ZONE1DIRECTAIR";
     rowLabels(2) = "ZONE2DIRECTAIR";
 
-    Array1D_string columnLabels(1);
+    Array1D<std::string> columnLabels(1);
     columnLabels(1) = "User-Specified Maximum Air Flow Rate [m3/s]";
 
     Array2D_string tableBody;
@@ -356,11 +356,11 @@ TEST_F(EnergyPlusFixture, JsonOutput_TableInfo)
 TEST_F(EnergyPlusFixture, JsonOutput_ReportInfo)
 {
 
-    Array1D_string rowLabels(2);
+    Array1D<std::string> rowLabels(2);
     rowLabels(1) = "ZONE1DIRECTAIR";
     rowLabels(2) = "ZONE2DIRECTAIR";
 
-    Array1D_string columnLabels(1);
+    Array1D<std::string> columnLabels(1);
     columnLabels(1) = "User-Specified Maximum Air Flow Rate [m3/s]";
 
     Array2D_string tableBody;

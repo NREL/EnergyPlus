@@ -92,7 +92,7 @@ namespace SolarShading {
     extern int const PartialOverlap;
     extern int const TooManyVertices;
     extern int const TooManyFigures;
-    extern Array1D_string const cOverLapStatus;
+    extern Array1D<std::string> const cOverLapStatus;
 
     // DERIVED TYPE DEFINITIONS:
     // INTERFACE BLOCK SPECIFICATIONS:

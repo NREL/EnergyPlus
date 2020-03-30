@@ -94,7 +94,7 @@ namespace SteamBaseboardRadiator {
         std::string EquipID;
         int EquipType;
         std::string Schedule;
-        Array1D_string SurfaceName;
+        Array1D<std::string> SurfaceName;
         Array1D_int SurfacePtr;
         int ZonePtr;
         int SchedPtr;         // Pointer to the correct schedule
@@ -157,7 +157,7 @@ namespace SteamBaseboardRadiator {
     struct SteamBaseboardNumericFieldData
     {
         // Members
-        Array1D_string FieldNames;
+        Array1D<std::string> FieldNames;
 
         // Default Constructor
         SteamBaseboardNumericFieldData()

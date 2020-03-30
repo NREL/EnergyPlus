@@ -112,8 +112,8 @@ namespace EconomicTariff {
     int const conversionGAL(9);
     int const conversionKGAL(10); // thousand gallons
 
-    Array1D_string const convEneStrings({0, 10}, {"", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF", "m3", "gal", "kgal"});
-    Array1D_string const convDemStrings({0, 10}, {"", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF", "m3", "gal", "kgal"});
+    Array1D<std::string> const convEneStrings({0, 10}, {"", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF", "m3", "gal", "kgal"});
+    Array1D<std::string> const convDemStrings({0, 10}, {"", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF", "m3", "gal", "kgal"});
 
     int const demandWindowQuarter(1);
     int const demandWindowHalf(2);
@@ -121,7 +121,7 @@ namespace EconomicTariff {
     int const demandWindowDay(4);
     int const demandWindowWeek(5);
 
-    Array1D_string const demWindowStrings({0, 5}, {"", "/Hr", "/Hr", "/Hr", "/Day", "/Wk"});
+    Array1D<std::string> const demWindowStrings({0, 5}, {"", "/Hr", "/Hr", "/Hr", "/Day", "/Wk"});
 
     int const buyFromUtility(1);
     int const sellToUtility(2);
@@ -404,7 +404,7 @@ namespace EconomicTariff {
         OutputProcessor::StoreType AvgSumVar;
         OutputProcessor::TimeStepType StepTypeVar;
         OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units sting, may be blank
-        Array1D_string NamesOfKeys;                                  // Specific key name
+        Array1D<std::string> NamesOfKeys;                                  // Specific key name
         Array1D_int IndexesForKeyVar;                                // Array index
         int jFld;
         std::string CurrentModuleObject; // for ease in renaming.
@@ -4200,9 +4200,9 @@ namespace EconomicTariff {
         using OutputReportTabular::WriteTextLine;
 
         // all arrays are in the format: (row, column)
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
         // other local variables
         int elecFacilMeter;
@@ -4688,9 +4688,9 @@ namespace EconomicTariff {
         using OutputReportTabular::WriteTable;
 
         // all arrays are in the format: (row, column)
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
         Real64 sumVal;
         Real64 maximumVal;

@@ -148,13 +148,13 @@ namespace DataWater {
         int NumWaterSupplies;
         Array1D<Real64> VdotAvailSupply; // Each supply component has its own term
         Array1D<Real64> TwaterSupply;    // Each supply component has its own term
-        Array1D_string SupplyCompNames;
-        Array1D_string SupplyCompTypes;
+        Array1D<std::string> SupplyCompNames;
+        Array1D<std::string> SupplyCompTypes;
         int NumWaterDemands;
         Array1D<Real64> VdotRequestDemand; // each demand componennt has a slot
         Array1D<Real64> VdotAvailDemand;   // each demand componennt has a slot
-        Array1D_string DemandCompNames;
-        Array1D_string DemandCompTypes;
+        Array1D<std::string> DemandCompNames;
+        Array1D<std::string> DemandCompTypes;
         Real64 VdotFromTank;
         Real64 VdotToTank;
         Real64 VdotOverflow;
@@ -197,7 +197,7 @@ namespace DataWater {
         int LossFactorSchedID; // index "pointer" to schedule
         Real64 MaxCollectRate;
         int NumCollectSurfs; // number of surfaces used in the collector
-        Array1D_string SurfName;
+        Array1D<std::string> SurfName;
         Array1D_int SurfID;
         // calculated and from elsewhere
         Real64 HorizArea; // area of surfaces in the vertical normal direction

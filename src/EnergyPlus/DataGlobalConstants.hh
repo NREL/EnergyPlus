@@ -225,7 +225,7 @@ namespace DataGlobalConstants {
     extern int const iRT_OtherFuel2;
     extern int const NumOfResourceTypes;
     extern int const ResourceTypeInitialOffset; // to reach "ValidTypes"
-    extern Array1D_string const cRT_ValidTypes;
+    extern Array1D<std::string> const cRT_ValidTypes;
 
     extern int const iGeneratorICEngine;
     extern int const iGeneratorCombTurbine;

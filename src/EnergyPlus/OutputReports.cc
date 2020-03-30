@@ -1778,7 +1778,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static Array1D_string const ConvCoeffCalcs(
+    static Array1D<std::string> const ConvCoeffCalcs(
         {1, 9}, {"ASHRAESimple", "ASHRAETARP", "CeilingDiffuser", "TrombeWall", "TARP", "MoWitt", "DOE-2", "BLAST", "AdaptiveConvectionAlgorithm"});
 
     // INTERFACE BLOCK SPECIFICATIONS
@@ -2360,7 +2360,7 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static Array1D_string const colorstring(7, {"WALL", "WINDOW", "FIXEDSHADE", "SUBSHADE", "ROOF", "FLOOR", "BLDGSHADE"});
+    static Array1D<std::string> const colorstring(7, {"WALL", "WINDOW", "FIXEDSHADE", "SUBSHADE", "ROOF", "FLOOR", "BLDGSHADE"});
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na

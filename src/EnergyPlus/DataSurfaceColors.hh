@@ -82,7 +82,7 @@ namespace DataSurfaceColors {
                                              // | detached building fixed | attached building shading | PV | TDD:Dome | TDD:Diffuser | Daylight Sensor
                                              // 1 | Daylight Sensor 2
 
-    extern Array1D_string const colorkeys;
+    extern Array1D<std::string> const colorkeys;
 
     extern Array1D_int const colorkeyptr;
 

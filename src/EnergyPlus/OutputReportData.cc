@@ -83,7 +83,7 @@ int AnnualFieldSet::getVariableKeyCountandTypeFromFldSt(int &typeVar,
 void AnnualFieldSet::getVariableKeysFromFldSt(int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar)
 {
     // this hides the Objexx arrays and returns regular vectors
-    Array1D_string tempNamesOfKeys;
+    Array1D<std::string> tempNamesOfKeys;
     Array1D_int tempIndexesForKeyVar;
     tempNamesOfKeys.allocate(keyCount);
     tempIndexesForKeyVar.allocate(keyCount);

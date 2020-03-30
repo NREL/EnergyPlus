@@ -600,11 +600,11 @@ namespace EMSManager {
         //  REAL(r64), DIMENSION(1)          :: NumArray  ! Numeric data
         static bool ErrorsFound(false);
         //  CHARACTER(len=MaxNameLength)   :: objNameMsg = ' '
-        Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
+        Array1D<std::string> cAlphaFieldNames;
+        Array1D<std::string> cNumericFieldNames;
         EPVector<bool> lNumericFieldBlanks;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
+        Array1D<std::string> cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int VarType;
@@ -1323,7 +1323,7 @@ namespace EMSManager {
         OutputProcessor::StoreType AvgOrSum;
         OutputProcessor::TimeStepType StepType;
         OutputProcessor::Unit Units(OutputProcessor::Unit::None);
-        Array1D_string KeyName;
+        Array1D<std::string> KeyName;
         Array1D_int KeyIndex;
         bool Found;
 

@@ -985,11 +985,11 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
 
 TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteTabularDataRecords)
 {
-    Array1D_string const rowLabels({"Heating", "Cooling"});
-    Array1D_string const columnLabels({"Electricity [GJ]", "Natural Gas [GJ]"});
+    Array1D<std::string> const rowLabels({"Heating", "Cooling"});
+    Array1D<std::string> const columnLabels({"Electricity [GJ]", "Natural Gas [GJ]"});
     Array2D_string const body(2, 2, {"216.38", "869.08", "1822.42", "0.00"});
-    Array1D_string const rowLabels2({"Heating [kWh]"});
-    Array1D_string const columnLabels2({"Electricity", "Natural Gas"});
+    Array1D<std::string> const rowLabels2({"Heating [kWh]"});
+    Array1D<std::string> const columnLabels2({"Electricity", "Natural Gas"});
     Array2D_string const body2(1, 2, {"815.19", "256.72"});
 
     EnergyPlus::sqlite->sqliteBegin();

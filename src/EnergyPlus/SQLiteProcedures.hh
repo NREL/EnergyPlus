@@ -236,8 +236,8 @@ public:
                                  Array2<Real64> const &illuminance);
 
     void createSQLiteTabularDataRecords(Array2D_string const &body, // row,column
-                                        Array1D_string const &rowLabels,
-                                        Array1D_string const &columnLabels,
+                                        Array1D<std::string> const &rowLabels,
+                                        Array1D<std::string> const &columnLabels,
                                         std::string const &ReportName,
                                         std::string const &ReportForString,
                                         std::string const &TableName);

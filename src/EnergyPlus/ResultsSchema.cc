@@ -550,8 +550,8 @@ namespace ResultsFramework {
     // class Table
 
     Table::Table(Array2D_string const &body,
-                 Array1D_string const &rowLabels,
-                 Array1D_string const &columnLabels,
+                 Array1D<std::string> const &rowLabels,
+                 Array1D<std::string> const &columnLabels,
                  std::string const &tableName,
                  std::string const &footnoteText)
     {
@@ -623,8 +623,8 @@ namespace ResultsFramework {
     }
 
     void ReportsCollection::addReportTable(Array2D_string const &body,
-                                           Array1D_string const &rowLabels,
-                                           Array1D_string const &columnLabels,
+                                           Array1D<std::string> const &rowLabels,
+                                           Array1D<std::string> const &columnLabels,
                                            std::string const &reportName,
                                            std::string const &reportForString,
                                            std::string const &tableName)
@@ -633,8 +633,8 @@ namespace ResultsFramework {
     }
 
     void ReportsCollection::addReportTable(Array2D_string const &body,
-                                           Array1D_string const &rowLabels,
-                                           Array1D_string const &columnLabels,
+                                           Array1D<std::string> const &rowLabels,
+                                           Array1D<std::string> const &columnLabels,
                                            std::string const &reportName,
                                            std::string const &reportForString,
                                            std::string const &tableName,
@@ -678,7 +678,7 @@ namespace ResultsFramework {
             return;
         }
 
-        Array1D_string alphas(5);
+        Array1D<std::string> alphas(5);
         int numAlphas;
         Array1D<Real64> numbers(2);
         int numNumbers;

@@ -164,7 +164,7 @@ namespace OutdoorAirUnit {
     int const CoolingMode(2); // normal cooling coil operation
     int const NeutralMode(3); // signal coil shouldn't run
 
-    Array1D_string const CurrentModuleObjects(2, {"ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:OutdoorAirUnit:EquipmentList"});
+    Array1D<std::string> const CurrentModuleObjects(2, {"ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:OutdoorAirUnit:EquipmentList"});
 
     static std::string const fluidNameSteam("STEAM");
     static std::string const fluidNameWater("WATER");
@@ -375,14 +375,14 @@ namespace OutdoorAirUnit {
         static int MaxAlphas(0);         // Maximum number of alpha input fields
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         bool IsValid;                    // Set for outside air node check
-        Array1D_string cAlphaArgs;       // Alpha input items for object
+        Array1D<std::string> cAlphaArgs;       // Alpha input items for object
         std::string CurrentModuleObject; // Object type for getting and messages
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         Array1D<Real64> NumArray;
-        Array1D_string AlphArray;
+        Array1D<std::string> AlphArray;
         static bool errFlag(false);
 
         // FLOW:

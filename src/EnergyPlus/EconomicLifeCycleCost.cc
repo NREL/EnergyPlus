@@ -212,7 +212,7 @@ namespace EconomicLifeCycleCost {
     Array1D<Real64> AfterTaxCashFlow;
     Array1D<Real64> AfterTaxPresentValue;
 
-    Array1D_string const
+    Array1D<std::string> const
         MonthNames(12, {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"});
 
     // arrays related to escalated energy costs
@@ -363,7 +363,7 @@ namespace EconomicLifeCycleCost {
         int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
-        Array1D_string AlphaArray;       // character string data
+        Array1D<std::string> AlphaArray;       // character string data
         Array1D<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
@@ -614,7 +614,7 @@ namespace EconomicLifeCycleCost {
         int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
-        Array1D_string AlphaArray;       // character string data
+        Array1D<std::string> AlphaArray;       // character string data
         Array1D<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
@@ -794,7 +794,7 @@ namespace EconomicLifeCycleCost {
         int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
-        Array1D_string AlphaArray;       // character string data
+        Array1D<std::string> AlphaArray;       // character string data
         Array1D<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
@@ -922,7 +922,7 @@ namespace EconomicLifeCycleCost {
         int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
-        Array1D_string AlphaArray;       // character string data
+        Array1D<std::string> AlphaArray;       // character string data
         Array1D<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
@@ -1056,7 +1056,7 @@ namespace EconomicLifeCycleCost {
         int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
-        Array1D_string AlphaArray;       // character string data
+        Array1D<std::string> AlphaArray;       // character string data
         Array1D<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
@@ -2061,9 +2061,9 @@ namespace EconomicLifeCycleCost {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // all arrays are in the format: (row, column)
-        Array1D_string columnHead;
+        Array1D<std::string> columnHead;
         Array1D_int columnWidth;
-        Array1D_string rowHead;
+        Array1D<std::string> rowHead;
         Array2D_string tableBody;
 
         int numColumns;

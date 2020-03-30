@@ -102,8 +102,8 @@ namespace BranchInputManager {
         int NumOfConnectors;          // Number of Connectors in this group
         int NumOfSplitters;           // Number of Splitters in this connector group
         int NumOfMixers;              // Number of Mixers in this connector group
-        Array1D_string ConnectorType; // Connector:Splitter or Connector:Mixer
-        Array1D_string ConnectorName; // Name for that Connector:Splitter or Connector:Mixer
+        Array1D<std::string> ConnectorType; // Connector:Splitter or Connector:Mixer
+        Array1D<std::string> ConnectorName; // Name for that Connector:Splitter or Connector:Mixer
         Array1D_int ConnectorMatchNo; // Pointer to index where this Splitter or Mixer matches
         // Splitter => Mixer or Mixer => Splitter.  0 indicates no match
 
@@ -118,7 +118,7 @@ namespace BranchInputManager {
         // Members
         std::string Name;           // Name of this Branch List
         int NumOfBranchNames;       // Number of Branches on the Branch List
-        Array1D_string BranchNames; // Names of the branches on this branch list
+        Array1D<std::string> BranchNames; // Names of the branches on this branch list
         std::string LoopName;       // Name of Loop this Branch list belongs to
         std::string LoopType;       // Loop type this branch is on
 
@@ -168,7 +168,7 @@ namespace BranchInputManager {
         std::string Name;                 // Splitter Name
         std::string InletBranchName;      // Splitter Inlet Branch Name
         int NumOutletBranches;            // Number of outlets on this Splitter
-        Array1D_string OutletBranchNames; // Names of the Outlet Branches
+        Array1D<std::string> OutletBranchNames; // Names of the Outlet Branches
 
         // Default Constructor
         SplitterData() : NumOutletBranches(0)
@@ -182,7 +182,7 @@ namespace BranchInputManager {
         std::string Name;                // Mixer Name
         std::string OutletBranchName;    // Mixer Outlet Branch Name
         int NumInletBranches;            // Number of inlets for this Mixer
-        Array1D_string InletBranchNames; // Names of Inlet Branches
+        Array1D<std::string> InletBranchNames; // Names of Inlet Branches
 
         // Default Constructor
         MixerData() : NumInletBranches(0)
@@ -209,7 +209,7 @@ namespace BranchInputManager {
     void GetBranchList(std::string const &LoopName,       // Name of Loop Branch List is on
                        std::string const &BranchListName, // Branch List Name from Input
                        int &NumBranchNames,               // Number of Branches for this Branch List
-                       Array1D_string &BranchNames,       // Names of Branches on this Branch List
+                       Array1D<std::string> &BranchNames,       // Names of Branches on this Branch List
                        std::string const &LoopType        // Type of Loop Branch list is on
     );
 
@@ -220,11 +220,11 @@ namespace BranchInputManager {
                        int &PressCurveType,                 // Index of a pressure curve object
                        int &PressCurveIndex,                // Index of a pressure curve object
                        int &NumComps,                       // Number of Components on Branch
-                       Array1D_string &CompType,            // Component Type for each item on Branch
-                       Array1D_string &CompName,            // Component Name for each item on Branch
-                       Array1D_string &CompInletNodeNames,  // Component Inlet Node IDs for each item on Branch
+                       Array1D<std::string> &CompType,            // Component Type for each item on Branch
+                       Array1D<std::string> &CompName,            // Component Name for each item on Branch
+                       Array1D<std::string> &CompInletNodeNames,  // Component Inlet Node IDs for each item on Branch
                        Array1D_int &CompInletNodeNums,      // Component Inlet Node Numbers for each item on Branch
-                       Array1D_string &CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
+                       Array1D<std::string> &CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
                        Array1D_int &CompOutletNodeNums,     // Component Outlet Node Numbers for each item on Branch
                        bool &ErrorsFound);
 
@@ -265,7 +265,7 @@ namespace BranchInputManager {
                       std::string &OutletNodeName,          // Outlet Node ID
                       int &OutletNodeNum,                   // Outlet Node Number
                       int &NumInletNodes,                   // Number of Inlet Nodes
-                      Array1D_string &InletNodeNames,        // Inlet Node IDs
+                      Array1D<std::string> &InletNodeNames,        // Inlet Node IDs
                       Array1D_int &InletNodeNums,            // Inlet Node Numbers
                       bool &ErrorsFound,
                       Optional_int_const ConnectorNumber = _, // number of the current item in connector list
@@ -279,7 +279,7 @@ namespace BranchInputManager {
                          std::string &InletNodeName,           // Inlet Node ID
                          int &InletNodeNum,                    // Inlet Node Number
                          int &NumOutletNodes,                  // Number of Outlet Nodes
-                         Array1D_string &OutletNodeNames,       // Outlet Node IDs
+                         Array1D<std::string> &OutletNodeNames,       // Outlet Node IDs
                          Array1D_int &OutletNodeNums,           // Outlet Node Numbers
                          bool &ErrorsFound,
                          Optional_int_const ConnectorNumber = _, // number of the current item in connector list
@@ -298,8 +298,8 @@ namespace BranchInputManager {
 
     void GetSingleBranchInput(std::string const RoutineName,
                               int const BCount,
-                              Array1D_string &Alphas,
-                              Array1D_string &cAlphaFields,
+                              Array1D<std::string> &Alphas,
+                              Array1D<std::string> &cAlphaFields,
                               int const NumAlphas,
                               Array1D_int &NodeNums,
                               EPVector<bool> &lAlphaBlanks);

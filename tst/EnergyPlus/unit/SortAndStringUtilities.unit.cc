@@ -68,7 +68,7 @@ TEST_F(EnergyPlusFixture, SortAndStringUtilitiesTest_Basic)
 {
     ShowMessage("Begin Test: SortAndStringUtilitiesTest, Basic");
 
-    Array1D_string Alphas({"ZEBRA", "LION", "RACOON", "BOA", "LEMUR"});
+    Array1D<std::string> Alphas({"ZEBRA", "LION", "RACOON", "BOA", "LEMUR"});
     Array1D_int iAlphas(5);
     SetupAndSort(Alphas, iAlphas);
     EXPECT_TRUE(eq(Array1D_int({4, 5, 2, 3, 1}), iAlphas));
@@ -76,11 +76,11 @@ TEST_F(EnergyPlusFixture, SortAndStringUtilitiesTest_Basic)
 
 TEST_F(EnergyPlusFixture, SortAndStringUtilitiesTest_findItemInSortedListUnderscoreTest)
 {
-    static Array1D_string ListOfObjects; // stored variable names
+    static Array1D<std::string> ListOfObjects; // stored variable names
     static Array1D_int iListOfObjects;
     ListOfObjects.allocate(7);
 
-    ListOfObjects = Array1D_string({
+    ListOfObjects = Array1D<std::string>({
         // list which has been incorrectly sorted
         "SYSTEM NODE STANDARD DENSITY VOLUME FLOW RATE",
         "SYSTEM NODE TEMPERATURE",

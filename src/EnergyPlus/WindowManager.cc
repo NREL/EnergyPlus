@@ -7611,8 +7611,8 @@ namespace WindowManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const Roughness(6, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
-        static Array1D_string const GasTypeName({0, 4}, {"Custom", "Air", "Argon", "Krypton", "Xenon"});
+        static Array1D<std::string> const Roughness(6, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
+        static Array1D<std::string> const GasTypeName({0, 4}, {"Custom", "Air", "Argon", "Krypton", "Xenon"});
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -9499,7 +9499,7 @@ namespace WindowManager {
         int NumNumbers;                 // Number of Numbers for each GetobjectItem call
         int NumArgs;
         int IOStatus;
-        Array1D_string cAlphaArgs;    // Alpha input items for object
+        Array1D<std::string> cAlphaArgs;    // Alpha input items for object
         Array1D<Real64> rNumericArgs; // Numeric input items for object
 
         static bool RunMeOnceFlag(false); // This subroutine only needs to be run once

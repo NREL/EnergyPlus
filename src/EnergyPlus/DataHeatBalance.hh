@@ -118,7 +118,7 @@ namespace DataHeatBalance {
     extern int const ScreenEquivalentLayer;
     extern int const GapEquivalentLayer;
 
-    extern Array1D_string const cMaterialGroupType;
+    extern Array1D<std::string> const cMaterialGroupType;
 
     // Parameters to indicate surface roughness for use with the Material
     // derived type (see below):
@@ -227,11 +227,11 @@ namespace DataHeatBalance {
 
     extern int const NumZoneIntGainDeviceTypes;
 
-    extern Array1D_string const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
+    extern Array1D<std::string> const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
                                                         // 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 |
                                                         // 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51
 
-    extern Array1D_string const ccZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
+    extern Array1D<std::string> const ccZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
                                                           // 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 |
                                                           // 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51
     extern int const IntGainTypeOf_People;
@@ -857,7 +857,7 @@ namespace DataHeatBalance {
         int NumGlzMat;            // Number of TC glazing materials
         Array1D_int LayerPoint;   // Layer pointer
         Array1D<Real64> SpecTemp; // Temperature corresponding to the specified TC glazing optical data
-        Array1D_string LayerName; // Name of the referenced WindowMaterial:Glazing object
+        Array1D<std::string> LayerName; // Name of the referenced WindowMaterial:Glazing object
 
         // Default Constructor
         TCGlazingsType() : NumGlzMat(0)
@@ -1789,8 +1789,8 @@ namespace DataHeatBalance {
         Array1D<Real64> DoorArea;            // Door area for refrigeration door, m2
         Array1D<Real64> Protection;          // Refrigeration door protection factor, dimensionless
         Array1D_int MateZonePtr;             // Zone connected by refrigeration door (MateZone > ZonePtr)
-        Array1D_string DoorMixingObjectName; // Used in one error statement and eio
-        Array1D_string DoorProtTypeName;     // Used in eio
+        Array1D<std::string> DoorMixingObjectName; // Used in one error statement and eio
+        Array1D<std::string> DoorProtTypeName;     // Used in eio
                                              // Note, for mixing and crossmixing, this type dimensioned by number of mixing objects.
         // For ref door mixing, dimensioned by number of zones.
 

@@ -83,11 +83,11 @@ namespace DataLoopNode {
     int const NodeType_Water(2);    // 'Water'
     int const NodeType_Steam(3);    // 'Steam'
     int const NodeType_Electric(4); // 'Electric'
-    Array1D_string const ValidNodeFluidTypes({0, 4}, {"blank", "Air", "Water", "Steam", "Electric"});
+    Array1D<std::string> const ValidNodeFluidTypes({0, 4}, {"blank", "Air", "Water", "Steam", "Electric"});
     //int const NumValidNodeFluidTypes(4);
 
     // Valid Connection Types for Nodes
-    Array1D_string const ValidConnectionTypes(15,
+    Array1D<std::string> const ValidConnectionTypes(15,
                                               {"Inlet",
                                                "Outlet",
                                                "Internal",
@@ -142,7 +142,7 @@ namespace DataLoopNode {
     // the following assignments:  Node(somenodenumber)=Node(someothernodenumber) to
     // set/update Node conditions.  If the Node derived type would include the name
     // then the name would get changed and bad things would result...
-    Array1D_string NodeID;
+    Array1D<std::string> NodeID;
 
     // Object Data
     Array1D<NodeData> Node; // dim to num nodes in SimHVAC

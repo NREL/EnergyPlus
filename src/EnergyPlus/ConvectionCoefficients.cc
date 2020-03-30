@@ -972,7 +972,7 @@ namespace ConvectionCoefficients {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetUserConvectionCoefficients");
         int const NumValidSurfaceTypes(11);
-        static Array1D_string const ValidSurfaceTypes(11,
+        static Array1D<std::string> const ValidSurfaceTypes(11,
                                                       {"ALLEXTERIORSURFACES",
                                                        "ALLEXTERIORWINDOWS",
                                                        "ALLEXTERIORWALLS",
@@ -986,7 +986,7 @@ namespace ConvectionCoefficients {
                                                        "ALLINTERIORFLOORS"});
 
         int const NumValidExtConvectionValueTypes(22);
-        static Array1D_string const ValidExtConvectionValueTypes(22,
+        static Array1D<std::string> const ValidExtConvectionValueTypes(22,
                                                                  {"VALUE",
                                                                   "SCHEDULE",
                                                                   "SIMPLECOMBINED",
@@ -1035,7 +1035,7 @@ namespace ConvectionCoefficients {
                                                      HcExt_AlamdariHammondUnstableHorizontal});
 
         int const NumValidSpecificExtWindConvValueTypes(15);
-        static Array1D_string const ValidSpecificExtWindConvValueTypes(15,
+        static Array1D<std::string> const ValidSpecificExtWindConvValueTypes(15,
                                                                        {"SIMPLECOMBINED",
                                                                         "TARPWINDWARD",
                                                                         "TARPLEEWARD",
@@ -1069,7 +1069,7 @@ namespace ConvectionCoefficients {
                                                                      HcExt_UserCurve});
 
         int const NumValidSpecificExtNatConvectValueTypes(10);
-        static Array1D_string const ValidSpecificExtNatConvectValueTypes(10,
+        static Array1D<std::string> const ValidSpecificExtNatConvectValueTypes(10,
                                                                          {"ASHRAEVERTICALWALL",
                                                                           "ALAMDARIHAMMONDVERTICALWALL",
                                                                           "FOHANNOPOLIDORIVERTICALWALL",
@@ -1094,7 +1094,7 @@ namespace ConvectionCoefficients {
 
         // CeilingDiffuser and TrombeWall Interior types are only Zone Level settings.
         int const NumValidIntConvectionValueTypes(34);
-        static Array1D_string const ValidIntConvectionValueTypes(34,
+        static Array1D<std::string> const ValidIntConvectionValueTypes(34,
                                                                  {"VALUE",
                                                                   "SCHEDULE",
                                                                   "SIMPLE",
@@ -1172,7 +1172,7 @@ namespace ConvectionCoefficients {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string Alphas(9);
+        Array1D<std::string> Alphas(9);
         Array1D<Real64> Numbers(2);
         int NumAlphas;
         int NumNumbers;

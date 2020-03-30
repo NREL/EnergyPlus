@@ -414,11 +414,11 @@ namespace DataRuntimeLanguage {
         // Members
         std::string Name;                     // Erl program or subroutine name, user defined
         int NumLines;                         // count of lines in Erl program or subroutine
-        Array1D_string Line;                  // string array holding lines of Erl code (for processing)
+        Array1D<std::string> Line;                  // string array holding lines of Erl code (for processing)
         int NumInstructions;                  // count of program instructions in stack
         Array1D<InstructionType> Instruction; // structure array of program instructions
         int NumErrors;                        // count of errors during stack parsing
-        Array1D_string Error;                 // array of error messages from stack parsing
+        Array1D<std::string> Error;                 // array of error messages from stack parsing
 
         // Default Constructor
         ErlStackType() : NumLines(0), NumInstructions(0), NumErrors(0)

@@ -138,7 +138,7 @@ namespace DataZoneEquipment {
     // End zone equip objects
 
     int const NumValidSysAvailZoneComponents(14);
-    Array1D_string const cValidSysAvailManagerCompTypes(NumValidSysAvailZoneComponents,
+    Array1D<std::string> const cValidSysAvailManagerCompTypes(NumValidSysAvailZoneComponents,
                                                         {"ZoneHVAC:FourPipeFanCoil",
                                                          "ZoneHVAC:PackagedTerminalHeatPump",
                                                          "ZoneHVAC:PackagedTerminalAirConditioner",
@@ -305,7 +305,7 @@ namespace DataZoneEquipment {
         std::string ExhaustNodeListName;
         std::string ReturnNodeListName;
         std::string ReturnFlowBasisNodeListName;
-        Array1D_string AlphArray;
+        Array1D<std::string> AlphArray;
         Array1D<Real64> NumArray;
         int MaxAlphas;
         int MaxNums;
@@ -322,8 +322,8 @@ namespace DataZoneEquipment {
         bool UniqueNodeError;
         int NumOfControlledZones;        // The number of Controlled Zone Equip Configuration objects
         std::string CurrentModuleObject; // Object type for getting and error messages
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         int maxEquipCount;

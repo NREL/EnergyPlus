@@ -89,7 +89,7 @@ namespace ThermalChimney {
         Real64 DischargeCoeff;
         int TotZoneToDistrib;
         Array1D_int ZonePtr;
-        Array1D_string ZoneName;
+        Array1D<std::string> ZoneName;
         Array1D<Real64> DistanceThermChimInlet;
         Array1D<Real64> RatioThermChimAirFlow;
         Array1D<Real64> EachAirInletCrossArea;

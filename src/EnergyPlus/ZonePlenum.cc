@@ -338,9 +338,9 @@ namespace ZonePlenum {
         int IOStat;
         Array1D<Real64> NumArray;        // Numeric input items for object
         std::string CurrentModuleObject; // for ease in getting objects
-        Array1D_string AlphArray;        // Alpha input items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> AlphArray;        // Alpha input items for object
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static bool ErrorsFound(false);

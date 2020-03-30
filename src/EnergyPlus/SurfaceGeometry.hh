@@ -71,8 +71,8 @@ namespace SurfaceGeometry {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    extern Array1D_string const BaseSurfCls;
-    extern Array1D_string const SubSurfCls;
+    extern Array1D<std::string> const BaseSurfCls;
+    extern Array1D<std::string> const SubSurfCls;
     extern Array1D_int const BaseSurfIDs;
 
     extern Array1D_int const SubSurfIDs;
@@ -152,7 +152,7 @@ namespace SurfaceGeometry {
                           int const TotDetailedWalls,       // Number of Wall:Detailed items to obtain
                           int const TotDetailedRoofs,       // Number of RoofCeiling:Detailed items to obtain
                           int const TotDetailedFloors,      // Number of Floor:Detailed items to obtain
-                          const Array1D_string &BaseSurfCls, // Valid Classes for Base Surfaces
+                          const Array1D<std::string> &BaseSurfCls, // Valid Classes for Base Surfaces
                           const Array1D_int &BaseSurfIDs,
                           int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
     );
@@ -184,7 +184,7 @@ namespace SurfaceGeometry {
     void GetHTSubSurfaceData(bool &ErrorsFound,               // Error flag indicator (true if errors found)
                              int &SurfNum,                    // Count of Current SurfaceNumber
                              int const TotHTSubs,             // Number of Heat Transfer SubSurfaces to obtain
-                             const Array1D_string &SubSurfCls, // Valid Classes for Sub Surfaces
+                             const Array1D<std::string> &SubSurfCls, // Valid Classes for Sub Surfaces
                              const Array1D_int &SubSurfIDs,    // ID Assignments for valid sub surface classes
                              int &AddedSubSurfaces,           // Subsurfaces added when windows reference Window5
                              int &NeedToAddSurfaces           // Number of surfaces to add, based on unentered IZ surfaces

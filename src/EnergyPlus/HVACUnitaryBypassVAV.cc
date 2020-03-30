@@ -402,10 +402,10 @@ namespace HVACUnitaryBypassVAV {
         bool OANodeErrFlag;                 // TRUE if DX Coil condenser node is not found
         bool DXCoilErrFlag;                 // used in warning messages
 
-        Array1D_string Alphas(20, "");
+        Array1D<std::string> Alphas(20, "");
         Array1D<Real64> Numbers(9, 0.0);
-        Array1D_string cAlphaFields(20, "");
-        Array1D_string cNumericFields(9, "");
+        Array1D<std::string> cAlphaFields(20, "");
+        Array1D<std::string> cNumericFields(9, "");
         EPVector<bool> lAlphaBlanks(20, true);
         EPVector<bool> lNumericBlanks(9, true);
 

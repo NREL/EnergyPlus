@@ -183,7 +183,7 @@ namespace DXCoils {
     int const WaterSupplyFromTank(102);
 
     int const NumValidOutputFuelTypes(9);
-    Array1D_string const
+    Array1D<std::string> const
         cValidOutputFuelTypes(NumValidOutputFuelTypes,
                               {"Electricity", "Gas", "Propane", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2"});
 
@@ -893,10 +893,10 @@ namespace DXCoils {
         int DXCoilNum;                   // current DX coil number
         int NumAlphas;                   // Number of alphas in input
         int NumNumbers;                  // Number of numeric items in input
-        Array1D_string Alphas2;          // Alpha input items for object
+        Array1D<std::string> Alphas2;          // Alpha input items for object
         Array1D<Real64> Numbers2;        // Numeric input items for object
-        Array1D_string cAlphaFields2;    // Alpha field names
-        Array1D_string cNumericFields2;  // Numeric field names
+        Array1D<std::string> cAlphaFields2;    // Alpha field names
+        Array1D<std::string> cNumericFields2;  // Numeric field names
         EPVector<bool> lAlphaBlanks2;      // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks2;    // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas2;                  // Number of alphas in input for performance object
@@ -916,9 +916,9 @@ namespace DXCoils {
         Real64 InletWaterTemp;           // Used to pass proper inlet water temp to HPWH DX coil performance curves
         int I;                           // Index of speeds
         Real64 CurveVal;                 // Used to verify modifier curves equal 1 at rated conditions
-        Array1D_string Alphas;           // Alpha input items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> Alphas;           // Alpha input items for object
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.

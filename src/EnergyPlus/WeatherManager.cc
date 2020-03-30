@@ -8151,7 +8151,7 @@ namespace WeatherManager {
         int GndNumProp;           // dummy variable for properties being passed
         int IOStat;               // IO Status when calling get input subroutine
         int I;                    // Loop counter variable
-        Array1D_string GndAlphas; // Construction Alpha names defined
+        Array1D<std::string> GndAlphas; // Construction Alpha names defined
         Array1D<Real64> GndProps; // Temporary array to transfer ground reflectances
 
         // Formats
@@ -8220,7 +8220,7 @@ namespace WeatherManager {
         int GndNumProp;           // dummy variable for properties being passed
         int IOStat;               // IO Status when calling get input subroutine
         int I;                    // Loop counter variable
-        Array1D_string GndAlphas; // Construction Alpha names defined
+        Array1D<std::string> GndAlphas; // Construction Alpha names defined
         Array1D<Real64> GndProps; // Temporary array to transfer ground reflectances
 
         // Formats
@@ -8298,7 +8298,7 @@ namespace WeatherManager {
         int NumAlphas;               // Number of elements in the alpha array
         int NumNums;                 // Number of elements in the numeric array
         int IOStat;                  // IO Status when calling get input subroutine
-        Array1D_string AlphArray(2); // Character string data
+        Array1D<std::string> AlphArray(2); // Character string data
         Array1D<Real64> NumArray(2); // Numeric data
 
         // FLOW:
@@ -8476,7 +8476,7 @@ namespace WeatherManager {
         int NumAlphas;                      // Number of elements in the alpha array
         int NumNums;                        // Number of elements in the numeric array
         int IOStat;                         // IO Status when calling get input subroutine
-        Array1D_string AlphArray(1);        // Character string data
+        Array1D<std::string> AlphArray(1);        // Character string data
         Array1D<Real64> NumArray(4);        // Numeric data
         Real64 WeatherFileWindSensorHeight; // Height of the wind sensor at the weather station, i.e., weather file
         Real64 WeatherFileWindExp;          // Exponent for the wind velocity profile at the weather station

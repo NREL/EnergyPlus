@@ -81,7 +81,7 @@ namespace DataErrorTracking {
 
     // MODULE PARAMETER DEFINITIONS:
     int const SearchCounts(20);
-    Array1D_string const MessageSearch(SearchCounts,
+    Array1D<std::string> const MessageSearch(SearchCounts,
                                        {"InterZone Surface Areas",
                                         "CAUTION -- Interzone",
                                         "Node Connection Error",
@@ -102,7 +102,7 @@ namespace DataErrorTracking {
                                         "nominally unused",
                                         "InfraredTransparent",
                                         "No reporting elements"});
-    Array1D_string const Summaries(SearchCounts,
+    Array1D<std::string> const Summaries(SearchCounts,
                                    {"InterZone Surface Areas -- mismatch",
                                     "Interzone surfaces - different zones",
                                     "Node Connection Errors",
@@ -193,7 +193,7 @@ namespace DataErrorTracking {
         MoreDetails_20("No Reporting elements have been requested. You will see no output values from your run.<CR>Add Output:Variable, "
                        "Output:Meter, Output:Table:SummaryReports, Output:Table:Monthly, Output:Table:TimeBins<CR>objects to your input file to "
                        "receive output values from the simulation.<CRE>"); // No reporting elements requested
-    Array1D_string const MoreDetails(SearchCounts, {MoreDetails_1,  MoreDetails_2,  MoreDetails_3,  MoreDetails_4,  MoreDetails_5,  MoreDetails_6,
+    Array1D<std::string> const MoreDetails(SearchCounts, {MoreDetails_1,  MoreDetails_2,  MoreDetails_3,  MoreDetails_4,  MoreDetails_5,  MoreDetails_6,
                                                     MoreDetails_7,  MoreDetails_8,  MoreDetails_9,  MoreDetails_10, MoreDetails_11, MoreDetails_12,
                                                     MoreDetails_13, MoreDetails_14, MoreDetails_15, MoreDetails_16, MoreDetails_16, MoreDetails_18,
                                                     MoreDetails_19, MoreDetails_20}); // Details 16 applies to both temperature out of bounds |

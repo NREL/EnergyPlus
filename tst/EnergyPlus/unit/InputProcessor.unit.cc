@@ -1979,12 +1979,12 @@ TEST_F(InputProcessorFixture, getObjectItem_json1)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
@@ -2029,12 +2029,12 @@ TEST_F(InputProcessorFixture, getObjectItem_json2)
 
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   NumGasSteamHums,
                                   Alphas,
@@ -2103,12 +2103,12 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
 
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   numBuildingSurfaceDetailed,
                                   Alphas,
@@ -2164,12 +2164,12 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   num_curve_biquadratic_objects,
@@ -2228,12 +2228,12 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   num_curve_biquadratic_objects,
@@ -2300,12 +2300,12 @@ TEST_F(InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   num_curve_biquadratic_objects,
@@ -2406,12 +2406,12 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   num_curve_biquadratic_objects,
@@ -2508,12 +2508,12 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   NumSizingSystem,
@@ -2593,12 +2593,12 @@ TEST_F(InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_a
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   NumGasSteamHums,
@@ -2667,12 +2667,12 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   NumGasSteamHums,
@@ -2766,12 +2766,12 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   num_unitary_systems,
@@ -2854,12 +2854,12 @@ TEST_F(InputProcessorFixture, getObjectItem_test_numbers_as_strings)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   num_eq_connections,
@@ -2913,12 +2913,12 @@ TEST_F(InputProcessorFixture, getObjectItem_test_zone_input)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, num_zones, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
@@ -2970,12 +2970,12 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   num_equipment_connections,
@@ -3011,12 +3011,12 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
 
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
 
-    Array1D_string Alphas2(NumAlphas2);
+    Array1D<std::string> Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
     EPVector<bool> lNumericBlanks2(NumNumbers2, true);
     EPVector<bool> lAlphaBlanks2(NumAlphas2, true);
-    Array1D_string cAlphaFields2(NumAlphas2);
-    Array1D_string cNumericFields2(NumNumbers2);
+    Array1D<std::string> cAlphaFields2(NumAlphas2);
+    Array1D<std::string> cNumericFields2(NumNumbers2);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   num_equipment_lists,
@@ -3085,12 +3085,12 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
@@ -3112,12 +3112,12 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
 
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
 
-    Array1D_string Alphas2(NumAlphas2);
+    Array1D<std::string> Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
     EPVector<bool> lNumericBlanks2(NumNumbers2, true);
     EPVector<bool> lAlphaBlanks2(NumAlphas2, true);
-    Array1D_string cAlphaFields2(NumAlphas2);
-    Array1D_string cNumericFields2(NumNumbers2);
+    Array1D<std::string> cAlphaFields2(NumAlphas2);
+    Array1D<std::string> cNumericFields2(NumNumbers2);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
@@ -3171,12 +3171,12 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   num_schedule_type_limits,
@@ -3209,12 +3209,12 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
 
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
-    Array1D_string Alphas2(NumAlphas);
+    Array1D<std::string> Alphas2(NumAlphas);
     Array1D<Real64> Numbers2(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks2(NumNumbers, true);
     EPVector<bool> lAlphaBlanks2(NumAlphas, true);
-    Array1D_string cAlphaFields2(NumAlphas);
-    Array1D_string cNumericFields2(NumNumbers);
+    Array1D<std::string> cAlphaFields2(NumAlphas);
+    Array1D<std::string> cNumericFields2(NumNumbers);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, 2, Alphas2, NumAlphas, Numbers2, NumNumbers, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
@@ -3262,12 +3262,12 @@ TEST_F(InputProcessorFixture, getObjectItem_fan_on_off)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, num_fans, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
@@ -3326,12 +3326,12 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
@@ -3350,12 +3350,12 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
 
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
 
-    Array1D_string Alphas2(NumAlphas2);
+    Array1D<std::string> Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
     EPVector<bool> lNumericBlanks2(NumNumbers2, true);
     EPVector<bool> lAlphaBlanks2(NumAlphas2, true);
-    Array1D_string cAlphaFields2(NumAlphas2);
-    Array1D_string cNumericFields2(NumNumbers2);
+    Array1D<std::string> cAlphaFields2(NumAlphas2);
+    Array1D<std::string> cNumericFields2(NumNumbers2);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
@@ -3374,12 +3374,12 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
 
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs3, NumAlphas3, NumNumbers3);
 
-    Array1D_string Alphas3(NumAlphas3);
+    Array1D<std::string> Alphas3(NumAlphas3);
     Array1D<Real64> Numbers3(NumNumbers3, 0.0);
     EPVector<bool> lNumericBlanks3(NumNumbers3, true);
     EPVector<bool> lAlphaBlanks3(NumAlphas3, true);
-    Array1D_string cAlphaFields3(NumAlphas3);
-    Array1D_string cNumericFields3(NumNumbers3);
+    Array1D<std::string> cAlphaFields3(NumAlphas3);
+    Array1D<std::string> cNumericFields3(NumNumbers3);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, 3, Alphas3, NumAlphas3, Numbers3, NumNumbers3, IOStatus, lNumericBlanks3, lAlphaBlanks3, cAlphaFields3, cNumericFields3);
@@ -3535,12 +3535,12 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, num_coils, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
@@ -3701,12 +3701,12 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
@@ -3729,12 +3729,12 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
 
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2);
 
-    Array1D_string Alphas2(NumAlphas2);
+    Array1D<std::string> Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
     EPVector<bool> lNumericBlanks2(NumNumbers2, true);
     EPVector<bool> lAlphaBlanks2(NumAlphas2, true);
-    Array1D_string cAlphaFields2(NumAlphas2);
-    Array1D_string cNumericFields2(NumNumbers2);
+    Array1D<std::string> cAlphaFields2(NumAlphas2);
+    Array1D<std::string> cNumericFields2(NumNumbers2);
 
     inputProcessor->getObjectItem(
         CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
@@ -3790,12 +3790,12 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     int IOStatus = 0;
-    Array1D_string Alphas(NumAlphas);
+    Array1D<std::string> Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
     EPVector<bool> lNumericBlanks(NumNumbers, true);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNumbers);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNumbers);
 
     inputProcessor->getObjectItem(CurrentModuleObject,
                                   num_curve_biquad,

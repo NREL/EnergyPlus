@@ -120,7 +120,7 @@ namespace DataSurfaces {
     int const GroundFCfactorMethod(-5);
     int const KivaFoundation(-6);
 
-    Array1D_string const cExtBoundCondition({-5, 0}, {"FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
+    Array1D<std::string> const cExtBoundCondition({-5, 0}, {"FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
 
     // Parameters to indicate the first "corner" of a surface
     // Currently, these are used only during input of surfaces
@@ -166,7 +166,7 @@ namespace DataSurfaces {
     int const SurfaceClass_TDD_Dome(17);
     int const SurfaceClass_TDD_Diffuser(18);
 
-    Array1D_string const HeatTransferModelNames(10,
+    Array1D<std::string> const HeatTransferModelNames(10,
                                                 {"CTF - ConductionTransferFunction",
                                                  "EMPD - MoisturePenetrationDepthConductionTransferFunction",
                                                  "",

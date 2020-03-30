@@ -616,9 +616,9 @@ namespace RefrigeratedCase {
         Real64 const PumpImpellerEfficiency(0.78);   // same as used in pump auto-sizing, dimensionless
         Real64 const PumpMotorEfficiency(0.85);      // suggested as average value in ITT/Gould pump references,
 
-        Array1D_string Alphas;                  // Alpha items for object
-        Array1D_string cAlphaFieldNames;        // Alpha field names (from input processor)
-        Array1D_string cNumericFieldNames;      // Numeric field names (from input processor)
+        Array1D<std::string> Alphas;                  // Alpha items for object
+        Array1D<std::string> cAlphaFieldNames;        // Alpha field names (from input processor)
+        Array1D<std::string> cNumericFieldNames;      // Numeric field names (from input processor)
         std::string CurrentModuleObject;   // Object type for getting and error messages
 
         EPVector<bool> lAlphaBlanks;      // Logic array, alpha input blank = .TRUE.

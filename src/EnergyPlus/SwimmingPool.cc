@@ -187,9 +187,9 @@ namespace SwimmingPool {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);         // Set to true if something goes wrong
         std::string CurrentModuleObject; // for ease in getting objects
-        Array1D_string Alphas;           // Alpha items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> Alphas;           // Alpha items for object
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         int IOStatus;                    // Used in GetObjectItem
         int Item;                        // Item to be "gotten"
         Array1D<Real64> Numbers;         // Numeric items for object

@@ -408,14 +408,14 @@ namespace SimAirServingZones {
         // SUBROUTINE LOCAL VARIABLE DEFINITIONS
         int NumNumbers;                // number of numbers returned by GetObjectItem
         Array1D<Real64> Numbers;       // numbers (REAL(r64)s) returned by GetObjectItem
-        Array1D_string cNumericFields; // Numeric field names
+        Array1D<std::string> cNumericFields; // Numeric field names
         EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas;                 // number of strings returned by GetObjectItem
         int NumParams;
         int MaxNumbers;
         int MaxAlphas;
-        Array1D_string Alphas;           // alpha strings returned by GetObjectItem
-        Array1D_string cAlphaFields;     // Alpha field names
+        Array1D<std::string> Alphas;           // alpha strings returned by GetObjectItem
+        Array1D<std::string> cAlphaFields;     // Alpha field names
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         std::string CurrentModuleObject; // Object type for getting and error messages
         int NumNodes;                    // number of nodes returned by GetNodeNums
@@ -441,12 +441,12 @@ namespace SimAirServingZones {
         std::string ControllerListName;        // Name of a controller list object
         std::string AvailManagerListName;      // Name of an availability manager list object
         std::string ConnectorListName;         // Name of a connector list object
-        static Array1D_string BranchNames;     // Branch names from GetBranchList call
-        static Array1D_string CompTypes;       // Component types from GetBranchList call
-        static Array1D_string CompNames;       // Component names from GetBranchList call
-        static Array1D_string InletNodeNames;  // Component inlet node names from GetBranchData call
-        static Array1D_string OutletNodeNames; // Component outlet node names from GetBranchData call
-        static Array1D_string NodeNames;       // Outlet node names from GetLoopSplitter call
+        static Array1D<std::string> BranchNames;     // Branch names from GetBranchList call
+        static Array1D<std::string> CompTypes;       // Component types from GetBranchList call
+        static Array1D<std::string> CompNames;       // Component names from GetBranchList call
+        static Array1D<std::string> InletNodeNames;  // Component inlet node names from GetBranchData call
+        static Array1D<std::string> OutletNodeNames; // Component outlet node names from GetBranchData call
+        static Array1D<std::string> NodeNames;       // Outlet node names from GetLoopSplitter call
         static Array1D_int NodeNumbers;        // Outlet node numbers from GetLoopSplitter call
         static Array1D_int InletNodeNumbers;   // Component inlet node numbers from GetBranchData call
         static Array1D_int OutletNodeNumbers;  // Component outlet node numbers from GetBranchData call
@@ -473,7 +473,7 @@ namespace SimAirServingZones {
         std::string CompType;        // component type
         int WaterCoilNodeNum;        // numeric equivalent for water coil node number
         int ActuatorNodeNum;         // numeric equivalent for controller actuator node number
-        Array1D_string MatchNodeName(3);
+        Array1D<std::string> MatchNodeName(3);
 
         struct AirUniqueNodes
         {

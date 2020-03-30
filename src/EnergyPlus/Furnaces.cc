@@ -910,9 +910,9 @@ namespace Furnaces {
         int MaxNumbers;                // Maximum number of numeric fields in all objects
         int IOStatus;                  // Function call status
         Array1D<Real64> Numbers;       // Numeric data
-        Array1D_string Alphas;         // Alpha data
-        Array1D_string cAlphaFields;   // Alpha field names
-        Array1D_string cNumericFields; // Numeric field names
+        Array1D<std::string> Alphas;         // Alpha data
+        Array1D<std::string> cAlphaFields;   // Alpha field names
+        Array1D<std::string> cNumericFields; // Numeric field names
         EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         std::string CompSetFanInlet;

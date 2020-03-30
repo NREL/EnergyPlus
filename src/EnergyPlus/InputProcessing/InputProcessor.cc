@@ -628,8 +628,8 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
                                         int &NumNumbers,
                                         Optional<EPVector<bool>> NumBlank,
                                         Optional<EPVector<bool>> AlphaBlank,
-                                        Optional<Array1D_string> AlphaFieldNames,
-                                        Optional<Array1D_string> NumericFieldNames)
+                                        Optional<Array1D<std::string>> AlphaFieldNames,
+                                        Optional<Array1D<std::string>> NumericFieldNames)
 {
     auto const is_AlphaBlank = present(AlphaBlank);
     auto const is_AlphaFieldNames = present(AlphaFieldNames);
@@ -809,8 +809,8 @@ void InputProcessor::getObjectItem(std::string const &Object,
                                    int &Status,
                                    Optional<EPVector<bool>> NumBlank,
                                    Optional<EPVector<bool>> AlphaBlank,
-                                   Optional<Array1D_string> AlphaFieldNames,
-                                   Optional<Array1D_string> NumericFieldNames)
+                                   Optional<Array1D<std::string>> AlphaFieldNames,
+                                   Optional<Array1D<std::string>> NumericFieldNames)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie

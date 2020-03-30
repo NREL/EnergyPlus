@@ -172,7 +172,7 @@ namespace DataHVACGlobals {
     extern int const BypassWhenWithinEconomizerLimits;   // heat recovery controlled by economizer limits
     extern int const BypassWhenOAFlowGreaterThanMinimum; // heat recovery ON at minimum OA in economizer mode
 
-    extern Array1D_string const cFanTypes; // cpw22Aug2010 | cpw22Aug2010 (new)
+    extern Array1D<std::string> const cFanTypes; // cpw22Aug2010 | cpw22Aug2010 (new)
 
     // parameters describing unitary systems
     extern int const NumUnitarySystemTypes;
@@ -184,7 +184,7 @@ namespace DataHVACGlobals {
     extern int const UnitarySys_HeatPump_AirToAir;
     extern int const UnitarySys_HeatPump_WaterToAir;
     extern int const UnitarySys_AnyCoilType;
-    extern Array1D_string const cFurnaceTypes;
+    extern Array1D<std::string> const cFurnaceTypes;
 
     // parameters describing coil types
     extern int const NumAllCoilTypes;
@@ -231,9 +231,9 @@ namespace DataHVACGlobals {
     extern int const CoilVRF_FluidTCtrl_Heating;
     extern int const CoilDX_SubcoolReheat;
 
-    extern Array1D_string const cAllCoilTypes;
-    extern Array1D_string const cCoolingCoilTypes;
-    extern Array1D_string const cHeatingCoilTypes;
+    extern Array1D<std::string> const cAllCoilTypes;
+    extern Array1D<std::string> const cCoolingCoilTypes;
+    extern Array1D<std::string> const cHeatingCoilTypes;
 
     // Water to air HP coil types
     extern int const WatertoAir_Simple;
@@ -282,7 +282,7 @@ namespace DataHVACGlobals {
     extern int const HX_AIRTOAIR_GENERIC;
     extern int const HX_DESICCANT_BALANCED;
 
-    extern Array1D_string const cHXTypes;
+    extern Array1D<std::string> const cHXTypes;
 
     // Parameters describing air terminal mixers
     extern int const NumATMixerTypes;
@@ -291,7 +291,7 @@ namespace DataHVACGlobals {
     extern int const ATMixer_InletSide;
     extern int const ATMixer_SupplySide;
 
-    extern Array1D_string const cATMixerTypes;
+    extern Array1D<std::string> const cATMixerTypes;
     extern bool const ATMixerExists;
 
     // Parameters describing variable refrigerant flow terminal unit types
@@ -299,14 +299,14 @@ namespace DataHVACGlobals {
 
     extern int const VRFTUType_ConstVolume;
 
-    extern Array1D_string const cVRFTUTypes;
+    extern Array1D<std::string> const cVRFTUTypes;
 
     // VRF Heating Performance Curve Temperature Type
     extern int const NumVRFHeatingPerformanceOATTypes;
     extern int const WetBulbIndicator;
     extern int const DryBulbIndicator;
 
-    extern Array1D_string const cVRFHeatingPerformanceOATTypes;
+    extern Array1D<std::string> const cVRFHeatingPerformanceOATTypes;
 
     // parameter concerning the amount of change in zone temperature is needed
     // for oscillation of zone temperature to be detected.
@@ -391,8 +391,8 @@ namespace DataHVACGlobals {
                                                // to operate on air loops)
 
     extern int const NumZoneHVACTerminalTypes;
-    extern Array1D_string const ccZoneHVACTerminalTypes;
-    extern Array1D_string const ZoneHVACTerminalTypes;
+    extern Array1D<std::string> const ccZoneHVACTerminalTypes;
+    extern Array1D<std::string> const ZoneHVACTerminalTypes;
     extern int const ZoneEquipTypeOf_VariableRefrigerantFlow;
     extern int const ZoneEquipTypeOf_EnergyRecoveryVentilator;
     extern int const ZoneEquipTypeOf_FourPipeFanCoil;
@@ -461,7 +461,7 @@ namespace DataHVACGlobals {
         int StartTime;                    // cycle on time (in SimTimeSteps)
         int StopTime;                     // cycle off time (in SimTimeSteps)
         std::string AvailManagerListName; // name of each availability manager
-        Array1D_string AvailManagerName;  // name of each availability manager
+        Array1D<std::string> AvailManagerName;  // name of each availability manager
         Array1D_int AvailManagerType;     // type of availability manager
         Array1D_int AvailManagerNum;      // index for availability manager
         int ZoneNum;                      // cycle off time (in SimTimeSteps)

@@ -69,7 +69,7 @@ namespace PurchasedAirManager {
     extern int const LimitFlowRate;
     extern int const LimitCapacity;
     extern int const LimitFlowRateAndCapacity;
-    extern Array1D_string const cLimitType;
+    extern Array1D<std::string> const cLimitType;
     // Dehumidification and Humidification control type parameters
     extern int const None;
     extern int const ConstantSensibleHeatRatio;
@@ -276,7 +276,7 @@ namespace PurchasedAirManager {
     struct PurchAirNumericFieldData
     {
         // Members
-        Array1D_string FieldNames;
+        Array1D<std::string> FieldNames;
 
         // Default Constructor
         PurchAirNumericFieldData()

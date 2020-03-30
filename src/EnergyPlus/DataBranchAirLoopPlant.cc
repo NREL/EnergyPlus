@@ -97,7 +97,7 @@ namespace DataBranchAirLoopPlant {
     int const ControlType_Passive(2);      // 'Passive'
     int const ControlType_SeriesActive(3); // 'SeriesActive'
     int const ControlType_Bypass(4);       // 'Bypass
-    Array1D_string const cControlType({0, 4}, {"Unknown", "Active", "Passive", "SeriesActive", "Bypass"});
+    Array1D<std::string> const cControlType({0, 4}, {"Unknown", "Active", "Passive", "SeriesActive", "Bypass"});
 
     // DERIVED TYPE DEFINITIONS:
 

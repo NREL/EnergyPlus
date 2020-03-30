@@ -267,7 +267,7 @@ namespace InternalHeatGains {
         int const noOtherFuelTypeZero = 0;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string AlphaName;
+        Array1D<std::string> AlphaName;
         Array1D<Real64> IHGNumbers;
         int IOStat;
         int Loop;

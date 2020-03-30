@@ -800,9 +800,9 @@ namespace PlantCondLoopOperation {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        Array1D_string AlphArray;      // Alpha input items for object
-        Array1D_string cAlphaFields;   // Alpha field names
-        Array1D_string cNumericFields; // Numeric field names
+        Array1D<std::string> AlphArray;      // Alpha input items for object
+        Array1D<std::string> cAlphaFields;   // Alpha field names
+        Array1D<std::string> cNumericFields; // Numeric field names
         Array1D<Real64> NumArray;      // Numeric input items for object
         EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
@@ -994,9 +994,9 @@ namespace PlantCondLoopOperation {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        Array1D_string AlphArray;      // Alpha input items for object
-        Array1D_string cAlphaFields;   // Alpha field names
-        Array1D_string cNumericFields; // Numeric field names
+        Array1D<std::string> AlphArray;      // Alpha input items for object
+        Array1D<std::string> cAlphaFields;   // Alpha field names
+        Array1D<std::string> cNumericFields; // Numeric field names
         Array1D<Real64> NumArray;      // Numeric input items for object
         EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
@@ -1120,7 +1120,7 @@ namespace PlantCondLoopOperation {
         bool IsNotOK;
         std::string CurrentModuleObject;
         static int TotNumLists(0);
-        static Array1D_string EquipListsNameList;
+        static Array1D<std::string> EquipListsNameList;
         static Array1D_int EquipListsTypeList;
         static Array1D_int EquipListsIndexList;
         int iIndex;

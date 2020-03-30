@@ -139,18 +139,18 @@ namespace VentilatedSlab {
         std::string ZoneName;  // Name of zone the system is serving
         int ZonePtr;           // Point to this zone in the Zone derived type
         // Variables for Delivery Config.
-        Array1D_string ZName;            // Name of zone the system is serving
+        Array1D<std::string> ZName;            // Name of zone the system is serving
         Array1D_int ZPtr;                // Point to this zone in the Zone derived type
         std::string SurfListName;        // Name of surface/surface list that is the radiant system
         int NumOfSurfaces;               // Number of surfaces included in this system (coordinated control)
         Array1D_int SurfacePtr;          // Pointer to the slabs in the Surface derived type
-        Array1D_string SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
+        Array1D<std::string> SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
         Array1D<Real64> CDiameter;       // Number of core diameter
         Array1D<Real64> CLength;         // Number of core length
         Array1D<Real64> CNumbers;        // Number of core numbers
-        Array1D_string SlabIn;           // Name of node that is slab inlet node
-        Array1D_string SlabOut;          // Name of node that is slab outlet node
+        Array1D<std::string> SlabIn;           // Name of node that is slab inlet node
+        Array1D<std::string> SlabOut;          // Name of node that is slab outlet node
         Real64 TotalSurfaceArea;         // Total surface area for all surfaces that are part of this system
         Real64 CoreDiameter;             // tube diameter for embedded tubing
         Real64 CoreLength;               // tube length embedded in radiant surface
@@ -326,7 +326,7 @@ namespace VentilatedSlab {
     struct VentSlabNumericFieldData
     {
         // Members
-        Array1D_string FieldNames;
+        Array1D<std::string> FieldNames;
 
         // Default Constructor
         VentSlabNumericFieldData()

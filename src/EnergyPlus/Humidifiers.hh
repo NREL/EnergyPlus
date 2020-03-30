@@ -66,7 +66,7 @@ namespace Humidifiers {
     extern int const Humidifier_Steam_Electric;
     extern int const Humidifier_Steam_Gas;
 
-    extern Array1D_string const HumidifierType;
+    extern Array1D<std::string> const HumidifierType;
 
     // DERIVED TYPE DEFINITIONS
 

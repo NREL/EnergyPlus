@@ -117,7 +117,7 @@ namespace ScheduleManager {
     // MODULE PARAMETER DEFINITIONS
     int const MaxDayTypes(12);
     static std::string const BlankString;
-    Array1D_string const ValidDayTypes(MaxDayTypes,
+    Array1D<std::string> const ValidDayTypes(MaxDayTypes,
                                        {"Sunday",
                                         "Monday",
                                         "Tuesday",
@@ -132,7 +132,7 @@ namespace ScheduleManager {
                                         "CustomDay2"});
 
     int const NumScheduleTypeLimitUnitTypes(14);
-    Array1D_string const ScheduleTypeLimitUnitTypes(NumScheduleTypeLimitUnitTypes,
+    Array1D<std::string> const ScheduleTypeLimitUnitTypes(NumScheduleTypeLimitUnitTypes,
                                                     {"Dimensionless",
                                                      "Temperature",
                                                      "DeltaTemperature",
@@ -260,9 +260,9 @@ namespace ScheduleManager {
         int InLoopIndex;
         int DayIndex;
         int WeekIndex;
-        Array1D_string Alphas;
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
+        Array1D<std::string> Alphas;
+        Array1D<std::string> cAlphaFields;
+        Array1D<std::string> cNumericFields;
         Array1D<Real64> Numbers;
         EPVector<bool> lAlphaBlanks;
         EPVector<bool> lNumericBlanks;
@@ -2379,8 +2379,8 @@ namespace ScheduleManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const Months(12, {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
-        static Array1D_string const HrField({0, 24}, {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
+        static Array1D<std::string> const Months(12, {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
+        static Array1D<std::string> const HrField({0, 24}, {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
                                                       "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"});
 
         static ObjexxFCL::gio::Fmt CMinFmt("(I2.2)");
@@ -2402,9 +2402,9 @@ namespace ScheduleManager {
         int iDay;
         int DT;
         int iDayP;
-        Array1D_string ShowMinute;
+        Array1D<std::string> ShowMinute;
         int CurMinute;
-        Array1D_string TimeHHMM;
+        Array1D<std::string> TimeHHMM;
         std::string NoAverageLinear;
         std::string YesNo2;
         std::string Num1;

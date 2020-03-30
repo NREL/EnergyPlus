@@ -63,7 +63,7 @@ namespace HeatBalanceManager {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    extern Array1D_string const PassFail;
+    extern Array1D<std::string> const PassFail;
 
     // DERIVED TYPE DEFINITIONS
 
@@ -177,14 +177,14 @@ namespace HeatBalanceManager {
 
     void ProcessZoneData(std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
-                         Array1D_string const &cAlphaArgs,
+                         Array1D<std::string> const &cAlphaArgs,
                          int &NumAlphas,
                          Array1D<Real64> const &rNumericArgs,
                          int &NumNumbers,
                          EPVector<bool> const &lNumericFieldBlanks, // Unused
                          EPVector<bool> const &lAlphaFieldBlanks,
-                         Array1D_string const &cAlphaFieldNames,
-                         Array1D_string const &cNumericFieldNames, // Unused
+                         Array1D<std::string> const &cAlphaFieldNames,
+                         Array1D<std::string> const &cNumericFieldNames, // Unused
                          bool &ErrorsFound                        // If errors found in input
     );
 

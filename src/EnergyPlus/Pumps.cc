@@ -142,7 +142,7 @@ namespace Pumps {
     int const PumpBank_VarSpeed(104);
     std::string const cPumpBank_ConSpeed("HeaderedPumps:ConstantSpeed");
     int const PumpBank_ConSpeed(105);
-    Array1D_string const cPumpTypes({101, 105}, {cPump_VarSpeed, cPump_ConSpeed, cPump_Cond, cPumpBank_VarSpeed, cPumpBank_ConSpeed});
+    Array1D<std::string> const cPumpTypes({101, 105}, {cPump_VarSpeed, cPump_ConSpeed, cPump_Cond, cPumpBank_VarSpeed, cPumpBank_ConSpeed});
 
     static std::string const fluidNameSteam("STEAM");
     static std::string const fluidNameWater("WATER");

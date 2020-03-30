@@ -79,9 +79,9 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     int NumOARequirements = 6;
     OARequirements.allocate(NumOARequirements);
 
-    Array1D_string Alphas;         // Alpha input items for object
-    Array1D_string cAlphaFields;   // Alpha field names
-    Array1D_string cNumericFields; // Numeric field names
+    Array1D<std::string> Alphas;         // Alpha input items for object
+    Array1D<std::string> cAlphaFields;   // Alpha field names
+    Array1D<std::string> cNumericFields; // Numeric field names
     Array1D<Real64> Numbers;       // Numeric input items for object
     EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
     EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.

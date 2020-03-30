@@ -109,7 +109,7 @@ namespace DataSurfaceColors {
                                                                                                                  // Daylight Sensor 1 | Daylight
                                                                                                                  // Sensor 2
 
-    Array1D_string const colorkeys(NumColors,
+    Array1D<std::string> const colorkeys(NumColors,
                                    {"Text",
                                     "Walls",
                                     "Windows",
@@ -218,9 +218,9 @@ namespace DataSurfaceColors {
         int numptr;
         int numargs;
         int status;
-        Array1D_string cAlphas;
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
+        Array1D<std::string> cAlphas;
+        Array1D<std::string> cAlphaFields;
+        Array1D<std::string> cNumericFields;
         EPVector<bool> lAlphaBlanks;
         EPVector<bool> lNumericBlanks;
         Array1D<Real64> rNumerics;

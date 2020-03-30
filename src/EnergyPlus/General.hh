@@ -402,7 +402,7 @@ namespace General {
                                          bool &errFlag                                   // Error flag set to true if error found here.
     )
     {
-        Array1D_string ItemNames(Items.size());
+        Array1D<std::string> ItemNames(Items.size());
         for (std::size_t i = 0, e = Items.size(); i < e; ++i)
             ItemNames[i] = Items[i].Name;
         CheckCreatedZoneItemName(calledFrom, CurrentObject, ZoneName, MaxZoneNameLength, ItemName, ItemNames, NumItems, ResultName, errFlag);

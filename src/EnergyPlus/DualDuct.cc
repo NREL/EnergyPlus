@@ -272,9 +272,9 @@ namespace DualDuct {
         int NumNums;
         int IOStat;
         static Array1D<Real64> NumArray(2, 0.0);
-        static Array1D_string AlphArray(7);
-        static Array1D_string cAlphaFields(7);       // Alpha field names
-        static Array1D_string cNumericFields(2);     // Numeric field names
+        static Array1D<std::string> AlphArray(7);
+        static Array1D<std::string> cAlphaFields(7);       // Alpha field names
+        static Array1D<std::string> cNumericFields(2);     // Numeric field names
         static EPVector<bool> lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
         static EPVector<bool> lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
         std::string CurrentModuleObject;             // for ease in getting objects
@@ -2274,13 +2274,13 @@ namespace DualDuct {
         //  INTEGER :: DDNum
         static bool FirstTimeOnly(true);
         static EPVector<bool> RecircIsUsedARR;
-        static Array1D_string DamperNamesARR;
+        static Array1D<std::string> DamperNamesARR;
         int DamperIndex;                 // Loop index to Damper that you are currently loading input into
         std::string CurrentModuleObject; // for ease in getting objects
         static Array1D<Real64> NumArray(2, 0.0);
-        static Array1D_string AlphArray(7);
-        static Array1D_string cAlphaFields(7);       // Alpha field names
-        static Array1D_string cNumericFields(2);     // Numeric field names
+        static Array1D<std::string> AlphArray(7);
+        static Array1D<std::string> cAlphaFields(7);       // Alpha field names
+        static Array1D<std::string> cNumericFields(2);     // Numeric field names
         static EPVector<bool> lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
         static EPVector<bool> lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas;

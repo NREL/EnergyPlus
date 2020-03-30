@@ -159,7 +159,7 @@ namespace OutputProcessor {
     static ObjexxFCL::gio::Fmt DailyStampFormat("(A,',',A,',',i2,',',i2,',',i2,',',A)");
     static ObjexxFCL::gio::Fmt MonthlyStampFormat("(A,',',A,',',i2)");
     static ObjexxFCL::gio::Fmt RunPeriodStampFormat("(A,',',A)");
-    Array1D_string const DayTypes(12,
+    Array1D<std::string> const DayTypes(12,
                                   {"Sunday",
                                    "Monday",
                                    "Tuesday",
@@ -875,11 +875,11 @@ namespace OutputProcessor {
         int IOStat;
         static bool ErrorsFound(false); // If errors detected in input
         std::string cCurrentModuleObject;
-        Array1D_string cAlphaArgs(4);
-        Array1D_string cAlphaFieldNames(4);
+        Array1D<std::string> cAlphaArgs(4);
+        Array1D<std::string> cAlphaFieldNames(4);
         EPVector<bool> lAlphaFieldBlanks(4);
         Array1D<Real64> rNumericArgs(1);
-        Array1D_string cNumericFieldNames(1);
+        Array1D<std::string> cNumericFieldNames(1);
         EPVector<bool> lNumericFieldBlanks(1);
 
 
@@ -1221,9 +1221,9 @@ namespace OutputProcessor {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static Array1D_string StateVariables(3);
+        static Array1D<std::string> StateVariables(3);
         static std::vector<std::string> stateVariables({"STATE", "AVERAGE", "AVERAGED"});
-        static Array1D_string NonStateVariables(4);
+        static Array1D<std::string> NonStateVariables(4);
         static std::vector<std::string> nonStateVariables({"NON STATE", "NONSTATE", "SUM", "SUMMED"});
         std::string uppercase(UtilityRoutines::MakeUPPERCase(VariableTypeKey));
 
@@ -1449,7 +1449,7 @@ namespace OutputProcessor {
         int NumCustomDecMeters;
         int fldIndex;
         bool KeyIsStar;
-        Array1D_string NamesOfKeys;                                    // Specific key name
+        Array1D<std::string> NamesOfKeys;                                    // Specific key name
         Array1D_int IndexesForKeyVar;                                  // Array index
         OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None);   // Units enumeration
         OutputProcessor::Unit MeterUnits(OutputProcessor::Unit::None); // Units enumeration
@@ -7147,7 +7147,7 @@ void UpdateMeterReporting(OutputFiles &outputFiles)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
-    Array1D_string Alphas(2);
+    Array1D<std::string> Alphas(2);
     Array1D<Real64> Numbers(1);
     int NumAlpha;
     int NumNumbers;
@@ -7770,7 +7770,7 @@ int GetMeterIndex(std::string const &MeterName)
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     // Valid Meter names because matching case insensitive
-    static Array1D_string ValidMeterNames;
+    static Array1D<std::string> ValidMeterNames;
     static Array1D_int iValidMeterNames;
     static int NumValidMeters(0);
     //////////// hoisted into namespace changed to GetMeterIndexFirstCall////////////
@@ -8311,9 +8311,9 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
                          Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
-                         Array1D_string &EndUses,                               // EndUses for each variable
-                         Array1D_string &Groups,                                // Groups for each variable
-                         Array1D_string &Names,                                 // Variable Names for each variable
+                         Array1D<std::string> &EndUses,                               // EndUses for each variable
+                         Array1D<std::string> &Groups,                                // Groups for each variable
+                         Array1D<std::string> &Names,                                 // Variable Names for each variable
                          int &NumFound                                          // Number Found
 )
 {
@@ -8392,9 +8392,9 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
                          Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
-                         Array1D_string &EndUses,                               // EndUses for each variable
-                         Array1D_string &Groups,                                // Groups for each variable
-                         Array1D_string &Names,                                 // Variable Names for each variable
+                         Array1D<std::string> &EndUses,                               // EndUses for each variable
+                         Array1D<std::string> &Groups,                                // Groups for each variable
+                         Array1D<std::string> &Names,                                 // Variable Names for each variable
                          Array1D_int &VarIDs                                    // Variable Report Numbers
 )
 {
@@ -8533,7 +8533,7 @@ void GetVariableKeyCountandType(std::string const &varName,                 // S
     bool Duplicate;                  // True if keyname is a duplicate
     std::string VarKeyPlusName;      // Full variable name including keyname and units
     std::string varNameUpper;        // varName pushed to all upper case
-    static Array1D_string varNames;  // stored variable names
+    static Array1D<std::string> varNames;  // stored variable names
     static Array1D_int ivarNames;    // pointers for sorted information
     static int numVarNames;          // number of variable names
 
@@ -8667,7 +8667,7 @@ void GetVariableKeyCountandType(std::string const &varName,                 // S
 
 void GetVariableKeys(std::string const &varName, // Standard variable name
                      int const varType,          // 1=integer, 2=real, 3=meter
-                     Array1D_string &keyNames,   // Specific key name
+                     Array1D<std::string> &keyNames,   // Specific key name
                      Array1D_int &keyVarIndexes  // Array index for
 )
 {
@@ -8899,7 +8899,7 @@ void InitPollutionMeterReporting(OutputFiles &outputFiles, std::string const &Re
     using namespace OutputProcessor;
     // SUBROUTINE PARAMETER DEFINITIONS:
     //             Now for the Pollution Meters
-    static Array1D_string const PollutionMeters({1, 29},
+    static Array1D<std::string> const PollutionMeters({1, 29},
                                                 {"Electricity:Facility",
                                                  "Diesel:Facility",
                                                  "DistrictCooling:Facility",
@@ -9158,7 +9158,7 @@ void ProduceRDDMDD()
         mdd_stream << "! Output:Meter Objects (applicable to this run)" << '\n';
     }
 
-    Array1D_string VariableNames(NumVariablesForOutput);
+    Array1D<std::string> VariableNames(NumVariablesForOutput);
     for (int i = 1; i <= NumVariablesForOutput; ++i)
         VariableNames(i) = DDVariableTypes(i).VarNameOnly;
     Array1D_int iVariableNames(NumVariablesForOutput);

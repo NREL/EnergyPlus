@@ -150,7 +150,7 @@ namespace EvaporativeFluidCoolers {
         int IOStat;                   // IO Status when calling get input subroutine
         bool ErrorsFound(false);      // Logical flag set .TRUE. if errors found while getting input data
         Array1D<Real64> NumArray(25); // Numeric input data array
-        Array1D_string AlphArray(13); // Character string input data array
+        Array1D<std::string> AlphArray(13); // Character string input data array
 
         // Get number of all evaporative fluid coolers specified in the input data file (idf)
         int NumSingleSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound(cEvapFluidCooler_SingleSpeed);

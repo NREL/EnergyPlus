@@ -80,7 +80,7 @@ namespace DataSizing {
     extern int const OAFlowSum;
     extern int const OAFlowMax;
 
-    extern Array1D_string const cOAFlowMethodTypes;
+    extern Array1D<std::string> const cOAFlowMethodTypes;
 
     // parameters for outside air
     extern int const AllOA;
@@ -308,8 +308,8 @@ namespace DataSizing {
     extern Real64 GlobalCoolSizingFactor;             // the global cooling sizing ratio
     extern Array1D<Real64> ZoneSizThermSetPtHi;       // highest zone thermostat setpoint during zone sizing calcs
     extern Array1D<Real64> ZoneSizThermSetPtLo;       // lowest zone thermostat setpoint during zone sizing calcs
-    extern Array1D_string CoolPeakDateHrMin;          // date:hr:min of cooling peak
-    extern Array1D_string HeatPeakDateHrMin;          // date:hr:min of heating peak
+    extern Array1D<std::string> CoolPeakDateHrMin;          // date:hr:min of cooling peak
+    extern Array1D<std::string> HeatPeakDateHrMin;          // date:hr:min of heating peak
     extern char SizingFileColSep;                     // Character to separate columns in sizing outputs
     extern int DataDesicDehumNum;                     // index to desiccant dehumidifier
     extern bool DataDesicRegCoil;                     // TRUE if heating coil desiccant regeneration coil

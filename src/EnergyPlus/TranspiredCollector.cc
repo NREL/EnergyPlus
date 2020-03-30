@@ -278,7 +278,7 @@ namespace TranspiredCollector {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Array1D_string Alphas; // Alpha items for extensible
+        Array1D<std::string> Alphas; // Alpha items for extensible
         // Solar Collectors:Unglazed Transpired object
         int Item;                       // Item to be "gotten"
         Array1D<Real64> Numbers(11);    // Numeric items for object
@@ -299,7 +299,7 @@ namespace TranspiredCollector {
         Real64 TiltRads;      // average tilt of collector in radians
         Real64 tempHdeltaNPL; // temporary variable for bouyancy length scale
         int NumUTSCSplitter(0);
-        Array1D_string AlphasSplit; // Alpha items for extensible
+        Array1D<std::string> AlphasSplit; // Alpha items for extensible
         // Solar Collectors:Unglazed Transpired object
         int ItemSplit;                        // Item to be "gotten"
         Array1D<Real64> NumbersSplit(1);      // Numeric items for object

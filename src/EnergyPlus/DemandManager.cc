@@ -416,7 +416,7 @@ namespace DemandManager {
         int NumAlphas;            // Number of elements in the alpha array
         int NumNums;              // Number of elements in the numeric array
         int IOStat;               // IO Status when calling get input subroutine
-        Array1D_string AlphArray; // Character string data
+        Array1D<std::string> AlphArray; // Character string data
         Array1D<Real64> NumArray; // Numeric data
         std::string Units;        // String for meter units
         static bool ErrorsFound(false);
@@ -688,7 +688,7 @@ namespace DemandManager {
         int MaxNums;              // Max number of elements in the numeric array
         int NumParams;            // Number of arguments total in an ObjectDef
         int IOStat;               // IO Status when calling get input subroutine
-        Array1D_string AlphArray; // Character string data
+        Array1D<std::string> AlphArray; // Character string data
         Array1D<Real64> NumArray; // Numeric data
         static bool ErrorsFound(false);
         std::string CurrentModuleObject; // for ease in renaming.

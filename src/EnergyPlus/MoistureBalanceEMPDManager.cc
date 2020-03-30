@@ -187,7 +187,7 @@ namespace MoistureBalanceEMPDManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;                       // IO Status when calling get input subroutine
-        Array1D_string MaterialNames(3);  // Number of Material Alpha names defined
+        Array1D<std::string> MaterialNames(3);  // Number of Material Alpha names defined
         int MaterNum;                     // Counter to keep track of the material number
         int MaterialNumAlpha;             // Number of material alpha names being passed
         int MaterialNumProp;              // Number of material properties being passed

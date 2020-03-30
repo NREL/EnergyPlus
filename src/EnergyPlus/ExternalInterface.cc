@@ -145,10 +145,10 @@ namespace ExternalInterface {
     bool noMoreValues(false);  // Flag, true if no more values
     // will be sent by the server
 
-    Array1D_string varKeys;     // Keys of report variables used for data exchange
-    Array1D_string varNames;    // Names of report variables used for data exchange
+    Array1D<std::string> varKeys;     // Keys of report variables used for data exchange
+    Array1D<std::string> varNames;    // Names of report variables used for data exchange
     Array1D_int inpVarTypes;    // Names of report variables used for data exchange
-    Array1D_string inpVarNames; // Names of report variables used for data exchange
+    Array1D<std::string> inpVarNames; // Names of report variables used for data exchange
 
     bool configuredControlPoints(false); // True if control points have been configured
     bool useEMS(false);                  // Will be set to true if ExternalInterface writes to EMS variables or actuators
@@ -421,7 +421,7 @@ namespace ExternalInterface {
     }
 
     void ParseString(std::string const &str, // The string, with all elements separated by ';'
-                     Array1D_string &ele,     // The elements
+                     Array1D<std::string> &ele,     // The elements
                      int const nEle          // The number of elements
     )
     {
@@ -1074,15 +1074,15 @@ namespace ExternalInterface {
 
         Array1D_int keyIndexes(1);     // Array index for
         Array1D_int varTypes(1);       // Array index for
-        Array1D_string NamesOfKeys(1); // Specific key name
+        Array1D<std::string> NamesOfKeys(1); // Specific key name
         int retValfmiVersion;
         int retValfmiPathLib;
-        Array1D_string NameListInstances(5);
+        Array1D<std::string> NameListInstances(5);
         static bool FirstCallIni(true); // First time, input has been read
         bool fileExist;
         std::string tempFullFileName;
-        Array1D_string strippedFileName; // remove path from entered file name
-        Array1D_string fullFileName;     // entered file name/found
+        Array1D<std::string> strippedFileName; // remove path from entered file name
+        Array1D<std::string> fullFileName;     // entered file name/found
         std::string::size_type pos;
         int FOUND;
 
@@ -1427,8 +1427,8 @@ namespace ExternalInterface {
 
                             // The next call expects an array, but a single item is passed
                             // Therefore create a single item array here first
-                            Array1D_string tempSingleStringA(1, FMU(i).Instance(j).eplusOutputVariable(k).VarKey);
-                            Array1D_string tempSingleStringB(1, FMU(i).Instance(j).eplusOutputVariable(k).Name);
+                            Array1D<std::string> tempSingleStringA(1, FMU(i).Instance(j).eplusOutputVariable(k).VarKey);
+                            Array1D<std::string> tempSingleStringB(1, FMU(i).Instance(j).eplusOutputVariable(k).Name);
 
                             // Make the call with arrays
                             GetReportVariableKey(tempSingleStringA, 1, tempSingleStringB, keyIndexes, varTypes);
@@ -1967,9 +1967,9 @@ namespace ExternalInterface {
         static bool FirstCallTStep(true);      // Flag for first call during time stepping
         static int fmiEndSimulation(0);        // Flag to indicate end of simulation
 
-        Array1D_string Alphas(5);
+        Array1D<std::string> Alphas(5);
         Array1D_int keyIndexes(1);     // Array index for
-        Array1D_string NamesOfKeys(1); // Specific key name
+        Array1D<std::string> NamesOfKeys(1); // Specific key name
 
         if (WarmupFlag && (KindOfSim != ksRunPeriodWeather)) { // No data exchange during design days
             if (FirstCallDesignDays) {
@@ -2391,9 +2391,9 @@ namespace ExternalInterface {
         firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
     }
 
-    void GetReportVariableKey(const Array1D_string &varKeys,  // Standard variable name
+    void GetReportVariableKey(const Array1D<std::string> &varKeys,  // Standard variable name
                               int const numberOfKeys,        // Number of keys=size(varKeys)
-                              const Array1D_string &varNames, // Standard variable name
+                              const Array1D<std::string> &varNames, // Standard variable name
                               Array1D_int &keyVarIndexes,     // Array index
                               Array1D_int &varTypes           // Types of variables in keyVarIndexes
     )
@@ -2414,7 +2414,7 @@ namespace ExternalInterface {
         OutputProcessor::TimeStepType varStepType(OutputProcessor::TimeStepType::TimeStepZone); // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit varUnits(OutputProcessor::Unit::None);                // Units sting, may be blank
         Array1D_int keyIndexes;                                                     // Array index for
-        Array1D_string NamesOfKeys;                                                 // Specific key name
+        Array1D<std::string> NamesOfKeys;                                                 // Specific key name
         int Loop, iKey;                                                             // Loop counters
 
         // Get pointers for variables to be sent to Ptolemy

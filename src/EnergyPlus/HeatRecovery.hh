@@ -490,7 +490,7 @@ namespace HeatRecovery {
     struct HeatExchCondNumericFieldData
     {
         // Members
-        Array1D_string NumericFieldNames;
+        Array1D<std::string> NumericFieldNames;
 
         // Default Constructor
         HeatExchCondNumericFieldData()
@@ -501,7 +501,7 @@ namespace HeatRecovery {
     struct BalDesDehumPerfNumericFieldData
     {
         // Members
-        Array1D_string NumericFieldNames;
+        Array1D<std::string> NumericFieldNames;
 
         // Default Constructor
         BalDesDehumPerfNumericFieldData()

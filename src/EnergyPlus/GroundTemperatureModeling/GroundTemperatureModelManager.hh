@@ -71,7 +71,7 @@ namespace GroundTemperatureManager {
     extern int const objectType_SiteFCFactorMethodGroundTemp;
     extern int const objectType_XingGroundTemp;
 
-    extern Array1D_string const CurrentModuleObjects;
+    extern Array1D<std::string> const CurrentModuleObjects;
 
     extern std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
 

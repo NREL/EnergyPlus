@@ -189,7 +189,7 @@ namespace OutputReportTabular {
     extern std::ofstream htm_stream;                   // HTML table stream
     extern std::ofstream xml_stream;                   // XML table stream
     extern Array1D<std::ofstream *> TabularOutputFile; // Table stream array
-    extern Array1D_string del;                         // the delimiter to use
+    extern Array1D<std::string> del;                         // the delimiter to use
     extern Array1D_int TableStyle;                     // see list of parameters
 
     extern Real64 timeInYear;
@@ -226,9 +226,9 @@ namespace OutputReportTabular {
     extern Array2D_int meterNumEndUseBEPS;
     extern Array3D_int meterNumEndUseSubBEPS;
     // arrays that hold the names of the resource and end uses
-    extern Array1D_string resourceTypeNames;
-    extern Array1D_string sourceTypeNames;
-    extern Array1D_string endUseNames;
+    extern Array1D<std::string> resourceTypeNames;
+    extern Array1D<std::string> sourceTypeNames;
+    extern Array1D<std::string> endUseNames;
     // arrays that hold the actual values for the year
     extern Array1D<Real64> gatherTotalsBEPS;
     extern Array1D<Real64> gatherTotalsBySourceBEPS;
@@ -321,7 +321,7 @@ namespace OutputReportTabular {
     //(8)   Milliseconds (0-999)
 
     // Design day name storage
-    extern Array1D_string DesignDayName;
+    extern Array1D<std::string> DesignDayName;
     extern int DesignDayCount;
 
     // arrays related to pulse and load component reporting
@@ -528,7 +528,7 @@ namespace OutputReportTabular {
         int keyCount;                         // noel
         OutputProcessor::StoreType varAvgSum; // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType varStepType;                      // Variable time step is Zone=1 or HVAC=2
-        Array1D_string NamesOfKeys;           // keyNames !noel
+        Array1D<std::string> NamesOfKeys;           // keyNames !noel
         Array1D_int IndexesForKeyVar;         // keyVarIndexes !noel
 
         // Default Constructor
@@ -899,8 +899,8 @@ namespace OutputReportTabular {
     void WriteTextLine(std::string const &lineOfText, Optional_bool_const isBold = _);
 
     void WriteTable(Array2S_string const body, // row,column
-                    const Array1D_string &rowLabels,
-                    const Array1D_string &columnLabels,
+                    const Array1D<std::string> &rowLabels,
+                    const Array1D<std::string> &columnLabels,
                     Array1D_int &widthColumn,
                     Optional_bool_const transposeXML = _,
                     Optional_string_const footnoteText = _);
@@ -921,7 +921,7 @@ namespace OutputReportTabular {
 
     /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
      * This routine will fill up the blanks for output to Sql in particular */
-    void FillRowHead(Array1D_string & rowHead);
+    void FillRowHead(Array1D<std::string> & rowHead);
 
     //======================================================================================================================
     //======================================================================================================================

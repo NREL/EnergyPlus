@@ -228,7 +228,7 @@ namespace BranchInputManager {
     void GetBranchList(std::string const &LoopName,       // Name of Loop Branch List is on
                        std::string const &BranchListName, // Branch List Name from Input
                        int &NumBranchNames,               // Number of Branches for this Branch List
-                       Array1D_string &BranchNames,       // Names of Branches on this Branch List
+                       Array1D<std::string> &BranchNames,       // Names of Branches on this Branch List
                        std::string const &LoopType        // Type of Loop Branch list is on
     )
     {
@@ -330,11 +330,11 @@ namespace BranchInputManager {
                        int &PressCurveType,                 // Index of a pressure curve object
                        int &PressCurveIndex,                // Index of a pressure curve object
                        int &NumComps,                       // Number of Components on Branch
-                       Array1D_string &CompType,            // Component Type for each item on Branch
-                       Array1D_string &CompName,            // Component Name for each item on Branch
-                       Array1D_string &CompInletNodeNames,  // Component Inlet Node IDs for each item on Branch
+                       Array1D<std::string> &CompType,            // Component Type for each item on Branch
+                       Array1D<std::string> &CompName,            // Component Name for each item on Branch
+                       Array1D<std::string> &CompInletNodeNames,  // Component Inlet Node IDs for each item on Branch
                        Array1D_int &CompInletNodeNums,      // Component Inlet Node Numbers for each item on Branch
-                       Array1D_string &CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
+                       Array1D<std::string> &CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
                        Array1D_int &CompOutletNodeNums,     // Component Outlet Node Numbers for each item on Branch
                        bool &ErrorsFound)
     {
@@ -839,7 +839,7 @@ namespace BranchInputManager {
                       std::string &OutletNodeName,          // Outlet Node ID
                       int &OutletNodeNum,                   // Outlet Node Number
                       int &NumInletNodes,                   // Number of Inlet Nodes
-                      Array1D_string &InletNodeNames,       // Inlet Node IDs
+                      Array1D<std::string> &InletNodeNames,       // Inlet Node IDs
                       Array1D_int &InletNodeNums,           // Inlet Node Numbers
                       bool &ErrorsFound,
                       Optional_int_const ConnectorNumber, // number of the current item in connector list
@@ -999,7 +999,7 @@ namespace BranchInputManager {
                          std::string &InletNodeName,           // Inlet Node ID
                          int &InletNodeNum,                    // Inlet Node Number
                          int &NumOutletNodes,                  // Number of Outlet Nodes
-                         Array1D_string &OutletNodeNames,      // Outlet Node IDs
+                         Array1D<std::string> &OutletNodeNames,      // Outlet Node IDs
                          Array1D_int &OutletNodeNums,          // Outlet Node Numbers
                          bool &ErrorsFound,
                          Optional_int_const ConnectorNumber, // number of the current item in connector list
@@ -1352,12 +1352,12 @@ namespace BranchInputManager {
         int BCount;              // Actual Num of Branches
         bool ErrFound;           // Flag for error detection
         int NumAlphas;           // Used to retrieve names from IDF
-        Array1D_string Alphas;   // Used to retrieve names from IDF
+        Array1D<std::string> Alphas;   // Used to retrieve names from IDF
         Array1D_int NodeNums;    // Possible Array of Node Numbers (only 1 allowed)
         int NumNumbers;          // Used to retrieve numbers from IDF
         Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
+        Array1D<std::string> cAlphaFields;
+        Array1D<std::string> cNumericFields;
         EPVector<bool> lNumericBlanks;
         EPVector<bool> lAlphaBlanks;
         int IOStat; // Could be used in the Get Routines, not currently checked
@@ -1419,8 +1419,8 @@ namespace BranchInputManager {
 
     void GetSingleBranchInput(std::string const RoutineName,
                               int const BCount,
-                              Array1D_string &Alphas,
-                              Array1D_string &cAlphaFields,
+                              Array1D<std::string> &Alphas,
+                              Array1D<std::string> &cAlphaFields,
                               int const NumAlphas,
                               Array1D_int &NodeNums,
                               EPVector<bool> &lAlphaBlanks)
@@ -1624,11 +1624,11 @@ namespace BranchInputManager {
         // Following are needed because routine calls GetBranchInput
         // which would overwrite the module Alphas and NumAlphas
         int NumAlphas;         // Used to retrieve Branch list from IDF
-        Array1D_string Alphas; // Used to retrieve names from IDF
+        Array1D<std::string> Alphas; // Used to retrieve names from IDF
         int NumNumbers;
         Array1D<Real64> Numbers; // Not used in this object
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
+        Array1D<std::string> cAlphaFields;
+        Array1D<std::string> cNumericFields;
         EPVector<bool> lNumericBlanks;
         EPVector<bool> lAlphaBlanks;
         int IOStat; // Could be used in the Get Routines, not currently checked
@@ -1777,11 +1777,11 @@ namespace BranchInputManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;               // Loop Counter
         int NumAlphas;           // Used to retrieve names from IDF
-        Array1D_string Alphas;   // Used to retrieve names from IDF
+        Array1D<std::string> Alphas;   // Used to retrieve names from IDF
         int NumNumbers;          // Used to retrieve numbers from IDF
         Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
+        Array1D<std::string> cAlphaFields;
+        Array1D<std::string> cNumericFields;
         EPVector<bool> lNumericBlanks;
         EPVector<bool> lAlphaBlanks;
         int IOStat; // Could be used in the Get Routines, not currently checked
@@ -1791,7 +1791,7 @@ namespace BranchInputManager {
         int Arg;
         int SplitNum;
         int MixerNum;
-        Array1D_string BranchNames;
+        Array1D<std::string> BranchNames;
         int NumBranchNames;
         bool ErrorsFound;
         int Loop;
@@ -2040,11 +2040,11 @@ namespace BranchInputManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;           // Used to retrieve names from IDF
-        Array1D_string Alphas;   // Used to retrieve names from IDF
+        Array1D<std::string> Alphas;   // Used to retrieve names from IDF
         int NumNumbers;          // Used to retrieve numbers from IDF
         Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
+        Array1D<std::string> cAlphaFields;
+        Array1D<std::string> cNumericFields;
         EPVector<bool> lNumericBlanks;
         EPVector<bool> lAlphaBlanks;
         int IOStat; // Could be used in the Get Routines, not currently checked
@@ -2285,11 +2285,11 @@ namespace BranchInputManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;           // Used to retrieve names from IDF
-        Array1D_string Alphas;   // Used to retrieve names from IDF
+        Array1D<std::string> Alphas;   // Used to retrieve names from IDF
         int NumNumbers;          // Used to retrieve numbers from IDF
         Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
+        Array1D<std::string> cAlphaFields;
+        Array1D<std::string> cNumericFields;
         EPVector<bool> lNumericBlanks;
         EPVector<bool> lAlphaBlanks;
         int IOStat; // Could be used in the Get Routines, not currently checked
@@ -2518,7 +2518,7 @@ namespace BranchInputManager {
         int Num;
         int NumPlantLoops;
         int NumParams;
-        Array1D_string Alphas;
+        Array1D<std::string> Alphas;
         int NumAlphas;
         Array1D<Real64> Numbers;
         int NumNumbers;
@@ -2598,7 +2598,7 @@ namespace BranchInputManager {
         int Num;
         int NumCondLoops;
         int NumParams;
-        Array1D_string Alphas;
+        Array1D<std::string> Alphas;
         int NumAlphas;
         Array1D<Real64> Numbers;
         int NumNumbers;
@@ -2678,7 +2678,7 @@ namespace BranchInputManager {
         int Num;
         int NumAirLoops;
         int NumParams;
-        Array1D_string Alphas;
+        Array1D<std::string> Alphas;
         int NumAlphas;
         Array1D<Real64> Numbers;
         int NumNumbers;
@@ -2950,7 +2950,7 @@ namespace BranchInputManager {
         {
             // Members
             int NumNodes;
-            Array1D_string UniqueNodeNames;
+            Array1D<std::string> UniqueNodeNames;
 
             // Default Constructor
             BranchUniqueNodes() : NumNodes(0)

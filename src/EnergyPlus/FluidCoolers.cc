@@ -185,7 +185,7 @@ namespace FluidCoolers {
         int IOStat;                   // IO Status when calling get input subroutine
         bool ErrorsFound(false);      // Logical flag set .TRUE. if errors found while getting input data
         Array1D<Real64> NumArray(16); // Numeric input data array
-        Array1D_string AlphArray(5);  // Character string input data array
+        Array1D<std::string> AlphArray(5);  // Character string input data array
 
         // Get number of all Fluid Coolers specified in the input data file (idf)
         int const NumSingleSpeedFluidCoolers = inputProcessor->getNumObjectsFound("FluidCooler:SingleSpeed");

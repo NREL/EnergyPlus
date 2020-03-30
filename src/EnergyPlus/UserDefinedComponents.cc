@@ -519,9 +519,9 @@ namespace UserDefinedComponents {
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
         int TotalArgs; // argument for call to GetObjectDefMaxArgs
-        Array1D_string cAlphaFieldNames;
+        Array1D<std::string> cAlphaFieldNames;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
+        Array1D<std::string> cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         std::string LoopStr;
@@ -1247,9 +1247,9 @@ namespace UserDefinedComponents {
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
         int TotalArgs; // argument for call to GetObjectDefMaxArgs
-        Array1D_string cAlphaFieldNames;
+        Array1D<std::string> cAlphaFieldNames;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
+        Array1D<std::string> cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         std::string LoopStr;

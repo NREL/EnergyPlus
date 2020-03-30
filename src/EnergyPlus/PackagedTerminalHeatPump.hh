@@ -337,7 +337,7 @@ namespace PackagedTerminalHeatPump {
     struct PTUnitNumericFieldData
     {
         // Members
-        Array1D_string FieldNames;
+        Array1D<std::string> FieldNames;
 
         // Default Constructor
         PTUnitNumericFieldData()

@@ -740,7 +740,7 @@ namespace DElightManagerF {
         static std::string const CurrentModuleObject("GeometryTransform");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string cAlphas(1);
+        Array1D<std::string> cAlphas(1);
         Array1D<Real64> rNumerics(2);
         int NAlphas;
         int NNum;

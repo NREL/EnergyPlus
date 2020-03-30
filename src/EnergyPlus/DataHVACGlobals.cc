@@ -173,7 +173,7 @@ namespace DataHVACGlobals {
     int const BypassWhenWithinEconomizerLimits(0);   // heat recovery controlled by economizer limits
     int const BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode
 
-    Array1D_string const
+    Array1D<std::string> const
         cFanTypes(NumAllFanTypes,
                   {"Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"});
 
@@ -187,7 +187,7 @@ namespace DataHVACGlobals {
     int const UnitarySys_HeatPump_AirToAir(5);
     int const UnitarySys_HeatPump_WaterToAir(6);
     int const UnitarySys_AnyCoilType(7);
-    Array1D_string const cFurnaceTypes(NumUnitarySystemTypes,
+    Array1D<std::string> const cFurnaceTypes(NumUnitarySystemTypes,
                                        {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
                                         "AirLoopHVAC:Unitary:Furnace:HeatCool",
                                         "AirLoopHVAC:UnitaryHeatOnly",
@@ -243,7 +243,7 @@ namespace DataHVACGlobals {
     int const CoilDX_Cooling(35);
     int const CoilDX_SubcoolReheat(36);
 
-    Array1D_string const cAllCoilTypes(NumAllCoilTypes,
+    Array1D<std::string> const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",
                                         "Coil:Heating:DX:SingleSpeed",
                                         "Coil:Cooling:DX:TwoSpeed",
@@ -280,7 +280,7 @@ namespace DataHVACGlobals {
                                         "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl",
                                         "Coil:Cooling:DX"});
 
-    Array1D_string const cCoolingCoilTypes(NumAllCoilTypes,
+    Array1D<std::string> const cCoolingCoilTypes(NumAllCoilTypes,
                                            {"Coil:Cooling:DX:SingleSpeed",
                                             "",
                                             "Coil:Cooling:DX:TwoSpeed",
@@ -317,7 +317,7 @@ namespace DataHVACGlobals {
                                             "",
                                             "Coil:Cooling:DX"});
 
-    Array1D_string const cHeatingCoilTypes(NumAllCoilTypes,
+    Array1D<std::string> const cHeatingCoilTypes(NumAllCoilTypes,
                                            {"",
                                             "Coil:Heating:DX:SingleSpeed",
                                             "",
@@ -401,7 +401,7 @@ namespace DataHVACGlobals {
     int const HX_AIRTOAIR_GENERIC(2);
     int const HX_DESICCANT_BALANCED(3);
 
-    Array1D_string const
+    Array1D<std::string> const
         cHXTypes(NumHXTypes,
                  {"HeatExchanger:AirToAir:FlatPlate", "HeatExchanger:AirToAir:SensibleAndLatent", "HeatExchanger:Desiccant:BalancedFlow"});
 
@@ -412,7 +412,7 @@ namespace DataHVACGlobals {
     int const ATMixer_InletSide(1);
     int const ATMixer_SupplySide(2);
 
-    Array1D_string const cATMixerTypes(NumATMixerTypes, {"AirTerminal:SingleDuct:InletSideMixer", "AirTerminal:SingleDuct:SupplySideMixer"});
+    Array1D<std::string> const cATMixerTypes(NumATMixerTypes, {"AirTerminal:SingleDuct:InletSideMixer", "AirTerminal:SingleDuct:SupplySideMixer"});
     bool const ATMixerExists(true);
 
     // Parameters describing variable refrigerant flow terminal unit types
@@ -420,14 +420,14 @@ namespace DataHVACGlobals {
 
     int const VRFTUType_ConstVolume(1);
 
-    Array1D_string const cVRFTUTypes(NumVRFTUTypes, std::string("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"));
+    Array1D<std::string> const cVRFTUTypes(NumVRFTUTypes, std::string("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"));
 
     // VRF Heating Performance Curve Temperature Type
     int const NumVRFHeatingPerformanceOATTypes(2);
     int const WetBulbIndicator(1);
     int const DryBulbIndicator(2);
 
-    Array1D_string const cVRFHeatingPerformanceOATTypes(NumVRFHeatingPerformanceOATTypes, {"WetBulbTemperature", "DryBulbTemperature"});
+    Array1D<std::string> const cVRFHeatingPerformanceOATTypes(NumVRFHeatingPerformanceOATTypes, {"WetBulbTemperature", "DryBulbTemperature"});
 
     // parameter concerning the amount of change in zone temperature is needed
     // for oscillation of zone temperature to be detected.
@@ -513,7 +513,7 @@ namespace DataHVACGlobals {
 
     int const NumZoneHVACTerminalTypes(38);
 
-    Array1D_string const ZoneHVACTerminalTypes(NumZoneHVACTerminalTypes,
+    Array1D<std::string> const ZoneHVACTerminalTypes(NumZoneHVACTerminalTypes,
                                                {"ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
                                                 "ZONEHVAC:ENERGYRECOVERYVENTILATOR",
                                                 "ZONEHVAC:FOURPIPEFANCOIL",
@@ -553,7 +553,7 @@ namespace DataHVACGlobals {
                                                 "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR",
                                                 "AIRLOOPHVACRETURNAIR"});
 
-    Array1D_string const ccZoneHVACTerminalTypes(NumZoneHVACTerminalTypes,
+    Array1D<std::string> const ccZoneHVACTerminalTypes(NumZoneHVACTerminalTypes,
                                                  {"ZoneHVAC:TerminalUnit:VariableRefrigerantFlow",
                                                   "ZoneHVAC:EnergyRecoveryVentilator",
                                                   "ZoneHVAC:FourPipeFanCoil",

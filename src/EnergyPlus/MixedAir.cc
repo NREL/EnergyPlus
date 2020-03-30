@@ -236,7 +236,7 @@ namespace MixedAir {
     // INTEGER, PARAMETER :: SOAM_ProportionalControlDesOcc = 7     ! Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
     //                                                       ! to calculate the system level outdoor air flow rates based on design occupancy
 
-    Array1D_string const CurrentModuleObjects(8,
+    Array1D<std::string> const CurrentModuleObjects(8,
                                               {"AirLoopHVAC:OutdoorAirSystem",
                                                "AirLoopHVAC:OutdoorAirSystem:EquipmentList",
                                                "AirLoopHVAC:ControllerList",
@@ -284,10 +284,10 @@ namespace MixedAir {
         EPVector<bool> InitOAControllerSetPointCheckFlag(true);
         bool InitOAControllerSetUpAirLoopHVACVariables(true);
         bool AllocateOAControllersFlag(true);
-        Array1D_string DesignSpecOAObjName;     // name of the design specification outdoor air object
+        Array1D<std::string> DesignSpecOAObjName;     // name of the design specification outdoor air object
         Array1D_int DesignSpecOAObjIndex;       // index of the design specification outdoor air object
-        Array1D_string VentMechZoneOrListName;  // Zone or Zone List to apply mechanical ventilation rate
-        Array1D_string DesignSpecZoneADObjName; // name of the design specification zone air distribution object
+        Array1D<std::string> VentMechZoneOrListName;  // Zone or Zone List to apply mechanical ventilation rate
+        Array1D<std::string> DesignSpecZoneADObjName; // name of the design specification zone air distribution object
         Array1D_int DesignSpecZoneADObjIndex;   // index of the design specification zone air distribution object
     }                                           // namespace
     // SUBROUTINE SPECIFICATIONS FOR MODULE MixedAir
@@ -1000,7 +1000,7 @@ namespace MixedAir {
         int NumAlphas; // Number of alphanumerics returned by GetObjectItem
         int IOStat;
         Array1D<Real64> NumArray;
-        Array1D_string AlphArray;
+        Array1D<std::string> AlphArray;
         int OASysNum;
         int CompNum;
         int Item;
@@ -1015,8 +1015,8 @@ namespace MixedAir {
         int NumSimpControllers; // number of Controller:Simple objects in an OA System
         static bool ErrorsFound(false);
         std::string CurrentModuleObject; // Object type for getting and messages
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);           // Maximum number of numeric input fields
@@ -1387,10 +1387,10 @@ namespace MixedAir {
         int groupNum;        // Index to group in extensible VENTILATION:MECHANICAL object
         int IOStat;          // Status of GetObjectItem call
         Array1D<Real64> NumArray;
-        Array1D_string AlphArray;
+        Array1D<std::string> AlphArray;
         std::string CurrentModuleObject; // Object type for getting and messages
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static bool ErrorsFound(false);  // Flag identifying errors found during get input
@@ -2127,10 +2127,10 @@ namespace MixedAir {
         int OutAirNum;
         int IOStat;
         Array1D<Real64> NumArray;        // array that holds numeric input values
-        Array1D_string AlphArray;        // array that holds alpha input values
+        Array1D<std::string> AlphArray;        // array that holds alpha input values
         std::string CurrentModuleObject; // Object type for getting and messages
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static bool ErrorsFound(false);
@@ -2223,14 +2223,14 @@ namespace MixedAir {
 
     void ProcessOAControllerInputs(std::string const &CurrentModuleObject,
                                    int const OutAirNum,
-                                   Array1D_string const &AlphArray,
+                                   Array1D<std::string> const &AlphArray,
                                    int &NumAlphas,
                                    Array1D<Real64> const &NumArray,
                                    int &NumNums,
                                    EPVector<bool> const &lNumericBlanks, // Unused
                                    EPVector<bool> const &lAlphaBlanks,
-                                   Array1D_string const &cAlphaFields,
-                                   Array1D_string const &cNumericFields, // Unused
+                                   Array1D<std::string> const &cAlphaFields,
+                                   Array1D<std::string> const &cNumericFields, // Unused
                                    bool &ErrorsFound                    // If errors found in input
     )
     {

@@ -109,7 +109,7 @@ namespace DataSurfaces {
     extern int const KivaFoundation;
     extern int const GroundFCfactorMethod;
 
-    extern Array1D_string const cExtBoundCondition;
+    extern Array1D<std::string> const cExtBoundCondition;
 
     // Parameters to indicate the first "corner" of a surface
     // Currently, these are used only during input of surfaces
@@ -156,7 +156,7 @@ namespace DataSurfaces {
     extern int const SurfaceClass_TDD_Diffuser;
 
     // Parameters to indicate heat transfer model to use for surface
-    extern Array1D_string const HeatTransferModelNames;
+    extern Array1D<std::string> const HeatTransferModelNames;
     extern int const HeatTransferModel_NotSet;
     extern int const HeatTransferModel_None; // shading surfaces for example
     extern int const HeatTransferModel_CTF;

@@ -598,7 +598,7 @@ namespace PackagedTerminalHeatPump {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PTUnitIndex;             // loop index
         int PTUnitNum;               // current packaged terminal unit number
-        Array1D_string Alphas;       // Alpha items for object
+        Array1D<std::string> Alphas;       // Alpha items for object
         Array1D<Real64> Numbers;     // Numeric items for object
         Array1D_int OANodeNums(4);   // Node numbers of OA mixer (OA, EA, RA, MA)
         int FanInletNodeNum;         // Fan inlet node number
@@ -639,8 +639,8 @@ namespace PackagedTerminalHeatPump {
         int NodeNum;                     // index to loop counter
         bool ZoneNodeNotFound;           // used in error checking
 
-        Array1D_string cAlphaFields;   // Alpha field names
-        Array1D_string cNumericFields; // Numeric field names
+        Array1D<std::string> cAlphaFields;   // Alpha field names
+        Array1D<std::string> cNumericFields; // Numeric field names
         EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 

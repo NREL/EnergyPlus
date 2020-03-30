@@ -123,7 +123,7 @@ namespace DataZoneEquipment {
     extern int const PerPersonByDesignLevel;
 
     extern int const NumValidSysAvailZoneComponents;
-    extern Array1D_string const cValidSysAvailManagerCompTypes;
+    extern Array1D<std::string> const cValidSysAvailManagerCompTypes;
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -390,9 +390,9 @@ namespace DataZoneEquipment {
         int NumOfEquipTypes;                        // Number of items on this list
         int NumAvailHeatEquip;                      // Number of pieces of equipment available for heating
         int NumAvailCoolEquip;                      // Number of pieces of equipment available for cooling
-        Array1D_string EquipType;
+        Array1D<std::string> EquipType;
         Array1D_int EquipType_Num;
-        Array1D_string EquipName;
+        Array1D<std::string> EquipName;
         Array1D_int EquipIndex;
         std::vector<HVACSystemData *> compPointer;
         Array1D_int CoolingPriority;
@@ -423,8 +423,8 @@ namespace DataZoneEquipment {
         // Members
         std::string Name;
         int NumOfControls;
-        Array1D_string ControlType;
-        Array1D_string ControlName;
+        Array1D<std::string> ControlType;
+        Array1D<std::string> ControlName;
 
         // Default Constructor
         ControlList() : NumOfControls(0)
@@ -438,9 +438,9 @@ namespace DataZoneEquipment {
         std::string Name;
         int NumOfComponents;
         int InletNodeNum;
-        Array1D_string ComponentType;
+        Array1D<std::string> ComponentType;
         Array1D_int ComponentType_Num;
-        Array1D_string ComponentName;
+        Array1D<std::string> ComponentName;
         Array1D_int ComponentIndex;
         Array1D_int SplitterIndex;
         Array1D_int PlenumIndex;
@@ -462,9 +462,9 @@ namespace DataZoneEquipment {
         std::string Name;
         int NumOfComponents;
         int OutletNodeNum;
-        Array1D_string ComponentType;
+        Array1D<std::string> ComponentType;
         Array1D_int ComponentType_Num;
-        Array1D_string ComponentName;
+        Array1D<std::string> ComponentName;
         Array1D_int ComponentIndex;
 
         // Default Constructor

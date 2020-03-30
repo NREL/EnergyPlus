@@ -261,7 +261,7 @@ namespace ThermalComfort {
         // Members
         Array1D<Real64> AngleFactor; // Angle factor of each surface
         std::string Name;            // Angle factor list name
-        Array1D_string SurfaceName;  // Names of the Surfces
+        Array1D<std::string> SurfaceName;  // Names of the Surfces
         Array1D_int SurfacePtr;      // ALLOCATABLE to the names of the Surfces
         int TotAngleFacSurfaces;     // Total number of surfaces
         std::string ZoneName;        // Name of zone the system is serving

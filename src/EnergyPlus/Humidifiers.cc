@@ -119,7 +119,7 @@ namespace Humidifiers {
     int const Humidifier_Steam_Electric(1);
     int const Humidifier_Steam_Gas(2);
 
-    Array1D_string const HumidifierType(2, {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"});
+    Array1D<std::string> const HumidifierType(2, {"Humidifier:Steam:Electric", "Humidifier:Steam:Gas"});
 
     static std::string const fluidNameSteam("STEAM");
     static std::string const fluidNameWater("WATER");
@@ -276,9 +276,9 @@ namespace Humidifiers {
         int IOStatus;                    // Used in GetObjectItem
         static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
         std::string CurrentModuleObject; // for ease in getting objects
-        Array1D_string Alphas;           // Alpha input items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
+        Array1D<std::string> Alphas;           // Alpha input items for object
+        Array1D<std::string> cAlphaFields;     // Alpha field names
+        Array1D<std::string> cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.

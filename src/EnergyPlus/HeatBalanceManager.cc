@@ -184,7 +184,7 @@ namespace HeatBalanceManager {
     static std::string const BlankString;
     static ObjexxFCL::gio::Fmt fmtA("(A)");
 
-    Array1D_string const PassFail(2, {"Fail", "Pass"});
+    Array1D<std::string> const PassFail(2, {"Fail", "Pass"});
 
     // DERIVED TYPE DEFINITIONS
 
@@ -501,7 +501,7 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const NumConstrObjects(6);
-        static Array1D_string const ConstrObjects(NumConstrObjects,
+        static Array1D<std::string> const ConstrObjects(NumConstrObjects,
                                                   {"Pipe:Indoor",
                                                    "Pipe:Outdoor",
                                                    "Pipe:Underground",
@@ -698,7 +698,7 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string AlphaName(4);
+        Array1D<std::string> AlphaName(4);
         Array1D<Real64> BuildingNumbers(5);
         int NumAlpha;
         int NumNumber;
@@ -1405,7 +1405,7 @@ namespace HeatBalanceManager {
         int NumAlphas;               // Number of elements in the alpha array
         int NumNums;                 // Number of elements in the numeric array
         int IOStat;                  // IO Status when calling get input subroutine
-        Array1D_string AlphArray(1); // Character string data
+        Array1D<std::string> AlphArray(1); // Character string data
         Array1D<Real64> NumArray(3); // Numeric data
 
         // Formats
@@ -1504,7 +1504,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int IOStat;                        // IO Status when calling get input subroutine
-        Array1D_string MaterialNames(7);   // Number of Material Alpha names defined
+        Array1D<std::string> MaterialNames(7);   // Number of Material Alpha names defined
         int MaterNum;                      // Counter to keep track of the material number
         int MaterialNumAlpha;              // Number of material alpha names being passed
         int MaterialNumProp;               // Number of material properties being passed
@@ -3944,7 +3944,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int IOStat;                      // IO Status when calling get input subroutine
-        Array1D_string SpecDataNames(1); // Spectral data alpha names
+        Array1D<std::string> SpecDataNames(1); // Spectral data alpha names
         int SpecDataNumAlpha;            // Number of spectral data alpha names being passed
         int SpecDataNumProp;             // Number of spectral data properties being passed
         Array1D<Real64> SpecDataProps;   // Temporary array to transfer spectal data properties
@@ -4161,7 +4161,7 @@ namespace HeatBalanceManager {
         int ConstructNumAlpha;                                     // Number of construction alpha names being passed
         int DummyNumProp;                                          // dummy variable for properties being passed
         int IOStat;                                                // IO Status when calling get input subroutine
-        Array1D_string ConstructAlphas({0, MaxLayersInConstruct}); // Construction Alpha names defined
+        Array1D<std::string> ConstructAlphas({0, MaxLayersInConstruct}); // Construction Alpha names defined
         Array1D<Real64> DummyProps(4);                             // Temporary array to transfer construction properties
         int Loop;
         int TotRegConstructs; // Number of "regular" constructions (no embedded sources or sinks and
@@ -4177,7 +4177,7 @@ namespace HeatBalanceManager {
         int MaterialLayerGroup; // window construction layer material group index
 
         int iMatGlass; // number of glass layers
-        Array1D_string WConstructNames;
+        Array1D<std::string> WConstructNames;
 
         // FLOW:
 
@@ -5000,14 +5000,14 @@ namespace HeatBalanceManager {
 
     void ProcessZoneData(std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
-                         Array1D_string const &cAlphaArgs,
+                         Array1D<std::string> const &cAlphaArgs,
                          int &NumAlphas,
                          Array1D<Real64> const &rNumericArgs,
                          int &NumNumbers,
                          EPVector<bool> const &EP_UNUSED(lNumericFieldBlanks), // Unused
                          EPVector<bool> const &lAlphaFieldBlanks,
-                         Array1D_string const &cAlphaFieldNames,
-                         Array1D_string const &EP_UNUSED(cNumericFieldNames), // Unused
+                         Array1D<std::string> const &cAlphaFieldNames,
+                         Array1D<std::string> const &EP_UNUSED(cNumericFieldNames), // Unused
                          bool &ErrorsFound                                   // If errors found in input
     )
     {
@@ -6081,7 +6081,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int IOStat;                            // IO Status when calling get input subroutine
-        Array1D_string FrameDividerNames(2);   // Frame/Divider Alpha names
+        Array1D<std::string> FrameDividerNames(2);   // Frame/Divider Alpha names
         int FrameDividerNum;                   // Counter to keep track of the frame/divider number
         int FrameDividerNumAlpha;              // Number of frame/divider alpha names being passed
         int FrameDividerNumProp;               // Number of frame/divider properties being passed
@@ -6231,16 +6231,16 @@ namespace HeatBalanceManager {
         using General::TrimSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const NumName(5, {"1", "2", "3", "4", "5"});
+        static Array1D<std::string> const NumName(5, {"1", "2", "3", "4", "5"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int W5DataFileNum;
         int FileLineCount;            // counter for number of lines read (used in some error messages)
-        Array1D_string DataLine(100); // Array of data lines
+        Array1D<std::string> DataLine(100); // Array of data lines
         std::string NextLine;         // Line of data
         std::string WindowNameInW5DataFile;
         std::string W5Name;
-        Array1D_string GasName(3);      // Gas name from data file
+        Array1D<std::string> GasName(3);      // Gas name from data file
         std::string LayerName;          // Layer name from data file
         std::string MullionOrientation; // Horizontal, vertical or none
         int LineNum;
@@ -6287,7 +6287,7 @@ namespace HeatBalanceManager {
         Array1D<Real64> tvisFit(10);        // Fitted visible transmittance vs incidence angle
         Array1D<Real64> rfsolFit(10);       // Fitted solar front reflectance vs incidence angle
         Array2D<Real64> solabsFit(5, 10);   // Fitted solar absorptance vs incidence angle for each glass layer
-        Array1D_string DividerType(2);      // Divider type: DividedLite or Suspended
+        Array1D<std::string> DividerType(2);      // Divider type: DividedLite or Suspended
         Real64 FrameWidth;
         Real64 MullionWidth;
         Real64 FrameProjectionOut;
@@ -7315,7 +7315,7 @@ namespace HeatBalanceManager {
         int ConstructNumAlpha;             // Number of construction alpha names being passed
         int DummyNumProp;                  // dummy variable for properties being passed
         int IOStat;                        // IO Status when calling get input subroutine
-        Array1D_string ConstructAlphas(1); // Construction Alpha names defined
+        Array1D<std::string> ConstructAlphas(1); // Construction Alpha names defined
         Array1D<Real64> DummyProps(4);     // Temporary array to transfer construction properties
         int Loop;
 
@@ -8249,7 +8249,7 @@ namespace HeatBalanceManager {
         static std::string const RoutineName("SetupComplexFenestrationMaterialInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string MaterialNames(5);   // Number of Material Alpha names defined
+        Array1D<std::string> MaterialNames(5);   // Number of Material Alpha names defined
         Array1D<Real64> MaterialProps(27); // Temporary array to transfer material properties
         int Loop;
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -8656,11 +8656,11 @@ namespace HeatBalanceManager {
         // When reading Construction:ComplexFenestrationState, there is a call of GetMatrix2D which also uses same
         // variables from DataIPShortCuts.  Since this can cause some errors in reading, it is important
         // to declare local variables for reading Construction:ComplexFenestrationState object(s)
-        Array1D_string locAlphaFieldNames;
-        Array1D_string locNumericFieldNames;
+        Array1D<std::string> locAlphaFieldNames;
+        Array1D<std::string> locNumericFieldNames;
         EPVector<bool> locNumericFieldBlanks;
         EPVector<bool> locAlphaFieldBlanks;
-        Array1D_string locAlphaArgs;
+        Array1D<std::string> locAlphaArgs;
         Array1D<Real64> locNumericArgs;
         std::string locCurrentModuleObject;
 

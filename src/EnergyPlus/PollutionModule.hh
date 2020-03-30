@@ -353,7 +353,7 @@ namespace PollutionModule {
     {
         // Members
         // FuelType Names
-        Array1D_string FuelTypeNames;
+        Array1D<std::string> FuelTypeNames;
         // Fuel Types used with the Pollution Factors
         Real64 Elec;
         Real64 NatGas;

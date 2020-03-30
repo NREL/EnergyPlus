@@ -92,7 +92,7 @@ namespace OutdoorAirUnit {
     extern int const CoolingMode; // normal cooling coil operation
     extern int const NeutralMode; // signal coil shouldn't run
 
-    extern Array1D_string const CurrentModuleObjects;
+    extern Array1D<std::string> const CurrentModuleObjects;
 
     // Parameters below (CO - Current module Object.  used primarily in Get Inputs)
     // Multiple Get Input routines in this module or these would be in individual routines.

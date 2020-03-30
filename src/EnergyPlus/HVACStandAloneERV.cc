@@ -286,10 +286,10 @@ namespace HVACStandAloneERV {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int StandAloneERVIndex;  // loop index
         int StandAloneERVNum;    // current Stand Alone ERV number
-        Array1D_string Alphas;   // Alpha items for object
+        Array1D<std::string> Alphas;   // Alpha items for object
         Array1D<Real64> Numbers; // Numeric items for object
-        Array1D_string cAlphaFields;
-        Array1D_string cNumericFields;
+        Array1D<std::string> cAlphaFields;
+        Array1D<std::string> cNumericFields;
         EPVector<bool> lAlphaBlanks;
         EPVector<bool> lNumericBlanks;
         std::string CompSetSupplyFanInlet;

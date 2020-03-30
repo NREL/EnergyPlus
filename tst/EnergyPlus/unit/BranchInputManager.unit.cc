@@ -92,11 +92,11 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
     int NumNumbers;          // Used to retrieve numbers from IDF
     bool IsNotOK;            // Flag to verify name
     bool IsBlank;            // Flag for blank name
-    Array1D_string Alphas;   // Used to retrieve names from IDF
+    Array1D<std::string> Alphas;   // Used to retrieve names from IDF
     Array1D_int NodeNums;    // Possible Array of Node Numbers (only 1 allowed)
     Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
-    Array1D_string cAlphaFields;
-    Array1D_string cNumericFields;
+    Array1D<std::string> cAlphaFields;
+    Array1D<std::string> cNumericFields;
     EPVector<bool> lNumericBlanks;
     EPVector<bool> lAlphaBlanks;
     int IOStat; // Could be used in the Get Routines, not currently checked
@@ -251,11 +251,11 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
     int NumNumbers;          // Used to retrieve numbers from IDF
     bool IsNotOK;            // Flag to verify name
     bool IsBlank;            // Flag for blank name
-    Array1D_string Alphas;   // Used to retrieve names from IDF
+    Array1D<std::string> Alphas;   // Used to retrieve names from IDF
     Array1D_int NodeNums;    // Possible Array of Node Numbers (only 1 allowed)
     Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
-    Array1D_string cAlphaFields;
-    Array1D_string cNumericFields;
+    Array1D<std::string> cAlphaFields;
+    Array1D<std::string> cNumericFields;
     EPVector<bool> lNumericBlanks;
     EPVector<bool> lAlphaBlanks;
     int IOStat; // Could be used in the Get Routines, not currently checked

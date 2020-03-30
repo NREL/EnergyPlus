@@ -2048,7 +2048,7 @@ GeneratorController::GeneratorController(std::string const &objectName,
                 int NumAlphas; // Number of PV Array parameter alpha names being passed
                 int NumNums;   // Number of PV Array numeric parameters are being passed
                 int IOStat;
-                Array1D_string Alphas(5);       // Alpha items for object
+                Array1D<std::string> Alphas(5);       // Alpha items for object
                 Array1D<Real64> Numbers(2);     // Numeric items for object
                 inputProcessor->getObjectItem(objectType,
                                               PVNum,

@@ -150,7 +150,7 @@ namespace MicroturbineElectricGenerator {
             int NumNums;
             int IOStat;
             Array1D<Real64> NumArray(19);
-            Array1D_string AlphArray(20);
+            Array1D<std::string> AlphArray(20);
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           GeneratorNum,
                                           AlphArray,

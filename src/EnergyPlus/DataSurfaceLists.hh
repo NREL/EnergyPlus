@@ -88,7 +88,7 @@ namespace DataSurfaceLists {
         // Members
         std::string Name;             // Name of the surface list
         int NumOfSurfaces;            // Number of surfaces in the list
-        Array1D_string SurfName;      // Surfaces named in the list
+        Array1D<std::string> SurfName;      // Surfaces named in the list
         Array1D_int SurfPtr;          // Location of surfaces in Surface derived type
         Array1D<Real64> SurfFlowFrac; // Fraction of mass flow/length for a surface
 
@@ -103,15 +103,15 @@ namespace DataSurfaceLists {
         // Members
         std::string Name;               // Name of the surface list
         int NumOfSurfaces;              // Number of surfaces in the list
-        Array1D_string SurfName;        // Surfaces named in the list
+        Array1D<std::string> SurfName;        // Surfaces named in the list
         Array1D_int SurfPtr;            // Location of surfaces in Surface derived type
-        Array1D_string ZoneName;        // Zone named in the list
+        Array1D<std::string> ZoneName;        // Zone named in the list
         Array1D_int ZonePtr;            // Location of Zone in Surface derived type
         Array1D<Real64> CoreDiameter;   // Fraction of mass flow/length for a surface
         Array1D<Real64> CoreLength;     // Fraction of mass flow/length for a surface
         Array1D<Real64> CoreNumbers;    // Fraction of mass flow/length for a surface
-        Array1D_string SlabInNodeName;  // Zone named in the list
-        Array1D_string SlabOutNodeName; // Zone named in the list
+        Array1D<std::string> SlabInNodeName;  // Zone named in the list
+        Array1D<std::string> SlabOutNodeName; // Zone named in the list
 
         // Default Constructor
         SlabListData() : NumOfSurfaces(0)

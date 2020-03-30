@@ -275,9 +275,9 @@ namespace FluidProperties {
         // DERIVED TYPE DEFINITIONS
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string Alphas;             // Reads string value from input file
-        Array1D_string cAlphaFieldNames;   // field names for alpha fields
-        Array1D_string cNumericFieldNames; // field names for numeric fields
+        Array1D<std::string> Alphas;             // Reads string value from input file
+        Array1D<std::string> cAlphaFieldNames;   // field names for alpha fields
+        Array1D<std::string> cNumericFieldNames; // field names for numeric fields
         int Loop;                          // DO loop counter (various uses)
         int NumAlphas;                     // States which alpha value to read from a "Number" line
         Array1D<Real64> Numbers;           // brings in data from IP

@@ -394,9 +394,9 @@ namespace LowTempRadiantSystem {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CurrentModuleObject;       // for ease in getting objects
-        Array1D_string Alphas;                 // Alpha items for object
-        Array1D_string cAlphaFields;           // Alpha field names
-        Array1D_string cNumericFields;         // Numeric field names
+        Array1D<std::string> Alphas;                 // Alpha items for object
+        Array1D<std::string> cAlphaFields;           // Alpha field names
+        Array1D<std::string> cNumericFields;         // Numeric field names
         EPVector<bool> AssignedAsRadiantSurface; // Set to true when a surface is part of a radiant system
         int CheckSurfNum;                      // Surface number to check to see if it has already been used by a radiant system
         static bool ErrorsFound(false);        // Set to true if errors in input, fatal at end of routine

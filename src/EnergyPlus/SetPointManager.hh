@@ -91,7 +91,7 @@ namespace SetPointManager {
     extern int const iCtrlVarType_MinMassFlow; // control Type 'MinimumMassFlowRate'
 
     extern int const NumValidCtrlTypes;
-    extern Array1D_string const cValidCtrlTypes;
+    extern Array1D<std::string> const cValidCtrlTypes;
 
     // following are used to reduce string comparisons related to CtrlVarType
     extern int const iSPMType_Scheduled;
@@ -125,7 +125,7 @@ namespace SetPointManager {
     extern int const iSPMType_ReturnWaterResetHW;
 
     extern int const NumValidSPMTypes;
-    extern Array1D_string const cValidSPMTypes;
+    extern Array1D<std::string> const cValidSPMTypes;
 
     // Type declarations in SetPointManager module
 

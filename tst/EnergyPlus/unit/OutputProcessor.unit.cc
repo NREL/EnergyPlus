@@ -82,9 +82,9 @@ namespace OutputProcessor {
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
         Array1D_int ResourceTypes(NumVariables);                         // ResourceTypes for each variable
-        Array1D_string EndUses(NumVariables);                            // EndUses for each variable
-        Array1D_string Groups(NumVariables);                             // Groups for each variable
-        Array1D_string Names(NumVariables);                              // Variable Names for each variable
+        Array1D<std::string> EndUses(NumVariables);                            // EndUses for each variable
+        Array1D<std::string> Groups(NumVariables);                             // Groups for each variable
+        Array1D<std::string> Names(NumVariables);                              // Variable Names for each variable
         Reference<RealVariables> RVar;
 
         std::string TypeOfComp = "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW";

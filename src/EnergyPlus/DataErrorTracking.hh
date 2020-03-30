@@ -64,8 +64,8 @@ namespace DataErrorTracking {
 
     // MODULE PARAMETER DEFINITIONS:
     extern int const SearchCounts;
-    extern Array1D_string const MessageSearch;
-    extern Array1D_string const Summaries;
+    extern Array1D<std::string> const MessageSearch;
+    extern Array1D<std::string> const Summaries;
     // in below -- simple line end <CR>.  End of Whole message <CRE>
     extern std::string const MoreDetails_1;  // InterZone Surface Areas -- mismatch
     extern std::string const MoreDetails_2;  // Interzone surfaces - different zones
@@ -86,7 +86,7 @@ namespace DataErrorTracking {
     extern std::string const MoreDetails_18; // Nominally unused constructions
     extern std::string const MoreDetails_19; // InfraredTransparent constructions in non-interzone surfaces
     extern std::string const MoreDetails_20; // No reporting elements requested
-    extern Array1D_string const MoreDetails; // Details 16 applies to both temperature out of bounds | errors.
+    extern Array1D<std::string> const MoreDetails; // Details 16 applies to both temperature out of bounds | errors.
 
     extern int const MaxRecurringErrorMsgLength; // Maximum error message length for recurring error messages
 

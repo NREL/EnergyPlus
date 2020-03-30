@@ -97,8 +97,8 @@ namespace DataZoneControls {
         std::string ControlTypeSchedName; // Name of the schedule which determines the zone temp setpoint
         int CTSchedIndex;                 // Index for this schedule
         int NumControlTypes;
-        Array1D_string ControlType;
-        Array1D_string ControlTypeName;
+        Array1D<std::string> ControlType;
+        Array1D<std::string> ControlTypeName;
         Array1D_int ControlTypeSchIndx;
         int SchIndx_SingleHeatSetPoint;
         int SchIndx_SingleCoolSetPoint;
@@ -189,8 +189,8 @@ namespace DataZoneControls {
         std::string ControlTypeSchedName;       // Name of the schedule which determines the zone temp setpoint
         int ComfortSchedIndex;                  // Index for this schedule
         int NumControlTypes;                    // Number of control types in ZoneControl:ThermalComfort object
-        Array1D_string ControlType;             // Type of control
-        Array1D_string ControlTypeName;         // Name of control type
+        Array1D<std::string> ControlType;             // Type of control
+        Array1D<std::string> ControlTypeName;         // Name of control type
         Array1D_int ControlTypeSchIndx;         // Index to control type schedule
         int SchIndx_SglHeatSetPointFanger;      // Index to fanger single heating setpoint schedule
         int SchIndx_SglCoolSetPointFanger;      // Index to fanger single cooling setpoint schedule

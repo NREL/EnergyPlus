@@ -111,7 +111,7 @@ namespace DXCoils {
     extern int const WaterSupplyFromTank;
 
     extern int const NumValidOutputFuelTypes;
-    extern Array1D_string const cValidOutputFuelTypes;
+    extern Array1D<std::string> const cValidOutputFuelTypes;
 
     // Fuel Types
     extern int const FuelTypeElectricity; // Fuel type for electricity
@@ -344,9 +344,9 @@ namespace DXCoils {
         // always 1 for other coils
         int NumDehumidModes; // number of enhanced dehumidification modes, up to MaxDehumidModes for Multimode DX coil,
         // always 0 for other coils)
-        Array1D_string CoilPerformanceType;  // Coil Performance object type
+        Array1D<std::string> CoilPerformanceType;  // Coil Performance object type
         Array1D_int CoilPerformanceType_Num; // Coil Performance object type number
-        Array1D_string CoilPerformanceName;  // Coil Performance object names
+        Array1D<std::string> CoilPerformanceName;  // Coil Performance object names
         Real64 CoolingCoilStg2RuntimeFrac;   // Run time fraction of stage 2
         int DehumidificationMode;            // Dehumidification mode for multimode coil,
         // 0=normal, 1+=enhanced dehumidification mode

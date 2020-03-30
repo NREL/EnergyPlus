@@ -69,7 +69,7 @@ namespace DataOutputs {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     extern int const NumMonthlyReports;
-    extern Array1D_string const MonthlyNamedReports;
+    extern Array1D<std::string> const MonthlyNamedReports;
 
     // DERIVED TYPE DEFINITIONS:
 

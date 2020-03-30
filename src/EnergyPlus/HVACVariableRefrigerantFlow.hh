@@ -98,10 +98,10 @@ namespace HVACVariableRefrigerantFlow {
     // VRF System Types (strings used in integer conversions)
     extern int const NumVRFSystemTypes;
     extern int const VRF_HeatPump;
-    extern Array1D_string const cVRFTypes;
+    extern Array1D<std::string> const cVRFTypes;
 
     extern int const NumValidFuelTypes;
-    extern Array1D_string const cValidFuelTypes;
+    extern Array1D<std::string> const cValidFuelTypes;
 
     // Fuel Types
     extern int const FuelTypeElectric;   // Fuel type for electricity
@@ -602,7 +602,7 @@ namespace HVACVariableRefrigerantFlow {
         int NumTUInList;                      // Number of VRF Terminal Units in List
         bool reset_isSimulatedFlags;           // used to align simulate flags with order of each TU in simulation
         Array1D_int ZoneTUPtr;                // index to VRF Terminal Unit
-        Array1D_string ZoneTUName;            // Name of the VRF Terminal Unit
+        Array1D<std::string> ZoneTUName;            // Name of the VRF Terminal Unit
         EPVector<bool> IsSimulated;             // TRUE if TU has been simulated
         Array1D<Real64> TotalCoolLoad;        // Total zone cooling coil load met by TU
         Array1D<Real64> TotalHeatLoad;        // Total zone heating coil load met by TU
@@ -858,7 +858,7 @@ namespace HVACVariableRefrigerantFlow {
     struct VRFTUNumericFieldData
     {
         // Members
-        Array1D_string FieldNames;
+        Array1D<std::string> FieldNames;
 
         // Default Constructor
         VRFTUNumericFieldData() = default;

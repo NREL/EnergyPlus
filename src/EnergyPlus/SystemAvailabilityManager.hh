@@ -99,7 +99,7 @@ namespace SystemAvailabilityManager {
     extern int const HybridVentCtrl_Close;    // Close windows or doors
 
     extern int const NumValidSysAvailManagerTypes;
-    extern Array1D_string const cValidSysAvailManagerTypes;
+    extern Array1D<std::string> const cValidSysAvailManagerTypes;
     extern int const SysAvailMgr_Scheduled;
     extern int const SysAvailMgr_ScheduledOn;
     extern int const SysAvailMgr_ScheduledOff;
@@ -423,8 +423,8 @@ namespace SystemAvailabilityManager {
         // Members
         std::string Name; // Availability Manager List Name
         int NumItems;
-        Array1D_string AvailManagerName;
-        Array1D_string cAvailManagerType;
+        Array1D<std::string> AvailManagerName;
+        Array1D<std::string> cAvailManagerType;
         Array1D_int AvailManagerType;
 
         // Default Constructor

@@ -118,7 +118,7 @@ namespace FaultsManager {
     //  Pressure sensor offset
     //  more
 
-    extern Array1D_string const cFaults;
+    extern Array1D<std::string> const cFaults;
     //      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
     //      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
     //      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &

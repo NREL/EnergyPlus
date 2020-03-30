@@ -127,8 +127,8 @@ namespace SurfaceGeometry {
     // Data
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
-    Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
-    Array1D_string const SubSurfCls(6, {"WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"});
+    Array1D<std::string> const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
+    Array1D<std::string> const SubSurfCls(6, {"WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"});
     Array1D_int const BaseSurfIDs(3, {SurfaceClass_Wall, SurfaceClass_Floor, SurfaceClass_Roof});
 
     Array1D_int const SubSurfIDs(
@@ -2240,11 +2240,11 @@ namespace SurfaceGeometry {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const FlCorners(4, {"UpperLeftCorner", "LowerLeftCorner", "LowerRightCorner", "UpperRightCorner"});
+        static Array1D<std::string> const FlCorners(4, {"UpperLeftCorner", "LowerLeftCorner", "LowerRightCorner", "UpperRightCorner"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumStmt;
-        Array1D_string GAlphas(5);
+        Array1D<std::string> GAlphas(5);
         int NAlphas;
         Array1D<Real64> GNum(1);
         int NNum;
@@ -2490,7 +2490,7 @@ namespace SurfaceGeometry {
         using ScheduleManager::GetScheduleMinValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const cModuleObjects(2, {"Shading:Site:Detailed", "Shading:Building:Detailed"});
+        static Array1D<std::string> const cModuleObjects(2, {"Shading:Site:Detailed", "Shading:Building:Detailed"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;     // IO Status when calling get input subroutine
@@ -2647,7 +2647,7 @@ namespace SurfaceGeometry {
         using General::TrimSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const cModuleObjects(2, {"Shading:Site", "Shading:Building"});
+        static Array1D<std::string> const cModuleObjects(2, {"Shading:Site", "Shading:Building"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;     // IO Status when calling get input subroutine
@@ -2741,7 +2741,7 @@ namespace SurfaceGeometry {
                           int const TotDetailedWalls,       // Number of Wall:Detailed items to obtain
                           int const TotDetailedRoofs,       // Number of RoofCeiling:Detailed items to obtain
                           int const TotDetailedFloors,      // Number of Floor:Detailed items to obtain
-                          const Array1D_string &BaseSurfCls, // Valid Classes for Base Surfaces
+                          const Array1D<std::string> &BaseSurfCls, // Valid Classes for Base Surfaces
                           const Array1D_int &BaseSurfIDs,
                           int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
     )
@@ -2865,7 +2865,7 @@ namespace SurfaceGeometry {
         using General::TrimSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const cModuleObjects(4, {"BuildingSurface:Detailed", "Wall:Detailed", "Floor:Detailed", "RoofCeiling:Detailed"});
+        static Array1D<std::string> const cModuleObjects(4, {"BuildingSurface:Detailed", "Wall:Detailed", "Floor:Detailed", "RoofCeiling:Detailed"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;          // IO Status when calling get input subroutine
@@ -3316,7 +3316,7 @@ namespace SurfaceGeometry {
         using General::TrimSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const cModuleObjects(10,
+        static Array1D<std::string> const cModuleObjects(10,
                                                    {"Wall:Exterior",
                                                     "Wall:Adiabatic",
                                                     "Wall:Interzone",
@@ -3773,7 +3773,7 @@ namespace SurfaceGeometry {
     void GetHTSubSurfaceData(bool &ErrorsFound,               // Error flag indicator (true if errors found)
                              int &SurfNum,                    // Count of Current SurfaceNumber
                              int const TotHTSubs,             // Number of Heat Transfer SubSurfaces to obtain
-                             const Array1D_string &SubSurfCls, // Valid Classes for Sub Surfaces
+                             const Array1D<std::string> &SubSurfCls, // Valid Classes for Sub Surfaces
                              const Array1D_int &SubSurfIDs,    // ID Assignments for valid sub surface classes
                              int &AddedSubSurfaces,           // Subsurfaces added when windows reference Window5
                              int &NeedToAddSurfaces           // Number of surfaces to add, based on unentered IZ surfaces
@@ -4178,7 +4178,7 @@ namespace SurfaceGeometry {
         //  data file entry with two glazing systems
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const cModuleObjects(6, {"Window", "Door", "GlazedDoor", "Window:Interzone", "Door:Interzone", "GlazedDoor:Interzone"});
+        static Array1D<std::string> const cModuleObjects(6, {"Window", "Door", "GlazedDoor", "Window:Interzone", "Door:Interzone", "GlazedDoor:Interzone"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;
@@ -5233,7 +5233,7 @@ namespace SurfaceGeometry {
         using namespace Vectors;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const cModuleObjects(4, {"Shading:Overhang", "Shading:Overhang:Projection", "Shading:Fin", "Shading:Fin:Projection"});
+        static Array1D<std::string> const cModuleObjects(4, {"Shading:Overhang", "Shading:Overhang:Projection", "Shading:Fin", "Shading:Fin:Projection"});
         static ObjexxFCL::gio::Fmt dfmt("(A,3(2x,f6.2))");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -7816,7 +7816,7 @@ namespace SurfaceGeometry {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const NumValidShadingTypes(8);
-        static Array1D_string const cValidShadingTypes(NumValidShadingTypes,
+        static Array1D<std::string> const cValidShadingTypes(NumValidShadingTypes,
                                                        {"INTERIORSHADE",
                                                         "EXTERIORSHADE",
                                                         "EXTERIORSCREEN",
@@ -7836,7 +7836,7 @@ namespace SurfaceGeometry {
                                                     WSC_ST_SwitchableGlazing});
 
         int const NumValidWindowShadingControlTypes(21);
-        static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
+        static Array1D<std::string> const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
                                                                     {"ALWAYSON",
                                                                      "ALWAYSOFF",
                                                                      "ONIFSCHEDULEALLOWS",
@@ -8895,7 +8895,7 @@ namespace SurfaceGeometry {
         if (TotKivaFnds > 0) {
             kivaManager.defineDefaultFoundation();
 
-            Array1D_string fndNames;
+            Array1D<std::string> fndNames;
             fndNames.allocate(TotKivaFnds + 1);
             fndNames(1) = "<Default Foundation>";
 
@@ -12282,7 +12282,7 @@ namespace SurfaceGeometry {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string cAlphas(1);
+        Array1D<std::string> cAlphas(1);
         Array1D<Real64> rNumerics(2);
         int NAlphas;
         int NNum;
@@ -12559,9 +12559,9 @@ namespace SurfaceGeometry {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string TmpCandidateSurfaceNames;
-        Array1D_string TmpCandidateICSSurfaceNames;
-        Array1D_string TmpCandidateICSBCTypeNames;
+        Array1D<std::string> TmpCandidateSurfaceNames;
+        Array1D<std::string> TmpCandidateICSSurfaceNames;
+        Array1D<std::string> TmpCandidateICSBCTypeNames;
         int NumCandidateNames;
         int NumOfCollectors;
         int NumOfICSUnits;

@@ -82,7 +82,7 @@ namespace DataRoomAirModel {
     extern int const RoomAirModel_UCSDUFI;        // UCSD UFAD interior zone model
     extern int const RoomAirModel_UCSDUFE;        // UCSD UFAD exterior zone model
     extern int const RoomAirModel_AirflowNetwork; // RoomAirModel_AirflowNetwork interior zone model
-    extern Array1D_string const ChAirModel;
+    extern Array1D<std::string> const ChAirModel;
 
     // Parameters to indicate air temperature coupling scheme
     extern int const DirectCoupling;   // direct coupling scheme
@@ -468,7 +468,7 @@ namespace DataRoomAirModel {
     {
         // Members
         // user variables
-        Array1D_string SurfName;  // user defined name
+        Array1D<std::string> SurfName;  // user defined name
         Array1D<Real64> DeltaTai; // (Tai - MAT ) offset from mean air temp
         int NumSurfs;             // number of surfaces in this pattern
         // calculated and from elsewhere

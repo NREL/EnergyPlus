@@ -260,8 +260,8 @@ namespace CondenserLoopTowers {
         std::string OutputCharHi;          // report variable for warning messages
         Array1D<Real64> NumArray(33);      // Numeric input data array
         Array1D<Real64> NumArray2(43);     // Numeric input data array for VS tower coefficients
-        Array1D_string AlphArray(16);      // Character string input data array
-        Array1D_string AlphArray2(1);      // Character string input data array for VS tower coefficients
+        Array1D<std::string> AlphArray(16);      // Character string input data array
+        Array1D<std::string> AlphArray2(1);      // Character string input data array for VS tower coefficients
 
         // Get number of all cooling towers specified in the input data file (idf)
         NumSingleSpeedTowers = inputProcessor->getNumObjectsFound(cCoolingTower_SingleSpeed);

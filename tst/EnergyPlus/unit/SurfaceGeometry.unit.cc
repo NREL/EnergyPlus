@@ -3015,7 +3015,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     SurfaceTmp.allocate(2);
     int SurfNum = 0;
     int TotHTSurfs = 2;
-    Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
+    Array1D<std::string> const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
     Array1D_int const BaseSurfIDs(3, {1, 2, 3});
     int NeedToAddSurfaces;
 
@@ -3703,7 +3703,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     SurfaceTmp.allocate(1);
     int SurfNum = 0;
     int TotHTSurfs = 1;
-    Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
+    Array1D<std::string> const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
     Array1D_int const BaseSurfIDs(3, {1, 2, 3});
     int NeedToAddSurfaces;
 

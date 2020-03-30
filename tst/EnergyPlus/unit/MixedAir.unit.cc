@@ -146,9 +146,9 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
-    Array1D_string AlphArray(NumAlphas);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNums);
+    Array1D<std::string> AlphArray(NumAlphas);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNums);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
     EPVector<bool> lNumericBlanks(NumNums, true);
 
@@ -1449,9 +1449,9 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
-    Array1D_string AlphArray(NumAlphas);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNums);
+    Array1D<std::string> AlphArray(NumAlphas);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNums);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
     EPVector<bool> lNumericBlanks(NumNums, true);
 
@@ -1580,9 +1580,9 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
-    Array1D_string AlphArray(NumAlphas);
-    Array1D_string cAlphaFields(NumAlphas);
-    Array1D_string cNumericFields(NumNums);
+    Array1D<std::string> AlphArray(NumAlphas);
+    Array1D<std::string> cAlphaFields(NumAlphas);
+    Array1D<std::string> cNumericFields(NumNums);
     EPVector<bool> lAlphaBlanks(NumAlphas, true);
     EPVector<bool> lNumericBlanks(NumNums, true);
 

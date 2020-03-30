@@ -154,10 +154,10 @@ namespace HVACVariableRefrigerantFlow {
     // VRF System Types (strings used in integer conversions)
     int const NumVRFSystemTypes(1);
     int const VRF_HeatPump(1);
-    Array1D_string const cVRFTypes(NumVRFSystemTypes, std::string("AirConditioner:VariableRefrigerantFlow"));
+    Array1D<std::string> const cVRFTypes(NumVRFSystemTypes, std::string("AirConditioner:VariableRefrigerantFlow"));
 
     int const NumValidFuelTypes(9);
-    Array1D_string const
+    Array1D<std::string> const
         cValidFuelTypes(NumValidFuelTypes,
                         {"Electric", "NaturalGas", "Propane", "Diesel", "Gasoline", "FuelOilNo1", "FuelOilNo2", "OtherFuel1", "OtherFuel2"});
 
@@ -1470,11 +1470,11 @@ namespace HVACVariableRefrigerantFlow {
         int IOStat;   // Status
         bool errFlag; // error flag for mining functions
         bool IsNotOK; // Flag to verify name
-        Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
+        Array1D<std::string> cAlphaFieldNames;
+        Array1D<std::string> cNumericFieldNames;
         EPVector<bool> lNumericFieldBlanks;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
+        Array1D<std::string> cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int NumParams;

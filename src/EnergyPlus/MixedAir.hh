@@ -135,7 +135,7 @@ namespace MixedAir {
     // INTEGER, PARAMETER :: SOAM_ProportionalControlDesOcc = 7     ! Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
     //                                                       ! to calculate the system level outdoor air flow rates based on design occupancy
 
-    extern Array1D_string const CurrentModuleObjects;
+    extern Array1D<std::string> const CurrentModuleObjects;
 
     // Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
     // Multiple Get Input routines in this module or these would be in individual routines.
@@ -186,8 +186,8 @@ namespace MixedAir {
         // Members
         std::string Name;
         int NumControllers; // number of controllers on list
-        Array1D_string ControllerType;
-        Array1D_string ControllerName;
+        Array1D<std::string> ControllerType;
+        Array1D<std::string> ControllerName;
 
         // Default Constructor
         ControllerListProps() : NumControllers(0)
@@ -337,9 +337,9 @@ namespace MixedAir {
         Array1D<Real64> ZoneOAFlowRate;         // OA Flow Rate (m3/s/zone) for each zone
         Array1D<Real64> ZoneOAACHRate;          // OA ACH (m3/s/volume) for each zone
         Array1D_int VentMechZone;               // Zones requiring mechanical ventilation
-        Array1D_string VentMechZoneName;        // name of mech vent zone
+        Array1D<std::string> VentMechZoneName;        // name of mech vent zone
         Array1D_int ZoneDesignSpecOAObjIndex;   // index of the design specification outdoor air object for each zone
-        Array1D_string ZoneDesignSpecOAObjName; // name of the design specification outdoor air object for each zone
+        Array1D<std::string> ZoneDesignSpecOAObjName; // name of the design specification outdoor air object for each zone
         int CO2MaxMinLimitErrorCount;           // Counter when max CO2 concentration < min CO2 concentration for SOAM_ProportionalControlSchOcc
         int CO2MaxMinLimitErrorIndex;           // Index for max CO2 concentration < min CO2 concentration recurring error message for
                                                 // SOAM_ProportionalControlSchOcc
@@ -351,7 +351,7 @@ namespace MixedAir {
         Array1D<Real64> ZoneADEffHeating;           // Zone air distribution effectiveness in heating mode for each zone
         Array1D_int ZoneADEffSchPtr;                // Pointer to the zone air distribution effectiveness schedule for each zone
         Array1D_int ZoneDesignSpecADObjIndex;       // index of the design specification zone air distribution object for each zone
-        Array1D_string ZoneDesignSpecADObjName;     // name of the design specification zone air distribution object for each zone
+        Array1D<std::string> ZoneDesignSpecADObjName;     // name of the design specification zone air distribution object for each zone
         Array1D<Real64> ZoneSecondaryRecirculation; // zone air secondary recirculation ratio for each zone
         Array1D_int ZoneOAFlowMethod;               // OA flow method for each zone
         Array1D_int ZoneOASchPtr;               // Index to the outdoor air schedule for each zone (from DesignSpecification:OutdoorAir or default)
@@ -468,14 +468,14 @@ namespace MixedAir {
 
     void ProcessOAControllerInputs(std::string const &CurrentModuleObject,
                                    int const OutAirNum,
-                                   Array1D_string const &AlphArray,
+                                   Array1D<std::string> const &AlphArray,
                                    int &NumAlphas,
                                    Array1D<Real64> const &NumArray,
                                    int &NumNums,
                                    EPVector<bool> const &lNumericBlanks, // Unused
                                    EPVector<bool> const &lAlphaBlanks,
-                                   Array1D_string const &cAlphaFields,
-                                   Array1D_string const &cNumericFields, // Unused
+                                   Array1D<std::string> const &cAlphaFields,
+                                   Array1D<std::string> const &cNumericFields, // Unused
                                    bool &ErrorsFound                    // If errors found in input
     );
 

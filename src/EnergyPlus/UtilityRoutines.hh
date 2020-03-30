@@ -337,9 +337,9 @@ namespace UtilityRoutines {
         return FindItem(first, last, str, is_shared_ptr<typename std::iterator_traits<InputIterator>::value_type>{});
     }
 
-    int FindItem(std::string const &String, Array1D_string const &ListOfItems, int const NumItems);
+    int FindItem(std::string const &String, Array1D<std::string> const &ListOfItems, int const NumItems);
 
-    inline int FindItem(std::string const &String, Array1D_string const &ListOfItems)
+    inline int FindItem(std::string const &String, Array1D<std::string> const &ListOfItems)
     {
         return FindItem(String, ListOfItems, ListOfItems.isize());
     }
@@ -464,7 +464,7 @@ namespace UtilityRoutines {
     }
 
     void VerifyName(std::string const &NameToVerify,
-                    Array1D_string const &NamesList,
+                    Array1D<std::string> const &NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
                     bool &IsBlank,

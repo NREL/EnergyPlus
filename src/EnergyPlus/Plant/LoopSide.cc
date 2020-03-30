@@ -1318,7 +1318,7 @@ namespace DataPlant {
         using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const LoopSideName(2, {"Demand", "Supply"});
+        static Array1D<std::string> const LoopSideName(2, {"Demand", "Supply"});
         int const LoopSideSingleBranch(1); // For readability
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
