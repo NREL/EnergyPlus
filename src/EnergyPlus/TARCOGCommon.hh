@@ -95,9 +95,9 @@ namespace TARCOGCommon {
 
     void EquationsSolver(Array2<Real64> &a, EPVector<Real64> &b, int const n, int &nperr, std::string &ErrorMessage);
 
-    void ludcmp(Array2<Real64> &a, int const n, Array1D<int> &indx, Real64 &d, int &nperr, std::string &ErrorMessage);
+    void ludcmp(Array2<Real64> &a, int const n, EPVector<int> &indx, Real64 &d, int &nperr, std::string &ErrorMessage);
 
-    void lubksb(Array2A<Real64> const a, int const n, const Array1D<int> &indx, EPVector<Real64> &b);
+    void lubksb(Array2A<Real64> const a, int const n, const EPVector<int> &indx, EPVector<Real64> &b);
 
     Real64 pos(Real64 const x);
 

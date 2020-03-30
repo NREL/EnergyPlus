@@ -211,8 +211,8 @@ namespace ThermalISO15099Calc {
                        Array2A<Real64> const xgcp,
                        const EPVector<Real64> &xwght,
                        const EPVector<Real64> &gama,
-                       const Array1D<int> &nmix,
-                       const Array1D<int> &SupportPillar,     // Shows whether or not gap have support pillar
+                       const EPVector<int> &nmix,
+                       const EPVector<int> &SupportPillar,     // Shows whether or not gap have support pillar
                        const EPVector<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
                        const EPVector<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
                        EPVector<Real64> &theta,
@@ -235,7 +235,7 @@ namespace ThermalISO15099Calc {
                        Real64 &shgct,
                        Real64 &tamb,
                        Real64 &troom,
-                       const Array1D<int> &ibc,
+                       const EPVector<int> &ibc,
                        const EPVector<Real64> &Atop,
                        const EPVector<Real64> &Abot,
                        const EPVector<Real64> &Al,
@@ -249,8 +249,8 @@ namespace ThermalISO15099Calc {
                        const EPVector<Real64> &SlatCurve,
                        const EPVector<Real64> &vvent,
                        const EPVector<Real64> &tvent,
-                       const Array1D<int> &LayerType,
-                       const Array1D<int> &nslice,
+                       const EPVector<int> &LayerType,
+                       const EPVector<int> &nslice,
                        const EPVector<Real64> &LaminateA,
                        const EPVector<Real64> &LaminateB,
                        const EPVector<Real64> &sumsol,
@@ -427,7 +427,7 @@ namespace ThermalISO15099Calc {
         Real64 hrout_NOSD;
         Real64 tamb_NOSD;
         Real64 troom_NOSD;
-        static Array1D<int> LayerType_NOSD(maxlay);
+        static EPVector<int> LayerType_NOSD(maxlay);
         Real64 ufactor_NOSD;
         Real64 sc_NOSD;
         Real64 hflux_NOSD;
@@ -442,7 +442,7 @@ namespace ThermalISO15099Calc {
         static EPVector<Real64> theta_NOSD(maxlay2);
         static Array2D<Real64> frct_NOSD(maxgas, maxlay1);
         static Array2D_int iprop_NOSD(maxgas, maxlay1);
-        static Array1D<int> nmix_NOSD(maxlay1);
+        static EPVector<int> nmix_NOSD(maxlay1);
         static EPVector<Real64> presure_NOSD(maxlay1);
         static EPVector<Real64> hcgas_NOSD(maxlay1);
         static EPVector<Real64> hrgas_NOSD(maxlay1);
@@ -475,7 +475,7 @@ namespace ThermalISO15099Calc {
         static EPVector<Real64> qcgas_NOSD(maxlay1);
         static EPVector<Real64> Keff_NOSD(maxlay1);
         static EPVector<Real64> qrgas_NOSD(maxlay1);
-        static Array1D<int> nslice_NOSD(maxlay);
+        static EPVector<int> nslice_NOSD(maxlay);
         static EPVector<Real64> vfreevent_NOSD(maxlay1);
 
         int FirstSpecularLayer;
@@ -1318,13 +1318,13 @@ namespace ThermalISO15099Calc {
                  Array2_int const &iprop,
                  Array2<Real64> const &frct,
                  const EPVector<Real64> &presure,
-                 const Array1D<int> &nmix,
+                 const EPVector<int> &nmix,
                  const EPVector<Real64> &wght,
                  Array2<Real64> const &gcon,
                  Array2<Real64> const &gvis,
                  Array2<Real64> const &gcp,
                  const EPVector<Real64> &gama,
-                 const Array1D<int> &SupportPillar,
+                 const EPVector<int> &SupportPillar,
                  const EPVector<Real64> &PillarSpacing,
                  const EPVector<Real64> &PillarRadius,
                  EPVector<Real64> &theta,
@@ -1344,7 +1344,7 @@ namespace ThermalISO15099Calc {
                  std::string &ErrorMessage,
                  Real64 &tamb,
                  Real64 &troom,
-                 const Array1D<int> &ibc,
+                 const EPVector<int> &ibc,
                  const EPVector<Real64> &Atop,
                  const EPVector<Real64> &Abot,
                  const EPVector<Real64> &Al,
@@ -1353,7 +1353,7 @@ namespace ThermalISO15099Calc {
                  const EPVector<Real64> &EffectiveOpenness, // Effective opennes for airflow calculations [m2]
                  const EPVector<Real64> &vvent,
                  const EPVector<Real64> &tvent,
-                 const Array1D<int> &LayerType,
+                 const EPVector<int> &LayerType,
                  EPVector<Real64> &Ra,
                  EPVector<Real64> &Nu,
                  EPVector<Real64> &vfreevent,
@@ -1485,7 +1485,7 @@ namespace ThermalISO15099Calc {
         EPVector<Real64> thetaSave(2 * nlayer);
         int currentTry;
 
-        //		static Array1D<int> LayerTypeSpec( maxlay ); //Unused
+        //		static EPVector<int> LayerTypeSpec( maxlay ); //Unused
 
         int CSMFlag;
         int i;
@@ -2300,7 +2300,7 @@ namespace ThermalISO15099Calc {
                 EPVector<Real64> &Theta,
                 EPVector<Real64> &qlayer,
                 const EPVector<Real64> &qv,
-                const Array1D<int> &LayerType,
+                const EPVector<int> &LayerType,
                 const EPVector<Real64> &thick,
                 const EPVector<Real64> &scon,
                 Real64 &ufactor,
@@ -2392,13 +2392,13 @@ namespace ThermalISO15099Calc {
                 Array2_int const &iprop,
                 Array2<Real64> const &frct,
                 const EPVector<Real64> &presure,
-                const Array1D<int> &nmix,
+                const EPVector<int> &nmix,
                 const EPVector<Real64> &wght,
                 Array2<Real64> const &gcon,
                 Array2<Real64> const &gvis,
                 Array2<Real64> const &gcp,
                 const EPVector<Real64> &gama,
-                const Array1D<int> &SupportPillar,
+                const EPVector<int> &SupportPillar,
                 const EPVector<Real64> &PillarSpacing,
                 const EPVector<Real64> &PillarRadius,
                 EPVector<Real64> &hgas,
@@ -2409,7 +2409,7 @@ namespace ThermalISO15099Calc {
                 Real64 const hin,
                 Real64 const hout,
                 int const index,
-                const Array1D<int> &ibc,
+                const EPVector<int> &ibc,
                 int &nperr,
                 std::string &ErrorMessage,
                 Real64 &hrin,
@@ -2603,12 +2603,12 @@ namespace ThermalISO15099Calc {
     }
 
     void effectiveLayerCond(int const nlayer,
-                            const Array1D<int> &LayerType,             // Layer type
+                            const EPVector<int> &LayerType,             // Layer type
                             const EPVector<Real64> &scon,              // Layer thermal conductivity
                             const EPVector<Real64> &thick,             // Layer thickness
                             Array2A_int const iprop,                 // Gas type in gaps
                             Array2A<Real64> const frct,              // Fraction of gas
-                            const Array1D<int> &nmix,                  // Gas mixture
+                            const EPVector<int> &nmix,                  // Gas mixture
                             const EPVector<Real64> &pressure,          // Gas pressure [Pa]
                             const EPVector<Real64> &wght,              // Molecular weight
                             Array2A<Real64> const gcon,              // Gas specific conductivity
@@ -2621,7 +2621,7 @@ namespace ThermalISO15099Calc {
                             std::string &ErrorMessage                // Error message
     )
     {
-        static Array1D<int> iprop1(maxgas);
+        static EPVector<int> iprop1(maxgas);
         static EPVector<Real64> frct1(maxgas);
 
         for (auto i = 1; i <= nlayer; ++i) {
@@ -2656,7 +2656,7 @@ namespace ThermalISO15099Calc {
                Array2A_int const iprop,
                Array2A<Real64> const frct,
                const EPVector<Real64> &presure,
-               const Array1D<int> &nmix,
+               const EPVector<int> &nmix,
                const EPVector<Real64> &wght,
                Array2A<Real64> const gcon,
                Array2A<Real64> const gvis,
@@ -2703,7 +2703,7 @@ namespace ThermalISO15099Calc {
         // Locals
         static EPVector<Real64> frcti(maxgas);
         int j;
-        static Array1D<int> ipropi(maxgas);
+        static EPVector<int> ipropi(maxgas);
         Real64 tiltr;
         Real64 tmean;
         Real64 delt;
@@ -2801,7 +2801,7 @@ namespace ThermalISO15099Calc {
                Array2A<Real64> const frct,
                Real64 const VacuumPressure,
                const EPVector<Real64> &presure,
-               const Array1D<int> &nmix,
+               const EPVector<int> &nmix,
                const EPVector<Real64> &wght,
                Array2A<Real64> const gcon,
                Array2A<Real64> const gvis,
@@ -2871,7 +2871,7 @@ namespace ThermalISO15099Calc {
         Real64 asp;
         Real64 gnu;
         static EPVector<Real64> frctg(maxgas);
-        static Array1D<int> ipropg(maxgas);
+        static EPVector<int> ipropg(maxgas);
         int i;
         int j;
         int k;
@@ -2923,7 +2923,7 @@ namespace ThermalISO15099Calc {
         }
     }
 
-    void filmPillar(const Array1D<int> &SupportPillar,     // Shows whether or not gap have support pillar
+    void filmPillar(const EPVector<int> &SupportPillar,     // Shows whether or not gap have support pillar
                     const EPVector<Real64> &scon,          // Conductivity of glass layers
                     const EPVector<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
                     const EPVector<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
@@ -3134,7 +3134,7 @@ namespace ThermalISO15099Calc {
     //  end subroutine picard
 
     void adjusthhat(int const SDLayerIndex,
-                    const Array1D<int> &ibc,
+                    const EPVector<int> &ibc,
                     Real64 const tout,
                     Real64 const tind,
                     int const nlayer,
@@ -3154,7 +3154,7 @@ namespace ThermalISO15099Calc {
                     Array2A_int const iprop,
                     Array2A<Real64> const frct,
                     const EPVector<Real64> &presure,
-                    const Array1D<int> &nmix,
+                    const EPVector<int> &nmix,
                     const EPVector<Real64> &wght,
                     Array2A<Real64> const gcon,
                     Array2A<Real64> const gvis,
@@ -3211,7 +3211,7 @@ namespace ThermalISO15099Calc {
         int j;
         int k;
         int l;
-        Array1D<int> ipropg(maxgas);
+        EPVector<int> ipropg(maxgas);
         Real64 tmean;
         Real64 con;
         Real64 visc;

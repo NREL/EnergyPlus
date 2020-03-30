@@ -156,8 +156,8 @@ namespace WindowComplexManager {
     // SUBROUTINE SPECIFICATIONS FOR MODULE WindowComplexManager:
 
     // Object Data
-    Array1D<BasisStruct> BasisList;
-    Array1D<WindowIndex> WindowList;
+    EPVector<BasisStruct> BasisList;
+    EPVector<WindowIndex> WindowList;
     Array2D<WindowStateIndex> WindowStateList;
 
     // Functions
@@ -222,7 +222,7 @@ namespace WindowComplexManager {
         int NumStates;          // Local variable for the number of states
         static int MatrixNo(0); // Index of Basis matrix
         EPVector<Real64> Thetas; // temp array holding theta values
-        Array1D<int> NPhis;      // temp array holding number of phis for a given theta
+        EPVector<int> NPhis;      // temp array holding number of phis for a given theta
         EPVector<Real64> V(3);   // vector array
         Real64 VLen;            // Length of vector array
         int NHold;              // No. values in the Temporary array
@@ -240,7 +240,7 @@ namespace WindowComplexManager {
         };
 
         // Object Data
-        Array1D<TempBasisIdx> IHold; // Temporary array
+        EPVector<TempBasisIdx> IHold; // Temporary array
 
         if (TotComplexFenStates <= 0) return; // Nothing to do if no complex fenestration states
         // Construct Basis List
@@ -973,7 +973,7 @@ namespace WindowComplexManager {
         int IBm;                 // index of beam ray in incoming basis
         int BkIncRay;            // index of sun dir in back incidence basis
         bool RegWindFnd;         // flag for regular exterior back surf window
-        Array1D<int> RegWinIndex; // bk surf nos of reg windows
+        EPVector<int> RegWinIndex; // bk surf nos of reg windows
         static int NRegWin(0);   // no reg windows found as back surfaces
         static int KRegWin(0);   // index of reg window as back surface
         Real64 Refl;             // temporary reflectance
@@ -1316,7 +1316,7 @@ namespace WindowComplexManager {
         static Real64 LowerTheta(0.0); // Lower theta boundary of the element
         static Real64 UpperTheta(0.0); // Upper theta boundary of the element
         EPVector<Real64> Thetas;        // temp array holding theta values
-        Array1D<int> NPhis;             // temp array holding number of phis for a given theta
+        EPVector<int> NPhis;             // temp array holding number of phis for a given theta
 
         NThetas = Construct(IConst).BSDFInput.BasisMatNrows; // Note here assuming row by row input
         Basis.NThetas = NThetas;
@@ -1347,7 +1347,7 @@ namespace WindowComplexManager {
                     if (NPhis(I) <= 0) ShowFatalError("WindowComplexManager: incorrect input, no. phis must be positive.");
                     NumElem += NPhis(I);
                 }
-                MaxNPhis = maxval(NPhis({1, NThetas}));
+                MaxNPhis = *std::max_element(NPhis.begin(), std::prev(NPhis.end()));
                 Basis.Phis.allocate(NThetas + 1, MaxNPhis + 1); // N+1st Phi point (not basis element) at 2Pi
                 Basis.BasisIndex.allocate(MaxNPhis, NThetas + 1);
                 Basis.Phis = 0.0;                                    // Initialize so undefined elements will contain zero
@@ -1619,15 +1619,15 @@ namespace WindowComplexManager {
         Real64 HitDsq;               // Squared distance to current hit pt
         Real64 LeastHitDsq;          // Squared distance to closest hit pt
         EPVector<Real64> V(3);        // vector array
-        Array1D<int> TmpRfSfInd;      // Temporary RefSurfIndex
-        Array1D<int> TmpRfRyNH;       // Temporary RefRayNHits
+        EPVector<int> TmpRfSfInd;      // Temporary RefSurfIndex
+        EPVector<int> TmpRfRyNH;       // Temporary RefRayNHits
         Array2D_int TmpHSurfNo;      // Temporary HitSurfNo
         Array2D<Real64> TmpHSurfDSq; // Temporary HitSurfDSq
-        Array1D<int> TmpSkyInd;       // Temporary sky index list
-        Array1D<int> TmpGndInd;       // Temporary gnd index list
+        EPVector<int> TmpSkyInd;       // Temporary sky index list
+        EPVector<int> TmpGndInd;       // Temporary gnd index list
         Array2D_int TmpSurfInt;      // Temporary index of ray intersecing back surf
         Array2D<Real64> TmpSjdotN;   // Temporary dot prod of ray angle w bk surf norm
-        Array1D<int> ITemp1D;         // Temporary INT 1D array
+        EPVector<int> ITemp1D;         // Temporary INT 1D array
         Array2D<Real64> Temp2D;      // Temporary real 2D array
         Real64 TransRSurf;           // Norminal transmittance of shading surface
         Real64 WtSum;                // Sum for normalizing various weights
@@ -1651,7 +1651,7 @@ namespace WindowComplexManager {
         Vector HitPt;             // coords of hit pt (world syst)
         Vector X;                 // position vector
         Vector VecNorm;           // outer normal vector
-        Array1D<Vector> TmpGndPt; // Temporary ground intersection list
+        EPVector<Vector> TmpGndPt; // Temporary ground intersection list
         Array2D<Vector> TempV2D;  // Temporary vector 2D array
         Array2D<Vector> TmpHitPt; // Temporary HitPt
         BackHitList BSHit;        // Temp list of back surface hit quantities for a ray
@@ -1841,22 +1841,22 @@ namespace WindowComplexManager {
         Geom.NGnd = NGnd;
         Geom.NReflSurf = NReflSurf;
         Geom.SkyIndex.allocate(NSky);
-        Geom.SkyIndex = TmpSkyInd({1, NSky});
+        std::copy_n(TmpSkyInd.begin(), NSky, Geom.SkyIndex.begin());
         TmpSkyInd.deallocate();
         Geom.GndIndex.allocate(NGnd);
         Geom.GndPt.allocate(NGnd);
-        Geom.GndIndex = TmpGndInd({1, NGnd});
-        Geom.GndPt = TmpGndPt({1, NGnd});
+        std::copy_n(TmpGndInd.begin(), NGnd, Geom.GndIndex.begin());
+        std::copy_n(TmpGndPt.begin(), NGnd, Geom.GndPt.begin());
         TmpGndInd.deallocate();
         TmpGndPt.deallocate();
-        MaxHits = maxval(TmpRfRyNH);
+        MaxHits = *std::max_element(TmpRfRyNH.begin(), TmpRfRyNH.end());
         Geom.RefSurfIndex.allocate(NReflSurf);
         Geom.RefRayNHits.allocate(NReflSurf);
         Geom.HitSurfNo.allocate(MaxHits, NReflSurf);
         Geom.HitSurfDSq.allocate(MaxHits, NReflSurf);
         Geom.HitPt.allocate(MaxHits, NReflSurf);
-        Geom.RefSurfIndex = TmpRfSfInd({1, NReflSurf});
-        Geom.RefRayNHits = TmpRfRyNH({1, NReflSurf});
+        std::copy_n(TmpRfSfInd.begin(), NReflSurf, Geom.RefSurfIndex.begin());
+        std::copy_n(TmpRfRyNH.begin(), NReflSurf, Geom.RefRayNHits.begin());
         Geom.HitSurfNo = 0;
         Geom.HitSurfDSq = 0.0;
         Geom.HitPt = Vector(0.0, 0.0, 0.0);
@@ -3021,7 +3021,7 @@ namespace WindowComplexManager {
         static EPVector<Real64> scon(maxlay, 0.0);     // Vector of conductivities of each glazing layer  [W/m.K] {maxlay}
         static EPVector<Real64> tir(maxlay * 2, 0.0);  // Vector of IR transmittances of each layer {2*maxlay - 2 surfaces per layer}
         static EPVector<Real64> emis(maxlay * 2, 0.0); // Vector of IR emittances of each surface {2*maxlay - 2 surfaces per layer}
-        static Array1D<int> SupportPlr(maxlay, 0);     // Shows whether or not gap have support pillar
+        static EPVector<int> SupportPlr(maxlay, 0);     // Shows whether or not gap have support pillar
         // 0 - does not have support pillar
         // 1 - have support pillar
         static EPVector<Real64> PillarSpacing(maxlay, 0.0); // Pillar spacing for each gap (used in case there is support pillar)
@@ -3062,10 +3062,10 @@ namespace WindowComplexManager {
         static EPVector<Real64> wght(maxgas, 0.0); // Vector of Molecular weights for gasses {maxgas}
         static EPVector<Real64> gama(maxgas, 0.0); // Vector of spefic heat ration for low pressure calc {maxgas}
         static bool feedData(false);              // flag to notify if data needs to be feed into gas arrays
-        static Array1D<int> nmix(maxlay + 1, 0);   // Vector of number of gasses in gas mixture of each gap {maxlay+1}
+        static EPVector<int> nmix(maxlay + 1, 0);   // Vector of number of gasses in gas mixture of each gap {maxlay+1}
         static Real64 hin(0.0);                   // Indoor combined film coefficient (if non-zero) [W/m^2.K]
         static Real64 hout(0.0);                  // Outdoor combined film coefficient (if non-zero) [W/m^2.K]
-        static Array1D<int> ibc(2, 0);             // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor)
+        static EPVector<int> ibc(2, 0);             // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor)
         //             0 - h to be calculated;
         //             1 - combined film coefficient (h) prescribed;
         //             2 - convective film coefficient (hc) prescribed.
@@ -3093,12 +3093,12 @@ namespace WindowComplexManager {
         //               outdoor and indoor environment [m/s] {maxlay+1} ***
         static EPVector<Real64> tvent(maxlay + 1, 0.0); // Vector of temperatures of ventilation gas for forced ventilation, for each
         //  gap, and for outdoor and indoor environment [K] {maxlay+1}
-        static Array1D<int> LayerType(maxlay, 0); // Glazing layer type flag {maxlay}:
+        static EPVector<int> LayerType(maxlay, 0); // Glazing layer type flag {maxlay}:
         //                 0 - Specular layer,
         //                 1 - Venetian blind (SD)
         //                 2 - Woven shade (SD) (not implemented)
         //                 3 - Diffuse shade (not implemented)
-        static Array1D<int> nslice(maxlay, 0); // Vector of numbers of slices in a laminated glazing layers
+        static EPVector<int> nslice(maxlay, 0); // Vector of numbers of slices in a laminated glazing layers
         //   (0 - monolithic layer) {maxlay}
         static EPVector<Real64> LaminateA(maxlay, 0.0); // Left-hand side array for creating slice equations {maxlay}
         static EPVector<Real64> LaminateB(maxlay, 0.0); // Right-hand side array for creating slice equations {maxlay}
@@ -3180,8 +3180,8 @@ namespace WindowComplexManager {
 
         static EPVector<Real64> deltaTemp(100, 0.0);
         int i;
-        static Array1D<int> iMinDT(1, 0);
-        static Array1D<int> IDConst(100, 0);
+        static EPVector<int> iMinDT(1, 0);
+        static EPVector<int> IDConst(100, 0);
 
         int TotLay; // Total number of layers in a construction
         //   (sum of solid layers and gap layers)

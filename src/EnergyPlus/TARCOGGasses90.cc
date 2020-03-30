@@ -49,7 +49,6 @@
 #include <cassert>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
@@ -99,7 +98,7 @@ namespace TARCOGGasses90 {
     // Functions
 
     void GASSES90(Real64 const tmean,
-                  const Array1D<int> &iprop,
+                  const EPVector<int> &iprop,
                   const EPVector<Real64> &frct,
                   Real64 const pres,
                   int const nmix,
