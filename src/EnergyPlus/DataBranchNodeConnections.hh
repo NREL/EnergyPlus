@@ -150,7 +150,7 @@ namespace DataBranchNodeConnections {
     // Object Data
     extern Array1D<ComponentListData> CompSets;
     extern Array1D<ParentListData> ParentNodeList;
-    extern Array1D<NodeConnectionDef> NodeConnections;
+    extern EPVector<NodeConnectionDef> NodeConnections;
     extern Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
     extern EPVector<bool> NonConnectedNodes;
 

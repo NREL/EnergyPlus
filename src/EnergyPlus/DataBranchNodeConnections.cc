@@ -96,7 +96,7 @@ namespace DataBranchNodeConnections {
     // Object Data
     Array1D<ComponentListData> CompSets;
     Array1D<ParentListData> ParentNodeList;
-    Array1D<NodeConnectionDef> NodeConnections;
+    EPVector<NodeConnectionDef> NodeConnections;
     Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
     EPVector<bool> NonConnectedNodes;
 

@@ -182,7 +182,7 @@ namespace BranchNodeConnections {
     void GetNodeConnectionType(int const NodeNumber, EPVector<int> &NodeConnectType, bool &errFlag);
 
     void FindAllNodeNumbersInList(int const WhichNumber,
-                                  Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
+                                  EPVector<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
                                   int const NumItems,
                                   int &CountOfItems,            // Number of items found
                                   Array1D_int &AllNumbersInList // Index array to all numbers found
