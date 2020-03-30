@@ -48,9 +48,6 @@
 #ifndef ChillerExhaustAbsorption_hh_INCLUDED
 #define ChillerExhaustAbsorption_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -237,7 +234,7 @@ namespace ChillerExhaustAbsorption {
         void updateHeatRecords(Real64 MyLoad, bool RunFlag);
     };
 
-    extern Array1D<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
+    extern EPVector<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
 
     void GetExhaustAbsorberInput();
 

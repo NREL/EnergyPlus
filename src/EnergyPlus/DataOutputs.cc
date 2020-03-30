@@ -84,7 +84,7 @@ namespace DataOutputs {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     int const NumMonthlyReports(63);
-    Array1D<std::string> const MonthlyNamedReports(NumMonthlyReports,
+    EPVector<std::string> const MonthlyNamedReports{
                                              {"ZONECOOLINGSUMMARYMONTHLY",
                                               "ZONEHEATINGSUMMARYMONTHLY",
                                               "ZONEELECTRICSUMMARYMONTHLY",
@@ -147,7 +147,7 @@ namespace DataOutputs {
                                               "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY",
                                               "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY",
                                               "MECHANICALVENTILATIONLOADSMONTHLY",
-                                              "HEATEMISSIONSREPORTMONTHLY"});
+                                              "HEATEMISSIONSREPORTMONTHLY"}};
 
     // DERIVED TYPE DEFINITIONS:
 

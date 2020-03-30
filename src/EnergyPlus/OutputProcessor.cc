@@ -8781,6 +8781,123 @@ void GetVariableKeys(std::string const &varName, // Standard variable name
     }
 }
 
+void GetVariableKeys(std::string const &varName, // Standard variable name
+                     int const varType,          // 1=integer, 2=real, 3=meter
+                     EPVector<std::string> &keyNames,   // Specific key name
+                     EPVector<int> &keyVarIndexes  // Array index for
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Michael J. Witte
+    //       DATE WRITTEN   August 2003
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine returns a list of keynames and indexes associated
+    // with a particular report variable or report meter name (varName).
+    // This routine assumes that the variable TYPE (Real, integer, meter, etc.)
+    // may be determined by calling GetVariableKeyCountandType.  The variable type
+    // and index can then be used with function GetInternalVariableValue to
+    // to retrieve the current value of a particular variable/keyname combination.
+
+    // METHODOLOGY EMPLOYED:
+    // Uses Internal OutputProcessor data structure to search for varName
+    // and build list of keynames and indexes.  The indexes are the array index
+    // in the data array for the
+
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
+    using namespace OutputProcessor;
+    using ScheduleManager::GetScheduleIndex;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int Loop; // Loop counters
+    int Loop2;
+    std::string::size_type Position; // Starting point of search string
+    bool Duplicate;                  // True if keyname is a duplicate
+    int maxKeyNames;                 // Max allowable # of key names=size of keyNames array
+    int maxkeyVarIndexes;            // Max allowable # of key indexes=size of keyVarIndexes array
+    int numKeys;                     // Number of keys found
+    std::string VarKeyPlusName;      // Full variable name including keyname and units
+    std::string varNameUpper;        // varName pushed to all upper case
+
+    // INITIALIZATIONS
+    keyNames = "";
+    keyVarIndexes = 0;
+    numKeys = 0;
+    Duplicate = false;
+    maxKeyNames = keyNames.size();
+    maxkeyVarIndexes = keyVarIndexes.size();
+    varNameUpper = UtilityRoutines::MakeUPPERCase(varName);
+
+    // Select based on variable type:  integer, real, or meter
+    if (varType == VarType_Integer) { // Integer
+        for (Loop = 1; Loop <= NumOfIVariable; ++Loop) {
+            VarKeyPlusName = IVariableTypes(Loop).VarNameUC;
+            Position = index(VarKeyPlusName, ':' + varNameUpper, true);
+            if (Position != std::string::npos) {
+                if (VarKeyPlusName.substr(Position + 1) == varNameUpper) {
+                    Duplicate = false;
+                    // Check if duplicate - duplicates happen if the same report variable/key name
+                    // combination is requested more than once in the idf at different reporting
+                    // frequencies
+                    for (Loop2 = 1; Loop2 <= numKeys; ++Loop2) {
+                        if (VarKeyPlusName == IVariableTypes(keyVarIndexes(Loop2)).VarNameUC) Duplicate = true;
+                    }
+                    if (!Duplicate) {
+                        ++numKeys;
+                        if ((numKeys > maxKeyNames) || (numKeys > maxkeyVarIndexes)) {
+                            ShowFatalError("Invalid array size in GetVariableKeys");
+                        }
+                        keyNames(numKeys) = IVariableTypes(Loop).VarNameUC.substr(0, Position);
+                        keyVarIndexes(numKeys) = Loop;
+                    }
+                }
+            }
+        }
+    } else if (varType == VarType_Real) { // Real
+        for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
+            if (RVariableTypes(Loop).VarNameOnlyUC == varNameUpper) {
+                Duplicate = false;
+                // Check if duplicate - duplicates happen if the same report variable/key name
+                // combination is requested more than once in the idf at different reporting
+                // frequencies
+                VarKeyPlusName = RVariableTypes(Loop).VarNameUC;
+                for (Loop2 = 1; Loop2 <= numKeys; ++Loop2) {
+                    if (VarKeyPlusName == RVariableTypes(keyVarIndexes(Loop2)).VarNameUC) Duplicate = true;
+                }
+                if (!Duplicate) {
+                    ++numKeys;
+                    if ((numKeys > maxKeyNames) || (numKeys > maxkeyVarIndexes)) {
+                        ShowFatalError("Invalid array size in GetVariableKeys");
+                    }
+                    keyNames(numKeys) = RVariableTypes(Loop).KeyNameOnlyUC;
+                    keyVarIndexes(numKeys) = Loop;
+                }
+            }
+        }
+    } else if (varType == VarType_Meter) { // Meter
+        numKeys = 1;
+        if ((numKeys > maxKeyNames) || (numKeys > maxkeyVarIndexes)) {
+            ShowFatalError("Invalid array size in GetVariableKeys");
+        }
+        keyNames(1) = "Meter";
+        keyVarIndexes(1) = GetMeterIndex(varName);
+    } else if (varType == VarType_Schedule) { // Schedule
+        numKeys = 1;
+        if ((numKeys > maxKeyNames) || (numKeys > maxkeyVarIndexes)) {
+            ShowFatalError("Invalid array size in GetVariableKeys");
+        }
+        keyNames(1) = "Environment";
+        keyVarIndexes(1) = GetScheduleIndex(varName);
+    } else {
+        // do nothing
+    }
+}
+
+
 bool ReportingThisVariable(std::string const &RepVarName)
 {
 

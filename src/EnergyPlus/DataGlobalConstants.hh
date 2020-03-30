@@ -48,9 +48,6 @@
 #ifndef DataGlobalConstants_hh_INCLUDED
 #define DataGlobalConstants_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -225,7 +222,7 @@ namespace DataGlobalConstants {
     extern int const iRT_OtherFuel2;
     extern int const NumOfResourceTypes;
     extern int const ResourceTypeInitialOffset; // to reach "ValidTypes"
-    extern Array1D<std::string> const cRT_ValidTypes;
+    extern EPVector<std::string> const cRT_ValidTypes;
 
     extern int const iGeneratorICEngine;
     extern int const iGeneratorCombTurbine;

@@ -251,7 +251,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
         ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
     }
 
-    weatherDataArray.dimension(NumDaysInYear);
+    weatherDataArray.resize(NumDaysInYear);
 
     BeginEnvrnFlag = true;
     EndEnvrnFlag = false;

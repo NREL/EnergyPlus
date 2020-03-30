@@ -113,7 +113,7 @@ namespace ChillerExhaustAbsorption {
     //    (Please see copyright and disclaimer information at end of module)
 
     // Object Data
-    Array1D<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
+    EPVector<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
     bool Sim_GetInput(true);                       // then TRUE, calls subroutine to read input file.
 
     PlantComponent *ExhaustAbsorberSpecs::factory(std::string const &objectName)

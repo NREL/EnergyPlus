@@ -1624,22 +1624,22 @@ namespace DataSurfaces {
     };
 
     // Object Data
-    extern Array1D<SurfaceData> Surface;
-    extern Array1D<SurfaceWindowCalc> SurfaceWindow;
-    extern Array1D<FrameDividerProperties> FrameDivider;
-    extern Array1D<StormWindowData> StormWindow;
-    extern Array1D<WindowShadingControlData> WindowShadingControl;
-    extern Array1D<OSCData> OSC;
-    extern Array1D<OSCMData> OSCM;
-    extern Array1D<ConvectionCoefficient> UserIntConvectionCoeffs;
-    extern Array1D<ConvectionCoefficient> UserExtConvectionCoeffs;
-    extern Array1D<ShadingVertexData> ShadeV;
-    extern Array1D<ExtVentedCavityStruct> ExtVentedCavity;
-    extern Array1D<SurfaceSolarIncident> SurfIncSolSSG;
-    extern Array1D<FenestrationSolarAbsorbed> FenLayAbsSSG;
-    extern Array1D<SurfaceLocalEnvironment> SurfLocalEnvironment;
-    extern Array1D<SurroundingSurfacesProperty> SurroundingSurfsProperty;
-    extern Array1D<IntMassObject> IntMassObjects;
+    extern EPVector<SurfaceData> Surface;
+    extern EPVector<SurfaceWindowCalc> SurfaceWindow;
+    extern EPVector<FrameDividerProperties> FrameDivider;
+    extern EPVector<StormWindowData> StormWindow;
+    extern EPVector<WindowShadingControlData> WindowShadingControl;
+    extern EPVector<OSCData> OSC;
+    extern EPVector<OSCMData> OSCM;
+    extern EPVector<ConvectionCoefficient> UserIntConvectionCoeffs;
+    extern EPVector<ConvectionCoefficient> UserExtConvectionCoeffs;
+    extern EPVector<ShadingVertexData> ShadeV;
+    extern EPVector<ExtVentedCavityStruct> ExtVentedCavity;
+    extern EPVector<SurfaceSolarIncident> SurfIncSolSSG;
+    extern EPVector<FenestrationSolarAbsorbed> FenLayAbsSSG;
+    extern EPVector<SurfaceLocalEnvironment> SurfLocalEnvironment;
+    extern EPVector<SurroundingSurfacesProperty> SurroundingSurfsProperty;
+    extern EPVector<IntMassObject> IntMassObjects;
 
     // Functions
 

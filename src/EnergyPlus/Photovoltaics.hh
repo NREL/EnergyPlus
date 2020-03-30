@@ -51,9 +51,6 @@
 // C++ Headers
 #include <functional>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 

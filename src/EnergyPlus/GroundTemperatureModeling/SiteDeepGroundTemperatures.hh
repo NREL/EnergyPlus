@@ -51,9 +51,6 @@
 // C++ Headers
 #include <memory>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
@@ -66,7 +63,7 @@ class SiteDeepGroundTemps : public BaseGroundTempsModel
 {
 public:
     int timeOfSimInMonths;
-    Array1D<Real64> deepGroundTemps;
+    EPVector<Real64> deepGroundTemps;
 
     // Default Constructor
     SiteDeepGroundTemps() : timeOfSimInMonths(0), deepGroundTemps(12, 13.0)

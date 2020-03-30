@@ -48,9 +48,6 @@
 #ifndef Pipes_hh_INCLUDED
 #define Pipes_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -114,7 +111,7 @@ namespace Pipes {
     };
 
     // Object Data
-    extern Array1D<LocalPipeData> LocalPipe; // dimension to number of pipes
+    extern EPVector<LocalPipeData> LocalPipe; // dimension to number of pipes
 
     // Functions
     void clear_state();

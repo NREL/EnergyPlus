@@ -2523,7 +2523,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 6;
 
-    Surface.dimension(6);
+    Surface.resize(6);
 
     Surface(1).Sides = 4;
     Surface(1).Vertex.dimension(4);
@@ -2595,7 +2595,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
 
-    Surface.dimension(5);
+    Surface.resize(5);
 
     Surface(1).Sides = 4;
     Surface(1).Vertex.dimension(4);
@@ -2661,7 +2661,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
 
-    Surface.dimension(5);
+    Surface.resize(5);
 
     Surface(1).Sides = 4;
     Surface(1).Vertex.dimension(4);
@@ -2727,7 +2727,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
 
-    Surface.dimension(5);
+    Surface.resize(5);
 
     Surface(1).Sides = 4;
     Surface(1).Vertex.dimension(4);
@@ -2792,7 +2792,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 4;
 
-    Surface.dimension(4);
+    Surface.resize(4);
 
     Surface(1).Sides = 4;
     Surface(1).Vertex.dimension(4);

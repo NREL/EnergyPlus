@@ -121,7 +121,7 @@ namespace ChillerIndirectAbsorption {
 
     bool GetInput(true); // when TRUE, calls subroutine to read input file.
 
-    Array1D<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
+    EPVector<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
 
     void clear_state()
     {

@@ -4046,7 +4046,7 @@ namespace SystemReports {
         // following for debug
         //    CHARACTER(len=60) :: cEnergyType
 
-        //    cEnergyType=cRT_ValidTypes(EnergyType-ResourceTypeInitialOffset)
+        //    cEnergyType=cRT_ValidTypes[EnergyType-ResourceTypeInitialOffset]
 
         // Find enum for the component type string
         ComponentTypes comp_type;

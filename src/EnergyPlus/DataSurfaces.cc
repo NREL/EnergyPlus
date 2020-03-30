@@ -510,22 +510,22 @@ namespace DataSurfaces {
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
     // Object Data
-    Array1D<SurfaceData> Surface;
-    Array1D<SurfaceWindowCalc> SurfaceWindow;
-    Array1D<FrameDividerProperties> FrameDivider;
-    Array1D<StormWindowData> StormWindow;
-    Array1D<WindowShadingControlData> WindowShadingControl;
-    Array1D<OSCData> OSC;
-    Array1D<OSCMData> OSCM;
-    Array1D<ConvectionCoefficient> UserIntConvectionCoeffs;
-    Array1D<ConvectionCoefficient> UserExtConvectionCoeffs;
-    Array1D<ShadingVertexData> ShadeV;
-    Array1D<ExtVentedCavityStruct> ExtVentedCavity;
-    Array1D<SurfaceSolarIncident> SurfIncSolSSG;
-    Array1D<FenestrationSolarAbsorbed> FenLayAbsSSG;
-    Array1D<SurfaceLocalEnvironment> SurfLocalEnvironment;
-    Array1D<SurroundingSurfacesProperty> SurroundingSurfsProperty;
-    Array1D<IntMassObject> IntMassObjects;
+    EPVector<SurfaceData> Surface;
+    EPVector<SurfaceWindowCalc> SurfaceWindow;
+    EPVector<FrameDividerProperties> FrameDivider;
+    EPVector<StormWindowData> StormWindow;
+    EPVector<WindowShadingControlData> WindowShadingControl;
+    EPVector<OSCData> OSC;
+    EPVector<OSCMData> OSCM;
+    EPVector<ConvectionCoefficient> UserIntConvectionCoeffs;
+    EPVector<ConvectionCoefficient> UserExtConvectionCoeffs;
+    EPVector<ShadingVertexData> ShadeV;
+    EPVector<ExtVentedCavityStruct> ExtVentedCavity;
+    EPVector<SurfaceSolarIncident> SurfIncSolSSG;
+    EPVector<FenestrationSolarAbsorbed> FenLayAbsSSG;
+    EPVector<SurfaceLocalEnvironment> SurfLocalEnvironment;
+    EPVector<SurroundingSurfacesProperty> SurroundingSurfsProperty;
+    EPVector<IntMassObject> IntMassObjects;
 
     // Class Methods
 

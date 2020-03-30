@@ -2286,7 +2286,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             int RetVal = 0;
-            for (int SurfCtr = 1; SurfCtr <= isize(DataSurfaces::Surface); ++SurfCtr) {
+            for (int SurfCtr = 1; SurfCtr <= DataSurfaces::Surface.isize(); ++SurfCtr) {
                 if (DataSurfaces::Surface(SurfCtr).OSCMPtr == OSCMIndex) ++RetVal;
             }
             return RetVal;
@@ -2301,7 +2301,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             std::vector<int> retVal;
-            for (int SurfCtr = 1; SurfCtr <= isize(DataSurfaces::Surface); ++SurfCtr) {
+            for (int SurfCtr = 1; SurfCtr <= DataSurfaces::Surface.isize(); ++SurfCtr) {
                 if (DataSurfaces::Surface(SurfCtr).OSCMPtr == OSCMIndex) {
                     retVal.push_back(SurfCtr);
                 }
@@ -2318,7 +2318,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             std::vector<ZoneCoupledSurfaceData> RetVal;
-            for (int SurfCtr = 1; SurfCtr <= isize(DataSurfaces::Surface); ++SurfCtr) {
+            for (int SurfCtr = 1; SurfCtr <= DataSurfaces::Surface.isize(); ++SurfCtr) {
                 if (DataSurfaces::Surface(SurfCtr).OSCMPtr == OSCMIndex) {
                     ZoneCoupledSurfaceData z;
                     z.IndexInSurfaceArray = SurfCtr;

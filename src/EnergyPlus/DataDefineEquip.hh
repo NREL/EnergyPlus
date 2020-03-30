@@ -50,8 +50,6 @@
 
 // C++ Headers
 #include <memory>
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/AirTerminalUnit.hh>
@@ -105,12 +103,12 @@ namespace DataDefineEquip {
         int OutletNodeNum;        // index of outlet node
         int NumComponents;        // number of subcomponents (=1)
         int NumControls;          // number of controls (not used; =0)
-        Array1D<std::string> EquipType; // Pointer indentifying type of subcomponent
-        Array1D<int> EquipType_Num;
+        EPVector<std::string> EquipType; // Pointer indentifying type of subcomponent
+        EPVector<int> EquipType_Num;
         ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
         std::shared_ptr<AirTerminalUnit> airTerminalPtr;
-        Array1D<std::string> EquipName; // name of subcomponent
-        Array1D<int> EquipIndex;
+        EPVector<std::string> EquipName; // name of subcomponent
+        EPVector<int> EquipIndex;
         int AirTerminalSizingSpecIndex; // index to DesignSpecification:AirTerminal:Sizing obect
         int TermUnitSizingNum;          // index to TermUnitSizing and TermUnitFinalZoneSizing for this air distribution unit
         Real64 UpStreamLeakFrac;        // upstream nominal leakage fraction
@@ -151,7 +149,7 @@ namespace DataDefineEquip {
     };
 
     // Object Data
-    extern Array1D<ZoneAirEquip> AirDistUnit; // Used to specify zone related
+    extern EPVector<ZoneAirEquip> AirDistUnit; // Used to specify zone related
 
     // Clears the global data in DataDefineEquip.
     // Needed for unit tests, should not be normally called.

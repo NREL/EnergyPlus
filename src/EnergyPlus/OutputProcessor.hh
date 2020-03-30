@@ -1050,6 +1050,12 @@ void GetVariableKeys(std::string const &varName, // Standard variable name
                      Array1D<int> &keyVarIndexes  // Array index for
 );
 
+void GetVariableKeys(std::string const &varName, // Standard variable name
+                     int const varType,          // 1=integer, 2=real, 3=meter
+                     EPVector<std::string> &keyNames,   // Specific key name
+                     EPVector<int> &keyVarIndexes  // Array index for
+);
+
 bool ReportingThisVariable(std::string const &RepVarName);
 
 void InitPollutionMeterReporting(OutputFiles &outputFiles, std::string const &ReportFreqName);

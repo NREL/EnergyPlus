@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
     thisModel->developMesh();
 
     // Setting weather data manually here
-    thisModel->weatherDataArray.dimension(NumDaysInYear);
+    thisModel->weatherDataArray.resize(NumDaysInYear);
 
     Real64 drybulb_minTemp = 5;
     Real64 drybulb_amp = 10;

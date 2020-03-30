@@ -48,9 +48,6 @@
 #ifndef BoilerSteam_hh_INCLUDED
 #define BoilerSteam_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -86,7 +83,7 @@ namespace BoilerSteam {
         Real64 SizFac;                 // sizing factor
         int BoilerInletNodeNum;        // Node number at the boiler inlet
         int BoilerOutletNodeNum;       // Node number at the boiler outlet
-        Array1D<Real64> FullLoadCoef;  // Coefficients of the fuel consumption/part load ratio curve
+        EPVector<Real64> FullLoadCoef;  // Coefficients of the fuel consumption/part load ratio curve
         int TypeNum;                   // Plant loop type identifier
         int LoopNum;                   // Plant loop index number
         int LoopSideNum;               // Loop side index number
@@ -148,7 +145,7 @@ namespace BoilerSteam {
     };
 
     // Object Data
-    extern Array1D<BoilerSpecs> Boiler; // dimension to number of machines
+    extern EPVector<BoilerSpecs> Boiler; // dimension to number of machines
 
     void clear_state();
 

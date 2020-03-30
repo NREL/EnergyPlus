@@ -48,9 +48,6 @@
 #ifndef ChillerGasAbsorption_hh_INCLUDED
 #define ChillerGasAbsorption_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -232,7 +229,7 @@ namespace ChillerGasAbsorption {
     };
 
     // Object Data
-    extern Array1D<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
+    extern EPVector<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
 
     void GetGasAbsorberInput();
 

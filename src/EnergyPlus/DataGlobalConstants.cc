@@ -248,8 +248,7 @@ namespace DataGlobalConstants {
     int const iRT_OtherFuel2(1046);
     int const NumOfResourceTypes(46);
     int const ResourceTypeInitialOffset(1000); // to reach "ValidTypes"
-    Array1D<std::string> const cRT_ValidTypes({0, NumOfResourceTypes},
-                                        {cRT_None,
+    EPVector<std::string> const cRT_ValidTypes{{cRT_None,
                                          cRT_Electricity,
                                          cRT_Gas,
                                          cRT_Gasoline,
@@ -295,7 +294,7 @@ namespace DataGlobalConstants {
                                          cRT_WellWater,
                                          cRT_Condensate,
                                          cRT_OtherFuel1,
-                                         cRT_OtherFuel2});
+                                         cRT_OtherFuel2}};
 
     int const iGeneratorICEngine(1);
     int const iGeneratorCombTurbine(2);

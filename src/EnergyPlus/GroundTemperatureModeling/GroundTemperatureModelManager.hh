@@ -51,9 +51,6 @@
 // C++ Headers
 #include <memory>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -71,7 +68,7 @@ namespace GroundTemperatureManager {
     extern int const objectType_SiteFCFactorMethodGroundTemp;
     extern int const objectType_XingGroundTemp;
 
-    extern Array1D<std::string> const CurrentModuleObjects;
+    extern EPVector<std::string> const CurrentModuleObjects;
 
     extern std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
 

@@ -48,9 +48,6 @@
 #ifndef GlobalNames_hh_INCLUDED
 #define GlobalNames_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>

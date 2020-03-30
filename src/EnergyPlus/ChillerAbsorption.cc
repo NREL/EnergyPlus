@@ -120,7 +120,7 @@ namespace ChillerAbsorption {
     int numBlastAbsorbers(0); // number of Absorption Chillers specified in input
     bool getInput(true);      // when TRUE, calls subroutine to read input file.
 
-    Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
+    EPVector<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
 
     void clear_state()
     {

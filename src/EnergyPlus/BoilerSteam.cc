@@ -94,7 +94,7 @@ namespace BoilerSteam {
     bool getSteamBoilerInput = true;
     static std::string const FluidNameSteam("STEAM");
 
-    Array1D<BoilerSpecs> Boiler; // dimension to number of machines
+    EPVector<BoilerSpecs> Boiler; // dimension to number of machines
 
     void clear_state()
     {

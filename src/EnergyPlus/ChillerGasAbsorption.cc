@@ -110,7 +110,7 @@ namespace ChillerGasAbsorption {
     //    Development of this module was funded by the Gas Research Institute.
     //    (Please see copyright and disclaimer information at end of module)
 
-    Array1D<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
+    EPVector<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
 
     bool getGasAbsorberInputs(true); // then TRUE, calls subroutine to read input file.
 

@@ -48,9 +48,6 @@
 #ifndef DataOutputs_hh_INCLUDED
 #define DataOutputs_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include "re2/re2.h"
 #include <EnergyPlus/DataGlobals.hh>
@@ -69,7 +66,7 @@ namespace DataOutputs {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     extern int const NumMonthlyReports;
-    extern Array1D<std::string> const MonthlyNamedReports;
+    extern EPVector<std::string> const MonthlyNamedReports;
 
     // DERIVED TYPE DEFINITIONS:
 
