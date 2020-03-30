@@ -140,80 +140,80 @@ namespace SystemReports {
 
     // MODULE VARIABLE DECLARATIONS:
     // Ventilation Report Variables
-    Array1D<Real64> MaxCoolingLoadMetByVent;
-    Array1D<Real64> MaxCoolingLoadAddedByVent;
-    Array1D<Real64> MaxOvercoolingByVent;
-    Array1D<Real64> MaxHeatingLoadMetByVent;
-    Array1D<Real64> MaxHeatingLoadAddedByVent;
-    Array1D<Real64> MaxOverheatingByVent;
-    Array1D<Real64> MaxNoLoadHeatingByVent;
-    Array1D<Real64> MaxNoLoadCoolingByVent;
+    EPVector<Real64> MaxCoolingLoadMetByVent;
+    EPVector<Real64> MaxCoolingLoadAddedByVent;
+    EPVector<Real64> MaxOvercoolingByVent;
+    EPVector<Real64> MaxHeatingLoadMetByVent;
+    EPVector<Real64> MaxHeatingLoadAddedByVent;
+    EPVector<Real64> MaxOverheatingByVent;
+    EPVector<Real64> MaxNoLoadHeatingByVent;
+    EPVector<Real64> MaxNoLoadCoolingByVent;
 
-    Array1D<Real64> RemMaxCoolingLoadMetByVent;
-    Array1D<Real64> RemMaxCoolingLoadAddedByVent;
-    Array1D<Real64> RemMaxOvercoolingByVent;
-    Array1D<Real64> RemMaxHeatingLoadMetByVent;
-    Array1D<Real64> RemMaxHeatingLoadAddedByVent;
-    Array1D<Real64> RemMaxOverheatingByVent;
-    Array1D<Real64> RemMaxNoLoadHeatingByVent;
-    Array1D<Real64> RemMaxNoLoadCoolingByVent;
+    EPVector<Real64> RemMaxCoolingLoadMetByVent;
+    EPVector<Real64> RemMaxCoolingLoadAddedByVent;
+    EPVector<Real64> RemMaxOvercoolingByVent;
+    EPVector<Real64> RemMaxHeatingLoadMetByVent;
+    EPVector<Real64> RemMaxHeatingLoadAddedByVent;
+    EPVector<Real64> RemMaxOverheatingByVent;
+    EPVector<Real64> RemMaxNoLoadHeatingByVent;
+    EPVector<Real64> RemMaxNoLoadCoolingByVent;
 
-    Array1D<Real64> LastMaxCoolingLoadMetByVent;
-    Array1D<Real64> LastMaxCoolingLoadAddedByVent;
-    Array1D<Real64> LastMaxOvercoolingByVent;
-    Array1D<Real64> LastMaxHeatingLoadMetByVent;
-    Array1D<Real64> LastMaxHeatingLoadAddedByVent;
-    Array1D<Real64> LastMaxOverheatingByVent;
-    Array1D<Real64> LastMaxNoLoadHeatingByVent;
-    Array1D<Real64> LastMaxNoLoadCoolingByVent;
+    EPVector<Real64> LastMaxCoolingLoadMetByVent;
+    EPVector<Real64> LastMaxCoolingLoadAddedByVent;
+    EPVector<Real64> LastMaxOvercoolingByVent;
+    EPVector<Real64> LastMaxHeatingLoadMetByVent;
+    EPVector<Real64> LastMaxHeatingLoadAddedByVent;
+    EPVector<Real64> LastMaxOverheatingByVent;
+    EPVector<Real64> LastMaxNoLoadHeatingByVent;
+    EPVector<Real64> LastMaxNoLoadCoolingByVent;
 
-    Array1D<Real64> SysTotZoneLoadHTNG;
-    Array1D<Real64> SysTotZoneLoadCLNG;
-    Array1D<Real64> SysOALoadHTNG;
-    Array1D<Real64> SysOALoadCLNG;
-    Array1D<Real64> SysTotHTNG;
-    Array1D<Real64> SysTotCLNG;
+    EPVector<Real64> SysTotZoneLoadHTNG;
+    EPVector<Real64> SysTotZoneLoadCLNG;
+    EPVector<Real64> SysOALoadHTNG;
+    EPVector<Real64> SysOALoadCLNG;
+    EPVector<Real64> SysTotHTNG;
+    EPVector<Real64> SysTotCLNG;
 
-    Array1D<Real64> SysTotH2OHOT;
-    Array1D<Real64> SysTotH2OCOLD;
-    Array1D<Real64> SysTotElec;
-    Array1D<Real64> SysTotGas;
-    Array1D<Real64> SysTotSteam;
+    EPVector<Real64> SysTotH2OHOT;
+    EPVector<Real64> SysTotH2OCOLD;
+    EPVector<Real64> SysTotElec;
+    EPVector<Real64> SysTotGas;
+    EPVector<Real64> SysTotSteam;
 
-    Array1D<Real64> SysHumidHTNG;
-    Array1D<Real64> SysHumidElec;
-    Array1D<Real64> SysHumidGas;
-    Array1D<Real64> SysEvapCLNG;
-    Array1D<Real64> SysEvapElec;
-    Array1D<Real64> SysHeatExHTNG;
-    Array1D<Real64> SysHeatExCLNG;
-    Array1D<Real64> DesDehumidCLNG;
-    Array1D<Real64> DesDehumidElec;
-    Array1D<Real64> SysSolarCollectHeating;
-    Array1D<Real64> SysSolarCollectCooling;
-    Array1D<Real64> SysUserDefinedTerminalHeating;
-    Array1D<Real64> SysUserDefinedTerminalCooling;
+    EPVector<Real64> SysHumidHTNG;
+    EPVector<Real64> SysHumidElec;
+    EPVector<Real64> SysHumidGas;
+    EPVector<Real64> SysEvapCLNG;
+    EPVector<Real64> SysEvapElec;
+    EPVector<Real64> SysHeatExHTNG;
+    EPVector<Real64> SysHeatExCLNG;
+    EPVector<Real64> DesDehumidCLNG;
+    EPVector<Real64> DesDehumidElec;
+    EPVector<Real64> SysSolarCollectHeating;
+    EPVector<Real64> SysSolarCollectCooling;
+    EPVector<Real64> SysUserDefinedTerminalHeating;
+    EPVector<Real64> SysUserDefinedTerminalCooling;
 
-    Array1D<Real64> SysFANCompHTNG;
-    Array1D<Real64> SysFANCompElec;
-    Array1D<Real64> SysCCCompCLNG;
-    Array1D<Real64> SysCCCompH2OCOLD;
-    Array1D<Real64> SysCCCompElec;
-    Array1D<Real64> SysHCCompH2OHOT;
-    Array1D<Real64> SysHCCompElec;
-    Array1D<Real64> SysHCCompElecRes;
-    Array1D<Real64> SysHCCompHTNG;
-    Array1D<Real64> SysHCCompGas;
-    Array1D<Real64> SysHCCompSteam;
-    Array1D<Real64> SysDomesticH2O;
+    EPVector<Real64> SysFANCompHTNG;
+    EPVector<Real64> SysFANCompElec;
+    EPVector<Real64> SysCCCompCLNG;
+    EPVector<Real64> SysCCCompH2OCOLD;
+    EPVector<Real64> SysCCCompElec;
+    EPVector<Real64> SysHCCompH2OHOT;
+    EPVector<Real64> SysHCCompElec;
+    EPVector<Real64> SysHCCompElecRes;
+    EPVector<Real64> SysHCCompHTNG;
+    EPVector<Real64> SysHCCompGas;
+    EPVector<Real64> SysHCCompSteam;
+    EPVector<Real64> SysDomesticH2O;
 
-    Array1D<Real64> ZoneOAMassFlow;       // zone mech vent mass flow rate {kg/s}
-    Array1D<Real64> ZoneOAMass;           // zone mech vent total mass for time {kg}
-    Array1D<Real64> ZoneOAVolFlowStdRho;  // zone mech vent volume flow rate at standard density {m3/s}
-    Array1D<Real64> ZoneOAVolStdRho;      // zone mech vent total volume OA at standard density {m3/s}
-    Array1D<Real64> ZoneOAVolFlowCrntRho; // zone mech vent volume flow rate at current density {m3/s}
-    Array1D<Real64> ZoneOAVolCrntRho;     // zone mech vent total volume OA at current density {m3/s}
-    Array1D<Real64> ZoneMechACH;          // zone mech vent air changes per hour {ACH}
+    EPVector<Real64> ZoneOAMassFlow;       // zone mech vent mass flow rate {kg/s}
+    EPVector<Real64> ZoneOAMass;           // zone mech vent total mass for time {kg}
+    EPVector<Real64> ZoneOAVolFlowStdRho;  // zone mech vent volume flow rate at standard density {m3/s}
+    EPVector<Real64> ZoneOAVolStdRho;      // zone mech vent total volume OA at standard density {m3/s}
+    EPVector<Real64> ZoneOAVolFlowCrntRho; // zone mech vent volume flow rate at current density {m3/s}
+    EPVector<Real64> ZoneOAVolCrntRho;     // zone mech vent total volume OA at current density {m3/s}
+    EPVector<Real64> ZoneMechACH;          // zone mech vent air changes per hour {ACH}
 
     bool AirLoopLoadsReportEnabled(true);
     bool VentLoadsReportEnabled(true);
@@ -244,7 +244,7 @@ namespace SystemReports {
     // Reporting routines for module
 
     // Object Data
-    Array1D<SummarizeLoads> Vent;
+    EPVector<SummarizeLoads> Vent;
 
     // MODULE SUBROUTINES:
     //*************************************************************************

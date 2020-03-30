@@ -49,7 +49,7 @@
 #define DataBranchNodeConnections_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+//#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
@@ -148,10 +148,10 @@ namespace DataBranchNodeConnections {
     };
 
     // Object Data
-    extern Array1D<ComponentListData> CompSets;
-    extern Array1D<ParentListData> ParentNodeList;
+    extern EPVector<ComponentListData> CompSets;
+    extern EPVector<ParentListData> ParentNodeList;
     extern EPVector<NodeConnectionDef> NodeConnections;
-    extern Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
+    extern EPVector<EqNodeConnectionDef> AirTerminalNodeConnections;
     extern EPVector<bool> NonConnectedNodes;
 
     // Clears the global data in DataBranchNodeConnections.
