@@ -48,7 +48,7 @@
 #ifndef ENERGYPLUS_LIB_ENERGYPLUSAPI_HPP
 #define ENERGYPLUS_LIB_ENERGYPLUSAPI_HPP
 
-#if _WIN32 || _MSC_VER
+#if (_WIN32 || _MSC_VER) && ! ENERGYPLUS_STATIC_API
 #if defined(energypluslib_EXPORTS) || defined(energyplusapi_EXPORTS) || defined(energypluslib2_EXPORTS)
 #define ENERGYPLUSLIB_API __declspec(dllexport)
 #else
