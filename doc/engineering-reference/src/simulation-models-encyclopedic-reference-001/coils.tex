@@ -1611,38 +1611,38 @@ Simulation logic
 
 1. No latent control
 
-   Perform normal operation with SHR_{Normal}
+   Perform normal operation with SHR\(_{Normal}\)
 
 2. Latent control
 
-a.  If CoilSHR >= SHR_{Normal}
+a.  If CoilSHR >= SHR\(_{Normal}\)
 
    Perform normal operation to meet sensible load, adjusted by PLR for a single capacity equipmentl
 
 	SenLoad = SenOut * PLR
 
-b.  Else if (SHR_{Normal} > CoilSHR And CoilSHR >= SHR_{Sub})
+b.  Else if (SHR\(_{Normal}\) > CoilSHR And CoilSHR >= SHR\(_{Sub}\))
 
    Perform combination between normal and subcooling operation
 
-	CoilSHR = SHR_{Sub} * r_{Sub} + SHR_{Normal} * (1 - r_{Sub})
+  \(CoilSHR = SHR_{Sub} * r_{Sub} + SHR_{Normal} * (1 - r_{Sub})\)
 
-	SenLoad = [SenOut_{Sub} * r_{Sub} + SenOut_{Normal} * (1 - r_{Sub})] * PLR
+  \(SenLoad = [SenOut_{Sub} * r_{Sub} + SenOut_{Normal} * (1 - r_{Sub})] * PLR\)
 
-c.  Else if (SHR_{Sub} > CoilSHR And CoilSHR >= SHR_{Reheat})
+c.  Else if (SHR\(_{Sub}\) > CoilSHR And CoilSHR >= SHR\(_{Reheat}\))
 
    Perform combination between normal and reheat operation
 
-	CoilSHR = SHR_{Reheat} * r_{Reheat} + SHR_{Normal} * (1 - r_{Sub})
+  \(CoilSHR = SHR_{Reheat} * r_{Reheat} + SHR_{Normal} * (1 - r_{Sub})\)
 
-	SenLoad = [SenOut_{Sub} * r_{Sub} + SenOut_{Normal} * (1 - r_{Sub})] * PLR
+  \(SenLoad = [SenOut_{Sub} * r_{Sub} + SenOut_{Normal} * (1 - r_{Sub})] * PLR\)
 
 
 Else
 
     Performreheatg operation
 
-    SenLoad = SenOut_{Reheat} * PLR
+    \(SenLoad = SenOut_{Reheat} * PLR\)
 
 End If
 
