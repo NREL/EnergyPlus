@@ -48,6 +48,9 @@
 #ifndef PollutionModule_hh_INCLUDED
 #define PollutionModule_hh_INCLUDED
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -350,7 +353,7 @@ namespace PollutionModule {
     {
         // Members
         // FuelType Names
-        EPVector<std::string> FuelTypeNames;
+        Array1D<std::string> FuelTypeNames;
         // Fuel Types used with the Pollution Factors
         Real64 Elec;
         Real64 NatGas;
@@ -401,7 +404,7 @@ namespace PollutionModule {
 
         // Default Constructor
         FuelTypeProps()
-            : FuelTypeNames({PollFactorNumTypes}), Elec(0.0), NatGas(0.0), FuelOil1(0.0), FuelOil2(0.0), Coal(0.0), Gasoline(0.0), Propane(0.0),
+            : FuelTypeNames({1, PollFactorNumTypes}), Elec(0.0), NatGas(0.0), FuelOil1(0.0), FuelOil2(0.0), Coal(0.0), Gasoline(0.0), Propane(0.0),
               Diesel(0.0), OtherFuel1(0.0), OtherFuel2(0.0), ElecPurch(0.0), ElecSold(0.0), ElecFacilityIndex(0), DieselFacilityIndex(0),
               PurchCoolFacilityIndex(0), PurchHeatFacilityIndex(0), NatGasFacilityIndex(0), GasolineFacilityIndex(0), CoalFacilityIndex(0),
               FuelOil1FacilityIndex(0), FuelOil2FacilityIndex(0), PropaneFacilityIndex(0), OtherFuel1FacilityIndex(0), OtherFuel2FacilityIndex(0),
