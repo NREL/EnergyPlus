@@ -94,10 +94,10 @@ namespace DataBranchNodeConnections {
     int EqNodeConnectionAlloc(100);
 
     // Object Data
-    Array1D<ComponentListData> CompSets;
-    Array1D<ParentListData> ParentNodeList;
-    Array1D<NodeConnectionDef> NodeConnections;
-    Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
+    EPVector<ComponentListData> CompSets;
+    EPVector<ParentListData> ParentNodeList;
+    EPVector<NodeConnectionDef> NodeConnections;
+    EPVector<EqNodeConnectionDef> AirTerminalNodeConnections;
     EPVector<bool> NonConnectedNodes;
 
     // Clears the global data in DataBranchNodeConnections.

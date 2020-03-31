@@ -342,9 +342,9 @@ namespace BranchNodeConnections {
         int Object;
         int StartConnect;
         int EndConnect;
-        Array1D<int> FluidStreamInletCount;
-        Array1D<int> FluidStreamOutletCount;
-        Array1D<int> NodeObjects;
+        EPVector<int> FluidStreamInletCount;
+        EPVector<int> FluidStreamOutletCount;
+        EPVector<int> NodeObjects;
         EPVector<bool> FluidStreamCounts;
         int NumObjects;
         int MaxFluidStream;
@@ -1098,13 +1098,13 @@ namespace BranchNodeConnections {
                           std::string const &ComponentName,
                           bool &IsParent,                    // true or false
                           int &NumInlets,
-                          Array1D<std::string> &InletNodeNames,
-                          Array1D<int> &InletNodeNums,
-                          Array1D<int> &InletFluidStreams,
+                          EPVector<std::string> &InletNodeNames,
+                          EPVector<int> &InletNodeNums,
+                          EPVector<int> &InletFluidStreams,
                           int &NumOutlets,
-                          Array1D<std::string> &OutletNodeNames,
-                          Array1D<int> &OutletNodeNums,
-                          Array1D<int> &OutletFluidStreams,
+                          EPVector<std::string> &OutletNodeNames,
+                          EPVector<int> &OutletNodeNums,
+                          EPVector<int> &OutletFluidStreams,
                           bool &ErrorsFound                  // set to true if errors found, unchanged otherwise
     )
     {
@@ -1196,9 +1196,9 @@ namespace BranchNodeConnections {
                          Array1D<std::string> &ChildrenCType,
                          Array1D<std::string> &ChildrenCName,
                          Array1D<std::string> &InletNodeName,
-                         Array1D<int> &InletNodeNum,
+                         EPVector<int> &InletNodeNum,
                          Array1D<std::string> &OutletNodeName,
-                         Array1D<int> &OutletNodeNum,
+                         EPVector<int> &OutletNodeNum,
                          bool &ErrorsFound)
     {
 
@@ -1219,8 +1219,8 @@ namespace BranchNodeConnections {
         Array1D<std::string> ChildCName;
         Array1D<std::string> ChildInNodeName;
         Array1D<std::string> ChildOutNodeName;
-        Array1D<int> ChildInNodeNum;
-        Array1D<int> ChildOutNodeNum;
+        EPVector<int> ChildInNodeNum;
+        EPVector<int> ChildOutNodeNum;
         int Loop;
         int CountNum;
         bool ErrInObject;
@@ -1977,7 +1977,7 @@ namespace BranchNodeConnections {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int NodeConnectIndex;
         int NumInList;
-        Array1D<int> ListArray;
+        EPVector<int> ListArray;
 
         if (allocated(NodeConnectType)) NodeConnectType.deallocate();
 
@@ -2001,10 +2001,10 @@ namespace BranchNodeConnections {
     }
 
     void FindAllNodeNumbersInList(int const WhichNumber,
-                                  Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
+                                  EPVector<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
                                   int const NumItems,
                                   int &CountOfItems,            // Number of items found
-                                  Array1D<int> &AllNumbersInList // Index array to all numbers found
+                                  EPVector<int> &AllNumbersInList // Index array to all numbers found
     )
     {
 
