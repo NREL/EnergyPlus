@@ -122,11 +122,11 @@ namespace DataDaylighting {
     int TotDElightCFS(0);
 
     // Object Data
-    Array1D<ZoneDaylightCalc> ZoneDaylight;
-    Array1D<IllumMapData> IllumMap;
-    Array1D<MapCalcData> IllumMapCalc;
-    Array1D<RefPointData> DaylRefPt;
-    Array1D<DElightComplexFeneData> DElightComplexFene;
+    EPVector<ZoneDaylightCalc> ZoneDaylight;
+    EPVector<IllumMapData> IllumMap;
+    EPVector<MapCalcData> IllumMapCalc;
+    EPVector<RefPointData> DaylRefPt;
+    EPVector<DElightComplexFeneData> DElightComplexFene;
 
 } // namespace DataDaylighting
 

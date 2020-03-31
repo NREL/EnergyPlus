@@ -52,7 +52,6 @@
 #include <memory>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array4D.hh>
 #include <ObjexxFCL/Optional.hh>
 
@@ -278,7 +277,7 @@ namespace PipeHeatTransfer {
     };
 
     // Object Data
-    extern Array1D<PipeHTData> PipeHT;
+    extern EPVector<PipeHTData> PipeHT;
 
     void GetPipesHeatTransfer();
 

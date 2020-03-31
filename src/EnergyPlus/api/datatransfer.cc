@@ -141,7 +141,7 @@ int getVariableHandle(const char* type, const char* key) {
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
     int handle = -1; // initialize to -1 as a flag
     if (EnergyPlus::OutputProcessor::RVariableTypes.allocated()) {
-        handle = 0; // initialize to 0 to get a 1 based Array1D index
+        handle = 0; // initialize to 0 to get a 1 based array index
         for (int i = 1; i <= EnergyPlus::OutputProcessor::NumOfRVariable; i++) {
             auto &availOutputVar = EnergyPlus::OutputProcessor::RVariableTypes(i);
             handle++;

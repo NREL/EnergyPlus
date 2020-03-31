@@ -49,7 +49,6 @@
 #define MixedAir_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -411,10 +410,10 @@ namespace MixedAir {
     };
 
     // Object Data
-    extern Array1D<ControllerListProps> ControllerLists;
-    extern Array1D<OAControllerProps> OAController;
-    extern Array1D<OAMixerProps> OAMixer;
-    extern Array1D<VentilationMechanicalProps> VentilationMechanical;
+    extern EPVector<ControllerListProps> ControllerLists;
+    extern EPVector<OAControllerProps> OAController;
+    extern EPVector<OAMixerProps> OAMixer;
+    extern EPVector<VentilationMechanicalProps> VentilationMechanical;
 
     // Functions
 
@@ -529,8 +528,8 @@ namespace MixedAir {
                                         Array1D<Real64> const &Par // par(1) = mixed node number
     );
 
-    Array1D<int> GetOAMixerNodeNumbers(std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
-                                      bool &ErrorsFound               // set to true if problem
+    EPVector<int> GetOAMixerNodeNumbers(std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
+                                        bool &ErrorsFound               // set to true if problem
     );
 
     int GetNumOAMixers();

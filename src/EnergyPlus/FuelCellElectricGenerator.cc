@@ -103,7 +103,7 @@ namespace FuelCellElectricGenerator {
     int NumFuelCellGenerators(0);
     bool getFuelCellInputFlag(true);
     EPVector<bool> CheckEquipName;
-    Array1D<FCDataStruct> FuelCell; // dimension to number of machines
+    EPVector<FCDataStruct> FuelCell; // dimension to number of machines
 
     void clear_state()
     {
@@ -530,10 +530,12 @@ namespace FuelCellElectricGenerator {
                 }
 
                 // check for molar fractions summing to 1.0.
-                if (std::abs(sum(FuelCell(thisFuelCell).AirSup.ConstitMolalFract) - 1.0) > 0.0001) {
+                if (std::abs(std::accumulate(FuelCell(thisFuelCell).AirSup.ConstitMolalFract.begin(),
+                    FuelCell(thisFuelCell).AirSup.ConstitMolalFract.end(), 0.0) - 1.0) > 0.0001) {
 
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " molar fractions do not sum to 1.0");
-                    ShowContinueError("..Sum was=" + General::RoundSigDigits(sum(FuelCell(thisFuelCell).AirSup.ConstitMolalFract), 1));
+                    ShowContinueError("..Sum was=" + General::RoundSigDigits(std::accumulate(FuelCell(thisFuelCell).AirSup.ConstitMolalFract.begin(),
+                        FuelCell(thisFuelCell).AirSup.ConstitMolalFract.end(), 0.0), 1));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -1819,7 +1821,7 @@ namespace FuelCellElectricGenerator {
             Real64 Acc = 0.01;      // guessing need to refine
             int MaxIter = 150;      // guessing need to refine
             SolverFlag = 0;         // init
-            Array1D<Real64> Par(2); // parameters passed in to SolveRoot
+            EPVector<Real64> Par(2); // parameters passed in to SolveRoot
             Par(1) = tmpTotProdGasEnthalpy;
             Par(2) = this->FCPM.NdotProdGas;
             Real64 tmpTprodGas = this->FCPM.TprodGasLeavingFCPM;
@@ -2039,7 +2041,7 @@ namespace FuelCellElectricGenerator {
     }
 
     Real64 FCDataStruct::FuelCellProductGasEnthResidual(Real64 const TprodGas,     // temperature, this is "x" being searched
-                                                        Array1D<Real64> const &Par // par(1) = Generator Number
+                                                        EPVector<Real64> const &Par // par(1) = Generator Number
     )
     {
 
@@ -2502,7 +2504,7 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (int thisConstit = 1; thisConstit <= isize(this->FCPM.GasLibID); ++thisConstit) {
+        for (int thisConstit = 1; thisConstit <= this->FCPM.GasLibID.isize(); ++thisConstit) {
             int gasID = this->FCPM.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
@@ -2566,7 +2568,7 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (int thisConstit = 1; thisConstit <= isize(this->AuxilHeat.GasLibID); ++thisConstit) {
+        for (int thisConstit = 1; thisConstit <= this->AuxilHeat.GasLibID.isize(); ++thisConstit) {
             int gasID = this->AuxilHeat.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
@@ -2997,7 +2999,7 @@ namespace FuelCellElectricGenerator {
                     Real64 NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
 
                     // find water fraction in incoming gas stream
-                    for (int i = 1; i <= isize(this->AuxilHeat.GasLibID); ++i) {
+                    for (int i = 1; i <= this->AuxilHeat.GasLibID.isize(); ++i) {
                         if (this->AuxilHeat.GasLibID(i) == 4) this->ExhaustHX.WaterVaporFractExh = this->AuxilHeat.ConstitMolalFract(i);
                     }
                     Real64 NdotWaterVapor = this->ExhaustHX.WaterVaporFractExh * NdotGas;
@@ -3325,8 +3327,7 @@ namespace FuelCellElectricGenerator {
             for (auto &e : DataGenerators::FuelSupply)
                 e.QskinLoss = 0.0;
             MyEnvrnFlag = false;
-            for (int i = FuelCell.l(), e = FuelCell.u(); i <= e; ++i) {
-                auto &cell(FuelCell(i));
+            for (auto &cell : FuelCell) {
                 cell.FCPM.HasBeenOn = false;
                 cell.AirSup.PairCompEl = 0.0;
                 cell.QconvZone = 0.0;

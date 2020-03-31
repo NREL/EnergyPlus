@@ -48,9 +48,6 @@
 #ifndef CoolTower_hh_INCLUDED
 #define CoolTower_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -141,7 +138,7 @@ namespace CoolTower {
     };
 
     // Object Data
-    extern Array1D<CoolTowerParams> CoolTowerSys;
+    extern EPVector<CoolTowerParams> CoolTowerSys;
 
     // Functions
 

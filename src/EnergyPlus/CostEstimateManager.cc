@@ -794,7 +794,8 @@ namespace CostEstimateManager {
 
                     if (CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                         WildcardObjNames = true;
-                        CostLineItem(Item).Qty = sum(ZoneDaylight, &ZoneDaylightCalc::TotalDaylRefPoints);
+                        CostLineItem(Item).Qty = std::accumulate(ZoneDaylight.begin(), ZoneDaylight.end(), 0.0,
+                            [](const Real64 &a, const ZoneDaylightCalc &b) {return a + b.TotalDaylRefPoints;});
                     } else if (CostLineItem(Item).ParentObjName != "") {
                         ThisZoneID = UtilityRoutines::FindItem(CostLineItem(Item).ParentObjName, Zone);
                         if (ThisZoneID > 0) {
@@ -873,7 +874,8 @@ namespace CostEstimateManager {
 
         // now sum up the line items, result for the current building
 
-        CurntBldg.LineItemTot = sum(CostLineItem, &CostLineItemStruct::LineSubTotal);
+        CurntBldg.LineItemTot = std::accumulate(CostLineItem.begin(), CostLineItem.end(), 0.0,
+            [](const Real64 &a, const CostLineItemStruct &b) {return a + b.LineSubTotal;});
     }
 
 } // namespace CostEstimateManager

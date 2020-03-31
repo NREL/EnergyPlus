@@ -306,10 +306,10 @@ namespace MixedAir {
     // Utility routines for the module
 
     // Object Data
-    Array1D<ControllerListProps> ControllerLists;
-    Array1D<OAControllerProps> OAController;
-    Array1D<OAMixerProps> OAMixer;
-    Array1D<VentilationMechanicalProps> VentilationMechanical;
+    EPVector<ControllerListProps> ControllerLists;
+    EPVector<OAControllerProps> OAController;
+    EPVector<OAMixerProps> OAMixer;
+    EPVector<VentilationMechanicalProps> VentilationMechanical;
     std::unordered_set<std::string> ControllerListUniqueNames;
     std::unordered_map<std::string, std::string> OAControllerUniqueNames;
 
@@ -5323,7 +5323,7 @@ namespace MixedAir {
         return Residuum;
     }
 
-    Array1D<int> GetOAMixerNodeNumbers(std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
+    EPVector<int> GetOAMixerNodeNumbers(std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
                                       bool &ErrorsFound               // set to true if problem
     )
     {
@@ -5340,7 +5340,7 @@ namespace MixedAir {
         // as zero.
 
         // Return value
-        Array1D<int> OANodeNumbers(4); // return OA mixer nodes
+        EPVector<int> OANodeNumbers(4); // return OA mixer nodes
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichOAMixer;

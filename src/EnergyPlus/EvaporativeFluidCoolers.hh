@@ -48,9 +48,6 @@
 #ifndef EvaporativeFluidCoolers_hh_INCLUDED
 #define EvaporativeFluidCoolers_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -270,13 +267,13 @@ namespace EvaporativeFluidCoolers {
 
         void CalcTwoSpeedEvapFluidCooler();
 
-        Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA, Array1D<Real64> const &Par);
+        Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA, EPVector<Real64> const &Par);
 
         void SimSimpleEvapFluidCooler(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
     };
 
     // Object Data
-    extern Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
+    extern EPVector<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
 
     void GetEvapFluidCoolerInput();
 

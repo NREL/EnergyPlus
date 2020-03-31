@@ -102,7 +102,7 @@ namespace EvaporativeFluidCoolers {
     bool GetEvapFluidCoolerInputFlag(true);
     int NumSimpleEvapFluidCoolers(0); // Number of similar evaporative fluid coolers
 
-    Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
+    EPVector<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleEvapFluidCoolerNames;
 
     PlantComponent *EvapFluidCoolerSpecs::factory(int objectType, std::string const &objectName)
@@ -1187,7 +1187,7 @@ namespace EvaporativeFluidCoolers {
         // temperature specified in the plant:sizing object
         // is higher than the design entering air wet-bulb temp
         // when autosize feature is used
-        Array1D<Real64> Par(4); // Parameter array need for RegulaFalsi routine
+        EPVector<Real64> Par(4); // Parameter array need for RegulaFalsi routine
 
         Real64 DesEvapFluidCoolerLoad = 0.0; // Design evaporative fluid cooler load [W]
         Real64 tmpDesignWaterFlowRate = this->DesignWaterFlowRate;
@@ -2262,7 +2262,7 @@ namespace EvaporativeFluidCoolers {
         }
     }
 
-    Real64 EvapFluidCoolerSpecs::SimpleEvapFluidCoolerUAResidual(Real64 const UA, Array1D<Real64> const &Par)
+    Real64 EvapFluidCoolerSpecs::SimpleEvapFluidCoolerUAResidual(Real64 const UA, EPVector<Real64> const &Par)
     {
 
         // FUNCTION INFORMATION:

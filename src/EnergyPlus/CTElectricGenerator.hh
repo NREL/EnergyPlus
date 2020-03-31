@@ -48,9 +48,6 @@
 #ifndef CTElectricGenerator_hh_INCLUDED
 #define CTElectricGenerator_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -98,7 +95,7 @@ namespace CTElectricGenerator {
         Real64 TotalHeatEnergyRec;        // total heat recovered (J)
         int QLubeOilRecoveredCurve;       // (ELUBEGC) Curve Index for Recoverable Lube Oil heat Input Coef Poly Fit
         Real64 UA;                        // (UACGC) exhaust gas Heat Exchanger UA
-        Array1D<Real64> UACoef;           // Heat Exchanger UA  Coeffs Poly Fit
+        EPVector<Real64> UACoef;           // Heat Exchanger UA  Coeffs Poly Fit
         Real64 MaxExhaustperCTPower;      // MAX EXHAUST FLOW PER W POWER OUTPUT COEFF
         Real64 DesignHeatRecVolFlowRate;  // m3/s, Design Water mass flow rate through heat recovery loop
         Real64 DesignHeatRecMassFlowRate; // kg/s, Design Water mass flow rate through heat recovery loop
@@ -154,7 +151,7 @@ namespace CTElectricGenerator {
     };
 
     // Object Data
-    extern Array1D<CTGeneratorData> CTGenerator; // dimension to number of machines
+    extern EPVector<CTGeneratorData> CTGenerator; // dimension to number of machines
 
     void GetCTGeneratorInput();
 

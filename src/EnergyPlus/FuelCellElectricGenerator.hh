@@ -48,9 +48,6 @@
 #ifndef FuelCellElectricGenerator_hh_INCLUDED
 #define FuelCellElectricGenerator_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -111,8 +108,8 @@ namespace FuelCellElectricGenerator {
         Real64 NdotFuel;           // molar fuel use rate.  (kmol/sec)
         Real64 TotFuelInEnthalphy; // Enthalpy of fuel coming into FCPM (watts)
         Real64 NdotProdGas;        // (kmol/sec)
-        Array1D<Real64> ConstitMolalFract;
-        Array1D<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        EPVector<Real64> ConstitMolalFract;
+        EPVector<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 TprodGasLeavingFCPM;
         Real64 NdotAir;           // molar air use rate    (kmol/sec)
         Real64 TotAirInEnthalphy; // Enthalpy of air coming nto FCPM energy balance (watts)
@@ -158,10 +155,10 @@ namespace FuelCellElectricGenerator {
         int IntakeRecoveryMode;
         int ConstituentMode; // how are air data input
         int NumConstituents;
-        Array1D<std::string> ConstitName;
-        Array1D<Real64> ConstitMolalFract;
+        EPVector<std::string> ConstitName;
+        EPVector<Real64> ConstitMolalFract;
         // Calculated values and input from elsewhere
-        Array1D<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        EPVector<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 O2fraction;
         Real64 TairIntoBlower;  // temperature entering blower
         Real64 TairIntoFCPM;    // temperature leaving blower and entering FCPM
@@ -222,8 +219,8 @@ namespace FuelCellElectricGenerator {
         int NumConstituents;
         Real64 TauxMix;
         Real64 NdotAuxMix;
-        Array1D<Real64> ConstitMolalFract;
-        Array1D<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        EPVector<Real64> ConstitMolalFract;
+        EPVector<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 QskinLoss;     // Heat lost to room
         Real64 QairIntake;    // heat into intake air
 
@@ -273,8 +270,8 @@ namespace FuelCellElectricGenerator {
         Real64 WaterInletTemp;
         Real64 WaterVaporFractExh; // water vapor fraction in exhaust gas stream.
         Real64 CondensateRate;     // water condensation rate.
-        Array1D<Real64> ConstitMolalFract;
-        Array1D<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        EPVector<Real64> ConstitMolalFract;
+        EPVector<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 NdotHXleaving;
         Real64 WaterOutletTemp;
         Real64 WaterOutletEnthalpy;
@@ -298,8 +295,8 @@ namespace FuelCellElectricGenerator {
         Real64 NominalVoltage;
         Real64 LowVoltsDischarged; // not used
         int NumTablePairs;
-        Array1D<Real64> DischargeCurrent; // amps
-        Array1D<Real64> DischargeTime;    // hours
+        EPVector<Real64> DischargeCurrent; // amps
+        EPVector<Real64> DischargeTime;    // hours
         // calculated variables
         Real64 k;    // parameter in Manwell McGowan model
         Real64 c;    // parameter in Manwell McGowan model
@@ -573,7 +570,7 @@ namespace FuelCellElectricGenerator {
                                         Real64 &PelDiff    // if constrained then this is the difference, positive
         );
 
-        Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, Array1D<Real64> const &Par);
+        Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, EPVector<Real64> const &Par);
 
         static void FigureGaseousWaterEnthalpy(Real64 FluidTemp, Real64 &HGasWater);
 
@@ -612,7 +609,7 @@ namespace FuelCellElectricGenerator {
     extern bool getFuelCellInputFlag;
     extern int NumFuelCellGenerators;
     extern EPVector<bool> CheckEquipName;
-    extern Array1D<FCDataStruct> FuelCell;
+    extern EPVector<FCDataStruct> FuelCell;
 
 } // namespace FuelCellElectricGenerator
 

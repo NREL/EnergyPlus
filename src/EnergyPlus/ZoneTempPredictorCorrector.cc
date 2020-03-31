@@ -499,8 +499,8 @@ namespace ZoneTempPredictorCorrector {
         };
 
         // Object Data
-        Array1D<NeededControlTypes> TStatControlTypes;
-        Array1D<NeededComfortControlTypes> TComfortControlTypes;
+        EPVector<NeededControlTypes> TStatControlTypes;
+        EPVector<NeededComfortControlTypes> TComfortControlTypes;
 
         // Formats
         static constexpr auto Header("! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier\n");
@@ -1988,8 +1988,8 @@ namespace ZoneTempPredictorCorrector {
                                     TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
                                         UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
                                     if (!AdapComfortDailySetPointSchedule.initialized) {
-                                        Array1D<Real64> runningAverageASH(NumDaysInYear, 0.0);
-                                        Array1D<Real64> runningAverageCEN(NumDaysInYear, 0.0);
+                                        EPVector<Real64> runningAverageASH(NumDaysInYear, 0.0);
+                                        EPVector<Real64> runningAverageCEN(NumDaysInYear, 0.0);
                                         CalculateMonthlyRunningAverageDryBulb(runningAverageASH, runningAverageCEN);
                                         CalculateAdaptiveComfortSetPointSchl(runningAverageASH, runningAverageCEN);
                                     }
@@ -2080,8 +2080,8 @@ namespace ZoneTempPredictorCorrector {
                                     TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
                                         UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
                                     if (!AdapComfortDailySetPointSchedule.initialized) {
-                                        Array1D<Real64> runningAverageASH(NumDaysInYear, 0.0);
-                                        Array1D<Real64> runningAverageCEN(NumDaysInYear, 0.0);
+                                        EPVector<Real64> runningAverageASH(NumDaysInYear, 0.0);
+                                        EPVector<Real64> runningAverageCEN(NumDaysInYear, 0.0);
                                         CalculateMonthlyRunningAverageDryBulb(runningAverageASH, runningAverageCEN);
                                         CalculateAdaptiveComfortSetPointSchl(runningAverageASH, runningAverageCEN);
                                     }
@@ -2506,7 +2506,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalculateMonthlyRunningAverageDryBulb(Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN)
+    void CalculateMonthlyRunningAverageDryBulb(EPVector<Real64> &runningAverageASH, EPVector<Real64> &runningAverageCEN)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
@@ -2549,8 +2549,8 @@ namespace ZoneTempPredictorCorrector {
         std::string::size_type pos;
         int ind, i, j;
 
-        Array1D<Real64> adaptiveTemp(NumDaysInYear, 0.0);
-        Array1D<Real64> dailyDryTemp(NumDaysInYear, 0.0);
+        EPVector<Real64> adaptiveTemp(NumDaysInYear, 0.0);
+        EPVector<Real64> dailyDryTemp(NumDaysInYear, 0.0);
 
         readStat = 0;
         {
@@ -2649,7 +2649,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalculateAdaptiveComfortSetPointSchl(Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN)
+    void CalculateAdaptiveComfortSetPointSchl(EPVector<Real64> const &runningAverageASH, EPVector<Real64> const &runningAverageCEN)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
@@ -5878,7 +5878,7 @@ namespace ZoneTempPredictorCorrector {
             Real64 HMMultiplierAverage(1.0);
             Real64 MultpHM(1.0);
 
-            ZT(ZoneNum) = Zone(ZoneNum).ZoneMeasuredTemperature; // Array1D<Real64> ZT -- Zone
+            ZT(ZoneNum) = Zone(ZoneNum).ZoneMeasuredTemperature; // EPVector<Real64> ZT -- Zone
                                                                  // Air Temperature Averaged over
                                                                  // the System Time Increment
             if (HybridModelZone(ZoneNum).InfiltrationCalc_T && UseZoneTimeStepHistory) {
@@ -7563,7 +7563,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 PMVResult;       // Calculated PMV value
         Real64 PMVMin;          // Minimum allowed PMV value
         Real64 PMVMax;          // Calculated PMV value
-        Array1D<Real64> Par(2); // Passed parameter for RegularFalsi function
+        EPVector<Real64> Par(2); // Passed parameter for RegularFalsi function
         int SolFla;             // feed back flag from SolveRoot
         static int IterLimitExceededNum1(0);
         static int IterLimitErrIndex1(0);
@@ -7618,7 +7618,7 @@ namespace ZoneTempPredictorCorrector {
     }
 
     Real64 PMVResidual(Real64 const Tset,
-                       Array1D<Real64> const &Par // par(1) = PMV set point
+                       EPVector<Real64> const &Par // par(1) = PMV set point
     )
     {
         // FUNCTION INFORMATION:

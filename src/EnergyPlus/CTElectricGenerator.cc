@@ -99,7 +99,7 @@ namespace CTElectricGenerator {
     int NumCTGenerators(0);    // number of CT Generators specified in input
     bool getCTInputFlag(true); // then TRUE, calls subroutine to read input file.
 
-    Array1D<CTGeneratorData> CTGenerator; // dimension to number of machines
+    EPVector<CTGeneratorData> CTGenerator; // dimension to number of machines
 
     void clear_state()
     {

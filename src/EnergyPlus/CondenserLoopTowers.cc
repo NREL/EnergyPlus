@@ -137,7 +137,7 @@ namespace CondenserLoopTowers {
     bool GetInput(true);
 
     // Object Data
-    Array1D<CoolingTower> towers; // dimension to number of machines
+    EPVector<CoolingTower> towers; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
 
     // Functions
@@ -2238,7 +2238,7 @@ namespace CondenserLoopTowers {
         Real64 UA0;                       // Lower bound for UA [W/C]
         Real64 UA1;                       // Upper bound for UA [W/C]
         Real64 UA;                        // Calculated UA value
-        Array1D<Real64> Par(6);           // Parameter array need for RegulaFalsi routine
+        EPVector<Real64> Par(6);           // Parameter array need for RegulaFalsi routine
         std::string OutputChar;           // report variable for warning messages
         std::string OutputChar2;          // report variable for warning messages
         std::string OutputCharLo;         // report variable for warning messages
@@ -3122,7 +3122,7 @@ namespace CondenserLoopTowers {
         int SolFla; // Flag of solver
         Real64 tmpHighSpeedFanPower;
 
-        Array1D<Real64> Par(6);           // Parameter array need for RegulaFalsi routine
+        EPVector<Real64> Par(6);           // Parameter array need for RegulaFalsi routine
         Real64 UA0;                       // Lower bound for UA [W/C]
         Real64 UA1;                       // Upper bound for UA [W/C]
         Real64 DesTowerLoad;              // Design tower load [W]
@@ -4568,7 +4568,7 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla(0);           // Flag of solver
-        Array1D<Real64> Par(6);  // Parameter array for regula falsi solver
+        EPVector<Real64> Par(6);  // Parameter array for regula falsi solver
         std::string OutputChar;  // character string used for warning messages
         std::string OutputChar2; // character string used for warning messages
         std::string OutputChar3; // character string used for warning messages
@@ -4872,7 +4872,7 @@ namespace CondenserLoopTowers {
         static std::string const RoutineName("calculateMerkelVariableSpeedTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> Par(8); // Parameter array passed to solver
+        EPVector<Real64> Par(8); // Parameter array passed to solver
         int SolFla(0);          // Flag of solver
 
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
@@ -5104,7 +5104,7 @@ namespace CondenserLoopTowers {
     }
 
     Real64 CoolingTower::residualMerkelLoad(Real64 _AirFlowRateRatio,  // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                            Array1D<Real64> const &Par // par(1) = Tower number
+                                            EPVector<Real64> const &Par // par(1) = Tower number
     )
     {
 
@@ -5290,7 +5290,7 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;             // Flag of solver
-        Array1D<Real64> Par(4); // Parameter array for regula falsi solver
+        EPVector<Real64> Par(4); // Parameter array for regula falsi solver
         Real64 const VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver 
 
         //   determine tower outlet water temperature
@@ -5644,7 +5644,7 @@ namespace CondenserLoopTowers {
     }
 
     Real64 CoolingTower::residualUA(Real64 UA,                 // UA of cooling tower
-                                    Array1D<Real64> const &Par // par(1) = design tower load [W]
+                                    EPVector<Real64> const &Par // par(1) = design tower load [W]
     )
     {
         // FUNCTION INFORMATION:
@@ -5673,7 +5673,7 @@ namespace CondenserLoopTowers {
     }
 
     Real64 CoolingTower::residualTr(Real64 Trange,             // cooling tower range temperature [C]
-                                    Array1D<Real64> const &Par // par(1) = tower number
+                                    EPVector<Real64> const &Par // par(1) = tower number
     )
     {
         // FUNCTION INFORMATION:
@@ -5706,7 +5706,7 @@ namespace CondenserLoopTowers {
     }
 
     Real64 CoolingTower::residualTa(Real64 FlowRatio,          // water or air flow ratio of cooling tower
-                                    Array1D<Real64> const &Par // par(1) = tower number
+                                    EPVector<Real64> const &Par // par(1) = tower number
     )
     {
         // FUNCTION INFORMATION:

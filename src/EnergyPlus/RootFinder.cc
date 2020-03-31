@@ -1886,7 +1886,7 @@ namespace RootFinder {
     }
 
     void SortHistory(int const N,                // Number of points to sort in history array
-                     Array1D<PointType> &History // Array of PointType variables. At least N of them
+                     EPVector<PointType> &History // Array of PointType variables. At least N of them
     )
     {
         // SUBROUTINE INFORMATION:

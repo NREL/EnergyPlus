@@ -48,9 +48,6 @@
 #ifndef CondenserLoopTowers_hh_INCLUDED
 #define CondenserLoopTowers_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -251,7 +248,7 @@ namespace CondenserLoopTowers {
         Real64 StarvedMakeUpVol;
 
         // From VSTower struct - for Variable speed towers only
-        Array1D<Real64> Coeff;      // - model coefficients
+        EPVector<Real64> Coeff;      // - model coefficients
         bool FoundModelCoeff;       // - TRUE if model is calibratable
         Real64 MinInletAirWBTemp;   // - model limit for min inlet air WB temp
         Real64 MaxInletAirWBTemp;   // - model limit for max inlet air WB temp
@@ -403,26 +400,26 @@ namespace CondenserLoopTowers {
         void report(bool RunFlag);
 
         Real64 residualUA(Real64 UA,                 // UA of cooling tower
-                          Array1D<Real64> const &Par // par(1) = design tower load [W]
+                          EPVector<Real64> const &Par // par(1) = design tower load [W]
         );
 
         Real64 residualTa(Real64 FlowRatio,          // water or air flow ratio of cooling tower
-                          Array1D<Real64> const &Par // par(1) = tower number
+                          EPVector<Real64> const &Par // par(1) = tower number
         );
 
         Real64 residualTr(Real64 Trange,             // cooling tower range temperature [C]
-                          Array1D<Real64> const &Par // par(1) = tower number
+                          EPVector<Real64> const &Par // par(1) = tower number
         );
 
         Real64 residualMerkelLoad(Real64 _AirFlowRateRatio,  // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                  Array1D<Real64> const &Par // par(1) = Tower number
+                                  EPVector<Real64> const &Par // par(1) = Tower number
         );
 
         static PlantComponent *factory(std::string const &objectName);
     };
 
     // Object Data
-    extern Array1D<CoolingTower> towers; // dimension to number of machines
+    extern EPVector<CoolingTower> towers; // dimension to number of machines
 
     // Functions
     void clear_state();

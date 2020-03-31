@@ -843,8 +843,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     ASSERT_FALSE(ErrorsFound);                                  // Tstat should show if there is error in zone processing
     ASSERT_FALSE(AdapComfortDailySetPointSchedule.initialized); // Tstat should show there adaptive model is not initialized
 
-    Array1D<Real64> runningAverageASH_1(365, 0.0);
-    Array1D<Real64> runningAverageCEN_1(365, 0.0);
+    EPVector<Real64> runningAverageASH_1(365, 0.0);
+    EPVector<Real64> runningAverageCEN_1(365, 0.0);
     CalculateAdaptiveComfortSetPointSchl(runningAverageASH_1, runningAverageCEN_1);
     // Tstat should show flage that adaptive comfort is not applicable (-1)
     ASSERT_EQ(-1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(DayOfYear));
@@ -855,8 +855,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     ASSERT_EQ(-1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(DayOfYear));
     ASSERT_EQ(-1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(DayOfYear));
 
-    Array1D<Real64> runningAverageASH_2(365, 40.0);
-    Array1D<Real64> runningAverageCEN_2(365, 40.0);
+    EPVector<Real64> runningAverageASH_2(365, 40.0);
+    EPVector<Real64> runningAverageCEN_2(365, 40.0);
     CalculateAdaptiveComfortSetPointSchl(runningAverageASH_2, runningAverageCEN_2);
     // Tstat should show flage that adaptive comfort is not applicable (-1)
     ASSERT_EQ(-1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(DayOfYear));
@@ -867,8 +867,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     ASSERT_EQ(-1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(DayOfYear));
     ASSERT_EQ(-1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(DayOfYear));
 
-    Array1D<Real64> runningAverageASH(365, 25.0);
-    Array1D<Real64> runningAverageCEN(365, 25.0);
+    EPVector<Real64> runningAverageASH(365, 25.0);
+    EPVector<Real64> runningAverageCEN(365, 25.0);
     CalculateAdaptiveComfortSetPointSchl(runningAverageASH, runningAverageCEN);
     ASSERT_TRUE(AdapComfortDailySetPointSchedule.initialized); // Tstat should show there adaptive model is initialized
     ASSERT_EQ(

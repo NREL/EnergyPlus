@@ -322,11 +322,11 @@ namespace DataDaylighting {
     extern int TotDElightCFS; // number of Daylighting:DELight:ComplexFenestration
 
     // Object Data
-    extern Array1D<ZoneDaylightCalc> ZoneDaylight;
-    extern Array1D<IllumMapData> IllumMap;
-    extern Array1D<MapCalcData> IllumMapCalc;
-    extern Array1D<RefPointData> DaylRefPt;
-    extern Array1D<DElightComplexFeneData> DElightComplexFene;
+    extern EPVector<ZoneDaylightCalc> ZoneDaylight;
+    extern EPVector<IllumMapData> IllumMap;
+    extern EPVector<MapCalcData> IllumMapCalc;
+    extern EPVector<RefPointData> DaylRefPt;
+    extern EPVector<DElightComplexFeneData> DElightComplexFene;
 
 } // namespace DataDaylighting
 

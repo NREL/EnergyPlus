@@ -49,7 +49,6 @@
 #define Fans_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -145,7 +144,7 @@ namespace Fans {
         int FaultyFilterIndex;    // Index of the fouling air filter corresponding to the fan
         Real64 MotEff;            // Fan motor efficiency
         Real64 MotInAirFrac;      // Fraction of motor heat entering air stream
-        Array1D<Real64> FanCoeff; // Fan Part Load Coefficients to match fan type
+        EPVector<Real64> FanCoeff; // Fan Part Load Coefficients to match fan type
         // Mass Flow Rate Control Variables
         Real64 MassFlowRateMaxAvail;
         Real64 MassFlowRateMinAvail;
@@ -258,7 +257,7 @@ namespace Fans {
     struct FanNumericFieldData
     {
         // Members
-        Array1D<std::string> FieldNames;
+        EPVector<std::string> FieldNames;
 
         // Default Constructor
         FanNumericFieldData()
@@ -267,9 +266,9 @@ namespace Fans {
     };
 
     // Object Data
-    extern Array1D<FanEquipConditions> Fan;
-    extern Array1D<NightVentPerfData> NightVentPerf;
-    extern Array1D<FanNumericFieldData> FanNumericFields;
+    extern EPVector<FanEquipConditions> Fan;
+    extern EPVector<NightVentPerfData> NightVentPerf;
+    extern EPVector<FanNumericFieldData> FanNumericFields;
 
     // Functions
     void clear_state();

@@ -184,10 +184,10 @@ namespace Fans {
     // Utility routines for module
 
     // Object Data
-    Array1D<FanEquipConditions> Fan;
+    EPVector<FanEquipConditions> Fan;
     std::unordered_map<std::string, std::string> UniqueFanNames;
-    Array1D<NightVentPerfData> NightVentPerf;
-    Array1D<FanNumericFieldData> FanNumericFields;
+    EPVector<NightVentPerfData> NightVentPerf;
+    EPVector<FanNumericFieldData> FanNumericFields;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -333,12 +333,12 @@ namespace Fans {
         int IOStat;
         static bool ErrorsFound(false);                        // If errors detected in input
         static std::string const RoutineName("GetFanInput: "); // include trailing blank space
-        Array1D<std::string> cAlphaFieldNames;
-        Array1D<std::string> cNumericFieldNames;
+        EPVector<std::string> cAlphaFieldNames;
+        EPVector<std::string> cNumericFieldNames;
         EPVector<bool> lNumericFieldBlanks;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D<std::string> cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<std::string> cAlphaArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int NumParams;
         int MaxAlphas;

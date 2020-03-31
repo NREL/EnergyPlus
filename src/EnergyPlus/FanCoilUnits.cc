@@ -199,8 +199,8 @@ namespace FanCoilUnits {
     // look up functions for node numbers
 
     // Object Data
-    Array1D<FanCoilData> FanCoil;
-    Array1D<FanCoilNumericFieldData> FanCoilNumericFields;
+    EPVector<FanCoilData> FanCoil;
+    EPVector<FanCoilNumericFieldData> FanCoilNumericFields;
 
     // Functions
 
@@ -348,16 +348,16 @@ namespace FanCoilUnits {
         int FanCoilNum;                        // current fan coil number
         int NumAlphas;                         // Number of Alphas for each GetObjectItem call
         int NumNumbers;                        // Number of Numbers for each GetObjectItem call
-        Array1D<int> OANodeNums(4);             // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
+        EPVector<int> OANodeNums(4);             // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
         int IOStatus;                          // Used in GetObjectItem
         static bool ErrorsFound(false);        // Set to true if errors in input, fatal at end of routine
         static bool errFlag(false);            // Local error flag for GetOAMixerNodeNums
         bool IsNotOK;                          // Flag to verify name
         std::string CurrentModuleObject;       // Object type for getting and error messages
-        Array1D<std::string> Alphas;                 // Alpha input items for object
-        Array1D<std::string> cAlphaFields;           // Alpha field names
-        Array1D<std::string> cNumericFields;         // Numeric field names
-        Array1D<Real64> Numbers;               // Numeric input items for object
+        EPVector<std::string> Alphas;                 // Alpha input items for object
+        EPVector<std::string> cAlphaFields;           // Alpha field names
+        EPVector<std::string> cNumericFields;         // Numeric field names
+        EPVector<Real64> Numbers;               // Numeric input items for object
         EPVector<bool> lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);               // Total number of alpha and numeric arguments (max) for a
@@ -2210,7 +2210,7 @@ namespace FanCoilUnits {
         // Real64 Low_mdot;
         Real64 QSensUnitOutNoATM;     // unit output not including air added by supply side air terminal mixer
         int SolFlag;                  // return flag from RegulaFalsi for sensible load
-        Array1D<Real64> Par(10);      // parameters passed to RegulaFalsi function
+        EPVector<Real64> Par(10);      // parameters passed to RegulaFalsi function
         Real64 ElectricHeaterControl; // 1 or 0, enables or disables heating coil
         Real64 OAVolumeFlowRate;      // OA volume flow rate based on design specifications object [m3/s]
         Real64 OAMassFlow;            // OA mass flow rate based on design specifications object [kg/s]
@@ -4785,7 +4785,7 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilLoadResidual(Real64 const PartLoadRatio, // coil part load ratio
-                                   Array1D<Real64> const &Par  // Function parameters
+                                   EPVector<Real64> const &Par  // Function parameters
     )
     {
 
@@ -4864,7 +4864,7 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilPLRResidual(Real64 const PLR,          // part-load ratio of air and water mass flow rate
-                                  Array1D<Real64> const &Par // Function parameters
+                                  EPVector<Real64> const &Par // Function parameters
     )
     {
 
@@ -4941,7 +4941,7 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilHWLoadResidual(Real64 const HWFlow,       // water mass flow rate [kg/s]
-                                     Array1D<Real64> const &Par // Function parameters
+                                     EPVector<Real64> const &Par // Function parameters
     )
     {
 
@@ -5017,7 +5017,7 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilCWLoadResidual(Real64 const CWFlow,       // water mass flow rate [kg/s]
-                                     Array1D<Real64> const &Par // Function parameters
+                                     EPVector<Real64> const &Par // Function parameters
     )
     {
 
@@ -5092,7 +5092,7 @@ namespace FanCoilUnits {
         return Residuum;
     }
     Real64 CalcFanCoilWaterFlowTempResidual(Real64 const WaterFlow,    // water mass flow rate [kg/s]
-                                            Array1D<Real64> const &Par // Function parameters
+                                            EPVector<Real64> const &Par // Function parameters
     )
     {
 
@@ -5181,7 +5181,7 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilWaterFlowResidual(Real64 const PLR,          // coil part load ratio
-                                        Array1D<Real64> const &Par // Function parameters
+                                        EPVector<Real64> const &Par // Function parameters
     )
     {
 
@@ -5277,7 +5277,7 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilAirAndWaterFlowResidual(Real64 const PLR,          // water and air part load ratio
-                                              Array1D<Real64> const &Par // Function parameters
+                                              EPVector<Real64> const &Par // Function parameters
     )
     {
 
@@ -5370,7 +5370,7 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilAirAndWaterInStepResidual(Real64 const PLR,          // water and air part load ratio
-                                                Array1D<Real64> const &Par // Function parameters
+                                                EPVector<Real64> const &Par // Function parameters
     )
     {
 
@@ -5469,7 +5469,7 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilBothFlowResidual(Real64 const PLR,          // water and air part load ratio
-                                       Array1D<Real64> const &Par // Function parameters
+                                       EPVector<Real64> const &Par // Function parameters
     )
     {
 
@@ -5561,7 +5561,7 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilElecHeatResidual(Real64 const PLR,          // water and air part load ratio
-                                       Array1D<Real64> const &Par // Function parameters
+                                       EPVector<Real64> const &Par // Function parameters
     )
     {
 
@@ -5643,7 +5643,7 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilElecHeatTempResidual(Real64 const PLR,          // water and air part load ratio
-                                           Array1D<Real64> const &Par // Function parameters
+                                           EPVector<Real64> const &Par // Function parameters
     )
     {
 
