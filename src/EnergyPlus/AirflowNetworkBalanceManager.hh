@@ -49,7 +49,6 @@
 #define AirflowNetworkBalanceManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -238,7 +237,7 @@ namespace AirflowNetworkBalanceManager {
     int GetAirLoopNumber(int const NodeNumber); // Get air loop number for each distribution node and linkage
 
     Real64 AFNPressureResidual(Real64 const ExFanMassFlowRate,
-                               Array1D<Real64> const &Par); // Residual function using Regula Falsi
+                               EPVector<Real64> const &Par); // Residual function using Regula Falsi
 
     // derived class or struct
     struct OccupantVentilationControlProp

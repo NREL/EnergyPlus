@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -85,7 +84,7 @@ namespace IntegratedHeatPump {
     bool GetCoilsInputFlag(true);
 
     // Object Data
-    Array1D<IntegratedHeatPumpData> IntegratedHeatPumps;
+    EPVector<IntegratedHeatPumpData> IntegratedHeatPumps;
 
     void clear_state()
     {
@@ -1125,10 +1124,10 @@ namespace IntegratedHeatPump {
 
         std::string CurrentModuleObject; // for ease in getting objects
         std::string sIHPType;            // specify IHP type
-        Array1D<std::string> AlphArray;        // Alpha input items for object
-        Array1D<std::string> cAlphaFields;     // Alpha field names
-        Array1D<std::string> cNumericFields;   // Numeric field names
-        Array1D<Real64> NumArray;        // Numeric input items for object
+        EPVector<std::string> AlphArray;        // Alpha input items for object
+        EPVector<std::string> cAlphaFields;     // Alpha field names
+        EPVector<std::string> cNumericFields;   // Numeric field names
+        EPVector<Real64> NumArray;        // Numeric input items for object
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 

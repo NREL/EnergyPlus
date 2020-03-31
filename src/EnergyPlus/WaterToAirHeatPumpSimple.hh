@@ -49,7 +49,6 @@
 #define WaterToAirHeatPumpSimple_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -230,7 +229,7 @@ namespace WaterToAirHeatPumpSimple {
     };
 
     // Object Data
-    extern Array1D<SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
+    extern EPVector<SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
 
     // Functions
     void clear_state();

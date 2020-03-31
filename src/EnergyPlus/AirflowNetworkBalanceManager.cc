@@ -5777,7 +5777,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 LocalWindDir;
         Real64 LocalHumRat;
         Real64 LocalDryBulb;
-        Array1D<Real64> Par; // Pressure setpoint
+        EPVector<Real64> Par; // Pressure setpoint
         Real64 const ErrorToler(0.00001);
         int const MaxIte(20);
         int SolFla;
@@ -5943,7 +5943,7 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        if (!Par.allocated()) {
+        if (Par.size() == 0) {
             Par.allocate(1);
             Par = 0.0;
         }
@@ -6127,7 +6127,7 @@ namespace AirflowNetworkBalanceManager {
     }
 
     Real64 AFNPressureResidual(Real64 const ControllerMassFlowRate, // Pressure setpoint
-                               Array1D<Real64> const &Par          // par(1) = PressureSet
+                               EPVector<Real64> const &Par          // par(1) = PressureSet
     )
     {
         // FUNCTION INFORMATION:

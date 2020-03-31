@@ -96,7 +96,7 @@ namespace HybridModel {
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // Object Data
-    Array1D<HybridModelProperties> HybridModelZone;
+    EPVector<HybridModelProperties> HybridModelZone;
 
     // Functions
 
@@ -114,10 +114,10 @@ namespace HybridModel {
         int ZonePtr;                     // Pointer to the zone
         int ZoneListPtr;                 // Pointer to the zone list
         std::string CurrentModuleObject; // to assist in getting input
-        Array1D<std::string> cAlphaArgs(16);   // Alpha input items for object
-        Array1D<std::string> cAlphaFieldNames(16);
-        Array1D<std::string> cNumericFieldNames(16);
-        Array1D<Real64> rNumericArgs(4); // Numeric input items for object
+        EPVector<std::string> cAlphaArgs(16);   // Alpha input items for object
+        EPVector<std::string> cAlphaFieldNames(16);
+        EPVector<std::string> cNumericFieldNames(16);
+        EPVector<Real64> rNumericArgs(4); // Numeric input items for object
         int HybridModelStartMonth(0);    // Hybrid model start month
         int HybridModelStartDate(0);     // Hybrid model start date of month
         int HybridModelEndMonth(0);      // Hybrid model end month

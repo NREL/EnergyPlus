@@ -48,9 +48,6 @@
 #ifndef HVACStandAloneERV_hh_INCLUDED
 #define HVACStandAloneERV_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -169,7 +166,7 @@ namespace HVACStandAloneERV {
     };
 
     // Object Data
-    extern Array1D<StandAloneERVData> StandAloneERV;
+    extern EPVector<StandAloneERVData> StandAloneERV;
 
     // Functions
 

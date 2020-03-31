@@ -48,9 +48,6 @@
 #ifndef ZoneDehumidifier_hh_INCLUDED
 #define ZoneDehumidifier_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -168,7 +165,7 @@ namespace ZoneDehumidifier {
     };
 
     // Object Data
-    extern Array1D<ZoneDehumidifierData> ZoneDehumid;
+    extern EPVector<ZoneDehumidifierData> ZoneDehumid;
 
     // Functions
 

@@ -48,9 +48,6 @@
 #ifndef ChillerElectricEIR_hh_INCLUDED
 #define ChillerElectricEIR_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -262,7 +259,7 @@ namespace ChillerElectricEIR {
     };
 
     // Object Data
-    extern Array1D<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
+    extern EPVector<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
 
     // Functions
     void clear_state();

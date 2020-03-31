@@ -48,9 +48,6 @@
 #ifndef HeatPumpWaterToWaterCOOLING_hh_INCLUDED
 #define HeatPumpWaterToWaterCOOLING_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -170,7 +167,7 @@ namespace HeatPumpWaterToWaterCOOLING {
     };
 
     // Object Data
-    extern Array1D<GshpPeCoolingSpecs> GSHP; // dimension to number of machines
+    extern EPVector<GshpPeCoolingSpecs> GSHP; // dimension to number of machines
 
     void clear_state();
 

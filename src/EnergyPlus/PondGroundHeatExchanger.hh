@@ -48,9 +48,6 @@
 #ifndef PondGroundHeatExchanger_hh_INCLUDED
 #define PondGroundHeatExchanger_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -146,7 +143,7 @@ namespace PondGroundHeatExchanger {
     };
 
     // Object Data
-    extern Array1D<PondGroundHeatExchangerData> PondGHE;
+    extern EPVector<PondGroundHeatExchangerData> PondGHE;
 
     void GetPondGroundHeatExchanger();
 

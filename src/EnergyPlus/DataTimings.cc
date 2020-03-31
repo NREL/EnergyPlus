@@ -139,7 +139,7 @@ namespace DataTimings {
 #endif
 
     // Object Data
-    Array1D<timings> Timing;
+    EPVector<timings> Timing;
 
     // Functions
 
@@ -186,7 +186,7 @@ namespace DataTimings {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Object Data
-        Array1D<timings> tempTiming; // used for reallocate.
+        EPVector<timings> tempTiming; // used for reallocate.
 
 #ifdef EP_NO_Timings
         return;

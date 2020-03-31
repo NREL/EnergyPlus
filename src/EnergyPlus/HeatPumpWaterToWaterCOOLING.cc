@@ -112,7 +112,7 @@ namespace HeatPumpWaterToWaterCOOLING {
     int GSHPRefrigIndex(0);
     int NumGSHPs(0);                         // number of Gshps specified in input
     bool GetWWHPCoolingInput = true;
-    Array1D<GshpPeCoolingSpecs> GSHP; // dimension to number of machines
+    EPVector<GshpPeCoolingSpecs> GSHP; // dimension to number of machines
 
     void clear_state() {
         NumGSHPs = 0;
@@ -238,8 +238,8 @@ namespace HeatPumpWaterToWaterCOOLING {
         int NumAlphas;                // Number of elements in the alpha array
         int NumNums;                  // Number of elements in the numeric array
         int IOStat;                   // IO Status when calling get input subroutine
-        Array1D<std::string> AlphArray(5);  // character string data
-        Array1D<Real64> NumArray(23); // numeric data
+        EPVector<std::string> AlphArray(5);  // character string data
+        EPVector<Real64> NumArray(23); // numeric data
 
         static bool ErrorsFound(false);
 

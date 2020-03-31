@@ -161,7 +161,7 @@ namespace PoweredInductionUnits {
     int NumParallelPIUs(0);
 
     // Object Data
-    Array1D<PowIndUnitData> PIU;
+    EPVector<PowIndUnitData> PIU;
     std::unordered_map<std::string, std::string> PiuUniqueNames;
 
     void clear_state()

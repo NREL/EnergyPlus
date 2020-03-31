@@ -48,9 +48,6 @@
 #ifndef HVACManager_hh_INCLUDED
 #define HVACManager_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 

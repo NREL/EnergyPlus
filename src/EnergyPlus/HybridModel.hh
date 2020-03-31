@@ -48,9 +48,6 @@
 #ifndef HybridModel_hh_INCLUDED
 #define HybridModel_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -124,7 +121,7 @@ namespace HybridModel {
     };
 
     // Object Data
-    extern Array1D<HybridModelProperties> HybridModelZone;
+    extern EPVector<HybridModelProperties> HybridModelZone;
 
     // Functions
 

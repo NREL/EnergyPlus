@@ -49,7 +49,6 @@
 #define SteamCoils_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -179,7 +178,7 @@ namespace SteamCoils {
     };
 
     // Object Data
-    extern Array1D<SteamCoilEquipConditions> SteamCoil;
+    extern EPVector<SteamCoilEquipConditions> SteamCoil;
 
     // Functions
 

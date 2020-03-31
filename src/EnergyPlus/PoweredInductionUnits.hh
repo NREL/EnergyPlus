@@ -48,9 +48,6 @@
 #ifndef PoweredInductionUnits_hh_INCLUDED
 #define PoweredInductionUnits_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -164,7 +161,7 @@ namespace PoweredInductionUnits {
     };
 
     // Object Data
-    extern Array1D<PowIndUnitData> PIU;
+    extern EPVector<PowIndUnitData> PIU;
 
     // Functions
 

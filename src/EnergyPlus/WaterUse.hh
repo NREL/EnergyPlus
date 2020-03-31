@@ -48,9 +48,6 @@
 #ifndef WaterUse_hh_INCLUDED
 #define WaterUse_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -202,7 +199,7 @@ namespace WaterUse {
         Real64 Energy;      // Heating energy required to raise temperature from cold to hot (J)
         int NumWaterEquipment;
         int MaxIterationsErrorIndex; // recurring error index
-        Array1D<int> myWaterEquipArr;
+        EPVector<int> myWaterEquipArr;
         int PlantLoopNum;
         int PlantLoopSide;
         int PlantLoopBranchNum;
@@ -253,9 +250,9 @@ namespace WaterUse {
 
     void CalcWaterUseZoneGains();
 
-    extern Array1D<WaterEquipmentType> WaterEquipment;
+    extern EPVector<WaterEquipmentType> WaterEquipment;
 
-    extern Array1D<WaterConnectionsType> WaterConnections;
+    extern EPVector<WaterConnectionsType> WaterConnections;
 
 } // namespace WaterUse
 

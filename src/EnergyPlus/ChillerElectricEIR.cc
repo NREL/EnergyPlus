@@ -133,7 +133,7 @@ namespace ChillerElectricEIR {
     bool getInputFlag(true);       // When TRUE, calls subroutine to read input file.
 
     // Object Data
-    Array1D<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
+    EPVector<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
 
     // Functions
     void clear_state()
@@ -701,7 +701,7 @@ namespace ChillerElectricEIR {
 
             if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex > 0) {
                 bool FoundNegValue = false;
-                Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
+                EPVector<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
                 for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
                     Real64 CurveValTmp = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex, double(CurveCheck / 10.0));
                     if (CurveValTmp < 0.0) FoundNegValue = true;

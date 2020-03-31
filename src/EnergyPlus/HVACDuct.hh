@@ -48,9 +48,6 @@
 #ifndef HVACDuct_hh_INCLUDED
 #define HVACDuct_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -91,7 +88,7 @@ namespace HVACDuct {
     };
 
     // Object Data
-    extern Array1D<DuctData> Duct;
+    extern EPVector<DuctData> Duct;
 
     // Functions
 

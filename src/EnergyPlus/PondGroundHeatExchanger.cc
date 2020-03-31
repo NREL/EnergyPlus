@@ -123,7 +123,7 @@ namespace PondGroundHeatExchanger {
 
     bool GetInputFlag(true);
 
-    Array1D<PondGroundHeatExchangerData> PondGHE;
+    EPVector<PondGroundHeatExchangerData> PondGHE;
 
     void PondGroundHeatExchangerData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
                                                bool const FirstHVACIteration,

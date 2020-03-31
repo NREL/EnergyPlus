@@ -159,7 +159,7 @@ namespace HVACStandAloneERV {
     // Utility routines for module
 
     // Object Data
-    Array1D<StandAloneERVData> StandAloneERV;
+    EPVector<StandAloneERVData> StandAloneERV;
     std::unordered_set<std::string> HeatExchangerUniqueNames;
     std::unordered_set<std::string> SupplyAirFanUniqueNames;
     std::unordered_set<std::string> ExhaustAirFanUniqueNames;
@@ -286,10 +286,10 @@ namespace HVACStandAloneERV {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int StandAloneERVIndex;  // loop index
         int StandAloneERVNum;    // current Stand Alone ERV number
-        Array1D<std::string> Alphas;   // Alpha items for object
-        Array1D<Real64> Numbers; // Numeric items for object
-        Array1D<std::string> cAlphaFields;
-        Array1D<std::string> cNumericFields;
+        EPVector<std::string> Alphas;   // Alpha items for object
+        EPVector<Real64> Numbers; // Numeric items for object
+        EPVector<std::string> cAlphaFields;
+        EPVector<std::string> cNumericFields;
         EPVector<bool> lAlphaBlanks;
         EPVector<bool> lNumericBlanks;
         std::string CompSetSupplyFanInlet;

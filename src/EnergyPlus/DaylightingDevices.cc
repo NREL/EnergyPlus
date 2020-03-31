@@ -196,7 +196,7 @@ namespace DaylightingDevices {
     // MODULE VARIABLE TYPE DECLARATIONS: na
 
     // MODULE VARIABLE DECLARATIONS:
-    Array1D<Real64> COSAngle(NumOfAngles); // List of cosines of incident angle
+    EPVector<Real64> COSAngle(NumOfAngles); // List of cosines of incident angle
 
     // SUBROUTINE SPECIFICATIONS:
 
@@ -255,7 +255,7 @@ namespace DaylightingDevices {
             // Members
             Real64 AspectRatio;        // Aspect ratio, length / diameter
             Real64 Reflectance;        // Reflectance of surface
-            Array1D<Real64> TransBeam; // Table of beam transmittance vs. cosine angle
+            EPVector<Real64> TransBeam; // Table of beam transmittance vs. cosine angle
 
             // Default Constructor
             TDDPipeStoredData() : AspectRatio(0.0), Reflectance(0.0), TransBeam(NumOfAngles, 0.0)
@@ -264,7 +264,7 @@ namespace DaylightingDevices {
         };
 
         // Object Data
-        Array1D<TDDPipeStoredData> TDDPipeStored;
+        EPVector<TDDPipeStoredData> TDDPipeStored;
 
         // FLOW:
         // Initialize tubular daylighting devices (TDDs)
@@ -1328,7 +1328,7 @@ namespace DaylightingDevices {
     }
 
     Real64 InterpolatePipeTransBeam(Real64 const COSI,               // Cosine of the incident angle
-                                    const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
+                                    const EPVector<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     )
     {
 

@@ -48,9 +48,6 @@
 #ifndef PlantValves_hh_INCLUDED
 #define PlantValves_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -112,7 +109,7 @@ namespace PlantValves {
     void GetPlantValvesInput();
 
     // Object Data
-    extern Array1D<TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
+    extern EPVector<TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
 
 } // namespace PlantValves
 

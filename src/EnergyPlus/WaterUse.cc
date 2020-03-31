@@ -89,8 +89,8 @@ namespace WaterUse {
 
     EPVector<bool> CheckEquipName;
 
-    Array1D<WaterEquipmentType> WaterEquipment;
-    Array1D<WaterConnectionsType> WaterConnections;
+    EPVector<WaterEquipmentType> WaterEquipment;
+    EPVector<WaterConnectionsType> WaterConnections;
 
     void clear_state()
     {
@@ -241,12 +241,12 @@ namespace WaterUse {
 
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
             if (numWaterEquipment > 0) {
-                for (int i = WaterEquipment.l(), e = WaterEquipment.u(); i <= e; ++i) {
-                    WaterEquipment(i).reset();
+                for (auto &water_equipment : WaterEquipment) {
+                    water_equipment.reset();
 
-                    if (WaterEquipment(i).setupMyOutputVars) {
-                        WaterEquipment(i).setupOutputVars();
-                        WaterEquipment(i).setupMyOutputVars = false;
+                    if (water_equipment.setupMyOutputVars) {
+                        water_equipment.setupOutputVars();
+                        water_equipment.setupMyOutputVars = false;
                     }
                 }
             }

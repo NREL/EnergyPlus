@@ -49,7 +49,6 @@
 #define IntegratedHeatPump_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.fwd.hh>
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
@@ -234,7 +233,7 @@ namespace IntegratedHeatPump {
     };
 
     // Object Data
-    extern Array1D<IntegratedHeatPumpData> IntegratedHeatPumps;
+    extern EPVector<IntegratedHeatPumpData> IntegratedHeatPumps;
 
     // Functions
     void clear_state();

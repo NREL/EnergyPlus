@@ -48,9 +48,6 @@
 #ifndef OutsideEnergySources_hh_INCLUDED
 #define OutsideEnergySources_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -113,7 +110,7 @@ namespace OutsideEnergySources {
     };
 
     // Object Data
-    extern Array1D<OutsideEnergySourceSpecs> EnergySource;
+    extern EPVector<OutsideEnergySourceSpecs> EnergySource;
 
     // Functions
     void clear_state();
