@@ -239,6 +239,12 @@ namespace General {
                    Array1A<Real64> SmoothedData  // output data after smoothing
     );
 
+    void MovingAvg(const EPVector<Real64> &DataIn, // input data that needs smoothing
+                   int const NumDataItems,       // number of values in DataIn
+                   int const NumItemsInAvg,      // number of items in the averaging window
+                   EPVector<Real64> &SmoothedData  // output data after smoothing
+    );
+
     void ProcessDateString(std::string const &String,
                            int &PMonth,
                            int &PDay,

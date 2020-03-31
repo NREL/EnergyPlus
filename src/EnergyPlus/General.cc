@@ -1937,6 +1937,62 @@ namespace General {
         }
     }
 
+    void MovingAvg(const EPVector<Real64> &DataIn, // input data that needs smoothing
+                   int const NumDataItems,       // number of values in DataIn
+                   int const NumItemsInAvg,      // number of items in the averaging window
+                   EPVector<Real64> &SmoothedData  // output data after smoothing
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   January 2003
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Smooth the data in the 1-d array DataIn by averaging over a window NumItemsInAvg
+        // wide. Return the results in the 1-d array SmoothedData
+
+        // METHODOLOGY EMPLOYED:
+        // Note that DataIn and SmoothedData should have the same size. This is the reponsibility
+        // of the calling routine. NumItemsInAvg should be no bigger than the size of DataIn.
+
+        // REFERENCES:
+        // na.
+
+        // USE STATEMENTS:
+        // na
+
+        // Argument array dimensioning
+        EP_SIZE_CHECK(DataIn, NumDataItems);
+        EP_SIZE_CHECK(SmoothedData, NumDataItems);
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+
+        // INTERFACE BLOCK SPECIFICATIONS
+
+        // DERIVED TYPE DEFINITIONS
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        EPVector<Real64> TempData(3 * NumDataItems); // a scratch array
+
+        for (int i = 1; i <= NumDataItems; ++i) {
+            TempData(i) = TempData(NumDataItems + i) = TempData(2 * NumDataItems + i) = DataIn(i);
+            SmoothedData(i) = 0.0;
+        }
+
+        for (int i = 1; i <= NumDataItems; ++i) {
+            for (int j = 1; j <= NumItemsInAvg; ++j) {
+                SmoothedData(i) += TempData(NumDataItems + i - NumItemsInAvg + j);
+            }
+            SmoothedData(i) /= double(NumItemsInAvg);
+        }
+    }
+
     void ProcessDateString(std::string const &String,
                            int &PMonth,
                            int &PDay,

@@ -48,9 +48,6 @@
 #ifndef WaterToAirHeatPump_hh_INCLUDED
 #define WaterToAirHeatPump_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -187,7 +184,7 @@ namespace WaterToAirHeatPump {
     };
 
     // Object Data
-    extern Array1D<WatertoAirHPEquipConditions> WatertoAirHP;
+    extern EPVector<WatertoAirHPEquipConditions> WatertoAirHP;
 
     // Functions
 
@@ -243,7 +240,7 @@ namespace WaterToAirHeatPump {
                                  Real64 const PartLoadRatio);
 
     Real64 CalcCompSuctionTempResidual(Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-                                       Array1D<Real64> const &Par    // Function parameters
+                                       EPVector<Real64> const &Par    // Function parameters
     );
 
     void CalcWatertoAirHPHeating(int const HPNum,               // heat pump number

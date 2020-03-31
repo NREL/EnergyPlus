@@ -145,7 +145,7 @@ namespace WaterToAirHeatPump {
     // Utility routines
 
     // Object Data
-    Array1D<WatertoAirHPEquipConditions> WatertoAirHP;
+    EPVector<WatertoAirHPEquipConditions> WatertoAirHP;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -280,10 +280,10 @@ namespace WaterToAirHeatPump {
         int IOStat;
         static bool ErrorsFound(false);  // If errors detected in input
         std::string CurrentModuleObject; // for ease in getting objects
-        Array1D<std::string> AlphArray;        // Alpha input items for object
-        Array1D<std::string> cAlphaFields;     // Alpha field names
-        Array1D<std::string> cNumericFields;   // Numeric field names
-        Array1D<Real64> NumArray;        // Numeric input items for object
+        EPVector<std::string> AlphArray;        // Alpha input items for object
+        EPVector<std::string> cAlphaFields;     // Alpha field names
+        EPVector<std::string> cNumericFields;   // Numeric field names
+        EPVector<Real64> NumArray;        // Numeric input items for object
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
@@ -1241,7 +1241,7 @@ namespace WaterToAirHeatPump {
         Real64 QLatActual;      // Qlatent at actual operating conditions
         Real64 SHRss;           // Sensible heat ratio at steady state
         Real64 SHReff;          // Effective sensible heat ratio at part-load condition
-        Array1D<Real64> Par(4); // Parameter array passed to RegulaFalsi function
+        EPVector<Real64> Par(4); // Parameter array passed to RegulaFalsi function
         int SolFlag;            // Solution flag returned from RegulaFalsi function
         static bool firstTime(true);
         static Real64 LoadSideInletDBTemp_Init;  // rated conditions
@@ -1698,7 +1698,7 @@ namespace WaterToAirHeatPump {
     }
 
     Real64 CalcCompSuctionTempResidual(Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-                                       Array1D<Real64> const &Par    // Function parameters
+                                       EPVector<Real64> const &Par    // Function parameters
     )
     {
 
@@ -1890,7 +1890,7 @@ namespace WaterToAirHeatPump {
         Real64 CompSuctionSatTemp; // Temperature of Saturated Refrigerant at Compressor Suction Pressure [C]
         bool StillSimulatingFlag;  // Final Simulation Flag
         bool Converged;            // Overall convergence Flag
-        Array1D<Real64> Par(4);    // Parameter array passed to RegulaFalsi function
+        EPVector<Real64> Par(4);    // Parameter array passed to RegulaFalsi function
         int SolFlag;               // Solution flag returned from RegulaFalsi function
         Real64 LoadResidual;       // loop convergence criteria
         Real64 SourceResidual;     // loop convergence criteria
