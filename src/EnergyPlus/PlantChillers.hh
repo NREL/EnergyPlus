@@ -48,9 +48,6 @@
 #ifndef PlantChillers_hh_INCLUDED
 #define PlantChillers_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -210,9 +207,9 @@ namespace PlantChillers {
     {
         // Members
         // temperature at the chiller evaporator side outlet
-        Array1D<Real64> CapRatCoef;                // (Electric RCAVC() ) coeff of cap ratio poly fit
-        Array1D<Real64> PowerRatCoef;              // (Electric ADJEC() ) coeff of power rat poly fit
-        Array1D<Real64> FullLoadCoef;              // (Electric RPWRC() ) coeff of full load poly. fit
+        EPVector<Real64> CapRatCoef;                // (Electric RCAVC() ) coeff of cap ratio poly fit
+        EPVector<Real64> PowerRatCoef;              // (Electric ADJEC() ) coeff of power rat poly fit
+        EPVector<Real64> FullLoadCoef;              // (Electric RPWRC() ) coeff of full load poly. fit
         Real64 TempLowLimitEvapOut;                // C - low temperature shut off
         Real64 DesignHeatRecVolFlowRate;           // m3/s, Design Water mass flow rate through heat recovery loop
         bool DesignHeatRecVolFlowRateWasAutoSized; // true if previous was input autosize.
@@ -281,9 +278,9 @@ namespace PlantChillers {
         // Members
         std::string FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
         // temperature at the chiller evaporator side outlet
-        Array1D<Real64> CapRatCoef;                // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
-        Array1D<Real64> PowerRatCoef;              // (EngineDriven ADJEC() ) coeff of power rat poly fit
-        Array1D<Real64> FullLoadCoef;              // (EngineDriven RPWRC() ) coeff of full load poly. fit
+        EPVector<Real64> CapRatCoef;                // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
+        EPVector<Real64> PowerRatCoef;              // (EngineDriven ADJEC() ) coeff of power rat poly fit
+        EPVector<Real64> FullLoadCoef;              // (EngineDriven RPWRC() ) coeff of full load poly. fit
         Real64 TempLowLimitEvapOut;                // C - low temperature shut off
         int ClngLoadtoFuelCurve;                   // Coeff of Shaft Power to Fuel Energy Input Coeff Poly Fit
         int RecJacHeattoFuelCurve;                 // Curve Index for Ratio of Recoverable Jacket Heat to
@@ -292,7 +289,7 @@ namespace PlantChillers {
         Real64 ExhaustTemp;                        // (TEXDC) Exhaust Gas Temp to Fuel Energy Input
         int ExhaustTempCurve;                      // Curve Index for Exhaust Gas Temp to Fuel Energy Input Coeffs Poly Fit
         Real64 UA;                                 // (UACDC) exhaust gas Heat Exchanger UA to Capacity
-        Array1D<Real64> UACoef;                    // Heat Exchanger UA Coeffs Poly Fit
+        EPVector<Real64> UACoef;                    // Heat Exchanger UA Coeffs Poly Fit
         Real64 MaxExhaustperPowerOutput;           // MAX EXHAUST FLOW PER W DSL POWER OUTPUT COEFF
         Real64 DesignMinExitGasTemp;               // Steam Saturation Temperature
         Real64 FuelHeatingValue;                   // Heating Value of Fuel in kJ/kg
@@ -375,25 +372,25 @@ namespace PlantChillers {
     {
         // Members
         std::string FuelType;         // Type of Fuel - DIESEL, GASOLINE, GAS
-        Array1D<Real64> CapRatCoef;   // (GT RCAVC() ) coeff of cap ratio poly fit
-        Array1D<Real64> PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
-        Array1D<Real64> FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit
+        EPVector<Real64> CapRatCoef;   // (GT RCAVC() ) coeff of cap ratio poly fit
+        EPVector<Real64> PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
+        EPVector<Real64> FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit
         Real64 TempLowLimitEvapOut;   // C - low temperature shut off
         // "special" GT chiller input parameters
         Real64 FuelEnergyIn;                      // (EFUEL) Amount of Fuel Energy Required to run gas turbine
-        Array1D<Real64> PLBasedFuelInputCoef;     // (FUL1GC) Part Load Ratio Based Fuel Input Coefficients Poly Fit
-        Array1D<Real64> TempBasedFuelInputCoef;   // (FUL2GC) Ambient Temperature Based Fuel Input Coeff Poly Fit
+        EPVector<Real64> PLBasedFuelInputCoef;     // (FUL1GC) Part Load Ratio Based Fuel Input Coefficients Poly Fit
+        EPVector<Real64> TempBasedFuelInputCoef;   // (FUL2GC) Ambient Temperature Based Fuel Input Coeff Poly Fit
         Real64 ExhaustFlow;                       // (FEX) Exhaust Gas Flow Rate cubic meters per second
-        Array1D<Real64> ExhaustFlowCoef;          // (FEXGC) Exhaust Gas Flow Rate Input Coef Poly Fit
+        EPVector<Real64> ExhaustFlowCoef;          // (FEXGC) Exhaust Gas Flow Rate Input Coef Poly Fit
         Real64 ExhaustTemp;                       // (TEX) Exhaust Gas Temperature in C
-        Array1D<Real64> PLBasedExhaustTempCoef;   // (TEX1GC) Part Load Ratio Based Exhaust Temperature Input Coeffs Poly Fit
-        Array1D<Real64> TempBasedExhaustTempCoef; // (TEX2GC) Ambient Temperature Based Exhaust Gas Temp to
+        EPVector<Real64> PLBasedExhaustTempCoef;   // (TEX1GC) Part Load Ratio Based Exhaust Temperature Input Coeffs Poly Fit
+        EPVector<Real64> TempBasedExhaustTempCoef; // (TEX2GC) Ambient Temperature Based Exhaust Gas Temp to
         // Fuel Energy Input Coeffs Poly Fit
         Real64 HeatRecLubeEnergy;                  // (ELUBE) Recoverable Lube Oil Energy
         Real64 HeatRecLubeRate;                    // (ELUBE) Recoverable Lube Oil Rate of Recovery (W)
-        Array1D<Real64> HeatRecLubeEnergyCoef;     // (ELUBEGC)  Recoverable Lube Oil Energy Input Coef Poly Fit
+        EPVector<Real64> HeatRecLubeEnergyCoef;     // (ELUBEGC)  Recoverable Lube Oil Energy Input Coef Poly Fit
         Real64 UAtoCapRat;                         // (UACGC) Heat Exchanger UA to Capacity
-        Array1D<Real64> UAtoCapCoef;               // Heat Exchanger UA to Capacity Coeffs Poly Fit
+        EPVector<Real64> UAtoCapCoef;               // Heat Exchanger UA to Capacity Coeffs Poly Fit
         Real64 GTEngineCapacity;                   // Capacity of GT Unit attached to Chiller
         bool GTEngineCapacityWasAutoSized;         // true if previous field was autosize on inpt
         Real64 MaxExhaustperGTPower;               // Max Exhaust Flow per KW Power Out
@@ -492,10 +489,10 @@ namespace PlantChillers {
     };
 
     // Object Data
-    extern Array1D<ElectricChillerSpecs> ElectricChiller;         // dimension to number of machines
-    extern Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
-    extern Array1D<GTChillerSpecs> GTChiller;                     // dimension to number of machines
-    extern Array1D<ConstCOPChillerSpecs> ConstCOPChiller;         // dimension to number of machines
+    extern EPVector<ElectricChillerSpecs> ElectricChiller;         // dimension to number of machines
+    extern EPVector<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
+    extern EPVector<GTChillerSpecs> GTChiller;                     // dimension to number of machines
+    extern EPVector<ConstCOPChillerSpecs> ConstCOPChiller;         // dimension to number of machines
 
     void clear_state();
 

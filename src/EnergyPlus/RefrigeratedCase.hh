@@ -49,7 +49,6 @@
 #define RefrigeratedCase_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -250,9 +249,9 @@ namespace RefrigeratedCase {
         std::string SupplyTankName;    // Evap water supply tank name
         std::string EndUseSubcategory; // Rack end-use subcategory
         // Index of refrigerated case (1 to NumCases) connected to rack #X
-        Array1D<int> CaseNum;
-        Array1D<int> CoilNum;
-        Array1D<int> WalkInNum;
+        EPVector<int> CaseNum;
+        EPVector<int> CoilNum;
+        EPVector<int> WalkInNum;
         int HeatRejectionLocation;        // Refrigeration Compressor Rack heat rejection location
         int CondenserType;                // Specifies cooling mode for outdoor condenser
         Real64 LaggedUsedWaterHeater;     // Heat reclaim used to heat water in previous zone/load time step(W)
@@ -381,16 +380,16 @@ namespace RefrigeratedCase {
         std::string EndUseSubcategory;    // Used for reporting purposes
         bool SystemRejectHeatToZone;      // Flag to show air-cooled condenser located inside zone
         bool CoilFlag;                    // Flag to show if coil type load on system (even if below in a secondary)
-        Array1D<int> CascadeLoadNum;       // absolute index  of condensers placing load (allocated NumCondensers)
-        Array1D<int> CaseNum;              // absolute Index of cases (allocated NumCases)
-        Array1D<int> CoilNum;              // absolute Index of coils (allocated NumCoils)
-        Array1D<int> CompressorNum;        // absolute Index of compressors (allocated NumCompressors)
-        Array1D<int> CondenserNum;         // absolute Index of condensers removing load (allocated NumCondensers)
-        Array1D<int> GasCoolerNum;         // absolute Index of gas cooler
-        Array1D<int> HiStageCompressorNum; // absolute Index of high-stage compressors (allocated NumHiStageCompressors)
-        Array1D<int> SecondaryNum;         // absolute Index of seocndary loops (allocated NumSecondarys)
-        Array1D<int> SubcoolerNum;         // Absolute Index of subcoolers (allocated NumSubcoolers)
-        Array1D<int> WalkInNum;            // absolute Index of walk ins (allocated NumWalkIns)
+        EPVector<int> CascadeLoadNum;       // absolute index  of condensers placing load (allocated NumCondensers)
+        EPVector<int> CaseNum;              // absolute Index of cases (allocated NumCases)
+        EPVector<int> CoilNum;              // absolute Index of coils (allocated NumCoils)
+        EPVector<int> CompressorNum;        // absolute Index of compressors (allocated NumCompressors)
+        EPVector<int> CondenserNum;         // absolute Index of condensers removing load (allocated NumCondensers)
+        EPVector<int> GasCoolerNum;         // absolute Index of gas cooler
+        EPVector<int> HiStageCompressorNum; // absolute Index of high-stage compressors (allocated NumHiStageCompressors)
+        EPVector<int> SecondaryNum;         // absolute Index of seocndary loops (allocated NumSecondarys)
+        EPVector<int> SubcoolerNum;         // Absolute Index of subcoolers (allocated NumSubcoolers)
+        EPVector<int> WalkInNum;            // absolute Index of walk ins (allocated NumWalkIns)
         int CompSuctControl;              // Index to suction control
         int HiStageWarnIndex1;            // Recurring warning index when hi stage compressors unable to meet coil loads
         int HiStageWarnIndex2;            // Recurring warning index when hi stage compressors unable to meet coil loads
@@ -415,7 +414,7 @@ namespace RefrigeratedCase {
         //   and used thereafter
         int SuctionPipeActualZoneNum;    // ID number for zone where suction pipes gain heat
         int SuctionPipeZoneNodeNum;      // ID number for zone node where suction pipes gain heat
-        Array1D<Real64> MechSCLoad;      // Mechanical subcooler load on system from other systems(W)
+        EPVector<Real64> MechSCLoad;      // Mechanical subcooler load on system from other systems(W)
         Real64 AverageCompressorCOP;     // Average COP for compressors on this system (W)
         Real64 CpSatLiqCond;             // Spec Heat of sat liquid at condensing pressure  (J/kg-C)
         Real64 CpSatVapEvap;             // Spec Heat of saturated vapor exiting evaporator (J/kg-C)
@@ -542,13 +541,13 @@ namespace RefrigeratedCase {
         //    (see fluidpropertiesrefdata.idf)
         std::string EndUseSubcategory; // Used for reporting purposes
         bool SystemRejectHeatToZone;   // Flag to show air-cooled gas cooler located inside zone
-        Array1D<int> CaseNumMT;         // absolute Index of medium temperature cases (allocated NumCasesMT)
-        Array1D<int> CaseNumLT;         // absolute Index of low temperature cases (allocated NumCasesLT)
-        Array1D<int> CompressorNumHP;   // absolute Index of high pressure compressors (allocated NumCompressorsHP)
-        Array1D<int> CompressorNumLP;   // absolute Index of low pressure compressors (allocated NumCompressorsLP)
-        Array1D<int> GasCoolerNum;      // absolute Index of gas cooler
-        Array1D<int> WalkInNumMT;       // absolute Index of medium temperature walk ins (allocated NumWalkInsMT)
-        Array1D<int> WalkInNumLT;       // absolute Index of low temperature walk ins (allocated NumWalkInsLT)
+        EPVector<int> CaseNumMT;         // absolute Index of medium temperature cases (allocated NumCasesMT)
+        EPVector<int> CaseNumLT;         // absolute Index of low temperature cases (allocated NumCasesLT)
+        EPVector<int> CompressorNumHP;   // absolute Index of high pressure compressors (allocated NumCompressorsHP)
+        EPVector<int> CompressorNumLP;   // absolute Index of low pressure compressors (allocated NumCompressorsLP)
+        EPVector<int> GasCoolerNum;      // absolute Index of gas cooler
+        EPVector<int> WalkInNumMT;       // absolute Index of medium temperature walk ins (allocated NumWalkInsMT)
+        EPVector<int> WalkInNumLT;       // absolute Index of low temperature walk ins (allocated NumWalkInsLT)
         int NumCasesLT;                // Number of low temperature cases on this system
         int NumCasesMT;                // Number of medium temperature cases on this system
         int NumCompressorsHP;          // Number of high pressure compressors on this system
@@ -690,9 +689,9 @@ namespace RefrigeratedCase {
         int NumCases;              // Number of Cases in this CaseAndWalkIn List
         int NumCoils;              // Number of Coils in this CaseAndWalkIn List
         int NumWalkIns;            // Number of WalkIns in this CaseAndWalkIn List
-        Array1D<int> CaseItemNum;   // List of Item numbers that correspond to each Case
-        Array1D<int> CoilItemNum;   // List of Item numbers that correspond to each Coil
-        Array1D<int> WalkInItemNum; // List of Item numbers that correspond to each WalkIn
+        EPVector<int> CaseItemNum;   // List of Item numbers that correspond to each Case
+        EPVector<int> CoilItemNum;   // List of Item numbers that correspond to each Coil
+        EPVector<int> WalkInItemNum; // List of Item numbers that correspond to each WalkIn
 
         // Default Constructor
         CaseAndWalkInListDef() : NumCases(0), NumCoils(0), NumWalkIns(0)
@@ -705,7 +704,7 @@ namespace RefrigeratedCase {
         // Members
         std::string Name;        // Name of this Compressor List
         int NumCompressors;      // Number of Compressors in this Node List
-        Array1D<int> CompItemNum; // List of Item numbers that correspond to the compressors
+        EPVector<int> CompItemNum; // List of Item numbers that correspond to the compressors
 
         // Default Constructor
         CompressorListDef() : NumCompressors(0)
@@ -721,7 +720,7 @@ namespace RefrigeratedCase {
         std::string EndUseSubcategory;  // Rack end-use subcategory
         bool CondenserRejectHeatToZone; // Flag to show air-cooled condenser located inside zone
         bool CoilFlag;                  // Flag to show if coil type load on system served by condenser
-        Array1D<int> SysNum;             // absolute Index of system placing load (allocated NumRefrigSystems)
+        EPVector<int> SysNum;             // absolute Index of system placing load (allocated NumRefrigSystems)
         int NumSysAttach;               // Number of systems attached to condenser, error if /=1
         int CondenserType;              // Specifies cooling mode for condenser
         // (1=Dry air, 2=Evap cooling, 3=Water-cooled, 4=Cascade)
@@ -874,7 +873,7 @@ namespace RefrigeratedCase {
         std::string EndUseSubcategory;    // Gas cooler end-use subcategory
         bool GasCoolerRejectHeatToZone;   // Flag to show gas cooler located inside zone
         bool TransOpFlag;                 // Flag to show transcritical (vs subcritical) operation of the refrigeration system
-        Array1D<int> SysNum;               // absolute Index of system placing load (allocated NumRefrigSystems)
+        EPVector<int> SysNum;               // absolute Index of system placing load (allocated NumRefrigSystems)
         int CapCurvePtr;                  // capcity curve pointer for gas cooler
         int FanSpeedControlType;          // fixed, two-speed, or variable
         int GasCoolerCreditWarnIndex;     // Used to count warnings
@@ -1021,9 +1020,9 @@ namespace RefrigeratedCase {
         std::string Name;              // Name of refrigeration system
         std::string FluidName;         // Name of circulating fluid
         std::string EndUseSubcategory; // Used for reporting purposes
-        Array1D<int> CaseNum;           // Absolute Index of cases (dimensioned 1 to NumCases)
-        Array1D<int> CoilNum;           // Absolute Index of coils (dimensioned 1 to NumCoils)
-        Array1D<int> WalkInNum;         // Absolute Index of walk-ins (dimensioned 1 to NumWalkIns)
+        EPVector<int> CaseNum;           // Absolute Index of cases (dimensioned 1 to NumCases)
+        EPVector<int> CoilNum;           // Absolute Index of coils (dimensioned 1 to NumCoils)
+        EPVector<int> WalkInNum;         // Absolute Index of walk-ins (dimensioned 1 to NumWalkIns)
         int DistPipeZoneNum;           // ID number for zone where distribution pipe gain heat
         int DistPipeZoneNodeNum;       // ID number for zone node where distribution pipe gain heat
         Real64 DistPipeZoneHeatGain;   // ! sensible heat gain rate to zone with pipe
@@ -1119,8 +1118,8 @@ namespace RefrigeratedCase {
         std::string Name;               // Name of this TransferLoad List
         int NumSecondarys;              // Number of Secondary Loops in this TransferLoad List
         int NumCascadeLoads;            // Number of Cascade condenser loads in this TransferLoad List
-        Array1D<int> CascadeLoadItemNum; // List of Item numbers that correspond to the Cascade Condenser
-        Array1D<int> SecondaryItemNum;   // List of Item numbers that correspond to the Secondary
+        EPVector<int> CascadeLoadItemNum; // List of Item numbers that correspond to the Cascade Condenser
+        EPVector<int> SecondaryItemNum;   // List of Item numbers that correspond to the Secondary
 
         // Default Constructor
         TransferLoadListDef() : NumSecondarys(0), NumCascadeLoads(0)
@@ -1132,7 +1131,7 @@ namespace RefrigeratedCase {
     {
         // Members
         std::string Name; // Name of walk in cooler
-        Array1D<std::string> ZoneName;
+        EPVector<std::string> ZoneName;
         // Names of zones exchanging energy with cooler
         int CircFanSchedPtr;               // Index to the correct availability schedule
         int DefrostDripDownSchedPtr;       // Index to the correct fail-safe schedule
@@ -1145,11 +1144,11 @@ namespace RefrigeratedCase {
         int NumZones;                      // Number of zones exchanging energy with WalkIn
         int SchedPtr;                      // Index to the correct availability schedule
         int StockingSchedPtr;              // Index to the correct product stocking schedule
-        Array1D<int> GlassDoorOpenSchedPtr; // Index to the door opening schedule
-        Array1D<int> StockDoorOpenSchedPtr; // Index to the door opening schedule
-        Array1D<int> StockDoorProtectType;  // Index to door protection type
-        Array1D<int> ZoneNodeNum;           // Index to Zone Node
-        Array1D<int> ZoneNum;               // Index to Zone
+        EPVector<int> GlassDoorOpenSchedPtr; // Index to the door opening schedule
+        EPVector<int> StockDoorOpenSchedPtr; // Index to the door opening schedule
+        EPVector<int> StockDoorProtectType;  // Index to door protection type
+        EPVector<int> ZoneNodeNum;           // Index to Zone Node
+        EPVector<int> ZoneNum;               // Index to Zone
         Real64 CircFanPower;               // Operating power of  Walk In fan [W]
         Real64 CoilFanPower;               // Operating power of  Walk In evap coil fan [W]
         Real64 IceTemp;                    // Temperature of Ice Mass [C]
@@ -1173,14 +1172,14 @@ namespace RefrigeratedCase {
         Real64 Temperature;           // Rated temperature [C]
         Real64 TEvapDesign;           // Design evaporator temperature (or brine inlet T) [C]
         Real64 TotalFanPower;         // Sum of coil and circ fan power  [W]
-        Array1D<Real64> AreaGlassDr;
-        Array1D<Real64> UValueGlassDr;
-        Array1D<Real64> HeightGlassDr;
-        Array1D<Real64> AreaStockDr;
-        Array1D<Real64> UValueStockDr;
-        Array1D<Real64> HeightStockDr;
-        Array1D<Real64> SurfaceArea;
-        Array1D<Real64> UValue;
+        EPVector<Real64> AreaGlassDr;
+        EPVector<Real64> UValueGlassDr;
+        EPVector<Real64> HeightGlassDr;
+        EPVector<Real64> AreaStockDr;
+        EPVector<Real64> UValueStockDr;
+        EPVector<Real64> HeightStockDr;
+        EPVector<Real64> SurfaceArea;
+        EPVector<Real64> UValue;
         // Report Variables
         Real64 ElecHeaterPower;         // Walk In heater rate (W)
         Real64 ElecHeaterConsumption;   // Walk In heater energy (J)
@@ -1199,13 +1198,13 @@ namespace RefrigeratedCase {
         Real64 TotLatCoolingEnergy;             // Walk In latent cooling energy (J)
         Real64 TotSensCoolingEnergyRate;        // Walk In sensible cooling rate (W)
         Real64 TotSensCoolingEnergy;            // Walk In sensible cooling energy (J)
-        Array1D<Real64> LatZoneCreditRate;      // Amount of latent energy provided to zone(W)
-        Array1D<Real64> LatZoneCredit;          // Amount of latent energy provided to zone(J)
-        Array1D<Real64> SensZoneCreditRate;     // Amount of sensible heat gain to zone, pos and neg (W)
-        Array1D<Real64> SensZoneCreditCoolRate; // Amount of sensible cooling provided to the zone (W)
-        Array1D<Real64> SensZoneCreditCool;     // Amount of sensible cooling provided to the zone (J)
-        Array1D<Real64> SensZoneCreditHeatRate; // Amount of sensible heat provided to the zone (W)
-        Array1D<Real64> SensZoneCreditHeat;     // Amount of sensible heat provided to the zone (J)
+        EPVector<Real64> LatZoneCreditRate;      // Amount of latent energy provided to zone(W)
+        EPVector<Real64> LatZoneCredit;          // Amount of latent energy provided to zone(J)
+        EPVector<Real64> SensZoneCreditRate;     // Amount of sensible heat gain to zone, pos and neg (W)
+        EPVector<Real64> SensZoneCreditCoolRate; // Amount of sensible cooling provided to the zone (W)
+        EPVector<Real64> SensZoneCreditCool;     // Amount of sensible cooling provided to the zone (J)
+        EPVector<Real64> SensZoneCreditHeatRate; // Amount of sensible heat provided to the zone (W)
+        EPVector<Real64> SensZoneCreditHeat;     // Amount of sensible heat provided to the zone (J)
         bool ShowUnmetWIEnergyWarning;
         bool ShowWIFrostWarning;
 
@@ -1428,7 +1427,7 @@ namespace RefrigeratedCase {
         std::string Name; // Name of Chiller Set
         // CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:)  :: CoilName   ! Name of Individual Chiller in set
         std::string ZoneName; // Name of zone where chiller set is located
-        Array1D<int> CoilNum;  // ID number of Individual Chiller in set
+        EPVector<int> CoilNum;  // ID number of Individual Chiller in set
         int ChillerSetID;     // ID number for this set of chillers (all serving one zone,
         //                       but can be chilled by multi systems)
         int SchedPtr;      // Schedule to take whole set off-line if needed
@@ -1496,24 +1495,24 @@ namespace RefrigeratedCase {
     };
 
     // Object Data
-    extern Array1D<RefrigCaseData> RefrigCase;
-    extern Array1D<RefrigRackData> RefrigRack;
-    extern Array1D<CaseRAFractionData> CaseRAFraction;
-    extern Array1D<RefrigSystemData> System;
-    extern Array1D<TransRefrigSystemData> TransSystem;
-    extern Array1D<RefrigCondenserData> Condenser;
-    extern Array1D<RefrigCompressorData> Compressor;
-    extern Array1D<RefrigGasCoolerData> GasCooler;
-    extern Array1D<SubcoolerData> Subcooler;
-    extern Array1D<CaseAndWalkInListDef> CaseAndWalkInList;
-    extern Array1D<CompressorListDef> CompressorLists;
-    extern Array1D<SecondaryLoopData> Secondary;
-    extern Array1D<TransferLoadListDef> TransferLoadList;
-    extern Array1D<WalkInData> WalkIn;
-    extern Array1D<WarehouseCoilData> WarehouseCoil;
-    extern Array1D<AirChillerSetData> AirChillerSet;
-    extern Array1D<CoilCreditData> CoilSysCredit;
-    extern Array1D<CaseWIZoneReportData> CaseWIZoneReport;
+    extern EPVector<RefrigCaseData> RefrigCase;
+    extern EPVector<RefrigRackData> RefrigRack;
+    extern EPVector<CaseRAFractionData> CaseRAFraction;
+    extern EPVector<RefrigSystemData> System;
+    extern EPVector<TransRefrigSystemData> TransSystem;
+    extern EPVector<RefrigCondenserData> Condenser;
+    extern EPVector<RefrigCompressorData> Compressor;
+    extern EPVector<RefrigGasCoolerData> GasCooler;
+    extern EPVector<SubcoolerData> Subcooler;
+    extern EPVector<CaseAndWalkInListDef> CaseAndWalkInList;
+    extern EPVector<CompressorListDef> CompressorLists;
+    extern EPVector<SecondaryLoopData> Secondary;
+    extern EPVector<TransferLoadListDef> TransferLoadList;
+    extern EPVector<WalkInData> WalkIn;
+    extern EPVector<WarehouseCoilData> WarehouseCoil;
+    extern EPVector<AirChillerSetData> AirChillerSet;
+    extern EPVector<CoilCreditData> CoilSysCredit;
+    extern EPVector<CaseWIZoneReportData> CaseWIZoneReport;
 
     // Functions
 

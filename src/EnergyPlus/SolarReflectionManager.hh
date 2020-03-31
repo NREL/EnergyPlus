@@ -49,7 +49,6 @@
 #define SolarReflectionManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Vector3.hh>
 
@@ -84,14 +83,14 @@ namespace SolarReflectionManager {
         int SurfNum;                     // Number of heat transfer surface
         std::string SurfName;            // Name of heat transfer surface
         int NumRecPts;                   // Number of receiving points
-        Array1D<Vector3<Real64>> RecPt;  // Coordinates of receiving point on receiving surface in global CS (m)
+        EPVector<Vector3<Real64>> RecPt;  // Coordinates of receiving point on receiving surface in global CS (m)
         Vector3<Real64> NormVec;         // Unit outward normal to receiving surface
         Real64 ThetaNormVec;             // Azimuth of surface normal (radians)
         Real64 PhiNormVec;               // Altitude of surface normal (radians)
         int NumReflRays;                 // Number of rays from this receiving surface
-        Array1D<Vector3<Real64>> RayVec; // Unit vector in direction of ray from receiving surface
-        Array1D<Real64> CosIncAngRay;    // Cosine of angle between ray and receiving surface outward normal
-        Array1D<Real64> dOmegaRay;       // Delta solid angle associated with ray
+        EPVector<Vector3<Real64>> RayVec; // Unit vector in direction of ray from receiving surface
+        EPVector<Real64> CosIncAngRay;    // Cosine of angle between ray and receiving surface outward normal
+        EPVector<Real64> dOmegaRay;       // Delta solid angle associated with ray
         Array2D<Vector3<Real64>> HitPt;  // For each receiving point and ray, coords of hit point on obstruction
         // that is closest to receiving point (m)
         Array2D_int HitPtSurfNum; // Number of surface containing the hit point for a ray, except:
@@ -101,7 +100,7 @@ namespace SolarReflectionManager {
         Array2D<Real64> RecPtHitPtDis;         // Distance from receiving point to hit point (m)
         Array2D<Vector3<Real64>> HitPtNormVec; // Hit point's surface normal unit vector pointing into hemisphere
         //  containing the receiving point
-        Array1D<int> PossibleObsSurfNums; // Surface numbers of possible obstructions for a receiving surf
+        EPVector<int> PossibleObsSurfNums; // Surface numbers of possible obstructions for a receiving surf
         int NumPossibleObs;              // Number of possible obstructions for a receiving surface
 
         // Default Constructor
@@ -111,7 +110,7 @@ namespace SolarReflectionManager {
     };
 
     // Object Data
-    extern Array1D<SolReflRecSurfData> SolReflRecSurf;
+    extern EPVector<SolReflRecSurfData> SolReflRecSurf;
 
     // Functions
 

@@ -101,8 +101,8 @@ namespace SolarCollectors {
     int NumOfParameters(0);
     bool GetInputFlag(true);
 
-    Array1D<ParametersData> Parameters;
-    Array1D<CollectorData> Collector;
+    EPVector<ParametersData> Parameters;
+    EPVector<CollectorData> Collector;
     std::unordered_map<std::string, std::string> UniqueParametersNames;
     std::unordered_map<std::string, std::string> UniqueCollectorNames;
 
@@ -159,10 +159,10 @@ namespace SolarCollectors {
         int MaxAlphas;  // Maximum number of alpha fields in all objects
         int MaxNumbers; // Maximum number of numeric fields in all objects
 
-        Array1D<Real64> Numbers;       // Numeric data
-        Array1D<std::string> Alphas;         // Alpha data
-        Array1D<std::string> cAlphaFields;   // Alpha field names
-        Array1D<std::string> cNumericFields; // Numeric field names
+        EPVector<Real64> Numbers;       // Numeric data
+        EPVector<std::string> Alphas;         // Alpha data
+        EPVector<std::string> cAlphaFields;   // Alpha field names
+        EPVector<std::string> cNumericFields; // Numeric field names
         EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 
@@ -1487,7 +1487,7 @@ namespace SolarCollectors {
 
             this->TauAlphaBeam = max(0.0, TuaAlphaBeam);
 
-            Array1D<Real64> CoversAbsBeam(2); // Inner and Outer Cover absorptance
+            EPVector<Real64> CoversAbsBeam(2); // Inner and Outer Cover absorptance
             CoversAbsBeam(1) = AbsCover1;
             CoversAbsBeam(2) = AbsCover2;
 
@@ -1547,13 +1547,13 @@ namespace SolarCollectors {
 
         Real64 const AirRefIndex(1.0003); // refractive index of air
 
-        Array1D<Real64> TransPara(2);    // cover transmittance parallel component
-        Array1D<Real64> TransPerp(2);    // cover transmittance perpendicular component
-        Array1D<Real64> ReflPara(2);     // cover reflectance parallel component
-        Array1D<Real64> ReflPerp(2);     // cover reflectance Perpendicular component
-        Array1D<Real64> AbsorPara(2);    // cover absorbtance parallel component
-        Array1D<Real64> AbsorPerp(2);    // cover absorbtance Perpendicular component
-        Array1D<Real64> TransAbsOnly(2); // cover transmittance with absorptance only considered
+        EPVector<Real64> TransPara(2);    // cover transmittance parallel component
+        EPVector<Real64> TransPerp(2);    // cover transmittance perpendicular component
+        EPVector<Real64> ReflPara(2);     // cover reflectance parallel component
+        EPVector<Real64> ReflPerp(2);     // cover reflectance Perpendicular component
+        EPVector<Real64> AbsorPara(2);    // cover absorbtance parallel component
+        EPVector<Real64> AbsorPerp(2);    // cover absorbtance Perpendicular component
+        EPVector<Real64> TransAbsOnly(2); // cover transmittance with absorptance only considered
 
         TransPerp = 1.0;
         TransPara = 1.0;
@@ -1829,18 +1829,17 @@ namespace SolarCollectors {
         Real64 const gravity(9.806); // gravitational constant [m/s^2]
 
         int const NumOfPropDivisions(11);
-        static Array1D<Real64> const Temps(NumOfPropDivisions,
-                                           {-23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85}); // Temperature, in C
-        static Array1D<Real64> const Mu(
-            NumOfPropDivisions,
-            {0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229}); // Viscosity, in
+        static EPVector<Real64> const Temps{
+            {-23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85}}; // Temperature, in C
+        static EPVector<Real64> const Mu{
+            {0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229}}; // Viscosity, in
                                                                                                                                       // kg/(m.s)
-        static Array1D<Real64> const Conductivity(
-            NumOfPropDivisions, {0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331}); // Conductivity, in W/mK
-        static Array1D<Real64> const Pr(
-            NumOfPropDivisions, {0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703}); // Prandtl number (dimensionless)
-        static Array1D<Real64> const Density(NumOfPropDivisions,
-                                             {1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883}); // Density, in kg/m3
+        static EPVector<Real64> const Conductivity{
+            {0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331}}; // Conductivity, in W/mK
+        static EPVector<Real64> const Pr{
+            {0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703}}; // Prandtl number (dimensionless)
+        static EPVector<Real64> const Density{
+                                             {1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883}}; // Density, in kg/m3
 
         Real64 CondOfAir; // thermal conductivity of air [W/mK]
         Real64 VisDOfAir; // dynamic viscosity of air [kg/m.s]

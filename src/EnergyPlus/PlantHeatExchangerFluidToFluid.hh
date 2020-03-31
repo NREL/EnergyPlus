@@ -48,9 +48,6 @@
 #ifndef PlantHeatExchangerFluidToFluid_hh_INCLUDED
 #define PlantHeatExchangerFluidToFluid_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -169,12 +166,12 @@ namespace PlantHeatExchangerFluidToFluid {
         void findDemandSideLoopFlow(Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
 
         Real64 demandSideFlowResidual(Real64 DmdSideMassFlowRate,
-                                      Array1D<Real64> const &Par // Par(1) = HX index number
+                                      EPVector<Real64> const &Par // Par(1) = HX index number
         );
     };
 
     // Object Data
-    extern Array1D<HeatExchangerStruct> FluidHX;
+    extern EPVector<HeatExchangerStruct> FluidHX;
 
     void GetFluidHeatExchangerInput();
 

@@ -1175,7 +1175,7 @@ void CalcPassiveExteriorBaffleGap(const Array1D<int> &SurfPtrARR, // Array of in
             ICSULossbottom = 0.40;
             ICSWaterTemp = 20.0;
         } else {
-            if (!Collector.allocated()) {
+            if (Collector.size() == 0) {
                 ICSULossbottom = 0.40;
                 ICSWaterTemp = 20.0;
             } else {

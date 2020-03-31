@@ -49,7 +49,6 @@
 #define SolarCollectors_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -106,9 +105,9 @@ namespace SolarCollectors {
         Real64 AspectRatio;                    // collector aspect ratio (dimensionless)
         int NumOfCovers;                       // number of transparent collector covers
         Real64 CoverSpacing;                   // collector cover spacings (m)
-        Array1D<Real64> RefractiveIndex;       // refractive idex of inner and outer covers (dimensionless)
-        Array1D<Real64> ExtCoefTimesThickness; // extinction coefficient times thickness of covers (dimensionless)
-        Array1D<Real64> EmissOfCover;          // emissivity of inner and outer covers (dimensionless)
+        EPVector<Real64> RefractiveIndex;       // refractive idex of inner and outer covers (dimensionless)
+        EPVector<Real64> ExtCoefTimesThickness; // extinction coefficient times thickness of covers (dimensionless)
+        EPVector<Real64> EmissOfCover;          // emissivity of inner and outer covers (dimensionless)
         Real64 EmissOfAbsPlate;                // emissivity Of absorber plate (dimensionless)
         Real64 AbsorOfAbsPlate;                // absorptance of the absorber plate (dimensionless)
 
@@ -180,9 +179,9 @@ namespace SolarCollectors {
         Real64 TauAlphaSkyDiffuse;           // Transmittance-absorptance product sky diffuse radiation
         Real64 TauAlphaGndDiffuse;           // Transmittance-absorptance product grn diffuse radiation
         Real64 TauAlphaBeam;                 // Transmittance-absorptance product beam radiation
-        Array1D<Real64> CoversAbsSkyDiffuse; // sky diffuse solar absorptance of cover
-        Array1D<Real64> CoversAbsGndDiffuse; // ground diffuse solar absorptance of cover
-        Array1D<Real64> CoverAbs;            // solar rad weighted covers absorptance
+        EPVector<Real64> CoversAbsSkyDiffuse; // sky diffuse solar absorptance of cover
+        EPVector<Real64> CoversAbsGndDiffuse; // ground diffuse solar absorptance of cover
+        EPVector<Real64> CoverAbs;            // solar rad weighted covers absorptance
         Real64 TimeElapsed;                  // Fraction of the current hour that has elapsed (h)
         // Saved in order to identify the beginning of a new system time
         Real64 UbLoss;                 // Over all bottom loss coefficient [W/m2C]
@@ -286,8 +285,8 @@ namespace SolarCollectors {
     };
 
     // Object Data
-    extern Array1D<ParametersData> Parameters;
-    extern Array1D<CollectorData> Collector;
+    extern EPVector<ParametersData> Parameters;
+    extern EPVector<CollectorData> Collector;
 
     // Functions
     void clear_state();

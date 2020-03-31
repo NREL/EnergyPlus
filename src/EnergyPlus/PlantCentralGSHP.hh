@@ -48,9 +48,6 @@
 #ifndef PlantCentralGSHP_hh_INCLUDED
 #define PlantCentralGSHP_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -346,8 +343,8 @@ namespace PlantCentralGSHP {
         Real64 WrapperCoolingLoad;  // Cooling demand for the central heat pump system
         Real64 WrapperHeatingLoad;  // Heating demand for the central heat pump system
         Real64 AncillaryPower;      // Wrapper Ancillary Power
-        Array1D<WrapperComponentSpecs> WrapperComp;
-        Array1D<ChillerHeaterSpecs> ChillerHeater; // Dimension to number of machines
+        EPVector<WrapperComponentSpecs> WrapperComp;
+        EPVector<ChillerHeaterSpecs> ChillerHeater; // Dimension to number of machines
         bool CoolSetPointErrDone;                  // true if setpoint warning issued
         bool HeatSetPointErrDone;                  // true if setpoint warning issued
         bool CoolSetPointSetToLoop;                // True if the setpoint is missing at the outlet node
@@ -419,8 +416,8 @@ namespace PlantCentralGSHP {
         void UpdateChillerRecords();
     };
 
-    extern Array1D<WrapperSpecs> Wrapper;
-    extern Array1D<ChillerHeaterSpecs> ChillerHeater;
+    extern EPVector<WrapperSpecs> Wrapper;
+    extern EPVector<ChillerHeaterSpecs> ChillerHeater;
 
     void clear_state();
 

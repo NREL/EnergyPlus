@@ -99,7 +99,7 @@ namespace PlantComponentTemperatureSources {
     bool getWaterSourceInput(true); // then TRUE, calls subroutine to read input file.
 
     // Object Data
-    Array1D<WaterSourceSpecs> WaterSource; // dimension to number of machines
+    EPVector<WaterSourceSpecs> WaterSource; // dimension to number of machines
 
     void clear_state()
     {

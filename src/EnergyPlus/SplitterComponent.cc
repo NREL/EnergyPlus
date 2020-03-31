@@ -116,7 +116,7 @@ namespace SplitterComponent {
     // Reporting routines for module
 
     // Object Data
-    Array1D<SplitterConditions> SplitterCond;
+    EPVector<SplitterConditions> SplitterCond;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -231,10 +231,10 @@ namespace SplitterComponent {
         int OutNodeNum1;
         int OutNodeNum2;
         std::string CurrentModuleObject; // for ease in getting objects
-        Array1D<std::string> AlphArray;        // Alpha input items for object
-        Array1D<std::string> cAlphaFields;     // Alpha field names
-        Array1D<std::string> cNumericFields;   // Numeric field names
-        Array1D<Real64> NumArray;        // Numeric input items for object
+        EPVector<std::string> AlphArray;        // Alpha input items for object
+        EPVector<std::string> cAlphaFields;     // Alpha field names
+        EPVector<std::string> cNumericFields;   // Numeric field names
+        EPVector<Real64> NumArray;        // Numeric input items for object
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 

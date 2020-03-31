@@ -318,8 +318,8 @@ namespace RefrigeratedCase {
     Real64 const FanHalfSpeedRatio(0.1768); // = 1/(2**2.5) for power step for two speed fan
     Real64 const CapFac60Percent(0.60);     // = 60%, load served by half power 2-speed fan
 
-    Array1D<Real64> const EuropeanWetCoilFactor(5, {1.35, 1.15, 1.05, 1.01, 1.0});
-    Array1D<Real64> const EuropeanAirInletTemp(5, {10.0, 0.0, -18.0, -25.0, -34.0});
+    EPVector<Real64> const EuropeanWetCoilFactor{{1.35, 1.15, 1.05, 1.01, 1.0}};
+    EPVector<Real64> const EuropeanAirInletTemp{{10.0, 0.0, -18.0, -25.0, -34.0}};
 
     int NumSimulationCondAir(0);            // Number of air-cooled condensers in simulation
     int NumSimulationCondEvap(0);           // Number of evaporative condensers in simulation
@@ -405,25 +405,25 @@ namespace RefrigeratedCase {
     // chillers exist in the input deck
 
     // Object Data
-    Array1D<RefrigCaseData> RefrigCase;
-    Array1D<RefrigRackData> RefrigRack;
-    Array1D<CaseRAFractionData> CaseRAFraction;
-    Array1D<RefrigSystemData> System;
-    Array1D<TransRefrigSystemData> TransSystem;
-    Array1D<RefrigCondenserData> Condenser;
+    EPVector<RefrigCaseData> RefrigCase;
+    EPVector<RefrigRackData> RefrigRack;
+    EPVector<CaseRAFractionData> CaseRAFraction;
+    EPVector<RefrigSystemData> System;
+    EPVector<TransRefrigSystemData> TransSystem;
+    EPVector<RefrigCondenserData> Condenser;
     std::unordered_map<std::string, std::string> UniqueCondenserNames;
-    Array1D<RefrigCompressorData> Compressor;
-    Array1D<RefrigGasCoolerData> GasCooler;
-    Array1D<SubcoolerData> Subcooler;
-    Array1D<CaseAndWalkInListDef> CaseAndWalkInList;
-    Array1D<CompressorListDef> CompressorLists;
-    Array1D<SecondaryLoopData> Secondary;
-    Array1D<TransferLoadListDef> TransferLoadList;
-    Array1D<WalkInData> WalkIn;
-    Array1D<WarehouseCoilData> WarehouseCoil;
-    Array1D<AirChillerSetData> AirChillerSet;
-    Array1D<CoilCreditData> CoilSysCredit;
-    Array1D<CaseWIZoneReportData> CaseWIZoneReport;
+    EPVector<RefrigCompressorData> Compressor;
+    EPVector<RefrigGasCoolerData> GasCooler;
+    EPVector<SubcoolerData> Subcooler;
+    EPVector<CaseAndWalkInListDef> CaseAndWalkInList;
+    EPVector<CompressorListDef> CompressorLists;
+    EPVector<SecondaryLoopData> Secondary;
+    EPVector<TransferLoadListDef> TransferLoadList;
+    EPVector<WalkInData> WalkIn;
+    EPVector<WarehouseCoilData> WarehouseCoil;
+    EPVector<AirChillerSetData> AirChillerSet;
+    EPVector<CoilCreditData> CoilSysCredit;
+    EPVector<CaseWIZoneReportData> CaseWIZoneReport;
 
     void clear_state()
     {
@@ -616,9 +616,9 @@ namespace RefrigeratedCase {
         Real64 const PumpImpellerEfficiency(0.78);   // same as used in pump auto-sizing, dimensionless
         Real64 const PumpMotorEfficiency(0.85);      // suggested as average value in ITT/Gould pump references,
 
-        Array1D<std::string> Alphas;                  // Alpha items for object
-        Array1D<std::string> cAlphaFieldNames;        // Alpha field names (from input processor)
-        Array1D<std::string> cNumericFieldNames;      // Numeric field names (from input processor)
+        EPVector<std::string> Alphas;                  // Alpha items for object
+        EPVector<std::string> cAlphaFieldNames;        // Alpha field names (from input processor)
+        EPVector<std::string> cNumericFieldNames;      // Numeric field names (from input processor)
         std::string CurrentModuleObject;   // Object type for getting and error messages
 
         EPVector<bool> lAlphaBlanks;      // Logic array, alpha input blank = .TRUE.
@@ -675,7 +675,7 @@ namespace RefrigeratedCase {
         Real64 DensityPhaseChange(0.0);    // Secondary loop density at condensing temperature w overfeed system (g/m3)
         Real64 NominalTotalCompCapLP(0.0); // Total of nominal low pressure compressor capacities, used for rough input check (W) (Transcritical CO2)
         Real64 NominalTotalCompCapHP(0.0);
-        Array1D<Real64> Numbers;                  // Numeric items for object
+        EPVector<Real64> Numbers;                  // Numeric items for object
         Array2D<Real64> DayValues;                // Array of schedule values
 
         NumSimulationCascadeCondensers = inputProcessor->getNumObjectsFound("Refrigeration:Condenser:Cascade");
@@ -1723,26 +1723,26 @@ namespace RefrigeratedCase {
                 // All variables for walk-in/zone interactions need to be allocated after know number of zones
                 // Autodesk Missing initialization added below: At least SensZoneCreditRate was used uninitialized
                 if (!allocated(WalkIn(WalkInID).ZoneName)) WalkIn(WalkInID).ZoneName.allocate(NumZones);
-                if (!allocated(WalkIn(WalkInID).ZoneNum)) WalkIn(WalkInID).ZoneNum.allocate(NumZones) = 0;
-                if (!allocated(WalkIn(WalkInID).ZoneNodeNum)) WalkIn(WalkInID).ZoneNodeNum.allocate(NumZones) = 0;
-                if (!allocated(WalkIn(WalkInID).SurfaceArea)) WalkIn(WalkInID).SurfaceArea.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).UValue)) WalkIn(WalkInID).UValue.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).UValueGlassDr)) WalkIn(WalkInID).UValueGlassDr.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).GlassDoorOpenSchedPtr)) WalkIn(WalkInID).GlassDoorOpenSchedPtr.allocate(NumZones) = 0;
-                if (!allocated(WalkIn(WalkInID).AreaGlassDr)) WalkIn(WalkInID).AreaGlassDr.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).HeightGlassDr)) WalkIn(WalkInID).HeightGlassDr.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).UValueStockDr)) WalkIn(WalkInID).UValueStockDr.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).StockDoorOpenSchedPtr)) WalkIn(WalkInID).StockDoorOpenSchedPtr.allocate(NumZones) = 0;
-                if (!allocated(WalkIn(WalkInID).StockDoorProtectType)) WalkIn(WalkInID).StockDoorProtectType.allocate(NumZones) = 0;
-                if (!allocated(WalkIn(WalkInID).AreaStockDr)) WalkIn(WalkInID).AreaStockDr.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).HeightStockDr)) WalkIn(WalkInID).HeightStockDr.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).SensZoneCreditRate)) WalkIn(WalkInID).SensZoneCreditRate.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).SensZoneCreditCoolRate)) WalkIn(WalkInID).SensZoneCreditCoolRate.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).SensZoneCreditCool)) WalkIn(WalkInID).SensZoneCreditCool.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).SensZoneCreditHeatRate)) WalkIn(WalkInID).SensZoneCreditHeatRate.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).SensZoneCreditHeat)) WalkIn(WalkInID).SensZoneCreditHeat.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).LatZoneCreditRate)) WalkIn(WalkInID).LatZoneCreditRate.allocate(NumZones) = 0.0;
-                if (!allocated(WalkIn(WalkInID).LatZoneCredit)) WalkIn(WalkInID).LatZoneCredit.allocate(NumZones) = 0.0;
+                if (!allocated(WalkIn(WalkInID).ZoneNum)) WalkIn(WalkInID).ZoneNum.resize(NumZones, 0);
+                if (!allocated(WalkIn(WalkInID).ZoneNodeNum)) WalkIn(WalkInID).ZoneNodeNum.resize(NumZones, 0);
+                if (!allocated(WalkIn(WalkInID).SurfaceArea)) WalkIn(WalkInID).SurfaceArea.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).UValue)) WalkIn(WalkInID).UValue.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).UValueGlassDr)) WalkIn(WalkInID).UValueGlassDr.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).GlassDoorOpenSchedPtr)) WalkIn(WalkInID).GlassDoorOpenSchedPtr.resize(NumZones, 0);
+                if (!allocated(WalkIn(WalkInID).AreaGlassDr)) WalkIn(WalkInID).AreaGlassDr.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).HeightGlassDr)) WalkIn(WalkInID).HeightGlassDr.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).UValueStockDr)) WalkIn(WalkInID).UValueStockDr.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).StockDoorOpenSchedPtr)) WalkIn(WalkInID).StockDoorOpenSchedPtr.resize(NumZones, 0);
+                if (!allocated(WalkIn(WalkInID).StockDoorProtectType)) WalkIn(WalkInID).StockDoorProtectType.resize(NumZones, 0);
+                if (!allocated(WalkIn(WalkInID).AreaStockDr)) WalkIn(WalkInID).AreaStockDr.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).HeightStockDr)) WalkIn(WalkInID).HeightStockDr.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).SensZoneCreditRate)) WalkIn(WalkInID).SensZoneCreditRate.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).SensZoneCreditCoolRate)) WalkIn(WalkInID).SensZoneCreditCoolRate.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).SensZoneCreditCool)) WalkIn(WalkInID).SensZoneCreditCool.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).SensZoneCreditHeatRate)) WalkIn(WalkInID).SensZoneCreditHeatRate.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).SensZoneCreditHeat)) WalkIn(WalkInID).SensZoneCreditHeat.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).LatZoneCreditRate)) WalkIn(WalkInID).LatZoneCreditRate.resize(NumZones, 0.0);
+                if (!allocated(WalkIn(WalkInID).LatZoneCredit)) WalkIn(WalkInID).LatZoneCredit.resize(NumZones, 0.0);
 
                 int AStart = NumWIAlphaFieldsBeforeZoneInput + 1;
                 int NStart = NumWINumberFieldsBeforeZoneInput + 1;
@@ -2948,11 +2948,11 @@ namespace RefrigeratedCase {
                         RefrigRack(RackNum).NumCases = NumCases;
                         RefrigRack(RackNum).NumWalkIns = NumWalkIns;
                         if (!allocated(RefrigRack(RackNum).CoilNum)) RefrigRack(RackNum).CoilNum.allocate(NumCoils);
-                        RefrigRack(RackNum).CoilNum({1, NumCoils}) = CaseAndWalkInList(CaseAndWalkInListNum).CoilItemNum({1, NumCoils});
+                        std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).CoilItemNum.begin(), NumCoils, RefrigRack(RackNum).CoilNum.begin());
                         if (!allocated(RefrigRack(RackNum).CaseNum)) RefrigRack(RackNum).CaseNum.allocate(NumCases);
-                        RefrigRack(RackNum).CaseNum({1, NumCases}) = CaseAndWalkInList(CaseAndWalkInListNum).CaseItemNum({1, NumCases});
+                        std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).CaseItemNum.begin(), NumCases, RefrigRack(RackNum).CaseNum.begin());
                         if (!allocated(RefrigRack(RackNum).WalkInNum)) RefrigRack(RackNum).WalkInNum.allocate(NumWalkIns);
-                        RefrigRack(RackNum).WalkInNum({1, NumWalkIns}) = CaseAndWalkInList(CaseAndWalkInListNum).WalkInItemNum({1, NumWalkIns});
+                        std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).WalkInItemNum.begin(), NumWalkIns, RefrigRack(RackNum).WalkInNum.begin());
                     } else if (CoilNum != 0) { // Name points to a coil
                         NumCoils = 1;
                         RefrigRack(RackNum).NumCoils = 1;
@@ -3910,12 +3910,12 @@ namespace RefrigeratedCase {
                             Secondary(SecondaryNum).NumCoils = NumCoils;
                             Secondary(SecondaryNum).NumWalkIns = NumWalkIns;
                             if (!allocated(Secondary(SecondaryNum).CaseNum)) Secondary(SecondaryNum).CaseNum.allocate(NumCases);
-                            Secondary(SecondaryNum).CaseNum({1, NumCases}) = CaseAndWalkInList(CaseAndWalkInListNum).CaseItemNum({1, NumCases});
+                            std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).CaseItemNum.begin(), NumCases, Secondary(SecondaryNum).CaseNum.begin());
                             if (!allocated(Secondary(SecondaryNum).CoilNum)) Secondary(SecondaryNum).CoilNum.allocate(NumCoils);
-                            Secondary(SecondaryNum).CoilNum({1, NumCoils}) = CaseAndWalkInList(CaseAndWalkInListNum).CoilItemNum({1, NumCoils});
+                            std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).CoilItemNum.begin(), NumCoils, Secondary(SecondaryNum).CoilNum.begin());
                             if (!allocated(Secondary(SecondaryNum).WalkInNum)) Secondary(SecondaryNum).WalkInNum.allocate(NumWalkIns);
-                            Secondary(SecondaryNum).WalkInNum({1, NumWalkIns}) =
-                                CaseAndWalkInList(CaseAndWalkInListNum).WalkInItemNum({1, NumWalkIns});
+                            std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).WalkInItemNum.begin(), NumWalkIns,
+                                Secondary(SecondaryNum).WalkInNum.begin());
                         } else if (CaseNum != 0) { // Name points to a case
                             NumCases = 1;
                             Secondary(SecondaryNum).NumCases = 1;
@@ -4794,15 +4794,15 @@ namespace RefrigeratedCase {
                         System(RefrigSysNum).NumCoils = NumCoils;
                         if (NumCases > 0) {
                             if (!allocated(System(RefrigSysNum).CaseNum)) System(RefrigSysNum).CaseNum.allocate(NumCases);
-                            System(RefrigSysNum).CaseNum({1, NumCases}) = CaseAndWalkInList(CaseAndWalkInListNum).CaseItemNum({1, NumCases});
+                            std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).CaseItemNum.begin(), NumCases, System(RefrigSysNum).CaseNum.begin()); 
                         }
                         if (NumCoils > 0) {
                             if (!allocated(System(RefrigSysNum).CoilNum)) System(RefrigSysNum).CoilNum.allocate(NumCoils);
-                            System(RefrigSysNum).CoilNum({1, NumCoils}) = CaseAndWalkInList(CaseAndWalkInListNum).CoilItemNum({1, NumCoils});
+                            std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).CoilItemNum.begin(), NumCoils, System(RefrigSysNum).CoilNum.begin()); 
                         }
                         if (NumWalkIns > 0) {
                             if (!allocated(System(RefrigSysNum).WalkInNum)) System(RefrigSysNum).WalkInNum.allocate(NumWalkIns);
-                            System(RefrigSysNum).WalkInNum({1, NumWalkIns}) = CaseAndWalkInList(CaseAndWalkInListNum).WalkInItemNum({1, NumWalkIns});
+                            std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).WalkInItemNum.begin(), NumWalkIns, System(RefrigSysNum).WalkInNum.begin());
                         }
                     } else if (CaseNum != 0) { // Name points to a case
                         NumCases = 1;
@@ -4921,11 +4921,11 @@ namespace RefrigeratedCase {
                         System(RefrigSysNum).NumSecondarys = NumSecondary;
                         System(RefrigSysNum).NumCascadeLoads = NumCascadeLoad;
                         if (!allocated(System(RefrigSysNum).SecondaryNum)) System(RefrigSysNum).SecondaryNum.allocate(NumSecondary);
-                        System(RefrigSysNum).SecondaryNum({1, NumSecondary}) =
-                            TransferLoadList(TransferLoadListNum).SecondaryItemNum({1, NumSecondary});
+                        std::copy_n(TransferLoadList(TransferLoadListNum).SecondaryItemNum.begin(), NumSecondary,
+                            System(RefrigSysNum).SecondaryNum.begin());
                         if (!allocated(System(RefrigSysNum).CascadeLoadNum)) System(RefrigSysNum).CascadeLoadNum.allocate(NumCascadeLoad);
-                        System(RefrigSysNum).CascadeLoadNum({1, NumCascadeLoad}) =
-                            TransferLoadList(TransferLoadListNum).CascadeLoadItemNum({1, NumCascadeLoad});
+                        std::copy_n(TransferLoadList(TransferLoadListNum).CascadeLoadItemNum.begin(), NumCascadeLoad,
+                            System(RefrigSysNum).CascadeLoadNum.begin());
                     } else if (SecondaryNum != 0) { // Name points to a secondary loop load
                         NumSecondary = 1;
                         System(RefrigSysNum).NumSecondarys = 1;
@@ -5103,7 +5103,7 @@ namespace RefrigeratedCase {
                         NumCompressorsSys = CompressorLists(ListNum).NumCompressors;
                         System(RefrigSysNum).NumCompressors = NumCompressorsSys;
                         if (!allocated(System(RefrigSysNum).CompressorNum)) System(RefrigSysNum).CompressorNum.allocate(NumCompressorsSys);
-                        System(RefrigSysNum).CompressorNum({1, NumCompressorsSys}) = CompressorLists(ListNum).CompItemNum({1, NumCompressorsSys});
+                        std::copy_n(CompressorLists(ListNum).CompItemNum.begin(), NumCompressorsSys, System(RefrigSysNum).CompressorNum.begin()); 
                     } else if (CompNum != 0) {
                         NumCompressorsSys = 1;
                         System(RefrigSysNum).NumCompressors = 1;
@@ -5317,8 +5317,8 @@ namespace RefrigeratedCase {
                             System(RefrigSysNum).NumHiStageCompressors = NumHiStageCompressorsSys;
                             if (!allocated(System(RefrigSysNum).HiStageCompressorNum))
                                 System(RefrigSysNum).HiStageCompressorNum.allocate(NumHiStageCompressorsSys);
-                            System(RefrigSysNum).HiStageCompressorNum({1, NumHiStageCompressorsSys}) =
-                                CompressorLists(ListNum).CompItemNum({1, NumHiStageCompressorsSys});
+                            std::copy_n(CompressorLists(ListNum).CompItemNum.begin(), NumHiStageCompressorsSys,
+                                System(RefrigSysNum).HiStageCompressorNum.begin());
                         } else if (CompNum != 0) {
                             NumHiStageCompressorsSys = 1;
                             System(RefrigSysNum).NumHiStageCompressors = 1;
@@ -5631,15 +5631,16 @@ namespace RefrigeratedCase {
                         TransSystem(TransRefrigSysNum).NumCasesMT = NumCasesMT;
                         TransSystem(TransRefrigSysNum).NumWalkInsMT = NumWalkInsMT;
                         if (NumCasesMT > 0) {
-                            if (!allocated(TransSystem(TransRefrigSysNum).CaseNumMT)) TransSystem(TransRefrigSysNum).CaseNumMT.allocate(NumCasesMT);
-                            TransSystem(TransRefrigSysNum).CaseNumMT({1, NumCasesMT}) =
-                                CaseAndWalkInList(CaseAndWalkInListNum).CaseItemNum({1, NumCasesMT});
+                            if (!allocated(TransSystem(TransRefrigSysNum).CaseNumMT))
+                                TransSystem(TransRefrigSysNum).CaseNumMT.allocate(NumCasesMT);
+                            std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).CaseItemNum.begin(), NumCasesMT,
+                                TransSystem(TransRefrigSysNum).CaseNumMT.begin());
                         }
                         if (NumWalkInsMT > 0) {
                             if (!allocated(TransSystem(TransRefrigSysNum).WalkInNumMT))
                                 TransSystem(TransRefrigSysNum).WalkInNumMT.allocate(NumWalkInsMT);
-                            TransSystem(TransRefrigSysNum).WalkInNumMT({1, NumWalkInsMT}) =
-                                CaseAndWalkInList(CaseAndWalkInListNum).WalkInItemNum({1, NumWalkInsMT});
+                            std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).WalkInItemNum.begin(), NumWalkInsMT,
+                                TransSystem(TransRefrigSysNum).WalkInNumMT.begin());
                         }
                     } else if (CaseNum != 0) { // Name points to a case
                         NumCasesMT = 1;
@@ -5734,20 +5735,22 @@ namespace RefrigeratedCase {
                         TransSystem(TransRefrigSysNum).NumCasesLT = NumCasesLT;
                         TransSystem(TransRefrigSysNum).NumWalkInsLT = NumWalkInsLT;
                         if (NumCasesLT > 0) {
-                            if (!allocated(TransSystem(TransRefrigSysNum).CaseNumLT)) TransSystem(TransRefrigSysNum).CaseNumLT.allocate(NumCasesLT);
-                            TransSystem(TransRefrigSysNum).CaseNumLT({1, NumCasesLT}) =
-                                CaseAndWalkInList(CaseAndWalkInListNum).CaseItemNum({1, NumCasesLT});
+                            if (!allocated(TransSystem(TransRefrigSysNum).CaseNumLT))
+                                TransSystem(TransRefrigSysNum).CaseNumLT.allocate(NumCasesLT);
+                            std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).CaseItemNum.begin(), NumCasesLT,
+                                TransSystem(TransRefrigSysNum).CaseNumLT.begin());
                         }
                         if (NumWalkInsLT > 0) {
                             if (!allocated(TransSystem(TransRefrigSysNum).WalkInNumLT))
                                 TransSystem(TransRefrigSysNum).WalkInNumLT.allocate(NumWalkInsLT);
-                            TransSystem(TransRefrigSysNum).WalkInNumLT({1, NumWalkInsLT}) =
-                                CaseAndWalkInList(CaseAndWalkInListNum).WalkInItemNum({1, NumWalkInsLT});
+                            std::copy_n(CaseAndWalkInList(CaseAndWalkInListNum).WalkInItemNum.begin(), NumWalkInsLT,
+                                TransSystem(TransRefrigSysNum).WalkInNumLT.begin());
                         }
                     } else if (CaseNum != 0) { // Name points to a case
                         NumCasesLT = 1;
                         TransSystem(TransRefrigSysNum).NumCasesLT = 1;
-                        if (!allocated(TransSystem(TransRefrigSysNum).CaseNumLT)) TransSystem(TransRefrigSysNum).CaseNumLT.allocate(NumCasesLT);
+                        if (!allocated(TransSystem(TransRefrigSysNum).CaseNumLT))
+                            TransSystem(TransRefrigSysNum).CaseNumLT.allocate(NumCasesLT);
                         TransSystem(TransRefrigSysNum).CaseNumLT(NumCases) = CaseNum;
                     } else if (WalkInNum != 0) { // Name points to a walkin
                         NumWalkInsLT = 1;
@@ -5853,8 +5856,8 @@ namespace RefrigeratedCase {
                         TransSystem(TransRefrigSysNum).NumCompressorsHP = NumCompressorsSys;
                         if (!allocated(TransSystem(TransRefrigSysNum).CompressorNumHP))
                             TransSystem(TransRefrigSysNum).CompressorNumHP.allocate(NumCompressorsSys);
-                        TransSystem(TransRefrigSysNum).CompressorNumHP({1, NumCompressorsSys}) =
-                            CompressorLists(ListNum).CompItemNum({1, NumCompressorsSys});
+                        std::copy_n(CompressorLists(ListNum).CompItemNum.begin(), NumCompressorsSys,
+                            TransSystem(TransRefrigSysNum).CompressorNumHP.begin());
                     } else if (CompNum != 0) {
                         NumCompressorsSys = 1;
                         TransSystem(TransRefrigSysNum).NumCompressorsHP = 1;
@@ -5920,8 +5923,7 @@ namespace RefrigeratedCase {
                         TransSystem(TransRefrigSysNum).NumCompressorsLP = NumCompressorsSys;
                         if (!allocated(TransSystem(TransRefrigSysNum).CompressorNumLP))
                             TransSystem(TransRefrigSysNum).CompressorNumLP.allocate(NumCompressorsSys);
-                        TransSystem(TransRefrigSysNum).CompressorNumLP({1, NumCompressorsSys}) =
-                            CompressorLists(ListNum).CompItemNum({1, NumCompressorsSys});
+                        std::copy_n(CompressorLists(ListNum).CompItemNum.begin(), NumCompressorsSys, TransSystem(TransRefrigSysNum).CompressorNumLP.begin());
                     } else if (CompNum != 0) {
                         NumCompressorsSys = 1;
                         TransSystem(TransRefrigSysNum).NumCompressorsLP = 1;
@@ -8896,8 +8898,8 @@ namespace RefrigeratedCase {
         // suction piping, and receiver shells to zone
         if (DataGlobals::NumOfZones > 0) {
             if (UseSysTimeStep) {
-                for (int i = CoilSysCredit.l(), e = CoilSysCredit.u(); i <= e; ++i) {
-                    CoilSysCredit(i).reset();
+                for (auto &el : CoilSysCredit) {
+                    el.reset();
                 }
             } // UseSysTimeStep = true
 
@@ -8906,39 +8908,39 @@ namespace RefrigeratedCase {
                 for (int i = DataHeatBalance::RefrigCaseCredit.l(), e = DataHeatBalance::RefrigCaseCredit.u(); i <= e; ++i) {
                     DataHeatBalance::RefrigCaseCredit(i).reset();
                 }
-                for (int i = CaseWIZoneReport.l(), e = CaseWIZoneReport.u(); i <= e; ++i) {
-                    CaseWIZoneReport(i).reset();
+                for (auto &el : CaseWIZoneReport) {
+                    el.reset();
                 }
             }
         }
 
         if (NumSimulationCases > 0) {
             // RefrigCase ALLOCATED to NumSimulationCases
-            for (int i = RefrigCase.l(), e = RefrigCase.u(); i <= e; ++i) {
-                RefrigCase(i).reset_init();
+            for (auto &el : RefrigCase) {
+                el.reset_init();
             }
         } // NumSimulationCases
 
         if (NumSimulationWalkIns > 0) {
             // WalkIn ALLOCATED to NumSimulationWalkIns
-            for (int i = WalkIn.l(), e = WalkIn.u(); i <= e; ++i) {
-                WalkIn(i).reset_init();
+            for (auto &el : WalkIn) {
+                el.reset_init();
             }
         }
 
         if (HaveChillers) {
             // HaveChillers is TRUE when NumSimulationRefrigAirChillers > 0
             // WarehouseCoil ALLOCATED to NumSimulationRefrigAirChillers
-            for (int i = WarehouseCoil.l(), e = WarehouseCoil.u(); i <= e; ++i) {
-                WarehouseCoil(i).reset_init();
+            for (auto &el : WarehouseCoil) {
+                el.reset_init();
             }
         }
 
         if (HaveRefrigRacks) {
             // HaveRefrigRacks TRUE when NumRefrigeratedRacks > 0
             // RefrigRack ALLOCATED to NumRefrigeratedRacks
-            for (int i = RefrigRack.l(), e = RefrigRack.u(); i <= e; ++i) {
-                RefrigRack(i).reset_init();
+            for (auto &el : RefrigRack) {
+                el.reset_init();
             }
             for (auto &e : DataHeatBalance::HeatReclaimRefrigeratedRack)
                 e.AvailCapacity = 0.0;
@@ -8949,8 +8951,8 @@ namespace RefrigeratedCase {
 
         if (DataHeatBalance::NumRefrigCondensers > 0) {
             // Condenser ALLOCATED to DataHeatBalance::NumRefrigCondensers
-            for (int i = Condenser.l(), e = Condenser.u(); i <= e; ++i) {
-                Condenser(i).reset_init();
+            for (auto &el : Condenser) {
+                el.reset_init();
             }
             // N don't reset basin heat to zero when no load because heater would remain on
             for (auto &e : DataHeatBalance::HeatReclaimRefrigCondenser) {
@@ -8961,46 +8963,46 @@ namespace RefrigeratedCase {
 
         if (NumSimulationGasCooler > 0) {
             // GasCooler ALLOCATED to NumSimulationGasCooler
-            for (int i = GasCooler.l(), e = GasCooler.u(); i <= e; ++i) {
-                GasCooler(i).reset_init();
+            for (auto &el : GasCooler) {
+                el.reset_init();
             }
         }
 
         if (NumSimulationCompressors > 0) {
             // Compressor ALLOCATED to NumSimulationCompressors
-            for (int i = Compressor.l(), e = Compressor.u(); i <= e; ++i) {
-                Compressor(i).reset_init();
+            for (auto &el : Compressor) {
+                el.reset_init();
             }
         }
 
         if (HaveDetailedRefrig) {
             // HaveDetailedRefrig is TRUE when NumRefrigSystems > 0
             // System is ALLOCATED to NumRefrigSystems
-            for (int i = System.l(), e = System.u(); i <= e; ++i) {
-                System(i).reset_init();
+            for (auto &el : System) {
+                el.reset_init();
             }
         }
 
         if (HaveDetailedTransRefrig) {
             // HaveDetailedTransRefrig is TRUE when NumTransRefrigSystems > 0
             // TransSystem is ALLOCATED to NumTransRefrigSystems
-            for (int i = TransSystem.l(), e = TransSystem.u(); i <= e; ++i) {
-                TransSystem(i).reset_init();
+            for (auto &el : TransSystem) {
+                el.reset_init();
             }
         }
 
         if (NumSimulationSecondarySystems > 0) {
             // Secondary is ALLOCATED to NumSimulationSecondarySystems
-            for (int i = Secondary.l(), e = Secondary.u(); i <= e; ++i) {
-                Secondary(i).reset_init();
+            for (auto &el : Secondary) {
+                el.reset_init();
             }
         }
 
         // Accumulative and carry-over variables are not zeroed at start of each time step, only at begining of environment
         if (DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag) {
             if (NumSimulationCases > 0) {
-                for (int i = RefrigCase.l(), e = RefrigCase.u(); i <= e; ++i) {
-                    RefrigCase(i).reset_init_accum();
+                for (auto &el : RefrigCase) {
+                    el.reset_init_accum();
                 }
             }
             if (DataHeatBalance::NumRefrigSystems > 0) {

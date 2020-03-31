@@ -120,7 +120,7 @@ namespace Boilers {
     // MODULE VARIABLE DECLARATIONS:
     int NumBoilers(0);
     bool GetBoilerInputFlag(true);
-    Array1D<BoilerSpecs> Boiler;
+    EPVector<BoilerSpecs> Boiler;
 
     void clear_state()
     {

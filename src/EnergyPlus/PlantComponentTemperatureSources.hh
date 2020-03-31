@@ -48,9 +48,6 @@
 #ifndef PlantComponentTemperatureSources_hh_INCLUDED
 #define PlantComponentTemperatureSources_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -131,12 +128,9 @@ namespace PlantComponentTemperatureSources {
     };
 
     // Object Data
-    extern Array1D<WaterSourceSpecs> WaterSource; // dimension to number of machines
+    extern EPVector<WaterSourceSpecs> WaterSource; // dimension to number of machines
 
     void GetWaterSourceInput();
-
-    // object data
-    extern Array1D<WaterSourceSpecs> WaterSource;
 
     void clear_state();
 

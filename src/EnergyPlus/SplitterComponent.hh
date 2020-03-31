@@ -48,9 +48,6 @@
 #ifndef SplitterComponent_hh_INCLUDED
 #define SplitterComponent_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -103,14 +100,14 @@ namespace SplitterComponent {
         Real64 InletMassFlowRateMaxAvail; // Max Avail MassFlow through the Splitter being Simulated [kg/Sec]
         Real64 InletMassFlowRateMinAvail; // Min Avail MassFlow through the Splitter being Simulated [kg/Sec]
         int NumOutletNodes;
-        Array1D<int> OutletNode;
-        Array1D<Real64> OutletMassFlowRate;
-        Array1D<Real64> OutletMassFlowRateMaxAvail;
-        Array1D<Real64> OutletMassFlowRateMinAvail;
-        Array1D<Real64> OutletTemp;
-        Array1D<Real64> OutletHumRat;
-        Array1D<Real64> OutletEnthalpy;
-        Array1D<Real64> OutletPressure;
+        EPVector<int> OutletNode;
+        EPVector<Real64> OutletMassFlowRate;
+        EPVector<Real64> OutletMassFlowRateMaxAvail;
+        EPVector<Real64> OutletMassFlowRateMinAvail;
+        EPVector<Real64> OutletTemp;
+        EPVector<Real64> OutletHumRat;
+        EPVector<Real64> OutletEnthalpy;
+        EPVector<Real64> OutletPressure;
 
         // Default Constructor
         SplitterConditions()
@@ -121,7 +118,7 @@ namespace SplitterComponent {
     };
 
     // Object Data
-    extern Array1D<SplitterConditions> SplitterCond;
+    extern EPVector<SplitterConditions> SplitterCond;
 
     // Functions
     void clear_state();

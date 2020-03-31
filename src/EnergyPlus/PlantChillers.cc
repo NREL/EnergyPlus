@@ -142,10 +142,10 @@ namespace PlantChillers {
     bool GetConstCOPInput(true);
 
     // Object Data
-    Array1D<ElectricChillerSpecs> ElectricChiller;         // dimension to number of machines
-    Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
-    Array1D<GTChillerSpecs> GTChiller;                     // dimension to number of machines
-    Array1D<ConstCOPChillerSpecs> ConstCOPChiller;         // dimension to number of machines
+    EPVector<ElectricChillerSpecs> ElectricChiller;         // dimension to number of machines
+    EPVector<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
+    EPVector<GTChillerSpecs> GTChiller;                     // dimension to number of machines
+    EPVector<ConstCOPChillerSpecs> ConstCOPChiller;         // dimension to number of machines
 
     void clear_state()
     {

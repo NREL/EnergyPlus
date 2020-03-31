@@ -48,9 +48,6 @@
 #ifndef VentilatedSlab_hh_INCLUDED
 #define VentilatedSlab_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -109,16 +106,16 @@ namespace VentilatedSlab {
     extern bool HCoilOn;                         // TRUE if the heating coil (gas or electric especially) should be running
     extern int NumOfVentSlabs;                   // Number of ventilated slab in the input file
     extern Real64 OAMassFlowRate;                // Outside air mass flow rate for the ventilated slab
-    extern Array1D<Real64> QRadSysSrcAvg;         // Average source over the time step for a particular radiant surfaceD
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+    extern EPVector<Real64> QRadSysSrcAvg;         // Average source over the time step for a particular radiant surfaceD
+    extern EPVector<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     extern int MaxCloNumOfSurfaces;              // Used to set allocate size in CalcClo routine
     extern Real64 QZnReq;                        // heating or cooling needed by system [watts]
 
     // Record keeping variables used to calculate QRadSysSrcAvg locally
 
-    extern Array1D<Real64> LastQRadSysSrc;      // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastQRadSysSrc;      // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     extern EPVector<bool> CheckEquipName;
 
     // Autosizing variables
@@ -139,18 +136,18 @@ namespace VentilatedSlab {
         std::string ZoneName;  // Name of zone the system is serving
         int ZonePtr;           // Point to this zone in the Zone derived type
         // Variables for Delivery Config.
-        Array1D<std::string> ZName;            // Name of zone the system is serving
-        Array1D<int> ZPtr;                // Point to this zone in the Zone derived type
+        EPVector<std::string> ZName;            // Name of zone the system is serving
+        EPVector<int> ZPtr;                // Point to this zone in the Zone derived type
         std::string SurfListName;        // Name of surface/surface list that is the radiant system
         int NumOfSurfaces;               // Number of surfaces included in this system (coordinated control)
-        Array1D<int> SurfacePtr;          // Pointer to the slabs in the Surface derived type
-        Array1D<std::string> SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
-        Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
-        Array1D<Real64> CDiameter;       // Number of core diameter
-        Array1D<Real64> CLength;         // Number of core length
-        Array1D<Real64> CNumbers;        // Number of core numbers
-        Array1D<std::string> SlabIn;           // Name of node that is slab inlet node
-        Array1D<std::string> SlabOut;          // Name of node that is slab outlet node
+        EPVector<int> SurfacePtr;          // Pointer to the slabs in the Surface derived type
+        EPVector<std::string> SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
+        EPVector<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
+        EPVector<Real64> CDiameter;       // Number of core diameter
+        EPVector<Real64> CLength;         // Number of core length
+        EPVector<Real64> CNumbers;        // Number of core numbers
+        EPVector<std::string> SlabIn;           // Name of node that is slab inlet node
+        EPVector<std::string> SlabOut;          // Name of node that is slab outlet node
         Real64 TotalSurfaceArea;         // Total surface area for all surfaces that are part of this system
         Real64 CoreDiameter;             // tube diameter for embedded tubing
         Real64 CoreLength;               // tube length embedded in radiant surface
@@ -326,7 +323,7 @@ namespace VentilatedSlab {
     struct VentSlabNumericFieldData
     {
         // Members
-        Array1D<std::string> FieldNames;
+        EPVector<std::string> FieldNames;
 
         // Default Constructor
         VentSlabNumericFieldData()
@@ -335,8 +332,8 @@ namespace VentilatedSlab {
     };
 
     // Object Data
-    extern Array1D<VentilatedSlabData> VentSlab;
-    extern Array1D<VentSlabNumericFieldData> VentSlabNumericFields;
+    extern EPVector<VentilatedSlabData> VentSlab;
+    extern EPVector<VentSlabNumericFieldData> VentSlabNumericFields;
 
     // Functions
 

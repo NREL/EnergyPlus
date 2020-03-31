@@ -121,7 +121,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
     int NumberOfPlantFluidHXs(0);
     bool GetInput(true);
-    Array1D<HeatExchangerStruct> FluidHX;
+    EPVector<HeatExchangerStruct> FluidHX;
     EPVector<bool> CheckFluidHXs;
 
     void clear_state()
@@ -221,12 +221,12 @@ namespace PlantHeatExchangerFluidToFluid {
         int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
         int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
         int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
-        Array1D<std::string> cAlphaFieldNames;
-        Array1D<std::string> cNumericFieldNames;
+        EPVector<std::string> cAlphaFieldNames;
+        EPVector<std::string> cNumericFieldNames;
         EPVector<bool> lNumericFieldBlanks;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D<std::string> cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<std::string> cAlphaArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
 
         cCurrentModuleObject = "HeatExchanger:FluidToFluid";
@@ -2106,7 +2106,7 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 const Acc(1.e-3); // Accuracy of solver result
 
         int SolFla;             // Flag of solver
-        Array1D<Real64> Par(2); // Parameter array passed to solver
+        EPVector<Real64> Par(2); // Parameter array passed to solver
 
         // mass flow rate of fluid entering from supply side loop
         Real64 SupSideMdot = DataLoopNode::Node(this->SupplySideLoop.inletNodeNum).MassFlowRate;
@@ -2275,7 +2275,7 @@ namespace PlantHeatExchangerFluidToFluid {
     }
 
     Real64 HeatExchangerStruct::demandSideFlowResidual(Real64 const DmdSideMassFlowRate,
-                                                       Array1D<Real64> const &Par // Par(1) = HX index number
+                                                       EPVector<Real64> const &Par // Par(1) = HX index number
     )
     {
 

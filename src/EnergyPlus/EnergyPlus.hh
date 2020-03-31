@@ -390,13 +390,26 @@ T dot(const EPVector<T> & u, const V &v)
     return std::inner_product(u.begin(), u.end(), v.begin(), 0);
 }
 
-template <typename Element, typename Member> inline Member maxval(EPVector<Element> const &a, Member Element::*pmem)
+template <typename Element, typename Member>
+inline
+Member maxval(EPVector<Element> const &a, Member Element::*pmem)
 {
     Member v(a.empty() ? std::numeric_limits<Member>::lowest() : a(1).*pmem);
     for (int i = 2, e = a.isize(); i <= e; ++i) {
         v = std::max(v, a(i).*pmem);
     }
     return v;
+}
+
+template <typename T>
+inline
+T maxval(EPVector<T> const &a)
+{
+    auto max = std::max_element(a.begin(), a.end());
+    if(max == a.end()){
+        return std::numeric_limits<T>::lowest();
+    }
+    return *max;
 }
 
 

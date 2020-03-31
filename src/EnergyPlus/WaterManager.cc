@@ -252,12 +252,12 @@ namespace WaterManager {
         static int alphaOffset(0);
         static int SurfNum(0);
         static std::string objNameMsg;
-        Array1D<std::string> cAlphaFieldNames;
-        Array1D<std::string> cNumericFieldNames;
+        EPVector<std::string> cAlphaFieldNames;
+        EPVector<std::string> cNumericFieldNames;
         EPVector<bool> lNumericFieldBlanks;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D<std::string> cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<std::string> cAlphaArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         static Real64 tmpMax(0.0);
         static Real64 tmpMin(0.0);

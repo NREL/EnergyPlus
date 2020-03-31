@@ -53,7 +53,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -800,10 +799,10 @@ namespace PlantCondLoopOperation {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        Array1D<std::string> AlphArray;      // Alpha input items for object
-        Array1D<std::string> cAlphaFields;   // Alpha field names
-        Array1D<std::string> cNumericFields; // Numeric field names
-        Array1D<Real64> NumArray;      // Numeric input items for object
+        EPVector<std::string> AlphArray;      // Alpha input items for object
+        EPVector<std::string> cAlphaFields;   // Alpha field names
+        EPVector<std::string> cNumericFields; // Numeric field names
+        EPVector<Real64> NumArray;      // Numeric input items for object
         EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
@@ -994,10 +993,10 @@ namespace PlantCondLoopOperation {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        Array1D<std::string> AlphArray;      // Alpha input items for object
-        Array1D<std::string> cAlphaFields;   // Alpha field names
-        Array1D<std::string> cNumericFields; // Numeric field names
-        Array1D<Real64> NumArray;      // Numeric input items for object
+        EPVector<std::string> AlphArray;      // Alpha input items for object
+        EPVector<std::string> cAlphaFields;   // Alpha field names
+        EPVector<std::string> cNumericFields; // Numeric field names
+        EPVector<Real64> NumArray;      // Numeric input items for object
         EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
@@ -1120,9 +1119,9 @@ namespace PlantCondLoopOperation {
         bool IsNotOK;
         std::string CurrentModuleObject;
         static int TotNumLists(0);
-        static Array1D<std::string> EquipListsNameList;
-        static Array1D<int> EquipListsTypeList;
-        static Array1D<int> EquipListsIndexList;
+        static EPVector<std::string> EquipListsNameList;
+        static EPVector<int> EquipListsTypeList;
+        static EPVector<int> EquipListsIndexList;
         int iIndex;
         bool firstblank;
 

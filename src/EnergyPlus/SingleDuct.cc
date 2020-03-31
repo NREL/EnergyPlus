@@ -195,10 +195,10 @@ namespace SingleDuct {
     // Reporting routines for module
 
     // Object Data
-    Array1D<SingleDuctAirTerminal> sd_airterminal;
+    EPVector<SingleDuctAirTerminal> sd_airterminal;
     std::unordered_map<std::string, std::string> SysUniqueNames;
-    Array1D<AirTerminalMixerData> SysATMixer;
-    // Array1D< AirTerminalSingleDuctConstantVolumeNoReheat > SingleDuctConstantVolumeNoReheat;
+    EPVector<AirTerminalMixerData> SysATMixer;
+    // EPVector< AirTerminalSingleDuctConstantVolumeNoReheat > SingleDuctConstantVolumeNoReheat;
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -379,10 +379,10 @@ namespace SingleDuct {
         int SupAirIn;                    // controlled zone supply air inlet index
         int ADUNum;                      // air distribution unit index
         std::string CurrentModuleObject; // for ease in getting objects
-        Array1D<std::string> Alphas;           // Alpha input items for object
-        Array1D<std::string> cAlphaFields;     // Alpha field names
-        Array1D<std::string> cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
+        EPVector<std::string> Alphas;           // Alpha input items for object
+        EPVector<std::string> cAlphaFields;     // Alpha field names
+        EPVector<std::string> cNumericFields;   // Numeric field names
+        EPVector<Real64> Numbers;         // Numeric input items for object
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);           // Maximum number of numeric input fields
@@ -4206,7 +4206,7 @@ namespace SingleDuct {
         Real64 UnitFlowToler;   // flow rate tolerance
         Real64 QDelivered;
         Real64 FracDelivered;
-        Array1D<Real64> Par(11);
+        EPVector<Real64> Par(11);
         int SolFlag;
         Real64 ErrTolerance;
         Real64 MaxSteamCap; // steam coil capacity at full load
@@ -4923,7 +4923,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-                                Array1D<Real64> const &Par       // Par(1) = REAL(SysNum)
+                                EPVector<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
 
@@ -4995,7 +4995,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSHWNoFanResidual(Real64 const HWMassFlow,  // hot water mass flow rate [kg/s]
-                                Array1D<Real64> const &Par // Par(1) = REAL(SysNum)
+                                EPVector<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
 
@@ -5086,7 +5086,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSHWFanOnResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-                                Array1D<Real64> const &Par       // Par(1) = REAL(SysNum)
+                                EPVector<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
 
@@ -5158,7 +5158,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSHCFanOnResidual(Real64 const HeatingFrac, // fraction of maximum heating output
-                                Array1D<Real64> const &Par // Par(1) = REAL(SysNum)
+                                EPVector<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
 

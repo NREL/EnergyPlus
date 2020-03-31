@@ -120,8 +120,8 @@ namespace PlantCentralGSHP {
 
     EPVector<bool> CheckEquipName;
 
-    Array1D<WrapperSpecs> Wrapper;
-    Array1D<ChillerHeaterSpecs> ChillerHeater;
+    EPVector<WrapperSpecs> Wrapper;
+    EPVector<ChillerHeaterSpecs> ChillerHeater;
 
     void clear_state()
     {
@@ -1076,7 +1076,7 @@ namespace PlantCentralGSHP {
         int NumAlphas;                     // Number of elements in the alpha array
         int NumNums;                       // Number of elements in the numeric array
         int IOStat;                        // IO Status when calling get input subroutine
-        Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
+        EPVector<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
 
         static ObjexxFCL::gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
         static ObjexxFCL::gio::Fmt Format_550("('Curve Output = ',11(F7.2))");
