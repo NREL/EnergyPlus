@@ -49,7 +49,6 @@
 #define DataBSDFWindow_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 
@@ -157,14 +156,14 @@ namespace DataBSDFWindow {
         int BasisSymmetryType;        // BasisSymmetry_Axisymmetric or BasisSymmetry_None  (see HeatBalanceManager)
         int BasisMatIndex;            // pointer to matrix for basis
         int NBasis;                   // No. elements in basis
-        Array1D<Real64> Lamda;        // Vector of diagonal Lamda matrix elems for grid
-        Array1D<Real64> SolAng;       // Vector of basis element solid angles for grid
+        EPVector<Real64> Lamda;        // Vector of diagonal Lamda matrix elems for grid
+        EPVector<Real64> SolAng;       // Vector of basis element solid angles for grid
         int NThetas;                  // No. Theta values in basis
-        Array1D<Real64> Thetas;       // List of basis theta values
-        Array1D<int> NPhis;            // No. basis phi values for each theta
+        EPVector<Real64> Thetas;       // List of basis theta values
+        EPVector<int> NPhis;            // No. basis phi values for each theta
         Array2D<Real64> Phis;         // List of basis phi values for each theta
         Array2D_int BasisIndex;       // Index of basis element for theta, phi
-        Array1D<BasisElemDescr> Grid; // actual basis (to be constructed from matrix)
+        EPVector<BasisElemDescr> Grid; // actual basis (to be constructed from matrix)
 
         // Default Constructor
         BasisStruct() : BasisType(0), BasisSymmetryType(0), BasisMatIndex(0), NBasis(0), NThetas(0)
@@ -176,26 +175,26 @@ namespace DataBSDFWindow {
     {
         // Members
         BasisStruct Inc;                   // Basis for incident hemisphere
-        Array1D<Vector> sInc;              // Central direction vectors of incident grid (World coords)
-        Array1D<BSDFDaylghtPosition> pInc; // azimuth and altitude of incidence vectors
-        Array1D<Real64> CosInc;            // cosine of incident angle
-        Array1D<Real64> DAInc;             // cosine of incident angle times delta theta time delta phi (used in daylighting calculations)
+        EPVector<Vector> sInc;              // Central direction vectors of incident grid (World coords)
+        EPVector<BSDFDaylghtPosition> pInc; // azimuth and altitude of incidence vectors
+        EPVector<Real64> CosInc;            // cosine of incident angle
+        EPVector<Real64> DAInc;             // cosine of incident angle times delta theta time delta phi (used in daylighting calculations)
         int NSkyUnobs;                     // Number of Inc basis rays from unobstructed sky
         int NGndUnobs;                     // Number of Inc basis rays from unobstructed ground
         int NSky;                          // Number of Inc basis rays from sky
         int NGnd;                          // Number of Inc basis rays from gnd
         int NReflSurf;                     // Number of Inc basis rays from (potentially reflecting) surfaces
-        Array1D<int> SkyIndex;              // list of sky basis indices
-        Array1D<int> GndIndex;              // list of gnd basis indices
-        Array1D<Vector> GndPt;             // gnd intersection pt of gnd basis ray (z=0)
-        Array1D<int> RefSurfIndex;          // list of basis indices of rays striking exterior surf
-        Array1D<int> RefRayNHits;           // for a given ray striking a surface, no. of surfaces pierced
+        EPVector<int> SkyIndex;              // list of sky basis indices
+        EPVector<int> GndIndex;              // list of gnd basis indices
+        EPVector<Vector> GndPt;             // gnd intersection pt of gnd basis ray (z=0)
+        EPVector<int> RefSurfIndex;          // list of basis indices of rays striking exterior surf
+        EPVector<int> RefRayNHits;           // for a given ray striking a surface, no. of surfaces pierced
         Array2D_int HitSurfNo;             // for a given ray striking surface, list of intersected surf nos
         Array2D<Real64> HitSurfDSq;        // for a given ray striking surface, list of distance^2
         //  from window
         Array2D<Vector> HitPt;       // for a given ray striking surface, list of hit pts
-        Array1D<Real64> SolSkyWt;    // Sky intensity weights
-        Array1D<Real64> SolSkyGndWt; // Wts for sky rad refl from grn
+        EPVector<Real64> SolSkyWt;    // Sky intensity weights
+        EPVector<Real64> SolSkyGndWt; // Wts for sky rad refl from grn
         Array3D<Real64> SolBmGndWt;  // Wts for beam rad refl from gnd (hour, timestep)
         Array2D_int SolBmIndex;      // Basis index corresponding to beam dir (hour, timestep)
         // Note this is zero if sun is not in incident hemisphere
@@ -203,9 +202,9 @@ namespace DataBSDFWindow {
         Array2D<Real64> ThetaBm; // Theta angle corresponging to beam dir (hour, timestep) (rad)
         Array2D<Real64> PhiBm;   // Theta angle corresponging to beam dir (hour, timestep) (rad)
         BasisStruct Trn;
-        Array1D<Vector> sTrn;              // Central direction vectors of Outgoing grid (World coords)
-        Array1D<BSDFDaylghtPosition> pTrn; // azimuth and altitude of incidence vectors
-        Array1D<int> NSurfInt;              // No. of basis rays intersecting back surface (dim from
+        EPVector<Vector> sTrn;              // Central direction vectors of Outgoing grid (World coords)
+        EPVector<BSDFDaylghtPosition> pTrn; // azimuth and altitude of incidence vectors
+        EPVector<int> NSurfInt;              // No. of basis rays intersecting back surface (dim from
         // NBkSurf in BSDF State Descr)
         Array2D_int SurfInt;    // Basis index (IBkSurf, j) of the jth ray intersecting IBkSurf
         Array2D<Real64> SjdotN; // dot product (IBksurf, j) of the jth ray direction with
@@ -214,7 +213,7 @@ namespace DataBSDFWindow {
         // direction (Trn) (no of outgoing dir, NBKSurf)
         Array2D<Real64>
             ARhoVisOverlap; // Overlap areas multiplied with surface reflectance for each outgoing direction (Trn) (no of outgoing dir, NBKSurf)
-        Array1D<Real64> AveRhoVisOverlap; // Average visible reflectance from overlap surface which originates from one outgoing direction
+        EPVector<Real64> AveRhoVisOverlap; // Average visible reflectance from overlap surface which originates from one outgoing direction
         bool InitState;                   // Flag for marking that state needs to be initalized
 
         // Default Constructor
@@ -226,9 +225,9 @@ namespace DataBSDFWindow {
     struct BSDFRefPoints
     {
         // Members
-        Array1D<int> NSky;                   // number of sky elements for each window element (# window el)
-        Array1D<int> NGnd;                   // number of ground elements for each window element (# window el)
-        Array1D<int> NReflSurf;              // number of Inc basis rays from reflecting surfaces (# window el)
+        EPVector<int> NSky;                   // number of sky elements for each window element (# window el)
+        EPVector<int> NGnd;                   // number of ground elements for each window element (# window el)
+        EPVector<int> NReflSurf;              // number of Inc basis rays from reflecting surfaces (# window el)
         Array2D_int SkyIndex;               // list of sky basis indices (# window el, NSky)
         Array2D_int GndIndex;               // list of gnd basis indices (# window el, NGnd)
         Array2D<Vector> GndPt;              // gnd intersection pt of gnd basis ray (z=0) (# window el, NGnd)
@@ -239,9 +238,9 @@ namespace DataBSDFWindow {
         Array3D_int HitSurfNo;        // for a given ray striking surface, list of intersected surf nos (# window el, NReflSurf, RefRayNHits)
         Array3D<Real64> HitSurfDSq;   // for a given ray striking surface, list of distance^2 from window (# window el, NReflSurf, RefRayNHits)
         Array3D<Vector> HitPt;        // for a given ray striking surface, list of hit pts (# window el, NReflSurf, RefRayNHits)
-        Array1D<int> RefPointIndex;    // outgoing direction which containts reference point (# window el)
+        EPVector<int> RefPointIndex;    // outgoing direction which containts reference point (# window el)
         EPVector<bool> RefPointIntersection; // determines if reference point is laying in light tube of bsdf outgoing direction (NTrnBasis)
-        Array1D<Real64> RefPtIntPosFac; // position factors for intersections from reference point to window for each outgoing direction (NTrnBasis)
+        EPVector<Real64> RefPtIntPosFac; // position factors for intersections from reference point to window for each outgoing direction (NTrnBasis)
 
         // Default Constructor
         BSDFRefPoints()
@@ -254,7 +253,7 @@ namespace DataBSDFWindow {
         // Members
         Array2D<BSDFRefPoints>
             IlluminanceMap; // array to keep bsdf coefficients for different illuminance maps (# of illuminance maps, # of reference points)
-        Array1D<BSDFRefPoints> RefPoint; // keep reference points daylight coefficients (# of reference points)
+        EPVector<BSDFRefPoints> RefPoint; // keep reference points daylight coefficients (# of reference points)
 
         // Default Constructor
         BSDFDaylghtGeomDescr()
@@ -301,25 +300,25 @@ namespace DataBSDFWindow {
         //(for reflection of interior diffuse radiation)
         int NLayers;                  // Number of absorbing layers in this window
         Array3D<Real64> WinBmFtAbs;   // Front directional absorptance (hour, timestep, layer)
-        Array1D<Real64> WinSkyFtAbs;  // Front absorptance (layer) averaged over sky
-        Array1D<Real64> WinSkyGndAbs; // Front absorptance (layer) averaged over ground
+        EPVector<Real64> WinSkyFtAbs;  // Front absorptance (layer) averaged over sky
+        EPVector<Real64> WinSkyGndAbs; // Front absorptance (layer) averaged over ground
         // viewed part of gnd  (for ground-reflected sky radiation)
         Array3D<Real64> WinBmGndAbs; // Front absorptance (hour, timestep, layer) averaged
         // over unshaded ground viewed by beam
-        Array1D<Real64> WinFtHemAbs;      // Front hemispherical absorptance (layers)
-        Array1D<Real64> WinBkHemAbs;      // Back hemispherical absorptance (layers)
+        EPVector<Real64> WinFtHemAbs;      // Front hemispherical absorptance (layers)
+        EPVector<Real64> WinBkHemAbs;      // Back hemispherical absorptance (layers)
         Array3D<Real64> WinToSurfBmTrans; // Beam transmittance (hour, timestep, bk surf no)
         // to back surface
         // Note: the following will be evaluated only if the given back surface is a  window
-        Array1D<BSDFBkSurfDescr> BkSurf; // Structure dimensioned (bk surface no)
+        EPVector<BSDFBkSurfDescr> BkSurf; // Structure dimensioned (bk surface no)
         // Integrated beam values at front and back sides of window.  It is used in calculations of how much of the energy is
         // leaving throught the window to other zone or to the outside for certain beam direction
-        Array1D<Real64> IntegratedFtAbs;   // Sum of all back layer absorptances (for each back direction)
-        Array1D<Real64> IntegratedFtRefl;  // Integrated back layer reflectance (for each back direction)
-        Array1D<Real64> IntegratedFtTrans; // Integrated back layer transmittance (for each back direction)
-        Array1D<Real64> IntegratedBkAbs;   // Sum of all back layer absorptances (for each back direction)
-        Array1D<Real64> IntegratedBkRefl;  // Integrated back layer reflectance (for each back direction)
-        Array1D<Real64> IntegratedBkTrans; // Integrated back layer transmittance (for each back direction)
+        EPVector<Real64> IntegratedFtAbs;   // Sum of all back layer absorptances (for each back direction)
+        EPVector<Real64> IntegratedFtRefl;  // Integrated back layer reflectance (for each back direction)
+        EPVector<Real64> IntegratedFtTrans; // Integrated back layer transmittance (for each back direction)
+        EPVector<Real64> IntegratedBkAbs;   // Sum of all back layer absorptances (for each back direction)
+        EPVector<Real64> IntegratedBkRefl;  // Integrated back layer reflectance (for each back direction)
+        EPVector<Real64> IntegratedBkTrans; // Integrated back layer transmittance (for each back direction)
 
         // Default Constructor
         BSDFStateDescr() : Konst(0), WinSkyTrans(0.0), WinSkyGndTrans(0.0), WinBkHemRefl(0.0), WinBkHemVisRefl(0.0), NLayers(0)
@@ -330,8 +329,8 @@ namespace DataBSDFWindow {
     struct BSDFRefPointsGeomDescr
     {
         // Members
-        Array1D<Real64> SolidAngle;    // Solid angle from daylighting reference point to each window element (# window el)
-        Array1D<Vector> SolidAngleVec; // unit vector from reference point towards center of window element (# window el)
+        EPVector<Real64> SolidAngle;    // Solid angle from daylighting reference point to each window element (# window el)
+        EPVector<Vector> SolidAngleVec; // unit vector from reference point towards center of window element (# window el)
 
         // Default Constructor
         BSDFRefPointsGeomDescr()
@@ -346,18 +345,18 @@ namespace DataBSDFWindow {
         // This is dimensioned like SurfaceWindow, but only surfaces that are complex windows
         // will have the structure below allocated
         int NumStates;                             // Number of states for this window
-        Array1D<BSDFGeomDescr> Geom;               // This is dimensioned with number of states
-        Array1D<BSDFDaylghtGeomDescr> DaylghtGeom; // This is dimensioned with number of states
+        EPVector<BSDFGeomDescr> Geom;               // This is dimensioned with number of states
+        EPVector<BSDFDaylghtGeomDescr> DaylghtGeom; // This is dimensioned with number of states
         bool DaylightingInitialized;               // used for one time initialization only
         int NBkSurf;                               // Number of back (interior) surfaces viewed by this window
-        Array1D<Vector> sWinSurf;                  // Unit vector from window center to center of IBkSurf
-        Array1D<Real64> sdotN;                     // Dot product of unit vector s with back surface normal
+        EPVector<Vector> sWinSurf;                  // Unit vector from window center to center of IBkSurf
+        EPVector<Real64> sdotN;                     // Dot product of unit vector s with back surface normal
         // here s is vector from center of window to center of back surface
         // Function of the following subsumed by using an index of 0 if no beam incidence
         // REAL(r64), DIMENSION(: , : ), ALLOCATABLE  ::  SolBmWt  !Intensity wt for beam radiation (Hour, timestep)
         Array2D<BSDFRefPointsGeomDescr>
             IlluminanceMap; // array to keep bsdf coefficients for different illuminance maps (# of illuminance maps, # of reference points)
-        Array1D<BSDFRefPointsGeomDescr> RefPoint; // keep reference points daylight coefficients (# of reference points)
+        EPVector<BSDFRefPointsGeomDescr> RefPoint; // keep reference points daylight coefficients (# of reference points)
 
         // Default Constructor
         BSDFWindowGeomDescr() : DaylightingInitialized(false), NBkSurf(0)
@@ -381,7 +380,7 @@ namespace DataBSDFWindow {
         // actual result (total cooling load or whatever), one needs to have
         // some information about all the states to decide where to
         // set the state variable for the next time step
-        Array1D<BSDFStateDescr> State; // State description, dimensioned with number of states
+        EPVector<BSDFStateDescr> State; // State description, dimensioned with number of states
 
         // Default Constructor
         BSDFWindowDescript() : CurrentState(1)
@@ -436,7 +435,7 @@ namespace DataBSDFWindow {
         // INTEGER   :: ThermalConstruction  !Pointer to location in Construct array of thermal construction for the state
         // (to be implemented)
         int NumLayers;
-        Array1D<BSDFLayerAbsorpStruct> Layer;
+        EPVector<BSDFLayerAbsorpStruct> Layer;
 
         // Default Constructor
         BSDFWindowInputStruct()
@@ -448,7 +447,7 @@ namespace DataBSDFWindow {
     };
 
     // Object Data
-    extern Array1D<BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
+    extern EPVector<BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
 
 } // namespace DataBSDFWindow
 

@@ -1887,15 +1887,17 @@ namespace WindowComplexManager {
             J = Geom.SkyIndex(I);
             Geom.SolSkyWt(I) = SkyWeight(Geom.sInc(J));
         }
-        WtSum = sum(Geom.SolSkyWt({1, NSky}));
-        Geom.SolSkyWt({1, NSky}) /= WtSum;
+        WtSum = std::accumulate(Geom.SolSkyWt.begin(), Geom.SolSkyWt.end(), 0.0);
+        std::transform(Geom.SolSkyWt.begin(), Geom.SolSkyWt.end(), Geom.SolSkyWt.begin(), [WtSum](Real64 v){return v/WtSum;});
+        //Geom.SolSkyWt({1, NSky}) /= WtSum;
         // SkyGround Weights
         Geom.SolSkyGndWt.allocate(NGnd);
         for (I = 1; I <= NGnd; ++I) {
             Geom.SolSkyGndWt(I) = SkyGndWeight(Geom.GndPt(I));
         }
-        WtSum = sum(Geom.SolSkyGndWt({1, NGnd}));
-        Geom.SolSkyGndWt({1, NGnd}) /= WtSum;
+        WtSum = std::accumulate(Geom.SolSkyGndWt.begin(), Geom.SolSkyGndWt.end(), 0.0);
+        std::transform(Geom.SolSkyGndWt.begin(), Geom.SolSkyGndWt.end(), Geom.SolSkyGndWt.begin(), [WtSum](Real64 v){return v/WtSum;});
+        //Geom.SolSkyGndWt({1, NGnd}) /= WtSum;
         //  Weights for beam reflected from ground are calculated after shading
         //  interval is determined
         // Transmitted Basis:
@@ -1965,7 +1967,7 @@ namespace WindowComplexManager {
             }
         } // ray loop
         //  All rays traced, now put away the results in the temporary arrays
-        MaxInt = maxval(Geom.NSurfInt);
+        MaxInt = *std::max_element(Geom.NSurfInt.begin(), Geom.NSurfInt.end());
         Geom.SurfInt.allocate(MaxInt, Window.NBkSurf);
         Geom.SjdotN.allocate(MaxInt, Window.NBkSurf);
         Geom.SurfInt = 0;
