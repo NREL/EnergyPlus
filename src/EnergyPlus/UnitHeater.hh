@@ -49,7 +49,6 @@
 #define UnitHeater_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -159,7 +158,7 @@ namespace UnitHeater {
     struct UnitHeatNumericFieldData
     {
         // Members
-        Array1D<std::string> FieldNames;
+        EPVector<std::string> FieldNames;
 
         // Default Constructor
         UnitHeatNumericFieldData()
@@ -168,8 +167,8 @@ namespace UnitHeater {
     };
 
     // Object Data
-    extern Array1D<UnitHeaterData> UnitHeat;
-    extern Array1D<UnitHeatNumericFieldData> UnitHeatNumericFields;
+    extern EPVector<UnitHeaterData> UnitHeat;
+    extern EPVector<UnitHeatNumericFieldData> UnitHeatNumericFields;
 
     // Functions
 
@@ -215,7 +214,7 @@ namespace UnitHeater {
     void ReportUnitHeater(int const UnitHeatNum); // Unit index in unit heater array
 
     Real64 CalcUnitHeaterResidual(Real64 const PartLoadRatio, // heating coil part load ratio
-                                  Array1D<Real64> const &Par  // Function parameters
+                                  EPVector<Real64> const &Par  // Function parameters
     );
 
 } // namespace UnitHeater

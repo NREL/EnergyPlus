@@ -423,12 +423,12 @@ namespace UnitarySystems {
                 int NumNumbers = 0;
                 inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
                 int IOStatus = 0;
-                Array1D<std::string> Alphas(NumAlphas);
-                Array1D<Real64> Numbers(NumNumbers, 0.0);
+                EPVector<std::string> Alphas(NumAlphas);
+                EPVector<Real64> Numbers(NumNumbers, 0.0);
                 EPVector<bool> lNumericBlanks(NumNumbers, true);
                 EPVector<bool> lAlphaBlanks(NumAlphas, true);
-                Array1D<std::string> cAlphaFields(NumAlphas);
-                Array1D<std::string> cNumericFields(NumNumbers);
+                EPVector<std::string> cAlphaFields(NumAlphas);
+                EPVector<std::string> cNumericFields(NumNumbers);
                 inputProcessor->getObjectItem(cCurrentModuleObject,
                                               ++designSpecNum,
                                               Alphas,

@@ -118,7 +118,7 @@ namespace SwimmingPool {
     int NumSwimmingPools(0); // Number of swimming pools
     EPVector<bool> CheckEquipName;
     bool getSwimmingPoolInput = true;
-    Array1D<SwimmingPoolData> Pool;
+    EPVector<SwimmingPoolData> Pool;
 
     void clear_state()
     {
@@ -187,12 +187,12 @@ namespace SwimmingPool {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);         // Set to true if something goes wrong
         std::string CurrentModuleObject; // for ease in getting objects
-        Array1D<std::string> Alphas;           // Alpha items for object
-        Array1D<std::string> cAlphaFields;     // Alpha field names
-        Array1D<std::string> cNumericFields;   // Numeric field names
+        EPVector<std::string> Alphas;           // Alpha items for object
+        EPVector<std::string> cAlphaFields;     // Alpha field names
+        EPVector<std::string> cNumericFields;   // Numeric field names
         int IOStatus;                    // Used in GetObjectItem
         int Item;                        // Item to be "gotten"
-        Array1D<Real64> Numbers;         // Numeric items for object
+        EPVector<Real64> Numbers;         // Numeric items for object
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumArgs;                     // Unused variable that is part of a subroutine call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call

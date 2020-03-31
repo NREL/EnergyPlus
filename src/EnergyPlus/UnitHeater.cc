@@ -162,8 +162,8 @@ namespace UnitHeater {
     // SUBROUTINE SPECIFICATIONS FOR MODULE UnitHeater
 
     // Object Data
-    Array1D<UnitHeaterData> UnitHeat;
-    Array1D<UnitHeatNumericFieldData> UnitHeatNumericFields;
+    EPVector<UnitHeaterData> UnitHeat;
+    EPVector<UnitHeatNumericFieldData> UnitHeatNumericFields;
 
     // Functions
 
@@ -307,10 +307,10 @@ namespace UnitHeater {
         static std::string const RoutineName("GetUnitHeaterInput: "); // include trailing blank space
         Real64 FanVolFlow;                                            // Fan volumetric flow rate
         std::string CurrentModuleObject;
-        Array1D<std::string> Alphas;         // Alpha items for object
-        Array1D<Real64> Numbers;       // Numeric items for object
-        Array1D<std::string> cAlphaFields;   // Alpha field names
-        Array1D<std::string> cNumericFields; // Numeric field names
+        EPVector<std::string> Alphas;         // Alpha items for object
+        EPVector<Real64> Numbers;       // Numeric items for object
+        EPVector<std::string> cAlphaFields;   // Alpha field names
+        EPVector<std::string> cNumericFields; // Numeric field names
         EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         int CtrlZone;                  // index to loop counter
@@ -1432,7 +1432,7 @@ namespace UnitHeater {
         Real64 SpecHumOut;      // Specific humidity ratio of outlet air (kg moisture / kg moist air)
         Real64 SpecHumIn;       // Specific humidity ratio of inlet air (kg moisture / kg moist air)
         Real64 mdot;            // local temporary for fluid mass flow rate
-        Array1D<Real64> Par(3); // parameters passed to RegulaFalsi function
+        EPVector<Real64> Par(3); // parameters passed to RegulaFalsi function
         int OpMode;
         Real64 PartLoadFrac;
         Real64 NoOutput;
@@ -1931,7 +1931,7 @@ namespace UnitHeater {
     }
 
     Real64 CalcUnitHeaterResidual(Real64 const PartLoadRatio, // heating coil part load ratio
-                                  Array1D<Real64> const &Par  // Function parameters
+                                  EPVector<Real64> const &Par  // Function parameters
     )
     {
 

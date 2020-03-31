@@ -106,10 +106,10 @@ namespace UserDefinedComponents {
     bool GetInput(true);
     bool GetPlantCompInput(true);
 
-    Array1D<UserPlantComponentStruct> UserPlantComp;
-    Array1D<UserCoilComponentStruct> UserCoil;
-    Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
-    Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
+    EPVector<UserPlantComponentStruct> UserPlantComp;
+    EPVector<UserCoilComponentStruct> UserCoil;
+    EPVector<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
+    EPVector<UserAirTerminalComponentStruct> UserAirTerminal;
 
     void clear_state()
     {
@@ -519,10 +519,10 @@ namespace UserDefinedComponents {
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
         int TotalArgs; // argument for call to GetObjectDefMaxArgs
-        Array1D<std::string> cAlphaFieldNames;
+        EPVector<std::string> cAlphaFieldNames;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D<std::string> cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<std::string> cAlphaArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         std::string LoopStr;
         static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
@@ -1247,10 +1247,10 @@ namespace UserDefinedComponents {
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
         int TotalArgs; // argument for call to GetObjectDefMaxArgs
-        Array1D<std::string> cAlphaFieldNames;
+        EPVector<std::string> cAlphaFieldNames;
         EPVector<bool> lAlphaFieldBlanks;
-        Array1D<std::string> cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<std::string> cAlphaArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         std::string LoopStr;
         static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference

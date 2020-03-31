@@ -49,7 +49,6 @@
 #define UnitVentilator_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -238,7 +237,7 @@ namespace UnitVentilator {
     struct UnitVentNumericFieldData
     {
         // Members
-        Array1D<std::string> FieldNames;
+        EPVector<std::string> FieldNames;
 
         // Default Constructor
         UnitVentNumericFieldData()
@@ -247,8 +246,8 @@ namespace UnitVentilator {
     };
 
     // Object Data
-    extern Array1D<UnitVentilatorData> UnitVent;
-    extern Array1D<UnitVentNumericFieldData> UnitVentNumericFields;
+    extern EPVector<UnitVentilatorData> UnitVent;
+    extern EPVector<UnitVentNumericFieldData> UnitVentNumericFields;
 
     // Functions
 
@@ -306,7 +305,7 @@ namespace UnitVentilator {
     int GetUnitVentilatorReturnAirNode(int const UnitVentNum);
 
     Real64 CalcUnitVentilatorResidual(Real64 const PartLoadRatio, // Coil Part Load Ratio
-                                      Array1D<Real64> const &Par  // Function parameters
+                                      EPVector<Real64> const &Par  // Function parameters
     );
     
     Real64 SetOAMassFlowRateForCoolingVariablePercent(int const UnitVentNum,        // Unit Ventilator index number

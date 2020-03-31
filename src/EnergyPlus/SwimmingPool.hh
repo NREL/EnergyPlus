@@ -48,9 +48,6 @@
 #ifndef SwimmingPool_hh_INCLUDED
 #define SwimmingPool_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -135,15 +132,15 @@ namespace SwimmingPool {
         bool MyOneTimeFlag;
         bool MyEnvrnFlagGeneral;
         bool MyPlantScanFlagPool;
-        Array1D<int> SurfaceToPoolIndex;
-        Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular radiant surface
-        Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
-        Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+        EPVector<int> SurfaceToPoolIndex;
+        EPVector<Real64> QPoolSrcAvg;          // Average source over the time step for a particular radiant surface
+        EPVector<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
+        EPVector<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
         // Record keeping variables used to calculate QRadSysSrcAvg locally
-        Array1D<Real64> LastQPoolSrc;       // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+        EPVector<Real64> LastQPoolSrc;       // Need to keep the last value in case we are still iterating
+        EPVector<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
+        EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+        EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
         // Default Constructor
         SwimmingPoolData()
@@ -184,7 +181,7 @@ namespace SwimmingPool {
     };
 
     // Object Data
-    extern Array1D<SwimmingPoolData> Pool;
+    extern EPVector<SwimmingPoolData> Pool;
 
     void clear_state();
 
