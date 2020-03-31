@@ -3853,7 +3853,7 @@ namespace ConvectionCoefficients {
         if (std::abs(cosTilt) >= 0.9239) {   // Horizontal Surface
             if (DeltaTemp * cosTilt < 0.0) { // Horizontal, Reduced Convection
                 return 0.948;
-            } else if (DeltaTemp * cosTilt == 0.0) { // Vertical Surface
+            } else if (DeltaTemp * cosTilt == 0.0 || (DeltaTemp * cosTilt < 0.000001 && DeltaTemp * cosTilt > 0.0)) { // Vertical Surface
                 return 3.076;
             } else /*if (DeltaTemp * cosTilt > 0.0)*/ { // Horizontal, Enhanced Convection
                 return 4.040;
@@ -3861,7 +3861,7 @@ namespace ConvectionCoefficients {
         } else {                             // Tilted Surface
             if (DeltaTemp * cosTilt < 0.0) { // Tilted, Reduced Convection
                 return 2.281;
-            } else if (DeltaTemp * cosTilt == 0.0) { // Vertical Surface
+            } else if (DeltaTemp * cosTilt == 0.0 || (DeltaTemp * cosTilt < 0.000001 && DeltaTemp * cosTilt > 0.0)) { // Vertical Surface
                 return 3.076;
             } else /*if (DeltaTemp * cosTilt > 0.0)*/ { // Tilted, Enhanced Convection
                 return 3.870;
