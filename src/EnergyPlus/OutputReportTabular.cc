@@ -7480,8 +7480,8 @@ namespace OutputReportTabular {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   November 2003
-        //       MODIFIED       January 2010, Kyle Benne
-        //                      Added SQLite output
+        //       MODIFIED       January 2010, Kyle Benne; Added SQLite output
+        //                      March 2020, Dareum Nam; Disaggregated "Additional Fuel"
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -9174,7 +9174,7 @@ namespace OutputReportTabular {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar
         //       DATE WRITTEN   September 2011
-        //       MODIFIED       na
+        //       MODIFIED       March 2020, Dareum Nam; Disaggregated "Additional Fuel"
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -9534,8 +9534,8 @@ namespace OutputReportTabular {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   January 2009
-        //       MODIFIED       January 2010, Kyle Benne
-        //                      Added SQLite output
+        //       MODIFIED       January 2010, Kyle Benne; Added SQLite output
+        //                      March 2020, Dareum Nam; Disaggregated "Additional Fuel"
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -9631,65 +9631,6 @@ namespace OutputReportTabular {
             collapsedTotal(13) = gatherDemandTotal(7); // water
             collapsedTimeStep(13) = gatherDemandTimeStamp(7);
             
-            /*
-            // select which of the additional fuels should be displayed based on which has the highest
-            // demand. This is usually likely to be the only additional fuel that is actually being used.
-            // If an additional fuel is non-zero, a footnote to the table is added.
-            // First step is to see if any additional fuels are non-zero
-            additionalFuelNonZeroCount = 0;
-            if (gatherDemandTotal(6) > 0.0) ++additionalFuelNonZeroCount;
-            if (gatherDemandTotal(8) > 0.0) ++additionalFuelNonZeroCount;
-            if (gatherDemandTotal(9) > 0.0) ++additionalFuelNonZeroCount;
-            if (gatherDemandTotal(10) > 0.0) ++additionalFuelNonZeroCount;
-            if (gatherDemandTotal(11) > 0.0) ++additionalFuelNonZeroCount;
-            if (gatherDemandTotal(12) > 0.0) ++additionalFuelNonZeroCount;
-            if (gatherDemandTotal(13) > 0.0) ++additionalFuelNonZeroCount;
-            if (gatherDemandTotal(14) > 0.0) ++additionalFuelNonZeroCount;
-            if (additionalFuelNonZeroCount > 1) {
-                footnote = "Additional fuels have non-zero demand but are not shown on this report.";
-            }
-            // assuming that at least one of these is non-zero
-            additionalFuelSelected = 12; // default is propane if no other given
-            additionalFuelMax = gatherDemandTotal(12);
-            if (additionalFuelNonZeroCount > 0) {
-                if (gatherDemandTotal(6) > additionalFuelMax) { // gasoline
-                    additionalFuelSelected = 6;
-                    additionalFuelMax = gatherDemandTotal(6);
-                }
-                if (gatherDemandTotal(8) > additionalFuelMax) { // diesel
-                    additionalFuelSelected = 8;
-                    additionalFuelMax = gatherDemandTotal(8);
-                }
-                if (gatherDemandTotal(9) > additionalFuelMax) { // coal
-                    additionalFuelSelected = 9;
-                    additionalFuelMax = gatherDemandTotal(9);
-                }
-                if (gatherDemandTotal(10) > additionalFuelMax) { // fuel oil #1
-                    additionalFuelSelected = 10;
-                    additionalFuelMax = gatherDemandTotal(10);
-                }
-                if (gatherDemandTotal(11) > additionalFuelMax) { // fuel oil #2
-                    additionalFuelSelected = 11;
-                    additionalFuelMax = gatherDemandTotal(11);
-                }
-                if (gatherDemandTotal(12) > additionalFuelMax) { // propane
-                    additionalFuelSelected = 12;
-                    additionalFuelMax = gatherDemandTotal(12);
-                }
-                if (gatherDemandTotal(13) > additionalFuelMax) { // otherfuel1
-                    additionalFuelSelected = 13;
-                    additionalFuelMax = gatherDemandTotal(13);
-                }
-                if (gatherDemandTotal(14) > additionalFuelMax) { // otherfuel2
-                    additionalFuelSelected = 14;
-                    additionalFuelMax = gatherDemandTotal(14);
-                }
-            }
-            // set the time of peak demand and total demand for the additinoal fuel selected
-           // collapsedTimeStep(3) = gatherDemandTimeStamp(additionalFuelSelected);
-           // collapsedTotal(3) = gatherDemandTotal(additionalFuelSelected);
-            */
-
             // set flag if both puchased heating and steam both have positive demand
             bothDistrHeatNonZero = (gatherDemandTotal(4) > 0.0) && (gatherDemandTotal(5) > 0.0);
             // select the district heating source that has a larger demand
