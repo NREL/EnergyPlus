@@ -49,8 +49,14 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <ostream>
 #include <random>
 #include <string>
+#include <map>
+#include <algorithm>
+
+#include <fmt/format.h>
+#include <milo/dtoa.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -58,7 +64,6 @@
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/Reference.fwd.hh>
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -73,6 +78,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -89,8 +95,6 @@ namespace ResultsFramework {
     using General::TrimSigDigits;
     using OutputProcessor::RealVariableType;
     using OutputProcessor::RealVariables;
-
-    static ObjexxFCL::gio::Fmt fmtLD("*");
 
     std::unique_ptr<ResultsSchema> OutputSchema(new ResultsSchema);
 
@@ -1057,6 +1061,253 @@ namespace ResultsFramework {
         }
     }
 
+    void ResultsSchema::writeOutputs()
+    {
+        writeCSVOutput();
+
+        if (timeSeriesEnabled()) {
+            writeTimeSeriesReports();
+        }
+
+        if (timeSeriesAndTabularEnabled()) {
+            writeReport();
+        }
+    }
+
+    void ResultsSchema::parseTSOutputs(json const & data, std::map<std::string, std::vector<std::string>> & outputs)
+    {
+        std::vector<int> indices;
+        std::string search_string;
+
+        std::string reportFrequency = data.at("ReportFrequency").get<std::string>();
+        if (reportFrequency == "Detailed-HVAC" || reportFrequency == "Detailed-Zone") {
+            reportFrequency = "Each Call";
+        }
+        auto const & columns = data.at("Cols");
+        for (auto const & column : columns) {
+            search_string = fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), reportFrequency);
+            auto found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
+            if (found == outputVariables.end()) {
+                ShowFatalError(fmt::format("Output variable ({0}) not found output variable list", search_string));
+            }
+            indices.emplace_back(std::distance(outputVariables.begin(), found));
+        }
+
+        auto const & rows = data.at("Rows");
+        for (auto const & row : rows) {
+            for (auto& el : row.items()) {
+//                if (el.key() == "1") {
+//                    std::string test = "";
+//                }
+                auto found_key = outputs.find(el.key());
+                if (found_key == outputs.end()) {
+                    std::vector<std::string> output(outputVariables.size());
+                    int i = 0;
+                    for (auto const & col : el.value()) {
+                        dtoa(col.get<double>(), s);
+                        output[indices[i]] = s;
+//                        output[indices[i]] = col.get<std::string>();
+                        ++i;
+                    }
+                    outputs[el.key()] = output;
+                } else {
+                    int i = 0;
+                    for (auto const & col : el.value()) {
+                        dtoa(col.get<double>(), s);
+                        found_key->second[indices[i]] = s;
+//                        found_key->second[indices[i]] = col.get<std::string>();
+                        ++i;
+                    }
+                }
+            }
+        }
+    }
+
+    void ResultsSchema::writeCSVOutput()
+    {
+        std::map<std::string, std::vector<std::string>> outputs;
+        OutputProcessor::ReportingFrequency reportingFrequency;
+        bool hasMonthly = false;
+
+        // Output yearly time series data
+        if (RIYearlyTSData.iDataFrameEnabled() || RIYearlyTSData.rDataFrameEnabled()) {
+            auto json_data = RIYearlyTSData.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
+        }
+
+        if (YRMeters.rDataFrameEnabled()) {
+            auto json_data =  YRMeters.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
+        }
+
+        // Output run period time series data
+        if (RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled()) {
+            auto json_data = RIRunPeriodTSData.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Simulation;
+        }
+
+        if (SMMeters.rDataFrameEnabled()) {
+            auto json_data =  SMMeters.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Simulation;
+        }
+
+        // Output monthly time series data
+        if (RIMonthlyTSData.iDataFrameEnabled() || RIMonthlyTSData.rDataFrameEnabled()) {
+            auto json_data = RIMonthlyTSData.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Monthly;
+            hasMonthly = true;
+        }
+
+        if (MNMeters.rDataFrameEnabled()) {
+            auto json_data =  MNMeters.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Monthly;
+            hasMonthly = true;
+        }
+
+        // Output daily time series data
+        if (RIDailyTSData.iDataFrameEnabled() || RIDailyTSData.rDataFrameEnabled()) {
+            auto json_data = RIDailyTSData.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Daily;
+        }
+
+        if (DYMeters.rDataFrameEnabled()) {
+            auto json_data =  DYMeters.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Daily;
+        }
+
+        // Output hourly time series data
+        if (RIHourlyTSData.iDataFrameEnabled() || RIHourlyTSData.rDataFrameEnabled()) {
+            auto json_data = RIHourlyTSData.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Hourly;
+        }
+
+        if (HRMeters.rDataFrameEnabled()) {
+            auto json_data =  HRMeters.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Hourly;
+        }
+
+        // Output timestep time series data
+        if (RITimestepTSData.iDataFrameEnabled() || RITimestepTSData.rDataFrameEnabled()) {
+            auto json_data = RITimestepTSData.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::TimeStep;
+        }
+
+        if (TSMeters.rDataFrameEnabled()) {
+            auto json_data = TSMeters.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::TimeStep;
+        }
+
+        // Output detailed HVAC time series data
+        if (RIDetailedHVACTSData.iDataFrameEnabled() || RIDetailedHVACTSData.rDataFrameEnabled()) {
+            auto json_data = RIDetailedHVACTSData.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::EachCall;
+        }
+
+        // Output detailed Zone time series data
+        if (RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled()) {
+            auto json_data = RIDetailedZoneTSData.getJSON();
+            parseTSOutputs(json_data, outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::EachCall;
+        }
+
+        std::map<std::string, std::string> endOfMonth;
+        if (hasMonthly) {
+            std::map<std::string, std::string> months({{"1", "01"}, {"2", "02"}, {"3", "03"}, {"4", "04"}, {"5", "05"}, {"6", "06"}, {"7", "07"}, {"8", "08"}, {"9", "09"}, {"10", "10"}, {"11", "11"}, {"12", "12"}});
+            std::string prev_month;
+            auto it = outputs.begin(), prev = outputs.end();
+            if (it->first.size() > 1) {
+                prev_month = it->first.substr(0, 2);
+            }
+            for (it = outputs.begin(); it != outputs.end(); ++it) {
+                if (it->first.size() > 2) {
+                    prev = it;
+                    auto const & month = it->first.substr(0, 2);
+                    if (month != prev_month) {
+                        --prev;
+                        endOfMonth.emplace(prev_month, prev->first);
+                        prev_month = month;
+                    }
+                }
+            }
+            if (it == outputs.end()) {
+                endOfMonth.emplace(prev_month, prev->first);
+            }
+
+            for (auto const & month : months) {
+                auto found = outputs.find(month.first);
+                if (found != outputs.end()) {
+                    std::string datetime;
+                    auto found_datetime = endOfMonth.find(month.second);
+                    if (found_datetime != endOfMonth.end()) {
+                        datetime = found_datetime->second;
+                    }
+                    auto found_actual = outputs.find(datetime);
+                    if (found_actual != outputs.end()) {
+                        if(found->second.size() != found_actual->second.size()) {
+                            ShowFatalError("Unequal sizes in output array sizes");
+                        }
+                        for (std::size_t i = 0; i < found->second.size(); ++i) {
+                            if (found_actual->second[i].empty() && !found->second[i].empty()) {
+                                found_actual->second[i] = found->second[i];
+                            }
+                        }
+                    }
+                    outputs.erase(found);
+                }
+            }
+        }
+
+        auto & outputFiles = OutputFiles::getSingleton();
+
+        outputFiles.csv.open();
+        if (!outputFiles.csv.good()) {
+            ShowFatalError("OpenOutputFiles: Could not open file " + outputFiles.csv.fileName + " for output (write).");
+        }
+
+//        auto os = std::unique_ptr<std::iostream>(new std::fstream("/Users/m5z/outputs/test.csv", std::ios_base::in | std::ios_base::out | std::ios_base::trunc));
+
+        print(outputFiles.csv, "{}", "Date/Time,");
+
+//        *os << "Date/Time,";
+        std::string sep;
+        for (auto const & var : outputVariables) {
+            print(outputFiles.csv, "{}{}", sep, var);
+//            *os << sep << var;
+            if (sep.empty()) sep = ",";
+        }
+        print(outputFiles.csv, "{}", DataStringGlobals::NL);
+//        *os << DataStringGlobals::NL;
+
+        for (auto const & item : outputs) {
+            std::string datetime = item.first;
+            print(outputFiles.csv, " {},", datetime.replace(datetime.find(' '), 1, "  "));
+//            *os << ' ' << datetime.replace(datetime.find(' '), 1, "  ") << ",";
+            auto result = std::find_if(item.second.rbegin(), item.second.rend(), [](std::string const & v) { return !v.empty(); } );
+            auto last = item.second.end();
+            if (result != item.second.rend()) {
+                last = (result + 1).base();
+            }
+            print(item.second.begin(), last, outputFiles.csv, ",");
+//            std::copy(std::begin(item.second), last, std::ostream_iterator<std::string>(*os, ","));
+            print(outputFiles.csv, "{}{}", *last, DataStringGlobals::NL);
+//            *os << *last << DataStringGlobals::NL;
+        }
+        outputFiles.csv.close();
+    }
+
     void ResultsSchema::writeTimeSeriesReports()
     {
         // Output detailed Zone time series data
@@ -1100,7 +1351,7 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsSchema::WriteReport()
+    void ResultsSchema::writeReport()
     {
         json root, outputVars, rdd, meterVars, meterData;
         json rddvals = json::array();
@@ -1227,6 +1478,21 @@ namespace ResultsFramework {
 //            std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
 //            std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_stream));
         }
+    }
+
+    void ResultsSchema::addReportVariable(std::string const & keyedValue,
+                                          std::string const & variableName,
+                                          std::string const & units,
+                                          OutputProcessor::ReportingFrequency const reportingInterval)
+    {
+        outputVariables.emplace_back(fmt::format("{0}:{1} [{2}]({3})", keyedValue, variableName, units, reportingFrequency(reportingInterval)));
+    }
+
+    void ResultsSchema::addReportMeter(std::string const & meter,
+                                       std::string const & units,
+                                       OutputProcessor::ReportingFrequency const reportingInterval)
+    {
+        outputVariables.emplace_back(fmt::format("{0} [{1}]({2})", meter, units, reportingFrequency(reportingInterval)));
     }
 
     void clear_state()

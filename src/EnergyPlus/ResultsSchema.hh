@@ -313,8 +313,18 @@ namespace ResultsFramework {
         DataFrame SMMeters = DataFrame("RunPeriod");
         DataFrame YRMeters = DataFrame("Yearly");
 
-        void writeTimeSeriesReports();
-        void WriteReport();
+        void writeOutputs();
+
+        void addReportVariable(std::string const & keyedValue,
+                               std::string const & variableName,
+                               std::string const & units,
+                               OutputProcessor::ReportingFrequency const reportingInterval);
+
+        void addReportMeter(std::string const & meter,
+                            std::string const & units,
+                            OutputProcessor::ReportingFrequency const reportingInterval);
+        // void readRVI();
+        // void readMVI();
 
         SimInfo SimulationInformation;
 
@@ -328,6 +338,17 @@ namespace ResultsFramework {
         bool outputJSON = false;
         bool outputCBOR = false;
         bool outputMsgPack = false;
+        std::vector<std::string> outputVariables;
+
+        void writeTimeSeriesReports();
+        void writeReport();
+        void writeCSVOutput();
+
+    private:
+        char s[129] = {0};
+
+        void parseTSOutputs(json const & data,
+                            std::map<std::string, std::vector<std::string>> & outputs);
     };
 
     extern std::unique_ptr<ResultsSchema> OutputSchema;

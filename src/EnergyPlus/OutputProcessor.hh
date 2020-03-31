@@ -611,6 +611,8 @@ namespace OutputProcessor {
 
     ReportingFrequency determineFrequency(std::string const &FreqString);
 
+    std::string reportingFrequency(ReportingFrequency reportingInterval);
+
     void ProduceMinMaxString(std::string &String,                // Current value
                              int const DateValue,                // Date of min/max
                              ReportingFrequency const ReportFreq // Reporting Frequency

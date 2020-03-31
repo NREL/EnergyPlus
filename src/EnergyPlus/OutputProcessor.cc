@@ -753,6 +753,34 @@ namespace OutputProcessor {
         return " !Hourly";
     }
 
+    std::string reportingFrequency(ReportingFrequency reportingInterval)
+    {
+        switch (reportingInterval) {
+        case ReportingFrequency::EachCall:
+            return "Each Call";
+            break;
+        case ReportingFrequency::TimeStep:
+            return "TimeStep";
+            break;
+        case ReportingFrequency::Hourly:
+            return "Hourly";
+            break;
+        case ReportingFrequency::Daily:
+            return "Daily";
+            break;
+        case ReportingFrequency::Monthly:
+            return "Monthly";
+            break;
+        case ReportingFrequency::Yearly:
+            return "Annual";
+            break;
+        case ReportingFrequency::Simulation:
+            return "RunPeriod";
+            break;
+        }
+        return "Hourly";
+    }
+
     ReportingFrequency determineFrequency(const std::string &FreqString)
     {
 
@@ -4543,6 +4571,10 @@ namespace OutputProcessor {
                                                        false,
                                                        ScheduleName);
         }
+
+        ResultsFramework::OutputSchema->addReportVariable(keyedValue, variableName, UnitsString, reportingInterval);
+
+        // add to ResultsFramework for output variable list, need to check RVI/MVI later
     }
 
     void WriteMeterDictionaryItem(OutputFiles &outputFiles,
@@ -4726,6 +4758,9 @@ namespace OutputProcessor {
                                                        static_cast<int>(reportingInterval),
                                                        true);
         }
+
+        ResultsFramework::OutputSchema->addReportMeter(meterName, UnitsString, reportingInterval);
+        // add to ResultsFramework for output variable list, need to check RVI/MVI later
     }
 
     void WriteRealVariableOutput(RealVariables &realVar,             // Real variable to write out
@@ -5892,7 +5927,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                  if (present(EndUseKey)) {
                     if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::MakeUPPERCase(EndUseKey)) != endUseCategoryNames.end()) {
                         EndUseSub = "General";
-                    } 
+                    }
                 }
             }
             if (present(GroupKey)) {
@@ -8358,7 +8393,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
             unitsForVar(NumVariables) = RVariableTypes(Loop).units;
 
             ResourceTypes(NumVariables) = AssignResourceTypeNum(UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).ResourceType));
-            
+
             Names(NumVariables) = RVariableTypes(Loop).VarNameUC;
 
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {

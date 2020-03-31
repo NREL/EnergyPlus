@@ -53,6 +53,7 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <ostream>
+#include <iterator>
 
 namespace EnergyPlus {
 class OutputFile
@@ -72,6 +73,8 @@ private:
     explicit OutputFile(std::string FileName);
     std::unique_ptr<std::iostream> os;
     template <typename... Args> friend void print(OutputFile &of, fmt::string_view format_str, const Args &... args);
+    template <class InputIterator> friend void print(InputIterator first, InputIterator last, OutputFile &of, const char * delim);
+    template <class InputIterator> friend void print(InputIterator first, InputIterator last, OutputFile &outputFile);
     friend class OutputFiles;
 };
 
@@ -107,6 +110,8 @@ public:
     std::string outputSszTxtFileName{"eplusssz.txt"};
 
     OutputFile mtr{"eplusout.mtr"};
+
+    OutputFile csv{"eplusout.csv"};
 
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
@@ -147,6 +152,18 @@ template <typename... Args> void print(OutputFile &outputFile, fmt::string_view 
 {
     assert(outputFile.os);
     EnergyPlus::vprint(*outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
+}
+
+template <class InputIterator> void print(InputIterator first, InputIterator last, OutputFile &outputFile, const char * delim)
+{
+    assert(outputFile.os);
+    std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<InputIterator>::value_type>(*outputFile.os, delim));
+}
+
+template <class InputIterator> void print(InputIterator first, InputIterator last, OutputFile &outputFile)
+{
+    assert(outputFile.os);
+    std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<InputIterator>::value_type>(*outputFile.os));
 }
 
 template <typename... Args> std::string format(fmt::string_view format_str, const Args &... args)

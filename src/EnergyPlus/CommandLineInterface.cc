@@ -467,7 +467,8 @@ namespace CommandLineInterface {
         eplusADSFileName = inputDirPathName + "eplusADS.inp";
 
         // Readvars files
-        outputCsvFileName = outputFilePrefix + normalSuffix + ".csv";
+        OutputFiles::getSingleton().csv.fileName = outputFilePrefix + normalSuffix + ".csv";
+//        outputCsvFileName = outputFilePrefix + normalSuffix + ".csv";
         outputMtrCsvFileName = outputFilePrefix + meterSuffix + ".csv";
         outputRvauditFileName = outputFilePrefix + normalSuffix + ".rvaudit";
 

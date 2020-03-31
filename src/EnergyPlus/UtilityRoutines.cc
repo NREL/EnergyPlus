@@ -657,13 +657,7 @@ int AbortEnergyPlus()
     // Output detailed ZONE time series data
     SimulationManager::OpenOutputJsonFiles();
 
-    if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-        ResultsFramework::OutputSchema->writeTimeSeriesReports();
-    }
-
-    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-        ResultsFramework::OutputSchema->WriteReport();
-    }
+    ResultsFramework::OutputSchema->writeOutputs();
 
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);
@@ -941,13 +935,7 @@ int EndEnergyPlus()
     // Output detailed ZONE time series data
     SimulationManager::OpenOutputJsonFiles();
 
-    if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-        ResultsFramework::OutputSchema->writeTimeSeriesReports();
-    }
-
-    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-        ResultsFramework::OutputSchema->WriteReport();
-    }
+    ResultsFramework::OutputSchema->writeOutputs();
 
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);
