@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['getactuatorhandle',['getActuatorHandle',['../datatransfer_8h.html#a4e231591e59c83ad2b59fa3362403630',1,'datatransfer.h']]],
+  ['getactuatorvalue',['getActuatorValue',['../datatransfer_8h.html#a5fb4926132e736ba902182738176ce24',1,'datatransfer.h']]],
+  ['getconstructionhandle',['getConstructionHandle',['../datatransfer_8h.html#a89ef2a120ed8ccb2c82f0507cb14ad37',1,'datatransfer.h']]],
+  ['getinternalvariablehandle',['getInternalVariableHandle',['../datatransfer_8h.html#ae65fc86c8aea54e2c6170b03facaa802',1,'datatransfer.h']]],
+  ['getinternalvariablevalue',['getInternalVariableValue',['../datatransfer_8h.html#a5e786f3b4cb8c2f97cc774584762398b',1,'datatransfer.h']]],
+  ['getmeterhandle',['getMeterHandle',['../datatransfer_8h.html#ac70505e7e99558e62dcdacf1beea1bef',1,'datatransfer.h']]],
+  ['getmetervalue',['getMeterValue',['../datatransfer_8h.html#a325e63d1ddd491884bfae375d1f6dc53',1,'datatransfer.h']]],
+  ['getpluginglobalvariablehandle',['getPluginGlobalVariableHandle',['../datatransfer_8h.html#ac196675c7643c5a7d35d02a2e540f34b',1,'datatransfer.h']]],
+  ['getpluginglobalvariablevalue',['getPluginGlobalVariableValue',['../datatransfer_8h.html#aae592a1a04a181919b71668fea92f4fb',1,'datatransfer.h']]],
+  ['getplugintrendvariableaverage',['getPluginTrendVariableAverage',['../datatransfer_8h.html#a6149804f696698962838f508b9e31c0e',1,'datatransfer.h']]],
+  ['getplugintrendvariabledirection',['getPluginTrendVariableDirection',['../datatransfer_8h.html#a67ab7ea44fa9c5d75f2a8c64dfa1aaed',1,'datatransfer.h']]],
+  ['getplugintrendvariablehandle',['getPluginTrendVariableHandle',['../datatransfer_8h.html#abec2aa8de29ff4ebe03c80d115e1c4b2',1,'datatransfer.h']]],
+  ['getplugintrendvariablemax',['getPluginTrendVariableMax',['../datatransfer_8h.html#a0907523b5f7d0a3c15ac18c7f8a60c19',1,'datatransfer.h']]],
+  ['getplugintrendvariablemin',['getPluginTrendVariableMin',['../datatransfer_8h.html#a3aea1d8a816aa30d7da51acb97d38af7',1,'datatransfer.h']]],
+  ['getplugintrendvariablesum',['getPluginTrendVariableSum',['../datatransfer_8h.html#a572519c421e7b87724ddf7b6ef6103b5',1,'datatransfer.h']]],
+  ['getplugintrendvariablevalue',['getPluginTrendVariableValue',['../datatransfer_8h.html#ae4a9b90f8b4fcc9c59631f0acb1f789a',1,'datatransfer.h']]],
+  ['getvariablehandle',['getVariableHandle',['../datatransfer_8h.html#a890084610394cff4609115b1813c4ae7',1,'datatransfer.h']]],
+  ['getvariablevalue',['getVariableValue',['../datatransfer_8h.html#a9e1644e92c7fc68e00145a6f02976b58',1,'datatransfer.h']]],
+  ['glycolconductivity',['glycolConductivity',['../func_8h.html#a9666c26c2f31d27b21a006f86847103a',1,'func.h']]],
+  ['glycoldelete',['glycolDelete',['../func_8h.html#a53b76922cce918ab3ad3cff845c396be',1,'func.h']]],
+  ['glycoldensity',['glycolDensity',['../func_8h.html#af24325ed3b125c0794054bc249e5c042',1,'func.h']]],
+  ['glycolnew',['glycolNew',['../func_8h.html#a5eed7ff24a59d85cbfaa205018c6f7df',1,'func.h']]],
+  ['glycolspecificheat',['glycolSpecificHeat',['../func_8h.html#a8e7e5859ac3353f1598ad22f7077c05a',1,'func.h']]],
+  ['glycolviscosity',['glycolViscosity',['../func_8h.html#a27bbd9ebafb8d315533986327023884a',1,'func.h']]]
+];
