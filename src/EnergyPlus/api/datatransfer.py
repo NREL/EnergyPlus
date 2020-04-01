@@ -123,7 +123,7 @@ class DataExchange:
         Check whether the data exchange API is ready.
         Handles to variables, actuators, and other data are not reliably defined prior to this being true.
 
-        :return:
+        :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.
         """
         success = self.api.apiDataFullyReady()
         if success == 0:
@@ -602,7 +602,7 @@ class DataExchange:
         """
         Get the current day of the year (1-366)
 
-        :return: AN integer day of the year (1-366)
+        :return: An integer day of the year (1-366)
         """
         return self.api.dayOfYear()
 
