@@ -7844,20 +7844,19 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
         }
     }
 
-    for (auto& endUseSubCategoryName: endUseSubCategoryNames) {
-        for (auto& reportName: testReportNames) {
+    for (auto& reportName: testReportNames) {
 
-            std::string query("SELECT Value From TabularDataWithStrings"
-                              "  WHERE TableName = 'End Uses'"
-                              "  AND ColumnName = 'Electricity'"
-                              "  AND ReportName = '" + reportName + "'"
-                              "  AND RowName = '" + endUseName + "'");
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ColumnName = 'Electricity'"
+                          "  AND ReportName = '" + reportName + "'"
+                          "  AND RowName = '" + endUseName + "'");
 
-            auto result = queryResult(query, "TabularDataWithStrings");
+        auto result = queryResult(query, "TabularDataWithStrings");
 
-            ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
-        }
+        ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
     }
+
     
     // Specifically get the electricity usage for End Use = Exterior Lighting, and End Use Subcat = AnotherEndUseSubCat,
     // and make sure it's the right number that's returned

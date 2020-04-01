@@ -9590,9 +9590,6 @@ namespace OutputReportTabular {
         int i;
         int numRows;
         static std::string footnote;
-        Real64 additionalFuelMax;
-       // int additionalFuelSelected;
-       // int additionalFuelNonZeroCount;
         int distrHeatSelected;
         bool bothDistrHeatNonZero;
         Real64 powerConversion;
