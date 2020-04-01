@@ -1,0 +1,633 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>func &#8212; EnergyPlus Python API Documentation 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for func</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">ctypes</span> <span class="k">import</span> <span class="n">cdll</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">,</span> <span class="n">c_void_p</span><span class="p">,</span> <span class="n">CFUNCTYPE</span>
+<span class="kn">from</span> <span class="nn">types</span> <span class="k">import</span> <span class="n">FunctionType</span>
+<span class="kn">from</span> <span class="nn">pyenergyplus.common</span> <span class="k">import</span> <span class="n">RealEP</span>
+
+<span class="c1"># CFUNCTYPE wrapped Python callbacks need to be kept in memory explicitly, otherwise GC takes it</span>
+<span class="c1"># This causes undefined behavior but generally segfaults and illegal access violations</span>
+<span class="c1"># Keeping them referenced in a global array here suffices to keep GC away from it</span>
+<span class="c1"># And while we _could_ clean up after ourselves, I would imagine users aren&#39;t making *so* many callbacks that</span>
+<span class="c1"># We have anything to worry about here</span>
+<span class="n">error_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="Glycol"><a class="viewcode-back" href="../func.html#func.Glycol">[docs]</a><span class="k">class</span> <span class="nc">Glycol</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class provides access to the glycol property calculations inside EnergyPlus.</span>
+<span class="sd">    For now, the only glycol name allowed is plain water.  This is because other fluids are only</span>
+<span class="sd">    initialized when they are declared in the input file.  When calling through the API,</span>
+<span class="sd">    there is no input file, so no other fluids are declared.  This is ripe for a refactor to enable</span>
+<span class="sd">    additional fluids, but water will suffice for now.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">:</span> <span class="n">cdll</span><span class="p">,</span> <span class="n">glycol_name</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">api</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolNew</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolNew</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolDelete</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolDelete</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolSpecificHeat</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolSpecificHeat</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolDensity</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolDensity</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolConductivity</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolConductivity</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolViscosity</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolViscosity</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolNew</span><span class="p">(</span><span class="n">glycol_name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolDelete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Glycol.specific_heat"><a class="viewcode-back" href="../func.html#func.Glycol.specific_heat">[docs]</a>    <span class="k">def</span> <span class="nf">specific_heat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the specific heat of the fluid at the specified temperature.</span>
+
+<span class="sd">        :param temperature: Fluid temperature, in degrees Celsius</span>
+<span class="sd">        :return: The specific heat of the fluid, in J/kg-K</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolSpecificHeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Glycol.density"><a class="viewcode-back" href="../func.html#func.Glycol.density">[docs]</a>    <span class="k">def</span> <span class="nf">density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the density of the fluid at the specified temperature.</span>
+
+<span class="sd">        :param temperature: Fluid temperature, in degrees Celsius</span>
+<span class="sd">        :return: The density of the fluid, in kg/m3</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolDensity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Glycol.conductivity"><a class="viewcode-back" href="../func.html#func.Glycol.conductivity">[docs]</a>    <span class="k">def</span> <span class="nf">conductivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the conductivity of the fluid at the specified temperature.</span>
+
+<span class="sd">        :param temperature: Fluid temperature, in degrees Celsius</span>
+<span class="sd">        :return: The conductivity of the fluid, in W/m-K</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolConductivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Glycol.viscosity"><a class="viewcode-back" href="../func.html#func.Glycol.viscosity">[docs]</a>    <span class="k">def</span> <span class="nf">viscosity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the dynamic viscosity of the fluid at the specified temperature.</span>
+
+<span class="sd">        :param temperature: Fluid temperature, in degrees Celsius</span>
+<span class="sd">        :return: The dynamic viscosity of the fluid, in Pa-s (or kg/m-s)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">glycolViscosity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Refrigerant"><a class="viewcode-back" href="../func.html#func.Refrigerant">[docs]</a><span class="k">class</span> <span class="nc">Refrigerant</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class provides access to the refrigerant property calculations inside EnergyPlus.</span>
+<span class="sd">    For now, the only refrigerant  name allowed is steam.  This is because other refrigerants are only</span>
+<span class="sd">    initialized when they are declared in the input file.  When calling through the API, there is no</span>
+<span class="sd">    input file, so no other refrigerants are declared.  This should be improved through later enhancements,</span>
+<span class="sd">    but steam will provide a suitable use case for now.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">:</span> <span class="n">cdll</span><span class="p">,</span> <span class="n">refrigerant_name</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refrigerant_name</span> <span class="o">=</span> <span class="n">refrigerant_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">api</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantNew</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantNew</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantDelete</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantDelete</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturationPressure</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturationPressure</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturationTemperature</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturationTemperature</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturatedEnthalpy</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturatedEnthalpy</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturatedDensity</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturatedDensity</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturatedSpecificHeat</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturatedSpecificHeat</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantNew</span><span class="p">(</span><span class="n">refrigerant_name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantDelete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Refrigerant.saturation_pressure"><a class="viewcode-back" href="../func.html#func.Refrigerant.saturation_pressure">[docs]</a>    <span class="k">def</span> <span class="nf">saturation_pressure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the saturation pressure of the refrigerant at the specified temperature.</span>
+
+<span class="sd">        :param temperature: Refrigerant temperature, in Celsius.</span>
+<span class="sd">        :return: Refrigerant saturation pressure, in Pa</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturationPressure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Refrigerant.saturation_temperature"><a class="viewcode-back" href="../func.html#func.Refrigerant.saturation_temperature">[docs]</a>    <span class="k">def</span> <span class="nf">saturation_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the saturation temperature of the refrigerant at the specified pressure.</span>
+
+<span class="sd">        :param pressure: Refrigerant pressure, in Pa</span>
+<span class="sd">        :return: Refrigerant saturation temperature, in Celsius</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturationTemperature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Refrigerant.saturated_enthalpy"><a class="viewcode-back" href="../func.html#func.Refrigerant.saturated_enthalpy">[docs]</a>    <span class="k">def</span> <span class="nf">saturated_enthalpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">quality</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the refrigerant saturated enthalpy at the specified temperature and quality.</span>
+
+<span class="sd">        :param temperature: Refrigerant temperature, in Celsius</span>
+<span class="sd">        :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0</span>
+<span class="sd">        :return: Refrigerant saturated enthalpy, in J/kg</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturatedEnthalpy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">quality</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Refrigerant.saturated_density"><a class="viewcode-back" href="../func.html#func.Refrigerant.saturated_density">[docs]</a>    <span class="k">def</span> <span class="nf">saturated_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">quality</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the refrigerant density at the specified temperature and quality.</span>
+
+<span class="sd">        :param temperature: Refrigerant temperature, in Celsius</span>
+<span class="sd">        :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0</span>
+<span class="sd">        :return: Refrigerant saturated density, in kg/m3</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturatedDensity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">quality</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Refrigerant.saturated_specific_heat"><a class="viewcode-back" href="../func.html#func.Refrigerant.saturated_specific_heat">[docs]</a>    <span class="k">def</span> <span class="nf">saturated_specific_heat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">quality</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the refrigerant specific heat at the specified temperature and quality.</span>
+
+<span class="sd">        :param temperature: Refrigerant temperature, in Celsius</span>
+<span class="sd">        :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0</span>
+<span class="sd">        :return: Refrigerant saturated specific heat, in J/kg-K</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">refrigerantSaturatedSpecificHeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">quality</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Psychrometrics"><a class="viewcode-back" href="../func.html#func.Psychrometrics">[docs]</a><span class="k">class</span> <span class="nc">Psychrometrics</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class provides access to the psychrometric functions within EnergyPlus.  Some property calculations are</span>
+<span class="sd">    available as functions of different independent variables, and so there are functions with suffixes like</span>
+<span class="sd">    `vapor_density_b` and `relative_humidity_c`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">:</span> <span class="n">cdll</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">api</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhoFnPbTdbW</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhoFnPbTdbW</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHfgAirFnWTdb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHfgAirFnWTdb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHgAirFnWTdb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHgAirFnWTdb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHFnTdbW</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHFnTdbW</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyCpAirFnW</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyCpAirFnW</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTdbFnHW</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTdbFnHW</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhovFnTdbWPb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhovFnTdbWPb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTwbFnTdbWPb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTwbFnTdbWPb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyVFnTdbWPb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyVFnTdbWPb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdbH</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdbH</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyPsatFnTemp</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyPsatFnTemp</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTsatFnHPb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTsatFnHPb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhovFnTdbRh</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhovFnTdbRh</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhFnTdbRhov</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhFnTdbRhov</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhFnTdbWPb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhFnTdbWPb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdpPb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdpPb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdbRhPb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdbRhPb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdbTwbPb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdbTwbPb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHFnTdbRhPb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHFnTdbRhPb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTdpFnWPb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTdpFnWPb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTdpFnTdbTwbPb</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTdpFnTdbTwbPb</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+
+<div class="viewcode-block" id="Psychrometrics.density"><a class="viewcode-back" href="../func.html#func.Psychrometrics.density">[docs]</a>    <span class="k">def</span> <span class="nf">density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric density at the specified conditions.</span>
+
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhoFnPbTdbW</span><span class="p">(</span><span class="n">barometric_pressure</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.latent_energy_of_air"><a class="viewcode-back" href="../func.html#func.Psychrometrics.latent_energy_of_air">[docs]</a>    <span class="k">def</span> <span class="nf">latent_energy_of_air</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric latent energy of air at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHfgAirFnWTdb</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.latent_energy_of_moisture_in_air"><a class="viewcode-back" href="../func.html#func.Psychrometrics.latent_energy_of_moisture_in_air">[docs]</a>    <span class="k">def</span> <span class="nf">latent_energy_of_moisture_in_air</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric latent energy of the moisture in air at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHgAirFnWTdb</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.enthalpy"><a class="viewcode-back" href="../func.html#func.Psychrometrics.enthalpy">[docs]</a>    <span class="k">def</span> <span class="nf">enthalpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric enthalpy at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHFnTdbW</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.enthalpy_b"><a class="viewcode-back" href="../func.html#func.Psychrometrics.enthalpy_b">[docs]</a>    <span class="k">def</span> <span class="nf">enthalpy_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">relative_humidity_fraction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric enthalpy at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param relative_humidity_fraction: Psychrometric relative humidity, as a fraction from 0.0 to 1.0.</span>
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyHFnTdbRhPb</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">relative_humidity_fraction</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.specific_heat"><a class="viewcode-back" href="../func.html#func.Psychrometrics.specific_heat">[docs]</a>    <span class="k">def</span> <span class="nf">specific_heat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric specific heat at the specified conditions.</span>
+
+<span class="sd">        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyCpAirFnW</span><span class="p">(</span><span class="n">humidity_ratio</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.dry_bulb"><a class="viewcode-back" href="../func.html#func.Psychrometrics.dry_bulb">[docs]</a>    <span class="k">def</span> <span class="nf">dry_bulb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enthalpy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric dry bulb temperature at the specified conditions.</span>
+
+<span class="sd">        :param enthalpy: Psychrometric enthalpy, in J/kg</span>
+<span class="sd">        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTdbFnHW</span><span class="p">(</span><span class="n">enthalpy</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.vapor_density"><a class="viewcode-back" href="../func.html#func.Psychrometrics.vapor_density">[docs]</a>    <span class="k">def</span> <span class="nf">vapor_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric vapor density at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir</span>
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhovFnTdbWPb</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.relative_humidity"><a class="viewcode-back" href="../func.html#func.Psychrometrics.relative_humidity">[docs]</a>    <span class="k">def</span> <span class="nf">relative_humidity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">vapor_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric relative humidity at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param vapor_density: Psychrometric vapor density, in kg/m3</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhFnTdbRhov</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">vapor_density</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.relative_humidity_b"><a class="viewcode-back" href="../func.html#func.Psychrometrics.relative_humidity_b">[docs]</a>    <span class="k">def</span> <span class="nf">relative_humidity_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric relative humidity at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir</span>
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhFnTdbWPb</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.wet_bulb"><a class="viewcode-back" href="../func.html#func.Psychrometrics.wet_bulb">[docs]</a>    <span class="k">def</span> <span class="nf">wet_bulb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric wet bulb temperature at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir</span>
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTwbFnTdbWPb</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.specific_volume"><a class="viewcode-back" href="../func.html#func.Psychrometrics.specific_volume">[docs]</a>    <span class="k">def</span> <span class="nf">specific_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric specific volume at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir</span>
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyVFnTdbWPb</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.saturation_pressure"><a class="viewcode-back" href="../func.html#func.Psychrometrics.saturation_pressure">[docs]</a>    <span class="k">def</span> <span class="nf">saturation_pressure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric saturation pressure at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyPsatFnTemp</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.saturation_temperature"><a class="viewcode-back" href="../func.html#func.Psychrometrics.saturation_temperature">[docs]</a>    <span class="k">def</span> <span class="nf">saturation_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enthalpy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric saturation temperature at the specified conditions.</span>
+
+<span class="sd">        :param enthalpy: Psychrometric enthalpy, in J/kg</span>
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTsatFnHPb</span><span class="p">(</span><span class="n">enthalpy</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.vapor_density_b"><a class="viewcode-back" href="../func.html#func.Psychrometrics.vapor_density_b">[docs]</a>    <span class="k">def</span> <span class="nf">vapor_density_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">relative_humidity_fraction</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric vapor density at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param relative_humidity_fraction: Psychrometric relative humidity, as a fraction from 0.0 to 1.0.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyRhovFnTdbRh</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">relative_humidity_fraction</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.humidity_ratio"><a class="viewcode-back" href="../func.html#func.Psychrometrics.humidity_ratio">[docs]</a>    <span class="k">def</span> <span class="nf">humidity_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">enthalpy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric humidity ratio at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param enthalpy: Psychrometric enthalpy, in J/kg</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdbH</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">enthalpy</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.humidity_ratio_b"><a class="viewcode-back" href="../func.html#func.Psychrometrics.humidity_ratio_b">[docs]</a>    <span class="k">def</span> <span class="nf">humidity_ratio_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dew_point_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric humidity ratio at the specified conditions.</span>
+
+<span class="sd">        :param dew_point_temp: Psychrometric dew point temperature, in Celsius</span>
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdpPb</span><span class="p">(</span><span class="n">dew_point_temp</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.humidity_ratio_c"><a class="viewcode-back" href="../func.html#func.Psychrometrics.humidity_ratio_c">[docs]</a>    <span class="k">def</span> <span class="nf">humidity_ratio_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">relative_humidity_fraction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                         <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric humidity ratio at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param relative_humidity_fraction: Psychrometric relative humidity, as a fraction from 0.0 to 1.0.</span>
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdbRhPb</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">relative_humidity_fraction</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.humidity_ratio_d"><a class="viewcode-back" href="../func.html#func.Psychrometrics.humidity_ratio_d">[docs]</a>    <span class="k">def</span> <span class="nf">humidity_ratio_d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">wet_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric humidity ratio at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param wet_bulb_temp: Psychrometric wet bulb temperature, in C</span>
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyWFnTdbTwbPb</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">wet_bulb_temp</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.dew_point"><a class="viewcode-back" href="../func.html#func.Psychrometrics.dew_point">[docs]</a>    <span class="k">def</span> <span class="nf">dew_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">humidity_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric dew point temperature at the specified conditions.</span>
+
+<span class="sd">        :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir</span>
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTdpFnWPb</span><span class="p">(</span><span class="n">humidity_ratio</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Psychrometrics.dew_point_b"><a class="viewcode-back" href="../func.html#func.Psychrometrics.dew_point_b">[docs]</a>    <span class="k">def</span> <span class="nf">dew_point_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dry_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">wet_bulb_temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the psychrometric dew point temperature at the specified conditions.</span>
+
+<span class="sd">        :param dry_bulb_temp: Psychrometric dry bulb temperature, in C</span>
+<span class="sd">        :param wet_bulb_temp: Psychrometric wet bulb temperature, in C</span>
+<span class="sd">        :param barometric_pressure: Barometric pressure, in Pa</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">psyTdpFnTdbTwbPb</span><span class="p">(</span><span class="n">dry_bulb_temp</span><span class="p">,</span> <span class="n">wet_bulb_temp</span><span class="p">,</span> <span class="n">barometric_pressure</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="EnergyPlusVersion"><a class="viewcode-back" href="../func.html#func.EnergyPlusVersion">[docs]</a><span class="k">class</span> <span class="nc">EnergyPlusVersion</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the EnergyPlus version.  Could also call into the DLL but it&#39;s the same effect.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ep_version_major</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">&quot;$</span><span class="si">{CMAKE_VERSION_MAJOR}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ep_version_minor</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">&quot;$</span><span class="si">{CMAKE_VERSION_MINOR}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ep_version_patch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">&quot;$</span><span class="si">{CMAKE_VERSION_PATCH}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ep_version_build</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;$</span><span class="si">{CMAKE_VERSION_BUILD}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a string representation of this EnergyPlus version.</span>
+<span class="sd">        :return: EnergyPlus version, as major.minor.patch.build</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">-</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ep_version_major</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ep_version_minor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ep_version_patch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ep_version_build</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Functional"><a class="viewcode-back" href="../func.html#func.Functional">[docs]</a><span class="k">class</span> <span class="nc">Functional</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This API class enables accessing structures and functionality inside EnergyPlus from an outside client.</span>
+<span class="sd">    This functional API will be extended over time, but initial targeted functionality includes fluid and refrigerant</span>
+<span class="sd">    property methods, and surface and geometry classes and methods.</span>
+
+<span class="sd">    The Functional API class itself is really just an organizational class that provides access to nested functional</span>
+<span class="sd">    classes through member functions.  The functional API class is instantiated by the higher level EnergyPlusAPI class,</span>
+<span class="sd">    and clients should *never* attempt to create an instance manually.  Instead, create an EnergyPlusAPI instance, and</span>
+<span class="sd">    call the `functional()` member function to create a Functional class instance.  For Python Plugin workflows, the</span>
+<span class="sd">    EnergyPlusPlugin base class also provides an instance of the Functional base class through the `self.functional`</span>
+<span class="sd">    member variable.  Clients should use that directly when needing to make functional calls into the library.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">:</span> <span class="n">cdll</span><span class="p">,</span> <span class="n">running_as_python_plugin</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">api</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">initializeFunctionalAPI</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">initializeFunctionalAPI</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">initializeFunctionalAPI</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">py_error_callback_type</span> <span class="o">=</span> <span class="n">CFUNCTYPE</span><span class="p">(</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">registerErrorCallback</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_error_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">registerErrorCallback</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+
+<div class="viewcode-block" id="Functional.glycol"><a class="viewcode-back" href="../func.html#func.Functional.glycol">[docs]</a>    <span class="k">def</span> <span class="nf">glycol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glycol_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Glycol</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a Glycol instance, which allows calculation of glycol properties.</span>
+
+<span class="sd">        :param glycol_name: Name of the Glycol, for now only water is allowed</span>
+<span class="sd">        :return: An instantiated Glycol structure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">glycol_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">glycol_name</span> <span class="o">=</span> <span class="n">glycol_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Glycol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">,</span> <span class="n">glycol_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Functional.refrigerant"><a class="viewcode-back" href="../func.html#func.Functional.refrigerant">[docs]</a>    <span class="k">def</span> <span class="nf">refrigerant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refrigerant_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Refrigerant</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a Refrigerant instance, which allows calculation of refrigerant properties.</span>
+
+<span class="sd">        :param refrigerant_name: Name of the Refrigerant, for now only steam is allowed</span>
+<span class="sd">        :return: An instantiated Refrigerant structure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">refrigerant_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">refrigerant_name</span> <span class="o">=</span> <span class="n">refrigerant_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Refrigerant</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">,</span> <span class="n">refrigerant_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Functional.psychrometrics"><a class="viewcode-back" href="../func.html#func.Functional.psychrometrics">[docs]</a>    <span class="k">def</span> <span class="nf">psychrometrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Psychrometrics</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a Psychrometric instance, which allows calculation of psychrometric properties.</span>
+
+<span class="sd">        :return: An instantiated Psychrometric structure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Psychrometrics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Functional.ep_version"><a class="viewcode-back" href="../func.html#func.Functional.ep_version">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">ep_version</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">EnergyPlusVersion</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">EnergyPlusVersion</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Functional.callback_error"><a class="viewcode-back" href="../func.html#func.Functional.callback_error">[docs]</a>    <span class="k">def</span> <span class="nf">callback_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus when an error message</span>
+<span class="sd">        is added to the error file.  The user can then detect specific error messages or whatever.</span>
+
+<span class="sd">        :param f: A python function which takes a string (bytes) argument and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_error_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">error_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">registerErrorCallback</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Functional.clear_callbacks"><a class="viewcode-back" href="../func.html#func.Functional.clear_callbacks">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">clear_callbacks</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function is only used if you are running this script continually making many calls into the E+ library in</span>
+<span class="sd">        one thread, each with many new and different error handler callbacks, and you need to clean up.</span>
+
+<span class="sd">        Note this will affect all current instances in this thread, so use carefully!</span>
+
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">error_callbacks</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EnergyPlus Python API Documentation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Root Api Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../func.html">Functional API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../runtime.html">Runtime API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datatransfer.html">Data Transfer API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, National Renewable Energy Laboratory for the United States Department of Energy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>runtime &#8212; EnergyPlus Python API Documentation 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for runtime</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">ctypes</span> <span class="k">import</span> <span class="n">cdll</span><span class="p">,</span> <span class="n">c_int</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">,</span> <span class="n">c_void_p</span><span class="p">,</span> <span class="n">CFUNCTYPE</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">types</span> <span class="k">import</span> <span class="n">FunctionType</span>
+
+
+<span class="c1"># CFUNCTYPE wrapped Python callbacks need to be kept in memory explicitly, otherwise GC takes it</span>
+<span class="c1"># This causes undefined behavior but generally segfaults and illegal access violations</span>
+<span class="c1"># Keeping them referenced in a global array here suffices to keep GC away from it</span>
+<span class="c1"># And while we _could_ clean up after ourselves, I would imagine users aren&#39;t making *so* many callbacks that</span>
+<span class="c1"># We have anything to worry about here</span>
+<span class="n">all_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="Runtime"><a class="viewcode-back" href="../runtime.html#runtime.Runtime">[docs]</a><span class="k">class</span> <span class="nc">Runtime</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This API class enables a client to hook into EnergyPlus at runtime and sense/actuate data in a running simulation.</span>
+<span class="sd">    The pattern is quite simple: create a callback function in Python, and register it with one of the registration</span>
+<span class="sd">    methods on this class to allow the callback to be called at a specific point in the simulation.  Inside the callback</span>
+<span class="sd">    function, the client can get sensor values and set actuator values using the DataTransfer API methods, and also</span>
+<span class="sd">    look up values and perform calculations using EnergyPlus internal methods via the Functional API methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">:</span> <span class="n">cdll</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">api</span>
+        <span class="c1"># self.api.energyplus.argtypes = [c_int, POINTER(c_char_p)]  # DEFERRED UNTIL run_energyplus call</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">energyplus</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">issueWarning</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">issueWarning</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">issueSevere</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">issueSevere</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">issueText</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">issueText</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">py_progress_callback_type</span> <span class="o">=</span> <span class="n">CFUNCTYPE</span><span class="p">(</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">c_int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">registerProgressCallback</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_progress_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">registerProgressCallback</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">py_message_callback_type</span> <span class="o">=</span> <span class="n">CFUNCTYPE</span><span class="p">(</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">registerStdOutCallback</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_message_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">registerStdOutCallback</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span> <span class="o">=</span> <span class="n">CFUNCTYPE</span><span class="p">(</span><span class="n">c_void_p</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginNewEnvironment</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginNewEnvironment</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackAfterNewEnvironmentWarmupComplete</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackAfterNewEnvironmentWarmupComplete</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginZoneTimeStepBeforeInitHeatBalance</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginZoneTimeStepBeforeInitHeatBalance</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginZoneTimeStepAfterInitHeatBalance</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginZoneTimeStepAfterInitHeatBalance</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginTimeStepBeforePredictor</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginTimeStepBeforePredictor</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackAfterPredictorBeforeHVACManagers</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackAfterPredictorBeforeHVACManagers</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackAfterPredictorAfterHVACManagers</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackAfterPredictorAfterHVACManagers</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackInsideSystemIterationLoop</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackInsideSystemIterationLoop</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfZoneTimeStepBeforeZoneReporting</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfZoneTimeStepBeforeZoneReporting</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfZoneTimeStepAfterZoneReporting</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfZoneTimeStepAfterZoneReporting</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfSystemTimeStepBeforeHVACReporting</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfSystemTimeStepBeforeHVACReporting</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfSystemTimeStepAfterHVACReporting</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfSystemTimeStepAfterHVACReporting</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfZoneSizing</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfZoneSizing</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfSystemSizing</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfSystemSizing</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfAfterComponentGetInput</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfAfterComponentGetInput</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="c1"># self.api.callbackUserDefinedComponentModel.argtypes = [self.py_empty_callback_type]</span>
+        <span class="c1"># self.api.callbackUserDefinedComponentModel.restype = c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackUnitarySystemSizing</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackUnitarySystemSizing</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+
+<div class="viewcode-block" id="Runtime.run_energyplus"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.run_energyplus">[docs]</a>    <span class="k">def</span> <span class="nf">run_energyplus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command_line_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function calls EnergyPlus to run a simulation.  The C API expects to find arguments matching the command</span>
+<span class="sd">        line string when executing EnergyPlus.  When calling the C API directly, the client must create a list of char</span>
+<span class="sd">        arguments starting with the program name, followed by all the command line options.  For this Python API, the</span>
+<span class="sd">        program name is not passed in as an argument, rather only the command line options.</span>
+
+<span class="sd">        An example call:</span>
+<span class="sd">        run_energyplus([&#39;-d&#39;, &#39;/path/to/output/directory&#39;, &#39;-w&#39;, &#39;/path/to/weather.epw&#39;, &#39;/path/to/input.idf&#39;])</span>
+
+<span class="sd">        :param command_line_args: The command line arguments that would be passed into EnergyPlus if executing directly</span>
+<span class="sd">                                  from the EnergyPlus executable.</span>
+<span class="sd">        :return: An integer exit code from the simulation, zero is success, non-zero is failure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">args_with_program_name</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;energyplus&quot;</span><span class="p">]</span>  <span class="c1"># don&#39;t require the program name argument, just add it here</span>
+        <span class="k">for</span> <span class="n">cla</span> <span class="ow">in</span> <span class="n">command_line_args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cla</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">prepped_cla</span> <span class="o">=</span> <span class="n">cla</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prepped_cla</span> <span class="o">=</span> <span class="n">cla</span>
+            <span class="n">args_with_program_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prepped_cla</span><span class="p">)</span>
+        <span class="c1"># Passing an array arg is a smidge tricky, as you need to cast to a fixed size array.</span>
+        <span class="c1"># Thus we must dynamically create the argument &quot;type&quot; based on the current number of arguments.</span>
+        <span class="c1"># The Python type checker may be complaining that c_char_p is actually needing to be an integer;</span>
+        <span class="c1"># this is something to do with the dynamic nature of the ctypes &quot;type&quot; objects.</span>
+        <span class="c1"># For now I&#39;m adding this noinspection marker to get it to hush</span>
+        <span class="c1"># noinspection PyTypeChecker</span>
+        <span class="n">cli_arg_type</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_char_p</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">args_with_program_name</span><span class="p">))</span>
+        <span class="c1"># OK, so now that we have the argument &quot;type&quot; set as a fixed length array of char*, we assign it to the</span>
+        <span class="c1"># DLL function call.  This must be done here because the arg count may change with each call.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">energyplus</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">cli_arg_type</span><span class="p">]</span>
+        <span class="c1"># Now cast the actual Python list instance into that dynamically created ctype &quot;type&quot;.  This is another</span>
+        <span class="c1"># line where the type checker is complaining because it things cli_arg_type is actually an &quot;int&quot;, and as such,</span>
+        <span class="c1"># it wouldn&#39;t be a callable item.  cli_arg_type is actually a callable type, so I&#39;m muting this warning.</span>
+        <span class="c1"># noinspection PyCallingNonCallable</span>
+        <span class="n">cli_args</span> <span class="o">=</span> <span class="n">cli_arg_type</span><span class="p">(</span><span class="o">*</span><span class="n">args_with_program_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">energyplus</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args_with_program_name</span><span class="p">),</span> <span class="n">cli_args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.issue_warning"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.issue_warning">[docs]</a>    <span class="k">def</span> <span class="nf">issue_warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a script to issue a warning through normal EnergyPlus methods.  The message will be listed</span>
+<span class="sd">        in the standard EnergyPlus error file once the simulation is complete.  This function has limited usefulness</span>
+<span class="sd">        when calling EnergyPlus as a library, as errors can be handled by the calling client, however, in a</span>
+<span class="sd">        PythonPlugin workflow, this can be an important tool to alert the user of issues once EnergyPlus(.exe) has</span>
+<span class="sd">        finished running.</span>
+
+<span class="sd">        Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles</span>
+<span class="sd">        conversion as needed.</span>
+
+<span class="sd">        :param message: The warning message to be listed in the error file.</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">issueWarning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.issue_severe"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.issue_severe">[docs]</a>    <span class="k">def</span> <span class="nf">issue_severe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a script to issue an error through normal EnergyPlus methods.  The message will be listed</span>
+<span class="sd">        in the standard EnergyPlus error file once the simulation is complete.  This function has limited usefulness</span>
+<span class="sd">        when calling EnergyPlus as a library, as errors can be handled by the calling client, however, in a</span>
+<span class="sd">        PythonPlugin workflow, this can be an important tool to alert the user of issues once EnergyPlus(.exe) has</span>
+<span class="sd">        finished running.</span>
+
+<span class="sd">        Note the severe errors tend to lead to EnergyPlus terminating with a Fatal Error.  This can be accomplished</span>
+<span class="sd">        in PythonPlugin workflows by issuing a severe error, followed by returning 1 from the plugin function.</span>
+<span class="sd">        EnergyPlus will interpret this return value as a signal to terminate with a fatal error.</span>
+
+<span class="sd">        Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles</span>
+<span class="sd">        conversion as needed.</span>
+
+<span class="sd">        :param message: The error message to be listed in the error file.</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">issueSevere</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.issue_text"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.issue_text">[docs]</a>    <span class="k">def</span> <span class="nf">issue_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a script to issue a message through normal EnergyPlus methods.  The message will be listed</span>
+<span class="sd">        in the standard EnergyPlus error file once the simulation is complete.  This function can be used alongside the</span>
+<span class="sd">        warning and error issuance functions to provide further context to the situation. This function has limited</span>
+<span class="sd">        usefulness when calling EnergyPlus as a library, as errors can be handled by the calling client, however, in a</span>
+<span class="sd">        PythonPlugin workflow, this can be an important tool to alert the user of issues once EnergyPlus(.exe) has</span>
+<span class="sd">        finished running.</span>
+
+<span class="sd">        Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles</span>
+<span class="sd">        conversion as needed.</span>
+
+<span class="sd">        :param message: The message to be listed in the error file.</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">issueText</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_progress"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_progress">[docs]</a>    <span class="k">def</span> <span class="nf">callback_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the end of each</span>
+<span class="sd">        day with a progress (percentage) indicator</span>
+
+<span class="sd">        :param f: A python function which takes an integer argument and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_progress_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">registerProgressCallback</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_message"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_message">[docs]</a>    <span class="k">def</span> <span class="nf">callback_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus when printing anything</span>
+<span class="sd">        to standard output.  This can allow a GUI to easily show the output of EnergyPlus streaming by.  When used in</span>
+<span class="sd">        conjunction with the progress callback, a progress bar and status text label can provide a nice EnergyPlus</span>
+<span class="sd">        experience on a GUI.</span>
+
+<span class="sd">        :param f: A python function which takes a string (bytes) argument and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_message_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">registerStdOutCallback</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_begin_new_environment"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_begin_new_environment">[docs]</a>    <span class="k">def</span> <span class="nf">callback_begin_new_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the beginning of</span>
+<span class="sd">        each environment.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginNewEnvironment</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_after_new_environment_warmup_complete"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_after_new_environment_warmup_complete">[docs]</a>    <span class="k">def</span> <span class="nf">callback_after_new_environment_warmup_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the warmup of</span>
+<span class="sd">        each environment.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackAfterNewEnvironmentWarmupComplete</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_begin_zone_timestep_before_init_heat_balance"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_begin_zone_timestep_before_init_heat_balance">[docs]</a>    <span class="k">def</span> <span class="nf">callback_begin_zone_timestep_before_init_heat_balance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the beginning of the</span>
+<span class="sd">        zone time step before init heat balance.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginZoneTimeStepBeforeInitHeatBalance</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_begin_zone_timestep_after_init_heat_balance"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_begin_zone_timestep_after_init_heat_balance">[docs]</a>    <span class="k">def</span> <span class="nf">callback_begin_zone_timestep_after_init_heat_balance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the beginning of the</span>
+<span class="sd">        zone time step after init heat balance.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginZoneTimeStepAfterInitHeatBalance</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_begin_system_timestep_before_predictor"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_begin_system_timestep_before_predictor">[docs]</a>    <span class="k">def</span> <span class="nf">callback_begin_system_timestep_before_predictor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the beginning of</span>
+<span class="sd">        system time step .</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackBeginTimeStepBeforePredictor</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_after_predictor_before_hvac_managers"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_after_predictor_before_hvac_managers">[docs]</a>    <span class="k">def</span> <span class="nf">callback_after_predictor_before_hvac_managers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the end of the</span>
+<span class="sd">        predictor step but before HVAC managers.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackAfterPredictorBeforeHVACManagers</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_after_predictor_after_hvac_managers"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_after_predictor_after_hvac_managers">[docs]</a>    <span class="k">def</span> <span class="nf">callback_after_predictor_after_hvac_managers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the end of the</span>
+<span class="sd">        predictor step after HVAC managers.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackAfterPredictorAfterHVACManagers</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_inside_system_iteration_loop"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_inside_system_iteration_loop">[docs]</a>    <span class="k">def</span> <span class="nf">callback_inside_system_iteration_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus inside the system</span>
+<span class="sd">        iteration loop.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackInsideSystemIterationLoop</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_end_zone_timestep_before_zone_reporting"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_end_zone_timestep_before_zone_reporting">[docs]</a>    <span class="k">def</span> <span class="nf">callback_end_zone_timestep_before_zone_reporting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the end of a zone</span>
+<span class="sd">        time step but before zone reporting has been completed.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfZoneTimeStepBeforeZoneReporting</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_end_zone_timestep_after_zone_reporting"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_end_zone_timestep_after_zone_reporting">[docs]</a>    <span class="k">def</span> <span class="nf">callback_end_zone_timestep_after_zone_reporting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the end of a zone</span>
+<span class="sd">        time step and after zone reporting.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfZoneTimeStepAfterZoneReporting</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_end_system_timestep_before_hvac_reporting"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_end_system_timestep_before_hvac_reporting">[docs]</a>    <span class="k">def</span> <span class="nf">callback_end_system_timestep_before_hvac_reporting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the end of a system</span>
+<span class="sd">        time step, but before HVAC reporting.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfSystemTimeStepBeforeHVACReporting</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_end_system_timestep_after_hvac_reporting"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_end_system_timestep_after_hvac_reporting">[docs]</a>    <span class="k">def</span> <span class="nf">callback_end_system_timestep_after_hvac_reporting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the end of a system</span>
+<span class="sd">        time step and after HVAC reporting.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfSystemTimeStepAfterHVACReporting</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_end_zone_sizing"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_end_zone_sizing">[docs]</a>    <span class="k">def</span> <span class="nf">callback_end_zone_sizing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the end of the zone</span>
+<span class="sd">        sizing process.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfZoneSizing</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_end_system_sizing"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_end_system_sizing">[docs]</a>    <span class="k">def</span> <span class="nf">callback_end_system_sizing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the end of the system</span>
+<span class="sd">        sizing process.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfSystemSizing</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.callback_after_component_get_input"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_after_component_get_input">[docs]</a>    <span class="k">def</span> <span class="nf">callback_after_component_get_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus at the end of</span>
+<span class="sd">        component get input processes.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackEndOfAfterComponentGetInput</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+    <span class="c1"># user defined component callbacks are not allowed, they are coupled directly to a specific EMS manager/PythonPlugin</span>
+    <span class="c1"># def callback_user_defined_component_model(self, f: FunctionType) -&gt; None:</span>
+
+<div class="viewcode-block" id="Runtime.callback_unitary_system_sizing"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.callback_unitary_system_sizing">[docs]</a>    <span class="k">def</span> <span class="nf">callback_unitary_system_sizing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows a client to register a function to be called back by EnergyPlus in unitary system sizing.</span>
+
+<span class="sd">        :param f: A python function which takes no arguments and returns nothing</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cb_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">py_empty_callback_type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">callbackUnitarySystemSizing</span><span class="p">(</span><span class="n">cb_ptr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Runtime.clear_callbacks"><a class="viewcode-back" href="../runtime.html#runtime.Runtime.clear_callbacks">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">clear_callbacks</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function is used if you are running this script continually making multiple calls into the E+ library in</span>
+<span class="sd">        one thread.  EnergyPlus should be cleaned up between runs.</span>
+
+<span class="sd">        Note this will clean all registered callbacks, so functions must be registered again prior to the next run.</span>
+
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_callbacks</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EnergyPlus Python API Documentation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Root Api Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../func.html">Functional API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../runtime.html">Runtime API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datatransfer.html">Data Transfer API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, National Renewable Energy Laboratory for the United States Department of Energy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

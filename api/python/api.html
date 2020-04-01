@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Root Api Documentation &#8212; EnergyPlus Python API Documentation 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Functional API" href="func.html" />
+    <link rel="prev" title="Welcome to EnergyPlus Python API Documentation’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-api">
+<span id="root-api-documentation"></span><h1>Root Api Documentation<a class="headerlink" href="#module-api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="api.EnergyPlusAPI">
+<em class="property">class </em><code class="sig-prename descclassname">api.</code><code class="sig-name descname">EnergyPlusAPI</code><span class="sig-paren">(</span><em class="sig-param">running_as_python_plugin: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api.html#EnergyPlusAPI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#api.EnergyPlusAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class exposes the EnergyPlus C Library API to Python.  The API is split into three categories, and this class
+exposes each API category through member variables.  If an instance of this class is created as
+<cite>api = EnergyPlusAPI()</cite>, then the following members are available:</p>
+<ul class="simple">
+<li><p><cite>api.functional</cite>: The functional API provides access to static API calls, such as thermophysical property methods.</p></li>
+<li><p><cite>api.runtime</cite>: The runtime API allows a user to provide Python functions as callbacks, which are then
+called from within EnergyPlus at specific points in the simulation.</p></li>
+<li><p><cite>api.exchange</cite> The data_exchange API allows a user to exchange data (get sensor values, set actuator values)
+from within runtime callback methods, during a simulation.  When this class is instantiated for Python Plugin use,
+this also exposes the plugin global data members to allow sharing data between plugins.</p></li>
+</ul>
+<p>In a makefile-style build, the API library (dll) should be in Products; for example: <cite>/path_to_build/Products</cite>.
+For Visual Studio, the DLL is inside of a Debug or Release folder inside that Products directory.  At build time,
+the cmake/PythonSetupAPIinBuild.cmake script is executed (the energyplusapi target depends on it).  At build time, the
+Python API files are placed inside of the Products directory on Makefile builds, and copied into <em>both</em> the Release
+and Debug folders on Visual Studio builds.  The API scripts are put into a pyenergyplus directory, so in all cases,
+the dynamic library will simply be in the current script’s parent directory. In an installation, the library will be
+in the installation root, and the Python API files will be in a pyenergyplus directory inside that install root as
+well, so the binary will again just be in this script’s parent directory.</p>
+<p>For either case, utilizing the Python API wrappers is straightforward: if executing from directly from the
+build or install folder, scripts can be imported as <cite>from pyenergyplus.foo import bar</cite>.  If executing from a totally
+separate directory, the build or install directory can be inserted into the beginning of sys.path so that the
+pyenergyplus directory can be found.</p>
+<p>To reference this in an IDE to allow writing scripts using autocomplete, etc., most IDEs allow you to add third-
+party library directories.  The directory to add would be the build or install folder, as appropriate, so that
+the <cite>from pyenergyplus</cite> import statements can find a pyenergyplus package inside that third-party directory.</p>
+<dl class="method">
+<dt id="api.EnergyPlusAPI.api_version">
+<em class="property">static </em><code class="sig-name descname">api_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/api.html#EnergyPlusAPI.api_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#api.EnergyPlusAPI.api_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a string representation of the version of this API.  The EnergyPlus API will evolve over time,
+but in most cases, it will be simply adding new functionality and methods, not breaking existing API calls.
+The fractional portion of the API will be incremented when new functionality is added, and the whole number
+portion will be incremented when an existing API is broken.
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="api.api_path">
+<code class="sig-prename descclassname">api.</code><code class="sig-name descname">api_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/api.html#api_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#api.api_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns a string to the EnergyPlus dynamic library.  The energyplusapi target in the build system
+depends on the Python API build script, so you shouldn’t be able to generate the EnergyPlus dynamic library without
+these scripts being successfully set up in the build tree by CMake.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A string absolute path to the EnergyPlus DLL.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">EnergyPlus Python API Documentation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Root Api Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="func.html">Functional API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runtime.html">Runtime API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datatransfer.html">Data Transfer API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to EnergyPlus Python API Documentation’s documentation!</a></li>
+      <li>Next: <a href="func.html" title="next chapter">Functional API</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, National Renewable Energy Laboratory for the United States Department of Energy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

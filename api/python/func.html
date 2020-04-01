@@ -1,0 +1,725 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Functional API &#8212; EnergyPlus Python API Documentation 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Runtime API" href="runtime.html" />
+    <link rel="prev" title="Root Api Documentation" href="api.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-func">
+<span id="functional-api"></span><h1>Functional API<a class="headerlink" href="#module-func" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="func.EnergyPlusVersion">
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">EnergyPlusVersion</code><a class="reference internal" href="_modules/func.html#EnergyPlusVersion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.EnergyPlusVersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is the EnergyPlus version.  Could also call into the DLL but it’s the same effect.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="func.Functional">
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Functional</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7f6337fdc9e8&gt;</em>, <em class="sig-param">running_as_python_plugin: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Functional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Functional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This API class enables accessing structures and functionality inside EnergyPlus from an outside client.
+This functional API will be extended over time, but initial targeted functionality includes fluid and refrigerant
+property methods, and surface and geometry classes and methods.</p>
+<p>The Functional API class itself is really just an organizational class that provides access to nested functional
+classes through member functions.  The functional API class is instantiated by the higher level EnergyPlusAPI class,
+and clients should <em>never</em> attempt to create an instance manually.  Instead, create an EnergyPlusAPI instance, and
+call the <cite>functional()</cite> member function to create a Functional class instance.  For Python Plugin workflows, the
+EnergyPlusPlugin base class also provides an instance of the Functional base class through the <cite>self.functional</cite>
+member variable.  Clients should use that directly when needing to make functional calls into the library.</p>
+<dl class="method">
+<dt id="func.Functional.callback_error">
+<code class="sig-name descname">callback_error</code><span class="sig-paren">(</span><em class="sig-param">f: function</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/func.html#Functional.callback_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Functional.callback_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function allows a client to register a function to be called back by EnergyPlus when an error message
+is added to the error file.  The user can then detect specific error messages or whatever.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>f</strong> – A python function which takes a string (bytes) argument and returns nothing</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Functional.clear_callbacks">
+<em class="property">static </em><code class="sig-name descname">clear_callbacks</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/func.html#Functional.clear_callbacks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Functional.clear_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is only used if you are running this script continually making many calls into the E+ library in
+one thread, each with many new and different error handler callbacks, and you need to clean up.</p>
+<p>Note this will affect all current instances in this thread, so use carefully!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Nothing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Functional.ep_version">
+<em class="property">static </em><code class="sig-name descname">ep_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; func.EnergyPlusVersion<a class="reference internal" href="_modules/func.html#Functional.ep_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Functional.ep_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="func.Functional.glycol">
+<code class="sig-name descname">glycol</code><span class="sig-paren">(</span><em class="sig-param">glycol_name: str</em><span class="sig-paren">)</span> &#x2192; func.Glycol<a class="reference internal" href="_modules/func.html#Functional.glycol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Functional.glycol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Glycol instance, which allows calculation of glycol properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>glycol_name</strong> – Name of the Glycol, for now only water is allowed</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instantiated Glycol structure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Functional.psychrometrics">
+<code class="sig-name descname">psychrometrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; func.Psychrometrics<a class="reference internal" href="_modules/func.html#Functional.psychrometrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Functional.psychrometrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Psychrometric instance, which allows calculation of psychrometric properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An instantiated Psychrometric structure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Functional.refrigerant">
+<code class="sig-name descname">refrigerant</code><span class="sig-paren">(</span><em class="sig-param">refrigerant_name: str</em><span class="sig-paren">)</span> &#x2192; func.Refrigerant<a class="reference internal" href="_modules/func.html#Functional.refrigerant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Functional.refrigerant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Refrigerant instance, which allows calculation of refrigerant properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>refrigerant_name</strong> – Name of the Refrigerant, for now only steam is allowed</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instantiated Refrigerant structure</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="func.Glycol">
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Glycol</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7f6337fdc9e8&gt;</em>, <em class="sig-param">glycol_name: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Glycol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Glycol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class provides access to the glycol property calculations inside EnergyPlus.
+For now, the only glycol name allowed is plain water.  This is because other fluids are only
+initialized when they are declared in the input file.  When calling through the API,
+there is no input file, so no other fluids are declared.  This is ripe for a refactor to enable
+additional fluids, but water will suffice for now.</p>
+<dl class="method">
+<dt id="func.Glycol.conductivity">
+<code class="sig-name descname">conductivity</code><span class="sig-paren">(</span><em class="sig-param">temperature: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Glycol.conductivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Glycol.conductivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the conductivity of the fluid at the specified temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>temperature</strong> – Fluid temperature, in degrees Celsius</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The conductivity of the fluid, in W/m-K</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Glycol.density">
+<code class="sig-name descname">density</code><span class="sig-paren">(</span><em class="sig-param">temperature: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Glycol.density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Glycol.density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the density of the fluid at the specified temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>temperature</strong> – Fluid temperature, in degrees Celsius</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The density of the fluid, in kg/m3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Glycol.specific_heat">
+<code class="sig-name descname">specific_heat</code><span class="sig-paren">(</span><em class="sig-param">temperature: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Glycol.specific_heat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Glycol.specific_heat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the specific heat of the fluid at the specified temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>temperature</strong> – Fluid temperature, in degrees Celsius</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The specific heat of the fluid, in J/kg-K</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Glycol.viscosity">
+<code class="sig-name descname">viscosity</code><span class="sig-paren">(</span><em class="sig-param">temperature: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Glycol.viscosity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Glycol.viscosity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dynamic viscosity of the fluid at the specified temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>temperature</strong> – Fluid temperature, in degrees Celsius</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dynamic viscosity of the fluid, in Pa-s (or kg/m-s)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="func.Psychrometrics">
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Psychrometrics</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7f6337fdc9e8&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Psychrometrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class provides access to the psychrometric functions within EnergyPlus.  Some property calculations are
+available as functions of different independent variables, and so there are functions with suffixes like
+<cite>vapor_density_b</cite> and <cite>relative_humidity_c</cite>.</p>
+<dl class="method">
+<dt id="func.Psychrometrics.density">
+<code class="sig-name descname">density</code><span class="sig-paren">(</span><em class="sig-param">barometric_pressure: float</em>, <em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">humidity_ratio: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric density at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>humidity_ratio</strong> – Humidity ratio, in kgWater/kgDryAir</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.dew_point">
+<code class="sig-name descname">dew_point</code><span class="sig-paren">(</span><em class="sig-param">humidity_ratio: float</em>, <em class="sig-param">barometric_pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.dew_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.dew_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric dew point temperature at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>humidity_ratio</strong> – Humidity ratio, in kgWater/kgDryAir</p></li>
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.dew_point_b">
+<code class="sig-name descname">dew_point_b</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">wet_bulb_temp: float</em>, <em class="sig-param">barometric_pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.dew_point_b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.dew_point_b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric dew point temperature at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>wet_bulb_temp</strong> – Psychrometric wet bulb temperature, in C</p></li>
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.dry_bulb">
+<code class="sig-name descname">dry_bulb</code><span class="sig-paren">(</span><em class="sig-param">enthalpy: float</em>, <em class="sig-param">humidity_ratio: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.dry_bulb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.dry_bulb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric dry bulb temperature at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>enthalpy</strong> – Psychrometric enthalpy, in J/kg</p></li>
+<li><p><strong>humidity_ratio</strong> – Humidity ratio, in kgWater/kgDryAir</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.enthalpy">
+<code class="sig-name descname">enthalpy</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">humidity_ratio: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.enthalpy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.enthalpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric enthalpy at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>humidity_ratio</strong> – Humidity ratio, in kgWater/kgDryAir</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.enthalpy_b">
+<code class="sig-name descname">enthalpy_b</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">relative_humidity_fraction: float</em>, <em class="sig-param">barometric_pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.enthalpy_b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.enthalpy_b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric enthalpy at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>relative_humidity_fraction</strong> – Psychrometric relative humidity, as a fraction from 0.0 to 1.0.</p></li>
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.humidity_ratio">
+<code class="sig-name descname">humidity_ratio</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">enthalpy: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.humidity_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.humidity_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric humidity ratio at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>enthalpy</strong> – Psychrometric enthalpy, in J/kg</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.humidity_ratio_b">
+<code class="sig-name descname">humidity_ratio_b</code><span class="sig-paren">(</span><em class="sig-param">dew_point_temp: float</em>, <em class="sig-param">barometric_pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.humidity_ratio_b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.humidity_ratio_b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric humidity ratio at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dew_point_temp</strong> – Psychrometric dew point temperature, in Celsius</p></li>
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.humidity_ratio_c">
+<code class="sig-name descname">humidity_ratio_c</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">relative_humidity_fraction: float</em>, <em class="sig-param">barometric_pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.humidity_ratio_c"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.humidity_ratio_c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric humidity ratio at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>relative_humidity_fraction</strong> – Psychrometric relative humidity, as a fraction from 0.0 to 1.0.</p></li>
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.humidity_ratio_d">
+<code class="sig-name descname">humidity_ratio_d</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">wet_bulb_temp: float</em>, <em class="sig-param">barometric_pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.humidity_ratio_d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.humidity_ratio_d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric humidity ratio at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>wet_bulb_temp</strong> – Psychrometric wet bulb temperature, in C</p></li>
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.latent_energy_of_air">
+<code class="sig-name descname">latent_energy_of_air</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.latent_energy_of_air"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.latent_energy_of_air" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric latent energy of air at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.latent_energy_of_moisture_in_air">
+<code class="sig-name descname">latent_energy_of_moisture_in_air</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.latent_energy_of_moisture_in_air"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.latent_energy_of_moisture_in_air" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric latent energy of the moisture in air at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.relative_humidity">
+<code class="sig-name descname">relative_humidity</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">vapor_density: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.relative_humidity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.relative_humidity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric relative humidity at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>vapor_density</strong> – Psychrometric vapor density, in kg/m3</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.relative_humidity_b">
+<code class="sig-name descname">relative_humidity_b</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">humidity_ratio: float</em>, <em class="sig-param">barometric_pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.relative_humidity_b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.relative_humidity_b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric relative humidity at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>humidity_ratio</strong> – Humidity ratio, in kgWater/kgDryAir</p></li>
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.saturation_pressure">
+<code class="sig-name descname">saturation_pressure</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.saturation_pressure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.saturation_pressure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric saturation pressure at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.saturation_temperature">
+<code class="sig-name descname">saturation_temperature</code><span class="sig-paren">(</span><em class="sig-param">enthalpy: float</em>, <em class="sig-param">barometric_pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.saturation_temperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.saturation_temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric saturation temperature at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>enthalpy</strong> – Psychrometric enthalpy, in J/kg</p></li>
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.specific_heat">
+<code class="sig-name descname">specific_heat</code><span class="sig-paren">(</span><em class="sig-param">humidity_ratio: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.specific_heat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.specific_heat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric specific heat at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>humidity_ratio</strong> – Humidity ratio, in kgWater/kgDryAir</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.specific_volume">
+<code class="sig-name descname">specific_volume</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">humidity_ratio: float</em>, <em class="sig-param">barometric_pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.specific_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.specific_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric specific volume at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>humidity_ratio</strong> – Humidity ratio, in kgWater/kgDryAir</p></li>
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.vapor_density">
+<code class="sig-name descname">vapor_density</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">humidity_ratio: float</em>, <em class="sig-param">barometric_pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.vapor_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.vapor_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric vapor density at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>humidity_ratio</strong> – Humidity ratio, in kgWater/kgDryAir</p></li>
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.vapor_density_b">
+<code class="sig-name descname">vapor_density_b</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">relative_humidity_fraction: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.vapor_density_b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.vapor_density_b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric vapor density at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>relative_humidity_fraction</strong> – Psychrometric relative humidity, as a fraction from 0.0 to 1.0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Psychrometrics.wet_bulb">
+<code class="sig-name descname">wet_bulb</code><span class="sig-paren">(</span><em class="sig-param">dry_bulb_temp: float</em>, <em class="sig-param">humidity_ratio: float</em>, <em class="sig-param">barometric_pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Psychrometrics.wet_bulb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics.wet_bulb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the psychrometric wet bulb temperature at the specified conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dry_bulb_temp</strong> – Psychrometric dry bulb temperature, in C</p></li>
+<li><p><strong>humidity_ratio</strong> – Humidity ratio, in kgWater/kgDryAir</p></li>
+<li><p><strong>barometric_pressure</strong> – Barometric pressure, in Pa</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="func.Refrigerant">
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Refrigerant</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7f6337fdc9e8&gt;</em>, <em class="sig-param">refrigerant_name: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Refrigerant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Refrigerant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class provides access to the refrigerant property calculations inside EnergyPlus.
+For now, the only refrigerant  name allowed is steam.  This is because other refrigerants are only
+initialized when they are declared in the input file.  When calling through the API, there is no
+input file, so no other refrigerants are declared.  This should be improved through later enhancements,
+but steam will provide a suitable use case for now.</p>
+<dl class="method">
+<dt id="func.Refrigerant.saturated_density">
+<code class="sig-name descname">saturated_density</code><span class="sig-paren">(</span><em class="sig-param">temperature: float</em>, <em class="sig-param">quality: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Refrigerant.saturated_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Refrigerant.saturated_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the refrigerant density at the specified temperature and quality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>temperature</strong> – Refrigerant temperature, in Celsius</p></li>
+<li><p><strong>quality</strong> – Refrigerant quality, in fractional form from 0.0 to 1.0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Refrigerant saturated density, in kg/m3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Refrigerant.saturated_enthalpy">
+<code class="sig-name descname">saturated_enthalpy</code><span class="sig-paren">(</span><em class="sig-param">temperature: float</em>, <em class="sig-param">quality: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Refrigerant.saturated_enthalpy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Refrigerant.saturated_enthalpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the refrigerant saturated enthalpy at the specified temperature and quality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>temperature</strong> – Refrigerant temperature, in Celsius</p></li>
+<li><p><strong>quality</strong> – Refrigerant quality, in fractional form from 0.0 to 1.0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Refrigerant saturated enthalpy, in J/kg</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Refrigerant.saturated_specific_heat">
+<code class="sig-name descname">saturated_specific_heat</code><span class="sig-paren">(</span><em class="sig-param">temperature: float</em>, <em class="sig-param">quality: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Refrigerant.saturated_specific_heat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Refrigerant.saturated_specific_heat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the refrigerant specific heat at the specified temperature and quality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>temperature</strong> – Refrigerant temperature, in Celsius</p></li>
+<li><p><strong>quality</strong> – Refrigerant quality, in fractional form from 0.0 to 1.0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Refrigerant saturated specific heat, in J/kg-K</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Refrigerant.saturation_pressure">
+<code class="sig-name descname">saturation_pressure</code><span class="sig-paren">(</span><em class="sig-param">temperature: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Refrigerant.saturation_pressure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Refrigerant.saturation_pressure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the saturation pressure of the refrigerant at the specified temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>temperature</strong> – Refrigerant temperature, in Celsius.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Refrigerant saturation pressure, in Pa</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="func.Refrigerant.saturation_temperature">
+<code class="sig-name descname">saturation_temperature</code><span class="sig-paren">(</span><em class="sig-param">pressure: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/func.html#Refrigerant.saturation_temperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Refrigerant.saturation_temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the saturation temperature of the refrigerant at the specified pressure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pressure</strong> – Refrigerant pressure, in Pa</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Refrigerant saturation temperature, in Celsius</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">EnergyPlus Python API Documentation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Root Api Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Functional API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runtime.html">Runtime API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datatransfer.html">Data Transfer API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="api.html" title="previous chapter">Root Api Documentation</a></li>
+      <li>Next: <a href="runtime.html" title="next chapter">Runtime API</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, National Renewable Energy Laboratory for the United States Department of Energy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/func.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

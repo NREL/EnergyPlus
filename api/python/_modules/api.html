@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>api &#8212; EnergyPlus Python API Documentation 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for api</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">ctypes</span> <span class="k">import</span> <span class="n">cdll</span><span class="p">,</span> <span class="n">c_char_p</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">pyenergyplus.func</span> <span class="k">import</span> <span class="n">Functional</span>
+<span class="kn">from</span> <span class="nn">pyenergyplus.datatransfer</span> <span class="k">import</span> <span class="n">DataExchange</span>
+<span class="kn">from</span> <span class="nn">pyenergyplus.runtime</span> <span class="k">import</span> <span class="n">Runtime</span>
+
+
+<div class="viewcode-block" id="api_path"><a class="viewcode-back" href="../api.html#api.api_path">[docs]</a><span class="k">def</span> <span class="nf">api_path</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a string to the EnergyPlus dynamic library.  The energyplusapi target in the build system</span>
+<span class="sd">    depends on the Python API build script, so you shouldn&#39;t be able to generate the EnergyPlus dynamic library without</span>
+<span class="sd">    these scripts being successfully set up in the build tree by CMake.</span>
+
+<span class="sd">    :return: A string absolute path to the EnergyPlus DLL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">this_script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">api_dll_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">this_script_dir</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;linux&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">api_dll_dir</span><span class="p">,</span> <span class="s1">&#39;libenergyplusapi.so&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;darwin&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">api_dll_dir</span><span class="p">,</span> <span class="s1">&#39;libenergyplusapi.dylib&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># assume Windows</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">api_dll_dir</span><span class="p">,</span> <span class="s1">&#39;EnergyPlusAPI.dll&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnergyPlusAPI"><a class="viewcode-back" href="../api.html#api.EnergyPlusAPI">[docs]</a><span class="k">class</span> <span class="nc">EnergyPlusAPI</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class exposes the EnergyPlus C Library API to Python.  The API is split into three categories, and this class</span>
+<span class="sd">    exposes each API category through member variables.  If an instance of this class is created as</span>
+<span class="sd">    `api = EnergyPlusAPI()`, then the following members are available:</span>
+
+<span class="sd">    - `api.functional`: The functional API provides access to static API calls, such as thermophysical property methods.</span>
+<span class="sd">    - `api.runtime`: The runtime API allows a user to provide Python functions as callbacks, which are then</span>
+<span class="sd">      called from within EnergyPlus at specific points in the simulation.</span>
+<span class="sd">    - `api.exchange` The data_exchange API allows a user to exchange data (get sensor values, set actuator values)</span>
+<span class="sd">      from within runtime callback methods, during a simulation.  When this class is instantiated for Python Plugin use,</span>
+<span class="sd">      this also exposes the plugin global data members to allow sharing data between plugins.</span>
+
+<span class="sd">    In a makefile-style build, the API library (dll) should be in Products; for example: `/path_to_build/Products`.</span>
+<span class="sd">    For Visual Studio, the DLL is inside of a Debug or Release folder inside that Products directory.  At build time,</span>
+<span class="sd">    the cmake/PythonSetupAPIinBuild.cmake script is executed (the energyplusapi target depends on it).  At build time, the</span>
+<span class="sd">    Python API files are placed inside of the Products directory on Makefile builds, and copied into *both* the Release</span>
+<span class="sd">    and Debug folders on Visual Studio builds.  The API scripts are put into a pyenergyplus directory, so in all cases,</span>
+<span class="sd">    the dynamic library will simply be in the current script&#39;s parent directory. In an installation, the library will be</span>
+<span class="sd">    in the installation root, and the Python API files will be in a pyenergyplus directory inside that install root as</span>
+<span class="sd">    well, so the binary will again just be in this script&#39;s parent directory.</span>
+
+<span class="sd">    For either case, utilizing the Python API wrappers is straightforward: if executing from directly from the</span>
+<span class="sd">    build or install folder, scripts can be imported as `from pyenergyplus.foo import bar`.  If executing from a totally</span>
+<span class="sd">    separate directory, the build or install directory can be inserted into the beginning of sys.path so that the</span>
+<span class="sd">    pyenergyplus directory can be found.</span>
+
+<span class="sd">    To reference this in an IDE to allow writing scripts using autocomplete, etc., most IDEs allow you to add third-</span>
+<span class="sd">    party library directories.  The directory to add would be the build or install folder, as appropriate, so that</span>
+<span class="sd">    the `from pyenergyplus` import statements can find a pyenergyplus package inside that third-party directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">running_as_python_plugin</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new API instance with child API classes set up as members on this class.</span>
+
+<span class="sd">        :param running_as_python_plugin: If running as a python plugin, pass True, and this will do two things: 1)</span>
+<span class="sd">                                         Instantiate the plugin &quot;global&quot; variable methods which are meaningless in</span>
+<span class="sd">                                         other API calling structures, and 2) Avoid re-instantiating the functional API</span>
+<span class="sd">                                         as this is already instantiated for Plugin workflows.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">cdll</span><span class="o">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="n">api_path</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">apiVersionFromEPlus</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">apiVersionFromEPlus</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_char_p</span>
+        <span class="n">api_version_from_ep</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">apiVersionFromEPlus</span><span class="p">())</span>
+        <span class="n">api_version_defined_here</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_version</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">api_version_defined_here</span> <span class="o">!=</span> <span class="n">api_version_from_ep</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;API version does not match, this API version: </span><span class="si">%s</span><span class="s2">; E+ is expecting version: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">api_version_defined_here</span><span class="p">,</span> <span class="n">api_version_from_ep</span>
+            <span class="p">))</span>
+        <span class="c1"># self.functional provides access to a functional API class, instantiated and ready to go</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">functional</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">,</span> <span class="n">running_as_python_plugin</span><span class="p">)</span>
+        <span class="c1"># self.exchange provides access to a data exchange API class, instantiated and ready to go</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exchange</span> <span class="o">=</span> <span class="n">DataExchange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">,</span> <span class="n">running_as_python_plugin</span><span class="p">)</span>
+        <span class="c1"># self.runtime provides access to a runtime API class, instantiated and ready to go</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runtime</span> <span class="o">=</span> <span class="n">Runtime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EnergyPlusAPI.api_version"><a class="viewcode-back" href="../api.html#api.EnergyPlusAPI.api_version">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">api_version</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a string representation of the version of this API.  The EnergyPlus API will evolve over time,</span>
+<span class="sd">        but in most cases, it will be simply adding new functionality and methods, not breaking existing API calls.</span>
+<span class="sd">        The fractional portion of the API will be incremented when new functionality is added, and the whole number</span>
+<span class="sd">        portion will be incremented when an existing API is broken.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;$</span><span class="si">{PYTHON_API_VERSION_MAJOR}</span><span class="s2">.$</span><span class="si">{PYTHON_API_VERSION_MINOR}</span><span class="s2">&quot;</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EnergyPlus Python API Documentation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Root Api Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../func.html">Functional API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../runtime.html">Runtime API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datatransfer.html">Data Transfer API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, National Renewable Energy Laboratory for the United States Department of Energy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

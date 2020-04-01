@@ -1,0 +1,775 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>datatransfer &#8212; EnergyPlus Python API Documentation 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for datatransfer</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">ctypes</span> <span class="k">import</span> <span class="n">cdll</span><span class="p">,</span> <span class="n">c_int</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">,</span> <span class="n">c_void_p</span>
+<span class="kn">from</span> <span class="nn">pyenergyplus.common</span> <span class="k">import</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">EnergyPlusException</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Union</span>
+
+
+<div class="viewcode-block" id="DataExchange"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange">[docs]</a><span class="k">class</span> <span class="nc">DataExchange</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This API class enables data transfer between EnergyPlus and a client.  Output variables and meters are treated as</span>
+<span class="sd">    &quot;sensor&quot; data.  A client should get a handle (integer) using one of the worker methods then make calls to get data</span>
+<span class="sd">    using that handle.  Some specific variables in EnergyPlus are controllable as actuators.  These work the same way,</span>
+<span class="sd">    in that a client should get an integer handle to an actuator and then use the workers to set the value on the</span>
+<span class="sd">    actuator.  There are also some static data members in EnergyPlus that are exposed as &quot;internal&quot; variables.  These</span>
+<span class="sd">    variables hold static data such as zone floor area and volume, so they do not change during a simulation, but are</span>
+<span class="sd">    constant once they are assigned.  Even with this difference, the variables are still handled the same way, by</span>
+<span class="sd">    getting an integer handle and then accessing the data using that handle.</span>
+
+<span class="sd">    This data transfer class is used in one of two workflows:</span>
+
+<span class="sd">    - When a outside tool is already running EnergyPlus using the Runtime API, and data transfer is to be made during</span>
+<span class="sd">      callback functions. In this case, the script should create a DataTransfer API class by calling the `data_transfer`</span>
+<span class="sd">      method on the main API class, never trying to create this class directly.</span>
+<span class="sd">    - When a Python script is used in the EnergyPlus Python Plugin System, and the user runs the EnergyPlus binary.  In</span>
+<span class="sd">      this case, the plugin may need access to state data to make control decisions, and this class enables that.  The</span>
+<span class="sd">      plugin base class automatically creates an instance of this class, so client plugins that inherit that class will</span>
+<span class="sd">      have a `self.transfer` instance of this class available, and should *not* attempt to create another one.</span>
+
+<span class="sd">    In the Python Plugin case, the client Python code may make use of the methods to get/set plugin global variables,</span>
+<span class="sd">    but only in the Python Plugin cases.  For the outside tool API usage, plugin global variables are not available, and</span>
+<span class="sd">    data should be shared in the outside calling code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api</span><span class="p">:</span> <span class="n">cdll</span><span class="p">,</span> <span class="n">running_as_python_plugin</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">api</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span> <span class="o">=</span> <span class="n">running_as_python_plugin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">listAllAPIDataCSV</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">listAllAPIDataCSV</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_char_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">apiDataFullyReady</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">apiDataFullyReady</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">requestVariable</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">requestVariable</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getVariableHandle</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getVariableHandle</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getMeterHandle</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getMeterHandle</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getActuatorHandle</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getActuatorHandle</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getVariableValue</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getVariableValue</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getMeterValue</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getMeterValue</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">setActuatorValue</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">setActuatorValue</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">resetActuator</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">resetActuator</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getActuatorValue</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getActuatorValue</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getInternalVariableHandle</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getInternalVariableHandle</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getInternalVariableValue</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getInternalVariableValue</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="c1"># some simulation data values are available for plugins or regular runtime calls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">month</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">month</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">dayOfMonth</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">dayOfMonth</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">dayOfWeek</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">dayOfWeek</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">dayOfYear</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">dayOfYear</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">daylightSavingsTimeIndicator</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">daylightSavingsTimeIndicator</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">hour</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">hour</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">currentTime</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">currentTime</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">minutes</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">minutes</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">holidayIndex</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">holidayIndex</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">sunIsUp</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">sunIsUp</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">isRaining</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">isRaining</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">systemTimeStep</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">systemTimeStep</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">currentEnvironmentNum</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">currentEnvironmentNum</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">warmupFlag</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">warmupFlag</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginGlobalVariableHandle</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginGlobalVariableHandle</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginGlobalVariableValue</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginGlobalVariableValue</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">setPluginGlobalVariableValue</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">RealEP</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">setPluginGlobalVariableValue</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableHandle</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableHandle</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableValue</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableValue</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableAverage</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableAverage</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableMin</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableMin</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableMax</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableMax</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableSum</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableSum</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableDirection</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">c_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableDirection</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+
+<div class="viewcode-block" id="DataExchange.list_available_api_data_csv"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.list_available_api_data_csv">[docs]</a>    <span class="k">def</span> <span class="nf">list_available_api_data_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lists out all API data stuff in an easily parseable CSV form</span>
+
+<span class="sd">        :return: Returns a raw bytes CSV representation of the available API data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">listAllAPIDataCSV</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.api_data_fully_ready"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.api_data_fully_ready">[docs]</a>    <span class="k">def</span> <span class="nf">api_data_fully_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check whether the data exchange API is ready.</span>
+<span class="sd">        Handles to variables, actuators, and other data are not reliably defined prior to this being true.</span>
+
+<span class="sd">        :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">apiDataFullyReady</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">success</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="DataExchange.request_variable"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.request_variable">[docs]</a>    <span class="k">def</span> <span class="nf">request_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span> <span class="n">variable_key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Request output variables so they can be accessed during a simulation.</span>
+
+<span class="sd">        In EnergyPlus, not all variables are available by default.  If they were all available, there would be a</span>
+<span class="sd">        terrible memory impact.  Instead, only requested and necessary variables are kept in memory.  When running</span>
+<span class="sd">        EnergyPlus as a program, including when using Python Plugins, variables are requested through input objects.</span>
+<span class="sd">        When running EnergyPlus as a library, variables can also be requested through this function call.  This</span>
+<span class="sd">        function has the same signature as the get_variable_handle function, which is used to then request the ID</span>
+<span class="sd">        of a variable once the simulation has begun.  NOTE: Variables should be requested before *each* run of</span>
+<span class="sd">        EnergyPlus, as the internal array is cleared when clearing the state of each run.</span>
+
+<span class="sd">        :param variable_name: The name of the variable to retrieve, e.g. &quot;Site Outdoor Air DryBulb Temperature&quot;, or</span>
+<span class="sd">                              &quot;Fan Air Mass Flow Rate&quot;</span>
+<span class="sd">        :param variable_key: The instance of the variable to retrieve, e.g. &quot;Environment&quot;, or &quot;Main System Fan&quot;</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">variable_name</span> <span class="o">=</span> <span class="n">variable_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">variable_key</span> <span class="o">=</span> <span class="n">variable_key</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">requestVariable</span><span class="p">(</span><span class="n">variable_name</span><span class="p">,</span> <span class="n">variable_key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_variable_handle"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_variable_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_variable_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span> <span class="n">variable_key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a handle to an output variable in a running simulation.</span>
+
+<span class="sd">        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API</span>
+<span class="sd">        automatically converts values to upper-case when finding matches to internal variables in the simulation.</span>
+
+<span class="sd">        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion</span>
+<span class="sd">        as needed.</span>
+
+<span class="sd">        :param variable_name: The name of the variable to retrieve, e.g. &quot;Site Outdoor Air DryBulb Temperature&quot;, or</span>
+<span class="sd">                              &quot;Fan Air Mass Flow Rate&quot;</span>
+<span class="sd">        :param variable_key: The instance of the variable to retrieve, e.g. &quot;Environment&quot;, or &quot;Main System Fan&quot;</span>
+<span class="sd">        :return: An integer ID for this output variable, or -1 if one could not be found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">variable_name</span> <span class="o">=</span> <span class="n">variable_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">variable_key</span> <span class="o">=</span> <span class="n">variable_key</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getVariableHandle</span><span class="p">(</span><span class="n">variable_name</span><span class="p">,</span> <span class="n">variable_key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_meter_handle"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_meter_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_meter_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meter_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a handle to a meter in a running simulation.</span>
+
+<span class="sd">        The meter name passed into this function do not need to be a particular case, as the EnergyPlus API</span>
+<span class="sd">        automatically converts values to upper-case when finding matches to internal variables in the simulation.</span>
+
+<span class="sd">        Note also that the meter name passed in here can be either strings or bytes, as this wrapper handles conversion</span>
+<span class="sd">        as needed.</span>
+
+<span class="sd">        :param meter_name: The name of the variable to retrieve, e.g. &quot;Electricity:Facility&quot;, or &quot;Fans:Electricity&quot;</span>
+<span class="sd">        :return: An integer ID for this meter, or -1 if one could not be found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">meter_name</span> <span class="o">=</span> <span class="n">meter_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meter_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">meter_name</span> <span class="o">=</span> <span class="n">meter_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getMeterHandle</span><span class="p">(</span><span class="n">meter_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_actuator_handle"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_actuator_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_actuator_handle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">component_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span>
+            <span class="n">control_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span>
+            <span class="n">actuator_key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a handle to an available actuator in a running simulation.</span>
+
+<span class="sd">        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API</span>
+<span class="sd">        automatically converts values to upper-case when finding matches to internal variables in the simulation.</span>
+
+<span class="sd">        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion</span>
+<span class="sd">        as needed.</span>
+
+<span class="sd">        :param component_type: The actuator category, e.g. &quot;Weather Data&quot;</span>
+<span class="sd">        :param control_type: The name of the actuator to retrieve, e.g. &quot;Outdoor Dew Point&quot;</span>
+<span class="sd">        :param actuator_key: The instance of the variable to retrieve, e.g. &quot;Environment&quot;</span>
+<span class="sd">        :return: An integer ID for this output variable, or -1 if one could not be found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">component_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">component_type</span> <span class="o">=</span> <span class="n">component_type</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">control_type</span> <span class="o">=</span> <span class="n">control_type</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actuator_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">actuator_key</span> <span class="o">=</span> <span class="n">actuator_key</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getActuatorHandle</span><span class="p">(</span><span class="n">component_type</span><span class="p">,</span> <span class="n">control_type</span><span class="p">,</span> <span class="n">actuator_key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_variable_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_variable_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_variable_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current value of a variable in a running simulation.  The `get_variable_handle` function is first used</span>
+<span class="sd">        to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this function to</span>
+<span class="sd">        then get the value of the variable.</span>
+
+<span class="sd">        :param variable_handle: An integer returned from the `get_variable_handle` function.</span>
+<span class="sd">        :return: Floating point representation of the current variable value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getVariableValue</span><span class="p">(</span><span class="n">variable_handle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_meter_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_meter_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_meter_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meter_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current value of a meter in a running simulation.  The `get_meter_handle` function is first used</span>
+<span class="sd">        to get a handle to the meter by name.  Then once the handle is retrieved, it is passed into this function to</span>
+<span class="sd">        then get the value of the meter.</span>
+
+<span class="sd">        Caution: This function currently returns the instantaneous value of a meter, not the cumulative value.</span>
+<span class="sd">        This will change in a future version of the API.</span>
+
+<span class="sd">        :param meter_handle: An integer returned from the `get_meter_handle` function.</span>
+<span class="sd">        :return: Floating point representation of the current meter value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getMeterValue</span><span class="p">(</span><span class="n">meter_handle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.set_actuator_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.set_actuator_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_actuator_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actuator_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">actuator_value</span><span class="p">:</span> <span class="n">RealEP</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the value of an actuator in a running simulation.  The `get_actuator_handle` function is first used</span>
+<span class="sd">        to get a handle to the actuator by name.  Then once the handle is retrieved, it is passed into this function,</span>
+<span class="sd">        along with the value to assign, to then set the value of the actuator.  Internally, actuators can alter floating</span>
+<span class="sd">        point, integer, and boolean operational values.  The API only exposes this set function with a floating point</span>
+<span class="sd">        argument.  For floating point types, the value is assigned directly.  For integer types, the value is rounded</span>
+<span class="sd">        to the nearest integer, with the halfway point rounded away from zero (2.5 becomes 3), then cast to a plain</span>
+<span class="sd">        integer.  For logical values, the original EMS convention is kept, where a value of 1.0 means TRUE, and a value</span>
+<span class="sd">        of 0.0 means FALSE -- and any other value defaults to FALSE.  A small tolerance is applied internally to allow</span>
+<span class="sd">        for small floating point round-off.  A value *very close* to 1.0 will still evaluate to TRUE.</span>
+
+<span class="sd">        :param actuator_handle: An integer returned from the `get_actuator_handle` function.</span>
+<span class="sd">        :param actuator_value: The floating point value to assign to the actuator</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">setActuatorValue</span><span class="p">(</span><span class="n">actuator_handle</span><span class="p">,</span> <span class="n">actuator_value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.reset_actuator"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.reset_actuator">[docs]</a>    <span class="k">def</span> <span class="nf">reset_actuator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actuator_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the actuator internally to EnergyPlus.  This allows subsequent calculations to be used for the actuator</span>
+<span class="sd">        instead of the externally set actuator value.</span>
+
+<span class="sd">        :param actuator_handle: An integer returned from the `get_actuator_handle` function.</span>
+<span class="sd">        :return: Nothing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">resetActuator</span><span class="p">(</span><span class="n">actuator_handle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_actuator_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_actuator_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_actuator_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actuator_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the most recent value of an actuator.  In some applications, actuators are altered by multiple scripts, and</span>
+<span class="sd">        this allows getting the most recent value.</span>
+
+<span class="sd">        :param actuator_handle: An integer returned from the `get_actuator_handle` function.</span>
+<span class="sd">        :return: A floating point of the actuator value.  For boolean actuators returns 1.0 for true and 0.0 for false.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getActuatorValue</span><span class="p">(</span><span class="n">actuator_handle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_internal_variable_handle"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_internal_variable_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_internal_variable_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span> <span class="n">variable_key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a handle to an internal variable in a running simulation.</span>
+
+<span class="sd">        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API</span>
+<span class="sd">        automatically converts values to upper-case when finding matches to internal variables in the simulation.</span>
+
+<span class="sd">        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion</span>
+<span class="sd">        as needed.</span>
+
+<span class="sd">        :param variable_type: The name of the variable to retrieve, e.g. &quot;Zone Air Volume&quot;, or &quot;Zone Floor Area&quot;</span>
+<span class="sd">        :param variable_key: The instance of the variable to retrieve, e.g. &quot;Zone 1&quot;</span>
+<span class="sd">        :return: An integer ID for this output variable, or -1 if one could not be found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">variable_type</span> <span class="o">=</span> <span class="n">variable_type</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">variable_key</span> <span class="o">=</span> <span class="n">variable_key</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getInternalVariableHandle</span><span class="p">(</span><span class="n">variable_type</span><span class="p">,</span> <span class="n">variable_key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_internal_variable_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_internal_variable_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_internal_variable_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of an internal variable in a running simulation.  The `get_internal_variable_handle` function is</span>
+<span class="sd">        first used to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this</span>
+<span class="sd">        function to then get the value of the variable.</span>
+
+<span class="sd">        :param variable_handle: An integer returned from the `get_internal_variable_handle` function.</span>
+<span class="sd">        :return: Floating point representation of the internal variable value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getInternalVariableValue</span><span class="p">(</span><span class="n">variable_handle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_global_handle"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_global_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a handle to a global variable in a running simulation.  This is only used for Python Plugin applications!</span>
+
+<span class="sd">        Global variables are used as a way to share data between running Python Plugins.  First a global variable must</span>
+<span class="sd">        be declared in the input file using the PythonPlugin:GlobalVariables object.  Once a name has been declared, it</span>
+<span class="sd">        can be accessed in the Plugin by getting a handle to the variable using this get_global_handle function, then</span>
+<span class="sd">        using the get_global_value and set_global_value functions as needed.  Note all global variables are</span>
+<span class="sd">        floating point values.</span>
+
+<span class="sd">        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API</span>
+<span class="sd">        automatically converts values to upper-case when finding matches to internal variables in the simulation.</span>
+
+<span class="sd">        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion</span>
+<span class="sd">        as needed.</span>
+
+<span class="sd">        :param var_name: The name of the global variable to retrieve, this name must be listed in the IDF object:</span>
+<span class="sd">                         `PythonPlugin:GlobalVariables`</span>
+<span class="sd">        :return: An integer ID for this global variable, or -1 if one could not be found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EnergyPlusException</span><span class="p">(</span><span class="s2">&quot;get_global_handle is only available as part of a Python Plugin workflow&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">var_name</span> <span class="o">=</span> <span class="n">var_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginGlobalVariableHandle</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_global_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_global_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current value of a plugin global variable in a running simulation.  This is only used for Python Plugin</span>
+<span class="sd">        applications!</span>
+
+<span class="sd">        Global variables are used as a way to share data between running Python Plugins.  First a global variable must</span>
+<span class="sd">        be declared in the input file using the PythonPlugin:GlobalVariables object.  Once a name has been declared, it</span>
+<span class="sd">        can be accessed in the Plugin by getting a handle to the variable using the get_global_handle function, then</span>
+<span class="sd">        using this get_global_value and the set_global_value functions as needed.  Note all global variables are</span>
+<span class="sd">        floating point values.</span>
+
+<span class="sd">        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API</span>
+<span class="sd">        automatically converts values to upper-case when finding matches to internal variables in the simulation.</span>
+
+<span class="sd">        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion</span>
+<span class="sd">        as needed.</span>
+
+<span class="sd">        :param handle: An integer returned from the `get_global_handle` function.</span>
+<span class="sd">        :return: Floating point representation of the global variable value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EnergyPlusException</span><span class="p">(</span><span class="s2">&quot;get_global_value is only available as part of a Python Plugin workflow&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginGlobalVariableValue</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.set_global_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.set_global_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_global_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the current value of a plugin global variable in a running simulation.  This is only used for Python Plugin</span>
+<span class="sd">        applications!</span>
+
+<span class="sd">        Global variables are used as a way to share data between running Python Plugins.  First a global variable must</span>
+<span class="sd">        be declared in the input file using the PythonPlugin:GlobalVariables object.  Once a name has been declared, it</span>
+<span class="sd">        can be accessed in the Plugin by getting a handle to the variable using the get_global_handle function, then</span>
+<span class="sd">        using the get_global_value and this set_global_value functions as needed.  Note all global variables are</span>
+<span class="sd">        floating point values.</span>
+
+<span class="sd">        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API</span>
+<span class="sd">        automatically converts values to upper-case when finding matches to internal variables in the simulation.</span>
+
+<span class="sd">        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion</span>
+<span class="sd">        as needed.</span>
+
+<span class="sd">        :param handle: An integer returned from the `get_global_handle` function.</span>
+<span class="sd">        :param value: Floating point value to assign to the global variable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EnergyPlusException</span><span class="p">(</span><span class="s2">&quot;set_global_handle is only available as part of a Python Plugin workflow&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">setPluginGlobalVariableValue</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_trend_handle"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_trend_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_trend_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trend_var_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a handle to a trend variable in a running simulation.  This is only used for Python Plugin applications!</span>
+
+<span class="sd">        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable</span>
+<span class="sd">        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been</span>
+<span class="sd">        declared there, it can be accessed in the Plugin by getting a handle to the variable using this get_trend_handle</span>
+<span class="sd">        function, then using the other trend variable worker functions as needed.</span>
+
+<span class="sd">        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API</span>
+<span class="sd">        automatically converts values to upper-case when finding matches to internal variables in the simulation.</span>
+
+<span class="sd">        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion</span>
+<span class="sd">        as needed.</span>
+
+<span class="sd">        :param trend_var_name: The name of the global variable to retrieve, this name must match the name of a</span>
+<span class="sd">                               `PythonPlugin:TrendVariable` IDF object.</span>
+<span class="sd">        :return: An integer ID for this trend variable, or -1 if one could not be found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EnergyPlusException</span><span class="p">(</span><span class="s2">&quot;get_trend_handle is only available as part of a Python Plugin workflow&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trend_var_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">trend_var_name</span> <span class="o">=</span> <span class="n">trend_var_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableHandle</span><span class="p">(</span><span class="n">trend_var_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_trend_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_trend_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_trend_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trend_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">time_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of a plugin trend variable at a specific history point.  The time_index argument specifies how</span>
+<span class="sd">        many time steps to go back in the trend history.  A value of 1 indicates taking the most recent value.  The</span>
+<span class="sd">        value of time_index must be less than or equal to the number of history terms specified in the matching</span>
+<span class="sd">        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin</span>
+<span class="sd">        applications!</span>
+
+<span class="sd">        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable</span>
+<span class="sd">        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been</span>
+<span class="sd">        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle</span>
+<span class="sd">        function, then using the other trend variable worker functions as needed.</span>
+
+<span class="sd">        :param trend_handle: An integer returned from the `get_trend_handle` function.</span>
+<span class="sd">        :param time_index: The number of time steps to search back in history to evaluate this function.</span>
+<span class="sd">        :return: Floating point value representation of the specific evaluation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EnergyPlusException</span><span class="p">(</span><span class="s2">&quot;get_trend_value is only available as part of a Python Plugin workflow&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableValue</span><span class="p">(</span><span class="n">trend_handle</span><span class="p">,</span> <span class="n">time_index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_trend_average"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_trend_average">[docs]</a>    <span class="k">def</span> <span class="nf">get_trend_average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trend_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the average of a plugin trend variable over a specific history set.  The count argument specifies how</span>
+<span class="sd">        many time steps to go back in the trend history.  A value of 1 indicates averaging just the most recent value.</span>
+<span class="sd">        The value of time_index must be less than or equal to the number of history terms specified in the matching</span>
+<span class="sd">        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin</span>
+<span class="sd">        applications!</span>
+
+<span class="sd">        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable</span>
+<span class="sd">        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been</span>
+<span class="sd">        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle</span>
+<span class="sd">        function, then using the other trend variable worker functions as needed.</span>
+
+<span class="sd">        :param trend_handle: An integer returned from the `get_trend_handle` function.</span>
+<span class="sd">        :param count: The number of time steps to search back in history to evaluate this function.</span>
+<span class="sd">        :return: Floating point value representation of the specific evaluation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EnergyPlusException</span><span class="p">(</span><span class="s2">&quot;get_trend_average is only available as part of a Python Plugin workflow&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableAverage</span><span class="p">(</span><span class="n">trend_handle</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_trend_min"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_trend_min">[docs]</a>    <span class="k">def</span> <span class="nf">get_trend_min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trend_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the minimum of a plugin trend variable over a specific history set.  The count argument specifies how</span>
+<span class="sd">        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.</span>
+<span class="sd">        The value of time_index must be less than or equal to the number of history terms specified in the matching</span>
+<span class="sd">        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin</span>
+<span class="sd">        applications!</span>
+
+<span class="sd">        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable</span>
+<span class="sd">        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been</span>
+<span class="sd">        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle</span>
+<span class="sd">        function, then using the other trend variable worker functions as needed.</span>
+
+<span class="sd">        :param trend_handle: An integer returned from the `get_trend_handle` function.</span>
+<span class="sd">        :param count: The number of time steps to search back in history to evaluate this function.</span>
+<span class="sd">        :return: Floating point value representation of the specific evaluation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EnergyPlusException</span><span class="p">(</span><span class="s2">&quot;get_trend_min is only available as part of a Python Plugin workflow&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableMin</span><span class="p">(</span><span class="n">trend_handle</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_trend_max"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_trend_max">[docs]</a>    <span class="k">def</span> <span class="nf">get_trend_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trend_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the maximum of a plugin trend variable over a specific history set.  The count argument specifies how</span>
+<span class="sd">        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.</span>
+<span class="sd">        The value of time_index must be less than or equal to the number of history terms specified in the matching</span>
+<span class="sd">        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin</span>
+<span class="sd">        applications!</span>
+
+<span class="sd">        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable</span>
+<span class="sd">        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been</span>
+<span class="sd">        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle</span>
+<span class="sd">        function, then using the other trend variable worker functions as needed.</span>
+
+<span class="sd">        :param trend_handle: An integer returned from the `get_trend_handle` function.</span>
+<span class="sd">        :param count: The number of time steps to search back in history to evaluate this function.</span>
+<span class="sd">        :return: Floating point value representation of the specific evaluation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EnergyPlusException</span><span class="p">(</span><span class="s2">&quot;get_trend_max is only available as part of a Python Plugin workflow&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableMax</span><span class="p">(</span><span class="n">trend_handle</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_trend_sum"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_trend_sum">[docs]</a>    <span class="k">def</span> <span class="nf">get_trend_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trend_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the summation of a plugin trend variable over a specific history set.  The count argument specifies how</span>
+<span class="sd">        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.</span>
+<span class="sd">        The value of time_index must be less than or equal to the number of history terms specified in the matching</span>
+<span class="sd">        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin</span>
+<span class="sd">        applications!</span>
+
+<span class="sd">        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable</span>
+<span class="sd">        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been</span>
+<span class="sd">        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle</span>
+<span class="sd">        function, then using the other trend variable worker functions as needed.</span>
+
+<span class="sd">        :param trend_handle: An integer returned from the `get_trend_handle` function.</span>
+<span class="sd">        :param count: The number of time steps to search back in history to evaluate this function.</span>
+<span class="sd">        :return: Floating point value representation of the specific evaluation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EnergyPlusException</span><span class="p">(</span><span class="s2">&quot;get_trend_sum is only available as part of a Python Plugin workflow&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableSum</span><span class="p">(</span><span class="n">trend_handle</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_trend_direction"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_trend_direction">[docs]</a>    <span class="k">def</span> <span class="nf">get_trend_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trend_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the trajectory of a plugin trend variable over a specific history set.  The count argument specifies how</span>
+<span class="sd">        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.</span>
+<span class="sd">        A linear regression is performed over the swept values and the slope of the regression line is returned as a</span>
+<span class="sd">        representation of the average trajectory over this range.</span>
+<span class="sd">        The value of time_index must be less than or equal to the number of history terms specified in the matching</span>
+<span class="sd">        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin</span>
+<span class="sd">        applications!</span>
+
+<span class="sd">        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable</span>
+<span class="sd">        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been</span>
+<span class="sd">        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle</span>
+<span class="sd">        function, then using the other trend variable worker functions as needed.</span>
+
+<span class="sd">        :param trend_handle: An integer returned from the `get_trend_handle` function.</span>
+<span class="sd">        :param count: The number of time steps to search back in history to evaluate this function.</span>
+<span class="sd">        :return: Floating point value representation of the specific evaluation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EnergyPlusException</span><span class="p">(</span><span class="s2">&quot;get_trend_direction is only available as part of a Python Plugin workflow&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableDirection</span><span class="p">(</span><span class="n">trend_handle</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.year"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.year">[docs]</a>    <span class="k">def</span> <span class="nf">year</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the &quot;current&quot; calendar year of the simulation.  All simulations operate at a real year, either user</span>
+<span class="sd">        specified or automatically selected by EnergyPlus based on other data (start day of week + leap year option).</span>
+
+<span class="sd">        :return: An integer year (2020, for example)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">year</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.month"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.month">[docs]</a>    <span class="k">def</span> <span class="nf">month</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current month of the simulation (1-12)</span>
+
+<span class="sd">        :return: An integer month (1-12)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">month</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.day_of_month"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.day_of_month">[docs]</a>    <span class="k">def</span> <span class="nf">day_of_month</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current day of month (1-31)</span>
+
+<span class="sd">        :return: An integer day of the month (1-31)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">dayOfMonth</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.hour"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.hour">[docs]</a>    <span class="k">def</span> <span class="nf">hour</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current hour of the simulation (0-23)</span>
+
+<span class="sd">        :return: An integer hour of the day (0-23)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">hour</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.current_time"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.current_time">[docs]</a>    <span class="k">def</span> <span class="nf">current_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current time of day in hours, where current time represents the end time of the current time step.</span>
+
+<span class="sd">        :return: A floating point representation of the current time in hours</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">currentTime</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.minutes"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.minutes">[docs]</a>    <span class="k">def</span> <span class="nf">minutes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current minutes into the hour (1-60)</span>
+
+<span class="sd">        :return: An integer number of minutes into the current hour (1-60)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">minutes</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.day_of_week"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.day_of_week">[docs]</a>    <span class="k">def</span> <span class="nf">day_of_week</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current day of the week (1-7)</span>
+
+<span class="sd">        :return: An integer day of week (1-7)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">dayOfWeek</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.day_of_year"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.day_of_year">[docs]</a>    <span class="k">def</span> <span class="nf">day_of_year</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current day of the year (1-366)</span>
+
+<span class="sd">        :return: An integer day of the year (1-366)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">dayOfYear</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.daylight_savings_time_indicator"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.daylight_savings_time_indicator">[docs]</a>    <span class="k">def</span> <span class="nf">daylight_savings_time_indicator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current daylight savings time indicator as a logical value.  The C API returns an integer where 1 is</span>
+<span class="sd">        yes and 0 is no, this simply wraps that with a bool conversion.</span>
+
+<span class="sd">        :return: A boolean DST indicator for the current time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">daylightSavingsTimeIndicator</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="DataExchange.holiday_index"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.holiday_index">[docs]</a>    <span class="k">def</span> <span class="nf">holiday_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a flag for the current day holiday type: 0 is no holiday, 1 is holiday type #1, etc.</span>
+
+<span class="sd">        :return: An integer indicator for current day holiday type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">holidayIndex</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.sun_is_up"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.sun_is_up">[docs]</a>    <span class="k">def</span> <span class="nf">sun_is_up</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a flag for whether the sun is currently up.  The C API returns an integer where 1 is yes and 0 is no, this</span>
+<span class="sd">        simply wraps that with a bool conversion.</span>
+
+<span class="sd">        :return: A boolean indicating whether the sun is currently up.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">sunIsUp</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="DataExchange.is_raining"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.is_raining">[docs]</a>    <span class="k">def</span> <span class="nf">is_raining</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a flag for whether the it is currently raining.  The C API returns an integer where 1 is yes and 0 is no,</span>
+<span class="sd">        this simply wraps that with a bool conversion.</span>
+
+<span class="sd">        :return: A boolean indicating whether it is currently raining.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">isRaining</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="DataExchange.warmup_flag"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.warmup_flag">[docs]</a>    <span class="k">def</span> <span class="nf">warmup_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a flag for whether the warmup flag is currently on, signaling that EnergyPlus is still in the process of</span>
+<span class="sd">        converging on warmup days.  The C API returns an integer where 1 is yes and 0 is no, this simply wraps that</span>
+<span class="sd">        with a bool conversion.</span>
+
+<span class="sd">        :return: A boolean indicating whether the warmup flag is on.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">warmupFlag</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="DataExchange.system_time_step"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.system_time_step">[docs]</a>    <span class="k">def</span> <span class="nf">system_time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the current system time step value in EnergyPlus.  The system time step is variable and fluctuates</span>
+<span class="sd">        during the simulation.</span>
+
+<span class="sd">        :return: The current system time step in fractional hours.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">systemTimeStep</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.current_environment_num"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.current_environment_num">[docs]</a>    <span class="k">def</span> <span class="nf">current_environment_num</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the current environment index.  EnergyPlus environments are design days, run periods, etc.  This function</span>
+<span class="sd">        is only expected to be useful in very specialized applications where you control the environment order</span>
+<span class="sd">        carefully.</span>
+
+<span class="sd">        :return: The current environment number.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">currentEnvironmentNum</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EnergyPlus Python API Documentation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Root Api Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../func.html">Functional API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../runtime.html">Runtime API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datatransfer.html">Data Transfer API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, National Renewable Energy Laboratory for the United States Department of Energy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
