@@ -359,12 +359,12 @@ namespace ResultsFramework {
             ShowWarningMessage("Failed to convert datetime when adding new output row. Skipping row.");
             return;
         }
-        TS.push_back(buffer);
+        TS.emplace_back(buffer);
     }
 
     void DataFrame::newRow(const std::string &ts)
     {
-        TS.push_back(ts);
+        TS.emplace_back(ts);
     }
 
     void DataFrame::setRDataFrameEnabled(bool state)
@@ -442,7 +442,6 @@ namespace ResultsFramework {
             for (auto const &varMap : variableMap) {
                 vals.push_back(varMap.second.value(row));
             }
-
             rows.push_back({{TS.at(row), vals}});
         }
         root = {{"ReportFrequency", ReportFrequency}, {"Cols", cols}, {"Rows", rows}};
@@ -1077,7 +1076,9 @@ namespace ResultsFramework {
     void ResultsSchema::parseTSOutputs(json const & data, std::map<std::string, std::vector<std::string>> & outputs)
     {
         std::vector<int> indices;
+        std::unordered_set<std::string> seen;
         std::string search_string;
+//        std::vector<std::map<std::string, std::vector<std::string>>> & outputs;
 
         std::string reportFrequency = data.at("ReportFrequency").get<std::string>();
         if (reportFrequency == "Detailed-HVAC" || reportFrequency == "Detailed-Zone") {
@@ -1094,6 +1095,37 @@ namespace ResultsFramework {
         }
 
         auto const & rows = data.at("Rows");
+        for (auto it = rows.rbegin(); it != rows.rend(); ++it) {
+            for (auto& el : it->items()) {
+//                auto const inserted = seen.insert(el.key());
+//                if (!inserted.second) {
+//
+//                }
+//                if (el.key() == "1") {
+//                    std::string test = "";
+//                }
+                auto found_key = outputs.find(el.key());
+                if (found_key == outputs.end()) {
+                    std::vector<std::string> output(outputVariables.size());
+                    int i = 0;
+                    for (auto const & col : el.value()) {
+                        dtoa(col.get<double>(), s);
+                        output[indices[i]] = s;
+//                        output[indices[i]] = col.get<std::string>();
+                        ++i;
+                    }
+                    outputs[el.key()] = output;
+                } else {
+                    int i = 0;
+                    for (auto const & col : el.value()) {
+                        dtoa(col.get<double>(), s);
+                        found_key->second[indices[i]] = s;
+//                        found_key->second[indices[i]] = col.get<std::string>();
+                        ++i;
+                    }
+                }
+            }
+        }
         for (auto const & row : rows) {
             for (auto& el : row.items()) {
 //                if (el.key() == "1") {
@@ -1123,47 +1155,144 @@ namespace ResultsFramework {
         }
     }
 
+    std::map<std::string, std::string> ResultsSchema::findEndOfMonth(std::map<std::string, std::vector<std::string>> const & outputs)
+    {
+        std::map<std::string, std::string> endOfMonth;
+        std::string prev_month;
+        auto it = outputs.begin(), prev = outputs.end();
+        if (it->first.size() > 1) {
+            prev_month = it->first.substr(0, 2);
+        }
+        for (it = outputs.begin(); it != outputs.end(); ++it) {
+            if (it->first.size() > 2) {
+                prev = it;
+                auto const &month = it->first.substr(0, 2);
+                if (month != prev_month) {
+                    auto tmp_prev = prev;
+                    --tmp_prev;
+                    endOfMonth.emplace(prev_month, tmp_prev->first);
+                    prev_month = month;
+                }
+            }
+        }
+        if (it == outputs.end()) {
+            endOfMonth.emplace(prev_month, prev->first);
+        }
+        return endOfMonth;
+    }
+
+    void ResultsSchema::fixMonthly(std::map<std::string, std::vector<std::string>> & outputs) {
+        static const std::vector<std::pair<std::string, std::string>> months({{"1",  "01"},
+                                                                              {"2",  "02"},
+                                                                              {"3",  "03"},
+                                                                              {"4",  "04"},
+                                                                              {"5",  "05"},
+                                                                              {"6",  "06"},
+                                                                              {"7",  "07"},
+                                                                              {"8",  "08"},
+                                                                              {"9",  "09"},
+                                                                              {"10", "10"},
+                                                                              {"11", "11"},
+                                                                              {"12", "12"}});
+
+        auto const endOfMonth = findEndOfMonth(outputs);
+
+        for (auto const &month : months) {
+            auto found = outputs.find(month.first);
+            if (found != outputs.end()) {
+                std::string datetime;
+                auto found_datetime = endOfMonth.find(month.second);
+                if (found_datetime != endOfMonth.end()) {
+                    datetime = found_datetime->second;
+                }
+                auto found_actual = outputs.find(datetime);
+                if (found_actual != outputs.end()) {
+                    if (found->second.size() != found_actual->second.size()) {
+                        ShowFatalError("Unequal sizes in output array sizes");
+                    }
+                    for (std::size_t i = 0; i < found->second.size(); ++i) {
+                        if (found_actual->second[i].empty() && !found->second[i].empty()) {
+                            found_actual->second[i] = found->second[i];
+                        }
+                    }
+                    outputs.erase(found);
+                }
+            }
+        }
+    }
+
+    std::string & ResultsSchema::convertToMonth(std::string & datetime) {
+        // if running this function, there should only ever be 12 + design days values to change
+        static const std::map<std::string, std::string> months({{"01", "January"},
+                                                                {"02", "February"},
+                                                                {"03", "March"},
+                                                                {"04", "April"},
+                                                                {"05", "May"},
+                                                                {"06", "June"},
+                                                                {"07", "July"},
+                                                                {"08", "August"},
+                                                                {"09", "September"},
+                                                                {"10", "October"},
+                                                                {"11", "November"},
+                                                                {"12", "December"}});
+        // 01/01 24:00:00
+        auto const month = datetime.substr(0, 2);
+        auto const pos = datetime.find(' ');
+        std::string time;
+        if (pos != std::string::npos) {
+            time = datetime.substr(pos);
+        }
+        if (time != " 24:00:00") {
+            ShowFatalError("Monthly output variables should occur at the end of the day.");
+        }
+        datetime = months.find(month)->second;
+        return datetime;
+    }
+
     void ResultsSchema::writeCSVOutput()
     {
+        if (!hasOutputData()) {
+            return;
+        }
         std::map<std::string, std::vector<std::string>> outputs;
         OutputProcessor::ReportingFrequency reportingFrequency;
         bool hasMonthly = false;
 
         // Output yearly time series data
-        if (RIYearlyTSData.iDataFrameEnabled() || RIYearlyTSData.rDataFrameEnabled()) {
+        if (hasRIYearlyTSData()) {
             auto json_data = RIYearlyTSData.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
         }
 
-        if (YRMeters.rDataFrameEnabled()) {
+        if (hasYRMeters()) {
             auto json_data =  YRMeters.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
         }
 
         // Output run period time series data
-        if (RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled()) {
+        if (hasRIRunPeriodTSData()) {
             auto json_data = RIRunPeriodTSData.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Simulation;
         }
 
-        if (SMMeters.rDataFrameEnabled()) {
+        if (hasSMMeters()) {
             auto json_data =  SMMeters.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Simulation;
         }
 
         // Output monthly time series data
-        if (RIMonthlyTSData.iDataFrameEnabled() || RIMonthlyTSData.rDataFrameEnabled()) {
+        if (hasRIMonthlyTSData()) {
             auto json_data = RIMonthlyTSData.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Monthly;
             hasMonthly = true;
         }
 
-        if (MNMeters.rDataFrameEnabled()) {
+        if (hasMNMeters()) {
             auto json_data =  MNMeters.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Monthly;
@@ -1171,103 +1300,60 @@ namespace ResultsFramework {
         }
 
         // Output daily time series data
-        if (RIDailyTSData.iDataFrameEnabled() || RIDailyTSData.rDataFrameEnabled()) {
+        if (hasRIDailyTSData()) {
             auto json_data = RIDailyTSData.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Daily;
         }
 
-        if (DYMeters.rDataFrameEnabled()) {
+        if (hasDYMeters()) {
             auto json_data =  DYMeters.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Daily;
         }
 
         // Output hourly time series data
-        if (RIHourlyTSData.iDataFrameEnabled() || RIHourlyTSData.rDataFrameEnabled()) {
+        if (hasRIHourlyTSData()) {
             auto json_data = RIHourlyTSData.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Hourly;
         }
 
-        if (HRMeters.rDataFrameEnabled()) {
+        if (hasHRMeters()) {
             auto json_data =  HRMeters.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Hourly;
         }
 
         // Output timestep time series data
-        if (RITimestepTSData.iDataFrameEnabled() || RITimestepTSData.rDataFrameEnabled()) {
+        if (hasRITimestepTSData()) {
             auto json_data = RITimestepTSData.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::TimeStep;
         }
 
-        if (TSMeters.rDataFrameEnabled()) {
+        if (hasTSMeters()) {
             auto json_data = TSMeters.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::TimeStep;
         }
 
         // Output detailed HVAC time series data
-        if (RIDetailedHVACTSData.iDataFrameEnabled() || RIDetailedHVACTSData.rDataFrameEnabled()) {
+        if (hasRIDetailedHVACTSData()) {
             auto json_data = RIDetailedHVACTSData.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::EachCall;
         }
 
         // Output detailed Zone time series data
-        if (RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled()) {
+        if (hasRIDetailedZoneTSData()) {
             auto json_data = RIDetailedZoneTSData.getJSON();
             parseTSOutputs(json_data, outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::EachCall;
         }
 
-        std::map<std::string, std::string> endOfMonth;
         if (hasMonthly) {
-            std::map<std::string, std::string> months({{"1", "01"}, {"2", "02"}, {"3", "03"}, {"4", "04"}, {"5", "05"}, {"6", "06"}, {"7", "07"}, {"8", "08"}, {"9", "09"}, {"10", "10"}, {"11", "11"}, {"12", "12"}});
-            std::string prev_month;
-            auto it = outputs.begin(), prev = outputs.end();
-            if (it->first.size() > 1) {
-                prev_month = it->first.substr(0, 2);
-            }
-            for (it = outputs.begin(); it != outputs.end(); ++it) {
-                if (it->first.size() > 2) {
-                    prev = it;
-                    auto const & month = it->first.substr(0, 2);
-                    if (month != prev_month) {
-                        --prev;
-                        endOfMonth.emplace(prev_month, prev->first);
-                        prev_month = month;
-                    }
-                }
-            }
-            if (it == outputs.end()) {
-                endOfMonth.emplace(prev_month, prev->first);
-            }
-
-            for (auto const & month : months) {
-                auto found = outputs.find(month.first);
-                if (found != outputs.end()) {
-                    std::string datetime;
-                    auto found_datetime = endOfMonth.find(month.second);
-                    if (found_datetime != endOfMonth.end()) {
-                        datetime = found_datetime->second;
-                    }
-                    auto found_actual = outputs.find(datetime);
-                    if (found_actual != outputs.end()) {
-                        if(found->second.size() != found_actual->second.size()) {
-                            ShowFatalError("Unequal sizes in output array sizes");
-                        }
-                        for (std::size_t i = 0; i < found->second.size(); ++i) {
-                            if (found_actual->second[i].empty() && !found->second[i].empty()) {
-                                found_actual->second[i] = found->second[i];
-                            }
-                        }
-                    }
-                    outputs.erase(found);
-                }
-            }
+            fixMonthly(outputs);
         }
 
         auto & outputFiles = OutputFiles::getSingleton();
@@ -1293,7 +1379,12 @@ namespace ResultsFramework {
 
         for (auto const & item : outputs) {
             std::string datetime = item.first;
-            print(outputFiles.csv, " {},", datetime.replace(datetime.find(' '), 1, "  "));
+            if (reportingFrequency < OutputProcessor::ReportingFrequency::Monthly) {
+                datetime = datetime.replace(datetime.find(' '), 1, "  ");
+            } else {
+                convertToMonth(datetime);
+            }
+            print(outputFiles.csv, " {},", datetime);
 //            *os << ' ' << datetime.replace(datetime.find(' '), 1, "  ") << ",";
             auto result = std::find_if(item.second.rbegin(), item.second.rend(), [](std::string const & v) { return !v.empty(); } );
             auto last = item.second.end();
@@ -1311,43 +1402,43 @@ namespace ResultsFramework {
     void ResultsSchema::writeTimeSeriesReports()
     {
         // Output detailed Zone time series data
-        if (OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() || OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled()) {
-            OutputSchema->RIDetailedZoneTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+        if (hasRIDetailedZoneTSData()) {
+            RIDetailedZoneTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output detailed HVAC time series data
-        if (OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() || OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled()) {
-            OutputSchema->RIDetailedHVACTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+        if (hasRIDetailedHVACTSData()) {
+            RIDetailedHVACTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output timestep time series data
-        if (OutputSchema->RITimestepTSData.iDataFrameEnabled() || OutputSchema->RITimestepTSData.rDataFrameEnabled()) {
-            OutputSchema->RITimestepTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+        if (hasRITimestepTSData()) {
+            RITimestepTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output hourly time series data
-        if (OutputSchema->RIHourlyTSData.iDataFrameEnabled() || OutputSchema->RIHourlyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIHourlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+        if (hasRIHourlyTSData()) {
+            RIHourlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output daily time series data
-        if (OutputSchema->RIDailyTSData.iDataFrameEnabled() || OutputSchema->RIDailyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIDailyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+        if (hasRIDailyTSData()) {
+            RIDailyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output monthly time series data
-        if (OutputSchema->RIMonthlyTSData.iDataFrameEnabled() || OutputSchema->RIMonthlyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIMonthlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+        if (hasRIMonthlyTSData()) {
+            RIMonthlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output run period time series data
-        if (OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() || OutputSchema->RIRunPeriodTSData.rDataFrameEnabled()) {
-            OutputSchema->RIRunPeriodTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+        if (hasRIRunPeriodTSData()) {
+            RIRunPeriodTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output yearly time series data
-        if (OutputSchema->RIYearlyTSData.iDataFrameEnabled() || OutputSchema->RIYearlyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIYearlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+        if (hasRIYearlyTSData()) {
+            RIYearlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
         }
     }
 
@@ -1358,35 +1449,35 @@ namespace ResultsFramework {
         root = {{"SimulationResults", {{"Simulation", SimulationInformation.getJSON()}}}};
 
         // output variables
-        if (RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled()) {
+        if (hasRIDetailedZoneTSData()) {
             outputVars["Detailed-Zone"] = RIDetailedZoneTSData.getVariablesJSON();
         }
 
-        if (RIDetailedHVACTSData.iDataFrameEnabled() || RIDetailedHVACTSData.rDataFrameEnabled()) {
+        if (hasRIDetailedHVACTSData()) {
             outputVars["Detailed-HVAC"] = RIDetailedHVACTSData.getVariablesJSON();
         }
 
-        if (RITimestepTSData.iDataFrameEnabled() || RITimestepTSData.rDataFrameEnabled()) {
+        if (hasRITimestepTSData()) {
             outputVars["Timestep"] = RITimestepTSData.getVariablesJSON();
         }
 
-        if (RIHourlyTSData.iDataFrameEnabled() || RIHourlyTSData.rDataFrameEnabled()) {
+        if (hasRIHourlyTSData()) {
             outputVars["Hourly"] = RIHourlyTSData.getVariablesJSON();
         }
 
-        if (RIDailyTSData.iDataFrameEnabled() || RIDailyTSData.rDataFrameEnabled()) {
+        if (hasRIDailyTSData()) {
             outputVars["Daily"], RIDailyTSData.getVariablesJSON();
         }
 
-        if (RIMonthlyTSData.iDataFrameEnabled() || RIMonthlyTSData.rDataFrameEnabled()) {
+        if (hasRIMonthlyTSData()) {
             outputVars["Monthly"] = RIMonthlyTSData.getVariablesJSON();
         }
 
-        if (RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled()) {
+        if (hasRIRunPeriodTSData()) {
             outputVars["RunPeriod"] = RIRunPeriodTSData.getVariablesJSON();
         }
 
-        if (RIYearlyTSData.iDataFrameEnabled() || RIYearlyTSData.rDataFrameEnabled()) {
+        if (hasRIYearlyTSData()) {
             outputVars["Yearly"] = RIYearlyTSData.getVariablesJSON();
         }
 
@@ -1400,51 +1491,51 @@ namespace ResultsFramework {
         // meter variables
 
         // -- meter values
-        if (TSMeters.rDataFrameEnabled()) {
+        if (hasTSMeters()) {
             meterVars["Timestep"] = TSMeters.getVariablesJSON();
         }
 
-        if (HRMeters.rDataFrameEnabled()) {
+        if (hasHRMeters()) {
             meterVars["Hourly"] = HRMeters.getVariablesJSON();
         }
 
-        if (DYMeters.rDataFrameEnabled()) {
+        if (hasDYMeters()) {
             meterVars["Daily"] = DYMeters.getVariablesJSON();
         }
 
-        if (MNMeters.rDataFrameEnabled()) {
+        if (hasMNMeters()) {
             meterVars["Monthly"] = MNMeters.getVariablesJSON();
         }
 
-        if (SMMeters.rDataFrameEnabled()) {
+        if (hasSMMeters()) {
             meterVars["RunPeriod"] = SMMeters.getVariablesJSON();
         }
 
-        if (YRMeters.rDataFrameEnabled()) {
+        if (hasYRMeters()) {
             meterVars["Yearly"] = YRMeters.getVariablesJSON();
         }
 
-        if (TSMeters.rDataFrameEnabled()) {
+        if (hasTSMeters()) {
             meterData["Timestep"] = TSMeters.getJSON();
         }
 
-        if (HRMeters.rDataFrameEnabled()) {
+        if (hasHRMeters()) {
             meterData["Hourly"] = HRMeters.getJSON();
         }
 
-        if (DYMeters.rDataFrameEnabled()) {
+        if (hasDYMeters()) {
             meterData["Daily"] = DYMeters.getJSON();
         }
 
-        if (MNMeters.rDataFrameEnabled()) {
+        if (hasMNMeters()) {
             meterData["Monthly"] = MNMeters.getJSON();
         }
 
-        if (SMMeters.rDataFrameEnabled()) {
+        if (hasSMMeters()) {
             meterData["RunPeriod"] = SMMeters.getJSON();
         }
 
-        if (YRMeters.rDataFrameEnabled()) {
+        if (hasYRMeters()) {
             meterData["Yearly"] = YRMeters.getJSON();
         }
 
