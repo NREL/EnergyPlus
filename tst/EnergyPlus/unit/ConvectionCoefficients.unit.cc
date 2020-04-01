@@ -1281,7 +1281,7 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
 
     //Scenario: Horizontal surface with enhanced convection:
     // Hcov expected = 4.040
-    // A positive Delta_T is required for reduced convection
+    // A positive Delta_T is required for enhanced convection
 
     Tsurf = 20.0;
     Tamb = 30.0;
@@ -1306,7 +1306,6 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
 
     //Scenario: tilted surface with enhanced convection
     // Hcov expected = 3.870
-    // A negative Delta_T is required for reduced convection
 
     Tsurf = 20.0;
     Tamb = 30.0;
@@ -1317,7 +1316,8 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 
 
-    //Scenario: 180 degree surface, positive Delta_T
+    //Scenario: horizontal surface, reduced convection
+    // 180 degree surface, negative Delta_T
     // Hcov expected = 0.948
 
     Tsurf = 30.0;
@@ -1328,7 +1328,8 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 
-    //Scenario: 180 degree surface, negative Delta_T
+    //Scenario: horizontal surface, enhanced convection
+    // 180 degree surface, positive Delta_T
     // Hcov expected = 4.040
 
     Tsurf = 20.0;
