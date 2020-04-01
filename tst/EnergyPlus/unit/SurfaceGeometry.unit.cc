@@ -5112,8 +5112,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
 
     ErrorsFound = false;
 
+    //std::string const error_string = delimited_string({
+    //"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:bySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
+    //    });
+    //EXPECT_TRUE(compare_err_stream(error_string, true));
+
     // For this test case, Zones 1 and 2 share a radiant enclosure and Zone 1 and 3 share a solar enclosure
-    // While InteriorWindow is disabled, Zones 1, 2, and 3 share a solar enclosure
 
     EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 2);
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
@@ -5125,17 +5129,267 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 1);
     EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 2);
 
+    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 2);
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 2);
+    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
+
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries3)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "Zone 1;             !- Name",
+
+        "Zone,",
+        "Zone 2;             !- Name",
+
+        "Zone,",
+        "Zone 3;             !- Name",
+
+        "Zone,",
+        "Zone 4;             !- Name",
+
+        "Zone,",
+        "Zone 5;             !- Name",
+
+        "Material,",
+        "    Some Material,         !- Name",
+        "    VeryRough,               !- Roughness",
+        "    0.006,                   !- Thickness {m}",
+        "    0.815,                   !- Conductivity {W/m-K}",
+        "    929,                     !- Density {kg/m3}",
+        "    3140,                    !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.7,                     !- Solar Absorptance",
+        "    0.7;                     !- Visible Absorptance",
+        "Construction,",
+        "    Some Construction,  !- Name",
+        "    Some Material;        !- Outside Layer",
+        "Construction:AirBoundary,",
+        "Grouped Air Boundary, !- Name",
+        "GroupedZones,            !- Solar and Daylighting Method",
+        "GroupedZones,            !- Radiant Exchange Method",
+        "None;                    !- Air Exchange Method",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone2-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone2-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 2,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone1-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone2-Surface2,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 2,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone3-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone3-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 3,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone2-Surface2,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone3-Surface2,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 3,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone4-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone4-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 4,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone3-Surface2,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+         "BuildingSurface:Detailed,",
+        "    Zone4-Surface2,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 4,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone5-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone5-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 5,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone4-Surface2,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+       "BuildingSurface:Detailed,",
+        "    Zone1-Surface3,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone5-Surface2,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone5-Surface2,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 5,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone1-Surface3,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        });
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);    // expect no errors
+
+    GetConstructData(ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);     // expect no errors
+
+    GetZoneData(ErrorsFound);  // read zone data
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
+    // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
+    // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
+    // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    // For this test case, there are air boundaries
+    // Between Zones 1 and 2
+    // None between Zones 2 and 3
+    // Between Zones 3 and 4 
+    // Between Zones 4 and 5
+    // Between Zones 1 and 5
+    // This should trigger the enclosure merging and all five zones should share a radiant and solar enclosure
+
+    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[2], "Zone 5"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[3], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[4], "Zone 4"));
+    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(4).RadiantEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(5).RadiantEnclosureNum, 1);
+
     EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 1);
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    //EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 3"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[2], "Zone 3"));
-    //EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Zone 2"));
-    //EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[2], "Zone 5"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[3], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[4], "Zone 4"));
     EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
-    //EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 2);
     EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 1);
     EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(4).SolarEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(5).SolarEnclosureNum, 1);
 
 }

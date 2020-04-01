@@ -114,8 +114,6 @@ void EnergyPlusFixture::SetUp()
 void EnergyPlusFixture::TearDown()
 {
 
-    clearAllStates();
-
     {
         IOFlags flags;
         flags.DISPOSE("DELETE");
@@ -133,6 +131,9 @@ void EnergyPlusFixture::TearDown()
         ObjexxFCL::gio::close(DataGlobals::OutputDElightIn, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileShadingFrac, flags);
     }
+
+    clearAllStates();
+
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)

@@ -367,6 +367,12 @@ namespace SimulationManager {
         if (!eplusRunningViaAPI) {
             EnergyPlus::PluginManagement::pluginManager =
                 std::unique_ptr<EnergyPlus::PluginManagement::PluginManager>(new EnergyPlus::PluginManagement::PluginManager);
+        } else {
+            // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
+            bool invalidPluginObjects = EnergyPlus::PluginManagement::PluginManager::anyUnexpectedPluginObjects();
+            if (invalidPluginObjects) {
+                ShowFatalError("Invalid Python Plugin object encounter causes program termination");
+            }
         }
 
         DoingSizing = true;
