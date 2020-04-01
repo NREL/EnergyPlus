@@ -1406,11 +1406,8 @@ namespace WaterCoils {
                     //        DesSatEnthAtWaterInTemp =PsyHFnTdbW(WaterCoil(CoilNum)%DesInletWaterTemp, &
                     //                                             PsyWFnTdpPb(WaterCoil(CoilNum)%DesInletWaterTemp,StdBaroPress))
 
-                    // Total Coil Load from Inlet and Outlet Air States.
+                    // Total Coil Load from Inlet and Outlet Air States (which include fan heat as appropriate).
                     WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesAirMassFlowRate * (DesInletAirEnth - DesOutletAirEnth);
-                    if (CurSysNum > 0 && CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
-                        WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesTotWaterCoilLoad + PrimaryAirSystem(CurSysNum).FanDesCoolLoad;
-                    }
 
                     // Enthalpy of Water at Intlet design conditions
                     Cp = GetSpecificHeatGlycol(PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName,
