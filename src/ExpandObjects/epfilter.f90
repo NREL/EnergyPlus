@@ -16056,7 +16056,11 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('Cooling Coil Name', TRIM(coolCoilObjectName))
   CALL AddToObjStr('Use DOAS DX Cooling Coil','')
   CALL AddToObjStr('DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}','')
-  CALL AddToObjStr('Latent Load Control','')
+  IF (isDehumidifyNone) THEN
+    CALL AddToObjStr('Latent Load Control','SensibleOnlyLoadControl')
+  ELSE
+    CALL AddToObjStr('Latent Load Control','LatentWithSensibleLoadControl')
+  END IF
   CALL AddToObjStr('Supplemental Heating Coil Object Type',TRIM(supheatCoilObjectType))
   CALL AddToObjStr('Supplemental Heating Coil Name',TRIM(supheatCoilObjectName))
   CALL AddToObjStr('Cooling Supply Air Flow Rate Method','SupplyAirFlowRate')

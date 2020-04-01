@@ -233,6 +233,7 @@ namespace OutputProcessor {
         J_m2,
         clo,
         W_K,
+        K_W,
         kgWater_s,
         unknown,
         customEMS
@@ -395,6 +396,8 @@ namespace OutputProcessor {
         std::string VarName;                // Name of Variable
         std::string VarNameUC;              // Name of Variable
         std::string VarNameOnly;            // Name of Variable
+        std::string VarNameOnlyUC;       // Name of Variable with out key in uppercase
+        std::string KeyNameOnlyUC;       // Name of key only witht out variable in uppercase
         OutputProcessor::Unit units;        // Units for Variable
         IntegerVariables VarPtr;            // Pointer used to integer Variables structure
 

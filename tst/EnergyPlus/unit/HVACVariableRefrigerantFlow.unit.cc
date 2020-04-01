@@ -124,7 +124,6 @@ using namespace EnergyPlus::SizingManager;
 
 namespace EnergyPlus {
 
-class HVACVRFFixture: public EnergyPlusFixture {};
 class AirLoopFixture: public EnergyPlusFixture {
 
 public:
@@ -381,7 +380,7 @@ protected:
         HVACVariableRefrigerantFlow::MaxCoolingCapacity(1) = 1.0E20;
         HVACVariableRefrigerantFlow::MaxHeatingCapacity.allocate(1);
         HVACVariableRefrigerantFlow::MaxHeatingCapacity(1) = 1.0E20;
-        
+
         int Sch1 = 1;
         int Sch2 = 2;
 
@@ -662,7 +661,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
 }
 
 //*****************VRF-FluidTCtrl Model
-TEST_F(HVACVRFFixture, VRF_FluidTCtrl_VRFOU_Compressor)
+TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 {
     //   PURPOSE OF THIS TEST:
     //   Test a group of methods related with the outdoor unit compressor calculations in the VRF_FluidTCtrl model.
@@ -2479,7 +2478,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 }
 }
 
-TEST_F(HVACVRFFixture, VRF_FluidTCtrl_VRFOU_Coil)
+TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
 {
     //   PURPOSE OF THIS TEST:
     //   Test a group of methods related with the outdoor unit coil calculations in the VRF_FluidTCtrl model.
@@ -2676,7 +2675,7 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
 VRF.deallocate();
 }
 
-TEST_F(HVACVRFFixture, VRF_FluidTCtrl_GetCoilInput)
+TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_GetCoilInput)
 {
     // PURPOSE OF THE TEST:
     //   IDF Read in for the new coil type: Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
@@ -2720,7 +2719,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_GetCoilInput)
     EXPECT_EQ(DXCoil(1).SH, 3);
 }
 
-TEST_F(HVACVRFFixture, VRF_FluidTCtrl_CompResidual)
+TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
 {
     // PURPOSE OF THIS SUBROUTINE:
     //  Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
@@ -2770,7 +2769,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_CompResidual)
     Par.deallocate();
 }
 
-TEST_F(HVACVRFFixture, VRF_FluidTCtrl_FanSpdResidualCool)
+TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualCool)
 {
     // PURPOSE OF THIS TEST:
     //   Test the method FanSpdResidualCool.
@@ -2811,7 +2810,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_FanSpdResidualCool)
     Par.deallocate();
 }
 
-TEST_F(HVACVRFFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
+TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
 {
     // PURPOSE OF THIS TEST:
     //   Test the method FanSpdResidualHeat.
@@ -2852,7 +2851,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
     Par.deallocate();
 }
 
-TEST_F(HVACVRFFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
+TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
 {
     // PURPOSE OF THIS TEST:
     //   Test the method CalcVRFIUAirFlow, which analyzes the VRF Indoor Unit operations given zonal loads.
@@ -2960,7 +2959,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
 
 }
 
-TEST_F(HVACVRFFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
+TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
 {
     // PURPOSE OF THIS TEST:
     //   Test the method CalcVRFIUTeTc_FluidTCtrl, which determines the VRF evaporating temperature at
@@ -3124,7 +3123,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
 }
 
 //*****************VRF-SysCurve Model
-TEST_F(HVACVRFFixture, VRFTest_SysCurve)
+TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 {
 
     bool ErrorsFound(false);       // function returns true on error
@@ -3779,8 +3778,8 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     ASSERT_EQ(ZoneInletAirNode,
               ZoneEquipConfig(VRFTU(VRFTUNum).ZoneNum).InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
     ASSERT_EQ(1.0, VRF(VRFCond).CoolingCombinationRatio);
-    EXPECT_NEAR(11176.29, VRF(VRFCond).CoolingCapacity, 0.01);
-    EXPECT_NEAR(11176.29, VRF(VRFCond).HeatingCapacity, 0.01);
+    EXPECT_NEAR(11170.869, VRF(VRFCond).CoolingCapacity, 0.001);
+    EXPECT_NEAR(11170.869, VRF(VRFCond).HeatingCapacity, 0.001);
     EXPECT_EQ(0.0, VRF(VRFCond).DefrostPower);
 
     // test defrost operation Issue #4950 - Reverse cycle with timed defrost = 0
@@ -4111,7 +4110,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
 }
 
-TEST_F(HVACVRFFixture, VRFTest_SysCurve_GetInputFailers)
+TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 {
     // Author: R. Raustad, FSEC
 
@@ -4718,7 +4717,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_GetInputFailers)
 
 }
 
-TEST_F(HVACVRFFixture, VRFTest_SysCurve_WaterCooled)
+TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 {
 
     static std::string const RoutineName("VRFTest_WaterCooled");
@@ -5743,7 +5742,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_WaterCooled)
               0.0); // flow should be > 0 at no load flow rate for constant fan mode in this example
 }
 
-TEST_F(HVACVRFFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
+TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 {
 
     // static std::string const RoutineName( "VRFTest_NoLoadOAFlowTest" );
@@ -6449,7 +6448,7 @@ TEST_F(HVACVRFFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 
 }
 
-TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest)
+TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 {
 
     std::string const idf_objects = delimited_string({
@@ -6770,7 +6769,7 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest)
     EXPECT_EQ(HREIRAdjustment, VRF(VRFCond).HREIRFTHeatConst);
 }
 
-TEST_F(HVACVRFFixture, VRFTU_SupplementalHeatingCoilGetInput)
+TEST_F(EnergyPlusFixture, VRFTU_SupplementalHeatingCoilGetInput)
 {
     // PURPOSE OF THE TEST:
     // IDF Read in for the VRF terminal unit "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"
@@ -7880,7 +7879,7 @@ TEST_F(HVACVRFFixture, VRFTU_SupplementalHeatingCoilGetInput)
     EXPECT_EQ(VRFTU_5.SuppHeatCoilName, "TU5 SUPP HEATING COIL");
 }
 
-TEST_F(HVACVRFFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
 {
     // PURPOSE OF THE TEST:
     // checks VRF terminal units supplemental electric heating coil calculation
@@ -7944,7 +7943,7 @@ TEST_F(HVACVRFFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     EXPECT_EQ(10000.0, HeatingCoils::HeatingCoil(CoilNum).ElecUseRate);
 }
 
-TEST_F(HVACVRFFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
 {
     // PURPOSE OF THE TEST:
     // checks VRF terminal units supplemental natural gas heating coil calculation
@@ -8008,7 +8007,7 @@ TEST_F(HVACVRFFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     EXPECT_EQ(10000.0, HeatingCoils::HeatingCoil(CoilNum).FuelUseRate);
 }
 
-TEST_F(HVACVRFFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
 {
     // PURPOSE OF THE TEST:
     // checks VRF terminal units supplemental hot water heating coil calculation
@@ -8127,7 +8126,7 @@ TEST_F(HVACVRFFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     EXPECT_NEAR(12000.0, WaterCoils::WaterCoil(CoilNum).TotWaterHeatingCoilRate, 5.0);
 }
 
-TEST_F(HVACVRFFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
+TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
 {
     // PURPOSE OF THE TEST:
     // checks VRF terminal units supplemental steam heating coil calculation
@@ -8234,7 +8233,7 @@ TEST_F(HVACVRFFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     EXPECT_DOUBLE_EQ(SteamCoils::SteamCoil(CoilNum).OperatingCapacity, SteamCoils::SteamCoil(CoilNum).TotSteamHeatingCoilRate);
 }
 
-TEST_F(HVACVRFFixture, VRFTU_SupplementalHeatingCoilCapacityLimitTest)
+TEST_F(EnergyPlusFixture, VRFTU_SupplementalHeatingCoilCapacityLimitTest)
 {
     // PURPOSE OF THE TEST:
     // heating capacity limit calculation based on maximum supply air temperature
@@ -8267,7 +8266,7 @@ TEST_F(HVACVRFFixture, VRFTU_SupplementalHeatingCoilCapacityLimitTest)
     EXPECT_NEAR(ExpectedResult, SuppHeatCoilCapMax, 0.0001);
 }
 
-TEST_F(HVACVRFFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
+TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
 {
 
     std::string const idf_objects = delimited_string({
@@ -10560,11 +10559,11 @@ TEST_F(HVACVRFFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check fan operation for cooling mode
     Real64 Result_AirMassFlowRateDesign = HVACFan::fanObjs[0]->maxAirMassFlowRate();
-    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347040, 0.000001);
+    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347052, 0.000001);
     Real64 Result_AirMassFlowRate = DataLoopNode::Node(HVACFan::fanObjs[0]->outletNodeNum).MassFlowRate;
     EXPECT_NEAR(Result_AirMassFlowRate, DXCoils::DXCoil(1).RatedAirMassFlowRate(1), 0.000001);
     Real64 Result_FanPower = HVACFan::fanObjs[0]->fanPower();
-    EXPECT_NEAR(Result_FanPower, 39.588, 0.001);
+    EXPECT_NEAR(Result_FanPower, 39.589, 0.001);
 
     // test no load mode fan operation
     ZoneSysEnergyDemand(1).RemainingOutputRequired = 0.0;
@@ -10578,14 +10577,14 @@ TEST_F(HVACVRFFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check no load fan operation
     Result_AirMassFlowRateDesign = HVACFan::fanObjs[0]->maxAirMassFlowRate();
-    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347046, 0.00001);
+    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.34706, 0.00001);
     Result_AirMassFlowRate = DataLoopNode::Node(HVACFan::fanObjs[0]->outletNodeNum).MassFlowRate;
     EXPECT_EQ(Result_AirMassFlowRate, 0.0);
     Result_FanPower = HVACFan::fanObjs[0]->fanPower();
     EXPECT_EQ(Result_FanPower, 0.0);
 }
 
-TEST_F(HVACVRFFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
+TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
 {
 
     bool ErrorsFound(false);       // function returns true on error
@@ -11228,13 +11227,13 @@ TEST_F(HVACVRFFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     EXPECT_EQ(0.0, thisVRFTU.CoolOutAirMassFlow);
     EXPECT_EQ(0.0, thisVRFTU.HeatOutAirMassFlow);
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
-    EXPECT_NEAR(5367.5132, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
-    EXPECT_NEAR(4999.3622, thisVRFTU.TotalCoolingRate, 0.0001);
-    EXPECT_NEAR(368.1510, thisFan.FanPower, 0.0001);
+    EXPECT_NEAR(5367.4015, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
+    EXPECT_NEAR(4999.3782, thisVRFTU.TotalCoolingRate, 0.0001);
+    EXPECT_NEAR(368.0233, thisFan.FanPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
 }
 
-TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
+TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
 {
     //   PURPOSE OF THIS TEST:
     //   Test a group of methods related with the outdoor unit compressor calculations in the VRF_FluidTCtrl model.
@@ -12966,7 +12965,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
 }
 
 // Test for #7648: HREIRFTHeat wrongly used HRCAPFTHeatConst. Occurs only if you have Heat Recovery
-TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
+TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
 {
 
     std::string const idf_objects = delimited_string({
@@ -13198,7 +13197,7 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
 }
 
 
-TEST_F(HVACVRFFixture, VRF_BlowthroughFanPlacement_InputTest)
+TEST_F(EnergyPlusFixture, VRF_BlowthroughFanPlacement_InputTest)
 {
     std::string const idf_objects = delimited_string({
 
@@ -13649,7 +13648,7 @@ TEST_F(HVACVRFFixture, VRF_BlowthroughFanPlacement_InputTest)
     ASSERT_EQ("TU1 SUPP HEATING COIL", thisSuppHeatingCoil.Name);
 }
 
-TEST_F(HVACVRFFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
+TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
 {
     std::string const idf_objects = delimited_string({
 

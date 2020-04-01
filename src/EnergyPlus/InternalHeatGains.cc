@@ -93,6 +93,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterUse.hh>
@@ -3939,6 +3940,19 @@ namespace InternalHeatGains {
                     }
                 }
 
+                if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
+                    Real64 TAirInSizing = 0.0;
+                    // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite object
+                    SetPointManager::GetSetPointManagerInputData(ErrorsFound);
+                    for (int SetPtMgrNum = 1; SetPtMgrNum <= SetPointManager::NumSZClSetPtMgrs; ++SetPtMgrNum) {
+                        if (SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == Loop) {
+                            TAirInSizing = SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
+                        }
+                    }
+
+                    ZoneITEq(Loop).SizingTAirIn = max(TAirInSizing, ZoneITEq(Loop).DesignTAirIn);
+                }
+
                 // Object report variables
                 SetupOutputVariable(
                     "ITE CPU Electric Power", OutputProcessor::Unit::W, ZoneITEq(Loop).CPUPower, "Zone", "Average", ZoneITEq(Loop).Name);
@@ -5617,21 +5631,12 @@ namespace InternalHeatGains {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M.J. Witte
         //       DATE WRITTEN   October 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the gains and other results for ElectricEquipment:ITE:AirCooled.
         // This broken into a separate subroutine, because the calculations are more detailed than the other
         // types of internal gains.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataZoneEquipment::ZoneEquipConfig;
@@ -5646,11 +5651,6 @@ namespace InternalHeatGains {
         using DataRoomAirModel::IsZoneUI;
         using DataRoomAirModel::TCMF;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C
         // From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
         static Array1D<Real64> const DBMin(7, {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0});           // Minimum dry-bulb temperature [C]
@@ -5658,15 +5658,8 @@ namespace InternalHeatGains {
         static Array1D<Real64> const DPMax(7, {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0});        // Maximum dewpoint temperature [C]
         static Array1D<Real64> const DPMin(7, {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0}); // Minimum dewpoint temperature [C]
         static Array1D<Real64> const RHMin(7, {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0});             // Minimum relative humidity [%]
-        static Array1D<Real64> const RHMax(7, {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0});        // Minimum relative humidity [%]
+        static Array1D<Real64> const RHMax(7, {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0});        // Maximum relative humidity [%]
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("CalcZoneITEq");
         int Loop;
         int NZ;
@@ -5831,10 +5824,23 @@ namespace InternalHeatGains {
                 }
             }
             TDPAirIn = PsyTdpFnWPb(WAirIn, StdBaroPress, RoutineName);
-            RHAirIn = PsyRhFnTdbWPb(TAirIn, WAirIn, StdBaroPress, RoutineName);
+            RHAirIn = 100.0 * PsyRhFnTdbWPb(TAirIn, WAirIn, StdBaroPress, RoutineName); // RHAirIn is %
 
             // Calculate power input and airflow
             TAirInDesign = ZoneITEq(Loop).DesignTAirIn;
+
+            if (DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
+
+                TAirInDesign = ZoneITEq(Loop).SizingTAirIn;
+                if (ZoneITEq(Loop).SupplyApproachTempSch != 0) {
+                    TAirInDesign = TAirInDesign + GetCurrentScheduleValue(ZoneITEq(Loop).SupplyApproachTempSch);
+                } else {
+                    TAirInDesign = TAirInDesign + ZoneITEq(Loop).SupplyApproachTemp;
+                }
+                OperSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).OperSchedPtr);
+                CPULoadSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).CPULoadSchedPtr);
+
+            }
 
             CPUPower =
                 max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
@@ -5896,7 +5902,11 @@ namespace InternalHeatGains {
             if (Zone(ZoneITEq(Loop).ZonePtr).HasAdjustedReturnTempByITE) {
                 ZoneITEMap[ZoneITEq(Loop).ZonePtr].push_back(Loop);
             }
-
+            if (DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
+                if (ZoneITEq(Loop).FanPowerAtDesign + ZoneITEq(Loop).CPUPowerAtDesign > ZoneITEq(Loop).DesignTotalPower) {
+                    ZoneITEq(Loop).ConGainRateToZone = ZoneITEq(Loop).FanPowerAtDesign + ZoneITEq(Loop).CPUPowerAtDesign;
+                }
+            }
             // Object report variables
             ZoneITEq(Loop).CPUPower = CPUPower;
             ZoneITEq(Loop).FanPower = FanPower;
@@ -5991,6 +6001,7 @@ namespace InternalHeatGains {
                 }
             }
 
+
         } // ZoneITEq calc loop
 
         // Zone-level sensible heat index
@@ -6024,6 +6035,7 @@ namespace InternalHeatGains {
             }
             it++;
         }
+
     } // End CalcZoneITEq
 
     void ReportInternalHeatGains()

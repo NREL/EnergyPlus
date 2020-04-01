@@ -401,6 +401,7 @@ namespace OutputProcessor {
         EnergyMeters.deallocate();
         EndUseCategory.deallocate();
         UniqueMeterNames.clear();
+        apiVarRequests.clear();
     }
 
     void InitializeOutput()
@@ -5617,6 +5618,9 @@ namespace OutputProcessor {
         case OutputProcessor::Unit::W_K:
             return "W/K";
             break;
+        case OutputProcessor::Unit::K_W:
+            return "K/W";
+            break;
         case OutputProcessor::Unit::ppm:
             return "ppm";
             break;
@@ -5766,6 +5770,8 @@ namespace OutputProcessor {
             return OutputProcessor::Unit::clo;
         } else if (unitUpper == "W/K") {
             return OutputProcessor::Unit::W_K;
+        } else if (unitUpper == "K/W") {
+            return OutputProcessor::Unit::K_W;
         } else if (unitUpper == "KGWATER/S") {
             return OutputProcessor::Unit::kgWater_s;
         } else {
@@ -6121,7 +6127,9 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         thisIVar.storeType = VariableType;
         thisIVar.VarName = KeyedValue + ':' + VarName;
         thisIVar.VarNameOnly = VarName;
+        thisIVar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
         thisIVar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisIVar.VarName);
+        thisIVar.KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
         thisIVar.units = VariableUnit;
         AssignReportNumber(CurrentReportNumber);
         ObjexxFCL::gio::write(IDOut, fmtLD) << CurrentReportNumber;
