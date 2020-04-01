@@ -62,7 +62,11 @@ public:
     void close();
     void del();
     bool good() const;
-    void open_at_end();
+
+    // opens the file if it is not currently open and returns
+    // a reference back to itself
+    OutputFile &ensure_open();
+
     std::string fileName;
     void open();
     std::vector<std::string> getLines();
@@ -97,7 +101,9 @@ public:
         friend class OutputFiles;
     };
 
+    OutputFile audit{"eplusout.audit"};
     OutputFile eio{"eplusout.eio"};
+    OutputFile eso{"eplusout.eso"}; // (hourly data only)
 
     OutputFile zsz{""};
     std::string outputZszCsvFileName{"epluszsz.csv"};
@@ -110,6 +116,7 @@ public:
     std::string outputSszTxtFileName{"eplusssz.txt"};
 
     OutputFile mtr{"eplusout.mtr"};
+    OutputFile bnd{"eplusout.bnd"};
 
     OutputFile csv{"eplusout.csv"};
 

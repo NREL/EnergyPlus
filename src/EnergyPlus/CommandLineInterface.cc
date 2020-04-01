@@ -384,13 +384,13 @@ namespace CommandLineInterface {
         }
 
         // EnergyPlus files
-        outputAuditFileName = outputFilePrefix + normalSuffix + ".audit";
+        OutputFiles::getSingleton().audit.fileName = outputFilePrefix + normalSuffix + ".audit";
         outputBndFileName = outputFilePrefix + normalSuffix + ".bnd";
         outputDxfFileName = outputFilePrefix + normalSuffix + ".dxf";
         OutputFiles::getSingleton().eio.fileName = outputFilePrefix + normalSuffix + ".eio";
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
-        outputEsoFileName = outputFilePrefix + normalSuffix + ".eso";
+        OutputFiles::getSingleton().eso.fileName = outputFilePrefix + normalSuffix + ".eso";
 
         outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
         outputTSZoneJsonFileName = outputFilePrefix + normalSuffix + "_detailed_zone.json";
@@ -877,7 +877,7 @@ namespace CommandLineInterface {
             if (iostatus != 0) {
                 ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             }
-            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputEsoFileName;
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << OutputFiles::getSingleton().eso.fileName;
             ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputCsvFileName;
             ObjexxFCL::gio::close(fileUnitNumber);
         }
