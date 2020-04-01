@@ -1689,10 +1689,14 @@ namespace UnitarySystems {
             TempSize = this->m_MaxHeatAirVolFlow;
             if ((HeatingSAFlowMethod == SupplyAirFlowRate) || (HeatingSAFlowMethod == None)) {
                 ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                if (DataSizing::CurSysNum > 0 && DataSizing::CurOASysNum == 0) {
-                    if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater &&
-                        DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat > 0.0)
-                        TempSize *= DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat;
+                if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize && DataSizing::FinalSysSizing.allocated()) {
+                    if (DataSizing::CurSysNum > 0 && DataSizing::CurOASysNum == 0) {
+                        if ((this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater ||
+                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel ||
+                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric) &&
+                            DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat > 0.0)
+                            TempSize *= DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat;
+                    }
                 }
                 SysHeatingFlow = TempSize;
             } else if (HeatingSAFlowMethod == FlowPerFloorArea) {
