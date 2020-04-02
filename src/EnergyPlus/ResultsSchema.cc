@@ -1358,7 +1358,7 @@ namespace ResultsFramework {
 
         auto & outputFiles = OutputFiles::getSingleton();
 
-        outputFiles.csv.open();
+        outputFiles.csv.ensure_open(outputFiles.outputControl.csv);
         if (!outputFiles.csv.good()) {
             ShowFatalError("OpenOutputFiles: Could not open file " + outputFiles.csv.fileName + " for output (write).");
         }

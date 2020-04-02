@@ -292,7 +292,7 @@ namespace SizingManager {
                 outputFiles.zsz.fileName = outputFiles.outputZszTxtFileName;
             }
 
-            outputFiles.zsz.ensure_open();
+            outputFiles.zsz.ensure_open(outputFiles.outputControl.zsz);
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
@@ -492,7 +492,7 @@ namespace SizingManager {
             } else {
                 outputFiles.ssz.fileName = outputFiles.outputSszTxtFileName;
             }
-            outputFiles.ssz.ensure_open();
+            outputFiles.ssz.ensure_open(outputFiles.outputControl.ssz);
 
             SimAir = true;
             SimZoneEquip = true;
@@ -842,14 +842,14 @@ namespace SizingManager {
 
         int const HourDayToPulse (10);
         int const TimeStepToPulse (1);
-        
+
         if ( (isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
              ((KindOfSim == ksRunPeriodDesign) || (DayOfSim == 1)) ) {
             return true;
         } else {
             return false;
         }
-        
+
     }
 
     void ManageSystemSizingAdjustments()

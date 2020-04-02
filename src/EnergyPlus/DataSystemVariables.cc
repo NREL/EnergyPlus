@@ -251,7 +251,7 @@ namespace DataSystemVariables {
         OutputFiles &outputFiles = OutputFiles::getSingleton();
 
         if (firstTime) {
-            outputFiles.audit.ensure_open();
+            outputFiles.audit.ensure_open(outputFiles.outputControl.audit);
             get_environment_variable(cInputPath1, envinputpath1);
             if (envinputpath1 != blank) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar

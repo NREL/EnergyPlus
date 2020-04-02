@@ -49,6 +49,7 @@
 #define OutputFiles_hh_INCLUDED
 
 #include "DataGlobals.hh"
+#include "nlohmann/json.hpp"
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -65,10 +66,10 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-    OutputFile &ensure_open();
+    OutputFile &ensure_open(bool output_to_file = true);
 
     std::string fileName;
-    void open();
+    void open(bool output_to_file = true);
     std::vector<std::string> getLines();
     void open_as_stringstream();
     std::string get_output();
@@ -76,6 +77,7 @@ public:
 private:
     explicit OutputFile(std::string FileName);
     std::unique_ptr<std::iostream> os;
+    bool print_to_dev_null = false;
     template <typename... Args> friend void print(OutputFile &of, fmt::string_view format_str, const Args &... args);
     template <class InputIterator> friend void print(InputIterator first, InputIterator last, OutputFile &of, const char * delim);
     template <class InputIterator> friend void print(InputIterator first, InputIterator last, OutputFile &outputFile);
@@ -100,6 +102,46 @@ public:
         template <typename... Args> friend void print(OutputFiles::GIOOutputFile &of, fmt::string_view format_str, const Args &... args);
         friend class OutputFiles;
     };
+
+    struct OutputControl
+    {
+        using json = nlohmann::json;
+        OutputControl() = default;
+
+        void getInput();
+
+        bool csv = true;
+        bool mtr = true;
+        bool eso = true;
+        bool eio = true;
+        bool audit = true;
+        bool zsz = true;
+        bool ssz = true;
+        bool dxf = true;
+        bool bnd = true;
+        bool rdd = true;
+        bool mdd = true;
+        bool mtd = true;
+        bool end = true;
+        bool shd = true;
+        bool dfs = true;
+        bool glhe = true;
+        bool delightin = true;
+        bool delightout = true;
+        bool delighteldmp = true;
+        bool delightdfdmp = true;
+        bool edd = true;
+        bool dbg = true;
+        bool perflog = true;
+        bool sln = true;
+        bool sci = true;
+        bool wrl = true;
+        bool screen = true;
+        bool tarcog = true;
+        bool extshd = true;
+    };
+
+    OutputControl outputControl;
 
     OutputFile audit{"eplusout.audit"};
     OutputFile eio{"eplusout.eio"};
