@@ -35,14 +35,12 @@ IS_CI = True
 
 # Get a path that'll work if run directly from this folder (when running
 # locally usually) or the root of the repo (decent_ci for eg)
-SRC_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                 "../../src/EnergyPlus"))
-
+REPO_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..')
+SRC_DIR = os.path.abspath(os.path.join(REPO_ROOT, 'src', 'EnergyPlus'))
 
 # Files for which to ignore missing header warning
-EXPECT_MISSING_HEADER = ['main.cc',
-                         'test_ep_as_library.cc',
+EXPECT_MISSING_HEADER = ['src/EnergyPlus/main.cc',
+                         'src/EnergyPlus/test_ep_as_library.cc',
                          'EnergyPlusPgm.cc']
 
 # Finds a boolean argument passed by reference
@@ -275,6 +273,12 @@ CHECKED_AND_OKED = {
     "OutputReportTabular.cc": {
         "ComputeTableBodyUsingMovingAvg": [
             "resCellsUsd"
+        ],
+        "parseStatLine": [
+            "isKoppen",
+            "heatingDesignlinepassed",
+            "coolingDesignlinepassed",
+            "desConditionlinepassed"
         ]
     },
     "PackagedTerminalHeatPump.cc": {
@@ -444,7 +448,6 @@ def infer_header_from_source(source_file):
     Guess the header file that matches a source_file.
     Throws if doesn't exist
     """
-
     header_file = source_file.replace('.in.cc', '.hh').replace('.cc', '.hh')
     if not os.path.isfile(header_file):
         raise ValueError("Cannot find header file: {}".format(header_file))
@@ -503,7 +506,7 @@ def parse_function_signatures_in_header(header_file):
                    "latin-1".format(rel_file))
             if IS_CI:
                 ci_msg = {'tool': 'find_byref_bool_overide',
-                          'filename': rel_file,
+                          'file': rel_file,
                           'messagetype': 'warning',
                           'message': msg
                           }
@@ -513,7 +516,7 @@ def parse_function_signatures_in_header(header_file):
         with open(header_file, 'r', encoding='latin-1') as f:
             content = f.read()
 
-    # Try to indentify namespace name
+    # Try to identify namespace name
     found_namespaces = []
     re_namespace = re.compile(r'^\s*(?:namespace|struct|class)\s+'
                               r'(?P<namespace>\w+)')
@@ -536,11 +539,12 @@ def parse_function_signatures_in_header(header_file):
 
 
 def check_if_oked(rel_file, function_name, boolname):
-    if rel_file not in CHECKED_AND_OKED:
+    file_name = os.path.basename(rel_file)
+    if file_name not in CHECKED_AND_OKED:
         return False
-    if function_name not in CHECKED_AND_OKED[rel_file]:
+    if function_name not in CHECKED_AND_OKED[file_name]:
         return False
-    if boolname not in CHECKED_AND_OKED[rel_file][function_name]:
+    if boolname not in CHECKED_AND_OKED[file_name][function_name]:
         return False
     return True
 
@@ -564,7 +568,7 @@ def lookup_errors_in_source_file(source_file, found_functions):
     """
 
     # Relative path, for cleaner reporting
-    rel_file = os.path.relpath(source_file, start=SRC_DIR)
+    rel_file = os.path.relpath(source_file, start=REPO_ROOT)
 
     try:
         with open(source_file, 'r') as f:
@@ -575,7 +579,7 @@ def lookup_errors_in_source_file(source_file, found_functions):
                    "latin-1".format(rel_file))
             if IS_CI:
                 ci_msg = {'tool': 'find_byref_bool_overide',
-                          'filename': rel_file,
+                          'file': rel_file,
                           'messagetype': 'warning',
                           'message': msg
                           }
@@ -612,7 +616,7 @@ def lookup_errors_in_source_file(source_file, found_functions):
                                     d=d))
                 if IS_CI:
                     ci_msg = {'tool': 'find_byref_bool_overide',
-                              'filename': rel_file,
+                              'file': rel_file,
                               'messagetype': 'warning',
                               'message': msg
                               }
@@ -636,7 +640,7 @@ def lookup_errors_in_source_file(source_file, found_functions):
                                                                   n=line_num))
             if IS_CI:
                 ci_msg = {'tool': 'find_byref_bool_overide',
-                          'filename': rel_file,
+                          'file': rel_file,
                           'messagetype': 'warning',
                           'message': msg,
                           'line_num': line_num,
@@ -727,7 +731,7 @@ def get_all_errors(source_files):
     all_errors = []
 
     for source_file in source_files:
-        rel_file = os.path.relpath(source_file, start=SRC_DIR)
+        rel_file = os.path.relpath(source_file, start=REPO_ROOT)
         try:
             header_file = infer_header_from_source(source_file)
         except ValueError:
@@ -736,7 +740,7 @@ def get_all_errors(source_files):
                        "{}".format(rel_file))
                 if IS_CI:
                     ci_msg = {'tool': 'find_byref_bool_overide',
-                              'filename': rel_file,
+                              'file': rel_file,
                               'messagetype': 'warning',
                               'message': msg
                               }
@@ -764,7 +768,7 @@ def output_errors_to_console(all_errors):
     for error in all_errors:
         if IS_CI:
             ci_msg = {'tool': 'find_byref_bool_overide',
-                      'filename': error['file'],
+                      'file': error['file'],
                       'line': error['line_num'],
                       'messagetype': 'error',
                       'message': error['msg']

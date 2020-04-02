@@ -85,14 +85,12 @@ namespace HybridEvapCoolingModel {
     class CModeSolutionSpace
     {
     public:
-        std::vector<Real64> PointX;
-        std::vector<Real64> PointY;
-        std::vector<Real64> PointMeta;
-        void AddItem(Real64 X, Real64 Y, Real64 M)
+        std::vector<Real64> MassFlowRatio;
+        std::vector<Real64> OutdoorAirFraction;
+        void AddItem(Real64 X, Real64 Y)
         {
-            PointX.push_back(X);
-            PointY.push_back(Y);
-            PointMeta.push_back(M);
+            MassFlowRatio.push_back(X);
+            OutdoorAirFraction.push_back(Y);
         }
     };
 
@@ -130,8 +128,7 @@ namespace HybridEvapCoolingModel {
         Real64 Maximum_Return_Air_Humidity_Ratio;
         Real64 Minimum_Return_Air_Relative_Humidity;
         Real64 Maximum_Return_Air_Relative_Humidity;
-        Real64 NormalizationReference;
-        Real64 Correction;
+        Real64 ModelScalingFactor;
         int MODE_BLOCK_OFFSET_Alpha;
         int BLOCK_HEADER_OFFSET_Alpha;
         int MODE1_BLOCK_OFFSET_Number;
@@ -145,7 +142,7 @@ namespace HybridEvapCoolingModel {
                             std::string cCurrentModuleObject);
         bool ParseMode(int ModeCounter,
                        std::vector<CMode> *OperatingModes,
-                       Real64 correction,
+                       Real64 ScalingFactor,
                        Array1D_string Alphas,
                        Array1D_string cAlphaFields,
                        Array1D<Real64> Numbers,
@@ -153,7 +150,7 @@ namespace HybridEvapCoolingModel {
                        Array1D<bool> lAlphaBlanks,
                        std::string cCurrentModuleObject);
         void InitializeCurve(int curveType, int CurveID);
-        Real64 CalculateCurveVal(Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curve_ID);
+        Real64 CalculateCurveVal(Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra, Real64 Msa, Real64 OSAF, int curveType);
         bool InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF);
         bool InitializeMsaRatioConstraints(Real64 minMsa, Real64 maxMsa);
         bool InitializeOutdoorAirTemperatureConstraints(Real64 min, Real64 max);
@@ -164,7 +161,6 @@ namespace HybridEvapCoolingModel {
         bool InitializeReturnAirRelativeHumidityConstraints(Real64 min, Real64 max);
         bool GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA);
         bool MeetsOAEnvConstraints(Real64 Tosa, Real64 Wosa, Real64 RHos);
-        bool CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject);
 
     private:
     };
@@ -195,9 +191,9 @@ namespace HybridEvapCoolingModel {
         Real64 TotalSystem;
         Real64 SensibleSystem;
         Real64 LatentSystem;
-        Real64 TotalZone;    // kW
-        Real64 SensibleZone; // kW
-        Real64 LatentZone;   // kW
+        Real64 TotalZone;    // W
+        Real64 SensibleZone; // W
+        Real64 LatentZone;   // W
         Real64 ElectricalPower;
         Real64 SupplyFanElectricPower;
         Real64 SecondaryFuelConsumptionRate;
@@ -239,10 +235,17 @@ namespace HybridEvapCoolingModel {
         int ZoneNum;  // stores the current zone associated with the system, this is currently not used but is expected to be used in the next set of
                       // functionality additions.
         int SchedPtr; // Pointer to the correct schedule
+        int ZoneNodeNum;                  // index of zone air node in node structure
+        std::string AvailManagerListName; // Name of an availability manager list object
+        int AvailStatus;
 
         Real64 SystemMaximumSupplyAirFlowRate;           // taken from IDF N1, the system max supply flow rate in m3/s.
         Real64 ScalingFactor;                            // taken from IDF N3, linear scaling factor.
-        Real64 ScaledSystemMaximumSupplyAirMassFlowRate; // the actual scaling factor used to multiply the
+        Real64 ScaledSystemMaximumSupplyAirMassFlowRate; // the scaled system max supply mass flow rate in m3/s.
+        Real64 ScaledSystemMaximumSupplyAirVolumeFlowRate; // the scaled system max supply volume flow rate in m3/s.
+        std::string FirstFuelType;             // First fuel type, currently electricity is only option
+        std::string SecondFuelType;             // Second fuel type
+        std::string ThirdFuelType;             // Third fuel type
 
         int UnitOn;                          // feels like it should be a bool but its an output and I couldn't get it to work as a bool
         Real64 UnitTotalCoolingRate;         // unit output to zone, total cooling rate [W]
@@ -301,10 +304,11 @@ namespace HybridEvapCoolingModel {
         int InletNode;
         int OutletNode;
         int SecondaryInletNode;       // This is usually OA node feeding into the purge/secondary side
-        int SecondaryOutletNode;      // This outlet node of the secondary side and ilet to the secondary fan
+        int SecondaryOutletNode;      // This outlet node of the secondary side and inlet to the secondary fan
         Real64 FinalElectricalPower;  // Output fuel use in W
         Real64 FinalElectricalEnergy; // Output fuel energy use in J
-        Real64 InletMassFlowRate;     // Inlet is primary process air node at inlet to cooler
+        Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
+        Real64 InletVolumetricFlowRate; // Inlet is primary process air node at inlet to cooler
         Real64 InletTemp;
         Real64 InletWetBulbTemp;
         Real64 InletHumRat;
@@ -326,6 +330,7 @@ namespace HybridEvapCoolingModel {
         Real64 SecInletEnthalpy;
         Real64 SecInletPressure;
         Real64 SecInletRH;
+        Real64 SecOutletVolumetricFlowRate;
         Real64 SecOutletMassFlowRate; // Inlet is primary process air node at inlet to cooler
         Real64 SecOutletTemp;
         Real64 SecOutletWetBulbTemp;
@@ -336,7 +341,6 @@ namespace HybridEvapCoolingModel {
         Real64 Wsa;
         Real64 SupplyVentilationAir;
         Real64 SupplyVentilationVolume;
-        Real64 ModelNormalizationReference;
 
         bool OutdoorAir;
         Real64 MinOA_Msa;

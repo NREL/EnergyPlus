@@ -48,6 +48,7 @@
 #include <EnergyPlus/StateManagement.hh>
 
 #include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Properties.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
@@ -150,6 +151,7 @@
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -339,6 +341,7 @@ void EnergyPlus::clearAllStates()
     HVACUnitaryBypassVAV::clear_state();
     HVACVariableRefrigerantFlow::clear_state();
     HybridModel::clear_state();
+    HybridUnitaryAirConditioners::clear_state();
     HysteresisPhaseChange::clear_state();
     EnergyPlus::inputProcessor->clear_state();
     IceThermalStorage::clear_state();
@@ -403,6 +406,7 @@ void EnergyPlus::clearAllStates()
     UnitHeater::clear_state();
     UnitVentilator::clear_state();
     UserDefinedComponents::clear_state();
+    UtilityRoutines::clear_state();
     VariableSpeedCoils::clear_state();
     VentilatedSlab::clear_state();
     WaterCoils::clear_state();

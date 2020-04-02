@@ -149,6 +149,10 @@ namespace ZoneTempPredictorCorrector {
     extern Real64 AnyZoneTempOscillate;
     extern Real64 AnyZoneTempOscillateDuringOccupancy;
     extern Real64 AnyZoneTempOscillateInDeadband;
+    extern Real64 AnnualAnyZoneTempOscillate;
+    extern Real64 AnnualAnyZoneTempOscillateDuringOccupancy;
+    extern Real64 AnnualAnyZoneTempOscillateInDeadband;
+    extern bool OscillationVariablesNeeded;
 
     // SUBROUTINE SPECIFICATIONS:
 
@@ -352,7 +356,7 @@ namespace ZoneTempPredictorCorrector {
     );
 
     Real64 PMVResidual(Real64 const Tset,
-                       Array1<Real64> const &Par // par(1) = PMV set point
+                       Array1D<Real64> const &Par // par(1) = PMV set point
     );
 
     void AdjustCoolingSetPointforTempAndHumidityControl(int const TempControlledZoneID,
