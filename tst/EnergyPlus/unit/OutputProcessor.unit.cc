@@ -1826,7 +1826,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(
             delimited_string({"26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(
-            delimited_string({"26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
+            delimited_string({"26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(outputFiles(),
                                  ReportingFrequency::Simulation,
@@ -1842,7 +1842,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(
             delimited_string({"27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(
-            delimited_string({"27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
+            delimited_string({"27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(outputFiles(),
                                  ReportingFrequency::Simulation,
@@ -2230,7 +2230,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(TrackingDailyVariables);
         TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(
-            delimited_string({"18,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName"})));
+            delimited_string({"18,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName"}, "\n")));
 
         WriteReportVariableDictionaryItem(outputFiles(),
                                           ReportingFrequency::Daily,
@@ -2318,7 +2318,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(TrackingMonthlyVariables);
         TrackingMonthlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(
-            delimited_string({"23,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName"})));
+            delimited_string({"23,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName"}, "\n")));
 
         WriteReportVariableDictionaryItem(outputFiles(),
                                           ReportingFrequency::Monthly,
@@ -2372,7 +2372,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(TrackingRunPeriodVariables);
         TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
-            delimited_string({"26,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
+            delimited_string({"26,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
         WriteReportVariableDictionaryItem(outputFiles(),
                                           ReportingFrequency::Simulation,
@@ -2390,7 +2390,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(TrackingRunPeriodVariables);
         TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
-            delimited_string({"27,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
+            delimited_string({"27,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
         WriteReportVariableDictionaryItem(outputFiles(),
                                           ReportingFrequency::Simulation,
@@ -2408,7 +2408,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(TrackingRunPeriodVariables);
         TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string(
-            {"28,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName"})));
+            {"28,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName"}, "\n")));
 
         WriteReportVariableDictionaryItem(outputFiles(),
                                           ReportingFrequency::Simulation,
@@ -2426,7 +2426,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(TrackingRunPeriodVariables);
         TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
-            delimited_string({"29,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
+            delimited_string({"29,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
         WriteReportVariableDictionaryItem(outputFiles(),
                                           ReportingFrequency::Simulation,
@@ -2444,7 +2444,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(TrackingRunPeriodVariables);
         TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
-            delimited_string({"30,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
+            delimited_string({"30,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
