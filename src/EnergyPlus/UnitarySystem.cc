@@ -4486,6 +4486,10 @@ namespace UnitarySystems {
                                 }
                             }
 
+                            if (DataGlobals::DoCoilDirectSolutions && thisSys.m_NumOfSpeedCooling > 1) {
+                                thisSys.FullOutput.resize(thisSys.m_NumOfSpeedCooling + 1);
+                            }
+
                             if (thisSys.m_HeatCoilExists) {
                                 if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
                                     thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
@@ -6603,7 +6607,7 @@ namespace UnitarySystems {
                             thisSys.m_HeatMassFlowRate.resize(thisSys.m_NumOfSpeedHeating + 1);
                             thisSys.m_HeatVolumeFlowRate.resize(thisSys.m_NumOfSpeedHeating + 1);
                             thisSys.m_MSHeatingSpeedRatio.resize(thisSys.m_NumOfSpeedHeating + 1);
-                            if (DataGlobals::DoCoilDirectSolutions) {
+                            if (DataGlobals::DoCoilDirectSolutions && thisSys.m_NumOfSpeedCooling < thisSys.m_NumOfSpeedHeating) {
                                 thisSys.FullOutput.resize(thisSys.m_NumOfSpeedHeating + 1);
                             }
                             for (int i = 1; i <= thisSys.m_NumOfSpeedHeating; ++i) {
@@ -8056,7 +8060,8 @@ namespace UnitarySystems {
                                                   HeatCoilLoad,
                                                   SupHeaterLoad,
                                                   CompressorONFlag);
-                    if (DataGlobals::DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                    if (DataGlobals::DoCoilDirectSolutions && (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                        (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling && this->m_NumOfSpeedCooling > 1))) {
                         this->FullOutput[SpeedNum] = SensOutputOn;
                     }
                     if ((this->m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
@@ -8246,6 +8251,23 @@ namespace UnitarySystems {
                                                       HeatCoilLoad,
                                                       SupHeaterLoad,
                                                       CompressorONFlag);
+                        PartLoadRatio = CoolPLR;
+                    } else if (DataGlobals::DoCoilDirectSolutions && CoolingLoad && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
+                               this->m_NumOfSpeedCooling == 1) {
+                        CoolPLR = (ZoneLoad - SensOutputOff) / (SensOutputOn - SensOutputOff);
+                        HeatPLR = 0.0;
+                        this->calcUnitarySystemToLoad(AirLoopNum,
+                                                      FirstHVACIteration,
+                                                      CoolPLR,
+                                                      HeatPLR,
+                                                      OnOffAirFlowRatio,
+                                                      SensOutput,
+                                                      LatOutput,
+                                                      HXUnitOn,
+                                                      HeatCoilLoad,
+                                                      SupHeaterLoad,
+                                                      CompressorONFlag);
+                        PartLoadRatio = CoolPLR;
                     } else if (DataGlobals::DoCoilDirectSolutions && HeatingLoad &&
                                (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
                                 this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric ||
@@ -8263,6 +8285,7 @@ namespace UnitarySystems {
                                                       HeatCoilLoad,
                                                       SupHeaterLoad,
                                                       CompressorONFlag);
+                        PartLoadRatio = HeatPLR;
                     } else if (DataGlobals::DoCoilDirectSolutions && HeatingLoad &&
                                this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
                         CoolPLR = 0.0;
@@ -8287,6 +8310,32 @@ namespace UnitarySystems {
                                                       HeatCoilLoad,
                                                       SupHeaterLoad,
                                                       CompressorONFlag);
+                        PartLoadRatio = HeatPLR;
+                    } else if (DataGlobals::DoCoilDirectSolutions && CoolingLoad &&
+                               this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling && this->m_NumOfSpeedCooling > 1) {
+                        HeatPLR = 0.0;
+                        if (this->m_CoolingSpeedNum == 1) {
+                            this->m_CoolingCycRatio = (ZoneLoad - SensOutputOff) / (this->FullOutput[this->m_CoolingSpeedNum] - SensOutputOff);
+                            CoolPLR = this->m_CoolingCycRatio;
+                            this->m_CoolingSpeedRatio = 0.0;
+                        } else {
+                            this->m_CoolingCycRatio = 1.0;
+                            this->m_CoolingSpeedRatio = (ZoneLoad - this->FullOutput[this->m_CoolingSpeedNum - 1]) /
+                                                        (this->FullOutput[this->m_CoolingSpeedNum] - this->FullOutput[this->m_CoolingSpeedNum - 1]);
+                            CoolPLR = this->m_CoolingSpeedRatio;
+                        }
+                        this->calcUnitarySystemToLoad(AirLoopNum,
+                                                      FirstHVACIteration,
+                                                      CoolPLR,
+                                                      HeatPLR,
+                                                      OnOffAirFlowRatio,
+                                                      SensOutput,
+                                                      LatOutput,
+                                                      HXUnitOn,
+                                                      HeatCoilLoad,
+                                                      SupHeaterLoad,
+                                                      CompressorONFlag);
+                        PartLoadRatio = CoolPLR;
                     } else {
 
                         Par[1] = double(this->m_UnitarySysNum);
