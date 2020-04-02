@@ -236,7 +236,6 @@ namespace SystemReports {
     Array1D_bool UnmetLoadFlag;
 
     static constexpr auto fmtLD("*");
-    static constexpr auto fmtA("(A)");
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SystemReports
 
