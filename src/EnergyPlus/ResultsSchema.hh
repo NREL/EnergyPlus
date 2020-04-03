@@ -307,13 +307,13 @@ namespace ResultsFramework {
 
         DataFrame RIDetailedZoneTSData = DataFrame("Detailed-Zone");
         DataFrame RIDetailedHVACTSData = DataFrame("Detailed-HVAC");
-        DataFrame RITimestepTSData = DataFrame("Timestep");
+        DataFrame RITimestepTSData = DataFrame("TimeStep");
         DataFrame RIHourlyTSData = DataFrame("Hourly");
         DataFrame RIDailyTSData = DataFrame("Daily");
         DataFrame RIMonthlyTSData = DataFrame("Monthly");
         DataFrame RIRunPeriodTSData = DataFrame("RunPeriod");
         DataFrame RIYearlyTSData = DataFrame("Yearly");
-        DataFrame TSMeters = DataFrame("Timestep");
+        DataFrame TSMeters = DataFrame("TimeStep");
         DataFrame HRMeters = DataFrame("Hourly");
         DataFrame DYMeters = DataFrame("Daily");
         DataFrame MNMeters = DataFrame("Monthly");

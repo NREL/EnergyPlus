@@ -54,6 +54,7 @@
 #include <string>
 #include <map>
 #include <algorithm>
+#include <cassert>
 
 #include <fmt/format.h>
 #include <milo/dtoa.h>
@@ -208,7 +209,7 @@ namespace ResultsFramework {
             if (m_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) sReportFreq = "Detailed - HVAC";
             break;
         case OutputProcessor::ReportingFrequency::TimeStep: // at 'EndTimeStepFlag'
-            sReportFreq = "Timestep";
+            sReportFreq = "TimeStep";
             break;
         case OutputProcessor::ReportingFrequency::Hourly: // at 'EndHourFlag'
             sReportFreq = "Hourly";
