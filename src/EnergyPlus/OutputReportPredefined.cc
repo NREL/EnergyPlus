@@ -2319,8 +2319,6 @@ namespace OutputReportPredefined {
         // remove this subtable when new subtables have been implemented
         pdstOAavgOcc = newPreDefSubTable(pdrOutsideAir, "Average Outdoor Air During Occupied Hours");
 
-        pdchOaoAvgNumOcc1 = newPreDefColumn(pdstOAavgOcc, "Average Number of Occupants");
-        pdchOaoNomNumOcc1 = newPreDefColumn(pdstOAavgOcc, "Nominal Number of Occupants");
         pdchOaoZoneVol1 = newPreDefColumn(pdstOAavgOcc, "Zone Volume [m3]");
         pdchOaoAvgMechVent = newPreDefColumn(pdstOAavgOcc, "Mechanical Ventilation [ach]");
         pdchOaoAvgInfil = newPreDefColumn(pdstOAavgOcc, "Infiltration [ach]");
@@ -2333,8 +2331,6 @@ namespace OutputReportPredefined {
         // remove this subtable when new subtables have been implemented
         pdstOAminOcc = newPreDefSubTable(pdrOutsideAir, "Minimum Outdoor Air During Occupied Hours");
 
-        pdchOaoAvgNumOcc2 = newPreDefColumn(pdstOAminOcc, "Average Number of Occupants");
-        pdchOaoNomNumOcc2 = newPreDefColumn(pdstOAminOcc, "Nominal Number of Occupants");
         pdchOaoZoneVol2 = newPreDefColumn(pdstOAminOcc, "Zone Volume [m3]");
         pdchOaoMinMechVent = newPreDefColumn(pdstOAminOcc, "Mechanical Ventilation [ach]");
         pdchOaoMinInfil = newPreDefColumn(pdstOAminOcc, "Infiltration [ach]");
@@ -2342,6 +2338,8 @@ namespace OutputReportPredefined {
         pdchOaoMinSimpVent = newPreDefColumn(pdstOAminOcc, "Simple Ventilation [ach]");
         // pdchOaoMinTotVent =   newPreDefColumn(pdstOAminOcc,'Total Ventilation [ach]')
         addFootNoteSubTable(pdstOAminOcc, "Values shown for a single zone without multipliers");
+
+
 
         pdstOAmechVentParByZone = newPreDefSubTable(pdrOutsideAir, "Mechanical Ventilation Parameters by Zone");
         pdchOaMvAirLpNm = newPreDefColumn(pdstOAmechVentParByZone, "AirLoop Name");

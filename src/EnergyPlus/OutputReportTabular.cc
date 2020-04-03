@@ -6547,9 +6547,7 @@ namespace OutputReportTabular {
                     // occupants
                     if (ZonePreDefRep(iZone).NumOccAccumTime > 0) {
                         PreDefTableEntry(
-                            pdchOaoAvgNumOcc1, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
-                        PreDefTableEntry(
-                            pdchOaoAvgNumOcc2, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
+                            pdchOaMvAvgNumOcc, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
                     }
                     // Mechanical ventilation
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
