@@ -552,7 +552,6 @@ namespace DaylightingManager {
         Real64 DaylFac2; // sky daylight factor at ref pt 2
 
         // added for output all daylight factors
-        int write_stat;
         Real64 DFClrSky1;
         Real64 DFClrTbSky1;
         Real64 DFIntSky1;
@@ -817,25 +816,18 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-            OutputFileDFS = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("write");
-                ObjexxFCL::gio::open(OutputFileDFS, DataStringGlobals::outputDfsFileName, flags);
-                write_stat = flags.ios();
-            }
-            if (write_stat != 0) {
-                ShowFatalError("CalcDayltgCoefficients: Could not open file " + DataStringGlobals::outputDfsFileName + " for output (write).");
-            } else {
-                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "This file contains daylight factors for all exterior windows of daylight zones.";
-                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "If only one reference point the last 4 columns in the data will be zero.";
-                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "MonthAndDay,Zone Name,Window Name,Window State";
-                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at "
-                                                   "Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for "
-                                                   "Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight "
-                                                   "Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at "
-                                                   "Reference point 2,Daylight Factor for Overcast Sky at Reference point 2";
-            }
+            ////  Change to following once dfs is converted to OutputFiles
+            //    outputFiles.dfs.ensure_open(outputFiles.outputControl.dfs);
+            OutputFileDFS = outputFiles.open_gio(DataStringGlobals::outputDfsFileName, "CalcDayltgCoefficients", outputFiles.outputControl.dfs);
+
+            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "This file contains daylight factors for all exterior windows of daylight zones.";
+            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "If only one reference point the last 4 columns in the data will be zero.";
+            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "MonthAndDay,Zone Name,Window Name,Window State";
+            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at "
+                                                          "Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for "
+                                                          "Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight "
+                                                          "Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at "
+                                                          "Reference point 2,Daylight Factor for Overcast Sky at Reference point 2";
             CreateDFSReportFile = false;
         }
 
@@ -4668,12 +4660,10 @@ namespace DaylightingManager {
             DisplayString("ReturnFrom DElight DaylightCoefficients Calc");
             if (iErrorFlag != 0) {
                 // Open DElight Daylight Factors Error File for reading
-                iDElightErrorFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("READWRITE");
-                    ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
-                }
+                auto & outputFiles = OutputFiles::getSingleton();
+                ////  Change to following once delightdfdmp is converted to OutputFiles
+                //    outputFiles.delightdfdmp.ensure_open(outputFiles.outputControl.delightdfdmp);
+                iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "ReadWrite");
 
                 // Sequentially read lines in DElight Daylight Factors Error File
                 // and process them using standard EPlus warning/error handling calls
@@ -4725,12 +4715,11 @@ namespace DaylightingManager {
                 }
             } else {
                 // Open, Close, and Delete DElight Daylight Factors Error File for reading
-                iDElightErrorFile = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("READWRITE");
-                    ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
-                }
+                auto & outputFiles = OutputFiles::getSingleton();
+                ////  Change to following once delightdfdmp is converted to OutputFiles
+                //    outputFiles.delightdfdmp.ensure_open(outputFiles.outputControl.delightdfdmp);
+                iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "ReadWrite");
+
                 {
                     IOFlags flags;
                     flags.DISPOSE("DELETE");

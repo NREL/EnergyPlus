@@ -318,6 +318,11 @@ namespace SimulationManager {
         int EnvCount;
 
         outputFiles.outputControl.getInput();
+        ResultsFramework::OutputSchema->setupOutputOptions();
+
+        ////  Change to following once dbg is converted to OutputFiles
+        //    outputFiles.dbg.ensure_open(outputFiles.outputControl.dbg);
+        OutputFileDebug = outputFiles.open_gio(DataStringGlobals::outputDbgFileName, "OutputFileDebug", outputFiles.outputControl.dbg);
 
         // CreateSQLiteDatabase();
         sqlite = EnergyPlus::CreateSQLiteDatabase();

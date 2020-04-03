@@ -6037,21 +6037,14 @@ namespace HeatBalanceManager {
         using DataSurfaces::Surface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int write_stat;
         int SurfNum;
         static ObjexxFCL::gio::Fmt ShdFracFmtName("(A, A)");
 
-        OutputFileShadingFrac = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileShadingFrac, DataStringGlobals::outputExtShdFracFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write).");
-        }
+        auto & outputFiles = OutputFiles::getSingleton();
+////  Change to following once extshd is converted to OutputFiles
+//    outputFiles.extshd.ensure_open(outputFiles.outputControl.extshd);
+        OutputFileShadingFrac = outputFiles.open_gio(DataStringGlobals::outputExtShdFracFileName, "OpenOutputFiles", outputFiles.outputControl.extshd);
+
         {
             IOFlags flags;
             flags.ADVANCE("No");

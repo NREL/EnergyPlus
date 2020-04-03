@@ -259,7 +259,6 @@ void LinesOut(std::string const &option)
     int surf; // Loop variable for surfaces
     int vert; // Loop counter
     std::string optcommasemi;
-    int write_stat;
 
     if (TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
@@ -275,16 +274,10 @@ void LinesOut(std::string const &option)
     lastoption = option;
     optiondone = true;
 
-    unit = GetNewUnitNumber();
-    {
-        IOFlags flags;
-        flags.ACTION("write");
-        ObjexxFCL::gio::open(unit, DataStringGlobals::outputSlnFileName, flags);
-        write_stat = flags.ios();
-    }
-    if (write_stat != 0) {
-        ShowFatalError("LinesOut: Could not open file " + DataStringGlobals::outputSlnFileName + " for output (write).");
-    }
+    auto & outputFiles = OutputFiles::getSingleton();
+    ////  Change to following once sln is converted to OutputFiles
+    //    outputFiles.sln.ensure_open(outputFiles.outputControl.sln);
+    unit = outputFiles.open_gio(DataStringGlobals::outputSlnFileName, "LinesOut", outputFiles.outputControl.sln);
 
     if (option != "IDF") {
         for (surf = 1; surf <= TotSurfaces; ++surf) {
@@ -414,7 +407,6 @@ void DXFOut(std::string &PolygonAction,
     int vv2;
     int refpt;      // for daylighting ref points
     int curcolorno; // again for daylighting ref pts
-    int write_stat;
     int mapnum;
 
     // Object Data
@@ -477,16 +469,10 @@ void DXFOut(std::string &PolygonAction,
         return;
     }
 
-    unit = GetNewUnitNumber();
-    {
-        IOFlags flags;
-        flags.ACTION("write");
-        ObjexxFCL::gio::open(unit, DataStringGlobals::outputDxfFileName, flags);
-        write_stat = flags.ios();
-    }
-    if (write_stat != 0) {
-        ShowFatalError("DXFOut: Could not open file " + DataStringGlobals::outputDxfFileName + " for output (write).");
-    }
+    auto & outputFiles = OutputFiles::getSingleton();
+////  Change to following once dxf is converted to OutputFiles
+//    outputFiles.dxf.ensure_open(outputFiles.outputControl.dxf);
+    unit = outputFiles.open_gio(DataStringGlobals::outputDxfFileName, "DXFOut", outputFiles.outputControl.dxf);
 
     ObjexxFCL::gio::write(unit, Format_702); // Start of Entities section
 
@@ -962,7 +948,6 @@ void DXFOutLines(std::string const &ColorScheme)
     int sptr;
     int refpt;
     int curcolorno;
-    int write_stat;
 
     // Formats
     static ObjexxFCL::gio::Fmt Format_702("('  0',/,'SECTION',/,'  2',/,'ENTITIES')");
@@ -993,16 +978,10 @@ void DXFOutLines(std::string const &ColorScheme)
         return;
     }
 
-    unit = GetNewUnitNumber();
-    {
-        IOFlags flags;
-        flags.ACTION("write");
-        ObjexxFCL::gio::open(unit, DataStringGlobals::outputDxfFileName, flags);
-        write_stat = flags.ios();
-    }
-    if (write_stat != 0) {
-        ShowFatalError("DXFOutLines: Could not open file " + DataStringGlobals::outputDxfFileName + " for output (write).");
-    }
+    auto & outputFiles = OutputFiles::getSingleton();
+////  Change to following once dxf is converted to OutputFiles
+//    outputFiles.dxf.ensure_open(outputFiles.outputControl.dxf);
+    unit = outputFiles.open_gio(DataStringGlobals::outputDxfFileName, "DXFOutLines", outputFiles.outputControl.dxf);
 
     ObjexxFCL::gio::write(unit, Format_702); // Start of Entities section
 
@@ -1406,7 +1385,6 @@ void DXFOutWireFrame(std::string const &ColorScheme)
     int surfcount;
     int refpt;
     int curcolorno;
-    int write_stat;
 
     // Formats
     static ObjexxFCL::gio::Fmt Format_702("('  0',/,'SECTION',/,'  2',/,'ENTITIES')");
@@ -1439,16 +1417,10 @@ void DXFOutWireFrame(std::string const &ColorScheme)
         return;
     }
 
-    unit = GetNewUnitNumber();
-    {
-        IOFlags flags;
-        flags.ACTION("write");
-        ObjexxFCL::gio::open(unit, DataStringGlobals::outputDxfFileName, flags);
-        write_stat = flags.ios();
-    }
-    if (write_stat != 0) {
-        ShowFatalError("DXFOutWireFrame: Could not open file " + DataStringGlobals::outputDxfFileName + " for output (write).");
-    }
+    auto & outputFiles = OutputFiles::getSingleton();
+////  Change to following once dxf is converted to OutputFiles
+//    outputFiles.dxf.ensure_open(outputFiles.outputControl.dxf);
+    unit = outputFiles.open_gio(DataStringGlobals::outputDxfFileName, "DXFOutWireFrame", outputFiles.outputControl.dxf);
 
     ObjexxFCL::gio::write(unit, Format_702); // Start of Entities section
 
@@ -2273,7 +2245,6 @@ void CostInfoOut()
     int unit; // Unit number on which to write file
     int surf; // Loop variable for surfaces
     Array1D_bool uniqueSurf;
-    int write_stat;
 
     // Formats
     static ObjexxFCL::gio::Fmt Format_801("(I5,',',A,',',A,',',A,',',f14.5,',',f14.5)");
@@ -2297,17 +2268,12 @@ void CostInfoOut()
         }
     }
 
-    unit = GetNewUnitNumber();
-    // .sci = surface cost info
-    {
-        IOFlags flags;
-        flags.ACTION("write");
-        ObjexxFCL::gio::open(unit, DataStringGlobals::outputSciFileName, flags);
-        write_stat = flags.ios();
-    }
-    if (write_stat != 0) {
-        ShowFatalError("CostInfoOut: Could not open file " + DataStringGlobals::outputSciFileName + " for output (write).");
-    }
+    // sci = surface cost info
+    auto & outputFiles = OutputFiles::getSingleton();
+////  Change to following once sci is converted to OutputFiles
+//    outputFiles.sci.ensure_open(outputFiles.outputControl.sci);
+    unit = outputFiles.open_gio(DataStringGlobals::outputSciFileName, "CostInfoOut", outputFiles.outputControl.sci);
+
     ObjexxFCL::gio::write(unit, fmtLD) << TotSurfaces << int(count(uniqueSurf));
     ObjexxFCL::gio::write(unit, fmtLD) << "data for surfaces useful for cost information";
     ObjexxFCL::gio::write(unit, fmtLD) << "Number, Name, Construction, class, area, grossarea";
@@ -2392,7 +2358,6 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
     int vv2;
     std::string csurfnumber;
     std::string csidenumber;
-    int write_stat;
 
     // Object Data
     Array1D<dTriangle> mytriangles;
@@ -2428,16 +2393,10 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
         return;
     }
 
-    unit = GetNewUnitNumber();
-    {
-        IOFlags flags;
-        flags.ACTION("write");
-        ObjexxFCL::gio::open(unit, DataStringGlobals::outputWrlFileName, flags);
-        write_stat = flags.ios();
-    }
-    if (write_stat != 0) {
-        ShowFatalError("VRMLOut: Could not open file " + DataStringGlobals::outputWrlFileName + " for output (write).");
-    }
+    auto & outputFiles = OutputFiles::getSingleton();
+////  Change to following once wrl is converted to OutputFiles
+//    outputFiles.wrl.ensure_open(outputFiles.outputControl.wrl);
+    unit = outputFiles.open_gio(DataStringGlobals::outputWrlFileName, "VRMLOut", outputFiles.outputControl.wrl);
 
     ObjexxFCL::gio::write(unit, Format_702); // Beginning
 

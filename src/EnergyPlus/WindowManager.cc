@@ -8449,14 +8449,11 @@ namespace WindowManager {
         // Write transmittance versus direct normal angle to csv file
 
         if (PrintTransMap) {
-            ScreenTransUnitNo = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("write");
-                flags.STATUS("unknown");
-                ObjexxFCL::gio::open(ScreenTransUnitNo, DataStringGlobals::outputScreenCsvFileName, flags);
-                if (flags.err()) goto Label99999;
-            }
+            auto & outputFiles = OutputFiles::getSingleton();
+            ////  Change to following once screen is converted to OutputFiles
+            //    outputFiles.screen.ensure_open(outputFiles.outputControl.screen);
+            ScreenTransUnitNo = outputFiles.open_gio(DataStringGlobals::outputScreenCsvFileName, "Screen", outputFiles.outputControl.screen);
+
             //  WRITE(ScreenTransUnitNo,*)' '
             for (ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum) {
                 MatNum = SurfaceScreens(ScreenNum).MaterialNumber;
@@ -8559,7 +8556,6 @@ namespace WindowManager {
                     ObjexxFCL::gio::write(ScreenTransUnitNo);
                 }
             }
-        Label99999:;
             ObjexxFCL::gio::close(ScreenTransUnitNo);
         }
         ScreenTrans.deallocate();

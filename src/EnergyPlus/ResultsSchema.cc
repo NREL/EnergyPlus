@@ -676,6 +676,12 @@ namespace ResultsFramework {
 
     void ResultsSchema::setupOutputOptions()
     {
+        auto & outputFiles = OutputFiles::getSingleton();
+        if (outputFiles.outputControl.csv) {
+            tsEnabled = true;
+            tsAndTabularEnabled = true;
+        }
+
         int numberOfOutputSchemaObjects = inputProcessor->getNumObjectsFound("Output:JSON");
         if (numberOfOutputSchemaObjects == 0) {
             return;
@@ -1062,13 +1068,15 @@ namespace ResultsFramework {
 
     void ResultsSchema::writeOutputs()
     {
-        writeCSVOutput();
+        if (OutputFiles::getSingleton().outputControl.csv) {
+            writeCSVOutput();
+        }
 
-        if (timeSeriesEnabled()) {
+        if (timeSeriesEnabled() && (outputJSON || outputCBOR || outputMsgPack)) {
             writeTimeSeriesReports();
         }
 
-        if (timeSeriesAndTabularEnabled()) {
+        if (timeSeriesAndTabularEnabled() && (outputJSON || outputCBOR || outputMsgPack)) {
             writeReport();
         }
     }
@@ -1249,133 +1257,15 @@ namespace ResultsFramework {
         return datetime;
     }
 
-    void ResultsSchema::writeCSVOutput()
+    void ResultsSchema::writeCSVToFile(OutputFile & outputFile, std::map<std::string, std::vector<std::string>> const & outputs, OutputProcessor::ReportingFrequency reportingFrequency)
     {
-        if (!hasOutputData()) {
-            return;
-        }
-        std::map<std::string, std::vector<std::string>> outputs;
-        OutputProcessor::ReportingFrequency reportingFrequency;
-        bool hasMonthly = false;
-
-        // Output yearly time series data
-        if (hasRIYearlyTSData()) {
-            auto json_data = RIYearlyTSData.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
-        }
-
-        if (hasYRMeters()) {
-            auto json_data =  YRMeters.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
-        }
-
-        // Output run period time series data
-        if (hasRIRunPeriodTSData()) {
-            auto json_data = RIRunPeriodTSData.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::Simulation;
-        }
-
-        if (hasSMMeters()) {
-            auto json_data =  SMMeters.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::Simulation;
-        }
-
-        // Output monthly time series data
-        if (hasRIMonthlyTSData()) {
-            auto json_data = RIMonthlyTSData.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::Monthly;
-            hasMonthly = true;
-        }
-
-        if (hasMNMeters()) {
-            auto json_data =  MNMeters.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::Monthly;
-            hasMonthly = true;
-        }
-
-        // Output daily time series data
-        if (hasRIDailyTSData()) {
-            auto json_data = RIDailyTSData.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::Daily;
-        }
-
-        if (hasDYMeters()) {
-            auto json_data =  DYMeters.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::Daily;
-        }
-
-        // Output hourly time series data
-        if (hasRIHourlyTSData()) {
-            auto json_data = RIHourlyTSData.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::Hourly;
-        }
-
-        if (hasHRMeters()) {
-            auto json_data =  HRMeters.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::Hourly;
-        }
-
-        // Output timestep time series data
-        if (hasRITimestepTSData()) {
-            auto json_data = RITimestepTSData.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::TimeStep;
-        }
-
-        if (hasTSMeters()) {
-            auto json_data = TSMeters.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::TimeStep;
-        }
-
-        // Output detailed HVAC time series data
-        if (hasRIDetailedHVACTSData()) {
-            auto json_data = RIDetailedHVACTSData.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::EachCall;
-        }
-
-        // Output detailed Zone time series data
-        if (hasRIDetailedZoneTSData()) {
-            auto json_data = RIDetailedZoneTSData.getJSON();
-            parseTSOutputs(json_data, outputs);
-            reportingFrequency = OutputProcessor::ReportingFrequency::EachCall;
-        }
-
-        if (hasMonthly) {
-            fixMonthly(outputs);
-        }
-
-        auto & outputFiles = OutputFiles::getSingleton();
-
-        outputFiles.csv.ensure_open(outputFiles.outputControl.csv);
-        if (!outputFiles.csv.good()) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + outputFiles.csv.fileName + " for output (write).");
-        }
-
-//        auto os = std::unique_ptr<std::iostream>(new std::fstream("/Users/m5z/outputs/test.csv", std::ios_base::in | std::ios_base::out | std::ios_base::trunc));
-
-        print(outputFiles.csv, "{}", "Date/Time,");
-
-//        *os << "Date/Time,";
+        print(outputFile, "{}", "Date/Time,");
         std::string sep;
         for (auto const & var : outputVariables) {
-            print(outputFiles.csv, "{}{}", sep, var);
-//            *os << sep << var;
+            print(outputFile, "{}{}", sep, var);
             if (sep.empty()) sep = ",";
         }
-        print(outputFiles.csv, "{}", DataStringGlobals::NL);
-//        *os << DataStringGlobals::NL;
+        print(outputFile, "{}", DataStringGlobals::NL);
 
         for (auto const & item : outputs) {
             std::string datetime = item.first;
@@ -1384,19 +1274,152 @@ namespace ResultsFramework {
             } else {
                 convertToMonth(datetime);
             }
-            print(outputFiles.csv, " {},", datetime);
-//            *os << ' ' << datetime.replace(datetime.find(' '), 1, "  ") << ",";
+            print(outputFile, " {},", datetime);
             auto result = std::find_if(item.second.rbegin(), item.second.rend(), [](std::string const & v) { return !v.empty(); } );
             auto last = item.second.end();
             if (result != item.second.rend()) {
                 last = (result + 1).base();
             }
-            print(item.second.begin(), last, outputFiles.csv, ",");
-//            std::copy(std::begin(item.second), last, std::ostream_iterator<std::string>(*os, ","));
-            print(outputFiles.csv, "{}{}", *last, DataStringGlobals::NL);
-//            *os << *last << DataStringGlobals::NL;
+            print(item.second.begin(), last, outputFile, ",");
+            print(outputFile, "{}{}", *last, DataStringGlobals::NL);
         }
+    }
+
+    void ResultsSchema::writeCSVOutput()
+    {
+        if (!hasOutputData()) {
+            return;
+        }
+        std::map<std::string, std::vector<std::string>> csv_outputs;
+        std::map<std::string, std::vector<std::string>> mtr_outputs;
+        OutputProcessor::ReportingFrequency reportingFrequency;
+        bool hasMonthly = false;
+
+        // Output yearly time series data
+        if (hasRIYearlyTSData()) {
+            auto json_data = RIYearlyTSData.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
+        }
+
+        if (hasYRMeters()) {
+            auto json_data =  YRMeters.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            parseTSOutputs(json_data, mtr_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
+        }
+
+        // Output run period time series data
+        if (hasRIRunPeriodTSData()) {
+            auto json_data = RIRunPeriodTSData.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Simulation;
+        }
+
+        if (hasSMMeters()) {
+            auto json_data =  SMMeters.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            parseTSOutputs(json_data, mtr_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Simulation;
+        }
+
+        // Output monthly time series data
+        if (hasRIMonthlyTSData()) {
+            auto json_data = RIMonthlyTSData.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Monthly;
+            hasMonthly = true;
+        }
+
+        if (hasMNMeters()) {
+            auto json_data =  MNMeters.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            parseTSOutputs(json_data, mtr_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Monthly;
+            hasMonthly = true;
+        }
+
+        // Output daily time series data
+        if (hasRIDailyTSData()) {
+            auto json_data = RIDailyTSData.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Daily;
+        }
+
+        if (hasDYMeters()) {
+            auto json_data =  DYMeters.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            parseTSOutputs(json_data, mtr_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Daily;
+        }
+
+        // Output hourly time series data
+        if (hasRIHourlyTSData()) {
+            auto json_data = RIHourlyTSData.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Hourly;
+        }
+
+        if (hasHRMeters()) {
+            auto json_data =  HRMeters.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            parseTSOutputs(json_data, mtr_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::Hourly;
+        }
+
+        // Output timestep time series data
+        if (hasRITimestepTSData()) {
+            auto json_data = RITimestepTSData.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::TimeStep;
+        }
+
+        if (hasTSMeters()) {
+            auto json_data = TSMeters.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            parseTSOutputs(json_data, mtr_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::TimeStep;
+        }
+
+        // Output detailed HVAC time series data
+        if (hasRIDetailedHVACTSData()) {
+            auto json_data = RIDetailedHVACTSData.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::EachCall;
+        }
+
+        // Output detailed Zone time series data
+        if (hasRIDetailedZoneTSData()) {
+            auto json_data = RIDetailedZoneTSData.getJSON();
+            parseTSOutputs(json_data, csv_outputs);
+            parseTSOutputs(json_data, mtr_outputs);
+            reportingFrequency = OutputProcessor::ReportingFrequency::EachCall;
+        }
+
+        if (hasMonthly) {
+            fixMonthly(csv_outputs);
+        }
+
+        auto & outputFiles = OutputFiles::getSingleton();
+
+        outputFiles.csv.ensure_open(outputFiles.outputControl.csv);
+        if (!outputFiles.csv.good()) {
+            ShowFatalError("OpenOutputFiles: Could not open file " + outputFiles.csv.fileName + " for output (write).");
+        }
+        writeCSVToFile(outputFiles.csv, csv_outputs, reportingFrequency);
         outputFiles.csv.close();
+
+        if (hasMeterData()) {
+            outputFiles.mtr_csv.ensure_open(outputFiles.outputControl.csv);
+            if (!outputFiles.mtr_csv.good()) {
+                ShowFatalError("OpenOutputFiles: Could not open file " + outputFiles.mtr_csv.fileName + " for output (write).");
+            }
+            if (hasMonthly) {
+                fixMonthly(mtr_outputs);
+            }
+            writeCSVToFile(outputFiles.mtr_csv, mtr_outputs, reportingFrequency);
+            outputFiles.mtr_csv.close();
+        }
     }
 
     void ResultsSchema::writeTimeSeriesReports()

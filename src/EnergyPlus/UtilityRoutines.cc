@@ -54,7 +54,6 @@ extern "C" {
 #include <cstdlib>
 #include <exception>
 #include <iostream>
-#include <sys/stat.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -81,6 +80,7 @@ extern "C" {
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/ExternalInterface.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -466,26 +466,31 @@ namespace UtilityRoutines {
 
         if (finalColumn) {
             std::fstream fsPerfLog;
-            if (!exists(DataStringGlobals::outputPerfLogFileName)) {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
-                if (!fsPerfLog.fail()) {
-                    fsPerfLog << appendPerfLog_headerRow << std::endl;
-                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
+            auto & outputFiles = OutputFiles::getSingleton();
+            if (!FileSystem::fileExists(DataStringGlobals::outputPerfLogFileName)) {
+                if (outputFiles.outputControl.perflog) {
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                    if (!fsPerfLog) {
+                        ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
+                    }
+                } else {
+                    fsPerfLog.open(nullptr);
                 }
+                fsPerfLog << appendPerfLog_headerRow << std::endl;
+                fsPerfLog << appendPerfLog_valuesRow << std::endl;
             } else {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
-                if (!fsPerfLog.fail()) {
-                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
+                if (outputFiles.outputControl.perflog) {
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                    if (!fsPerfLog) {
+                        ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
+                    }
+                } else {
+                    fsPerfLog.open(nullptr);
                 }
+                fsPerfLog << appendPerfLog_valuesRow << std::endl;
             }
             fsPerfLog.close();
         }
-    }
-
-    inline bool exists (const std::string& filename) {
-    // https://stackoverflow.com/questions/25225948/how-to-check-if-a-file-exists-in-c-with-fstreamopen/51300933
-      struct stat buffer;   
-      return (stat (filename.c_str(), &buffer) == 0); 
     }
 
 } // namespace UtilityRoutines
@@ -532,7 +537,7 @@ int AbortEnergyPlus()
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static ObjexxFCL::gio::Fmt fmtLD("*");
+    static constexpr auto fmtLD("*");
     static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
     static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
 
@@ -555,7 +560,6 @@ int AbortEnergyPlus()
     Real64 Seconds; // Elapsed Time Second Reporting
     bool ErrFound;
     bool TerminalError;
-    int write_stat;
 
     if (sqlite) {
         sqlite->updateSQLiteSimulationRecord(true, false);
@@ -641,16 +645,12 @@ int AbortEnergyPlus()
                 " Severe Errors.");
     ShowMessage("EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
     DisplayString("EnergyPlus Run Time=" + Elapsed);
-    tempfl = GetNewUnitNumber();
-    {
-        IOFlags flags;
-        flags.ACTION("write");
-        ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
-        write_stat = flags.ios();
-    }
-    if (write_stat != 0) {
-        DisplayString("AbortEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
-    }
+
+    auto & outputFiles = OutputFiles::getSingleton();
+    ////  Change to following once end is converted to OutputFiles
+    //    outputFiles.end.ensure_open(outputFiles.outputControl.end);
+    tempfl = outputFiles.open_gio(DataStringGlobals::outputEndFileName, "AbortEnergyPlus", outputFiles.outputControl.end);
+
     ObjexxFCL::gio::write(tempfl, fmtLD) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
                                      " Severe Errors; Elapsed Time=" + Elapsed;
 
@@ -864,7 +864,6 @@ int EndEnergyPlus()
     int Hours;      // Elapsed Time Hour Reporting
     int Minutes;    // Elapsed Time Minute Reporting
     Real64 Seconds; // Elapsed Time Second Reporting
-    int write_stat;
 
     if (sqlite) {
         sqlite->updateSQLiteSimulationRecord(true, true);
@@ -920,16 +919,12 @@ int EndEnergyPlus()
                 " Severe Errors.");
     ShowMessage("EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
     DisplayString("EnergyPlus Run Time=" + Elapsed);
-    tempfl = GetNewUnitNumber();
-    {
-        IOFlags flags;
-        flags.ACTION("write");
-        ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
-        write_stat = flags.ios();
-    }
-    if (write_stat != 0) {
-        DisplayString("EndEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
-    }
+
+    auto & outputFiles = OutputFiles::getSingleton();
+    ////  Change to following once end is converted to OutputFiles
+    //    outputFiles.end.ensure_open(outputFiles.outputControl.end);
+    tempfl = outputFiles.open_gio(DataStringGlobals::outputEndFileName, "EndEnergyPlus", outputFiles.outputControl.end);
+
     ObjexxFCL::gio::write(tempfl, fmtA) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere +
                                     " Severe Errors; Elapsed Time=" + Elapsed;
     ObjexxFCL::gio::close(tempfl);

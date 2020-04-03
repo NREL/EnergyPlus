@@ -400,10 +400,14 @@ namespace SolarShading {
         ++NumInitSolar_Calls;
 #endif
         if (BeginSimFlag) {
-
-            shd_stream.open(DataStringGlobals::outputShdFileName);
-            if (!shd_stream) {
-                ShowFatalError("InitSolarCalculations: Could not open file \"" + DataStringGlobals::outputShdFileName + "\" for output (write).");
+            auto & outputFiles = OutputFiles::getSingleton();
+            if (outputFiles.outputControl.shd) {
+                shd_stream.open(DataStringGlobals::outputShdFileName);
+                if (!shd_stream) {
+                    ShowFatalError("InitSolarCalculations: Could not open file \"" + DataStringGlobals::outputShdFileName + "\" for output (write).");
+                }
+            } else {
+                shd_stream.open(nullptr);
             }
 
             if (GetInputFlag) {

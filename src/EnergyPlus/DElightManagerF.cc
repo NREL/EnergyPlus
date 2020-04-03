@@ -71,6 +71,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -220,18 +221,10 @@ namespace DElightManagerF {
         // Init the counter for Window Construction types for writing to Library Data section of DElight input file
         int iNumWndoConsts = 0;
 
-        // Open a file for writing DElight input from EnergyPlus data
-        unit = GetNewUnitNumber();
-
-        // Hardwire file name to eplusout.delightin in the current working directory
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(unit, outputDelightInFileName, flags);
-            if (flags.err()) {
-                ShowFatalError("DElightInputGenerator: Could not open file \"" + outputDelightInFileName + "\" for output (write).");
-            }
-        }
+        auto & outputFiles = OutputFiles::getSingleton();
+        ////  Change to following once delightin is converted to OutputFiles
+        //    outputFiles.delightin.ensure_open(outputFiles.outputControl.delightin);
+        unit = outputFiles.open_gio(outputDelightInFileName, "DElightInputGenerator", outputFiles.outputControl.delightin);
 
         // Start of DElight input file
         ObjexxFCL::gio::write(unit, Format_901) << CurrentDateTime;

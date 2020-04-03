@@ -180,6 +180,37 @@ void OutputFiles::GIOOutputFile::open_at_end()
     os = open_out_stream(fileID, fileName);
 }
 
+int OutputFiles::open_gio(std::string const& filename, std::string const & header, bool outputControlCheck, bool showFatalError)
+{
+    return open_gio(filename, header, outputControlCheck, "write", showFatalError);
+}
+
+int OutputFiles::open_gio(std::string const& filename, std::string const & header, bool outputControlCheck, std::string const & action, bool showFatalError)
+{
+    auto unit = GetNewUnitNumber();
+    {
+        IOFlags flags;
+        flags.ACTION(action);
+        if (outputControlCheck) {
+            ObjexxFCL::gio::open(unit, filename, flags);
+        } else {
+            flags.STATUS("scratch");
+            ObjexxFCL::gio::open(unit, flags);
+            auto * stream = ObjexxFCL::gio::out_stream(unit);
+            stream->setstate(std::ios::badbit);
+        }
+        auto write_stat = flags.ios();
+        if (write_stat != 0) {
+            if (showFatalError) {
+                ShowFatalError(fmt::format("{}: Could not open file {} for output ({}}).", header, filename, action));
+            } else {
+                print(std::cout, "{}: Could not open file {} for output ({}}).", header, filename, action);
+            }
+        }
+    }
+    return unit;
+}
+
 OutputFiles OutputFiles::makeOutputFiles()
 {
     return OutputFiles();
@@ -266,9 +297,6 @@ void OutputFiles::OutputControl::getInput()
             }
             { // "output_delightin"
                 delightin = boolean_choice(find_input(fields, "output_delightin"));
-            }
-            { // "output_delightout"
-                delightout = boolean_choice(find_input(fields, "output_delightout"));
             }
             { // "output_delighteldmp"
                 delighteldmp = boolean_choice(find_input(fields, "output_delighteldmp"));

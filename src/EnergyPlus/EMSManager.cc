@@ -71,6 +71,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -156,7 +157,6 @@ namespace EMSManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int write_stat;
         std::string cCurrentModuleObject;
 
         cCurrentModuleObject = "EnergyManagementSystem:Sensor";
@@ -234,16 +234,10 @@ namespace EMSManager {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
                 // open up output file for EMS EDD file  EMS Data and Debug
-                OutputEMSFileUnitNum = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputEMSFileUnitNum, DataStringGlobals::outputEddFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError("CheckIFAnyEMS: Could not open file " + DataStringGlobals::outputEddFileName + " for output (write).");
-                }
+                auto & outputFiles = OutputFiles::getSingleton();
+                ////  Change to following once edd is converted to OutputFiles
+                //    outputFiles.edd.ensure_open(outputFiles.outputControl.edd);
+                OutputEMSFileUnitNum = outputFiles.open_gio(DataStringGlobals::outputEddFileName, "CheckIFAnyEMS", outputFiles.outputControl.edd);
             }
         } else {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);

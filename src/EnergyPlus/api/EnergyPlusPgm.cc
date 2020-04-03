@@ -304,7 +304,6 @@ int initializeEnergyPlus(std::string const & filepath) {
             DisplayString("Converted input file format. Exiting.");
             return EndEnergyPlus();
         }
-        ResultsFramework::OutputSchema->setupOutputOptions();
     } catch (const FatalError &e) {
         return AbortEnergyPlus();
     } catch (const std::exception &e) {
@@ -364,7 +363,6 @@ int initializeAsLibrary() {
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();
         EnergyPlus::inputProcessor->processInput();
-        ResultsFramework::OutputSchema->setupOutputOptions();
     } catch (const FatalError &e) {
         return AbortEnergyPlus();
     } catch (const std::exception &e) {

@@ -103,6 +103,13 @@ public:
         friend class OutputFiles;
     };
 
+////  Remove once all gio are converted to OutputFiles
+////  Use following example at each calling location
+//    auto & outputFiles = OutputFiles::getSingleton();
+//    outputFiles.eso.ensure_open(outputFiles.outputControl.eso);
+    int open_gio(std::string const& filename, std::string const & header, bool outputControlCheck, bool showFatalError = true);
+    int open_gio(std::string const& filename, std::string const & header, bool outputControlCheck, std::string const & action, bool showFatalError = true);
+
     struct OutputControl
     {
         using json = nlohmann::json;
@@ -127,7 +134,6 @@ public:
         bool dfs = true;
         bool glhe = true;
         bool delightin = true;
-        bool delightout = true;
         bool delighteldmp = true;
         bool delightdfdmp = true;
         bool edd = true;
@@ -159,8 +165,11 @@ public:
 
     OutputFile mtr{"eplusout.mtr"};
     OutputFile bnd{"eplusout.bnd"};
+    OutputFile rdd{"eplusout.rdd"};
+    OutputFile mdd{"eplusout.mdd"};
 
     OutputFile csv{"eplusout.csv"};
+    OutputFile mtr_csv{"eplusmtr.csv"};
 
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();

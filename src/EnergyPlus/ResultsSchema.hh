@@ -363,8 +363,8 @@ namespace ResultsFramework {
         findEndOfMonth(std::map<std::string, std::vector<std::string>> const &outputs);
 
         void fixMonthly(std::map<std::string, std::vector<std::string>> &outputs);
-
         std::string &convertToMonth(std::string &datetime);
+        void writeCSVToFile(OutputFile & outputFile, std::map<std::string, std::vector<std::string>> const & outputs, OutputProcessor::ReportingFrequency reportingFrequency);
 
     protected:
         inline bool hasRIDetailedZoneTSData() {
@@ -411,12 +411,17 @@ namespace ResultsFramework {
 
         inline bool hasYRMeters() { return YRMeters.rDataFrameEnabled(); };
 
-        inline bool hasOutputData() {
+        inline bool hasMeterData() {
+            return hasTSMeters() || hasHRMeters() || hasDYMeters() || hasMNMeters() || hasSMMeters() || hasYRMeters();
+        };
+
+        inline bool hasTSData() {
             return hasRIDetailedZoneTSData() || hasRIDetailedHVACTSData() || hasRITimestepTSData() ||
                    hasRIHourlyTSData() || hasRIDailyTSData() || hasRIMonthlyTSData() || hasRIRunPeriodTSData() ||
-                   hasRIYearlyTSData() || hasTSMeters() || hasHRMeters() || hasDYMeters() || hasMNMeters() ||
-                   hasSMMeters() || hasYRMeters();
+                   hasRIYearlyTSData();
         };
+
+        inline bool hasOutputData() { return hasTSData() || hasMeterData(); };
     };
 
     extern std::unique_ptr<ResultsSchema> OutputSchema;
