@@ -7736,6 +7736,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     SetPredefinedTables();
 
     Real64 extLitUse = 1e8;
+    Real64 CoalHeating = 2e8;
+    Real64 GasolineHeating = 3e8;
+    Real64 PropaneHeating = 4e8;
 
     SetupOutputVariable("Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
@@ -7767,7 +7770,36 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-
+    SetupOutputVariable("Heating Coal Energy",
+                        OutputProcessor::Unit::J,
+                        CoalHeating,
+                        "Zone",
+                        "Sum",
+                        "Lite4",
+                        _,
+                        "Coal",
+                        "Heating",
+                        "General");
+    SetupOutputVariable("Heating Gasoline Energy",
+                        OutputProcessor::Unit::J,
+                        GasolineHeating,
+                        "Zone",
+                        "Sum",
+                        "Lite5",
+                        _,
+                        "Gasoline",
+                        "Heating",
+                        "General");
+    SetupOutputVariable("Heating Propane Energy",
+                        OutputProcessor::Unit::J,
+                        PropaneHeating,
+                        "Zone",
+                        "Sum",
+                        "Lite6",
+                        _,
+                        "Propane",
+                        "Heating",
+                        "General");
     DataGlobals::DoWeathSim = true;
     DataGlobals::TimeStepZone = 1.0;
     displayTabularBEPS = true;
@@ -7856,8 +7888,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
         ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
     }
-
-    
+   
     // Specifically get the electricity usage for End Use = Exterior Lighting, and End Use Subcat = AnotherEndUseSubCat,
     // and make sure it's the right number that's returned
     std::string query("SELECT Value From TabularDataWithStrings"
@@ -7893,32 +7924,65 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
         ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
     }
 
-    // check the result size for all fuels (including disaggregated "additional fuel")
+    // Specifically get the each fuel (Coal, Gasoline, and Propane) usage for End Use = Heating,
+    // and make sure it's the right number that's returned
+
     {
         std::string query("SELECT Value From TabularDataWithStrings"
                           "  WHERE TableName = 'End Uses'"
                           "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
-                          "  AND RowName = 'Exterior Lighting'");
+                          "  AND ColumnName = 'Coal'"
+                          "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
-
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        Real64 return_val1 = execAndReturnFirstDouble(query);
+        
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        EXPECT_NEAR(CoalHeating * 3 / 3.6e6, return_val1, 0.01) << "Failed for query: " << query;
     }
 
     {
         std::string query("SELECT Value From TabularDataWithStrings"
                           "  WHERE TableName = 'End Uses'"
-                          "  AND ReportName = 'DemandEndUseComponentsSummary'"
-                          "  AND RowName = 'Exterior Lighting'");
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'Gasoline'"
+                          "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
-
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        Real64 return_val2 = execAndReturnFirstDouble(query);
+        
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        EXPECT_NEAR(GasolineHeating * 3 / 3.6e6, return_val2, 0.01) << "Failed for query: " << query;
     }
 
     {
         std::string query("SELECT Value From TabularDataWithStrings"
-                          "  WHERE TableName = 'End Uses By Subcategory'"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'Propane'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+        Real64 return_val3 = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        EXPECT_NEAR(PropaneHeating * 3 / 3.6e6, return_val3, 0.01) << "Failed for query: " << query;
+    }
+
+    // Check the heating category has the result size of 13 (including all disaggregated additional fuels) in both reports)
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+    }
+    
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
                           "  AND ReportName = 'DemandEndUseComponentsSummary'"
-                          "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
+                          "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
         ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
