@@ -6605,8 +6605,8 @@ namespace OutputReportTabular {
                     }
 
                     // Zone volume
-                    PreDefTableEntry(pdchOaoZoneVol1, Zone(iZone).Name, Zone(iZone).Volume);
-                    PreDefTableEntry(pdchOaoZoneVol2, Zone(iZone).Name, Zone(iZone).Volume);
+                    PreDefTableEntry(pdchOaMvZoneVol, Zone(iZone).Name, Zone(iZone).Volume);
+                    PreDefTableEntry(pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
                     totalVolume += Zone(iZone).Volume;
                 }
             }
