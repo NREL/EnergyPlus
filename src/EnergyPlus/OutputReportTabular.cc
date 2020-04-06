@@ -5654,7 +5654,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports()
+    void WriteTabularReports(OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -5667,8 +5667,6 @@ namespace OutputReportTabular {
         //   types of tabular reports are each created. If another type of
         //   report is added it can be added to the list here.
 
-        // Locals
-        int EchoInputFile; // found unit number for 'eplusout.audit'
 
         FillWeatherPredefinedEntries();
         FillRemainingPredefinedEntries();
@@ -5697,23 +5695,25 @@ namespace OutputReportTabular {
                 OutputReportTabularAnnual::WriteAnnualTables();
             }
         }
-        EchoInputFile = FindUnitNumber(DataStringGlobals::outputAuditFileName);
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyInputCount=" << MonthlyInputCount;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeMonthlyInput=" << sizeMonthlyInput;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeMonthlyFieldSetInput=" << sizeMonthlyFieldSetInput;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyTablesCount=" << MonthlyTablesCount;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyColumnsCount=" << MonthlyColumnsCount;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeReportName=" << sizeReportName;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numReportName=" << numReportName;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeSubTable=" << sizeSubTable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numSubTable=" << numSubTable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeColumnTag=" << sizeColumnTag;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numColumnTag=" << numColumnTag;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeTableEntry=" << sizeTableEntry;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numTableEntry=" << numTableEntry;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "sizeCompSizeTableEntry=" << sizeCompSizeTableEntry;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numCompSizeTableEntry=" << numCompSizeTableEntry;
+
+        constexpr static auto variable_fmt{" {}={:12}\n"};
+        outputFiles.audit.ensure_open();
+        print(outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
+        print(outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
+        print(outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
+        print(outputFiles.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
+        print(outputFiles.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
+        print(outputFiles.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
+        print(outputFiles.audit, variable_fmt, "sizeReportName", sizeReportName);
+        print(outputFiles.audit, variable_fmt, "numReportName", numReportName);
+        print(outputFiles.audit, variable_fmt, "sizeSubTable", sizeSubTable);
+        print(outputFiles.audit, variable_fmt, "numSubTable", numSubTable);
+        print(outputFiles.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
+        print(outputFiles.audit, variable_fmt, "numColumnTag", numColumnTag);
+        print(outputFiles.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
+        print(outputFiles.audit, variable_fmt, "numTableEntry", numTableEntry);
+        print(outputFiles.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
+        print(outputFiles.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
     }
 
     void parseStatLine(const std::string &lineIn,
@@ -7352,7 +7352,7 @@ namespace OutputReportTabular {
             tableBody(1, 1) = "less than";
             tableBody(1, 2) = RealToStr(curIntervalStart, numIntervalDigits);
             for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                columnHead(nCol + 1) = IntToStr(nCol) + " [hr]";
+                columnHead(nCol + 1) = std::to_string(nCol) + " [hr]";
                 // beginning of interval
                 tableBody(nCol + 1, 1) = RealToStr(curIntervalStart + (nCol - 1) * curIntervalSize, numIntervalDigits) + "<=";
                 // end of interval
@@ -10246,7 +10246,7 @@ namespace OutputReportTabular {
         columnWidth = {7, 30, 16, 10, 16, 16}; // array assignment - for all columns
 
         for (item = 1; item <= NumLineItems; ++item) {
-            tableBody(1, item) = IntToStr(CostLineItem(item).LineNumber);
+            tableBody(1, item) = std::to_string(CostLineItem(item).LineNumber);
             tableBody(2, item) = CostLineItem(item).LineName;
             if (unitsStyle == unitsStyleInchPound) {
                 LookupSItoIP(CostLineItem(item).Units, unitConvIndex, IPunitName);
@@ -10547,7 +10547,7 @@ namespace OutputReportTabular {
             tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);           // north axis angle
             tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2); // Rotation for Appendix G
             tableBody(1, 10) = RealToStr(gatherElapsedTimeBEPS, 2);    // hours simulated
-            //  tableBody(9,1) = TRIM(IntToStr(numTableEntry)) !number of table entries for predefined tables
+            //  tableBody(9,1) = TRIM(std::to_string(numTableEntry)) !number of table entries for predefined tables
 
             WriteSubtitle("General");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
@@ -11976,7 +11976,7 @@ namespace OutputReportTabular {
                                 ++rowNum;
                                 if (rowNum > countOfMatchingLines) break; // should never happen since same test as original could
                                 std::vector<std::string> dataFields = splitCommaString(bodyLine);
-                                rowHead(rowNum) = IntToStr(rowNum);
+                                rowHead(rowNum) = std::to_string(rowNum);
                                 for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol) {
                                     if (unitsStyle == unitsStyleInchPound || unitsStyle == unitsStyleJtoKWH) {
                                         if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) { // if it is a number that has a conversion
@@ -15741,24 +15741,6 @@ namespace OutputReportTabular {
         return StringOut;
     }
 
-    std::string IntToStr(int const intIn)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   August 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   Abstract away the internal write concept
-
-        // Return value
-        std::string StringOut;
-
-        ObjexxFCL::gio::write(StringOut, fmtLD) << intIn;
-        return StringOut;
-    }
-
     Real64 StrToReal(std::string const &stringIn)
     {
         // SUBROUTINE INFORMATION:
@@ -15776,11 +15758,8 @@ namespace OutputReportTabular {
         {
             IOFlags flags;
             ObjexxFCL::gio::read(stringIn, fmtLD, flags) >> realValue;
-            if (flags.err()) goto Label900;
+            if (flags.err()) return -99999.0;
         }
-        return realValue;
-    Label900:;
-        realValue = -99999.0;
         return realValue;
     }
 
@@ -16544,7 +16523,7 @@ namespace OutputReportTabular {
         }
         // For debugging only
         // CALL  ShowWarningError('LookupSItoIP in: ' // TRIM(stringInWithSI) // ' out: ' // TRIM(stringOutWithIP))
-        // IF (foundConv .NE. 0) CALL  ShowWarningError('   Hint ' // TRIM(UnitConv(foundConv)%hint) // IntToStr(foundConv) )
+        // IF (foundConv .NE. 0) CALL  ShowWarningError('   Hint ' // TRIM(UnitConv(foundConv)%hint) // std::to_string(foundConv) )
 
         unitConvIndex = selectedConv;
 

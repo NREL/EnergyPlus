@@ -2039,7 +2039,6 @@ namespace EconomicLifeCycleCost {
         // na
 
         // Using/Aliasing
-        using OutputReportTabular::IntToStr;
         using OutputReportTabular::RealToStr;
         using OutputReportTabular::WriteReportHeaders;
         using OutputReportTabular::WriteSubtitle;
@@ -2128,9 +2127,9 @@ namespace EconomicLifeCycleCost {
             } else {
                 tableBody(1, 6) = "-- N/A --";
             }
-            tableBody(1, 7) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear);
-            tableBody(1, 8) = MonthNames(serviceDateMonth) + ' ' + IntToStr(serviceDateYear);
-            tableBody(1, 9) = IntToStr(lengthStudyYears);
+            tableBody(1, 7) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear);
+            tableBody(1, 8) = MonthNames(serviceDateMonth) + ' ' + std::to_string(serviceDateYear);
+            tableBody(1, 9) = std::to_string(lengthStudyYears);
             tableBody(1, 10) = RealToStr(taxRate, 4);
             {
                 auto const SELECT_CASE_var(depreciationMethod);
@@ -2185,13 +2184,13 @@ namespace EconomicLifeCycleCost {
             rowHead(1) = "Resource";
             rowHead(2) = "Start Date";
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear + 2) = IntToStr(iYear);
+                rowHead(iYear + 2) = std::to_string(iYear);
             }
             for (jObj = 1; jObj <= numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
                 columnHead(jObj) = UsePriceEscalation(jObj).name;
                 tableBody(jObj, 1) = GetResourceTypeChar(UsePriceEscalation(jObj).resource);
                 tableBody(jObj, 2) =
-                    MonthNames(UsePriceEscalation(jObj).escalationStartMonth) + ' ' + IntToStr(UsePriceEscalation(jObj).escalationStartYear);
+                    MonthNames(UsePriceEscalation(jObj).escalationStartMonth) + ' ' + std::to_string(UsePriceEscalation(jObj).escalationStartYear);
             }
             for (jObj = 1; jObj <= numUsePriceEscalation; ++jObj) {
                 for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
@@ -2224,7 +2223,7 @@ namespace EconomicLifeCycleCost {
                 columnHead = "none";
                 rowHead(1) = "";
                 for (iYear = 1; iYear <= numYears; ++iYear) {
-                    rowHead(iYear + 1) = MonthNames(serviceDateMonth) + ' ' + IntToStr(serviceDateYear + iYear - 1);
+                    rowHead(iYear + 1) = MonthNames(serviceDateMonth) + ' ' + std::to_string(serviceDateYear + iYear - 1);
                 }
                 for (jObj = 1; jObj <= numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                     columnHead(jObj) = UseAdjustment(jObj).name;
@@ -2259,7 +2258,7 @@ namespace EconomicLifeCycleCost {
             tableBody = "";
             rowHead(1) = "";
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear + 1) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear + 1) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
             }
             for (jObj = 1; jObj <= (numRecurringCosts + numNonrecurringCost); ++jObj) {
                 curCashFlow = countOfCostCat + jObj;
@@ -2307,7 +2306,7 @@ namespace EconomicLifeCycleCost {
             tableBody.allocate(numColumns, lengthStudyYears);
             tableBody = "";
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
             }
             for (jObj = 1; jObj <= numResourcesUsed; ++jObj) {
                 curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
@@ -2350,7 +2349,7 @@ namespace EconomicLifeCycleCost {
             tableBody.allocate(numColumns, lengthStudyYears);
             tableBody = "";
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
             }
             for (int jObj = 1; jObj <= numResourcesUsed; ++jObj) {
                 curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
@@ -2405,7 +2404,7 @@ namespace EconomicLifeCycleCost {
             columnHead(3) = "OtherCapital";
             columnHead(4) = "Total";
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(CashFlow(costCatConstruction).yrAmount(iYear), 2);
                 tableBody(2, iYear) = RealToStr(CashFlow(costCatSalvage).yrAmount(iYear), 2);
                 tableBody(3, iYear) = RealToStr(CashFlow(costCatOtherCapital).yrAmount(iYear), 2);
@@ -2452,7 +2451,7 @@ namespace EconomicLifeCycleCost {
             columnHead(10) = "Total";
 
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(CashFlow(costCatEnergy).yrAmount(iYear), 2);
                 tableBody(2, iYear) = RealToStr(CashFlow(costCatWater).yrAmount(iYear), 2);
                 tableBody(3, iYear) = RealToStr(CashFlow(costCatMaintenance).yrAmount(iYear), 2);
@@ -2505,7 +2504,7 @@ namespace EconomicLifeCycleCost {
             columnHead(10) = "Total";
 
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(EscalatedTotEnergy(iYear), 2);
                 tableBody(2, iYear) = RealToStr(CashFlow(costCatWater).yrAmount(iYear), 2);
                 tableBody(3, iYear) = RealToStr(CashFlow(costCatMaintenance).yrAmount(iYear), 2);
@@ -2569,7 +2568,7 @@ namespace EconomicLifeCycleCost {
                     columnHead(jObj) = CashFlow(jObj).name;
                 }
                 for (kMonth = 1; kMonth <= lengthStudyTotalMonths; ++kMonth) {
-                    rowHead(kMonth) = MonthNames(1 + (kMonth + baseDateMonth - 2) % 12) + ' ' + IntToStr(baseDateYear + int((kMonth - 1) / 12));
+                    rowHead(kMonth) = MonthNames(1 + (kMonth + baseDateMonth - 2) % 12) + ' ' + std::to_string(baseDateYear + int((kMonth - 1) / 12));
                 }
                 for (kMonth = 1; kMonth <= lengthStudyTotalMonths; ++kMonth) {
                     for (jObj = 1; jObj <= numCashFlow; ++jObj) {
@@ -2602,7 +2601,7 @@ namespace EconomicLifeCycleCost {
                 columnHead(kMonth) = MonthNames(kMonth);
             }
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = std::to_string(baseDateYear + iYear - 1);
             }
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
                 for (kMonth = 1; kMonth <= 12; ++kMonth) {
@@ -2789,7 +2788,7 @@ namespace EconomicLifeCycleCost {
 
             totalPV = 0.0;
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(CashFlow(costCatTotGrand).yrAmount(iYear), 2);
                 // adjust for escalated energy costs
                 Real64 yearly_total_cost =
@@ -2832,7 +2831,7 @@ namespace EconomicLifeCycleCost {
 
                 totalPV = 0.0;
                 for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                    rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                    rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
                     tableBody(1, iYear) = RealToStr(DepreciatedCapital(iYear), 2);
                     tableBody(2, iYear) = RealToStr(TaxableIncome(iYear), 2);
                     tableBody(3, iYear) = RealToStr(Taxes(iYear), 2);
