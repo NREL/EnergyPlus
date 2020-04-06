@@ -3343,7 +3343,7 @@ namespace OutputProcessor {
             ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Daily);
         }
         if (ResultsFramework::OutputSchema->DYMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->DYMeters.newRow(std::to_string(Month) + "/" + std::to_string(DayOfMonth));
+            ResultsFramework::OutputSchema->DYMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
         }
 
         PrintTimeStamp = true;
@@ -3441,7 +3441,7 @@ namespace OutputProcessor {
             ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Monthly);
         }
         if (ResultsFramework::OutputSchema->MNMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->MNMeters.newRow(std::to_string(Month));
+            ResultsFramework::OutputSchema->MNMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
         }
 
         PrintTimeStamp = true;
@@ -3602,7 +3602,7 @@ namespace OutputProcessor {
             ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Simulation);
         }
         if (ResultsFramework::OutputSchema->SMMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->SMMeters.newRow(DayOfSimChr);
+            ResultsFramework::OutputSchema->SMMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
         }
 
         PrintTimeStamp = true;

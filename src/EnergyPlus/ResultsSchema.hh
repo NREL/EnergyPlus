@@ -65,6 +65,9 @@
 
 namespace EnergyPlus {
 
+    class EnergyPlusFixture;
+    class ResultsFrameworkFixture;
+
 namespace ResultsFramework {
 
     using json = nlohmann::json;
@@ -195,7 +198,7 @@ namespace ResultsFramework {
         bool iVariablesScanned() const;
 
         void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin);
-        void newRow(const std::string &ts);
+//        void newRow(const std::string &ts);
         void pushVariableValue(const int reportID, double value);
 
         Variable &lastVariable();
@@ -275,7 +278,6 @@ namespace ResultsFramework {
 
     class ResultsSchema : public BaseResultObject {
     public:
-
         ResultsSchema() = default;
 
         virtual ~ResultsSchema() = default;
@@ -354,6 +356,8 @@ namespace ResultsFramework {
         void writeCSVOutput();
 
     private:
+        friend class EnergyPlus::EnergyPlusFixture;
+        friend class EnergyPlus::ResultsFrameworkFixture;
         char s[129] = {0};
 
         void parseTSOutputs(json const &data,

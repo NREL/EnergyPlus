@@ -56,9 +56,10 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 // Fixture
-#include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/ResultsFrameworkFixture.hh"
 
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::ResultsFramework;
@@ -68,7 +69,7 @@ using namespace EnergyPlus::NodeInputManager;
 
 namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, JsonOutput_ParseJsonObject1)
+TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject1)
 {
     std::string const idf_objects = delimited_string({
         "Output:JSON,",
@@ -82,7 +83,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_ParseJsonObject1)
     EXPECT_TRUE(OutputSchema->timeSeriesAndTabularEnabled());
 }
 
-TEST_F(EnergyPlusFixture, JsonOutput_ParseJsonObject2)
+TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject2)
 {
     std::string const idf_objects = delimited_string({
         "Output:JSON,",
@@ -97,7 +98,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_ParseJsonObject2)
     compare_json_stream("");
 }
 
-TEST_F(EnergyPlusFixture, JsonOutput_SimInfo)
+TEST_F(ResultsFrameworkFixture, ResultsFramework_SimInfo)
 {
 
     OutputSchema->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
@@ -132,7 +133,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_SimInfo)
     EXPECT_EQ(result.dump(), expectedResult.dump());
 }
 
-TEST_F(EnergyPlusFixture, JsonOutput_SimInfo_String)
+TEST_F(ResultsFrameworkFixture, ResultsFramework_SimInfo_String)
 {
     OutputSchema->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
     OutputSchema->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
@@ -153,7 +154,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_SimInfo_String)
     EXPECT_EQ(result.dump(4), expectedResult);
 }
 
-TEST_F(EnergyPlusFixture, JsonOutput_VariableInfo)
+TEST_F(ResultsFrameworkFixture, ResultsFramework_VariableInfo)
 {
 
     //      std::string const idf_objects = delimited_string({
@@ -174,12 +175,12 @@ TEST_F(EnergyPlusFixture, JsonOutput_VariableInfo)
 
     Variable var("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, repordId, Unit::C);
 
-    std::string expected_result = "{\n         \"Frequency\": \"Timestep\",\n         \"Name\": \"SALESFLOOR INLET NODE:System Node Temperature\",\n "
+    std::string expected_result = "{\n         \"Frequency\": \"TimeStep\",\n         \"Name\": \"SALESFLOOR INLET NODE:System Node Temperature\",\n "
                                   "        \"Units\": \"C\"\n}";
     EXPECT_EQ(expected_result, var.getJSON().dump('\t'));
 
     json expectedObject = R"( {
-            "Frequency": "Timestep",
+            "Frequency": "TimeStep",
             "Name": "SALESFLOOR INLET NODE:System Node Temperature",
             "Units": "C"
         } )"_json;
@@ -187,7 +188,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_VariableInfo)
     EXPECT_EQ(expectedObject, var.getJSON());
 }
 
-TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo1)
+TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo1)
 {
 
     json OutputVars;
@@ -201,17 +202,17 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo1)
     OutputSchema->RITimestepTSData.addVariable(var0);
     OutputSchema->RITimestepTSData.addVariable(var1);
 
-    OutputVars["Timestep"] = OutputSchema->RITimestepTSData.getVariablesJSON();
+    OutputVars["TimeStep"] = OutputSchema->RITimestepTSData.getVariablesJSON();
 
     json expectedObject = R"( {
-            "Timestep": [
+            "TimeStep": [
                  {
-                    "Frequency": "Timestep",
+                    "Frequency": "TimeStep",
                     "Name": "SALESFLOOR INLET NODE:System Node Humidity Ratio",
                     "Units": "kgWater/kgDryAir"
                 },
                 {
-                    "Frequency": "Timestep",
+                    "Frequency": "TimeStep",
                     "Name": "SALESFLOOR INLET NODE:System Node Temperature",
                     "Units": "C"
                 }]
@@ -221,7 +222,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo1)
     // EXPECT_EQ( expectedObject.dump(), OutputVars.dump());
 }
 
-TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
+TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
 {
 
     json OutputData;
@@ -248,10 +249,10 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
     OutputSchema->RITimestepTSData.pushVariableValue(reportId, 7.0);
     OutputSchema->RITimestepTSData.pushVariableValue(reportId, 8.0);
 
-    OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
+    OutputData["TimeStep"] = OutputSchema->RITimestepTSData.getJSON();
 
     json expectedObject = R"( {
-            "Timestep": {
+            "TimeStep": {
                 "Cols":[
                     {
                         "Units" : "C",
@@ -262,7 +263,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
                         "Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
                     }
                 ],
-                "ReportFrequency" : "Timestep",
+                "ReportFrequency" : "TimeStep",
                 "Rows":[
                     { "02/25 00:45:00" : [1.0,5.0] },
                     { "02/25 01:00:00" : [2.0,6.0] },
@@ -282,10 +283,10 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
     OutputSchema->RITimestepTSData.pushVariableValue(reportId, 10.0);
     OutputSchema->RITimestepTSData.pushVariableValue(reportId, 11.0);
     OutputSchema->RITimestepTSData.pushVariableValue(reportId, 12.0);
-    OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
+    OutputData["TimeStep"] = OutputSchema->RITimestepTSData.getJSON();
 
     expectedObject = R"( {
-            "Timestep": {
+            "TimeStep": {
                 "Cols":[
                     {
                         "Units" : "C",
@@ -300,7 +301,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
                         "Variable" : "SALESFLOOR OUTLET NODE:System Node Temperature"
                     }
                 ],
-                "ReportFrequency" : "Timestep",
+                "ReportFrequency" : "TimeStep",
                 "Rows":[
                     { "02/25 00:45:00" : [1.0,5.0,9.0] },
                     { "02/25 01:00:00" : [2.0,6.0,10.0] },
@@ -313,7 +314,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
     EXPECT_EQ( expectedObject.dump(), OutputData.dump());
 }
 
-TEST_F(EnergyPlusFixture, JsonOutput_TableInfo)
+TEST_F(ResultsFrameworkFixture, ResultsFramework_TableInfo)
 {
 
     Array1D_string rowLabels(2);
@@ -353,7 +354,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_TableInfo)
     EXPECT_EQ(result.dump(), expectedResult.dump());
 }
 
-TEST_F(EnergyPlusFixture, JsonOutput_ReportInfo)
+TEST_F(ResultsFrameworkFixture, ResultsFramework_ReportInfo)
 {
 
     Array1D_string rowLabels(2);
@@ -440,5 +441,189 @@ TEST_F(EnergyPlusFixture, JsonOutput_ReportInfo)
 
     EXPECT_EQ(result.dump(), expectedResult.dump());
 }
+
+TEST_F(ResultsFrameworkFixture, ResultsFramework_convertToMonth)
+{
+    std::string datetime;
+    datetime = "01/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "January");
+    datetime = "02/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "February");
+    datetime = "03/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "March");
+    datetime = "04/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "April");
+    datetime = "05/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "May");
+    datetime = "06/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "June");
+    datetime = "07/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "July");
+    datetime = "08/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "August");
+    datetime = "09/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "September");
+    datetime = "10/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "October");
+    datetime = "11/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "November");
+    datetime = "12/01 24:00:00";
+    convertToMonth(datetime);
+    EXPECT_EQ(datetime, "December");
+    datetime = "01/01 23:00:00";
+    EXPECT_THROW(convertToMonth(datetime), FatalError);
+}
+
+//TEST_F(ResultsFrameworkFixture, ResultsFramework_findEndOfMonth1)
+//{
+//    std::map<std::string, std::vector<std::string>> output{
+//            {"01/31 23:50:00", {"1", "1", "", "", "1"}},
+//            {"01/31 24:00:00", {"1", "1", "", "", "1"}},
+//            {"02/01 00:10:00", {"1", "1", "", "", "1"}},
+//            {"02/28 23:50:00", {"1", "1", "", "", "1"}},
+//            {"02/28 24:00:00", {"1", "1", "", "", "1"}},
+//            {"12/31 23:50:00", {"1", "1", "", "", "1"}},
+//            {"12/31 24:00:00", {"1", "1", "", "", "1"}}
+//    };
+//    std::map<std::string, std::string> expectedEndOfMonth{
+//            {"01", "01/31 24:00:00"},
+//            {"02", "02/28 24:00:00"},
+//            {"12", "12/31 24:00:00"}
+//    };
+//
+//    std::map<std::string, std::string> endOfMonth = findEndOfMonth(output);
+//    EXPECT_EQ(endOfMonth, expectedEndOfMonth);
+//}
+//
+//TEST_F(ResultsFrameworkFixture, ResultsFramework_findEndOfMonth2)
+//{
+//    std::map<std::string, std::vector<std::string>> output{
+//            {"01/31 24:00:00", {"1", "1", "", "", "1"}},
+//            {"02/28 24:00:00", {"1", "1", "", "", "1"}},
+//            {"03/31 24:00:00", {"1", "1", "", "", "1"}},
+//            {"04/30 24:00:00", {"1", "1", "", "", "1"}},
+//            {"05/31 24:00:00", {"1", "1", "", "", "1"}},
+//            {"06/30 24:00:00", {"1", "1", "", "", "1"}},
+//            {"07/31 24:00:00", {"1", "1", "", "", "1"}},
+//            {"08/31 24:00:00", {"1", "1", "", "", "1"}},
+//            {"09/30 24:00:00", {"1", "1", "", "", "1"}},
+//            {"10/31 24:00:00", {"1", "1", "", "", "1"}},
+//            {"11/30 24:00:00", {"1", "1", "", "", "1"}},
+//            {"12/31 24:00:00", {"1", "1", "", "", "1"}}
+//    };
+//    std::map<std::string, std::string> expectedEndOfMonth{
+//            {"01", "01/31 24:00:00"},
+//            {"02", "02/28 24:00:00"},
+//            {"03", "03/31 24:00:00"},
+//            {"04", "04/30 24:00:00"},
+//            {"05", "05/31 24:00:00"},
+//            {"06", "06/30 24:00:00"},
+//            {"07", "07/31 24:00:00"},
+//            {"08", "08/31 24:00:00"},
+//            {"09", "09/30 24:00:00"},
+//            {"10", "10/31 24:00:00"},
+//            {"11", "11/30 24:00:00"},
+//            {"12", "12/31 24:00:00"}
+//    };
+//
+//    std::map<std::string, std::string> endOfMonth = findEndOfMonth(output);
+//    EXPECT_EQ(endOfMonth, expectedEndOfMonth);
+//}
+//
+//TEST_F(ResultsFrameworkFixture, ResultsFramework_findEndOfMonth3)
+//{
+//    std::map<std::string, std::vector<std::string>> output{
+//            {"01/21 01:00:00", {"1", "1", "", "", "1"}},
+//            {"01/21 22:00:00", {"1", "1", "", "", "1"}},
+//            {"01/21 23:00:00", {"1", "1", "", "", "1"}},
+//            {"01/21 24:00:00", {"1", "1", "", "", "1"}},
+//            {"07/21 01:00:00", {"1", "1", "", "", "1"}},
+//            {"07/21 22:00:00", {"1", "1", "", "", "1"}},
+//            {"07/21 23:00:00", {"1", "1", "", "", "1"}},
+//            {"07/21 24:00:00", {"1", "1", "", "", "1"}},
+//            {"1", {"1", "1", "", "", "1"}},
+//            {"7", {"1", "1", "", "", "1"}}
+//    };
+//    std::map<std::string, std::string> expectedEndOfMonth{
+//            {"01", "01/21 24:00:00"},
+//            {"07", "07/21 24:00:00"}
+//    };
+//
+//    std::map<std::string, std::string> endOfMonth = findEndOfMonth(output);
+//    EXPECT_EQ(endOfMonth, expectedEndOfMonth);
+//}
+//
+//TEST_F(ResultsFrameworkFixture, ResultsFramework_findEndOfMonth4)
+//{
+//    std::map<std::string, std::vector<std::string>> output{
+//            {"07/21 01:00:00", {"1", "1", "", "", "1"}},
+//            {"07/21 23:00:00", {"1", "1", "", "", "1"}},
+//            {"07/21 24:00:00", {"1", "1", "", "", "1"}},
+//            // {"1", {"1", "1", "", "", "1"}},
+//            {"12", {"1", "1", "", "", "1"}},
+//            {"12/21 01:00:00", {"1", "1", "", "", "1"}},
+//            {"12/21 23:00:00", {"1", "1", "", "", "1"}},
+//            {"12/21 24:00:00", {"1", "1", "", "", "1"}},
+//            {"7", {"1", "1", "", "", "1"}}
+//    };
+//    std::map<std::string, std::string> expectedEndOfMonth{
+////            {"01", "01/21 24:00:00"},
+//            {"07", "07/21 24:00:00"},
+//            {"12", "12/21 24:00:00"}
+//    };
+//
+//    std::map<std::string, std::string> endOfMonth = findEndOfMonth(output);
+//    EXPECT_EQ(endOfMonth, expectedEndOfMonth);
+//}
+//
+//TEST_F(ResultsFrameworkFixture, ResultsFramework_findEndOfMonth5)
+//{
+//    std::map<std::string, std::vector<std::string>> output{
+//            {"01/31 24:00:00", {"1", "1", "", "", "1"}},
+//            {"02/28 24:00:00", {"1", "1", "", "", "1"}},
+//            {"12/31 24:00:00", {"1", "1", "", "", "1"}},
+//            {"1", {"1", "1", "", "", "1"}},
+//            {"2", {"1", "1", "", "", "1"}}
+//    };
+//    std::map<std::string, std::string> expectedEndOfMonth{
+//            {"01", "01/31 24:00:00"},
+//            {"02", "02/28 24:00:00"},
+//            {"12", "12/31 24:00:00"}
+//    };
+//
+//    std::map<std::string, std::string> endOfMonth = findEndOfMonth(output);
+//    EXPECT_EQ(endOfMonth, expectedEndOfMonth);
+//}
+//
+//TEST_F(ResultsFrameworkFixture, ResultsFramework_findEndOfMonth6)
+//{
+//    std::map<std::string, std::vector<std::string>> output{
+//            {"01/31 24:00:00", {"1", "1", "", "", "1"}},
+//            {"02/28 24:00:00", {"1", "1", "", "", "1"}},
+//            {"12/31 24:00:00", {"1", "1", "", "", "1"}},
+//            {"1", {"1", "1", "", "", "1"}},
+//            {"2", {"1", "1", "", "", "1"}},
+//            {"12", {"1", "1", "", "", "1"}}
+//    };
+//    std::map<std::string, std::string> expectedEndOfMonth{
+//            {"01", "01/31 24:00:00"},
+//            {"02", "02/28 24:00:00"},
+//            {"12", "12/31 24:00:00"}
+//    };
+//
+//    std::map<std::string, std::string> endOfMonth = findEndOfMonth(output);
+//    EXPECT_EQ(endOfMonth, expectedEndOfMonth);
+//}
 
 } // namespace EnergyPlus

@@ -363,10 +363,10 @@ namespace ResultsFramework {
         TS.emplace_back(buffer);
     }
 
-    void DataFrame::newRow(const std::string &ts)
-    {
-        TS.emplace_back(ts);
-    }
+//    void DataFrame::newRow(const std::string &ts)
+//    {
+//        TS.emplace_back(ts);
+//    }
 
     void DataFrame::setRDataFrameEnabled(bool state)
     {
@@ -477,7 +477,7 @@ namespace ResultsFramework {
                 std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
                 std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*DataGlobals::jsonOutputStreams.msgpack_TSstream_Zone));
             }
-        } else if (ReportFrequency == "Timestep") {
+        } else if (ReportFrequency == "TimeStep") {
             if (outputJSON && DataGlobals::jsonOutputStreams.json_TSstream) {
                 *(DataGlobals::jsonOutputStreams.json_TSstream) << std::setw(4) << root << std::endl;
             }
@@ -931,7 +931,7 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::EachCall:
             // nothing to do; meters are not reported at this frequency
             break;
-        case OutputProcessor::ReportingFrequency::TimeStep: // at 'Timestep'
+        case OutputProcessor::ReportingFrequency::TimeStep: // at 'TimeStep'
             for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
                 if (EnergyMeters(Loop).RptTS || EnergyMeters(Loop).RptTSFO) {
                     // MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).TSRptNum, EnergyMeters(
@@ -1164,6 +1164,32 @@ namespace ResultsFramework {
         }
     }
 
+//    std::map<std::string, std::string> ResultsSchema::findEndOfMonth(std::map<std::string, std::vector<std::string>> const & outputs)
+//    {
+//        std::map<std::string, std::string> endOfMonth;
+//        std::string prev_month;
+//        auto it = outputs.begin(), prev = outputs.end();
+//        if (it->first.size() > 1) {
+//            prev_month = it->first.substr(0, 2);
+//        }
+//        for (it = outputs.begin(); it != outputs.end(); ++it) {
+//            if (it->first.size() > 2) {
+//                prev = it;
+//                auto const &month = it->first.substr(0, 2);
+//                if (month != prev_month) {
+//                    auto tmp_prev = prev;
+//                    --tmp_prev;
+//                    endOfMonth.emplace(prev_month, tmp_prev->first);
+//                    prev_month = month;
+//                }
+//            }
+//        }
+//        if (it == outputs.end()) {
+//            endOfMonth.emplace(prev_month, prev->first);
+//        }
+//        return endOfMonth;
+//    }
+
     std::map<std::string, std::string> ResultsSchema::findEndOfMonth(std::map<std::string, std::vector<std::string>> const & outputs)
     {
         std::map<std::string, std::string> endOfMonth;
@@ -1293,7 +1319,7 @@ namespace ResultsFramework {
         }
         std::map<std::string, std::vector<std::string>> csv_outputs;
         std::map<std::string, std::vector<std::string>> mtr_outputs;
-        OutputProcessor::ReportingFrequency reportingFrequency;
+        OutputProcessor::ReportingFrequency reportingFrequency(OutputProcessor::ReportingFrequency::Hourly);
         bool hasMonthly = false;
 
         // Output yearly time series data
@@ -1397,9 +1423,9 @@ namespace ResultsFramework {
             reportingFrequency = OutputProcessor::ReportingFrequency::EachCall;
         }
 
-        if (hasMonthly) {
-            fixMonthly(csv_outputs);
-        }
+//        if (hasMonthly) {
+//            fixMonthly(csv_outputs);
+//        }
 
         auto & outputFiles = OutputFiles::getSingleton();
 
@@ -1482,7 +1508,7 @@ namespace ResultsFramework {
         }
 
         if (hasRITimestepTSData()) {
-            outputVars["Timestep"] = RITimestepTSData.getVariablesJSON();
+            outputVars["TimeStep"] = RITimestepTSData.getVariablesJSON();
         }
 
         if (hasRIHourlyTSData()) {
@@ -1516,7 +1542,7 @@ namespace ResultsFramework {
 
         // -- meter values
         if (hasTSMeters()) {
-            meterVars["Timestep"] = TSMeters.getVariablesJSON();
+            meterVars["TimeStep"] = TSMeters.getVariablesJSON();
         }
 
         if (hasHRMeters()) {
@@ -1540,7 +1566,7 @@ namespace ResultsFramework {
         }
 
         if (hasTSMeters()) {
-            meterData["Timestep"] = TSMeters.getJSON();
+            meterData["TimeStep"] = TSMeters.getJSON();
         }
 
         if (hasHRMeters()) {

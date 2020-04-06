@@ -13,6 +13,7 @@ set( test_src
   Fixtures/EnergyPlusFixture.hh
   Fixtures/IdfParserFixture.hh
   Fixtures/InputProcessorFixture.hh
+  Fixtures/ResultsFrameworkFixture.hh
   Fixtures/SQLiteFixture.hh
   PhaseChangeModeling/HysteresisModel.unit.cc
   AdvancedAFN.unit.cc
@@ -115,7 +116,6 @@ set( test_src
   InputProcessor.unit.cc
   IntegratedHeatPump.unit.cc
   InternalHeatGains.unit.cc
-  JsonOutput.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   MicroCHPElectricGenerator.unit.cc
@@ -155,6 +155,7 @@ set( test_src
   PVWatts.unit.cc
   ReportCoilSelection.unit.cc
   ReportSizingManager.unit.cc
+  ResultsFramework.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
   RunPeriod.unit.cc
