@@ -202,7 +202,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
 
-    HeatBalanceManager::ManageHeatBalance();
+    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
 
     // This test will emulate NFRC 100 U-factor test
     int winNum;
@@ -543,6 +543,8 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(3);
     DataHeatBalSurface::QRadOutReport.allocate(3);
     DataHeatBalSurface::QRadLWOutSrdSurfs.allocate(3);
+    DataHeatBalSurface::QAirExtReport.allocate(3);
+    DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
     DataHeatBalance::QRadSWOutIncident = 0.0;
     DataHeatBalance::QRadSWwinAbs = 0.0;
@@ -2768,6 +2770,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(3);
     DataHeatBalSurface::QRadOutReport.allocate(3);
     DataHeatBalSurface::QRadLWOutSrdSurfs.allocate(3);
+    DataHeatBalSurface::QAirExtReport.allocate(3);
+    DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
     DataHeatBalance::QRadSWOutIncident = 0.0;
     DataHeatBalance::QRadSWwinAbs = 0.0;
@@ -2790,6 +2794,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
     // Test if LWR from surrounding surfaces correctly calculated
     EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(2));
+    EXPECT_NEAR(-24.9342, DataHeatBalSurface::QHeatEmiReport(2),3);
 }
 TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 {

@@ -6110,6 +6110,8 @@
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;
 
+  Output:Variable,*,Site Rain Status,hourly;
+
   PythonPlugin:Instance,
     Average Zone Temp Calculation,  !- Name
     Yes,                     !- Run During Warmup Days

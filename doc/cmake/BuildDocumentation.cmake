@@ -3,7 +3,7 @@
   # INNAME, the name of the input tex file
   # OUTNAME, the pretty output name for the pdf
   # ORIGINAL_CMAKE_SOURCE_DIR, the root of the source repo
-  # ORIGINAL_CMAKE_BINARY_DIR, the root fo the build tree
+  # ORIGINAL_CMAKE_BINARY_DIR, the root of the build tree
 # this will get more complicated as we add things like bibtex and makeindex, for now just execute xelatex twice and rename the output
 if ("${TEX_INTERACTION}" STREQUAL "")
   set(THIS_TEX_INTERACTION "batchmode")
@@ -13,5 +13,5 @@ endif()
 execute_process( COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex TIMEOUT 600 )
 execute_process( COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex TIMEOUT 600 )
 execute_process( COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex TIMEOUT 600 )
-file( COPY "${INNAME}.pdf" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/doc-pdf/" )
-file( RENAME "${ORIGINAL_CMAKE_BINARY_DIR}/doc-pdf/${INNAME}.pdf" "${ORIGINAL_CMAKE_BINARY_DIR}/doc-pdf/${OUTNAME}.pdf")
+file( COPY "${INNAME}.pdf" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/" )
+file( RENAME "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${INNAME}.pdf" "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${OUTNAME}.pdf")

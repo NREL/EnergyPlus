@@ -49,7 +49,6 @@
 #define TarcogShading_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
@@ -61,16 +60,16 @@ namespace TarcogShading {
 
     // Functions
 
-    void shading(Array1<Real64> const &theta,
-                 Array1<Real64> const &gap,
-                 Array1<Real64> &hgas,
-                 Array1<Real64> &hcgas,
-                 Array1<Real64> &hrgas,
+    void shading(Array1D<Real64> const &theta,
+                 Array1D<Real64> const &gap,
+                 Array1D<Real64> &hgas,
+                 Array1D<Real64> &hcgas,
+                 Array1D<Real64> &hrgas,
                  Array2<Real64> const &frct,
                  Array2_int const &iprop,
-                 Array1<Real64> const &pressure,
-                 Array1_int const &nmix,
-                 Array1<Real64> const &xwght,
+                 Array1D<Real64> const &pressure,
+                 Array1D_int const &nmix,
+                 const Array1D<Real64> &xwght,
                  Array2<Real64> const &xgcon,
                  Array2<Real64> const &xgvis,
                  Array2<Real64> const &xgcp,
@@ -80,26 +79,26 @@ namespace TarcogShading {
                  Real64 const angle,
                  Real64 const Tout,
                  Real64 const Tin,
-                 Array1<Real64> const &Atop,
-                 Array1<Real64> const &Abot,
-                 Array1<Real64> const &Al,
-                 Array1<Real64> const &Ar,
-                 Array1<Real64> const &Ah,
-                 Array1<Real64> const &vvent,
-                 Array1<Real64> const &tvent,
-                 Array1_int const &LayerType,
-                 Array1<Real64> &Tgaps,
-                 Array1<Real64> &qv,
-                 Array1<Real64> &hcv,
+                 Array1D<Real64> const &Atop,
+                 Array1D<Real64> const &Abot,
+                 Array1D<Real64> const &Al,
+                 Array1D<Real64> const &Ar,
+                 Array1D<Real64> const &Ah,
+                 Array1D<Real64> const &vvent,
+                 Array1D<Real64> const &tvent,
+                 Array1D_int const &LayerType,
+                 Array1D<Real64> &Tgaps,
+                 Array1D<Real64> &qv,
+                 Array1D<Real64> &hcv,
                  int &nperr,
                  std::string &ErrorMessage,
-                 Array1<Real64> &vfreevent);
+                 Array1D<Real64> &vfreevent);
 
-    void forcedventilation(Array1A_int const iprop,
-                           Array1A<Real64> const frct,
+    void forcedventilation(const Array1D_int &iprop,
+                           const Array1D<Real64> &frct,
                            Real64 const press,
                            int const nmix,
-                           Array1A<Real64> const xwght,
+                           const Array1D<Real64> &xwght,
                            Array2A<Real64> const xgcon,
                            Array2A<Real64> const xgvis,
                            Array2A<Real64> const xgcp,
@@ -115,15 +114,15 @@ namespace TarcogShading {
                            int &nperr,
                            std::string &ErrorMessage);
 
-    void shadingin(Array1A_int const iprop1,
-                   Array1A<Real64> const frct1,
+    void shadingin(const Array1D_int &iprop1,
+                   const Array1D<Real64> &frct1,
                    Real64 const press1,
                    int const nmix1,
-                   Array1A_int const iprop2,
-                   Array1A<Real64> const frct2,
+                   const Array1D_int &iprop2,
+                   const Array1D<Real64> &frct2,
                    Real64 const press2,
                    int const nmix2,
-                   Array1A<Real64> const xwght,
+                   const Array1D<Real64> &xwght,
                    Array2A<Real64> const xgcon,
                    Array2A<Real64> const xgvis,
                    Array2A<Real64> const xgcp,
@@ -152,15 +151,15 @@ namespace TarcogShading {
                    int &nperr,
                    std::string &ErrorMessage);
 
-    void shadingedge(Array1A_int const iprop1,
-                     Array1A<Real64> const frct1,
+    void shadingedge(const Array1D_int &iprop1,
+                     const Array1D<Real64> &frct1,
                      Real64 const press1,
                      int const nmix1,
-                     Array1A_int const iprop2,
-                     Array1A<Real64> const frct2,
+                     const Array1D_int &iprop2,
+                     const Array1D<Real64> &frct2,
                      Real64 const press2,
                      int const nmix2,
-                     Array1A<Real64> const xwght,
+                     const Array1D<Real64> &xwght,
                      Array2A<Real64> const xgcon,
                      Array2A<Real64> const xgvis,
                      Array2A<Real64> const xgcp,
@@ -184,21 +183,21 @@ namespace TarcogShading {
                      std::string &ErrorMessage,
                      Real64 &speed);
 
-    void updateEffectiveMultipliers(int const nlayer,               // Number of layers
-                                    Real64 const width,             // IGU width [m]
-                                    Real64 const height,            // IGU height [m]
-                                    Array1A<Real64> const Atop,     // Top openning area [m2]
-                                    Array1A<Real64> const Abot,     // Bottom openning area [m2]
-                                    Array1A<Real64> const Al,       // Left side openning area [m2]
-                                    Array1A<Real64> const Ar,       // Right side openning area [m2]
-                                    Array1A<Real64> const Ah,       // Front side openning area [m2]
-                                    Array1D<Real64> &Atop_eff,      // Output - Effective top openning area [m2]
-                                    Array1D<Real64> &Abot_eff,      // Output - Effective bottom openning area [m2]
-                                    Array1D<Real64> &Al_eff,        // Output - Effective left side openning area [m2]
-                                    Array1D<Real64> &Ar_eff,        // Output - Effective right side openning area [m2]
-                                    Array1D<Real64> &Ah_eff,        // Output - Effective front side openning area [m2]
-                                    Array1A_int const LayerType,    // Layer type
-                                    Array1A<Real64> const SlatAngle // Venetian layer slat angle [deg]
+    void updateEffectiveMultipliers(int const nlayer,                // Number of layers
+                                    Real64 const width,              // IGU width [m]
+                                    Real64 const height,             // IGU height [m]
+                                    const Array1D<Real64> &Atop,     // Top openning area [m2]
+                                    const Array1D<Real64> &Abot,     // Bottom openning area [m2]
+                                    const Array1D<Real64> &Al,       // Left side openning area [m2]
+                                    const Array1D<Real64> &Ar,       // Right side openning area [m2]
+                                    const Array1D<Real64> &Ah,       // Front side openning area [m2]
+                                    Array1D<Real64> &Atop_eff,       // Output - Effective top openning area [m2]
+                                    Array1D<Real64> &Abot_eff,       // Output - Effective bottom openning area [m2]
+                                    Array1D<Real64> &Al_eff,         // Output - Effective left side openning area [m2]
+                                    Array1D<Real64> &Ar_eff,         // Output - Effective right side openning area [m2]
+                                    Array1D<Real64> &Ah_eff,         // Output - Effective front side openning area [m2]
+                                    const Array1D_int &LayerType,    // Layer type
+                                    const Array1D<Real64> &SlatAngle // Venetian layer slat angle [deg]
     );
 
 } // namespace TarcogShading

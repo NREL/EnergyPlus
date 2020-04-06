@@ -165,6 +165,8 @@ namespace UserDefinedComponents {
         if (thisLoop > 0) {
             if (this->Loop(thisLoop).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
+            } else if (this->Loop(thisLoop).initPluginLocation > -1) {
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(this->Loop(thisLoop).initPluginLocation);
             }
 
             PlantUtilities::InitComponentNodes(this->Loop(thisLoop).MassFlowRateMin,
@@ -839,13 +841,13 @@ namespace UserDefinedComponents {
                                               cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainTypeOf_PlantComponentUserDefined,
-                                              UserPlantComp(CompLoop).Zone.ConvectionGainRate,
-                                              UserPlantComp(CompLoop).Zone.ReturnAirConvectionGainRate,
-                                              UserPlantComp(CompLoop).Zone.ThermalRadiationGainRate,
-                                              UserPlantComp(CompLoop).Zone.LatentGainRate,
-                                              UserPlantComp(CompLoop).Zone.ReturnAirLatentGainRate,
-                                              UserPlantComp(CompLoop).Zone.CarbonDioxideGainRate,
-                                              UserPlantComp(CompLoop).Zone.GenericContamGainRate);
+                                              &UserPlantComp(CompLoop).Zone.ConvectionGainRate,
+                                              &UserPlantComp(CompLoop).Zone.ReturnAirConvectionGainRate,
+                                              &UserPlantComp(CompLoop).Zone.ThermalRadiationGainRate,
+                                              &UserPlantComp(CompLoop).Zone.LatentGainRate,
+                                              &UserPlantComp(CompLoop).Zone.ReturnAirLatentGainRate,
+                                              &UserPlantComp(CompLoop).Zone.CarbonDioxideGainRate,
+                                              &UserPlantComp(CompLoop).Zone.GenericContamGainRate);
 
                         SetupEMSActuator("Component Zone Internal Gain",
                                          UserPlantComp(CompLoop).Name,
@@ -1167,13 +1169,13 @@ namespace UserDefinedComponents {
                                                   cCurrentModuleObject,
                                                   cAlphaArgs(1),
                                                   DataHeatBalance::IntGainTypeOf_CoilUserDefined,
-                                                  UserCoil(CompLoop).Zone.ConvectionGainRate,
-                                                  UserCoil(CompLoop).Zone.ReturnAirConvectionGainRate,
-                                                  UserCoil(CompLoop).Zone.ThermalRadiationGainRate,
-                                                  UserCoil(CompLoop).Zone.LatentGainRate,
-                                                  UserCoil(CompLoop).Zone.ReturnAirLatentGainRate,
-                                                  UserCoil(CompLoop).Zone.CarbonDioxideGainRate,
-                                                  UserCoil(CompLoop).Zone.GenericContamGainRate);
+                                                  &UserCoil(CompLoop).Zone.ConvectionGainRate,
+                                                  &UserCoil(CompLoop).Zone.ReturnAirConvectionGainRate,
+                                                  &UserCoil(CompLoop).Zone.ThermalRadiationGainRate,
+                                                  &UserCoil(CompLoop).Zone.LatentGainRate,
+                                                  &UserCoil(CompLoop).Zone.ReturnAirLatentGainRate,
+                                                  &UserCoil(CompLoop).Zone.CarbonDioxideGainRate,
+                                                  &UserCoil(CompLoop).Zone.GenericContamGainRate);
 
                             SetupEMSActuator("Component Zone Internal Gain",
                                              UserCoil(CompLoop).Name,
@@ -1580,13 +1582,13 @@ namespace UserDefinedComponents {
                                               cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainTypeOf_ZoneHVACForcedAirUserDefined,
-                                              UserZoneAirHVAC(CompLoop).Zone.ConvectionGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.ReturnAirConvectionGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.ThermalRadiationGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.LatentGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.ReturnAirLatentGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.CarbonDioxideGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.GenericContamGainRate);
+                                              &UserZoneAirHVAC(CompLoop).Zone.ConvectionGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.ReturnAirConvectionGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.ThermalRadiationGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.LatentGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.ReturnAirLatentGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.CarbonDioxideGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.GenericContamGainRate);
 
                         SetupEMSActuator("Component Zone Internal Gain",
                                          UserZoneAirHVAC(CompLoop).Name,
@@ -2007,13 +2009,13 @@ namespace UserDefinedComponents {
                                               cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainTypeOf_AirTerminalUserDefined,
-                                              UserAirTerminal(CompLoop).Zone.ConvectionGainRate,
-                                              UserAirTerminal(CompLoop).Zone.ReturnAirConvectionGainRate,
-                                              UserAirTerminal(CompLoop).Zone.ThermalRadiationGainRate,
-                                              UserAirTerminal(CompLoop).Zone.LatentGainRate,
-                                              UserAirTerminal(CompLoop).Zone.ReturnAirLatentGainRate,
-                                              UserAirTerminal(CompLoop).Zone.CarbonDioxideGainRate,
-                                              UserAirTerminal(CompLoop).Zone.GenericContamGainRate);
+                                              &UserAirTerminal(CompLoop).Zone.ConvectionGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.ReturnAirConvectionGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.ThermalRadiationGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.LatentGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.ReturnAirLatentGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.CarbonDioxideGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.GenericContamGainRate);
 
                         SetupEMSActuator("Component Zone Internal Gain",
                                          UserAirTerminal(CompLoop).Name,

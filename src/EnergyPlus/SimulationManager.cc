@@ -217,7 +217,7 @@ namespace SimulationManager {
         PreP_Fatal = false;
     }
 
-    void ManageSimulation()
+    void ManageSimulation(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -342,7 +342,6 @@ namespace SimulationManager {
         AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles();
-        auto &outputFiles = OutputFiles::getSingleton();
         GetProjectData(outputFiles);
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
@@ -369,6 +368,12 @@ namespace SimulationManager {
         if (!eplusRunningViaAPI) {
             EnergyPlus::PluginManagement::pluginManager =
                 std::unique_ptr<EnergyPlus::PluginManagement::PluginManager>(new EnergyPlus::PluginManagement::PluginManager);
+        } else {
+            // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
+            bool invalidPluginObjects = EnergyPlus::PluginManagement::PluginManager::anyUnexpectedPluginObjects();
+            if (invalidPluginObjects) {
+                ShowFatalError("Invalid Python Plugin object encounter causes program termination");
+            }
         }
 
         DoingSizing = true;
@@ -426,7 +431,7 @@ namespace SimulationManager {
             if (EnergyPlus::PluginManagement::pluginManager) {
                 EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
             }
-            UpdateMeterReporting();
+            UpdateMeterReporting(outputFiles);
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
@@ -630,7 +635,7 @@ namespace SimulationManager {
 
                         ManageExteriorEnergyUse();
 
-                        ManageHeatBalance();
+                        ManageHeatBalance(outputFiles);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
                             AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
@@ -1183,7 +1188,7 @@ namespace SimulationManager {
             ErrorsFound = true;
             ShowFatalError("GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
         }
-        DataGlobals::createProfLog = Num > 0;
+        DataGlobals::createPerfLog = Num > 0;
         std::string overrideModeValue = "Normal";
         if (instances != inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
@@ -1204,6 +1209,7 @@ namespace SimulationManager {
                 bool overrideMinNumWarmupDays(false);
                 bool overrideBeginEnvResetSuppress(false);
                 bool overrideMaxZoneTempDiff(false);
+                ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
@@ -1259,6 +1265,9 @@ namespace SimulationManager {
                     if (overrideTimestep) {
                         ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Number of TimeSteps has been changed to 1.");
                         DataGlobals::NumOfTimeStepInHour = 1;
+                        DataGlobals::TimeStepZone = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
+                        DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
+                        DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
@@ -1411,7 +1420,7 @@ namespace SimulationManager {
         //    ENDIF
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
-        if (DataGlobals::createProfLog) {
+        if (DataGlobals::createPerfLog) {
             writeIntialPerfLogValues(overrideModeValue);
         }
     }
@@ -1431,7 +1440,7 @@ namespace SimulationManager {
         UtilityRoutines::appendPerfLog("Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
         UtilityRoutines::appendPerfLog("Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
         UtilityRoutines::appendPerfLog("SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
-        UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff));
+        UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
      }
 
     std::string bool_to_string(bool logical)
@@ -1808,20 +1817,12 @@ namespace SimulationManager {
         print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        OutputFileMeters = GetNewUnitNumber();
+        OutputFiles::getSingleton().mtr.open();
         StdMeterRecordCount = 0;
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileMeters, DataStringGlobals::outputMtrFileName, flags);
-            write_stat = flags.ios();
+        if (!OutputFiles::getSingleton().mtr.good()) {
+            ShowFatalError("OpenOutputFiles: Could not open file " + OutputFiles::getSingleton().mtr.fileName + " for output (write).");
         }
-        if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputMtrFileName + " for output (write).");
-        }
-        mtr_stream = ObjexxFCL::gio::out_stream(OutputFileMeters);
-        ObjexxFCL::gio::write(OutputFileMeters, fmtA) << "Program Version," + VerString;
+        print(OutputFiles::getSingleton().mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
         OutputFileBNDetails = GetNewUnitNumber();
@@ -2048,18 +2049,13 @@ namespace SimulationManager {
         outputFiles.eio.close();
 
         // Close the Meters Output File
-        ObjexxFCL::gio::write(OutputFileMeters, EndOfDataFormat);
-        ObjexxFCL::gio::write(OutputFileMeters, fmtLD) << "Number of Records Written=" << StdMeterRecordCount;
+        print(outputFiles.mtr, "{}\n", EndOfDataString);
+        print(outputFiles.mtr, " Number of Records Written={:12}\n", StdMeterRecordCount);
         if (StdMeterRecordCount > 0) {
-            ObjexxFCL::gio::close(OutputFileMeters);
+            outputFiles.mtr.close();
         } else {
-            {
-                IOFlags flags;
-                flags.DISPOSE("DELETE");
-                ObjexxFCL::gio::close(OutputFileMeters, flags);
-            }
+            outputFiles.mtr.del();
         }
-        mtr_stream = nullptr;
 
         // Close the External Shading Output File
 
@@ -2138,7 +2134,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -2153,7 +2149,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
             //         do an end of day, end of environment time step
 
@@ -2166,7 +2162,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
         } // ... End environment loop.
 
@@ -3047,7 +3043,6 @@ namespace SimulationManager {
                                 EndUses,
                                 Groups,
                                 VarNames,
-                                _,
                                 VarIDs);
             for (Loop1 = 1; Loop1 <= NumVariables; ++Loop1) {
                 ObjexxFCL::gio::write(OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)")
