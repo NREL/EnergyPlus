@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -930,7 +929,7 @@ namespace HVACVariableRefrigerantFlow {
     void isVRFCoilPresent(std::string const VRFTUName, bool &CoolCoilPresent, bool & HeatCoilPresent);
 
     Real64 PLRResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                       Array1<Real64> const &Par   // par(1) = VRFTUNum
+                       Array1D<Real64> const &Par   // par(1) = VRFTUNum
     );
 
     void SetAverageAirFlow(int VRFTUNum,         // Unit index
@@ -947,31 +946,31 @@ namespace HVACVariableRefrigerantFlow {
     void LimitTUCapacity(int VRFCond,              // Condenser Unit index
                          int NumTUInList,          // Number of terminal units in list
                          Real64 StartingCapacity,  // temporary variable holding condenser capacity [W]
-                         Array1S<Real64> CapArray, // Array of coil capacities in either cooling or heating mode [W]
+                         const Array1D<Real64> &CapArray, // Array of coil capacities in either cooling or heating mode [W]
                          Real64 &MaxLimit,               // Maximum terminal unit capacity for coils in same operating mode [W]
                          Real64 AltCapacity,       // temporary variable holding heat recovery capacity [W]
-                         Array1S<Real64> AltArray, // Array of coil capacities of heat recovery [W]
+                         const Array1D<Real64> &AltArray, // Array of coil capacities of heat recovery [W]
                          Real64 &AltLimit                // Maximum terminal unit capacity of heat recovery coils [W]
     );
 
     void LimitCoilCapacity(int NumTUInList,          // Number of terminal units in list
                            Real64 TotalCapacity,     // temporary variable holding condenser capacity [W]
-                           Array1S<Real64> CapArray, // Array of coil capacities in either cooling or heating mode [W]
+                           const Array1D<Real64> &CapArray, // Array of coil capacities in either cooling or heating mode [W]
                            Real64 &MaxLimit                // Maximum terminal unit capacity for coils in same operating mode [W]
     );
 
     void clear_state();
 
     Real64 VRFTUAirFlowResidual_FluidTCtrl(Real64 FanSpdRatio, // fan speed ratio of VRF VAV TU
-                                           Array1<Real64> const &Par // par(1) = VRFTUNum
+                                           Array1D<Real64> const &Par // par(1) = VRFTUNum
     );
 
     Real64 VRFOUTeResidual_FluidTCtrl(Real64 Te,          // outdoor unit evaporating temperature
-                                      Array1<Real64> const &Par // par(1) = VRFTUNum
+                                      Array1D<Real64> const &Par // par(1) = VRFTUNum
     );
 
     Real64 CompResidual_FluidTCtrl(Real64 T_suc,       // Compressor suction temperature Te' [C]
-                                   Array1<Real64> const &Par // parameters
+                                   Array1D<Real64> const &Par // parameters
     );
 
 } // namespace HVACVariableRefrigerantFlow

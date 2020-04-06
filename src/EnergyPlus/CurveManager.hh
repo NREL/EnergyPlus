@@ -53,9 +53,7 @@
 #include <vector>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array5D.hh>
@@ -270,7 +268,7 @@ namespace CurveManager {
             gridMap.emplace(indVarListName,grids.size() - 1 );
             return grids.size() - 1;
         };
-        void normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar = 1.0);
+        double normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar = 1.0);
         int addOutputValues(int gridIndex, std::vector<double> values);
         int getGridIndex(std::string indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);

@@ -209,8 +209,8 @@ namespace FluidCoolers {
 
     void CalcFluidCoolerOutlet(int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
 
-    Real64 SimpleFluidCoolerUAResidual(Real64 UA,                // UA of fluid cooler
-                                       Array1<Real64> const &Par // par(1) = design fluid cooler load [W]
+    Real64 SimpleFluidCoolerUAResidual(Real64 UA,                 // UA of fluid cooler
+                                       Array1D<Real64> const &Par // par(1) = design fluid cooler load [W]
     );
 
     void clear_state();

@@ -55,6 +55,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace HVACManager {
 
@@ -73,7 +74,7 @@ namespace HVACManager {
     // Functions
     void clear_state();
 
-    void ManageHVAC();
+    void ManageHVAC(OutputFiles &outputFiles);
 
     void SimHVAC();
 

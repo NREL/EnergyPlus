@@ -1157,7 +1157,7 @@ namespace HeatBalanceSurfaceManager {
             } else {
                 isExterior = false;
                 // interior window report
-                if (Surface(iSurf).Class == SurfaceClass_Window) {
+                if (Surface(iSurf).Class == SurfaceClass_Window && !Construct(Surface(iSurf).Construction).TypeIsAirBoundaryInteriorWindow) {
                     if (!has_prefix(Surface(iSurf).Name, "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
                         surfName = Surface(iSurf).Name;
                         curCons = Surface(iSurf).Construction;
@@ -2220,7 +2220,6 @@ namespace HeatBalanceSurfaceManager {
         using namespace HeatBalanceMovableInsulation;
         using General::BlindBeamBeamTrans;
         using General::InterpBlind;
-        using General::InterpProfAng;
         using General::InterpProfSlatAng;
         using General::InterpSlatAng;
         using General::InterpSw;
@@ -5720,6 +5719,8 @@ namespace HeatBalanceSurfaceManager {
 
             QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
 
+            QHeatEmiReport(SurfNum) = QAirExtReport(SurfNum) - QdotConvOutRep(SurfNum);
+
         } // ...end of DO loop over all surface (actually heat transfer surfaces)
     }
 
@@ -7133,8 +7134,6 @@ namespace HeatBalanceSurfaceManager {
 
         // Calculate surface heat emission to the air, positive values indicates heat transfer from surface to the outside
         QAirExtReport(SurfNum) = Surface(SurfNum).Area * HAirExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
-        QHeatEmiReport(SurfNum) =
-            Surface(SurfNum).Area * (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
 
         // Set the radiant system heat balance coefficients if this surface is also a radiant system
         if (construct.SourceSinkPresent) {

@@ -205,9 +205,6 @@ namespace DataGlobals {
     int StdOutputRecordCount(0);                     // Count of Standard output records
     int OutputFileDebug(0);                          // Unit number for debug outputs
     int OutputFilePerfLog(0);                        // Unit number for performance log outputs
-    int OutputFileZoneSizing(0);                     // Unit number of zone sizing calc output file
-    int OutputFileSysSizing(0);                      // Unit number of system sizing calc output file
-    int OutputFileMeters(0);                         // Unit number for meters output
     std::ostream *mtr_stream(nullptr);               // Internal stream used for mtr output (used for performance)
     int OutputFileShadingFrac(0);                    // Unit number for shading output
     int StdMeterRecordCount(0);                      // Count of Meter output records
@@ -261,7 +258,7 @@ namespace DataGlobals {
     bool AnyBasementsInModel(false);     // true if there are any basements in the input file
     // Performance tradeoff globals
     bool DoCoilDirectSolutions(false);       //true if use coil direction solutions
-    bool createProfLog(false); //true if the _proflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
+    bool createPerfLog(false); //true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
 
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
@@ -315,9 +312,6 @@ namespace DataGlobals {
         StdOutputRecordCount = 0;
         OutputFileDebug = 0;
         OutputFilePerfLog = 0;
-        OutputFileZoneSizing = 0;
-        OutputFileSysSizing = 0;
-        OutputFileMeters = 0;
         OutputFileShadingFrac = 0;
         StdMeterRecordCount = 0;
         OutputFileBNDetails = 0;

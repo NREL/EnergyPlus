@@ -2164,7 +2164,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void UpdateZoneSizing(int const CallIndicator)
+    void UpdateZoneSizing(OutputFiles &outputFiles, int const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2198,7 +2198,6 @@ namespace ZoneEquipmentManager {
         using DataGlobals::isPulseZoneSizing;
         using DataGlobals::MinutesPerTimeStep;
         using DataGlobals::NumOfTimeStepInHour;
-        using DataGlobals::OutputFileZoneSizing;
         using DataGlobals::TimeStep;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
@@ -2215,14 +2214,7 @@ namespace ZoneEquipmentManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static ObjexxFCL::gio::Fmt ZSizeFmt10("('Time')");
-        static ObjexxFCL::gio::Fmt ZSizeFmt11("(A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A )");
-        static ObjexxFCL::gio::Fmt ZSizeFmt20("(I2.2,':',I2.2,':00')");
-        static ObjexxFCL::gio::Fmt ZSizeFmt21("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )");
-        static ObjexxFCL::gio::Fmt ZSizeFmt30("('Peak')");
-        static ObjexxFCL::gio::Fmt ZSizeFmt31("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
-        static ObjexxFCL::gio::Fmt ZSizeFmt40("(/'Peak Vol Flow (m3/s)')");
-        static ObjexxFCL::gio::Fmt ZSizeFmt41("(A1,A1,A1,ES12.6,A1,ES12.6)");
+
         static std::string const RoutineName("UpdateZoneSizing");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -2620,23 +2612,30 @@ namespace ZoneEquipmentManager {
                         }
                     }
 
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt10, flags);
-                    }
+                    print(outputFiles.zsz, "Time");
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt11, flags)
-                                << SizingFileColSep << CalcFinalZoneSizing(I).ZoneName << CalcFinalZoneSizing(I).HeatDesDay << ":Des Heat Load [W]"
-                                << SizingFileColSep << CalcFinalZoneSizing(I).ZoneName << CalcFinalZoneSizing(I).CoolDesDay
-                                << ":Des Sens Cool Load [W]" << SizingFileColSep << CalcFinalZoneSizing(I).ZoneName
-                                << CalcFinalZoneSizing(I).HeatDesDay << ":Des Heat Mass Flow [kg/s]" << SizingFileColSep
-                                << CalcFinalZoneSizing(I).ZoneName << CalcFinalZoneSizing(I).CoolDesDay << ":Des Cool Mass Flow [kg/s]";
-                        }
+
+                        static constexpr auto ZSizeFmt11("{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}");
+                        print(outputFiles.zsz,
+                              ZSizeFmt11,
+                              SizingFileColSep,
+                              CalcFinalZoneSizing(I).ZoneName,
+                              CalcFinalZoneSizing(I).HeatDesDay,
+                              ":Des Heat Load [W]",
+                              SizingFileColSep,
+                              CalcFinalZoneSizing(I).ZoneName,
+                              CalcFinalZoneSizing(I).CoolDesDay,
+                              ":Des Sens Cool Load [W]",
+                              SizingFileColSep,
+                              CalcFinalZoneSizing(I).ZoneName,
+                              CalcFinalZoneSizing(I).HeatDesDay,
+                              ":Des Heat Mass Flow [kg/s]",
+                              SizingFileColSep,
+                              CalcFinalZoneSizing(I).ZoneName,
+                              CalcFinalZoneSizing(I).CoolDesDay,
+                              ":Des Cool Mass Flow [kg/s]");
+
 
                         // Should this be done only if there is a cooling load? Or would this message help determine why there was no load?
                         if (std::abs(CalcFinalZoneSizing(I).DesCoolLoad) > 1.e-8) {
@@ -2742,7 +2741,7 @@ namespace ZoneEquipmentManager {
                         }
                     }
 
-                    ObjexxFCL::gio::write(OutputFileZoneSizing);
+                    print(outputFiles.zsz, "\n");
                     //      HourFrac = 0.0
                     Minutes = 0;
                     TimeStepIndex = 0;
@@ -2767,60 +2766,60 @@ namespace ZoneEquipmentManager {
                                     CoolPeakDateHrMin(CtrlZoneNum) = CalcFinalZoneSizing(CtrlZoneNum).cCoolDDDate + ' ' + HrMinString;
                                 }
                             }
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt20, flags) << HourPrint << Minutes;
-                            }
+
+                            static constexpr auto ZSizeFmt20("{:02}:{:02}:00");
+                            print(outputFiles.zsz, ZSizeFmt20, HourPrint, Minutes);
                             for (I = 1; I <= NumOfZones; ++I) {
                                 if (!ZoneEquipConfig(I).IsControlled) continue;
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt21, flags)
-                                        << SizingFileColSep << CalcFinalZoneSizing(I).HeatLoadSeq(TimeStepIndex) << SizingFileColSep
-                                        << CalcFinalZoneSizing(I).CoolLoadSeq(TimeStepIndex) << SizingFileColSep
-                                        << CalcFinalZoneSizing(I).HeatFlowSeq(TimeStepIndex) << SizingFileColSep
-                                        << CalcFinalZoneSizing(I).CoolFlowSeq(TimeStepIndex);
-                                }
+                                static constexpr auto ZSizeFmt21("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
+                                print(outputFiles.zsz,
+                                      ZSizeFmt21,
+                                      SizingFileColSep,
+                                      CalcFinalZoneSizing(I).HeatLoadSeq(TimeStepIndex),
+                                      SizingFileColSep,
+                                      CalcFinalZoneSizing(I).CoolLoadSeq(TimeStepIndex),
+                                      SizingFileColSep,
+                                      CalcFinalZoneSizing(I).HeatFlowSeq(TimeStepIndex),
+                                      SizingFileColSep,
+                                      CalcFinalZoneSizing(I).CoolFlowSeq(TimeStepIndex));
                             }
-                            ObjexxFCL::gio::write(OutputFileZoneSizing);
+                            print(outputFiles.zsz, "\n");
                         }
                     }
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt30, flags);
-                    }
+                    print(outputFiles.zsz, "Peak");
+
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt31, flags)
-                                << SizingFileColSep << CalcFinalZoneSizing(I).DesHeatLoad << SizingFileColSep << CalcFinalZoneSizing(I).DesCoolLoad
-                                << SizingFileColSep << CalcFinalZoneSizing(I).DesHeatMassFlow << SizingFileColSep
-                                << CalcFinalZoneSizing(I).DesCoolMassFlow;
-                        }
+
+                        static constexpr auto ZSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
+                        print(outputFiles.zsz,
+                              ZSizeFmt31,
+                              SizingFileColSep,
+                              CalcFinalZoneSizing(I).DesHeatLoad,
+                              SizingFileColSep,
+                              CalcFinalZoneSizing(I).DesCoolLoad,
+                              SizingFileColSep,
+                              CalcFinalZoneSizing(I).DesHeatMassFlow,
+                              SizingFileColSep,
+                              CalcFinalZoneSizing(I).DesCoolMassFlow);
                     }
-                    ObjexxFCL::gio::write(OutputFileZoneSizing);
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt40, flags);
-                    }
+                    print(outputFiles.zsz, "\n");
+
+                    print(outputFiles.zsz, "\nPeak Vol Flow (m3/s)");
                     for (I = 1; I <= NumOfZones; ++I) {
                         if (!ZoneEquipConfig(I).IsControlled) continue;
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(OutputFileZoneSizing, ZSizeFmt41, flags)
-                                << SizingFileColSep << SizingFileColSep << SizingFileColSep << CalcFinalZoneSizing(I).DesHeatVolFlow
-                                << SizingFileColSep << CalcFinalZoneSizing(I).DesCoolVolFlow;
-                        }
+                        static constexpr auto ZSizeFmt41("{}{}{}{:12.6E}{}{:12.6E}");
+                        print(outputFiles.zsz,
+                              ZSizeFmt41,
+                              SizingFileColSep,
+                              SizingFileColSep,
+                              SizingFileColSep,
+                              CalcFinalZoneSizing(I).DesHeatVolFlow,
+                              SizingFileColSep,
+                              CalcFinalZoneSizing(I).DesCoolVolFlow);
                     }
-                    ObjexxFCL::gio::write(OutputFileZoneSizing);
-                    ObjexxFCL::gio::close(OutputFileZoneSizing);
+                    print(outputFiles.zsz, "\n");
+                    outputFiles.zsz.close();
                 }
 
                 // Move data from Calc arrays to user modified arrays
@@ -5321,11 +5320,6 @@ namespace ZoneEquipmentManager {
                                 SysDepZoneLoads(ActualZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
                             }
                         } else {
-                            Node(ReturnNode).Temp = TempRetAir;
-                        }
-                        // Overwrite heat-to-return from ITE objects, other return air flow from window or lights are not allowed in this situation
-                        if (Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
-                            TempRetAir = Zone(ActualZoneNum).AdjustedReturnTempByITE;
                             Node(ReturnNode).Temp = TempRetAir;
                         }
                     } else { // No return air flow

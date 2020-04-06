@@ -64,6 +64,8 @@ namespace HybridUnitaryAirConditioners {
     using HybridEvapCoolingModel::Model;
     extern Array1D<Model> ZoneHybridUnitaryAirConditioner;
 
+    void clear_state();
+
     // MODULE PARAMETER DEFINITIONS
     void SimZoneHybridUnitaryAirConditioners(std::string const &CompName,    // name of the packaged terminal heat pump
                                              int const ZoneNum,              // number of zone being served
@@ -85,6 +87,12 @@ namespace HybridUnitaryAirConditioners {
     );
 
     void ReportZoneHybridUnitaryAirConditioners(int const UnitNum);
+
+    int GetHybridUnitaryACOutAirNode(int const UnitNum);
+
+    int GetHybridUnitaryACZoneInletNode(int const UnitNum);
+
+    int GetHybridUnitaryACReturnAirNode(int const UnitNum);
 
 } // namespace HybridUnitaryAirConditioners
 } // namespace EnergyPlus
