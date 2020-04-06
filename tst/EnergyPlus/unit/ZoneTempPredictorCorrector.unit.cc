@@ -481,9 +481,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
+    ProcessScheduleInput(outputFiles());  // read schedules
 
-    GetZoneAirSetPoints(OutputFiles::getSingleton());
+    GetZoneAirSetPoints(outputFiles());
 
     DeadBandOrSetback.allocate(NumTempControlledZones);
     CurDeadBandOrSetback.allocate(NumTempControlledZones);

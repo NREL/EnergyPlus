@@ -119,12 +119,10 @@ namespace DataStringGlobals {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    std::string outputAuditFileName("eplusout.audit");
     std::string outputBndFileName("eplusout.bnd");
     std::string outputDxfFileName("eplusout.dxf");
     std::string outputEndFileName("eplusout.end");
     std::string outputErrFileName("eplusout.err");
-    std::string outputEsoFileName("eplusout.eso");
     std::string outputJsonFileName("eplusout.json");
     std::string outputTSHvacJsonFileName("eplusout_detailed_HVAC.json");
     std::string outputTSZoneJsonFileName("eplusout_detailed_zone.json");
