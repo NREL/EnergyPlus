@@ -84,14 +84,6 @@ protected:
     {
         return ResultsFramework::OutputSchema->convertToMonth(datetime);
     }
-
-    std::map<std::string, std::string> findEndOfMonth(std::map<std::string, std::vector<std::string>> const &outputs) {
-        return ResultsFramework::OutputSchema->findEndOfMonth(outputs);
-    }
-
-    void fixMonthly(std::map<std::string, std::vector<std::string>> &outputs) {
-        ResultsFramework::OutputSchema->fixMonthly(outputs);
-    }
 };
 
 } // namespace EnergyPlus

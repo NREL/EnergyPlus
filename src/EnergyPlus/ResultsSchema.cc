@@ -1087,7 +1087,6 @@ namespace ResultsFramework {
         std::vector<int> indices;
         std::unordered_set<std::string> seen;
         std::string search_string;
-//        std::vector<std::map<std::string, std::vector<std::string>>> & outputs;
 
         std::string reportFrequency = data.at("ReportFrequency").get<std::string>();
         if (reportFrequency == "Detailed-HVAC" || reportFrequency == "Detailed-Zone") {
@@ -1106,13 +1105,6 @@ namespace ResultsFramework {
         auto const & rows = data.at("Rows");
         for (auto it = rows.rbegin(); it != rows.rend(); ++it) {
             for (auto& el : it->items()) {
-//                auto const inserted = seen.insert(el.key());
-//                if (!inserted.second) {
-//
-//                }
-//                if (el.key() == "1") {
-//                    std::string test = "";
-//                }
                 auto found_key = outputs.find(el.key());
                 if (found_key == outputs.end()) {
                     std::vector<std::string> output(outputVariables.size());
@@ -1120,7 +1112,6 @@ namespace ResultsFramework {
                     for (auto const & col : el.value()) {
                         dtoa(col.get<double>(), s);
                         output[indices[i]] = s;
-//                        output[indices[i]] = col.get<std::string>();
                         ++i;
                     }
                     outputs[el.key()] = output;
@@ -1129,7 +1120,6 @@ namespace ResultsFramework {
                     for (auto const & col : el.value()) {
                         dtoa(col.get<double>(), s);
                         found_key->second[indices[i]] = s;
-//                        found_key->second[indices[i]] = col.get<std::string>();
                         ++i;
                     }
                 }
@@ -1137,9 +1127,6 @@ namespace ResultsFramework {
         }
         for (auto const & row : rows) {
             for (auto& el : row.items()) {
-//                if (el.key() == "1") {
-//                    std::string test = "";
-//                }
                 auto found_key = outputs.find(el.key());
                 if (found_key == outputs.end()) {
                     std::vector<std::string> output(outputVariables.size());
@@ -1147,7 +1134,6 @@ namespace ResultsFramework {
                     for (auto const & col : el.value()) {
                         dtoa(col.get<double>(), s);
                         output[indices[i]] = s;
-//                        output[indices[i]] = col.get<std::string>();
                         ++i;
                     }
                     outputs[el.key()] = output;
@@ -1156,101 +1142,8 @@ namespace ResultsFramework {
                     for (auto const & col : el.value()) {
                         dtoa(col.get<double>(), s);
                         found_key->second[indices[i]] = s;
-//                        found_key->second[indices[i]] = col.get<std::string>();
                         ++i;
                     }
-                }
-            }
-        }
-    }
-
-//    std::map<std::string, std::string> ResultsSchema::findEndOfMonth(std::map<std::string, std::vector<std::string>> const & outputs)
-//    {
-//        std::map<std::string, std::string> endOfMonth;
-//        std::string prev_month;
-//        auto it = outputs.begin(), prev = outputs.end();
-//        if (it->first.size() > 1) {
-//            prev_month = it->first.substr(0, 2);
-//        }
-//        for (it = outputs.begin(); it != outputs.end(); ++it) {
-//            if (it->first.size() > 2) {
-//                prev = it;
-//                auto const &month = it->first.substr(0, 2);
-//                if (month != prev_month) {
-//                    auto tmp_prev = prev;
-//                    --tmp_prev;
-//                    endOfMonth.emplace(prev_month, tmp_prev->first);
-//                    prev_month = month;
-//                }
-//            }
-//        }
-//        if (it == outputs.end()) {
-//            endOfMonth.emplace(prev_month, prev->first);
-//        }
-//        return endOfMonth;
-//    }
-
-    std::map<std::string, std::string> ResultsSchema::findEndOfMonth(std::map<std::string, std::vector<std::string>> const & outputs)
-    {
-        std::map<std::string, std::string> endOfMonth;
-        std::string prev_month;
-        auto it = outputs.begin(), prev = outputs.end();
-        if (it->first.size() > 1) {
-            prev_month = it->first.substr(0, 2);
-        }
-        for (it = outputs.begin(); it != outputs.end(); ++it) {
-            if (it->first.size() > 2) {
-                prev = it;
-                auto const &month = it->first.substr(0, 2);
-                if (month != prev_month) {
-                    auto tmp_prev = prev;
-                    --tmp_prev;
-                    endOfMonth.emplace(prev_month, tmp_prev->first);
-                    prev_month = month;
-                }
-            }
-        }
-        if (it == outputs.end()) {
-            endOfMonth.emplace(prev_month, prev->first);
-        }
-        return endOfMonth;
-    }
-
-    void ResultsSchema::fixMonthly(std::map<std::string, std::vector<std::string>> & outputs) {
-        static const std::vector<std::pair<std::string, std::string>> months({{"1",  "01"},
-                                                                              {"2",  "02"},
-                                                                              {"3",  "03"},
-                                                                              {"4",  "04"},
-                                                                              {"5",  "05"},
-                                                                              {"6",  "06"},
-                                                                              {"7",  "07"},
-                                                                              {"8",  "08"},
-                                                                              {"9",  "09"},
-                                                                              {"10", "10"},
-                                                                              {"11", "11"},
-                                                                              {"12", "12"}});
-
-        auto const endOfMonth = findEndOfMonth(outputs);
-
-        for (auto const &month : months) {
-            auto found = outputs.find(month.first);
-            if (found != outputs.end()) {
-                std::string datetime;
-                auto found_datetime = endOfMonth.find(month.second);
-                if (found_datetime != endOfMonth.end()) {
-                    datetime = found_datetime->second;
-                }
-                auto found_actual = outputs.find(datetime);
-                if (found_actual != outputs.end()) {
-                    if (found->second.size() != found_actual->second.size()) {
-                        ShowFatalError("Unequal sizes in output array sizes");
-                    }
-                    for (std::size_t i = 0; i < found->second.size(); ++i) {
-                        if (found_actual->second[i].empty() && !found->second[i].empty()) {
-                            found_actual->second[i] = found->second[i];
-                        }
-                    }
-                    outputs.erase(found);
                 }
             }
         }
@@ -1320,7 +1213,6 @@ namespace ResultsFramework {
         std::map<std::string, std::vector<std::string>> csv_outputs;
         std::map<std::string, std::vector<std::string>> mtr_outputs;
         OutputProcessor::ReportingFrequency reportingFrequency(OutputProcessor::ReportingFrequency::Hourly);
-        bool hasMonthly = false;
 
         // Output yearly time series data
         if (hasRIYearlyTSData()) {
@@ -1355,7 +1247,6 @@ namespace ResultsFramework {
             auto json_data = RIMonthlyTSData.getJSON();
             parseTSOutputs(json_data, csv_outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Monthly;
-            hasMonthly = true;
         }
 
         if (hasMNMeters()) {
@@ -1363,7 +1254,6 @@ namespace ResultsFramework {
             parseTSOutputs(json_data, csv_outputs);
             parseTSOutputs(json_data, mtr_outputs);
             reportingFrequency = OutputProcessor::ReportingFrequency::Monthly;
-            hasMonthly = true;
         }
 
         // Output daily time series data
@@ -1423,10 +1313,6 @@ namespace ResultsFramework {
             reportingFrequency = OutputProcessor::ReportingFrequency::EachCall;
         }
 
-//        if (hasMonthly) {
-//            fixMonthly(csv_outputs);
-//        }
-
         auto & outputFiles = OutputFiles::getSingleton();
 
         outputFiles.csv.ensure_open(outputFiles.outputControl.csv);
@@ -1440,9 +1326,6 @@ namespace ResultsFramework {
             outputFiles.mtr_csv.ensure_open(outputFiles.outputControl.csv);
             if (!outputFiles.mtr_csv.good()) {
                 ShowFatalError("OpenOutputFiles: Could not open file " + outputFiles.mtr_csv.fileName + " for output (write).");
-            }
-            if (hasMonthly) {
-                fixMonthly(mtr_outputs);
             }
             writeCSVToFile(outputFiles.mtr_csv, mtr_outputs, reportingFrequency);
             outputFiles.mtr_csv.close();

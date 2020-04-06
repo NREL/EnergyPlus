@@ -363,10 +363,6 @@ namespace ResultsFramework {
         void parseTSOutputs(json const &data,
                             std::map<std::string, std::vector<std::string>> &outputs);
 
-        std::map<std::string, std::string>
-        findEndOfMonth(std::map<std::string, std::vector<std::string>> const &outputs);
-
-        void fixMonthly(std::map<std::string, std::vector<std::string>> &outputs);
         std::string &convertToMonth(std::string &datetime);
         void writeCSVToFile(OutputFile & outputFile, std::map<std::string, std::vector<std::string>> const & outputs, OutputProcessor::ReportingFrequency reportingFrequency);
 
