@@ -472,8 +472,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
 
     // Test 1: user PLF curve is different from the AHRI Std 210/240-2008 default PLF Curve
     Array1D<Real64> NetCoolingCapRated(1);
-    Real64 SEER(0.0);
-    Real64 SEER_Default(0.0);
+    Real64 SEER_User(0.0);
+    Real64 SEER_Standard(0.0);
     Real64 EER(0.0);
     Real64 IEER(0.0);
     NetCoolingCapRated = 0.0;
@@ -481,7 +481,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     thisCoil.RatedTotCap(1) = 25000.0;
     thisCoil.RatedAirVolFlowRate(1) = 1.300;
     // calculate standard ratings
-    SingelSpeedDXCoolingCoilStandardRatings(thisCoil.Name,
+    SingleSpeedDXCoolingCoilStandardRatings(thisCoil.Name,
                                             thisCoil.DXCoilType,
                                             thisCoil.CCapFTemp(1),
                                             thisCoil.CCapFFlow(1),
@@ -493,13 +493,13 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
                                             thisCoil.RatedAirVolFlowRate(1),
                                             thisCoil.FanPowerPerEvapAirFlowRate(1),
                                             NetCoolingCapRated(1),
-                                            SEER,
-                                            SEER_Default,
+        SEER_User,
+        SEER_Standard,
                                             EER,
                                             IEER);
     // check SEER values calculated using user PLF and default PLF curve
-    EXPECT_NEAR(13.00, SEER * StandardRatings::ConvFromSIToIP, 0.01);
-    EXPECT_NEAR(11.98, SEER_Default * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(13.00, SEER_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(11.98, SEER_Standard * StandardRatings::ConvFromSIToIP, 0.01);
 
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
@@ -509,13 +509,13 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     thisCoolPLFfPLR.Var1Min = 0.0;  // PLR minimum value allowed by the PLF curve
     thisCoolPLFfPLR.Var1Max = 1.0;  // PLR maximum value allowed by the PLF curve
     // reset output variables
-    SEER = 0.0;
-    SEER_Default = 0.0;
+    SEER_User = 0.0;
+    SEER_Standard = 0.0;
     EER = 0.0;
     IEER = 0.0;
     NetCoolingCapRated = 0.0;
     // rerun the standard ratings calculation
-    SingelSpeedDXCoolingCoilStandardRatings(thisCoil.Name,
+    SingleSpeedDXCoolingCoilStandardRatings(thisCoil.Name,
                                             thisCoil.DXCoilType,
                                             thisCoil.CCapFTemp(1),
                                             thisCoil.CCapFFlow(1),
@@ -527,14 +527,14 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
                                             thisCoil.RatedAirVolFlowRate(1),
                                             thisCoil.FanPowerPerEvapAirFlowRate(1),
                                             NetCoolingCapRated(1),
-                                            SEER,
-                                            SEER_Default,
+                                            SEER_User,
+                                            SEER_Standard,
                                             EER,
                                             IEER);
     // SEER and SEER_Default must match for the same PLF curve
-    EXPECT_DOUBLE_EQ(SEER, SEER_Default);
-    EXPECT_NEAR(11.98, SEER * StandardRatings::ConvFromSIToIP, 0.01);
-    EXPECT_NEAR(11.98, SEER_Default * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_DOUBLE_EQ(SEER_User, SEER_Standard);
+    EXPECT_NEAR(11.98, SEER_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(11.98, SEER_Standard * StandardRatings::ConvFromSIToIP, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
@@ -743,8 +743,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
 
     // Test 1: user PLF curve is different from the AHRI Std 210/240-2008 default PLF Curve
     Array1D<Real64> NetCoolingCapRated(thisCoil.NumOfSpeeds);
-    Real64 SEER(0.0);
-    Real64 SEER_Default(0.0);
+    Real64 SEER_User(0.0);
+    Real64 SEER_Standard(0.0);
     NetCoolingCapRated = 0.0;
     // calculate standard ratings for multispeed DX cooling coil
     MultiSpeedDXCoolingCoilStandardRatings(thisCoil.MSCCapFTemp,
@@ -758,11 +758,11 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
                                            thisCoil.MSFanPowerPerEvapAirFlowRate,
                                            thisCoil.NumOfSpeeds,
                                            NetCoolingCapRated(thisCoil.NumOfSpeeds),
-                                           SEER,
-                                           SEER_Default);
+                                           SEER_User,
+                                           SEER_Standard);
     // check SEER values calculated using user PLF and default PLF curve
-    EXPECT_NEAR(13.95, SEER * StandardRatings::ConvFromSIToIP, 0.01);
-    EXPECT_NEAR(13.86, SEER_Default * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(13.95, SEER_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(13.86, SEER_Standard * StandardRatings::ConvFromSIToIP, 0.01);
 
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
@@ -772,8 +772,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     thisCoolPLFfPLR.Var1Min = 0.0;  // PLR minimum value allowed by the PLF curve
     thisCoolPLFfPLR.Var1Max = 1.0;  // PLR maximum value allowed by the PLF curve
     // reset output variables
-    SEER = 0.0;
-    SEER_Default = 0.0;
+    SEER_User = 0.0;
+    SEER_Standard = 0.0;
     NetCoolingCapRated = 0.0;
     // rerun the standard ratings calculation
     MultiSpeedDXCoolingCoilStandardRatings(thisCoil.MSCCapFTemp,
@@ -787,12 +787,12 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
                                            thisCoil.MSFanPowerPerEvapAirFlowRate,
                                            thisCoil.NumOfSpeeds,
                                            NetCoolingCapRated(thisCoil.NumOfSpeeds),
-                                           SEER,
-                                           SEER_Default);
+                                           SEER_User,
+                                           SEER_Standard);
     // SEER and SEER_Default must match for the same PLF curve
-    EXPECT_DOUBLE_EQ(SEER, SEER_Default);
-    EXPECT_NEAR(13.86, SEER * StandardRatings::ConvFromSIToIP, 0.01);
-    EXPECT_NEAR(13.86, SEER_Default * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_DOUBLE_EQ(SEER_User, SEER_Standard);
+    EXPECT_NEAR(13.86, SEER_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(13.86, SEER_Standard * StandardRatings::ConvFromSIToIP, 0.01);
 }
 
 } // namespace EnergyPlus
