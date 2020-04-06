@@ -780,7 +780,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports();
+    void WriteTabularReports(OutputFiles &outputFiles);
 
     void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 
@@ -980,8 +980,6 @@ namespace OutputReportTabular {
     //======================================================================================================================
 
     std::string RealToStr(Real64 const RealIn, int const numDigits);
-
-    std::string IntToStr(int const intIn);
 
     Real64 StrToReal(std::string const &stringIn);
 
