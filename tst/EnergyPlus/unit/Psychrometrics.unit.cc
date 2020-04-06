@@ -400,3 +400,35 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test)
     EXPECT_NEAR(result, expected_result, 0.001);
 
 }
+
+TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
+{
+
+    InitializePsychRoutines();
+
+    // Test 1: heating process, constant humidity ratio
+    Real64 W1 = 0.0030;
+    Real64 W2 = 0.0030;
+    Real64 CpAirIn = PsyCpAirFnW(W1);           // cp of air at state 1
+    Real64 CpAirOut = PsyCpAirFnW(W2);          // cp of air at state 2
+    Real64 CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2));  // cp of air at average humidity ratio
+    Real64 CpAir_average = (CpAirIn + CpAirOut) / 2;
+    ;
+    // check heating results
+    EXPECT_DOUBLE_EQ(CpAirIn, 1.00484e3 + W1 * 1.85895e3);
+    EXPECT_DOUBLE_EQ(CpAirOut, 1.00484e3 + W2 * 1.85895e3);
+    EXPECT_DOUBLE_EQ(CpAir_result, CpAir_average);
+
+    // Test 2: cooling Processes, dehumidified air
+    W1 = 0.010;
+    W2 = 0.008;
+    CpAirIn = PsyCpAirFnW(W1);           // cp of air at state 1
+    CpAirOut = PsyCpAirFnW(W2);          // cp of air at state 2
+    CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2));  // cp of air at average humidity ratio
+    CpAir_average = (CpAirIn + CpAirOut) / 2;
+    ;
+    // check cooling results
+    EXPECT_DOUBLE_EQ(CpAirIn, 1.00484e3 + W1 * 1.85895e3);
+    EXPECT_DOUBLE_EQ(CpAirOut, 1.00484e3 + W2 * 1.85895e3);
+    EXPECT_DOUBLE_EQ(CpAir_result, CpAir_average);
+}
