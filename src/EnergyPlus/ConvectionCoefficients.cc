@@ -51,6 +51,7 @@
 #include <cmath>
 #include <limits>
 #include <string>
+#include <utility>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -858,6 +859,107 @@ namespace ConvectionCoefficients {
         }
 
         return AgainstWind;
+    }
+
+    bool SetAdaptiveConvectionAlgoCoefficient(int* InsideFaceAdaptiveConvectionAlgoParam, std::string equationName, std::string curveName, std::string sourceFieldName, std::string curveFieldName, std::string moduleName){
+
+        static std::string const RoutineName("GetUserConvectionCoefficients");
+        static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
+        int const NumValidIntConvectionValueTypes(34);
+        static Array1D_string const ValidIntConvectionValueTypes(34,
+                                                                 {"VALUE",
+                                                                  "SCHEDULE",
+                                                                  "SIMPLE",
+                                                                  "TARP",
+                                                                  "ADAPTIVECONVECTIONALGORITHM",
+                                                                  "USERCURVE",
+                                                                  "ASHRAEVERTICALWALL",
+                                                                  "WALTONUNSTABLEHORIZONTALORTILT",
+                                                                  "WALTONSTABLEHORIZONTALORTILT",
+                                                                  "FISHERPEDERSENCEILINGDIFFUSERWALLS",
+                                                                  "FISHERPEDERSENCEILINGDIFFUSERCEILING",
+                                                                  "FISHERPEDERSENCEILINGDIFFUSERFLOOR",
+                                                                  "ALAMDARIHAMMONDSTABLEHORIZONTAL",
+                                                                  "ALAMDARIHAMMONDUNSTABLEHORIZONTAL",
+                                                                  "ALAMDARIHAMMONDVERTICALWALL",
+                                                                  "KHALIFAEQ3WALLAWAYFROMHEAT",
+                                                                  "KHALIFAEQ4CEILINGAWAYFROMHEAT",
+                                                                  "KHALIFAEQ5WALLNEARHEAT",
+                                                                  "KHALIFAEQ6NONHEATEDWALLS",
+                                                                  "KHALIFAEQ7CEILING",
+                                                                  "AWBIHATTONHEATEDFLOOR",
+                                                                  "AWBIHATTONHEATEDWALL",
+                                                                  "BEAUSOLEILMORRISONMIXEDASSISTEDWALL",
+                                                                  "BEAUSOLEILMORRISONMIXEDOPPOSINGWALL",
+                                                                  "BEAUSOLEILMORRISONMIXEDSTABLEFLOOR",
+                                                                  "BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR",
+                                                                  "BEAUSOLEILMORRISONMIXEDSTABLECEILING",
+                                                                  "BEAUSOLEILMORRISONMIXEDUNSTABLECEILING",
+                                                                  "FOHANNOPOLIDORIVERTICALWALL",
+                                                                  "KARADAGCHILLEDCEILING",
+                                                                  "ISO15099WINDOWS",
+                                                                  "GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW",
+                                                                  "GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS",
+                                                                  "GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR"});
+        static Array1D_int const IntConvectionValue(34,
+                                                    {-999,
+                                                     -999,
+                                                     ASHRAESimple,
+                                                     ASHRAETARP,
+                                                     AdaptiveConvectionAlgorithm,
+                                                     HcInt_UserCurve,
+                                                     HcInt_ASHRAEVerticalWall,
+                                                     HcInt_WaltonUnstableHorizontalOrTilt,
+                                                     HcInt_WaltonStableHorizontalOrTilt,
+                                                     HcInt_FisherPedersenCeilDiffuserWalls,
+                                                     HcInt_FisherPedersenCeilDiffuserCeiling,
+                                                     HcInt_FisherPedersenCeilDiffuserFloor,
+                                                     HcInt_AlamdariHammondStableHorizontal,
+                                                     HcInt_AlamdariHammondUnstableHorizontal,
+                                                     HcInt_AlamdariHammondVerticalWall,
+                                                     HcInt_KhalifaEq3WallAwayFromHeat,
+                                                     HcInt_KhalifaEq4CeilingAwayFromHeat,
+                                                     HcInt_KhalifaEq5WallNearHeat,
+                                                     HcInt_KhalifaEq6NonHeatedWalls,
+                                                     HcInt_KhalifaEq7Ceiling,
+                                                     HcInt_AwbiHattonHeatedFloor,
+                                                     HcInt_AwbiHattonHeatedWall,
+                                                     HcInt_BeausoleilMorrisonMixedAssistingWall,
+                                                     HcInt_BeausoleilMorrisonMixedOppossingWall,
+                                                     HcInt_BeausoleilMorrisonMixedStableFloor,
+                                                     HcInt_BeausoleilMorrisonMixedUnstableFloor,
+                                                     HcInt_BeausoleilMorrisonMixedStableCeiling,
+                                                     HcInt_BeausoleilMorrisonMixedUnstableCeiling,
+                                                     HcInt_FohannoPolidoriVerticalWall,
+                                                     HcInt_KaradagChilledCeiling,
+                                                     HcInt_ISO15099Windows,
+                                                     HcInt_GoldsteinNovoselacCeilingDiffuserWindow,
+                                                     HcInt_GoldsteinNovoselacCeilingDiffuserWalls,
+                                                     HcInt_GoldsteinNovoselacCeilingDiffuserFloor});
+
+        bool ErrorsFound = false;
+        bool IsValidType = false;
+        for (int Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
+            if (equationName != ValidIntConvectionValueTypes(Loop1)) continue;
+            IsValidType = true;
+            InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum = IntConvectionValue(Loop1);
+            if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum == HcInt_UserCurve) {
+                // A5 , \field Simple Bouyancy Stable Horizontal Equation User Curve Name
+                *InsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, HcInsideUserCurve);
+                if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizUserCurveNum == 0) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + moduleName + ", invalid value");
+                    ShowContinueError("Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
+                    ErrorsFound = true;
+                }
+            }
+            break; // found it
+        }
+        if (!IsValidType) {
+            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + moduleName + ", invalid value");
+            ShowContinueError("Invalid Key choice Entered, for " + sourceFieldName + '=' + equationName);
+            ErrorsFound = true;
+        }
+        return ErrorsFound;
     }
 
     void GetUserConvectionCoefficients()
@@ -2022,1082 +2124,72 @@ namespace ConvectionCoefficients {
             InsideFaceAdaptiveConvectionAlgo.Name = cAlphaArgs(1); // not used by E+, unique object
             InsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
 
-            // A2 , \field Simple Bouyancy Vertical Wall Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(2) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum == HcInt_UserCurve) {
-                    // A3 , \field Simple Bouyancy Vertical Wall User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(3), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                        ShowContinueError(" Invalid " + cAlphaFieldNames(3) + " entered=" + cAlphaArgs(3));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                ErrorsFound = true;
+            std::vector<std::pair<int*, int>> AdaptiveConvectionAlgoDefaults = //(45,
+                {
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum, HcInt_FohannoPolidoriVerticalWall),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum, HcInt_AlamdariHammondStableHorizontal),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum, HcInt_AlamdariHammondUnstableHorizontal),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum, HcInt_WaltonStableHorizontalOrTilt),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum, HcInt_WaltonUnstableHorizontalOrTilt),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum, HcInt_ISO15099Windows),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum, HcInt_KhalifaEq3WallAwayFromHeat),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum, HcInt_AlamdariHammondStableHorizontal),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum, HcInt_KhalifaEq4CeilingAwayFromHeat),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum, HcInt_AwbiHattonHeatedFloor),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum, HcInt_KaradagChilledCeiling),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum, HcInt_WaltonStableHorizontalOrTilt),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum, HcInt_WaltonUnstableHorizontalOrTilt),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum, HcInt_ISO15099Windows),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum, HcInt_KhalifaEq6NonHeatedWalls),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum, HcInt_AwbiHattonHeatedWall),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum, HcInt_AlamdariHammondStableHorizontal),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum, HcInt_KhalifaEq7Ceiling),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum, HcInt_WaltonStableHorizontalOrTilt),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum, HcInt_WaltonUnstableHorizontalOrTilt),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum, HcInt_ISO15099Windows),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum, HcInt_FohannoPolidoriVerticalWall),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum, HcInt_KhalifaEq5WallNearHeat),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum, HcInt_AlamdariHammondStableHorizontal),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum, HcInt_KhalifaEq7Ceiling),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum, HcInt_WaltonStableHorizontalOrTilt),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum, HcInt_WaltonUnstableHorizontalOrTilt),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum, HcInt_ISO15099Windows),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum, HcInt_GoldsteinNovoselacCeilingDiffuserWalls),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum, HcInt_FisherPedersenCeilDiffuserCeiling),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum, HcInt_GoldsteinNovoselacCeilingDiffuserFloor),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum, HcInt_GoldsteinNovoselacCeilingDiffuserWindow),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum, HcInt_KhalifaEq3WallAwayFromHeat),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum, HcInt_AlamdariHammondStableHorizontal),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum, HcInt_KhalifaEq4CeilingAwayFromHeat),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum, HcInt_WaltonStableHorizontalOrTilt),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum, HcInt_WaltonUnstableHorizontalOrTilt),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum, HcInt_ISO15099Windows),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum, HcInt_BeausoleilMorrisonMixedAssistingWall),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum, HcInt_BeausoleilMorrisonMixedOppossingWall),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum, HcInt_BeausoleilMorrisonMixedStableFloor),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum, HcInt_BeausoleilMorrisonMixedUnstableFloor),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum, HcInt_BeausoleilMorrisonMixedStableCeiling),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum, HcInt_BeausoleilMorrisonMixedUnstableCeiling),
+                    std::make_pair (&InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum, HcInt_GoldsteinNovoselacCeilingDiffuserWindow),
+                };//);
+
+            // From range(Full_length_of_IDD_object,  Length_of_inputs, -2 step)
+            //      set default
+            //      decrement
+            // From range(2, Length_of_inputs, +2 step
+            //      call function
+
+            for (int i = 2; i < NumAlphas-1; i+=2){
+                //                                                  InsideFaceAdaptiveConvectionAlgoParam,         equationName,  curveName,       sourceFieldName,     curveFieldName,        moduleName
+                ErrorsFound = SetAdaptiveConvectionAlgoCoefficient( AdaptiveConvectionAlgoDefaults[(i/2)-1].first, cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1), cAlphaArgs(1) );
             }
 
-            // A4 , \field Simple Bouyancy Stable Horizontal Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(4) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum == HcInt_UserCurve) {
-                    // A5 , \field Simple Bouyancy Stable Horizontal Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(5), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                ErrorsFound = true;
-            }
-
-            // A6 , \field Simple Bouyancy Unstable Horizontal Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(6) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum == HcInt_UserCurve) {
-                    // A7 , \field Simple Bouyancy Unstable Horizontal Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(7), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
-                ErrorsFound = true;
-            }
-
-            // A8 , \field Simple Bouyancy Stable Tilted Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(8) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum == HcInt_UserCurve) {
-                    // A9 , \field Simple Bouyancy Stable Tilted Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(9), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(9) + '=' + cAlphaArgs(9));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(8) + '=' + cAlphaArgs(8));
-                ErrorsFound = true;
-            }
-
-            // A10 , \field Simple Bouyancy Unstable Tilted Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(10) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum == HcInt_UserCurve) {
-                    // A11, \field Simple Bouyancy Unstable Tilted Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(11), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(11) + '=' + cAlphaArgs(11));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(10) + '=' + cAlphaArgs(10));
-                ErrorsFound = true;
-            }
-
-            // A12, \field Simple Bouyancy Windows Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(12) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum == HcInt_UserCurve) {
-                    // A13, \field Simple Bouyancy Windows Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(13), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(13) + '=' + cAlphaArgs(13));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(12) + '=' + cAlphaArgs(12));
-                ErrorsFound = true;
-            }
-
-            // A14, \field Floor Heat Ceiling Cool Vertical Wall Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(14) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum == HcInt_UserCurve) {
-                    //  A15, \field Floor Heat Ceiling Cool Vertical Wall Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(15), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(15) + '=' + cAlphaArgs(15));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(14) + '=' + cAlphaArgs(14));
-                ErrorsFound = true;
-            }
-
-            // A16, \field Floor Heat Ceiling Cool Stable Horizontal Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(16) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum == HcInt_UserCurve) {
-                    //  A17, \field Floor Heat Ceiling Cool Stable Horizontal Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(17), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(17) + '=' + cAlphaArgs(17));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(16) + '=' + cAlphaArgs(16));
-                ErrorsFound = true;
-            }
-
-            // A18, \field Floor Heat Ceiling Cool Unstable Horizontal Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(18) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum == HcInt_UserCurve) {
-                    // A19, \field Floor Heat Ceiling Cool Unstable Horizontal Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(19), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(19) + '=' + cAlphaArgs(19));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(18) + '=' + cAlphaArgs(18));
-                ErrorsFound = true;
-            }
-
-            // A20, \field Floor Heat Ceiling Cool Heated Floor Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(20) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum == HcInt_UserCurve) {
-                    // A21, \field Floor Heat Ceiling Cool Heated Floor Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(21), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(21) + '=' + cAlphaArgs(21));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(20) + '=' + cAlphaArgs(20));
-                ErrorsFound = true;
-            }
-
-            // A22, \field Floor Heat Ceiling Cool Chilled Ceiling Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(22) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum == HcInt_UserCurve) {
-                    // A23, \field Floor Heat Ceiling Cool Chilled Ceiling Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(23), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(23) + '=' + cAlphaArgs(23));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(22) + '=' + cAlphaArgs(22));
-                ErrorsFound = true;
-            }
-
-            // A24, \field Floor Heat Ceiling Cool Stable Tilted Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(24) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum == HcInt_UserCurve) {
-                    //   A25, \field Floor Heat Ceiling Cool Stable Tilted Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(25), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(25) + '=' + cAlphaArgs(25));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(24) + '=' + cAlphaArgs(24));
-                ErrorsFound = true;
-            }
-
-            // A26, \field Floor Heat Ceiling Cool Unstable Tilted Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(26) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum == HcInt_UserCurve) {
-                    //   A27, \field Floor Heat Ceiling Cool Unstable Tilted Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(27), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(27) + '=' + cAlphaArgs(27));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(26) + '=' + cAlphaArgs(26));
-                ErrorsFound = true;
-            }
-
-            // A28, \field Floor Heat Ceiling Cool Window Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(28) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum == HcInt_UserCurve) {
-                    //    A29, \field Floor Heat Ceiling Cool Window Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(29), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(29) + '=' + cAlphaArgs(29));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(28) + '=' + cAlphaArgs(28));
-                ErrorsFound = true;
-            }
-
-            // A30, \field Wall Panel Heating Vertical Wall Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(30) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum == HcInt_UserCurve) {
-                    //    A31, \field Wall Panel Heating Vertical Wall Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(31), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(31) + '=' + cAlphaArgs(31));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(30) + '=' + cAlphaArgs(30));
-                ErrorsFound = true;
-            }
-
-            //  A32, \field Wall Panel Heating Heated Wall Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(32) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum == HcInt_UserCurve) {
-                    //   A33, \field Wall Panel Heating Heated Wall Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(33), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(33) + '=' + cAlphaArgs(33));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(32) + '=' + cAlphaArgs(32));
-                ErrorsFound = true;
-            }
-
-            //  A34, \field Wall Panel Heating Stable Horizontal Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(34) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum == HcInt_UserCurve) {
-                    //   A35, \field Wall Panel Heating Stable Horizontal Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(35), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(35) + '=' + cAlphaArgs(35));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(34) + '=' + cAlphaArgs(34));
-                ErrorsFound = true;
-            }
-
-            // A36, \field Wall Panel Heating Unstable Horizontal Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(36) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum == HcInt_UserCurve) {
-                    //  A37, \field Wall Panel Heating Unstable Horizontal Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(37), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(37) + '=' + cAlphaArgs(37));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(36) + '=' + cAlphaArgs(36));
-                ErrorsFound = true;
-            }
-
-            // A38, \field Wall Panel Heating Stable Tilted Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(38) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum == HcInt_UserCurve) {
-                    //  A39, \field Wall Panel Heating Stable Tilted Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(39), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(39) + '=' + cAlphaArgs(39));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(38) + '=' + cAlphaArgs(38));
-                ErrorsFound = true;
-            }
-
-            //   A40, \field Wall Panel Heating Unstable Tilted Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(40) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum == HcInt_UserCurve) {
-                    //  A41, \field Wall Panel Heating Unstable Tilted Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(41), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(41) + '=' + cAlphaArgs(41));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(40) + '=' + cAlphaArgs(40));
-                ErrorsFound = true;
-            }
-
-            //  A42, \field Wall Panel Heating Window Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(42) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum == HcInt_UserCurve) {
-                    //  A43, \field Wall Panel Heating Window Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(43), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(43) + '=' + cAlphaArgs(43));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(42) + '=' + cAlphaArgs(42));
-                ErrorsFound = true;
-            }
-
-            //  A44, \field Convective Zone Heater Vertical Wall Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(44) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum == HcInt_UserCurve) {
-                    // A45, \field Convective Zone Heater Vertical Wall Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(45), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(45) + '=' + cAlphaArgs(45));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(44) + '=' + cAlphaArgs(44));
-                ErrorsFound = true;
-            }
-
-            //  A46, \field Convective Zone Heater Vertical Walls Near Heater Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(46) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum == HcInt_UserCurve) {
-                    // A47, \field Convective Zone Heater Vertical Walls Near Heater Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(47), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(47) + '=' + cAlphaArgs(47));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(46) + '=' + cAlphaArgs(46));
-                ErrorsFound = true;
-            }
-
-            //  A48, \field Convective Zone Heater Stable Horizontal Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(48) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum == HcInt_UserCurve) {
-                    // A49, \field Convective Zone Heater Stable Horizontal Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(49), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(49) + '=' + cAlphaArgs(49));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(48) + '=' + cAlphaArgs(48));
-                ErrorsFound = true;
-            }
-
-            //  A50, \field Convective Zone Heater Unstable Horizontal Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(50) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum == HcInt_UserCurve) {
-                    //  A51, \field Convective Zone Heater Unstable Horizontal Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(51), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(51) + '=' + cAlphaArgs(51));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(50) + '=' + cAlphaArgs(50));
-                ErrorsFound = true;
-            }
-
-            //  A52, \field Convective Zone Heater Stable Tilted Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(52) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum == HcInt_UserCurve) {
-                    //  A53, \field Convective Zone Heater Stable Tilted Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(53), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(53) + '=' + cAlphaArgs(53));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(52) + '=' + cAlphaArgs(52));
-                ErrorsFound = true;
-            }
-
-            //  A54, \field Convective Zone Heater Unstable Tilted Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(54) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum == HcInt_UserCurve) {
-                    //  A55, \field Convective Zone Heater Unstable Tilted Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(55), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(55) + '=' + cAlphaArgs(55));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(54) + '=' + cAlphaArgs(54));
-                ErrorsFound = true;
-            }
-
-            //  A56, \field Convective Zone Heater Windows Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(56) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum == HcInt_UserCurve) {
-                    //   A57, \field Convective Zone Heater Windows Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(57), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(57) + '=' + cAlphaArgs(57));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(56) + '=' + cAlphaArgs(56));
-                ErrorsFound = true;
-            }
-
-            //  A58, \field Central Air Diffuser Wall Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(58) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum == HcInt_UserCurve) {
-                    //   A59, \field Central Air Diffuser Wall Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.CentralAirWallUserCurveNum = UtilityRoutines::FindItemInList(cAlphaArgs(59), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.CentralAirWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(59) + '=' + cAlphaArgs(59));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(58) + '=' + cAlphaArgs(58));
-                ErrorsFound = true;
-            }
-
-            //   A60, \field Central Air Diffuser Ceiling Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(60) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum == HcInt_UserCurve) {
-                    //   A61, \field Central Air Diffuser Ceiling Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(61), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(61) + '=' + cAlphaArgs(61));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(60) + '=' + cAlphaArgs(60));
-                ErrorsFound = true;
-            }
-
-            //  A62, \field Central Air Diffuser Floor Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(62) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum == HcInt_UserCurve) {
-                    //  A63, \field Central Air Diffuser Floor Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.CentralAirFloorUserCurveNum = UtilityRoutines::FindItemInList(cAlphaArgs(63), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.CentralAirFloorUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(63) + '=' + cAlphaArgs(63));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(62) + '=' + cAlphaArgs(62));
-                ErrorsFound = true;
-            }
-
-            //  A64, \field Central Air Diffuser Window Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(64) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum == HcInt_UserCurve) {
-                    //   A65, \field Central Air Diffuser Window Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(65), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(65) + '=' + cAlphaArgs(65));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(64) + '=' + cAlphaArgs(64));
-                ErrorsFound = true;
-            }
-
-            // A66, \field Mechanical Zone Fan Circulation Vertical Wall Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(66) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum == HcInt_UserCurve) {
-                    //   A67, \field Mechanical Zone Fan Circulation Vertical Wall Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(67), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(67) + '=' + cAlphaArgs(67));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(66) + '=' + cAlphaArgs(66));
-                ErrorsFound = true;
-            }
-
-            // A68, \field Mechanical Zone Fan Circulation Stable Horizontal Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(68) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum == HcInt_UserCurve) {
-                    //   A69, \field Mechanical Zone Fan Circulation Stable Horizontal Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(69), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(69) + '=' + cAlphaArgs(69));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(68) + '=' + cAlphaArgs(68));
-                ErrorsFound = true;
-            }
-
-            // A70, \field Mechanical Zone Fan Circulation Unstable Horizontal Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(70) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum == HcInt_UserCurve) {
-                    //   A71, \field Mechanical Zone Fan Circulation Unstable Horizontal Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(71), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(71) + '=' + cAlphaArgs(71));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(70) + '=' + cAlphaArgs(70));
-                ErrorsFound = true;
-            }
-
-            // A72, \field Mechanical Zone Fan Circulation Stable Tilted Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(72) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum == HcInt_UserCurve) {
-                    //  A73, \field Mechanical Zone Fan Circulation Stable Tilted Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(73), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(73) + '=' + cAlphaArgs(73));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(72) + '=' + cAlphaArgs(72));
-                ErrorsFound = true;
-            }
-
-            // A74, \field Mechanical Zone Fan Circulation Unstable Tilted Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(74) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum == HcInt_UserCurve) {
-                    //  A75, \field Mechanical Zone Fan Circulation Unstable Tilted Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(75), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(75) + '=' + cAlphaArgs(75));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(74) + '=' + cAlphaArgs(74));
-                ErrorsFound = true;
-            }
-
-            // A76, \field Mechanical Zone Fan Circulation Window Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(76) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum == HcInt_UserCurve) {
-                    //  A77, \field Mechanical Zone Fan Circulation Window Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(77), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(77) + '=' + cAlphaArgs(77));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(76) + '=' + cAlphaArgs(76));
-                ErrorsFound = true;
-            }
-
-            // A78, \field Mixed Regime Bouyancy Assisting Flow on Walls Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(78) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum == HcInt_UserCurve) {
-                    //  A79, \field Mixed Regime Bouyancy Assisting Flow on Walls Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(79), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(79) + '=' + cAlphaArgs(79));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(78) + '=' + cAlphaArgs(78));
-                ErrorsFound = true;
-            }
-
-            // A80, \field Mixed Regime Bouyancy Oppossing Flow on Walls Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(80) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum == HcInt_UserCurve) {
-                    //  A81, \field Mixed Regime Bouyancy Oppossing Flow on Walls Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(81), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(81) + '=' + cAlphaArgs(81));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(80) + '=' + cAlphaArgs(80));
-                ErrorsFound = true;
-            }
-
-            // A82, \field Mixed Regime Stable Floor Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(82) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum == HcInt_UserCurve) {
-                    //  A83, \field Mixed Regime Stable Floor Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.MixedStableFloorUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(83), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.MixedStableFloorUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(83) + '=' + cAlphaArgs(83));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(82) + '=' + cAlphaArgs(82));
-                ErrorsFound = true;
-            }
-
-            // A84, \field Mixed Regime Unstable Floor Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(84) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum == HcInt_UserCurve) {
-                    //  A85, \field Mixed Regime Unstable Floor Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(85), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(85) + '=' + cAlphaArgs(85));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(84) + '=' + cAlphaArgs(84));
-                ErrorsFound = true;
-            }
-
-            // A86, \field Mixed Regime Stable Ceiling Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(86) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum == HcInt_UserCurve) {
-                    //  A87, \field Mixed Regime Stable Ceiling Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(87), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(87) + '=' + cAlphaArgs(87));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(86) + '=' + cAlphaArgs(86));
-                ErrorsFound = true;
-            }
-
-            // A88, \field Mixed Regime Unstable Ceiling Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(88) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum == HcInt_UserCurve) {
-                    //  A89, \field Mixed Regime Unstable Ceiling Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingUserCurveNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(89), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(89) + '=' + cAlphaArgs(89));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(88) + '=' + cAlphaArgs(88));
-                ErrorsFound = true;
-            }
-
-            // A90, \field Mixed Regime Window Equation Source
-            IsValidType = false;
-            for (Loop1 = 6; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) { // skipping first 5 whole-model types
-                if (cAlphaArgs(90) != ValidIntConvectionValueTypes(Loop1)) continue;
-                IsValidType = true;
-                InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum = IntConvectionValue(Loop1);
-                if (InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum == HcInt_UserCurve) {
-                    //   A91; \field Mixed Regime Window Equation User Curve Name
-                    InsideFaceAdaptiveConvectionAlgo.MixedWindowsUserCurveNum = UtilityRoutines::FindItemInList(cAlphaArgs(91), HcInsideUserCurve);
-                    if (InsideFaceAdaptiveConvectionAlgo.MixedWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(91) + '=' + cAlphaArgs(91));
-                        ErrorsFound = true;
-                    }
-                }
-                break; // found it
-            }
-            if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
-                ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(90) + '=' + cAlphaArgs(90));
-                ErrorsFound = true;
-            }
+//            if (implicit_defaults > 1){
+//                for (int i =45; i > implicit_defaults/2; i-=2){
+//                    *AdaptiveConvectionAlgoDefaults[i].first = AdaptiveConvectionAlgoDefaults[i].second;
+//                }
+//
+//            }
 
         } // end of 'SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections'
 
