@@ -318,6 +318,9 @@ namespace SimulationManager {
         int EnvCount;
 
         outputFiles.outputControl.getInput();
+        if (DataGlobals::runReadVars) {
+            outputFiles.outputControl.csv = true;
+        }
         ResultsFramework::OutputSchema->setupOutputOptions();
 
         ////  Change to following once dbg is converted to OutputFiles

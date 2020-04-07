@@ -387,10 +387,11 @@ int wrapUpEnergyPlus() {
         ScheduleManager::ReportOrphanSchedules();
 
         if (DataGlobals::runReadVars) {
-            int status = CommandLineInterface::runReadVarsESO();
-            if (status) {
-                return status;
-            }
+            OutputFiles::getSingleton().outputControl.csv = true;
+//            int status = CommandLineInterface::runReadVarsESO();
+//            if (status) {
+//                return status;
+//            }
         }
     } catch (const FatalError &e) {
         return AbortEnergyPlus();
