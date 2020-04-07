@@ -3526,6 +3526,10 @@ namespace OutputProcessor {
         bool PrintTimeStamp;
         std::string cReportID;
 
+        if (!ResultsFramework::OutputSchema->YRMeters.rVariablesScanned()) {
+            ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Yearly);
+        }
+
         PrintTimeStamp = true;
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
             if (!EnergyMeters(Loop).RptYR && !EnergyMeters(Loop).RptAccYR) continue;
