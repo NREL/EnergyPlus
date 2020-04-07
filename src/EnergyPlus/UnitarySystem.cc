@@ -1886,6 +1886,44 @@ namespace UnitarySystems {
 
             SizingMethod = DataHVACGlobals::SystemAirflowSizing;
 
+            MSHPIndex = this->m_DesignSpecMSHPIndex;
+            if (MSHPIndex > -1) {
+                // set no load air flow ratio local var
+                Real64 NoLoadCoolingAirFlowRateRatio = 1.0;
+                Real64 NoLoadHeatingAirFlowRateRatio = 1.0;
+                if (designSpecMSHP[MSHPIndex].coolingVolFlowRatio[0] == DataSizing::AutoSize) {
+                    NoLoadCoolingAirFlowRateRatio = 1.0 / double(designSpecMSHP[MSHPIndex].numOfSpeedCooling);
+                } else {
+                    NoLoadCoolingAirFlowRateRatio = min(this->m_NoLoadAirFlowRateRatio, designSpecMSHP[MSHPIndex].coolingVolFlowRatio[0]);
+                }
+                if (designSpecMSHP[MSHPIndex].heatingVolFlowRatio[0] == DataSizing::AutoSize) {
+                    NoLoadHeatingAirFlowRateRatio = 1.0 / double(designSpecMSHP[MSHPIndex].numOfSpeedHeating);
+                } else {
+                    NoLoadHeatingAirFlowRateRatio = min(this->m_NoLoadAirFlowRateRatio, designSpecMSHP[MSHPIndex].heatingVolFlowRatio[0]);
+                }
+                this->m_NoLoadAirFlowRateRatio = min(NoLoadCoolingAirFlowRateRatio, NoLoadHeatingAirFlowRateRatio);
+            }
+            // variable speed dx coils need local variable for saving noload flow fraction
+            Real64 NoLoadFractionForVarSpeedCoils = 1.0;
+            if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed || 
+                this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                Real64 NoLoadCoolingAirFlowRateRatio = 1.0;
+                Real64 NoLoadHeatingAirFlowRateRatio = 1.0;
+                if (this->m_CoolCoilExists && this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                    Real64 MaxSpeedFlowRate = VariableSpeedCoils::VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(VariableSpeedCoils::VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds);
+                    if (MaxSpeedFlowRate > 0.0) {
+                        NoLoadCoolingAirFlowRateRatio = VariableSpeedCoils::VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
+                    }
+                }
+                if (this->m_HeatCoilExists && this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                    Real64 MaxSpeedFlowRate = VariableSpeedCoils::VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(VariableSpeedCoils::VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds);
+                    if (MaxSpeedFlowRate > 0.0) {
+                        NoLoadHeatingAirFlowRateRatio = VariableSpeedCoils::VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
+                    }
+                }
+                NoLoadFractionForVarSpeedCoils = min(NoLoadCoolingAirFlowRateRatio, NoLoadHeatingAirFlowRateRatio);
+            }
+
             if (this->m_NoCoolHeatSAFMethod <= SupplyAirFlowRate && this->m_ControlType == ControlType::CCMASHRAE) {
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 if (this->m_MaxNoCoolHeatAirVolFlow == DataSizing::AutoSize) {
@@ -1957,7 +1995,12 @@ namespace UnitarySystems {
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 this->m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
             } else {
-                DataSizing::DataFractionUsedForSizing = this->m_NoLoadAirFlowRateRatio;
+                if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
+                    this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                    DataSizing::DataFractionUsedForSizing = NoLoadFractionForVarSpeedCoils;
+                } else {
+                    DataSizing::DataFractionUsedForSizing = this->m_NoLoadAirFlowRateRatio;
+                }
             }
 
             FieldNum = 11; // N11 , \field No Load Supply Air Flow Rate
@@ -2240,7 +2283,7 @@ namespace UnitarySystems {
                             min(this->m_IdleVolumeAirRate, this->m_MaxHeatAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
                         this->m_IdleMassFlowRate =
                             min(this->m_IdleMassFlowRate, this->MaxHeatAirMassFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
-                        this->m_IdleSpeedRatio = min(this->m_IdleSpeedRatio, this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate);
+                        this->m_IdleSpeedRatio = min(this->m_IdleSpeedRatio, this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate);
                     } else {
                         this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
                         this->m_IdleMassFlowRate = this->MaxNoCoolHeatAirMassFlow;
