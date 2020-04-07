@@ -118,8 +118,8 @@ namespace ResultsFramework {
         std::string variableName() const;
         void setVariableName(const std::string &VarName);
 
-        std::string sReportFrequency();
-        OutputProcessor::ReportingFrequency iReportFrequency();
+        std::string sReportFrequency() const;
+        OutputProcessor::ReportingFrequency iReportFrequency() const;
         void setReportFrequency(const OutputProcessor::ReportingFrequency reportFrequency);
 
         OutputProcessor::TimeStepType timeStepType() const;
@@ -135,7 +135,7 @@ namespace ResultsFramework {
         double value(size_t index) const;
         size_t numValues() const;
 
-        json getJSON() const;
+        virtual json getJSON() const;
 
     protected:
         std::string varName;
@@ -160,19 +160,24 @@ namespace ResultsFramework {
     class MeterVariable : public Variable
     {
     public:
+        MeterVariable() = default;
         MeterVariable(const std::string &VarName,
                       const OutputProcessor::ReportingFrequency reportFrequency,
                       const int ReportID,
                       const OutputProcessor::Unit &units,
+                      const bool MeterOnly,
                       const bool Acculumative = false);
 
-        bool accumulative();
+        bool accumulative() const;
         void setAccumulative(bool state);
+        bool meterOnly() const;
+        void setMeterOnly(bool state);
 
-        json getJSON() const;
+        json getJSON() const override;
 
     protected:
-        bool acc;
+        bool acc = false;
+        bool meter_only = true;
     };
 
     class DataFrame : public BaseResultObject
@@ -180,8 +185,8 @@ namespace ResultsFramework {
     public:
         typedef std::pair<int, Variable> VarPtrPair;
 
-        DataFrame(const std::string &ReportFreq);
-        virtual ~DataFrame();
+        explicit DataFrame(const std::string &ReportFreq);
+        virtual ~DataFrame() = default;
 
         void addVariable(Variable const &var);
 
@@ -199,7 +204,7 @@ namespace ResultsFramework {
 
         void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin);
 //        void newRow(const std::string &ts);
-        void pushVariableValue(const int reportID, double value);
+        virtual void pushVariableValue(const int reportID, double value);
 
         Variable &lastVariable();
 
@@ -216,7 +221,23 @@ namespace ResultsFramework {
         std::string ReportFrequency;
         std::vector<std::string> TS;
         std::map<int, Variable> variableMap;
-        int lastVarID;
+        int lastVarID = -1;
+    };
+
+    class MeterDataFrame : public DataFrame
+    {
+    public:
+        explicit MeterDataFrame(const std::string &ReportFreq) : DataFrame(ReportFreq) {};
+        virtual ~MeterDataFrame() = default;
+
+        void addVariable(MeterVariable const &var);
+
+        void pushVariableValue(const int reportID, double value) override;
+
+        json getJSON(bool meterOnlyCheck = false) const;
+
+    protected:
+        std::map<int, MeterVariable> meterMap;
     };
 
     class Table : public BaseResultObject
@@ -315,12 +336,12 @@ namespace ResultsFramework {
         DataFrame RIMonthlyTSData = DataFrame("Monthly");
         DataFrame RIRunPeriodTSData = DataFrame("RunPeriod");
         DataFrame RIYearlyTSData = DataFrame("Yearly");
-        DataFrame TSMeters = DataFrame("TimeStep");
-        DataFrame HRMeters = DataFrame("Hourly");
-        DataFrame DYMeters = DataFrame("Daily");
-        DataFrame MNMeters = DataFrame("Monthly");
-        DataFrame SMMeters = DataFrame("RunPeriod");
-        DataFrame YRMeters = DataFrame("Yearly");
+        MeterDataFrame TSMeters = MeterDataFrame("TimeStep");
+        MeterDataFrame HRMeters = MeterDataFrame("Hourly");
+        MeterDataFrame DYMeters = MeterDataFrame("Daily");
+        MeterDataFrame MNMeters = MeterDataFrame("Monthly");
+        MeterDataFrame SMMeters = MeterDataFrame("RunPeriod");
+        MeterDataFrame YRMeters = MeterDataFrame("Yearly");
 
         void writeOutputs();
 
@@ -361,10 +382,14 @@ namespace ResultsFramework {
         char s[129] = {0};
 
         void parseTSOutputs(json const &data,
-                            std::map<std::string, std::vector<std::string>> &outputs);
+                            std::map<std::string, std::vector<std::string>> &outputs,
+                            std::vector<bool> & outputVariableIndices);
 
         std::string &convertToMonth(std::string &datetime);
-        void writeCSVToFile(OutputFile & outputFile, std::map<std::string, std::vector<std::string>> const & outputs, OutputProcessor::ReportingFrequency reportingFrequency);
+        void writeCSVToFile(OutputFile & outputFile,
+                            std::map<std::string, std::vector<std::string>> & outputs,
+                            std::vector<bool> const & outputVariableIndices,
+                            OutputProcessor::ReportingFrequency reportingFrequency);
 
     protected:
         inline bool hasRIDetailedZoneTSData() {

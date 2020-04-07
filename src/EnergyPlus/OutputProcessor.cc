@@ -4560,40 +4560,9 @@ namespace OutputProcessor {
             NumberOut = std::string(s);
         }
 
-        // add to daily TS data store
         if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-//            switch (reportingInterval) {
-//                case OutputProcessor::ReportingFrequency::EachCall:
-//                    if (timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
-//                        ResultsFramework::OutputSchema->RIDetailedZoneTSData.pushVariableValue(reportID, repVal);
-//                    } else if (timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-//                        ResultsFramework::OutputSchema->RIDetailedHVACTSData.pushVariableValue(reportID, repVal);
-//                    }
-//                    break;
-//                case OutputProcessor::ReportingFrequency::TimeStep:
-//                    ResultsFramework::OutputSchema->RITimestepTSData.pushVariableValue(reportID, repVal);
-//                    break;
-//                case OutputProcessor::ReportingFrequency::Hourly:
-//                    ResultsFramework::OutputSchema->RIHourlyTSData.pushVariableValue(reportID, repVal);
-//                    break;
-//                case OutputProcessor::ReportingFrequency::Daily:
-//                    ResultsFramework::OutputSchema->RIDailyTSData.pushVariableValue(reportID, repVal);
-//                    break;
-//                case OutputProcessor::ReportingFrequency::Monthly:
-//                    ResultsFramework::OutputSchema->RIMonthlyTSData.pushVariableValue(reportID, repVal);
-//                    break;
-//                case OutputProcessor::ReportingFrequency::Simulation:
-//                    ResultsFramework::OutputSchema->RIRunPeriodTSData.pushVariableValue(reportID, repVal);
-//                    break;
-//                case OutputProcessor::ReportingFrequency::Yearly:
-//                    ResultsFramework::OutputSchema->RIYearlyTSData.pushVariableValue(reportID, repVal);
-//                    break;
-//                default:
-//                    ResultsFramework::OutputSchema->RIHourlyTSData.pushVariableValue(reportID, repVal);
-//                    break;
-//            }
-
             //// The others (<= hourly) are handled inline with the code
+            // add to daily TS data store
             if (reportingInterval == ReportingFrequency::Daily) {
                 ResultsFramework::OutputSchema->RIDailyTSData.pushVariableValue(reportID, repVal);
             }
