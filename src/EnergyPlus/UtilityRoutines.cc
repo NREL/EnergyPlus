@@ -473,21 +473,17 @@ namespace UtilityRoutines {
                     if (!fsPerfLog) {
                         ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
                     }
-                } else {
-                    fsPerfLog.open(nullptr);
+                    fsPerfLog << appendPerfLog_headerRow << std::endl;
+                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
-                fsPerfLog << appendPerfLog_headerRow << std::endl;
-                fsPerfLog << appendPerfLog_valuesRow << std::endl;
             } else {
                 if (outputFiles.outputControl.perflog) {
                     fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
                     if (!fsPerfLog) {
                         ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
                     }
-                } else {
-                    fsPerfLog.open(nullptr);
+                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
-                fsPerfLog << appendPerfLog_valuesRow << std::endl;
             }
             fsPerfLog.close();
         }

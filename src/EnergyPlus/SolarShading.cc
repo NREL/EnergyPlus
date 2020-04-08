@@ -223,7 +223,7 @@ namespace SolarShading {
         std::vector<unsigned> penumbraIDs;
     } // namespace
 
-    std::ofstream shd_stream; // Shading file stream
+    std::unique_ptr<std::iostream> shd_stream; // Shading file stream
     Array1D_int HCNS;         // Surface number of back surface HC figures
     Array1D_int HCNV;         // Number of vertices of each HC figure
     Array2D<Int64> HCA;       // 'A' homogeneous coordinates of sides
@@ -402,12 +402,12 @@ namespace SolarShading {
         if (BeginSimFlag) {
             auto & outputFiles = OutputFiles::getSingleton();
             if (outputFiles.outputControl.shd) {
-                shd_stream.open(DataStringGlobals::outputShdFileName);
+                shd_stream = std::unique_ptr<std::iostream>(new std::fstream(DataStringGlobals::outputShdFileName.c_str(), std::ios_base::out | std::ios_base::trunc));
                 if (!shd_stream) {
                     ShowFatalError("InitSolarCalculations: Could not open file \"" + DataStringGlobals::outputShdFileName + "\" for output (write).");
                 }
             } else {
-                shd_stream.open(nullptr);
+                shd_stream = std::unique_ptr<std::iostream>(new std::iostream(nullptr));
             }
 
             if (GetInputFlag) {
@@ -427,7 +427,7 @@ namespace SolarShading {
 
             if (firstTime) DisplayString("Determining Shadowing Combinations");
             DetermineShadowingCombinations();
-            shd_stream.close(); // Done writing to shd file
+            shd_stream.reset(); // Done writing to shd file
 
             if (firstTime) DisplayString("Computing Window Shade Absorption Factors");
             ComputeWinShadeAbsorpFactors();
@@ -3008,24 +3008,25 @@ namespace SolarShading {
                 //    CALL ShowRecurringContinueErrorAtEnd('Surface "'//TRIM(Surface(GRSNR)%Name)//'" '//TRIM(MSG(OverlapStatus))//  &
                 //                       ' SubSurface "'//TRIM(Surface(SBSNR)%Name)//'"',  &
                 //                      TrackBaseSubSurround(SBSNR)%ErrIndex2)
-
-                shd_stream << "==== Base does not Surround subsurface details ====\n";
-                shd_stream << "Surface=" << Surface(GRSNR).Name << ' ' << cOverLapStatus(OverlapStatus) << '\n';
-                shd_stream << "Surface#=" << std::setw(5) << GRSNR << " NSides=" << std::setw(5) << Surface(GRSNR).Sides << '\n';
-                shd_stream << std::fixed << std::setprecision(2);
-                for (N = 1; N <= Surface(GRSNR).Sides; ++N) {
-                    Vector const &v(Surface(GRSNR).Vertex(N));
-                    shd_stream << "Vertex " << std::setw(5) << N << "=(" << std::setw(15) << v.x << ',' << std::setw(15) << v.y << ','
-                               << std::setw(15) << v.z << ")\n";
+                if (shd_stream) {
+                    *shd_stream << "==== Base does not Surround subsurface details ====\n";
+                    *shd_stream << "Surface=" << Surface(GRSNR).Name << ' ' << cOverLapStatus(OverlapStatus) << '\n';
+                    *shd_stream << "Surface#=" << std::setw(5) << GRSNR << " NSides=" << std::setw(5) << Surface(GRSNR).Sides << '\n';
+                    *shd_stream << std::fixed << std::setprecision(2);
+                    for (N = 1; N <= Surface(GRSNR).Sides; ++N) {
+                        Vector const &v(Surface(GRSNR).Vertex(N));
+                        *shd_stream << "Vertex " << std::setw(5) << N << "=(" << std::setw(15) << v.x << ',' << std::setw(15) << v.y << ','
+                                    << std::setw(15) << v.z << ")\n";
+                    }
+                    *shd_stream << "SubSurface=" << Surface(SBSNR).Name << '\n';
+                    *shd_stream << "Surface#=" << std::setw(5) << SBSNR << " NSides=" << std::setw(5) << Surface(SBSNR).Sides << '\n';
+                    for (N = 1; N <= Surface(SBSNR).Sides; ++N) {
+                        Vector const &v(Surface(SBSNR).Vertex(N));
+                        *shd_stream << "Vertex " << std::setw(5) << N << "=(" << std::setw(15) << v.x << ',' << std::setw(15) << v.y << ','
+                                    << std::setw(15) << v.z << ")\n";
+                    }
+                    *shd_stream << "================================\n";
                 }
-                shd_stream << "SubSurface=" << Surface(SBSNR).Name << '\n';
-                shd_stream << "Surface#=" << std::setw(5) << SBSNR << " NSides=" << std::setw(5) << Surface(SBSNR).Sides << '\n';
-                for (N = 1; N <= Surface(SBSNR).Sides; ++N) {
-                    Vector const &v(Surface(SBSNR).Vertex(N));
-                    shd_stream << "Vertex " << std::setw(5) << N << "=(" << std::setw(15) << v.x << ',' << std::setw(15) << v.y << ','
-                               << std::setw(15) << v.z << ")\n";
-                }
-                shd_stream << "================================\n";
             }
         }
     }
@@ -5593,59 +5594,61 @@ namespace SolarShading {
         SBS.deallocate();
         BKS.deallocate();
 
-        shd_stream << "Shadowing Combinations\n";
-        if (SolarDistribution == MinimalShadowing) {
-            shd_stream << "..Solar Distribution=Minimal Shadowing, Detached Shading will not be used in shadowing calculations\n";
-        } else if (SolarDistribution == FullExterior) {
-            if (CalcSolRefl) {
-                shd_stream << "..Solar Distribution=FullExteriorWithReflectionsFromExteriorSurfaces\n";
-            } else {
-                shd_stream << "..Solar Distribution=FullExterior\n";
-            }
-        } else if (SolarDistribution == FullInteriorExterior) {
-            if (CalcSolRefl) {
-                shd_stream << "..Solar Distribution=FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces\n";
-            } else {
-                shd_stream << "..Solar Distribution=FullInteriorAndExterior\n";
-            }
-        } else {
-        }
-
-        shd_stream << "..In the following, only the first 10 reference surfaces will be shown.\n";
-        shd_stream << "..But all surfaces are used in the calculations.\n";
-
-        for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
-            shd_stream << "==================================\n";
-            if (ShadowComb(HTS).UseThisSurf) {
-                if (Surface(HTS).IsConvex) {
-                    shd_stream << "Surface=" << Surface(HTS).Name << " is used as Receiving Surface in calculations and is convex.\n";
+        if (shd_stream) {
+            *shd_stream << "Shadowing Combinations\n";
+            if (SolarDistribution == MinimalShadowing) {
+                *shd_stream << "..Solar Distribution=Minimal Shadowing, Detached Shading will not be used in shadowing calculations\n";
+            } else if (SolarDistribution == FullExterior) {
+                if (CalcSolRefl) {
+                    *shd_stream << "..Solar Distribution=FullExteriorWithReflectionsFromExteriorSurfaces\n";
                 } else {
-                    shd_stream << "Surface=" << Surface(HTS).Name << " is used as Receiving Surface in calculations and is non-convex.\n";
-                    if (ShadowComb(HTS).NumGenSurf > 0) {
-                        if (DisplayExtraWarnings) {
-                            ShowWarningError("DetermineShadowingCombinations: Surface=\"" + Surface(HTS).Name +
-                                             "\" is a receiving surface and is non-convex.");
-                            ShowContinueError("...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
-                        } else {
-                            ++TotalReceivingNonConvexSurfaces;
-                        }
-                    }
+                    *shd_stream << "..Solar Distribution=FullExterior\n";
+                }
+            } else if (SolarDistribution == FullInteriorExterior) {
+                if (CalcSolRefl) {
+                    *shd_stream << "..Solar Distribution=FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces\n";
+                } else {
+                    *shd_stream << "..Solar Distribution=FullInteriorAndExterior\n";
                 }
             } else {
-                shd_stream << "Surface=" << Surface(HTS).Name << " is not used as Receiving Surface in calculations.\n";
             }
-            shd_stream << "Number of general casting surfaces=" << ShadowComb(HTS).NumGenSurf << '\n';
-            for (NGSS = 1; NGSS <= ShadowComb(HTS).NumGenSurf; ++NGSS) {
-                if (NGSS <= 10) shd_stream << "..Surface=" << Surface(ShadowComb(HTS).GenSurf(NGSS)).Name << '\n';
-                CastingSurface(ShadowComb(HTS).GenSurf(NGSS)) = true;
-            }
-            shd_stream << "Number of back surfaces=" << ShadowComb(HTS).NumBackSurf << '\n';
-            for (NGSS = 1; NGSS <= min(10, ShadowComb(HTS).NumBackSurf); ++NGSS) {
-                shd_stream << "...Surface=" << Surface(ShadowComb(HTS).BackSurf(NGSS)).Name << '\n';
-            }
-            shd_stream << "Number of receiving sub surfaces=" << ShadowComb(HTS).NumSubSurf << '\n';
-            for (NGSS = 1; NGSS <= min(10, ShadowComb(HTS).NumSubSurf); ++NGSS) {
-                shd_stream << "....Surface=" << Surface(ShadowComb(HTS).SubSurf(NGSS)).Name << '\n';
+
+            *shd_stream << "..In the following, only the first 10 reference surfaces will be shown.\n";
+            *shd_stream << "..But all surfaces are used in the calculations.\n";
+
+            for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
+                *shd_stream << "==================================\n";
+                if (ShadowComb(HTS).UseThisSurf) {
+                    if (Surface(HTS).IsConvex) {
+                        *shd_stream << "Surface=" << Surface(HTS).Name << " is used as Receiving Surface in calculations and is convex.\n";
+                    } else {
+                        *shd_stream << "Surface=" << Surface(HTS).Name << " is used as Receiving Surface in calculations and is non-convex.\n";
+                        if (ShadowComb(HTS).NumGenSurf > 0) {
+                            if (DisplayExtraWarnings) {
+                                ShowWarningError("DetermineShadowingCombinations: Surface=\"" + Surface(HTS).Name +
+                                                 "\" is a receiving surface and is non-convex.");
+                                ShowContinueError("...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
+                            } else {
+                                ++TotalReceivingNonConvexSurfaces;
+                            }
+                        }
+                    }
+                } else {
+                    *shd_stream << "Surface=" << Surface(HTS).Name << " is not used as Receiving Surface in calculations.\n";
+                }
+                *shd_stream << "Number of general casting surfaces=" << ShadowComb(HTS).NumGenSurf << '\n';
+                for (NGSS = 1; NGSS <= ShadowComb(HTS).NumGenSurf; ++NGSS) {
+                    if (NGSS <= 10) *shd_stream << "..Surface=" << Surface(ShadowComb(HTS).GenSurf(NGSS)).Name << '\n';
+                    CastingSurface(ShadowComb(HTS).GenSurf(NGSS)) = true;
+                }
+                *shd_stream << "Number of back surfaces=" << ShadowComb(HTS).NumBackSurf << '\n';
+                for (NGSS = 1; NGSS <= min(10, ShadowComb(HTS).NumBackSurf); ++NGSS) {
+                    *shd_stream << "...Surface=" << Surface(ShadowComb(HTS).BackSurf(NGSS)).Name << '\n';
+                }
+                *shd_stream << "Number of receiving sub surfaces=" << ShadowComb(HTS).NumSubSurf << '\n';
+                for (NGSS = 1; NGSS <= min(10, ShadowComb(HTS).NumSubSurf); ++NGSS) {
+                    *shd_stream << "....Surface=" << Surface(ShadowComb(HTS).SubSurf(NGSS)).Name << '\n';
+                }
             }
         }
 

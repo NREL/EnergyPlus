@@ -225,7 +225,7 @@ void OutputFiles::OutputControl::getInput()
             std::string input;
             auto found = fields.find(field_name);
             if (found != fields.end()) {
-                input = found.value();
+                input = found.value().get<std::string>();
                 input = UtilityRoutines::MakeUPPERCase(input);
             } else {
                 inputProcessor->getDefaultValue("Output:Control", field_name, input);

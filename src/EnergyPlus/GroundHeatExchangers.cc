@@ -1155,20 +1155,16 @@ namespace GroundHeatExchangers {
             std::string case_name = "GHLE " + std::to_string(i + 1);
             json_out[case_name] = myCacheData;
 
-            // open output file
-            std::ofstream ofs;
             auto & outputFiles = OutputFiles::getSingleton();
             if (outputFiles.outputControl.glhe) {
+                // open output file
+                std::ofstream ofs;
                 ofs.open(DataStringGlobals::outputGLHEFileName);
-            } else {
-                ofs.open(nullptr);
+                // write data to file, set spacing at 2
+                ofs << std::setw(2) << json_out;
+                // don't forget to close
+                ofs.close();
             }
-
-            // write data to file, set spacing at 2
-            ofs << std::setw(2) << json_out;
-
-            // don't forget to close
-            ofs.close();
 
         } else {
             // file doesn't exist -- add data
@@ -1180,20 +1176,16 @@ namespace GroundHeatExchangers {
             std::string case_name = "GHLE 1";
             json_out[case_name] = myCacheData;
 
-            // open output file
-            std::ofstream ofs;
             auto & outputFiles = OutputFiles::getSingleton();
             if (outputFiles.outputControl.glhe) {
+                // open output file
+                std::ofstream ofs;
                 ofs.open(DataStringGlobals::outputGLHEFileName);
-            } else {
-                ofs.open(nullptr);
+                // write data to file, set spacing at 2
+                ofs << std::setw(2) << json_out;
+                // don't forget to close
+                ofs.close();
             }
-
-            // write data to file, set spacing at 2
-            ofs << std::setw(2) << json_out;
-
-            // don't forget to close
-            ofs.close();
         }
     }
 
