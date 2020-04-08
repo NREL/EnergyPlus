@@ -1034,7 +1034,7 @@ namespace WeatherManager {
                 }
             }
             if (Envrn > TotDesDays && WeatherFileExists) {
-                OpenEPlusWeatherFile(ErrorsFound, false);
+                OpenEPlusWeatherFile(outputFiles, ErrorsFound, false);
             }
             Available = true;
             if ((KindOfSim == ksRunPeriodWeather) && (!WeatherFileExists && DoWeathSim)) {
@@ -1468,7 +1468,7 @@ namespace WeatherManager {
         } // for each loop over Environment data strucure
     }
 
-    void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, Array1A_int WeekDays)
+    void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, Array1D_int &WeekDays)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1491,7 +1491,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        WeekDays.dim(12);
+        EP_SIZE_CHECK(WeekDays, 12);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1585,7 +1585,7 @@ namespace WeatherManager {
         }
     }
 
-    void ResetWeekDaysByMonth(Array1A_int WeekDays,
+    void ResetWeekDaysByMonth(Array1D_int &WeekDays,
                               int const LeapYearAdd,
                               int const StartMonth,
                               int const StartMonthDay,
@@ -1615,7 +1615,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        WeekDays.dim(12);
+        EP_SIZE_CHECK(WeekDays, 12);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2734,10 +2734,11 @@ namespace WeatherManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        ReadEPlusWeatherForDay(DayToRead, Environ, BackSpaceAfterRead);
+        ReadEPlusWeatherForDay(OutputFiles::getSingleton(), DayToRead, Environ, BackSpaceAfterRead);
     }
 
-    void ReadEPlusWeatherForDay(int const DayToRead,          // =1 when starting out, otherwise signifies next day
+    void ReadEPlusWeatherForDay(OutputFiles &outputFiles,
+                                int const DayToRead,          // =1 when starting out, otherwise signifies next day
                                 int const Environ,            // Environment being simulated
                                 bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     )
@@ -2997,7 +2998,7 @@ namespace WeatherManager {
                     strip(ErrOut);
                     ShowFatalError("Error occurred on EPW while searching for first day, stopped at " + BadRecord +
                                        " IO Error=" + RoundSigDigits(ReadStatus),
-                                   OutputFileStandard);
+                                   OptionalOutputFileRef{outputFiles.eso});
                 }
                 if (CurDayOfWeek <= 7) {
                     CurDayOfWeek = mod(CurDayOfWeek, 7) + 1;
@@ -3115,7 +3116,7 @@ namespace WeatherManager {
                                         RoundSigDigits(WHour) + ':' + RoundSigDigits(WMinute);
                             ShowFatalError("Error occurred on EPW while searching for first day, stopped at " + BadRecord +
                                                " IO Error=" + RoundSigDigits(ReadStatus),
-                                           OutputFileStandard);
+                                           OptionalOutputFileRef{outputFiles.eso});
                         }
                     }
                     for (Item = 1; Item <= 23 * NumIntervalsPerHour; ++Item) {
@@ -3130,7 +3131,7 @@ namespace WeatherManager {
                                         RoundSigDigits(WHour) + ':' + RoundSigDigits(WMinute);
                             ShowFatalError("Error occurred on EPW while searching for first day, stopped at " + BadRecord +
                                                " IO Error=" + RoundSigDigits(ReadStatus),
-                                           OutputFileStandard);
+                                           OptionalOutputFileRef{outputFiles.eso});
                         }
                     }
                 }
@@ -3289,14 +3290,14 @@ namespace WeatherManager {
                         } else {
                             BadRecord = RoundSigDigits(WYear) + '/' + RoundSigDigits(WMonth) + '/' + RoundSigDigits(WDay) + BlankString +
                                         RoundSigDigits(WHour) + ':' + RoundSigDigits(WMinute);
-                            ShowFatalError("Unexpected error condition in middle of reading EPW file, stopped at " + BadRecord, OutputFileStandard);
+                            ShowFatalError("Unexpected error condition in middle of reading EPW file, stopped at " + BadRecord, OptionalOutputFileRef{outputFiles.eso});
                         }
                     }
 
                     if (Hour != WHour) {
                         BadRecord = RoundSigDigits(WYear) + '/' + RoundSigDigits(WMonth) + '/' + RoundSigDigits(WDay) + BlankString +
                                     RoundSigDigits(WHour) + ':' + RoundSigDigits(WMinute);
-                        ShowFatalError("Unexpected error condition in middle of reading EPW file, " + BadRecord, OutputFileStandard);
+                        ShowFatalError("Unexpected error condition in middle of reading EPW file, " + BadRecord, OptionalOutputFileRef{outputFiles.eso});
                     }
 
                     //         Set possible missing values
@@ -3860,7 +3861,7 @@ namespace WeatherManager {
                                   Real64 &RField19,      // Visibility
                                   Real64 &RField20,      // CeilHeight
                                   int &WObs,             // PresWeathObs
-                                  Array1A_int WCodesArr, // PresWeathConds
+                                  Array1D_int &WCodesArr, // PresWeathConds
                                   Real64 &RField22,      // PrecipWater
                                   Real64 &RField23,      // AerosolOptDepth
                                   Real64 &RField24,      // SnowDepth
@@ -3898,7 +3899,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        WCodesArr.dim(9);
+        EP_SIZE_CHECK(WCodesArr, 9);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5108,7 +5109,7 @@ namespace WeatherManager {
                                       Real64 const EqOfTime,     // Equation of Time
                                       Real64 const SinSolDeclin, // Sine of Solar Declination
                                       Real64 const CosSolDeclin, // Cosine of Solar Declination
-                                      Array1A<Real64> SUNCOS)
+                                      Array1D<Real64> &SUNCOS)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5131,7 +5132,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        SUNCOS.dim(3);
+        EP_SIZE_CHECK(SUNCOS, 3);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5167,7 +5168,7 @@ namespace WeatherManager {
         }
     }
 
-    void DetermineSunUpDown(Array1A<Real64> SunDirectionCosines)
+    void DetermineSunUpDown(Array1D<Real64> &SunDirectionCosines)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5190,7 +5191,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        SunDirectionCosines.dim(3);
+        EP_SIZE_CHECK(SunDirectionCosines, 3);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5300,11 +5301,12 @@ namespace WeatherManager {
         }
 
         if (WeatherFileExists) {
-            OpenEPlusWeatherFile(ErrorsFound, true);
+            OpenEPlusWeatherFile(OutputFiles::getSingleton(), ErrorsFound, true);
         }
     }
 
-    void OpenEPlusWeatherFile(bool &ErrorsFound,       // Will be set to true if errors found
+    void OpenEPlusWeatherFile(OutputFiles &outputFiles,
+                              bool &ErrorsFound,       // Will be set to true if errors found
                               bool const ProcessHeader // Set to true when headers should be processed (rather than just read)
     )
     {
@@ -5392,17 +5394,17 @@ namespace WeatherManager {
         return;
 
     Label9997:;
-        ShowSevereError("OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.", OutputFileStandard);
+        ShowSevereError("OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.", OptionalOutputFileRef(outputFiles.eso));
         ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
         ShowFatalError("Program terminates due to previous condition.");
 
     Label9998:;
         ShowFatalError("OpenWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" +
                            Header(HdLine),
-                       OutputFileStandard);
+                       OptionalOutputFileRef(outputFiles.eso));
 
     Label9999:;
-        ShowFatalError("OpenWeatherFile: Could not OPEN EPW Weather File", OutputFileStandard);
+        ShowFatalError("OpenWeatherFile: Could not OPEN EPW Weather File", OptionalOutputFileRef(outputFiles.eso));
     }
 
     void CloseWeatherFile()
@@ -5768,37 +5770,37 @@ namespace WeatherManager {
         }
         EnvironmentReportChr = std::to_string(EnvironmentReportNbr);
         strip(EnvironmentReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << EnvironmentReportChr + EnvironmentString;
+        print(outputFiles.eso, "{}{}\n", EnvironmentReportChr, EnvironmentString);
         print(outputFiles.mtr, "{}{}\n", EnvironmentReportChr, EnvironmentString);
 
         AssignReportNumber(OutputProcessor::TimeStepStampReportNbr);
         OutputProcessor::TimeStepStampReportChr = std::to_string(OutputProcessor::TimeStepStampReportNbr);
         strip(OutputProcessor::TimeStepStampReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::TimeStepStampReportChr + TimeStepString;
+        print(outputFiles.eso, "{}{}\n", OutputProcessor::TimeStepStampReportChr, TimeStepString);
         print(outputFiles.mtr, "{}{}\n", OutputProcessor::TimeStepStampReportChr, TimeStepString);
 
         AssignReportNumber(OutputProcessor::DailyStampReportNbr);
         OutputProcessor::DailyStampReportChr = std::to_string(OutputProcessor::DailyStampReportNbr);
         strip(OutputProcessor::DailyStampReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::DailyStampReportChr + DailyString + "Report Variables Requested";
+        print(outputFiles.eso, "{}{}{}\n", OutputProcessor::DailyStampReportChr, DailyString, "Report Variables Requested");
         print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::DailyStampReportChr, DailyString, "Meters Requested");
 
         AssignReportNumber(OutputProcessor::MonthlyStampReportNbr);
         OutputProcessor::MonthlyStampReportChr = std::to_string(OutputProcessor::MonthlyStampReportNbr);
         strip(OutputProcessor::MonthlyStampReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::MonthlyStampReportChr + MonthlyString + "Report Variables Requested";
+        print(outputFiles.eso, "{}{}{}\n", OutputProcessor::MonthlyStampReportChr, MonthlyString, "Report Variables Requested");
         print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::MonthlyStampReportChr, MonthlyString, "Meters Requested");
 
         AssignReportNumber(OutputProcessor::RunPeriodStampReportNbr);
         OutputProcessor::RunPeriodStampReportChr = std::to_string(OutputProcessor::RunPeriodStampReportNbr);
         strip(OutputProcessor::RunPeriodStampReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::RunPeriodStampReportChr + RunPeriodString + "Report Variables Requested";
+        print(outputFiles.eso, "{}{}{}\n", OutputProcessor::RunPeriodStampReportChr, RunPeriodString, "Report Variables Requested");
         print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::RunPeriodStampReportChr, RunPeriodString, "Meters Requested");
 
         AssignReportNumber(OutputProcessor::YearlyStampReportNbr);
         OutputProcessor::YearlyStampReportChr = std::to_string(OutputProcessor::YearlyStampReportNbr);
         strip(OutputProcessor::YearlyStampReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::YearlyStampReportChr + YearlyString + "Report Variables Requested";
+        print(outputFiles.eso, "{}{}{}\n", OutputProcessor::YearlyStampReportChr, YearlyString, "Report Variables Requested");
         print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::YearlyStampReportChr, YearlyString, "Meters Requested");
     }
 
@@ -5833,10 +5835,6 @@ namespace WeatherManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
-        static constexpr auto EndOfHeaderString("End of Data Dictionary");          // End of data dictionary marker
-        static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
-        static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
         //  CHARACTER(len=*), PARAMETER :: TimeStampFormat = "(i3,',',i4,',',i2,',',i2,',',i2)" ! Format descriptor for the date/time stamp
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -5866,14 +5864,15 @@ namespace WeatherManager {
             if (PrintEnvrnStamp) {
 
                 if (PrintEndDataDictionary && DoOutputReporting) {
-                    ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
+                    static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
+                    print(outputFiles.eso, "{}\n", EndOfHeaderString);
                     print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
                     std::string const &Title(Environment(Envrn).Title);
-                    ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
-                        << EnvironmentReportChr << Title << Latitude << Longitude << TimeZoneNumber << Elevation;
+                    static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+                    print(outputFiles.eso, EnvironmentStampFormatStr, EnvironmentReportChr, Title, Latitude, Longitude, TimeZoneNumber, Elevation);
                     print(outputFiles.mtr, EnvironmentStampFormatStr, EnvironmentReportChr, Title, Latitude, Longitude, TimeZoneNumber, Elevation);
                     PrintEnvrnStamp = false;
                 }
@@ -9610,7 +9609,7 @@ namespace WeatherManager {
 
     Label9998:;
         ShowFatalError("Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header,
-                       OutputFileStandard);
+                       OptionalOutputFileRef{OutputFiles::getSingleton().eso});
     }
 
     void ReportMissing_RangeData()

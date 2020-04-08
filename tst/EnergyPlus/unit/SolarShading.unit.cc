@@ -611,16 +611,16 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(outputFiles(), FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
 
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), FoundError);
+    HeatBalanceManager::GetMaterialData(outputFiles(), FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -632,7 +632,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), FoundError);
+    SurfaceGeometry::GetGeometryParameters(outputFiles(), FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -643,12 +643,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(outputFiles(), FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), FoundError); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(outputFiles(), FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays();
@@ -1009,16 +1009,16 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     SolarShading::clear_state();
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(outputFiles(), FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
 
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), FoundError);
+    HeatBalanceManager::GetMaterialData(outputFiles(), FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -1030,7 +1030,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), FoundError);
+    SurfaceGeometry::GetGeometryParameters(outputFiles(), FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -1042,7 +1042,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
     compare_err_stream("");                         // just for debugging
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), FoundError); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(outputFiles(), FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays();
@@ -1419,16 +1419,16 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     SolarShading::clear_state();
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(outputFiles(), FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
 
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), FoundError);
+    HeatBalanceManager::GetMaterialData(outputFiles(), FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -1440,7 +1440,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), FoundError);
+    SurfaceGeometry::GetGeometryParameters(outputFiles(), FoundError);
     EXPECT_FALSE(FoundError);
 
     SizingManager::GetZoneSizingInput();
@@ -1454,12 +1454,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
     compare_err_stream("");                         // just for debugging
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), FoundError); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(outputFiles(), FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
     compare_err_stream(""); // just for debugging
 
-    SolarShading::GetShadowingInput(OutputFiles::getSingleton());
+    SolarShading::GetShadowingInput(outputFiles());
 
     for (int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
         if (Surface(SurfNum).ExtBoundCond == 0 && Surface(SurfNum).Zone != 0) {
@@ -1787,16 +1787,16 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(outputFiles(), FoundError); // read project control data
     EXPECT_FALSE(FoundError);                                                           // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
 
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), FoundError);
+    HeatBalanceManager::GetMaterialData(outputFiles(), FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -1808,7 +1808,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), FoundError);
+    SurfaceGeometry::GetGeometryParameters(outputFiles(), FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -1819,12 +1819,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(outputFiles(), FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                                                 // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), FoundError); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(outputFiles(), FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays();

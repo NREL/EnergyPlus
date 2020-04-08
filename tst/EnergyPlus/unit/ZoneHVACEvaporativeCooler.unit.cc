@@ -195,7 +195,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(outputFiles());
     ScheduleManager::ScheduleInputProcessed = true;
 
     Fans::GetFanInput();
@@ -245,7 +245,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = HalfOfFullLoad;
     // calculate part load ratio for cycling fan
     EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
-    EXPECT_NEAR(0.4746755, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
+    EXPECT_NEAR(0.4747010, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
     EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
 
@@ -262,7 +262,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = HalfOfFullLoad;
     // calculate part load ratio for cycling fan
     EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
-    EXPECT_NEAR(0.4746755, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
+    EXPECT_NEAR(0.4747010, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
     EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
 }
@@ -319,7 +319,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(outputFiles());
     ScheduleManager::ScheduleInputProcessed = true;
 
     Fans::GetFanInput();
@@ -448,7 +448,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(outputFiles());
     ScheduleManager::ScheduleInputProcessed = true;
 
     Fans::GetFanInput();

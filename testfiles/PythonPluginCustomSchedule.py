@@ -9,10 +9,13 @@ class HeatingSetPoint(EnergyPlusPlugin):
 
     def on_begin_timestep_before_predictor(self) -> int:
         if 'handles_done' not in self.data:
-            self.data['actuator_heating'] = self.api.exchange.get_actuator_handle(
-                "HTGSETP_SCH", "Schedule:Constant", "Schedule Value"
-            )
-            self.data['handles_done'] = True
+            if self.api.exchange.api_data_fully_ready():
+                self.data['actuator_heating'] = self.api.exchange.get_actuator_handle(
+                    "Schedule:Constant", "Schedule Value", "HTGSETP_SCH"
+                )
+                self.data['handles_done'] = True
+            else:
+                return 0
         hour = self.api.exchange.hour()
         day_of_week = self.api.exchange.day_of_week()
         day_of_year = self.api.exchange.day_of_year()
@@ -43,10 +46,13 @@ class CoolingSetPoint(EnergyPlusPlugin):
 
     def on_begin_timestep_before_predictor(self) -> int:
         if 'handles_done' not in self.data:
-            self.data['actuator_cooling'] = self.api.exchange.get_actuator_handle(
-                "CLGSETP_SCH", "Schedule:Constant", "Schedule Value"
-            )
-            self.data['handles_done'] = True
+            if self.api.exchange.api_data_fully_ready():
+                self.data['actuator_cooling'] = self.api.exchange.get_actuator_handle(
+                    "Schedule:Constant", "Schedule Value", "CLGSETP_SCH"
+                )
+                self.data['handles_done'] = True
+            else:
+                return 0
         hour = self.api.exchange.hour()
         day_of_week = self.api.exchange.day_of_week()
         day_of_month = self.api.exchange.day_of_month()

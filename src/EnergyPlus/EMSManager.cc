@@ -310,9 +310,11 @@ namespace EMSManager {
 
         // also call plugins and callbacks here for convenience
         bool anyPluginsOrCallbacksRan = false;
-        PluginManagement::runAnyRegisteredCallbacks(iCalledFrom, anyPluginsOrCallbacksRan);
-        if (anyPluginsOrCallbacksRan) {
-            anyProgramRan = true;
+        if (iCalledFrom != DataGlobals::emsCallFromUserDefinedComponentModel) { // don't run user-defined component plugins this way
+            PluginManagement::runAnyRegisteredCallbacks(iCalledFrom, anyPluginsOrCallbacksRan);
+            if (anyPluginsOrCallbacksRan) {
+                anyProgramRan = true;
+            }
         }
 
         if (iCalledFrom == emsCallFromSetupSimulation) {

@@ -1077,7 +1077,7 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    ProcessScheduleInput(outputFiles());
     GetCurveInput();
     GetDXCoils();
 
@@ -1356,7 +1356,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
 
     CalcMultiSpeedDXCoilCooling(1, 1, 1, 2, 1, 1, 0);
 
-    EXPECT_NEAR(1303.4304, MSHPWasteHeat, 0.001);
+    EXPECT_NEAR(1302.748, MSHPWasteHeat, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
@@ -1459,7 +1459,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    ProcessScheduleInput(outputFiles());
     GetCurveInput();
     GetDXCoils();
     SetPredefinedTables();
@@ -1789,7 +1789,7 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    ProcessScheduleInput(outputFiles());
     GetCurveInput();
     GetDXCoils();
 
@@ -1856,7 +1856,7 @@ TEST_F(EnergyPlusFixture, CurveOutputLimitWarning)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    ProcessScheduleInput(outputFiles());
     GetCurveInput();
     GetDXCoils();
 
@@ -1963,7 +1963,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    ProcessScheduleInput(outputFiles());
     GetDXCoils();
 
     ASSERT_EQ("HEATING COIL SINGLESPEED", DXCoil(1).Name); // Heating Coil Single Speed
@@ -2074,7 +2074,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    ProcessScheduleInput(outputFiles());
     GetDXCoils();
 
     ASSERT_EQ("MAIN COOLING COIL 1", DXCoil(1).Name); // Cooling Coil Two Speed
@@ -2197,7 +2197,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(outputFiles());
     DXCoils::GetDXCoils();
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 
@@ -2419,7 +2419,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(outputFiles());
     DXCoils::GetDXCoils();
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 
@@ -3558,8 +3558,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(1));
     // Design Capacity at speed 2 and speed 1
-    EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCap(2));
-    EXPECT_EQ(31899.037804634620 * 0.5, DXCoil(1).MSRatedTotCap(1));
+    EXPECT_NEAR(31888.0, DXCoil(1).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(15944.0, DXCoil(1).MSRatedTotCap(1), 0.01);
     
     // check multi-speed DX heating coil
     EXPECT_EQ("ASHP HTG COIL", DXCoil(2).Name);
@@ -3570,8 +3570,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_EQ(1.75, DXCoil(2).MSRatedAirVolFlowRate(2));
     EXPECT_EQ(0.875, DXCoil(2).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, DXCoil(2).MSRatedAirVolFlowRate(1));
-    EXPECT_EQ(31899.037804634620, DXCoil(2).MSRatedTotCap(2));
-    EXPECT_EQ(31899.037804634620 * 0.5, DXCoil(2).MSRatedTotCap(1));
+    EXPECT_NEAR(31888.0, DXCoil(2).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(15944.0, DXCoil(2).MSRatedTotCap(1), 0.01);
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
@@ -3811,12 +3811,12 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(1));
     // Design Capacity at speed 2 and speed 1
-    EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCapDes(2));
-    EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCap(2));
-    EXPECT_EQ(31899.037804634620 * 0.5, DXCoil(1).MSRatedTotCap(1));
+    EXPECT_NEAR(31888.0, DXCoil(1).MSRatedTotCapDes(2), 0.01);
+    EXPECT_NEAR(31888.0, DXCoil(1).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(15944.0, DXCoil(1).MSRatedTotCap(1), 0.01);
     // Design SHR at speed 2 and speed 1
-    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(2), 0.00001);
-    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(1), 0.00001);
+    EXPECT_NEAR(0.80099, DXCoil(1).MSRatedSHR(2), 0.00001);
+    EXPECT_NEAR(0.80099, DXCoil(1).MSRatedSHR(1), 0.00001);
 
     // test SHR design size when partial autosizing (capacity is hardsized)
     DXCoil(1).MSRatedTotCap(1) = 17500.0; // DataSizing::AutoSize;
@@ -3824,10 +3824,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 
     SizeDXCoil(1);
     // Design size SHR at speed 2 and speed 1
-    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(2), 0.00001);
-    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(1), 0.00001);
+    EXPECT_NEAR(0.80099, DXCoil(1).MSRatedSHR(2), 0.00001);
+    EXPECT_NEAR(0.80099, DXCoil(1).MSRatedSHR(1), 0.00001);
     // Design Capacity at speed 2 and speed 1
-    EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCapDes(2));
+    EXPECT_NEAR(31888.0, DXCoil(1).MSRatedTotCapDes(2), 0.01);
     EXPECT_EQ(35000.0, DXCoil(1).MSRatedTotCap(2));
     EXPECT_EQ(35000.0 * 0.5, DXCoil(1).MSRatedTotCap(1));
     // Design flow rate at speed 2 and speed 1

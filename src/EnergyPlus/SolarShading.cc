@@ -3026,9 +3026,9 @@ namespace SolarShading {
         }
     }
 
-    bool polygon_contains_point(int const nsides,           // number of sides (vertices)
-                                Array1A<Vector> polygon_3d, // points of polygon
-                                Vector const &point_3d,     // point to be tested
+    bool polygon_contains_point(int const nsides,            // number of sides (vertices)
+                                Array1D<Vector> &polygon_3d, // points of polygon
+                                Vector const &point_3d,      // point to be tested
                                 bool const ignorex,
                                 bool const ignorey,
                                 bool const ignorez)
@@ -3059,7 +3059,7 @@ namespace SolarShading {
         bool inside; // return value, true=inside, false = not inside
 
         // Argument array dimensioning
-        polygon_3d.dim(nsides);
+        EP_SIZE_CHECK(polygon_3d, nsides);
 
         // Locals
         // Function argument definitions:
@@ -3264,7 +3264,7 @@ namespace SolarShading {
         } // enclosure loop
     }
 
-    void CLIP(int const NVT, Array1<Real64> &XVT, Array1<Real64> &YVT, Array1<Real64> &ZVT)
+    void CLIP(int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3379,12 +3379,12 @@ namespace SolarShading {
         }
     }
 
-    void CTRANS(int const NS,        // Surface number whose vertex coordinates are being transformed
-                int const NGRS,      // Base surface number for surface NS
-                int &NVT,            // Number of vertices for surface NS
-                Array1<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
-                Array1<Real64> &YVT,
-                Array1<Real64> &ZVT)
+    void CTRANS(int const NS,         // Surface number whose vertex coordinates are being transformed
+                int const NGRS,       // Base surface number for surface NS
+                int &NVT,             // Number of vertices for surface NS
+                Array1D<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
+                Array1D<Real64> &YVT,
+                Array1D<Real64> &ZVT)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5540,7 +5540,7 @@ namespace SolarShading {
                     if (!Surface(BackSurfaceNumber).HeatTransSurf) continue;              // Skip non-heat transfer surfaces
                     if (Surface(BackSurfaceNumber).BaseSurf == GRSNR) continue;           // Skip subsurfaces of this GRSNR
                     if (BackSurfaceNumber == GRSNR) continue;                             // A back surface cannot be GRSNR itself
-                    if (Surface(BackSurfaceNumber).Zone != Surface(GRSNR).Zone) continue; // Skip if back surface not in zone
+                    if (Surface(BackSurfaceNumber).SolarEnclIndex != Surface(GRSNR).SolarEnclIndex) continue; // Skip if back surface not in same solar enclosure
 
                     if (Surface(BackSurfaceNumber).Class == SurfaceClass_IntMass) continue;
 
@@ -5723,7 +5723,6 @@ namespace SolarShading {
         Real64 ZS; // Intermediate result
         int N;     // Vertex number
         int NGRS;  // Coordinate transformation index
-        int NZ;    // Zone Number of surface
         int NVT;
         static Array1D<Real64> XVT; // X Vertices of Shadows
         static Array1D<Real64> YVT; // Y vertices of Shadows
@@ -5772,7 +5771,6 @@ namespace SolarShading {
 
             SAREA(GRSNR) = 0.0;
 
-            NZ = Surface(GRSNR).Zone;
             NGSS = ShadowComb(GRSNR).NumGenSurf;
             NGSSHC = 0;
             NBKS = ShadowComb(GRSNR).NumBackSurf;
@@ -7966,6 +7964,8 @@ namespace SolarShading {
 
                                     if (Construct(ConstrNumBack).TypeIsAirBoundaryInteriorWindow) {
                                         TransBeamWin = 1.0;
+                                        AbsBeamWinEQL = 0.0;
+                                        AbsBeamTotWin = 0.0;
                                     } else if (ShadeFlagBack <= 0) {
                                         for (Lay = 1; Lay <= NBackGlass; ++Lay) {
                                             AbsBeamWin(Lay) = POLYF(CosIncBack, Construct(ConstrNumBack).AbsBeamBackCoef({1, 6}, Lay));
@@ -8498,66 +8498,59 @@ namespace SolarShading {
                                     // Equivalent Layer window model has no distinction when treating windows with and
                                     // without shades (interior, inbetween and exterior shades)
 
-                                    if (Construct(ConstrNumBack).TypeIsAirBoundaryInteriorWindow) {
-                                        TransBeamWin = 1.0;
-                                        AbsBeamWinEQL = 0.0;
-                                        AbsBeamTotWin = 0.0;
+                                    CosIncBack = std::abs(CosIncAng(TimeStep, HourOfDay, BackSurfNum));
+                                    //  Note in equivalent layer window model if storm window exists it is defined as part of
+                                    //  window construction, hence it does not require a separate treatment
+                                    AbsBeamWinEQL = 0.0;
+                                    TransBeamWin = 0.0;
+
+                                    // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
+                                    // or interior window (treates windows with/without shades as defined) for this timestep
+
+                                    // call the ASHWAT fenestration model for beam radiation here
+                                    CalcEQLOpticalProperty(BackSurfNum, isBEAM, AbsSolBeamBackEQL);
+
+                                    EQLNum = Construct(ConstrNumBack).EQLConsPtr;
+                                    AbsBeamWinEQL({ 1, CFS(EQLNum).NL }) = AbsSolBeamBackEQL(1, { 1, CFS(EQLNum).NL });
+                                    // get the interior beam transmitted through back exterior or interior EQL window
+                                    TransBeamWin = AbsSolBeamBackEQL(1, CFS(EQLNum).NL + 1);
+                                    //   Absorbed by the interior shade layer of back exterior window
+                                    if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
+                                        IntBeamAbsByShadFac(BackSurfNum) = BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL) /
+                                            (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
+                                        BABSZone += BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL);
                                     }
-                                    else {
+                                    //   Absorbed by the exterior shade layer of back exterior window
+                                    if (CFS(EQLNum).L(1).LTYPE != ltyGLAZE) {
+                                        IntBeamAbsByShadFac(BackSurfNum) =
+                                            BOverlap * AbsSolBeamBackEQL(1, 1) / (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
+                                        BABSZone += BOverlap * AbsSolBeamBackEQL(1, 1);
+                                    }
 
-                                        CosIncBack = std::abs(CosIncAng(TimeStep, HourOfDay, BackSurfNum));
-                                        //  Note in equivalent layer window model if storm window exists it is defined as part of
-                                        //  window construction, hence it does not require a separate treatment
-                                        AbsBeamWinEQL = 0.0;
-                                        TransBeamWin = 0.0;
-
-                                        // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
-                                        // or interior window (treates windows with/without shades as defined) for this timestep
-
-                                        // call the ASHWAT fenestration model for beam radiation here
-                                        CalcEQLOpticalProperty(BackSurfNum, isBEAM, AbsSolBeamBackEQL);
-
-                                        EQLNum = Construct(ConstrNumBack).EQLConsPtr;
-                                        AbsBeamWinEQL({ 1, CFS(EQLNum).NL }) = AbsSolBeamBackEQL(1, { 1, CFS(EQLNum).NL });
-                                        // get the interior beam transmitted through back exterior or interior EQL window
-                                        TransBeamWin = AbsSolBeamBackEQL(1, CFS(EQLNum).NL + 1);
-                                        //   Absorbed by the interior shade layer of back exterior window
-                                        if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
-                                            IntBeamAbsByShadFac(BackSurfNum) = BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL) /
-                                                (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
-                                            BABSZone += BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL);
-                                        }
-                                        //   Absorbed by the exterior shade layer of back exterior window
-                                        if (CFS(EQLNum).L(1).LTYPE != ltyGLAZE) {
-                                            IntBeamAbsByShadFac(BackSurfNum) =
-                                                BOverlap * AbsSolBeamBackEQL(1, 1) / (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
-                                            BABSZone += BOverlap * AbsSolBeamBackEQL(1, 1);
-                                        }
-
-                                        // determine the number of glass layers
-                                        NBackGlass = 0;
-                                        for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
-                                            if (CFS(EQLNum).L(Lay).LTYPE != ltyGLAZE) continue;
-                                            ++NBackGlass;
-                                        }
-                                        if (NBackGlass >= 2) {
-                                            // If the number of glass is greater than 2, in between glass shade can be present
-                                            for (Lay = 2; Lay <= CFS(EQLNum).NL - 1; ++Lay) {
-                                                if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
-                                                    // if there is in between shade glass determine the shade absorptance
-                                                    IntBeamAbsByShadFac(BackSurfNum) += BOverlap * AbsSolBeamBackEQL(1, Lay) / Surface(BackSurfNum).Area;
-                                                    BABSZone += BOverlap * AbsSolBeamBackEQL(1, Lay);
-                                                }
+                                    // determine the number of glass layers
+                                    NBackGlass = 0;
+                                    for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
+                                        if (CFS(EQLNum).L(Lay).LTYPE != ltyGLAZE) continue;
+                                        ++NBackGlass;
+                                    }
+                                    if (NBackGlass >= 2) {
+                                        // If the number of glass is greater than 2, in between glass shade can be present
+                                        for (Lay = 2; Lay <= CFS(EQLNum).NL - 1; ++Lay) {
+                                            if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
+                                                // if there is in between shade glass determine the shade absorptance
+                                                IntBeamAbsByShadFac(BackSurfNum) += BOverlap * AbsSolBeamBackEQL(1, Lay) / Surface(BackSurfNum).Area;
+                                                BABSZone += BOverlap * AbsSolBeamBackEQL(1, Lay);
                                             }
                                         }
-                                        // Sum of interior beam absorbed by all glass layers of back window
-                                        AbsBeamTotWin = 0.0;
-                                        for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
-                                            AbsBeamTotWin += AbsBeamWinEQL(Lay);
-                                            AWinSurf(Lay, BackSurfNum) += BOverlap * AbsBeamWinEQL(Lay) /
-                                                (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea); //[-]
-                                        }
                                     }
+                                    // Sum of interior beam absorbed by all glass layers of back window
+                                    AbsBeamTotWin = 0.0;
+                                    for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
+                                        AbsBeamTotWin += AbsBeamWinEQL(Lay);
+                                        AWinSurf(Lay, BackSurfNum) += BOverlap * AbsBeamWinEQL(Lay) /
+                                            (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea); //[-]
+                                    }
+
                                     // To BABSZon, add interior beam glass absorption and overall beam transmission for this back window
 
                                     BABSZone += BOverlap * (AbsBeamTotWin + TransBeamWin);
@@ -8595,6 +8588,10 @@ namespace SolarShading {
                                 // Opaque surface
 
                                 AISurf(FloorNum) += BTOTWinZone * ISABSF(FloorNum) / Surface(FloorNum).Area; //[-]
+                            } else if (Construct(FlConstrNum).TypeIsAirBoundaryInteriorWindow) {
+                                    TransBeamWin = 1.0;
+                                    AbsBeamWinEQL = 0.0;
+                                    AbsBeamTotWin = 0.0;
                             } else {
                                 // Window
 

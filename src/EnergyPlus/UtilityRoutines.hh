@@ -58,7 +58,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 
+#include <functional>
+
 namespace EnergyPlus {
+class OutputFile;
+
 
 int AbortEnergyPlus();
 
@@ -130,21 +134,23 @@ public:
     {}
 };
 
-void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::OutputFile>>;
 
-void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowSevereMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowSevereError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowContinueError(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowMessage(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowContinueErrorTimeStamp(std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowWarningError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowMessage(std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowWarningMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowWarningError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+
+void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
 void ShowRecurringSevereErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                    int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
@@ -186,7 +192,7 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,             // 
                                 std::string const &ErrorReportSumUnits = ""  // Units for "sum" reporting
 );
 
-void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowErrorMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
 void SummarizeErrors();
 
@@ -194,6 +200,8 @@ void ShowRecurringErrors();
 
 namespace UtilityRoutines {
     extern bool outputErrorHeader;
+
+    void clear_state();
 
     template <class T> struct is_shared_ptr : std::false_type
     {
@@ -566,6 +574,8 @@ namespace UtilityRoutines {
     };
 
     void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
+
+    inline bool exists(const std::string& filename);
 
 } // namespace UtilityRoutines
 

@@ -131,8 +131,6 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
     DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));
     // Open six files to get unit number beyond 6 - these all get closed later by EnergyPlusFixture
-    DataGlobals::OutputFileStandard = FindUnitNumber(DataStringGlobals::outputEsoFileName);
-    DataGlobals::OutputFileBNDetails = FindUnitNumber(DataStringGlobals::outputBndFileName);
     DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));
     // repeat this one - before fix, this broke cout_stream
@@ -143,7 +141,7 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
 
 TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
 {
-    DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
+    DataStringGlobals::outputPerfLogFileName = "eplusout_1_perflog.csv";
 
     // start with no file 
     std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
@@ -179,7 +177,7 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
     // make sure the static variables are cleared
     UtilityRoutines::appendPerfLog("RESET", "RESET");
 
-    DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
+    DataStringGlobals::outputPerfLogFileName = "eplusout_2_perflog.csv";
 
     //create a file for the equivalent of the previous run
     std::ofstream initPerfLogFile;
