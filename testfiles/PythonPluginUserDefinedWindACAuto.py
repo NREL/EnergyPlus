@@ -21,6 +21,7 @@ class Zone1WinACModel(EnergyPlusPlugin):
         self.prim_air_cp_handle = None
         self.des_cool_cap_handle = None
         self.cool_setpoint_temp_handle = None
+        self.cool_coil_avail_sched_handle = None
 
     def on_user_defined_component_model(self) -> int:
 
@@ -70,6 +71,10 @@ class Zone1WinACModel(EnergyPlusPlugin):
                 "Zone Thermostat Cooling Setpoint Temperature",
                 "West Zone")
 
+            self.cool_coil_avail_sched_handle = self.api.exchange.get_variable_handle(
+                "Schedule Value",
+                "COOLINGCOILAVAILSCHED")
+
         else:
             return 0
 
@@ -89,4 +94,30 @@ class Zone1WinACModel(EnergyPlusPlugin):
         rated_cap = des_cool_cap / 0.75
         rated_eir = 1.0 / 3.0
         cool_setpoint_temp = self.api.exchange.get_variable_value(self.cool_setpoint_temp_handle)
+
+        # sim block
+        q_dot_req = 0.0
+        if sens_q_request < 0.0:
+            q_dot_req = sens_q_request
+
+        if self.api.exchange.get_variable_value(self.cool_coil_avail_sched_handle) == 0.0:
+            q_dot_req = 0.0
+
+        prim_air_mdot_in = 0.0
+        prim_air_mdot_out = 0.0
+        prim_air_outlet_temp = 0.0
+        prim_air_outlet_hum = 0.0
+        tot_cool_power = 0.0
+        elect_power = 0.0
+        elect_energy = 0.0
+        oa_mdot_in = 0.0
+        if q_dot_req == 0.0:
+            prim_air_outlet_temp = prim_air_inlet_temp
+            prim_air_outlet_hum = prim_air_inlet_hum
+            tot_cool_power = 0.0
+            elect_power = 0.0
+            elect_energy = 0.0
+            oa_mdot_in = 0.0
+        else:
+
         return 0

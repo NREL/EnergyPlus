@@ -1806,8 +1806,8 @@
 !    Zone 1 Window AC Model Program Manager,  !- Name
 !    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
 !    Zone1_WinAC_ModelInput,  !- Program Name 1
-!    WinAC_OnFanCycCoil_Sim_Model,  !- Program Name 2
-!    Zone1_WinAC_ModelOuput;  !- Program Name 3
+    WinAC_OnFanCycCoil_Sim_Model,  !- Program Name 2
+    Zone1_WinAC_ModelOuput;  !- Program Name 3
 
   PythonPlugin:Instance,
     Zone 1 Window AC Model Program Manager,  !- Name
@@ -2309,26 +2309,26 @@
      ! need to find PLR that satisifies load
 
   EnergyManagementSystem:Program,
-    WinAC_OnFanCycCoil_Sim_Model,  !- Name
-    IF Qdot_Request < 0.0,   !- Program Line 1
-    Set QdotReq = Qdot_Request,  !- Program Line 2
-    ELSE,                    !- <none>
-    Set QdotReq = 0.0,       !- <none>
-    ENDIF,                   !- <none>
-    IF COOLINGCOILAVAILSCHED == 0.0,  !- <none>
-    Set QdotReq = 0.0,       !- <none>
-    ENDIF,                   !- <none>
-    IF QdotReq == 0.0,       !- <none>
-    Set PrimAir_MdotIn = 0.0,!- <none>
-    Set PrimAir_MdotOut = 0.0,  !- <none>
-    Set PrimAir_Tout = PrimAir_Tinlet,  !- <none>
-    Set PrimAir_Wout = PrimAir_Winlet,  !- <none>
-    Set tot_cool_Power = 0.0,!- <none>
-    Set ElectPower = 0.0,    !- <none>
-    Set ElectEnergy = 0.0,   !- <none>
-    Set OA_MdotIn = 0.0,     !- <none>
-    RETURN,                  !- <none>
-    ENDIF,                   !- <none>
+    WinAC_OnFanCycCoil_Sim_Model,
+    IF Qdot_Request < 0.0,
+    Set QdotReq = Qdot_Request,
+    ELSE,
+    Set QdotReq = 0.0,
+    ENDIF,
+    IF COOLINGCOILAVAILSCHED == 0.0,
+    Set QdotReq = 0.0,
+    ENDIF,
+    IF QdotReq == 0.0,
+    Set PrimAir_MdotIn = 0.0,
+    Set PrimAir_MdotOut = 0.0,
+    Set PrimAir_Tout = PrimAir_Tinlet,
+    Set PrimAir_Wout = PrimAir_Winlet,
+    Set tot_cool_Power = 0.0,
+    Set ElectPower = 0.0,
+    Set ElectEnergy = 0.0,
+    Set OA_MdotIn = 0.0,
+    RETURN,
+    ENDIF,
     Set Recirc_Mdot = AirSupMdotDesign - AirOAMdotDesign,  !- <none>
     Set Recirc_H  = @HFnTdbW PrimAir_Tinlet PrimAir_Winlet,  !- <none>
     Set OA_H  = @HFnTdbW OA_Tdb OA_W,  !- <none>
