@@ -9603,84 +9603,14 @@ namespace AirflowNetworkBalanceManager {
 
     void AssignSystemAirLoopNum()
     {
-
-        using DataAirSystems::PrimaryAirSystem;
-        using DXCoils::SetDXCoilAirLoopNumber;
-        using Fans::SetFanAirLoopNumber;
-        using HeatingCoils::SetHeatingCoilAirLoopNumber;
-        using SingleDuct::GetHVACSingleDuctSysIndex;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("AssignSystemAirLoopNum: "); // include trailing blank space
-
-        int i;
-        int j;
-        int k;
-        int n;
-
-        bool ErrorsFound(false);
-        bool IsNotOK(false);
-        std::string CurrentModuleObject;
-
-        // Assign AirLoop Number to every node and linkage
-        // Zone first
-        for (i = 1; i <= AirflowNetworkNumOfZones; i++) {
-            for (j = 1; j <= NumOfZones; j++) {
+        for (int i = 1; i <= AirflowNetworkNumOfZones; i++) {
+            for (int j = 1; j <= NumOfZones; j++) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;
                 if ((MultizoneZoneData(i).ZoneNum == j) && (ZoneEquipConfig(j).NumInletNodes > 0)) {
-                    // No multiple Airloop
-                    AirflowNetworkNodeData(i).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(1);
+                    for (int k = 1; k <= DisSysNumOfCVFs; k++) {
+                        DisSysCompCVFData(k).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(1);
+                    }
                 }
-            }
-        }
-        // Air Distribution system
-        for (i = AirflowNetworkNumOfSurfaces + 1; i <= AirflowNetworkNumOfLinks; ++i) {
-            j = AirflowNetworkLinkageData(i).NodeNums[0];
-            k = AirflowNetworkLinkageData(i).NodeNums[1];
-            if (AirflowNetworkNodeData(j).AirLoopNum == 0 && AirflowNetworkNodeData(k).AirLoopNum == 0) {
-                // Error messaage
-                ShowSevereError("ValidateDistributionSystem: AIRFLOWNETWORK:DISTRIBUTION:LINKAGE = " + AirflowNetworkLinkageData(i).Name +
-                                " is not valid for AirLoopNum assignment");
-                ShowContinueError("AirLoopNum is not found in both nodes for the linkage: " + AirflowNetworkLinkageData(i).NodeNames[0] + " and " +
-                                  AirflowNetworkLinkageData(i).NodeNames[1]);
-                ShowContinueError("Please ensure one of two AIRFLOWNETWORK:DISTRIBUTION:NODEs in the first AIRFLOWNETWORK:DISTRIBUTION:LINKAGE "
-                                  "object should be defined as EnergyPlus NodeID.");
-                ErrorsFound = true;
-            }
-            if (AirflowNetworkNodeData(j).AirLoopNum > 0 && AirflowNetworkNodeData(k).AirLoopNum == 0) {
-                AirflowNetworkNodeData(k).AirLoopNum = AirflowNetworkNodeData(j).AirLoopNum;
-            }
-            if (AirflowNetworkNodeData(j).AirLoopNum == 0 && AirflowNetworkNodeData(k).AirLoopNum > 0) {
-                AirflowNetworkNodeData(j).AirLoopNum = AirflowNetworkNodeData(k).AirLoopNum;
-            }
-            if (AirflowNetworkNodeData(j).AirLoopNum == AirflowNetworkNodeData(k).AirLoopNum) {
-                AirflowNetworkLinkageData(i).AirLoopNum = AirflowNetworkNodeData(j).AirLoopNum;
-            }
-            if (AirflowNetworkNodeData(j).AirLoopNum != AirflowNetworkNodeData(k).AirLoopNum && AirflowNetworkNodeData(j).AirLoopNum > 0 &&
-                AirflowNetworkNodeData(k).AirLoopNum > 0) {
-                AirflowNetworkLinkageData(i).AirLoopNum = AirflowNetworkNodeData(j).AirLoopNum;
-                ShowSevereError("The AirLoopNum defined in both AIRFLOWNETWORK:DISTRIBUTION:NODE objects in " + AirflowNetworkLinkageData(i).Name +
-                                " are not the same. Please make sure both nodes should be listed in the same AirLoop as a valid linkage.");
-                ShowContinueError("AirLoop defined in " + AirflowNetworkNodeData(j).Name + " is " +
-                                  PrimaryAirSystem(AirflowNetworkNodeData(j).AirLoopNum).Name + ", and AirLoop defined in " +
-                                  AirflowNetworkNodeData(k).Name + " is " + PrimaryAirSystem(AirflowNetworkNodeData(k).AirLoopNum).Name);
-                ErrorsFound = true;
-            }
-            // Set AirLoopNum to fans and coils
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == EPlusTypeNum_FAN) {
-                n = DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanIndex;
-                DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).AirLoopNum =
-                    AirflowNetworkLinkageData(i).AirLoopNum;
-                if (DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanModelFlag) {
-                    HVACFan::fanObjs[DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanIndex]->AirLoopNum =
-                        AirflowNetworkLinkageData(i).AirLoopNum;
-                } else {
-                    SetFanAirLoopNumber(n, AirflowNetworkLinkageData(i).AirLoopNum);
-                }
-            }
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == EPlusTypeNum_COI) {
-                DisSysCompCoilData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).AirLoopNum =
-                    AirflowNetworkLinkageData(i).AirLoopNum;
             }
         }
     }
@@ -9937,6 +9867,68 @@ namespace AirflowNetworkBalanceManager {
             }
         }
         NodeFound.deallocate();
+
+        // Assign AirLoop Number to every node and linkage
+        // Zone first
+        for (i = 1; i <= AirflowNetworkNumOfZones; i++) {
+            for (j = 1; j <= NumOfZones; j++) {
+                if (!ZoneEquipConfig(j).IsControlled) continue;
+                if ((MultizoneZoneData(i).ZoneNum == j) && (ZoneEquipConfig(j).NumInletNodes > 0)) {
+                    // No multiple Airloop
+                    AirflowNetworkNodeData(i).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(1);
+                }
+            }
+        }
+        // Air Distribution system
+        for (i = AirflowNetworkNumOfSurfaces + 1; i <= AirflowNetworkNumOfLinks; ++i) {
+            j = AirflowNetworkLinkageData(i).NodeNums[0];
+            k = AirflowNetworkLinkageData(i).NodeNums[1];
+            if (AirflowNetworkNodeData(j).AirLoopNum == 0 && AirflowNetworkNodeData(k).AirLoopNum == 0) {
+                // Error messaage
+                ShowSevereError("ValidateDistributionSystem: AIRFLOWNETWORK:DISTRIBUTION:LINKAGE = " + AirflowNetworkLinkageData(i).Name +
+                                " is not valid for AirLoopNum assignment");
+                ShowContinueError("AirLoopNum is not found in both nodes for the linkage: " + AirflowNetworkLinkageData(i).NodeNames[0] + " and " +
+                                  AirflowNetworkLinkageData(i).NodeNames[1]);
+                ShowContinueError("Please ensure one of two AIRFLOWNETWORK:DISTRIBUTION:NODEs in the first AIRFLOWNETWORK:DISTRIBUTION:LINKAGE "
+                                  "object should be defined as EnergyPlus NodeID.");
+                ErrorsFound = true;
+            }
+            if (AirflowNetworkNodeData(j).AirLoopNum > 0 && AirflowNetworkNodeData(k).AirLoopNum == 0) {
+                AirflowNetworkNodeData(k).AirLoopNum = AirflowNetworkNodeData(j).AirLoopNum;
+            }
+            if (AirflowNetworkNodeData(j).AirLoopNum == 0 && AirflowNetworkNodeData(k).AirLoopNum > 0) {
+                AirflowNetworkNodeData(j).AirLoopNum = AirflowNetworkNodeData(k).AirLoopNum;
+            }
+            if (AirflowNetworkNodeData(j).AirLoopNum == AirflowNetworkNodeData(k).AirLoopNum) {
+                AirflowNetworkLinkageData(i).AirLoopNum = AirflowNetworkNodeData(j).AirLoopNum;
+            }
+            if (AirflowNetworkNodeData(j).AirLoopNum != AirflowNetworkNodeData(k).AirLoopNum && AirflowNetworkNodeData(j).AirLoopNum > 0 &&
+                AirflowNetworkNodeData(k).AirLoopNum > 0) {
+                AirflowNetworkLinkageData(i).AirLoopNum = AirflowNetworkNodeData(j).AirLoopNum;
+                ShowSevereError("The AirLoopNum defined in both AIRFLOWNETWORK:DISTRIBUTION:NODE objects in " + AirflowNetworkLinkageData(i).Name +
+                                " are not the same. Please make sure both nodes should be listed in the same AirLoop as a valid linkage.");
+                ShowContinueError("AirLoop defined in " + AirflowNetworkNodeData(j).Name + " is " +
+                                  PrimaryAirSystem(AirflowNetworkNodeData(j).AirLoopNum).Name + ", and AirLoop defined in " +
+                                  AirflowNetworkNodeData(k).Name + " is " + PrimaryAirSystem(AirflowNetworkNodeData(k).AirLoopNum).Name);
+                ErrorsFound = true;
+            }
+            // Set AirLoopNum to fans and coils
+            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == EPlusTypeNum_FAN) {
+                n = DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanIndex;
+                DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).AirLoopNum =
+                    AirflowNetworkLinkageData(i).AirLoopNum;
+                if (DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanModelFlag) {
+                    HVACFan::fanObjs[DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanIndex]->AirLoopNum =
+                        AirflowNetworkLinkageData(i).AirLoopNum;
+                } else {
+                    SetFanAirLoopNumber(n, AirflowNetworkLinkageData(i).AirLoopNum);
+                }
+            }
+            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == EPlusTypeNum_COI) {
+                DisSysCompCoilData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).AirLoopNum =
+                    AirflowNetworkLinkageData(i).AirLoopNum;
+            }
+        }
 
         // Validate coil name and type
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Coil";
