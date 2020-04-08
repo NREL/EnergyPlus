@@ -13,23 +13,24 @@ class TowerControl(EnergyPlusPlugin):
         self.pump_override_report_handle = None
 
     def on_inside_hvac_system_iteration_loop(self) -> int:
-        if self.need_to_get_handles:
-            if self.api.exchange.api_data_fully_ready():
-                self.outdoor_air_temp_handle = self.api.exchange.get_variable_handle(
-                    "Site Outdoor Air Drybulb Temperature",
-                    "Environment")
+        if self.need_to_get_handles and self.api.exchange.api_data_fully_ready():
+            self.outdoor_air_temp_handle = self.api.exchange.get_variable_handle(
+                "Site Outdoor Air Drybulb Temperature",
+                "Environment")
 
-                self.chiller_condenser_loop_handle = self.api.exchange.get_actuator_handle("Plant Loop Overall",
-                                                                                           "On/Off Supervisory",
-                                                                                           "Chiller Plant Condenser Loop")
+            self.chiller_condenser_loop_handle = self.api.exchange.get_actuator_handle("Plant Loop Overall",
+                                                                                       "On/Off Supervisory",
+                                                                                       "Chiller Plant Condenser Loop")
 
-                self.chiller_cond_pump_handle = self.api.exchange.get_actuator_handle("Pump",
-                                                                                      "Pump Mass Flow Rate",
-                                                                                      "Chiller Plant Cnd Circ Pump")
+            self.chiller_cond_pump_handle = self.api.exchange.get_actuator_handle("Pump",
+                                                                                  "Pump Mass Flow Rate",
+                                                                                  "Chiller Plant Cnd Circ Pump")
 
-                self.pump_override_report_handle = self.api.exchange.get_global_handle("PumpFlowOverrideReport")
+            self.pump_override_report_handle = self.api.exchange.get_global_handle("PumpFlowOverrideReport")
 
-                self.need_to_get_handles = False
+            self.need_to_get_handles = False
+        else:
+            return 0
 
         if self.api.exchange.get_variable_value(self.outdoor_air_temp_handle) < 6.0:
             self.api.exchange.set_actuator_value(self.chiller_condenser_loop_handle, 0.0)

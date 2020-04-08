@@ -7853,16 +7853,52 @@
 
   Output:Variable,*,Zone Mean Air Temperature,detailed;
 
-  PythonPlugin:Variables,
-    PythonGlobalVars,           !- Name
-    PumpFlowOverrideReport;     !- Variable Name 1
+! Begin demo of using PythonPlugin to replace EMS
 
-  PythonPlugin:OutputVariable,
-    EMS Condenser Flow Override On,     !- Name
-    PumpFlowOverrideReport,             !- PythonPlugin:Variable Name
-    Averaged,                           !- Type of Data in Variable
-    SystemTimestep,                     !- Update Frequency
-    On/Off;                             !- Units
+!  EnergyManagementSystem:Sensor,
+!    OutdoorTemp,             !- Name
+!    Environment,             !- Output:Variable or Output:Meter Index Key Name
+!    Site Outdoor Air Drybulb Temperature;  !- Output:Variable or Output:Meter Name
+!
+!  EnergyManagementSystem:Actuator,
+!    Actuator_Loop,           !- Name
+!    Chiller Plant Condenser Loop,  !- Actuated Component Unique Name
+!    Plant Loop Overall,      !- Actuated Component Type
+!    On/Off Supervisory;      !- Actuated Component Control Type
+!
+!  EnergyManagementSystem:Actuator,
+!    PumpFlowOverride,        !- Name
+!    Chiller Plant Cnd Circ Pump,  !- Actuated Component Unique Name
+!    Pump,                    !- Actuated Component Type
+!    Pump Mass Flow Rate;     !- Actuated Component Control Type
+!
+!  EnergyManagementSystem:GlobalVariable,
+!    PumpFlowOverrideReport;  !- Erl Variable 1 Name
+!
+!  EnergyManagementSystem:OutputVariable,
+!    EMS Condenser Flow Override On,  !- Name
+!    PumpFlowOverrideReport,  !- EMS Variable Name
+!    Averaged,                !- Type of Data in Variable
+!    SystemTimeStep,          !- Update Frequency
+!    ,                        !- EMS Program or Subroutine Name
+!    On/Off;                  !- Units
+!
+!  EnergyManagementSystem:ProgramCallingManager,
+!    Condenser OnOff Management,  !- Name
+!    InsideHVACSystemIterationLoop,  !- EnergyPlus Model Calling Point
+!    TowerControl;            !- Program Name 1
+!
+!  EnergyManagementSystem:Program,
+!    TowerControl,            !- Name
+!    IF (OutdoorTemp < 6.0),  !- Program Line 1
+!    SET Actuator_Loop = 0.0, !- Program Line 2
+!    SET PumpFlowOverride = 0.0,  !- <none>
+!    SET PumpFlowOverrideReport = 1.0,  !- <none>
+!    ELSE,                    !- <none>
+!    SET Actuator_Loop = Null,!- <none>
+!    SET PumpFlowOverride = Null,  !- <none>
+!    SET PumpFlowOverrideReport = 0.0,  !- <none>
+!    ENDIF;                   !- <none>
 
   PythonPlugin:Instance,
     Condenser OnOff Management,             !- Name
@@ -7870,7 +7906,21 @@
     PythonPluginPlantLoopOverrideControl,   !- Python Module Name
     TowerControl;                           !- Plugin Class Name
 
-  Output:Variable,*,EMS Condenser Flow Override On,Hourly;
+  PythonPlugin:Variables,
+    PythonGlobalVars,           !- Name
+    PumpFlowOverrideReport;     !- Variable Name 1
+
+  PythonPlugin:OutputVariable,
+    PythonPlugin Condenser Flow Override On,     !- Name
+    PumpFlowOverrideReport,             !- PythonPlugin:Variable Name
+    Averaged,                           !- Type of Data in Variable
+    SystemTimestep,                     !- Update Frequency
+    On/Off;                             !- Units
+
+  Output:Variable,
+    PythonPlugin Condenser Flow Override On,
+    PythonPlugin:OutputVariable,
+    Hourly;
 
   Output:SQLite,
     SimpleAndTabular;        !- Option Type
