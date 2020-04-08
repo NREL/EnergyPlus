@@ -255,7 +255,6 @@ namespace ScheduleManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Array1D_int DaysInYear(366);
-        int UnitNumber;
         int LoopIndex;
         int InLoopIndex;
         int DayIndex;
@@ -731,8 +730,7 @@ namespace ScheduleManager {
         Schedule(0).ScheduleTypePtr = 0;
         Schedule(0).WeekSchedulePointer = 0;
 
-        UnitNumber = FindUnitNumber(DataStringGlobals::outputAuditFileName);
-        ObjexxFCL::gio::write(UnitNumber, fmtLD) << " Processing Schedule Input -- Start";
+        print(outputFiles.audit.ensure_open(), "{}\n", "  Processing Schedule Input -- Start");
 
         //!! Get Schedule Types
 
@@ -1142,7 +1140,7 @@ namespace ScheduleManager {
                 if (DayIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) + " \"" +
                                         Alphas(InLoopIndex + 1) + "\" not Found",
-                                    UnitNumber);
+                                    OptionalOutputFileRef{outputFiles.audit});
                     ErrorsFound = true;
                 } else {
                     WeekSchedule(LoopIndex).DaySchedulePointer(InLoopIndex) = DayIndex;
@@ -1177,7 +1175,7 @@ namespace ScheduleManager {
                 if (DayIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) + " \"" +
                                         Alphas(InLoopIndex + 1) + "\" not Found",
-                                    UnitNumber);
+                                    OptionalOutputFileRef{outputFiles.audit});
                     ShowContinueError("ref: " + cAlphaFields(InLoopIndex) + " \"" + Alphas(InLoopIndex) + "\"");
                     ErrorsFound = true;
                 } else {
@@ -1247,7 +1245,7 @@ namespace ScheduleManager {
                 if (WeekIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex) + "=\"" +
                                         Alphas(InLoopIndex) + "\" not found.",
-                                    UnitNumber);
+                                    OptionalOutputFileRef{outputFiles.audit});
                     ErrorsFound = true;
                 } else {
                     // Process for month, day
@@ -1283,13 +1281,13 @@ namespace ScheduleManager {
             }
             if (any_eq(DaysInYear, 0)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(LoopIndex).Name + "\" has missing days in its schedule pointers",
-                                UnitNumber);
+                                OptionalOutputFileRef{outputFiles.audit});
                 ErrorsFound = true;
             }
             if (any_gt(DaysInYear, 1)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(LoopIndex).Name +
                                     "\" has overlapping days in its schedule pointers",
-                                UnitNumber);
+                                OptionalOutputFileRef{outputFiles.audit});
                 ErrorsFound = true;
             }
 
@@ -1578,13 +1576,13 @@ namespace ScheduleManager {
             }
             if (any_eq(DaysInYear, 0)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\" has missing days in its schedule pointers",
-                                UnitNumber);
+                                OptionalOutputFileRef{outputFiles.audit});
                 ErrorsFound = true;
             }
             if (any_gt(DaysInYear, 1)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name +
                                     "\" has overlapping days in its schedule pointers",
-                                UnitNumber);
+                                OptionalOutputFileRef{outputFiles.audit});
                 ErrorsFound = true;
             }
 
@@ -2350,7 +2348,7 @@ namespace ScheduleManager {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        ObjexxFCL::gio::write(UnitNumber, fmtLD) << " Processing Schedule Input -- Complete";
+        print(outputFiles.audit, "{}\n", "  Processing Schedule Input -- Complete");
     }
 
     void ReportScheduleDetails(OutputFiles &outputFiles, int const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt

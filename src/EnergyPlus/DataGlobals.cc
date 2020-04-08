@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/OutputFiles.hh>
 
 namespace EnergyPlus {
 
@@ -197,18 +198,14 @@ namespace DataGlobals {
     int TimeStep(0);                   // Counter for time steps (fractional hours)
     Real64 TimeStepZone(0.0);          // Zone time step in fractional hours
     bool WarmupFlag(false);            // True during the warmup portion of a simulation
-    int OutputFileStandard(0);         // Unit number for the standard output file (hourly data only)
-    std::ostream *eso_stream(nullptr); // Internal stream used for eso output (used for performance)
     JsonOutputStreams jsonOutputStreams;
     int OutputStandardError(0);                      // Unit number for the standard error output file
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
     int OutputFileDebug(0);                          // Unit number for debug outputs
     int OutputFilePerfLog(0);                        // Unit number for performance log outputs
-    std::ostream *mtr_stream(nullptr);               // Internal stream used for mtr output (used for performance)
     int OutputFileShadingFrac(0);                    // Unit number for shading output
     int StdMeterRecordCount(0);                      // Count of Meter output records
-    int OutputFileBNDetails(0);                      // Unit number for Branch-Node Details
     int OutputDElightIn(0);                          // Unit number for the DElight In file
     std::ostream *delightin_stream(nullptr);         // Internal stream used for DElight In file
     bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
@@ -307,14 +304,16 @@ namespace DataGlobals {
         TimeStep = 0;
         TimeStepZone = 0.0;
         WarmupFlag = false;
-        OutputFileStandard = 0;
+        OutputFiles::getSingleton().eso.close();
         OutputStandardError = 0;
         StdOutputRecordCount = 0;
         OutputFileDebug = 0;
+        OutputFiles::getSingleton().zsz.close();
+        OutputFiles::getSingleton().ssz.close();
+        OutputFiles::getSingleton().mtr.close();
         OutputFilePerfLog = 0;
         OutputFileShadingFrac = 0;
         StdMeterRecordCount = 0;
-        OutputFileBNDetails = 0;
         ZoneSizingCalc = false;
         SysSizingCalc = false;
         DoZoneSizing = false;
@@ -367,8 +366,7 @@ namespace DataGlobals {
         progressCallback = nullptr;
         messageCallback = nullptr;
         errorCallback = nullptr;
-        eso_stream = nullptr;
-        mtr_stream = nullptr;
+        OutputFiles::getSingleton().mtr.close();
         err_stream = nullptr;
         delightin_stream = nullptr;
         eplusRunningViaAPI = false;
