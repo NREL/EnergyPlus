@@ -935,20 +935,21 @@ namespace ConvectionCoefficients {
 
         bool ErrorsFound = false;
         bool IsValidType = false;
-        for (int Loop1 = 1; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) {
-            if (equationName != ValidIntConvectionValueTypes(Loop1)) continue;
-            IsValidType = true;
-            InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum = IntConvectionValue(Loop1);
-            if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum == HcInt_UserCurve) {
-                // A5 , \field Simple Bouyancy Stable Horizontal Equation User Curve Name
-                *InsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, HcInsideUserCurve);
-                if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizUserCurveNum == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + moduleName + ", invalid value");
-                    ShowContinueError("Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
-                    ErrorsFound = true;
+        for (int i = 1; i <= NumValidIntConvectionValueTypes; ++i) {
+            // Can we use a find here instead of looping through
+            if (equationName == ValidIntConvectionValueTypes(i)) {
+                IsValidType = true;
+                *InsideFaceAdaptiveConvectionAlgoParam = IntConvectionValue(i);
+                if (*InsideFaceAdaptiveConvectionAlgoParam == HcInt_UserCurve) {
+                    *InsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, HcInsideUserCurve);
+                    if (*InsideFaceAdaptiveConvectionAlgoParam == 0) {
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + moduleName + ", invalid value");
+                        ShowContinueError("Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
+                        ErrorsFound = true;
+                    }
                 }
+                break; // found it
             }
-            break; // found it
         }
         if (!IsValidType) {
             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + moduleName + ", invalid value");
@@ -2167,13 +2168,7 @@ namespace ConvectionCoefficients {
                     std::make_pair (&InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum, HcInt_BeausoleilMorrisonMixedStableCeiling),
                     std::make_pair (&InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum, HcInt_BeausoleilMorrisonMixedUnstableCeiling),
                     std::make_pair (&InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum, HcInt_GoldsteinNovoselacCeilingDiffuserWindow),
-                };//);
-
-            // From range(Full_length_of_IDD_object,  Length_of_inputs, -2 step)
-            //      set default
-            //      decrement
-            // From range(2, Length_of_inputs, +2 step
-            //      call function
+                };
 
             for (int i = 2; i < NumAlphas-1; i+=2){
                 //                                                  InsideFaceAdaptiveConvectionAlgoParam,         equationName,  curveName,       sourceFieldName,     curveFieldName,        moduleName
@@ -2182,12 +2177,10 @@ namespace ConvectionCoefficients {
 
             int implicit_defaults = 91 - NumAlphas;
             if (implicit_defaults > 1 ){
-                for (int i =(NumAlphas-1)/2; i < 90; i++){
+                for (int i =(NumAlphas-1)/2; i < implicit_defaults/2; i++){
                     *AdaptiveConvectionAlgoDefaults[i].first = AdaptiveConvectionAlgoDefaults[i].second;
                 }
-
             }
-
         } // end of 'SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections'
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
