@@ -1148,11 +1148,12 @@ namespace HVACControllers {
 
             // Check to make sure that the Minimum Flow rate is less than the max.
             if (ControllerProps(ControlNum).MaxVolFlowActuated == 0.0) {
-                ShowWarningError("Controller:WaterCoil, Maximum Actuated Flow is zero; " + ControllerProps(ControlNum).ControllerName);
+                ShowWarningError(RoutineName + ": Controller:WaterCoil=\"" + ControllerProps(ControlNum).ControllerName +
+                                 "\", Maximum Actuated Flow is zero.");
                 ControllerProps(ControlNum).MinVolFlowActuated = 0.0;
             } else if (ControllerProps(ControlNum).MinVolFlowActuated >= ControllerProps(ControlNum).MaxVolFlowActuated) {
-                ShowFatalError("Controller:WaterCoil, Minimum control flow is > or = Maximum control flow; " +
-                               ControllerProps(ControlNum).ControllerName);
+                ShowFatalError(RoutineName + ": Controller:WaterCoil=\"" + ControllerProps(ControlNum).ControllerName +
+                               "\", Minimum control flow is > or = Maximum control flow.");
             }
 
             // Setup root finder after sizing calculation
