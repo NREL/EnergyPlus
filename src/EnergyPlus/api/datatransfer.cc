@@ -58,8 +58,7 @@
 #include <EnergyPlus/PluginManager.hh>
 
 const char * listAllAPIDataCSV() {
-    std::string output;
-    output.append("**ACTUATORS**\n");
+    std::string output = "**ACTUATORS**\n";
     for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
         if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.ControlTypeName.empty()) {
             break;
@@ -105,8 +104,13 @@ const char * listAllAPIDataCSV() {
         output.append(variable.VarNameOnly).append(",");
         output.append(variable.KeyNameOnlyUC).append("\n");
     }
-    // add output vars and meters
-    return output.c_str();
+    // note that we cannot just return a c_str to the local string, as the string will be destructed upon leaving
+    // this function, and undefined behavior will occur.
+    // instead make a small copy -- I realize it could cause its own issues, but I would not expect users to be making
+    // many many calls to this.  And if they did, just free the memory and be done.
+    char *p = new char[std::strlen(output.c_str())];
+    std::strcpy(p, output.c_str());
+    return p;
 }
 
 int apiDataFullyReady() {
@@ -179,7 +183,7 @@ Real64 getVariableValue(const int handle) {
     if (handle > 0 && handle <= EnergyPlus::OutputProcessor::NumOfRVariable) {
         auto &thisOutputVar = EnergyPlus::OutputProcessor::RVariableTypes(handle);
         return *thisOutputVar.VarPtr.Which;
-    } else if (handle <= EnergyPlus::OutputProcessor::NumOfRVariable + EnergyPlus::OutputProcessor::NumOfIVariable) {
+    } else if (handle > EnergyPlus::OutputProcessor::NumOfRVariable && handle <= EnergyPlus::OutputProcessor::NumOfRVariable + EnergyPlus::OutputProcessor::NumOfIVariable) {
         int thisHandle = handle - EnergyPlus::OutputProcessor::NumOfRVariable;
         auto &thisOutputVar = EnergyPlus::OutputProcessor::IVariableTypes(thisHandle);
         return (Real64)*thisOutputVar.VarPtr.Which;
@@ -235,7 +239,8 @@ int getActuatorHandle(const char* componentType, const char* controlType, const 
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(componentType);
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(uniqueKey);
     std::string const controlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(controlType);
-    for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) { // is this iterating over cushion space?
+    for (int ActuatorLoop = 1; ActuatorLoop <= EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable; ++ActuatorLoop) {
+        auto const & availActuator = EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(ActuatorLoop);
         handle++;
         std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ComponentTypeName);
         std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.UniqueIDName);
@@ -249,7 +254,7 @@ int getActuatorHandle(const char* componentType, const char* controlType, const 
 
 void resetActuator(int handle) {
     // resets the actuator so that E+ will use the internally calculated value again
-    if (handle >= 1 && handle <= (int)EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable.size()) {
+    if (handle >= 1 && handle <= EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable) {
         auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
         *theActuator.Actuated = false;
     } else {
@@ -267,7 +272,7 @@ void resetActuator(int handle) {
 }
 
 void setActuatorValue(const int handle, const Real64 value) {
-    if (handle >= 1 && handle <= (int)EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable.size()) {
+    if (handle >= 1 && handle <= EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable) {
         auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
         if (theActuator.RealValue) {
             *theActuator.RealValue = value;
@@ -293,7 +298,7 @@ void setActuatorValue(const int handle, const Real64 value) {
 }
 
 Real64 getActuatorValue(const int handle) {
-    if (handle >= 1 && handle <= (int)EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable.size()) {
+    if (handle >= 1 && handle <= EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable) {
         auto &theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
         if (theActuator.RealValue) {
             return *theActuator.RealValue;
@@ -321,6 +326,7 @@ Real64 getActuatorValue(const int handle) {
         }
     }
 }
+
 
 int getInternalVariableHandle(const char* type, const char* key) {
     int handle;
