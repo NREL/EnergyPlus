@@ -1016,7 +1016,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     EXPECT_EQ(ControllerProps(1).Offset, expectedOffset);
 
     std::string const error_string = delimited_string({
-        "   ** Warning ** Controller:WaterCoil, Maximum Actuated Flow is zero; CW COIL CONTROLLER",
+        "   ** Warning ** InitController: Controller:WaterCoil=\"CW COIL CONTROLLER\", Maximum Actuated Flow is zero.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
