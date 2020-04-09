@@ -1842,10 +1842,10 @@
     Set Zone1WinAC_ElectEnergy     = ElectEnergy,  !- <none>
     Set Zone1WinAC_OA_MdotIn       = OA_MdotIn;  !- <none>
 
-  EnergyManagementSystem:Sensor,
-    COOLINGCOILAVAILSCHED,   !- Name
-    COOLINGCOILAVAILSCHED,   !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value;          !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    COOLINGCOILAVAILSCHED,   !- Name
+!    COOLINGCOILAVAILSCHED,   !- Output:Variable or Output:Meter Index Key Name
+!    Schedule Value;          !- Output:Variable or Output:Meter Name
 
 !  EnergyManagementSystem:Sensor,
 !    Zone1Cooling_Tstat,      !- Name
@@ -1935,10 +1935,10 @@
 !    West Zone,               !- Internal Data Index Key Name
 !    Zone Outdoor Air Design Volume Flow Rate;  !- Internal Data Type
 
-  EnergyManagementSystem:Sensor,
-    OA_Press,                !- Name
-    Environment,             !- Output:Variable or Output:Meter Index Key Name
-    Site Outdoor Air Barometric Pressure;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    OA_Press,                !- Name
+!    Environment,             !- Output:Variable or Output:Meter Index Key Name
+!    Site Outdoor Air Barometric Pressure;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:OutputVariable,
     Zone 1 WinAC Total Cooling Rate,  !- Name
@@ -2329,27 +2329,27 @@
     Set OA_MdotIn = 0.0,
     RETURN,
     ENDIF,
-    Set Recirc_Mdot = AirSupMdotDesign - AirOAMdotDesign,  !- <none>
-    Set Recirc_H  = @HFnTdbW PrimAir_Tinlet PrimAir_Winlet,  !- <none>
-    Set OA_H  = @HFnTdbW OA_Tdb OA_W,  !- <none>
-    Set Mix_H = ((Recirc_Mdot * Recirc_H) + (AirOAMdotDesign * OA_H)) / AirSupMdotDesign,  !- <none>
-    Set Mix_W = ((Recirc_Mdot * PrimAir_Winlet) + (AirOAMdotDesign * OA_W)) / AirSupMdotDesign,  !- <none>
-    Set Mix_Tdb = @TdbFnHW Mix_H Mix_W,  !- <none>
-    Set Mix_Cp = @CpAirFnW Mix_W,  !- <none>
-    Set Mix_rho = @RhoAirFnPbTdbW OA_Press Mix_Tdb Mix_W,  !- <none>
-    Set FanPower = (AirSupMdotDesign * FanDeltaP) / (FanEff * Mix_rho),  !- <none>
-    Set FanPowerToAir = FanPower,  !- <none>
-    Set FanDeltaH = FanPowerToAir/AirSupMdotDesign,  !- <none>
-    Set FanOut_H = Mix_H + FanDeltaH,  !- <none>
-    Set FanOut_W = Mix_W,    !- <none>
-    Set FanOut_Tdb = @TdbFnHW FanOut_H FanOut_W,  !- <none>
-    Set FanOut_Twb = @TwbFnTdbWPb FanOut_Tdb FanOut_W OA_Press,  !- <none>
-    Set RatedCBF = 0.12666,  !- <none>
-    Set LogRatedCBF = @Ln RatedCBF,  !- <none>
-    Set A0 = (0.0 -1.0) * LogRatedCBF * AirSupMdotDesign,  !- <none>
-    Set ADiff = (0.0 - 1.0) * (A0 / AirSupMdotDesign),  !- <none>
-    Set CBF = @Exp ADiff,    !- <none>
-    Set dummy = 0.0,         !- <none>
+    Set Recirc_Mdot = AirSupMdotDesign - AirOAMdotDesign,
+    Set Recirc_H  = @HFnTdbW PrimAir_Tinlet PrimAir_Winlet,
+    Set OA_H  = @HFnTdbW OA_Tdb OA_W,
+    Set Mix_H = ((Recirc_Mdot * Recirc_H) + (AirOAMdotDesign * OA_H)) / AirSupMdotDesign,
+    Set Mix_W = ((Recirc_Mdot * PrimAir_Winlet) + (AirOAMdotDesign * OA_W)) / AirSupMdotDesign,
+    Set Mix_Tdb = @TdbFnHW Mix_H Mix_W,
+    Set Mix_Cp = @CpAirFnW Mix_W,
+    Set Mix_rho = @RhoAirFnPbTdbW OA_Press Mix_Tdb Mix_W,
+    Set FanPower = (AirSupMdotDesign * FanDeltaP) / (FanEff * Mix_rho),
+    Set FanPowerToAir = FanPower,
+    Set FanDeltaH = FanPowerToAir/AirSupMdotDesign,
+    Set FanOut_H = Mix_H + FanDeltaH,
+    Set FanOut_W = Mix_W,
+    Set FanOut_Tdb = @TdbFnHW FanOut_H FanOut_W,
+    Set FanOut_Twb = @TwbFnTdbWPb FanOut_Tdb FanOut_W OA_Press,
+    Set RatedCBF = 0.12666,
+    Set LogRatedCBF = @Ln RatedCBF,
+    Set A0 = (0.0 -1.0) * LogRatedCBF * AirSupMdotDesign,
+    Set ADiff = (0.0 - 1.0) * (A0 / AirSupMdotDesign),
+    Set CBF = @Exp ADiff,
+    Set dummy = 0.0,
     Set TotCapTempModFac = @CurveValue WindACCoolCapFT FanOut_Twb OA_Tdb dummy dummy dummy,  !- <none>
     Set TotCapFlowModFac = @CurveValue WindACCoolCapFFF 1.0 dummy dummy dummy dummy,  !- <none>
     Set TotCap = RatedCap * TotCapTempModFac * TotCapFlowModFac,  !- <none>
