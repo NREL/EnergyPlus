@@ -4719,17 +4719,17 @@ TEST_F(EnergyPlusFixture, HPWH_Wrapped_Stratified_Simultaneous)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(WaterThermalTanks::GetWaterThermalTankInput(outputFiles()));
+    // This returns true if ErrorsFound
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(outputFiles()));
 
-    std::string const error_string = delimited_string({
+    // Previous warning before fix
+    //std::string const error_string = delimited_string({
 
-        "   ** Severe  ** WaterHeater:HeatPump:WrappedCondenser = HPWHWRAPPED:",
-        "   **   ~~~   ** Heater Control Type for WaterHeater:Stratified = HPWHWRAPPED STRATIFIED TANK must be CYCLE.",
-    });
+        //"   ** Severe  ** WaterHeater:HeatPump:WrappedCondenser = HPWHWRAPPED:",
+        //"   **   ~~~   ** Heater Control Type for WaterHeater:Stratified = HPWHWRAPPED STRATIFIED TANK must be CYCLE.",
+    //});
 
-    EXPECT_TRUE(compare_err_stream(error_string, true));
-
-
+    EXPECT_TRUE(compare_err_stream("", true));
 }
 
 // Test for #7902: If the HPWH is Pumped, and it has a Stratified Tank which  Priority Mode is Simultaneous,
@@ -4993,14 +4993,15 @@ TEST_F(EnergyPlusFixture, HPWH_Pumped_Stratified_Simultaneous)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(WaterThermalTanks::GetWaterThermalTankInput(outputFiles()));
+    // This returns true if ErrorsFound
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(outputFiles()));
 
-    std::string const error_string = delimited_string({
+    // Previous warning before fix
+    //std::string const error_string = delimited_string({
+        //"   ** Severe  ** WaterHeater:HeatPump:PumpedCondenser = HPWHPUMPED:",
+        //"   **   ~~~   ** Heater Control Type for WaterHeater:Stratified = HPWHPUMPED STRATIFIED TANK must be CYCLE.",
+    //});
 
-        "   ** Severe  ** WaterHeater:HeatPump:PumpedCondenser = HPWHPUMPED:",
-        "   **   ~~~   ** Heater Control Type for WaterHeater:Stratified = HPWHPUMPED STRATIFIED TANK must be CYCLE.",
-    });
-
-    EXPECT_TRUE(compare_err_stream(error_string, true));
+    EXPECT_TRUE(compare_err_stream("", true));
 
 }
