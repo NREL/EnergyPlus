@@ -1245,8 +1245,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
 TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections)
 {
     std::string const idf_objects = delimited_string({
-        "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
 
+        "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
+        "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
+
+        "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
         "Default Algorithm,       !- Name",
         "FohannoPolidoriVerticalWall,  !- Simple Buoyancy Vertical Wall Equation Source",
         ",                        !- Simple Buoyancy Vertical Wall User Curve Name",
@@ -1324,19 +1327,19 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections)
         ",                        !- Mechanical Zone Fan Circulation Unstable Tilted Equation User Curve Name",
         "ISO15099Windows,         !- Mechanical Zone Fan Circulation Window Equation Source",
         ",                        !- Mechanical Zone Fan Circulation Window Equation User Curve Name",
-        "BeausoleilMorrisonMixedAssistedWall,  !- Mixed Regime Buoyancy Assisting Flow on Walls Equation Source",
+        ",  !- Mixed Regime Buoyancy Assisting Flow on Walls Equation Source",
         ",                        !- Mixed Regime Buoyancy Assisting Flow on Walls Equation User Curve Name",
-        "BeausoleilMorrisonMixedOpposingWall,  !- Mixed Regime Buoyancy Opposing Flow on Walls Equation Source",
+        ",  !- Mixed Regime Buoyancy Opposing Flow on Walls Equation Source",
         ",                        !- Mixed Regime Buoyancy Opposing Flow on Walls Equation User Curve Name",
-        "BeausoleilMorrisonMixedStableFloor,  !- Mixed Regime Stable Floor Equation Source",
+        ",  !- Mixed Regime Stable Floor Equation Source",
         ",                        !- Mixed Regime Stable Floor Equation User Curve Name",
-        "BeausoleilMorrisonMixedUnstableFloor,  !- Mixed Regime Unstable Floor Equation Source",
+        ",  !- Mixed Regime Unstable Floor Equation Source",
         ",                        !- Mixed Regime Unstable Floor Equation User Curve Name",
-        "BeausoleilMorrisonMixedStableCeiling,  !- Mixed Regime Stable Ceiling Equation Source",
+        ",  !- Mixed Regime Stable Ceiling Equation Source",
         ",                        !- Mixed Regime Stable Ceiling Equation User Curve Name",
-        "BeausoleilMorrisonMixedUnstableCeiling,  !- Mixed Regime Unstable Ceiling Equation Source",
+        ",  !- Mixed Regime Unstable Ceiling Equation Source",
         ",                        !- Mixed Regime Unstable Ceiling Equation User Curve Name",
-        "GoldsteinNovoselacCeilingDiffuserWindow,  !- Mixed Regime Window Equation Source",
+        ",  !- Mixed Regime Window Equation Source",
         ";                        !- Mixed Regime Window Equation User Curve Name",
 
         "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,",
@@ -1454,8 +1457,12 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections)
 TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections_Implicit)
 {
     std::string const idf_objects = delimited_string({
+        "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
+        "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
+
         "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
-        "Default Algorithm;       !- Name",
+        "Default Algorithm,       !- Name",
+        "FohannoPolidoriVerticalWall;  !- Simple Buoyancy Vertical Wall Equation Source"
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1553,3 +1560,26 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections_Implicit)
     algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWindow);
 }
+
+
+TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections_BadInput)
+{
+    std::string const idf_objects = delimited_string({
+        "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
+
+        "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
+        "Default Algorithm,                  !- Name",
+        "ACurveThatDoesntExists,             !- Simple Buoyancy Vertical Wall Equation Source",
+        ",                                   !- Simple Buoyancy Vertical Wall User Curve Name",
+        "AlamdariHammondStableHorizontal,    !- Simple Buoyancy Stable Horizontal Equation Source",
+        ",                                   !- Simple Buoyancy Stable Horizontal Equation User Curve Name",
+        "AlamdariHammondUnstableHorizontal,  !- Simple Buoyancy Unstable Horizontal Equation Source",
+        ";                                   !- Simple Buoyancy Unstable Horizontal Equation User Curve Name",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Expect Severe Error
+
+}
+
