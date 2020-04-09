@@ -583,7 +583,7 @@ namespace HeatBalanceSurfaceManager {
                     auto & outputFiles = OutputFiles::getSingleton();
                     ////  Change to following once delightdfdmp is converted to OutputFiles
                     //    outputFiles.delightdfdmp.ensure_open(outputFiles.outputControl.delightdfdmp);
-                    iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "readwrite");
+                    iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "readwrite", true);
 
                     // Sequentially read lines in DElight Electric Lighting Error File
                     // and process them using standard EPlus warning/error handling calls
@@ -628,7 +628,7 @@ namespace HeatBalanceSurfaceManager {
                     auto & outputFiles = OutputFiles::getSingleton();
                     ////  Change to following once delighteldmp is converted to OutputFiles
                     //    outputFiles.delighteldmp.ensure_open(outputFiles.outputControl.delighteldmp);
-                    iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightEldmpFileName, "DelightELdmp", outputFiles.outputControl.delighteldmp, "readwrite");
+                    iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightEldmpFileName, "DelightELdmp", outputFiles.outputControl.delighteldmp, "readwrite", true);
 
                     // Sequentially read lines in DElight Electric Lighting Dump File
                     // and extract refpt illuminances for standard EPlus output handling

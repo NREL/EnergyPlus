@@ -4663,7 +4663,7 @@ namespace DaylightingManager {
                 auto & outputFiles = OutputFiles::getSingleton();
                 ////  Change to following once delightdfdmp is converted to OutputFiles
                 //    outputFiles.delightdfdmp.ensure_open(outputFiles.outputControl.delightdfdmp);
-                iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "ReadWrite");
+                iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "ReadWrite", true);
 
                 // Sequentially read lines in DElight Daylight Factors Error File
                 // and process them using standard EPlus warning/error handling calls
@@ -4718,7 +4718,7 @@ namespace DaylightingManager {
                 auto & outputFiles = OutputFiles::getSingleton();
                 ////  Change to following once delightdfdmp is converted to OutputFiles
                 //    outputFiles.delightdfdmp.ensure_open(outputFiles.outputControl.delightdfdmp);
-                iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "ReadWrite");
+                iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "ReadWrite", true);
 
                 {
                     IOFlags flags;
