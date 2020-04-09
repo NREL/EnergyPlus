@@ -61,6 +61,7 @@ list( APPEND VERSIONS 9_0_0 )
 list( APPEND VERSIONS 9_1_0 )
 list( APPEND VERSIONS 9_2_0 )
 list( APPEND VERSIONS 9_3_0 )
+list( APPEND VERSIONS 9_4_0 )
 
 if(APPLE)
   if( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
@@ -151,6 +152,7 @@ install(FILES "InputRulesFiles/Rules8-9-0-to-9-0-0.md" DESTINATION "PreProcess/I
 install(FILES "InputRulesFiles/Rules9-0-0-to-9-1-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules9-1-0-to-9-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules9-2-0-to-9-3-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules9-3-0-to-9-4-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 
 # output changes file first introduced with v8.5.0, so no older ones exist
 install(FILES "OutputRulesFiles/OutputChanges8-4-0-to-8-5-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
@@ -162,6 +164,7 @@ install(FILES "OutputRulesFiles/OutputChanges8-9-0-to-9-0-0.md" DESTINATION "Pre
 install(FILES "OutputRulesFiles/OutputChanges9-0-0-to-9-1-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges9-1-0-to-9-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges9-2-0-to-9-3-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "OutputRulesFiles/OutputChanges9-3-0-to-9-4-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 
 install(FILES "SupportFiles/Report Variables 7-2-0-006 to 8-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 8-0-0-007 to 8-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
@@ -177,3 +180,4 @@ install(FILES "SupportFiles/Report Variables 8-9-0 to 9-0-0.csv" DESTINATION "Pr
 install(FILES "SupportFiles/Report Variables 9-0-0 to 9-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 9-1-0 to 9-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 9-2-0 to 9-3-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 9-3-0 to 9-4-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
