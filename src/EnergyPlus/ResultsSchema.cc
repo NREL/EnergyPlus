@@ -1217,28 +1217,6 @@ namespace ResultsFramework {
         }
 
         auto const & rows = data.at("Rows");
-        for (auto it = rows.rbegin(); it != rows.rend(); ++it) {
-            for (auto& el : it->items()) {
-                auto found_key = outputs.find(el.key());
-                if (found_key == outputs.end()) {
-                    std::vector<std::string> output(outputVariables.size());
-                    int i = 0;
-                    for (auto const & col : el.value()) {
-                        dtoa(col.get<double>(), s);
-                        output[indices[i]] = s;
-                        ++i;
-                    }
-                    outputs[el.key()] = output;
-                } else {
-                    int i = 0;
-                    for (auto const & col : el.value()) {
-                        dtoa(col.get<double>(), s);
-                        found_key->second[indices[i]] = s;
-                        ++i;
-                    }
-                }
-            }
-        }
         for (auto const & row : rows) {
             for (auto& el : row.items()) {
                 auto found_key = outputs.find(el.key());
@@ -1246,16 +1224,24 @@ namespace ResultsFramework {
                     std::vector<std::string> output(outputVariables.size());
                     int i = 0;
                     for (auto const & col : el.value()) {
-                        dtoa(col.get<double>(), s);
-                        output[indices[i]] = s;
+                        if (col.is_null()) {
+                            output[indices[i]] = "";
+                        } else {
+                            dtoa(col.get<double>(), s);
+                            output[indices[i]] = s;
+                        }
                         ++i;
                     }
                     outputs[el.key()] = output;
                 } else {
                     int i = 0;
                     for (auto const & col : el.value()) {
-                        dtoa(col.get<double>(), s);
-                        found_key->second[indices[i]] = s;
+                        if (col.is_null()) {
+                            found_key->second[indices[i]] = "";
+                        } else {
+                            dtoa(col.get<double>(), s);
+                            found_key->second[indices[i]] = s;
+                        }
                         ++i;
                     }
                 }
