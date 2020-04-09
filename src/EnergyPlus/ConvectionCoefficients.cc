@@ -2135,8 +2135,13 @@ namespace ConvectionCoefficients {
                 };
 
             for (int i = 2; i < NumAlphas-1; i+=2){
-                //                                                  InsideFaceAdaptiveConvectionAlgoParam,         equationName,  curveName,       sourceFieldName,     curveFieldName,        moduleName
-                ErrorsFound = SetAdaptiveConvectionAlgoCoefficient( AdaptiveConvectionAlgoDefaults[(i/2)-1].first, cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1), cAlphaArgs(1) );
+                std::string eqname = cAlphaArgs(i);
+                std::string curvename = cAlphaArgs(i+1);
+                std::string sourcefield = cAlphaFieldNames(i);
+                std::string curvefield = cAlphaFieldNames(i+1);
+                std::string modulename = cAlphaArgs(1);
+
+                ErrorsFound = SetAdaptiveConvectionAlgoCoefficient( AdaptiveConvectionAlgoDefaults[(i/2)-1].first, cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1));
             }
 
             int implicit_defaults = 91 - NumAlphas;
