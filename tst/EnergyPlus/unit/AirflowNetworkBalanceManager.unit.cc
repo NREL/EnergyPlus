@@ -9420,8 +9420,6 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
 
-        "  Output:DebuggingData,0,0;",
-
         "  ZoneCapacitanceMultiplier:ResearchSpecial,",
         "    Multiplier,              !- Name",
         "    ,                        !- Zone or ZoneList Name",
@@ -13472,8 +13470,6 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
-        "  Output:DebuggingData,0,0;",
 
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",

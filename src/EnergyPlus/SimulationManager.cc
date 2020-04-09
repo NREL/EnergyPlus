@@ -763,7 +763,6 @@ namespace SimulationManager {
         int Num;
         int Which;
         bool ErrorsFound;
-        int Num1;
         int NumA;
         int NumRunControl;
         static std::string VersionID;
@@ -1042,20 +1041,26 @@ namespace SimulationManager {
         EvenDuringWarmup = false;
         CurrentModuleObject = "Output:DebuggingData";
         NumDebugOut = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (NumDebugOut > 1) {
+            ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+        }
         if (NumDebugOut > 0) {
             inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
-            if (int(Number(1)) == 1) {
-                DebugOutput = true;
+            if (NumAlpha >= 1) {
+                DebugOutput = UtilityRoutines::SameString(Alphas(1), "Yes");
             }
-            if (int(Number(2)) == 1) {
-                EvenDuringWarmup = true;
+            if (NumAlpha >= 2) {
+                EvenDuringWarmup = UtilityRoutines::SameString(Alphas(2), "Yes");
             }
         }
 
         CurrentModuleObject = "Output:Diagnostics";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        for (Num1 = 1; Num1 <= Num; ++Num1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat);
+        if (Num > 1) {
+            ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+        }
+        if (Num > 0) {
+            inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
             for (NumA = 1; NumA <= NumAlpha; ++NumA) {
                 if (UtilityRoutines::SameString(Alphas(NumA), "DisplayExtraWarnings")) {
                     DisplayExtraWarnings = true;

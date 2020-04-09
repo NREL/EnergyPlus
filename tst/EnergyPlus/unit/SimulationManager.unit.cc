@@ -51,6 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -157,5 +158,85 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
 
     // clean up the file
     std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+
+}
+
+TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
+{
+    {
+        std::string const idf_objects = delimited_string({
+            "  Output:DebuggingData,",
+            "    No;                      !- Report Debugging Data",
+        });
+
+        EXPECT_TRUE(process_idf(idf_objects));
+
+        SimulationManager::GetProjectData(outputFiles());
+        EXPECT_FALSE(DataReportingFlags::DebugOutput);
+        EXPECT_FALSE(DataReportingFlags::EvenDuringWarmup);
+
+        // no error message from
+        EXPECT_TRUE(compare_err_stream("", true));
+    }
+
+    {
+        std::string const idf_objects = delimited_string({
+            "  Output:DebuggingData,",
+            "    Yes,                     !- Report Debugging Data",
+            "    ;                        !- Report During Warmup",
+        });
+
+        EXPECT_TRUE(process_idf(idf_objects));
+
+        SimulationManager::GetProjectData(outputFiles());
+        EXPECT_TRUE(DataReportingFlags::DebugOutput);
+        EXPECT_FALSE(DataReportingFlags::EvenDuringWarmup);
+
+        // no error message from
+        EXPECT_TRUE(compare_err_stream("", true));
+    }
+
+    {
+        std::string const idf_objects = delimited_string({
+            "  Output:DebuggingData,",
+            "    No,                      !- Report Debugging Data",
+            "    Yes;                     !- Report During Warmup",
+        });
+
+        EXPECT_TRUE(process_idf(idf_objects));
+
+        SimulationManager::GetProjectData(outputFiles());
+        EXPECT_FALSE(DataReportingFlags::DebugOutput);
+        EXPECT_TRUE(DataReportingFlags::EvenDuringWarmup);
+
+        // no error message from
+        EXPECT_TRUE(compare_err_stream("", true));
+    }
+
+    // Unicity warning
+    {
+        std::string const idf_objects = delimited_string({
+            "  Output:DebuggingData,",
+            "    No,                      !- Report Debugging Data",
+            "    Yes;                     !- Report During Warmup",
+
+            "  Output:DebuggingData,",
+            "    Yes,                      !- Report Debugging Data",
+            "    No;                     !- Report During Warmup",
+        });
+
+        // Input processor with throw a severe, so do not use assertions
+        EXPECT_FALSE(process_idf(idf_objects, false));
+        // Instead do it here, making sure to reset the stream
+        EXPECT_TRUE(compare_err_stream("   ** Severe  ** <root>[Output:DebuggingData] - Object should have no more than 1 properties.\n", true));
+
+        SimulationManager::GetProjectData(outputFiles());
+        EXPECT_FALSE(DataReportingFlags::DebugOutput);
+        EXPECT_TRUE(DataReportingFlags::EvenDuringWarmup);
+
+        // no error message from
+        EXPECT_TRUE(compare_err_stream("   ** Warning ** Output:DebuggingData: More than 1 occurrence of this object found, only first will be used.\n", true));
+    }
+
 
 }
