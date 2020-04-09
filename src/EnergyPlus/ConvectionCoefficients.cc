@@ -49,9 +49,9 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <limits>
 #include <string>
 #include <utility>
+#include <unordered_map>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -246,6 +246,38 @@ namespace ConvectionCoefficients {
     Array1D<HcInsideFaceUserCurveStruct> HcInsideUserCurve;
     Array1D<HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
     RoofGeoCharactisticsStruct RoofGeo;
+
+    std::unordered_map<std::string, int> ConvectionTypesMap = {
+        {"USERCURVE", HcInt_UserCurve},
+        {"ASHRAEVERTICALWALL", HcInt_ASHRAEVerticalWall},
+        {"WALTONUNSTABLEHORIZONTALORTILT", HcInt_WaltonUnstableHorizontalOrTilt},
+        {"WALTONSTABLEHORIZONTALORTILT", HcInt_WaltonStableHorizontalOrTilt},
+        {"FISHERPEDERSENCEILINGDIFFUSERWALLS", HcInt_FisherPedersenCeilDiffuserWalls},
+        {"FISHERPEDERSENCEILINGDIFFUSERCEILING", HcInt_FisherPedersenCeilDiffuserCeiling},
+        {"FISHERPEDERSENCEILINGDIFFUSERFLOOR", HcInt_FisherPedersenCeilDiffuserFloor},
+        {"ALAMDARIHAMMONDSTABLEHORIZONTAL", HcInt_AlamdariHammondStableHorizontal},
+        {"ALAMDARIHAMMONDUNSTABLEHORIZONTAL", HcInt_AlamdariHammondUnstableHorizontal},
+        {"ALAMDARIHAMMONDVERTICALWALL", HcInt_AlamdariHammondVerticalWall},
+        {"KHALIFAEQ3WALLAWAYFROMHEAT", HcInt_KhalifaEq3WallAwayFromHeat},
+        {"KHALIFAEQ4CEILINGAWAYFROMHEAT", HcInt_KhalifaEq4CeilingAwayFromHeat},
+        {"KHALIFAEQ5WALLNEARHEAT", HcInt_KhalifaEq5WallNearHeat},
+        {"KHALIFAEQ6NONHEATEDWALLS", HcInt_KhalifaEq6NonHeatedWalls},
+        {"KHALIFAEQ7CEILING", HcInt_KhalifaEq7Ceiling},
+        {"AWBIHATTONHEATEDFLOOR", HcInt_AwbiHattonHeatedFloor},
+        {"AWBIHATTONHEATEDWALL", HcInt_AwbiHattonHeatedWall},
+        {"BEAUSOLEILMORRISONMIXEDASSISTEDWALL", HcInt_BeausoleilMorrisonMixedAssistingWall},
+        {"BEAUSOLEILMORRISONMIXEDOPPOSINGWALL", HcInt_BeausoleilMorrisonMixedOppossingWall},
+        {"BEAUSOLEILMORRISONMIXEDSTABLEFLOOR", HcInt_BeausoleilMorrisonMixedStableFloor},
+        {"BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR", HcInt_BeausoleilMorrisonMixedUnstableFloor},
+        {"BEAUSOLEILMORRISONMIXEDSTABLECEILING", HcInt_BeausoleilMorrisonMixedStableCeiling},
+        {"BEAUSOLEILMORRISONMIXEDUNSTABLECEILING", HcInt_BeausoleilMorrisonMixedUnstableCeiling},
+        {"FOHANNOPOLIDORIVERTICALWALL", HcInt_FohannoPolidoriVerticalWall},
+        {"KARADAGCHILLEDCEILING", HcInt_KaradagChilledCeiling},
+        {"ISO15099WINDOWS", HcInt_ISO15099Windows},
+        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW", HcInt_GoldsteinNovoselacCeilingDiffuserWindow},
+        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS", HcInt_GoldsteinNovoselacCeilingDiffuserWalls},
+        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR",HcInt_GoldsteinNovoselacCeilingDiffuserFloor},
+     };
 
     void clear_state()
     {
@@ -861,98 +893,30 @@ namespace ConvectionCoefficients {
         return AgainstWind;
     }
 
-    bool SetAdaptiveConvectionAlgoCoefficient(int* InsideFaceAdaptiveConvectionAlgoParam, std::string equationName, std::string curveName, std::string sourceFieldName, std::string curveFieldName, std::string moduleName){
+    bool SetAdaptiveConvectionAlgoCoefficient(int* InsideFaceAdaptiveConvectionAlgoParam, std::string equationName, std::string curveName, std::string sourceFieldName, std::string curveFieldName){
 
         static std::string const RoutineName("GetUserConvectionCoefficients");
         static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
         int const NumValidIntConvectionValueTypes(34);
-        static Array1D_string const ValidIntConvectionValueTypes(29,
-                                                                 {
-                                                                  "USERCURVE",
-                                                                  "ASHRAEVERTICALWALL",
-                                                                  "WALTONUNSTABLEHORIZONTALORTILT",
-                                                                  "WALTONSTABLEHORIZONTALORTILT",
-                                                                  "FISHERPEDERSENCEILINGDIFFUSERWALLS",
-                                                                  "FISHERPEDERSENCEILINGDIFFUSERCEILING",
-                                                                  "FISHERPEDERSENCEILINGDIFFUSERFLOOR",
-                                                                  "ALAMDARIHAMMONDSTABLEHORIZONTAL",
-                                                                  "ALAMDARIHAMMONDUNSTABLEHORIZONTAL",
-                                                                  "ALAMDARIHAMMONDVERTICALWALL",
-                                                                  "KHALIFAEQ3WALLAWAYFROMHEAT",
-                                                                  "KHALIFAEQ4CEILINGAWAYFROMHEAT",
-                                                                  "KHALIFAEQ5WALLNEARHEAT",
-                                                                  "KHALIFAEQ6NONHEATEDWALLS",
-                                                                  "KHALIFAEQ7CEILING",
-                                                                  "AWBIHATTONHEATEDFLOOR",
-                                                                  "AWBIHATTONHEATEDWALL",
-                                                                  "BEAUSOLEILMORRISONMIXEDASSISTEDWALL",
-                                                                  "BEAUSOLEILMORRISONMIXEDOPPOSINGWALL",
-                                                                  "BEAUSOLEILMORRISONMIXEDSTABLEFLOOR",
-                                                                  "BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR",
-                                                                  "BEAUSOLEILMORRISONMIXEDSTABLECEILING",
-                                                                  "BEAUSOLEILMORRISONMIXEDUNSTABLECEILING",
-                                                                  "FOHANNOPOLIDORIVERTICALWALL",
-                                                                  "KARADAGCHILLEDCEILING",
-                                                                  "ISO15099WINDOWS",
-                                                                  "GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW",
-                                                                  "GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS",
-                                                                  "GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR"});
-        static Array1D_int const IntConvectionValue(34,
-                                                    {-999,
-                                                     -999,
-                                                     ASHRAESimple,
-                                                     ASHRAETARP,
-                                                     AdaptiveConvectionAlgorithm,
-                                                     HcInt_UserCurve,
-                                                     HcInt_ASHRAEVerticalWall,
-                                                     HcInt_WaltonUnstableHorizontalOrTilt,
-                                                     HcInt_WaltonStableHorizontalOrTilt,
-                                                     HcInt_FisherPedersenCeilDiffuserWalls,
-                                                     HcInt_FisherPedersenCeilDiffuserCeiling,
-                                                     HcInt_FisherPedersenCeilDiffuserFloor,
-                                                     HcInt_AlamdariHammondStableHorizontal,
-                                                     HcInt_AlamdariHammondUnstableHorizontal,
-                                                     HcInt_AlamdariHammondVerticalWall,
-                                                     HcInt_KhalifaEq3WallAwayFromHeat,
-                                                     HcInt_KhalifaEq4CeilingAwayFromHeat,
-                                                     HcInt_KhalifaEq5WallNearHeat,
-                                                     HcInt_KhalifaEq6NonHeatedWalls,
-                                                     HcInt_KhalifaEq7Ceiling,
-                                                     HcInt_AwbiHattonHeatedFloor,
-                                                     HcInt_AwbiHattonHeatedWall,
-                                                     HcInt_BeausoleilMorrisonMixedAssistingWall,
-                                                     HcInt_BeausoleilMorrisonMixedOppossingWall,
-                                                     HcInt_BeausoleilMorrisonMixedStableFloor,
-                                                     HcInt_BeausoleilMorrisonMixedUnstableFloor,
-                                                     HcInt_BeausoleilMorrisonMixedStableCeiling,
-                                                     HcInt_BeausoleilMorrisonMixedUnstableCeiling,
-                                                     HcInt_FohannoPolidoriVerticalWall,
-                                                     HcInt_KaradagChilledCeiling,
-                                                     HcInt_ISO15099Windows,
-                                                     HcInt_GoldsteinNovoselacCeilingDiffuserWindow,
-                                                     HcInt_GoldsteinNovoselacCeilingDiffuserWalls,
-                                                     HcInt_GoldsteinNovoselacCeilingDiffuserFloor});
-
         bool ErrorsFound = false;
-        bool IsValidType = false;
-        for (int i = 1; i <= NumValidIntConvectionValueTypes; ++i) {
-            // Can we use a find here instead of looping through
-            if (equationName == ValidIntConvectionValueTypes(i)) {
-                IsValidType = true;
-                *InsideFaceAdaptiveConvectionAlgoParam = IntConvectionValue(i);
-                if (*InsideFaceAdaptiveConvectionAlgoParam == HcInt_UserCurve) {
-                    *InsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, HcInsideUserCurve);
-                    if (*InsideFaceAdaptiveConvectionAlgoParam == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + moduleName + ", invalid value");
-                        ShowContinueError("Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
-                        ErrorsFound = true;
-                    }
+        bool IsValidType = true;
+
+        if (ConvectionTypesMap.find(equationName) == ConvectionTypesMap.end()){
+            IsValidType = false;
+        }
+        else {
+            *InsideFaceAdaptiveConvectionAlgoParam = ConvectionTypesMap[equationName];
+            if (ConvectionTypesMap[equationName] == HcInt_UserCurve) {
+                *InsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, HcInsideUserCurve);
+                if (*InsideFaceAdaptiveConvectionAlgoParam == 0) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
+                    ShowContinueError("Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
+                    ErrorsFound = true;
                 }
-                break; // found it
             }
         }
         if (!IsValidType) {
-            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + moduleName + ", invalid value");
+            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
             ShowContinueError("Invalid Key choice Entered, for " + sourceFieldName + '=' + equationName);
             ErrorsFound = true;
         }
