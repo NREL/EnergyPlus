@@ -318,7 +318,7 @@ namespace SystemReports {
                              int &MatchComp               // Component number of the match
     );
 
-    void ReportAirLoopConnections();
+    void ReportAirLoopConnections(OutputFiles &outputFiles);
 
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************

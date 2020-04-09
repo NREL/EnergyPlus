@@ -1416,7 +1416,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_SupplyAirTempLessThanZoneTStatTest
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(OutputFiles::getSingleton());
+    SimulationManager::ManageSimulation(outputFiles());
 
     int CtrlZoneNum(1);
     // design peak load conditons and design supply air temperature

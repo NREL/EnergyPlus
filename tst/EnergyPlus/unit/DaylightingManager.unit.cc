@@ -372,7 +372,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
     GetZoneData(foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    GetInputIlluminanceMap(OutputFiles::getSingleton(), foundErrors);
+    GetInputIlluminanceMap(outputFiles(), foundErrors);
     // compare_err_stream(""); // expecting errors because zone is not really defined
 
     EXPECT_EQ(1, TotIllumMaps);
@@ -799,10 +799,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
 
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(outputFiles(), foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(outputFiles(), foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(foundErrors); // read construction data
@@ -822,16 +822,16 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(outputFiles(), foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), foundErrors); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(outputFiles(), foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
-    HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
+    HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles());
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(outputFiles());
     ScheduleManager::ScheduleInputProcessed = true;
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
@@ -844,7 +844,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
-    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
+    InternalHeatGains::GetInternalHeatGainsInput(outputFiles());
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
 
     GetDaylightingParametersInput();
@@ -874,7 +874,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     DataGlobals::BeginSimFlag = true;
     DataGlobals::WeightNow = 1.0;
     DataGlobals::WeightPreviousHour = 0.0;
-    CalcDayltgCoefficients(OutputFiles::getSingleton());
+    CalcDayltgCoefficients(outputFiles());
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
     // zone 1 has only 1 daylighting reference point
@@ -1300,7 +1300,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
     DataGlobals::NumOfTimeStepInHour = 1;
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(outputFiles());
     ScheduleManager::ScheduleInputProcessed = true;
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 10;
@@ -1312,10 +1312,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     DataEnvironment::HolidayIndex = 0;
 
     bool foundErrors = false;
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(outputFiles(), foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(outputFiles(), foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(foundErrors); // read construction data
@@ -1325,12 +1325,12 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     HeatBalanceManager::GetZoneData(foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), foundErrors); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(outputFiles(), foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
-    HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
+    HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles());
 
     int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone);
-    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
+    InternalHeatGains::GetInternalHeatGainsInput(outputFiles());
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
     DaylightingManager::GetInputDayliteRefPt(foundErrors);
     DaylightingManager::GetDaylightingParametersInput();

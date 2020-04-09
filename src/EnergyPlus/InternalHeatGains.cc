@@ -5264,6 +5264,7 @@ namespace InternalHeatGains {
             e.HWPower = 0.0;
             e.SteamPower = 0.0;
             e.BaseHeatPower = 0.0;
+            e.CO2Rate = 0.0;
         }
 
         //  QSA = 0.0
