@@ -181,6 +181,17 @@ namespace ResultsFramework {
         setReportFrequency(reportFrequency);
     }
 
+    Variable::Variable(const std::string &VarName,
+                       const OutputProcessor::ReportingFrequency reportFrequency,
+                       const OutputProcessor::TimeStepType timeStepType,
+                       const int ReportID,
+                       const OutputProcessor::Unit &units,
+                       const std::string &customUnits)
+            : varName(VarName), m_timeStepType(timeStepType), rptID(ReportID), Units(units), m_customUnits(customUnits)
+    {
+        setReportFrequency(reportFrequency);
+    }
+
     std::string Variable::variableName() const
     {
         return varName;
@@ -260,6 +271,16 @@ namespace ResultsFramework {
         Units = units;
     }
 
+    std::string Variable::customUnits() const
+    {
+        return m_customUnits;
+    }
+
+    void Variable::setCustomUnits(const std::string &customUnits)
+    {
+        m_customUnits = customUnits;
+    }
+
     void Variable::pushValue(const double val)
     {
         Values.push_back(val);
@@ -277,7 +298,12 @@ namespace ResultsFramework {
 
     json Variable::getJSON() const
     {
-        json root = {{"Name", varName}, {"Units", unitEnumToString(Units)}, {"Frequency", sReportFreq}};
+        json root;
+        if (m_customUnits.empty()) {
+            root = {{"Name", varName}, {"Units", unitEnumToString(Units)}, {"Frequency", sReportFreq}};
+        } else {
+            root = {{"Name", varName}, {"Units", m_customUnits}, {"Frequency", sReportFreq}};
+        }
         return root;
     }
 
@@ -288,6 +314,16 @@ namespace ResultsFramework {
                                    const int ReportID,
                                    const OutputProcessor::Unit &units)
         : Variable(VarName, reportFrequency, timeStepType, ReportID, units)
+    {
+    }
+
+    OutputVariable::OutputVariable(const std::string &VarName,
+                                   const OutputProcessor::ReportingFrequency reportFrequency,
+                                   const OutputProcessor::TimeStepType timeStepType,
+                                   const int ReportID,
+                                   const OutputProcessor::Unit &units,
+                                   const std::string &customUnits)
+            : Variable(VarName, reportFrequency, timeStepType, ReportID, units, customUnits)
     {
     }
 
@@ -440,7 +476,11 @@ namespace ResultsFramework {
         json rows = json::array();
 
         for (auto const &varMap : variableMap) {
-            cols.push_back({{"Variable", varMap.second.variableName()}, {"Units", unitEnumToString(varMap.second.units())}});
+            if (varMap.second.customUnits().empty()) {
+                cols.push_back({{"Variable", varMap.second.variableName()}, {"Units", unitEnumToString(varMap.second.units())}});
+            } else {
+                cols.push_back({{"Variable", varMap.second.variableName()}, {"Units", varMap.second.customUnits()}});
+            }
         }
 
         json vals = json::array();
@@ -824,8 +864,15 @@ namespace ResultsFramework {
                 //      reportFrequency, RVariableTypes( Loop ).IndexType,
                 //      RVariableTypes( Loop ).ReportID,
                 //      RVariableTypes( Loop ).units);
-                Variable var(RVariableTypes(Loop).VarName, reportFrequency, RVariableTypes(Loop).timeStepType, RVariableTypes(Loop).ReportID,
-                             RVariableTypes(Loop).units);
+                Variable var;
+                if (RVariableTypes(Loop).units == OutputProcessor::Unit::customEMS) {
+                    var = Variable(RVariableTypes(Loop).VarName, reportFrequency, RVariableTypes(Loop).timeStepType,
+                                   RVariableTypes(Loop).ReportID, RVariableTypes(Loop).units,
+                                   RVariableTypes(Loop).unitNameCustomEMS);
+                } else {
+                    var = Variable(RVariableTypes(Loop).VarName, reportFrequency, RVariableTypes(Loop).timeStepType,
+                                   RVariableTypes(Loop).ReportID, RVariableTypes(Loop).units);
+                }
                 switch (reportFrequency) {
                 case OutputProcessor::ReportingFrequency::EachCall: // each time UpdatedataandReport is called
                     if ((timeStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
@@ -912,8 +959,8 @@ namespace ResultsFramework {
                 //          IVariableTypes( Loop ).IndexType,
                 //          IVariableTypes( Loop ).ReportID,
                 //          IVariableTypes( Loop ).units);
-                OutputVariable var(IVariableTypes(Loop).VarName, reportFrequency, IVariableTypes(Loop).timeStepType, IVariableTypes(Loop).ReportID,
-                                   IVariableTypes(Loop).units);
+                OutputVariable var(IVariableTypes(Loop).VarName, reportFrequency, IVariableTypes(Loop).timeStepType,
+                                   IVariableTypes(Loop).ReportID, IVariableTypes(Loop).units);
                 switch (reportFrequency) {
                 case OutputProcessor::ReportingFrequency::EachCall: // each time UpdatedataandReport is called
                     if ((timeStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
@@ -1158,6 +1205,10 @@ namespace ResultsFramework {
         for (auto const & column : columns) {
             search_string = fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), reportFrequency);
             auto found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
+            if (found == outputVariables.end()) {
+                search_string = fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), "Each Call");
+                found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
+            }
             if (found == outputVariables.end()) {
                 ShowFatalError(fmt::format("Output variable ({0}) not found output variable list", search_string));
             }

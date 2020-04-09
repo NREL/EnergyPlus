@@ -114,6 +114,12 @@ namespace ResultsFramework {
                  const OutputProcessor::TimeStepType timeStepType,
                  const int ReportID,
                  const OutputProcessor::Unit &units);
+        Variable(const std::string &VarName,
+                 const OutputProcessor::ReportingFrequency reportFrequency,
+                 const OutputProcessor::TimeStepType timeStepType,
+                 const int ReportID,
+                 const OutputProcessor::Unit &units,
+                 const std::string &customUnits);
 
         std::string variableName() const;
         void setVariableName(const std::string &VarName);
@@ -131,6 +137,9 @@ namespace ResultsFramework {
         OutputProcessor::Unit units() const;
         void setUnits(const OutputProcessor::Unit &units);
 
+        std::string customUnits() const;
+        void setCustomUnits(const std::string &customUnits);
+
         void pushValue(const double val);
         double value(size_t index) const;
         size_t numValues() const;
@@ -144,6 +153,7 @@ namespace ResultsFramework {
         OutputProcessor::TimeStepType m_timeStepType = OutputProcessor::TimeStepType::TimeStepZone;
         int rptID = -1;
         OutputProcessor::Unit Units;
+        std::string m_customUnits;
         std::vector<double> Values;
     };
 
@@ -155,6 +165,13 @@ namespace ResultsFramework {
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
                        const OutputProcessor::Unit &units);
+
+        OutputVariable(const std::string &VarName,
+                       const OutputProcessor::ReportingFrequency reportFrequency,
+                       const OutputProcessor::TimeStepType timeStepType,
+                       const int ReportID,
+                       const OutputProcessor::Unit &units,
+                       const std::string &customUnits);
     };
 
     class MeterVariable : public Variable
