@@ -522,10 +522,10 @@ namespace DataGlobalConstants {
                 ResourceTypeChar = "Coal";
 
             } else if (SELECT_CASE_var == iRT_FuelOil_1) {
-                ResourceTypeChar = "FuelOil#1";
+                ResourceTypeChar = "FuelOilNo1";
 
             } else if (SELECT_CASE_var == iRT_FuelOil_2) {
-                ResourceTypeChar = "FuelOil#2";
+                ResourceTypeChar = "FuelOilNo2";
 
             } else if (SELECT_CASE_var == iRT_Propane) {
                 ResourceTypeChar = "Propane";
