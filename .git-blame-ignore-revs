@@ -6,8 +6,10 @@
 # * Here's an example of a way to grep the commit history to find commits to exclude:
 # ```
 # git log --all --reverse --grep='copyright' --grep='license' --grep='\[chore\]' --shortstat --pretty='format:# %C(auto)%s [%an, %as]%n%H%n' >> .git-blame-ignore-revs
+# Add commits from the style bot
+# git log --all --reverse --shortstat --pretty='format:# %C(auto)%s [%an, %as]%n%H%n' --author='energyplus-style-bot' >> .git-blame-ignore-revs
 # ```
-# You can add `--shortstat` to it to see the number of files changes.
+# You can add `--shortstat` to it to see the number of files changes, then do a replace `:%s/\n \(files\? changed.*\)/#    \1/g`
 
 # Note: On older git (like 2.17 which is default in 18.04, without `sudo add-apt-repository ppa:git-core/ppa`),
 # '%as' (date in YYYY-MM-DD)  doesn't work, use '%ai' instead
@@ -197,3 +199,251 @@ d3608dbbdce2ee659e9a6d55f4683d2f8d7b05b0
 #    15 files changed, 15 insertions(+), 15 deletions(-)
 
 
+
+#######################################################################
+#                         S T Y L E    B O T                          #
+#######################################################################
+
+# Merge remote-tracking branch 'origin/Update_Style_Guides' into develop [energyplus-style-bot, 2018-03-23]
+9768414a04e06361a0c0afedcb0a8b89e5a12b10
+
+# Apply formatting with clang-format [energyplus-style-bot, 2018-03-23]
+61b09a18629a347273e5d099c3f2e3acbcbc0da4
+#    611 files changed, 737797 insertions(+), 730009 deletions(-)
+
+# Merge branch 'develop' into WindowShadingControlOrder [energyplus-style-bot, 2018-03-23]
+e7bde3f3b1aedf79a169b5bd8239b6d11c2e1fa9
+
+# Apply clang-format changes [energyplus-style-bot, 2018-03-23]
+25c9b9964000546f130ef9e784ecdad90d20a99d
+#    13 files changed, 12328 insertions(+), 12322 deletions(-)
+
+# Merge branch 'develop' into Allow-Multiple-AirLoops-in-Airflow-Netwrok-Model [energyplus-style-bot, 2018-03-23]
+406db543703fbc676578d74e9af3a6e6016543c0
+
+# Apply clang-format changes [energyplus-style-bot, 2018-03-23]
+372e53cc17c4c513b690213c544023e7506505ae
+#    11 files changed, 34 insertions(+), 26 deletions(-)
+
+# Merge branch 'develop' into add-curve-unit-tests [energyplus-style-bot, 2018-03-23]
+e38419765fa0b65c09a4bbdd26e754b73968464b
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+2a827f6a0286b1fb1a83f16aca1edca8f4f9be1f
+#    12 files changed, 5835 insertions(+), 5827 deletions(-)
+
+# Merge branch 'develop' into FixNaNrelatedTo5160 [energyplus-style-bot, 2018-03-23]
+e9f22eb430f0e731f3da536d29503074336bf43e
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+f13b519cd97564e68afaec495594c1da2bd7ea75
+#    14 files changed, 10936 insertions(+), 10927 deletions(-)
+
+# Merge branch 'develop' into ashrae-205-parser [energyplus-style-bot, 2018-03-23]
+cb1c74eb36ead83f9fe8a67573348b6c16b1aaa3
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+7ce042fc6359d754c3b7f2d5e3b32cac70942419
+#    11 files changed, 34 insertions(+), 26 deletions(-)
+
+# Merge branch 'develop' into 148617889-LowTempRadiantAutoSizeSpacingIssue [energyplus-style-bot, 2018-03-23]
+dd8085385b7b90d28cbb9772e41501e4eb7f3839
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+aa9c4535c458425cff760f84604e72e1955a8ba3
+#    11 files changed, 32 insertions(+), 26 deletions(-)
+
+# Merge branch 'develop' into 131165083-RadConv-HWBaseboard-Covergence-Issue [energyplus-style-bot, 2018-03-23]
+f3eb3446435be647dbf745694a45dfda233e112f
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+116602b6acb2b844499ec4a4219f8141ea80c34b
+#    13 files changed, 3002 insertions(+), 2995 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into #2520943-WindowsCalc-Engine_Integration [energyplus-style-bot, 2018-03-23]
+2c358bb9ec10af3899669820c1e8aabb24a6d644
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into #2520943-WindowsCalc-Engine_Integration [energyplus-style-bot, 2018-03-23]
+0e47396ec2137be5667ea30bf9fcd219234d4c86
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+c3201778426e3f7efaa1f97fbac2393ae22b45df
+#    28 files changed, 50148 insertions(+), 50289 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into expanded-runperiod [energyplus-style-bot, 2018-03-23]
+fd9d360cb62673f44f1eb92d0c4f3d2be22e85ed
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into expanded-runperiod [energyplus-style-bot, 2018-03-23]
+29b65013d951752b08a6d0efe661d229a48ff783
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+ada781c42c5ed8af42ba87b3f109b4b7b6763a9b
+#    14 files changed, 10157 insertions(+), 10124 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into output_processor_json [energyplus-style-bot, 2018-03-23]
+6e2bcc09222c263be34342dd81f71acdcafaf124
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into output_processor_json [energyplus-style-bot, 2018-03-23]
+9621230586193ff3ba3f811fba18bec56cc62119
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+585b7d08bdc5ad79ac61b76c1d5617d76e0267fb
+#    26 files changed, 35528 insertions(+), 35386 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into afn-alternate [energyplus-style-bot, 2018-03-23]
+6f28370b792c8bae47f812233d0a2f646c15c6a1
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into afn-alternate [energyplus-style-bot, 2018-03-23]
+eb12ff75ab3d76c22ee4cae0896a06eb2a75c26f
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+8cf2baa22f0b0348067fd0b0505944044d2412c6
+#    19 files changed, 20559 insertions(+), 20577 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into afexxx-refactor [energyplus-style-bot, 2018-03-23]
+3dd450cf357bcb4ff51067e89e783164dc73b95b
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into afexxx-refactor [energyplus-style-bot, 2018-03-23]
+b2ba52852db98b28034b36d09f36f513539740e1
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+8fda060227b37e94ade907a71c5b21aade1c7191
+#    19 files changed, 20615 insertions(+), 20634 deletions(-)
+
+# Merge commit '9768414a04e06361a0c0afedcb0a8b89e5a12b10' into error-enhancement-prep [energyplus-style-bot, 2018-03-23]
+917d529335431f16a7780f57ad08ab695b5fea91
+
+# Merge commit '61b09a18629a347273e5d099c3f2e3acbcbc0da4' into error-enhancement-prep [energyplus-style-bot, 2018-03-23]
+9e89b2b17b383e061d05bc928cae933aa122e36b
+
+# apply clang-format [energyplus-style-bot, 2018-03-23]
+c10dfe6f644e89542bbca332ed79528c5ba99ebe
+#    29 files changed, 74203 insertions(+), 74210 deletions(-)
+
+# Fix header includes found by reordering [energyplus-style-bot, 2018-03-24]
+73eb0356ba28c869b7fa2bdc5a79128013921b57
+#    2 files changed, 2 insertions(+)
+
+# Merge branch 'develop' into add-curve-unit-tests [energyplus-style-bot, 2018-03-24]
+d01b3f26edf0896307205467b4d13d4e9dfdb569
+
+# Merge branch 'develop' into 131165083-RadConv-HWBaseboard-Covergence-Issue [energyplus-style-bot, 2018-03-24]
+10705e3c26abe74516125bc9f2b88e4f5a1ec678
+
+# Apply formatting to tst folder [energyplus-style-bot, 2018-03-24]
+b6f573e2e9a42174cad2383d458fefad5b62a211
+#    195 files changed, 153500 insertions(+), 154872 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into 131165083-RadConv-HWBaseboard-Covergence-Issue [energyplus-style-bot, 2018-03-24]
+82d2f09b9c801b039672502f22d6a01ee91f3c0a
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+f300a45acc6087832e810ee6ae792e5dd2c66b32
+#    8 files changed, 147 insertions(+), 144 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into 148617889-LowTempRadiantAutoSizeSpacingIssue [energyplus-style-bot, 2018-03-24]
+a9bf4248ee65c2bc10b916b593c5bfcdc133e6bc
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+5f87c2a7298a8c73a34e2aa8b6fbc18ac0b3f4e7
+#    7 files changed, 13 insertions(+), 11 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into #2520943-WindowsCalc-Engine_Integration [energyplus-style-bot, 2018-03-24]
+c96f3fffe12efefa598499f315970ed7ec420c60
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+dcdc7f850b0aef060f4af9c10851d490290c9485
+#    3 files changed, 5 insertions(+), 4 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into WindowShadingControlOrder [energyplus-style-bot, 2018-03-24]
+d5515b17f664094e0e804df55675a0e622582462
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+baa6dc90377670d62dd1ad4f2ebd38ae3cc5d1ca
+#    16 files changed, 40147 insertions(+), 40758 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into expanded-runperiod [energyplus-style-bot, 2018-03-24]
+3b8bb8af97402de714a75fd96a81199da3b04f4a
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+6cfc50cceb98ed90fc191d1ff90818d07bef559a
+#    20 files changed, 33216 insertions(+), 33218 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into output_processor_json [energyplus-style-bot, 2018-03-24]
+e4fc6dc3d1562af93050d968dabbb6fda51db93b
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+a0d58eea1507aaf170e4348648d4c0e6d0b1d883
+#    7 files changed, 1971 insertions(+), 1964 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into Allow-Multiple-AirLoops-in-Airflow-Netwrok-Model [energyplus-style-bot, 2018-03-24]
+1cf06ff53068cf2500e06750ebce3ecd3643f47b
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+75f68b8b06d2caceeaf20ff2c2ef40e9b10a9d79
+#    3 files changed, 5 insertions(+), 4 deletions(-)
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+9c03907f73939a7de1cd24876b9d1700a0444705
+#    1 file changed, 1 insertion(+), 1 deletion(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into add-curve-unit-tests [energyplus-style-bot, 2018-03-24]
+5f13f4ca8f2976b00168af8ee38adb2b51942e7c
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+ef636cf4a4c9acc94f0b2ed2cae0b74f8178affb
+#    5 files changed, 5968 insertions(+), 6018 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into FixNaNrelatedTo5160 [energyplus-style-bot, 2018-03-24]
+7865e60cd3c5bbbc22a5722df4d14b795057d337
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+2149d26bf86d4950e407a0e76d110cdb0d8b78b6
+#    3 files changed, 5 insertions(+), 4 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into afn-alternate [energyplus-style-bot, 2018-03-24]
+0918eb01a44065bb22b678856ebb5d9fbb8d1306
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+901eee19621a1c587e690cbbb63f7dbd39ff1740
+#    6 files changed, 7350 insertions(+), 7350 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into ashrae-205-parser [energyplus-style-bot, 2018-03-24]
+3cb67575699ab5c2e6e8a0643b95aded2c71544d
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+1182b42efeddd6b659f03d9400d8863e2c25f161
+#    3 files changed, 5 insertions(+), 4 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into afexxx-refactor [energyplus-style-bot, 2018-03-24]
+8340edbc06a09d40c36fb8450a121f26e549eaa3
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+2bc7931e8089fe28f91a7a8ace27345886e482dd
+#    10 files changed, 7358 insertions(+), 7357 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into error-enhancement-prep [energyplus-style-bot, 2018-03-24]
+c7e7f429b39ab4fecd82b58087a9ef498aa9138c
+
+# apply clang-tidy [energyplus-style-bot, 2018-03-24]
+22d320cd8b16e6b08448ef30050541f9ebc59349
+#    9 files changed, 998 insertions(+), 996 deletions(-)
+
+# Merge commit 'b6f573e2e9a42174cad2383d458fefad5b62a211' into table-refactor [energyplus-style-bot, 2018-03-24]
+9db591eae5e02e1e5185c2149b5bfb7eca09f6de
+
+# Fix rearranged using declaration [energyplus-style-bot, 2018-03-26]
+3a59bb16001afefa5bd357311d412232060c5441
+#    1 file changed, 12 insertions(+), 1 deletion(-)
+
+# Fix rearranged using declarations [energyplus-style-bot, 2018-03-26]
+deb313430ea9b1cc2c0bb679c376689db32eeb17
+#    1 file changed, 13 insertions(+), 1 deletion(-)
+
+# Fix issue from reformatting with DataSurfaces [energyplus-style-bot, 2018-03-26]
+1666a15639ac8634184a4a6bd6d2ab9d09b9c45c
+#    1 file changed, 2 insertions(+)
+
+# Specify BinPackArguments: false [energyplus-style-bot, 2018-03-26]
+c8f9fbba47a5425fbb4220285f70d0017f6f65b4
+#    2 files changed, 2 insertions(+)
