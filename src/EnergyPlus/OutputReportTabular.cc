@@ -6552,19 +6552,62 @@ namespace OutputReportTabular {
         // outside air ventilation
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
+
+                // air loop name
+                std::string airLoopName = "";
+                int ctrlZoneNum = DataHeatBalance::Zone(iZone).ZoneEqNum;
+                if (ctrlZoneNum > 0) {
+                    for (int zoneInNode = 1; zoneInNode <= DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
+                        int airLoopNumber = DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
+                        if (airLoopName.empty()) {
+                            airLoopName = DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
+                        }
+                        else {
+                            airLoopName += "; " + DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
+                        }
+                    }
+                }
+                PreDefTableEntry(pdchOaMvAirLpNm, Zone(iZone).Name, airLoopName);
+
+                // occupants
                 if (Zone(iZone).isNominalOccupied) {
-                    // occupants
                     if (ZonePreDefRep(iZone).NumOccAccumTime > 0) {
                         PreDefTableEntry(
                             pdchOaMvAvgNumOcc, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
                     }
+                }
+                PreDefTableEntry(pdchOaMvNomNumOcc, Zone(iZone).Name, Zone(iZone).TotOccupants);
+
+                // Zone volume and area
+                PreDefTableEntry(pdchOaMvZoneVol, Zone(iZone).Name, Zone(iZone).Volume);
+                PreDefTableEntry(pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
+
+
+                if (Zone(iZone).isNominalOccupied) {
                     // Mechanical ventilation
+                    PreDefTableEntry(pdchOaTaBzMechVent,
+                        Zone(iZone).Name,
+                        ZonePreDefRep(iZone).MechVentVolTotal + ZonePreDefRep(iZone).SimpVentVolTotal ,
+                        3);
+                }
+
+                // infiltration
+                PreDefTableEntry(pdchOaTaBzInfil,
+                                Zone(iZone).Name,
+                                ZonePreDefRep(iZone).InfilVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal, 0);
+
+
+
+// OLD CODE RELATED TO OUTSIDE AIR VENTILATION BELOW HERE
+
+
+
+                if (Zone(iZone).isNominalOccupied) {
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
                         PreDefTableEntry(pdchOaoAvgMechVent,
                                          Zone(iZone).Name,
                                          ZonePreDefRep(iZone).MechVentVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume *
-                                                                                  Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
-                                         3);
+                                                                                  Zone(iZone).Multiplier * Zone(iZone).ListMultiplier), 0);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                         PreDefTableEntry(pdchOaoMinMechVent,
@@ -6573,7 +6616,7 @@ namespace OutputReportTabular {
                                              (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
                                          3);
                     }
-                    // infiltration
+
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
                         PreDefTableEntry(pdchOaoAvgInfil,
                                          Zone(iZone).Name,
@@ -6599,6 +6642,7 @@ namespace OutputReportTabular {
                                          ZonePreDefRep(iZone).AFNInfilVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
                                          3);
                     }
+
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                         PreDefTableEntry(pdchOaoMinAFNInfil, Zone(iZone).Name, ZonePreDefRep(iZone).AFNInfilVolMin / (Zone(iZone).Volume), 3);
                     }
@@ -6613,25 +6657,7 @@ namespace OutputReportTabular {
                         PreDefTableEntry(pdchOaoMinSimpVent, Zone(iZone).Name, ZonePreDefRep(iZone).SimpVentVolMin / (Zone(iZone).Volume), 3);
                     }
 
-                    // Zone volume
-                    PreDefTableEntry(pdchOaMvZoneVol, Zone(iZone).Name, Zone(iZone).Volume);
                     totalVolume += Zone(iZone).Volume;
-
-                    PreDefTableEntry(pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
-
-                    // air loop name
-                    std::string airLoopName = "";
-                    int ctrlZoneNum = DataHeatBalance::Zone(iZone).ZoneEqNum;
-                    for (int zoneInNode = 1; zoneInNode <= DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
-                        int airLoopNumber = DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
-                        if (airLoopName.empty()) {
-                            airLoopName = DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
-                        }
-                        else {
-                            airLoopName += "; " + DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
-                        }
-                    }
-                    PreDefTableEntry(pdchOaMvAirLpNm, Zone(iZone).Name, airLoopName);
 
                 }
             }

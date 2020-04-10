@@ -1165,7 +1165,6 @@ namespace InternalHeatGains {
             if (Zone(Loop).isNominalControlled) { // conditioned zones only
                 if (Zone(Loop).TotOccupants > 0.0) {
                     Zone(Loop).isNominalOccupied = true;
-                    PreDefTableEntry(pdchOaMvNomNumOcc, Zone(Loop).Name, Zone(Loop).TotOccupants);
                 }
             }
         }
