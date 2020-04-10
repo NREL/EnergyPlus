@@ -117,6 +117,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                                     I N S E R T    L O C A L    V A R I A B L E S    H E R E                                     !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  LOGICAL :: processNumberErrFlag
+  INTEGER :: convertedNumber
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -387,6 +389,22 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with N, insert the rules here
 
               ! If your original object starts with O, insert the rules here
+              CASE('OUTPUT:DEBUGGINGDATA')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  NoDiff=.false.
+                  ! This object previously used a numeric field, where 1 would mean TRUE and any other would mean FALSE
+                  ! and it is being replaced by a Yes/No choice field now
+                  DO CurField = 1, CurArgs
+                    ! Default to No
+                    OutArgs(CurField) = 'No'
+                    convertedNumber = ProcessNumber(InArgs(CurField), processNumberErrFlag)
+                    IF (processNumberErrFlag) THEN
+                      CALL ShowWarningError('For ' // TRIM(ObjectName) // ', field "' // TRIM(FldNames(CurField)) // '"="' // &
+                        TRIM(InArgs(CurField)) // '" is not a number, defaulting to No', Auditf)
+                    ELSE IF (INT(convertedNumber) == 1) THEN
+                      OutArgs(CurField) = 'Yes'
+                    END IF
+                  END DO
 
               ! If your original object starts with P, insert the rules here
 
