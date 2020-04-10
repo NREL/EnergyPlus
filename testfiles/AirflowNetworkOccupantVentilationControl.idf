@@ -128,7 +128,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     AirflowNetwork 3 Zone Building,  !- Name

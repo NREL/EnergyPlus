@@ -97,7 +97,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.3;",
+        "  Version,9.4;",
 
         "  Zone,",
         "    ZN1_S_Space_1,           !- Name",

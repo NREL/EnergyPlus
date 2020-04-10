@@ -657,7 +657,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
 {
 
     std::string const idf_objects =
-        delimited_string({"Version,9.3;",
+        delimited_string({"Version,9.4;",
 
                           "Zone,Zone1;",
 

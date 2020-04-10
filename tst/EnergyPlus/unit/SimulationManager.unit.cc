@@ -77,7 +77,7 @@ TEST_F(EnergyPlusFixture, CheckThreading)
 TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
+        "  Version,9.4;",
 
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
@@ -103,7 +103,7 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Mess
 {
     // issue 7646
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
+        "  Version,9.4;",
         "  PerformancePrecisionTradeoffs,",
         "     Yes; ! - Use Coil Direct Solutions",
 

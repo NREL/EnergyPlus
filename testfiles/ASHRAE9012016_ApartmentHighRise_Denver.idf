@@ -232,7 +232,7 @@
 !    AirLoop_T_S2_ERV_power = 68.620847
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     HeatBalanceKivaManager::KivaManager km;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
+        "Version,9.4;",
         " ",
         "Zone,",
         "  Core_bottom,             !- Name",

@@ -76,7 +76,7 @@ TEST_F(EnergyPlusFixture, WCEClear)
     bool ErrorsFound(false);
 
     std::string const idf_objects =
-        delimited_string({ "Version,9.3;",
+        delimited_string({ "Version,9.4;",
             "WindowsCalculationEngine,",
             "ExternalWindowsModel;",
             "WindowMaterial:Glazing,",
@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, WCEVenetian)
     bool ErrorsFound(false);
 
     std::string const idf_objects =
-        delimited_string({"Version,9.3;",
+        delimited_string({"Version,9.4;",
                           "WindowsCalculationEngine,",
                           "ExternalWindowsModel;",
                           "WindowMaterial:Glazing,",
@@ -231,7 +231,7 @@ TEST_F(EnergyPlusFixture, WCEShade)
     bool ErrorsFound(false);
 
     std::string const idf_objects =
-        delimited_string({ "Version,9.3;",
+        delimited_string({ "Version,9.4;",
             "WindowsCalculationEngine,",
             "ExternalWindowsModel;",
             "WindowMaterial:Glazing,",
