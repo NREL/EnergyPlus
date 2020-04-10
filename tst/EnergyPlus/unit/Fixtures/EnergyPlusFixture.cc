@@ -276,6 +276,12 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     bool success = true;
     inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
+    // Add common objects that will trigger a warning if not present
+    if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {
+        inputProcessor->epJSON["Version"] = {{"",
+                                               {{"idf_order", 0},
+                                                {"version_identifier", DataStringGlobals::MatchVersion}}}};
+    }
     if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
         inputProcessor->epJSON["Building"] = {{"Bldg",
                                                {{"idf_order", 0},
