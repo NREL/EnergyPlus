@@ -5473,8 +5473,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.4;",
-
         "  Timestep,6;",
 
         "  Building,",
