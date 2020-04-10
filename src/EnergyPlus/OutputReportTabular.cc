@@ -75,6 +75,7 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataCostEstimate.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -6614,8 +6615,24 @@ namespace OutputReportTabular {
 
                     // Zone volume
                     PreDefTableEntry(pdchOaMvZoneVol, Zone(iZone).Name, Zone(iZone).Volume);
-                    PreDefTableEntry(pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
                     totalVolume += Zone(iZone).Volume;
+
+                    PreDefTableEntry(pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
+
+                    // air loop name
+                    std::string airLoopName = "";
+                    int ctrlZoneNum = DataHeatBalance::Zone(iZone).ZoneEqNum;
+                    for (int zoneInNode = 1; zoneInNode <= DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
+                        int airLoopNumber = DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
+                        if (airLoopName.empty()) {
+                            airLoopName = DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
+                        }
+                        else {
+                            airLoopName += "; " + DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
+                        }
+                    }
+                    PreDefTableEntry(pdchOaMvAirLpNm, Zone(iZone).Name, airLoopName);
+
                 }
             }
         }
