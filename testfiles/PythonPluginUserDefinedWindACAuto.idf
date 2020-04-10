@@ -1712,9 +1712,13 @@
 
   Output:Variable,*,Zone 2 WinAC Electricity Power,hourly;
 
-  Output:Variable,*,Zone 1 WinAC Total Cooling Rate,hourly;
+  ! Output:Variable,*,Zone 1 WinAC Total Cooling Rate,hourly;
 
-  Output:Variable,*,Zone 1 WinAC Electricity Power,hourly;
+  Output:Variable, Zone 1 WinAC Total Cooling Rate, PythonPlugin:OutputVariable, hourly;
+
+  ! Output:Variable,*,Zone 1 WinAC Electricity Power,hourly;
+
+  Output:Variable, Zone 1 WinAC Electricity Power, PythonPlugin:OutputVariable, hourly;
 
   Output:Variable,Zone1WindACAirOutletNode,System Node Mass Flow Rate,hourly;
 
@@ -1806,8 +1810,8 @@
 !    Zone 1 Window AC Model Program Manager,  !- Name
 !    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
 !    Zone1_WinAC_ModelInput,  !- Program Name 1
-    WinAC_OnFanCycCoil_Sim_Model,  !- Program Name 2
-    Zone1_WinAC_ModelOuput;  !- Program Name 3
+!    WinAC_OnFanCycCoil_Sim_Model,  !- Program Name 2
+!    Zone1_WinAC_ModelOuput;  !- Program Name 3
 
   PythonPlugin:Instance,
     Zone 1 Window AC Model Program Manager,  !- Name
@@ -1824,23 +1828,22 @@
 !    Set Qdot_Request = Zone1WinAC_Qdot_Request,  !- <none>
 !    Set AirOAMdotDesign  = Zone1_OADesign_Vdot * Zone1WinAC_OA_rho,  !- <none>
 !    Set AirSupMdotDesign = Zone1_CoolDesign_Mdot,  !- <none>
-!    Set AirCp      = Zone1WinAC_PrimAir_Cp,  !- <none>
 !    Set FanEff     = 0.5,    !- <none>
 !    Set FanDeltaP  = 75.0,   !- <none>
 !    Set RatedCap  = Zone1_CoolDesign_Cap / 0.75,  !- <none>
 !    Set RatedEIR  = 1 / 3.0, !- <none>
 !    Set ZoneCoolTstat = Zone1Cooling_Tstat;  !- <none>
 
-  EnergyManagementSystem:Program,
-    Zone1_WinAC_ModelOuput,  !- Name
-    Set Zone1WinAC_PrimAir_MdotOut = PrimAir_MdotOut,  !- Program Line 1
-    Set Zone1WinAC_PrimAir_MdotIn  = PrimAir_MdotIn,  !- Program Line 2
-    Set Zone1WinAC_PrimAir_Tout    = PrimAir_Tout,  !- <none>
-    Set Zone1WinAC_PrimAir_Wout    = PrimAir_Wout,  !- <none>
-    Set Zone1WinAC_ElectPower      = ElectPower,  !- <none>
-    Set Zone1WinAC_tot_cool_Power  = tot_cool_Power,  !- <none>
-    Set Zone1WinAC_ElectEnergy     = ElectEnergy,  !- <none>
-    Set Zone1WinAC_OA_MdotIn       = OA_MdotIn;  !- <none>
+!  EnergyManagementSystem:Program,
+!    Zone1_WinAC_ModelOuput,  !- Name
+!    Set Zone1WinAC_PrimAir_MdotOut = PrimAir_MdotOut,  !- Program Line 1
+!    Set Zone1WinAC_PrimAir_MdotIn  = PrimAir_MdotIn,  !- Program Line 2
+!    Set Zone1WinAC_PrimAir_Tout    = PrimAir_Tout,  !- <none>
+!    Set Zone1WinAC_PrimAir_Wout    = PrimAir_Wout,  !- <none>
+!    Set Zone1WinAC_ElectPower      = ElectPower,  !- <none>
+!    Set Zone1WinAC_tot_cool_Power  = tot_cool_Power,  !- <none>
+!    Set Zone1WinAC_ElectEnergy     = ElectEnergy,  !- <none>
+!    Set Zone1WinAC_OA_MdotIn       = OA_MdotIn;  !- <none>
 
 !  EnergyManagementSystem:Sensor,
 !    COOLINGCOILAVAILSCHED,   !- Name
@@ -1858,29 +1861,29 @@
     Primary Air Connection,  !- Actuated Component Type
     Outlet Temperature;      !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    Zone1WinAC_PrimAir_Wout, !- Name
-    Zone1WindAC,             !- Actuated Component Unique Name
-    Primary Air Connection,  !- Actuated Component Type
-    Outlet Humidity Ratio;   !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    Zone1WinAC_PrimAir_Wout, !- Name
+!    Zone1WindAC,             !- Actuated Component Unique Name
+!    Primary Air Connection,  !- Actuated Component Type
+!    Outlet Humidity Ratio;   !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    Zone1WinAC_PrimAir_MdotOut,  !- Name
-    Zone1WindAC,             !- Actuated Component Unique Name
-    Primary Air Connection,  !- Actuated Component Type
-    Outlet Mass Flow Rate;   !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    Zone1WinAC_PrimAir_MdotOut,  !- Name
+!    Zone1WindAC,             !- Actuated Component Unique Name
+!    Primary Air Connection,  !- Actuated Component Type
+!    Outlet Mass Flow Rate;   !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    Zone1WinAC_PrimAir_MdotIn,  !- Name
-    Zone1WindAC,             !- Actuated Component Unique Name
-    Primary Air Connection,  !- Actuated Component Type
-    Inlet Mass Flow Rate;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    Zone1WinAC_PrimAir_MdotIn,  !- Name
+!    Zone1WindAC,             !- Actuated Component Unique Name
+!    Primary Air Connection,  !- Actuated Component Type
+!    Inlet Mass Flow Rate;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    Zone1WinAC_OA_MdotIn,    !- Name
-    Zone1WindAC,             !- Actuated Component Unique Name
-    Secondary Air Connection,!- Actuated Component Type
-    Inlet Mass Flow Rate;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    Zone1WinAC_OA_MdotIn,    !- Name
+!    Zone1WindAC,             !- Actuated Component Unique Name
+!    Secondary Air Connection,!- Actuated Component Type
+!    Inlet Mass Flow Rate;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:InternalVariable,
 !    Zone1WinAC_PrimAir_Tinlet,  !- Name
@@ -1940,32 +1943,63 @@
 !    Environment,             !- Output:Variable or Output:Meter Index Key Name
 !    Site Outdoor Air Barometric Pressure;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:OutputVariable,
-    Zone 1 WinAC Total Cooling Rate,  !- Name
-    Zone1WinAC_tot_cool_Power,  !- EMS Variable Name
-    Averaged,                !- Type of Data in Variable
-    SystemTimestep,          !- Update Frequency
-    Zone1_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
-    W;                       !- Units
+!  EnergyManagementSystem:OutputVariable,
+!    Zone 1 WinAC Total Cooling Rate,  !- Name
+!    Zone1WinAC_tot_cool_Power,  !- EMS Variable Name
+!    Averaged,                !- Type of Data in Variable
+!    SystemTimestep,          !- Update Frequency
+!    Zone1_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
+!    W;                       !- Units
 
-  EnergyManagementSystem:OutputVariable,
+  PythonPlugin:Variables,
+    MyGlobalVariables,       !- Name
+    Zone1WinAC_ElectPower,     !- Variable Name 1
+    Zone1WinAC_tot_cool_Power,
+    Zone1WinAC_ElectEnergy;
+
+  PythonPlugin:OutputVariable,
     Zone 1 WinAC Electricity Power,  !- Name
-    Zone1WinAC_ElectPower,   !- EMS Variable Name
+    Zone1WinAC_ElectPower,     !- PythonPlugin:Variable Name
     Averaged,                !- Type of Data in Variable
     SystemTimestep,          !- Update Frequency
-    Zone1_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
     W;                       !- Units
 
-  EnergyManagementSystem:MeteredOutputVariable,
-    Zone 1 WinAC Electricity Consumption,  !- Name
-    Zone1WinAC_ElectEnergy,  !- EMS Variable Name
+  PythonPlugin:OutputVariable,
+    Zone 1 WinAC Total Cooling Rate,  !- Name
+    Zone1WinAC_tot_cool_Power,     !- PythonPlugin:Variable Name
+    Averaged,                !- Type of Data in Variable
     SystemTimestep,          !- Update Frequency
-    Zone1_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
+    W;                       !- Units
+
+!  EnergyManagementSystem:OutputVariable,
+!    Zone 1 WinAC Electricity Power,  !- Name
+!    Zone1WinAC_ElectPower,   !- EMS Variable Name
+!    Averaged,                !- Type of Data in Variable
+!    SystemTimestep,          !- Update Frequency
+!    Zone1_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
+!    W;                       !- Units
+
+!  EnergyManagementSystem:MeteredOutputVariable,
+!    Zone 1 WinAC Electricity Consumption,  !- Name
+!    Zone1WinAC_ElectEnergy,  !- EMS Variable Name
+!    SystemTimestep,          !- Update Frequency
+!    Zone1_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
+!    Electricity,             !- Resource Type
+!    HVAC,                    !- Group Type
+!    Cooling,                 !- End-Use Category
+!    Window Air Conditioners, !- End-Use Subcategory
+!    J;                       !- Units
+
+  PythonPlugin:OutputVariable,
+    Zone 1 WinAC Electricity Consumption,  !- Name
+    Zone1WinAC_ElectEnergy,  !- PythonPlugin:Variable
+    Metered,                 !- Type of Data in Variable
+    SystemTimestep,          !- Update Frequency
+    J,                       !- Units
     Electricity,             !- Resource Type
     HVAC,                    !- Group Type
     Cooling,                 !- End-Use Category
-    Window Air Conditioners, !- End-Use Subcategory
-    J;                       !- Units
+    Window Air Conditioners; !- End-Use Subcategory
 
   ZoneHVAC:ForcedAir:UserDefined,
     Zone2WindAC,             !- Name
@@ -2002,7 +2036,6 @@
     Set Qdot_Request = Zone2WinAC_Qdot_Request,  !- <none>
     Set AirOAMdotDesign  = Zone2_OADesign_Vdot * Zone2WinAC_OA_rho,  !- <none>
     Set AirSupMdotDesign = Zone2_CoolDesign_Mdot,  !- <none>
-    Set AirCp      = Zone2WinAC_PrimAir_Cp,  !- <none>
     Set FanEff     = 0.5,    !- <none>
     Set FanDeltaP  = 75.0,   !- <none>
     Set RatedCap  = Zone2_CoolDesign_Cap / 0.75,  !- <none>
@@ -2170,7 +2203,6 @@
     Set Qdot_Request = Zone3WinAC_Qdot_Request,  !- <none>
     Set AirOAMdotDesign  = Zone3_OADesign_Vdot * Zone3WinAC_OA_rho,  !- <none>
     Set AirSupMdotDesign = Zone3_CoolDesign_Mdot,  !- <none>
-    Set AirCp      = Zone3WinAC_PrimAir_Cp,  !- <none>
     Set FanEff     = 0.5,    !- <none>
     Set FanDeltaP  = 75.0,   !- <none>
     Set RatedCap  = Zone3_CoolDesign_Cap / 0.75,  !- <none>
@@ -2335,7 +2367,6 @@
     Set Mix_H = ((Recirc_Mdot * Recirc_H) + (AirOAMdotDesign * OA_H)) / AirSupMdotDesign,
     Set Mix_W = ((Recirc_Mdot * PrimAir_Winlet) + (AirOAMdotDesign * OA_W)) / AirSupMdotDesign,
     Set Mix_Tdb = @TdbFnHW Mix_H Mix_W,
-    Set Mix_Cp = @CpAirFnW Mix_W,
     Set Mix_rho = @RhoAirFnPbTdbW OA_Press Mix_Tdb Mix_W,
     Set FanPower = (AirSupMdotDesign * FanDeltaP) / (FanEff * Mix_rho),
     Set FanPowerToAir = FanPower,
@@ -2350,78 +2381,78 @@
     Set ADiff = (0.0 - 1.0) * (A0 / AirSupMdotDesign),
     Set CBF = @Exp ADiff,
     Set dummy = 0.0,
-    Set TotCapTempModFac = @CurveValue WindACCoolCapFT FanOut_Twb OA_Tdb dummy dummy dummy,  !- <none>
-    Set TotCapFlowModFac = @CurveValue WindACCoolCapFFF 1.0 dummy dummy dummy dummy,  !- <none>
-    Set TotCap = RatedCap * TotCapTempModFac * TotCapFlowModFac,  !- <none>
-    Set HDelta = TotCap / AirSupMdotDesign,  !- <none>
-    Set H_ADP = FanOut_H - (HDelta / ( 1.0 - CBF)),  !- <none>
-    Set T_ADP = @TsatFnHPb H_ADP OA_Press,  !- <none>
-    Set W_ADP = @WfnTdbH T_ADP H_ADP,  !- <none>
-    Set H_Tin_W_ADP = @HFnTdbW FanOut_Tdb W_ADP,  !- <none>
+    Set TotCapTempModFac = @CurveValue WindACCoolCapFT FanOut_Twb OA_Tdb dummy dummy dummy,
+    Set TotCapFlowModFac = @CurveValue WindACCoolCapFFF 1.0 dummy dummy dummy dummy,
+    Set TotCap = RatedCap * TotCapTempModFac * TotCapFlowModFac,
+    Set HDelta = TotCap / AirSupMdotDesign,
+    Set H_ADP = FanOut_H - (HDelta / ( 1.0 - CBF)),
+    Set T_ADP = @TsatFnHPb H_ADP OA_Press,
+    Set W_ADP = @WfnTdbH T_ADP H_ADP,
+    Set H_Tin_W_ADP = @HFnTdbW FanOut_Tdb W_ADP,
     IF ((FanOut_H - H_ADP) <> 0.0),  !- <none>
-    Set SHR = (H_Tin_W_ADP - H_ADP)/(FanOut_H - H_ADP ),  !- <none>
-    Set SHR = @Min SHR 1.0,  !- <none>
-    ELSE,                    !- <none>
-    Set SHR = 1.0,           !- <none>
-    ENDIF,                   !- <none>
-    Set PLR = 1.0,           !- <none>
-    Set FullLoadOutAirEnth = FanOut_H - (TotCap/AirSupMdotDesign),  !- <none>
-    Set hTinwout = FanOut_H - ((1.0 - SHR) * HDelta),  !- <none>
-    IF (SHR < 1.0),          !- <none>
-    Set FullLoadOutAirHumRat = @WFnTdbH FanOut_Tdb hTinwout,  !- <none>
-    ELSE,                    !- <none>
-    Set FullLoadOutAirHumRat = FanOut_W,  !- <none>
-    ENDIF,                   !- <none>
-    Set FullLoadOutAirTemp = @TdbFnHW FullLoadOutAirEnth  FullLoadOutAirHumRat,  !- <none>
-    Set DesiredZone_H = @HFnTdbW ZoneCoolTstat PrimAir_Winlet,  !- <none>
-    Set FullTotCapSens = AirSupMdotDesign * (DesiredZone_H - FullLoadOutAirEnth),  !- <none>
-    Set ABS_FullTotCapSens = @ABS FullTotCapSens,  !- <none>
-    Set ABS_QdotReq = @ABS QdotReq,  !- <none>
-    IF ABS_QdotReq < ABS_FullTotCapSens,  !- <none>
-    Set PLR = (ABS_QdotReq - FanPowerToAir)/ (ABS_FullTotCapSens - FanPowerToAir),  !- <none>
-    Set ErrorTol = 0.0005,   !- <none>
-    Set Iter = 0,            !- <none>
-    Set MaxIter = 30,        !- <none>
-    Set Relax = 0.8,         !- <none>
-    Set ABS_Error = 0.002,   !- <none>
-    WHILE (ABS_Error > ErrorTol) && (Iter < MaxIter),  !- <none>
-    Set OutAir_H = (PLR*FullLoadOutAirEnth) +  ((1.0-PLR)* FanOut_H),  !- <none>
-    Set OutAir_W = (PLR*FullLoadOutAirHumRat) + ((1.0-PLR)*FanOut_W),  !- <none>
-    Set OutletAirTemp = @TdbFnHW OutAir_H OutAir_W,  !- <none>
-    Set TotCapTest = AirSupMdotDesign * (DesiredZone_H - OutAir_H),  !- <none>
-    Set Error = (ABS_QdotReq - TotCapTest)/ABS_QdotReq,  !- <none>
-    Set ABS_Error = @ABS Error,  !- <none>
-    IF (ABS_Error > ErrorTol),  !- <none>
-    Set DelPLR = (ABS_QdotReq - TotCapTest) / ABS_FullTotCapSens,  !- <none>
-    Set PLR = PLR + Relax * DelPLR,  !- <none>
-    Set PLR = @min PLR 1.0,  !- <none>
-    ENDIF,                   !- <none>
-    Set Iter = Iter + 1,     !- <none>
-    If (Iter == 16),         !- <none>
-    Set Relax = 0.5,         !- <none>
-    ENDIF,                   !- <none>
-    ENDWHILE,                !- <none>
-    ELSE,                    !- <none>
-    Set PLR = 1.0,           !- <none>
-    Set OutAir_H = FullLoadOutAirEnth,  !- <none>
-    Set OutAir_W = FullLoadOutAirHumRat,  !- <none>
-    Set OutletAirTemp = FullLoadOutAirTemp,  !- <none>
-    ENDIF,                   !- <none>
-    Set PLF = @CurveValue WindACPLFFPLR PLR dummy dummy dummy dummy,  !- <none>
-    Set CoilRTF = PLR / PLF, !- <none>
-    Set CoilRTF = @Min CoilRTF 1.0,  !- <none>
-    Set EIRTempModFac = @CurveValue WindACEIRFT FanOut_Twb OA_Tdb dummy dummy dummy,  !- <none>
-    Set EIRFlowModFac = @CurveValue WindACEIRFFF 1.0 dummy dummy dummy dummy,  !- <none>
-    Set EIR = RatedEIR * EIRTempModFac * EIRFlowModFac,  !- <none>
-    Set DXElecPower = TotCap * CoilRTF * EIR,  !- <none>
-    Set ElectPower = DXElecPower + FanPower,  !- <none>
-    Set ElectEnergy = ElectPower * SystemTimeStep * 3600,  !- <none>
-    Set tot_cool_Power = ABS_FullTotCapSens * PLR,  !- <none>
-    Set PrimAir_MdotOut = AirSupMdotDesign,  !- <none>
-    Set PrimAir_MdotIn  = AirSupMdotDesign,  !- <none>
-    Set PrimAir_Tout  = OutletAirTemp,  !- <none>
-    SEt PrimAir_Wout = OutAir_W,  !- <none>
-    Set OA_MdotIn = AirOAMdotDesign;  !- <none>
+    Set SHR = (H_Tin_W_ADP - H_ADP)/(FanOut_H - H_ADP ),
+    Set SHR = @Min SHR 1.0,
+    ELSE,
+    Set SHR = 1.0,
+    ENDIF,
+    Set PLR = 1.0,
+    Set FullLoadOutAirEnth = FanOut_H - (TotCap/AirSupMdotDesign),
+    Set hTinwout = FanOut_H - ((1.0 - SHR) * HDelta),
+    IF (SHR < 1.0),
+    Set FullLoadOutAirHumRat = @WFnTdbH FanOut_Tdb hTinwout,
+    ELSE,
+    Set FullLoadOutAirHumRat = FanOut_W,
+    ENDIF,
+    Set FullLoadOutAirTemp = @TdbFnHW FullLoadOutAirEnth  FullLoadOutAirHumRat,
+    Set DesiredZone_H = @HFnTdbW ZoneCoolTstat PrimAir_Winlet,
+    Set FullTotCapSens = AirSupMdotDesign * (DesiredZone_H - FullLoadOutAirEnth),
+    Set ABS_FullTotCapSens = @ABS FullTotCapSens,
+    Set ABS_QdotReq = @ABS QdotReq,
+    IF ABS_QdotReq < ABS_FullTotCapSens,
+    Set PLR = (ABS_QdotReq - FanPowerToAir)/ (ABS_FullTotCapSens - FanPowerToAir),
+    Set ErrorTol = 0.0005,
+    Set Iter = 0,
+    Set MaxIter = 30,
+    Set Relax = 0.8,
+    Set ABS_Error = 0.002,
+    WHILE (ABS_Error > ErrorTol) && (Iter < MaxIter),
+    Set OutAir_H = (PLR*FullLoadOutAirEnth) +  ((1.0-PLR)* FanOut_H),
+    Set OutAir_W = (PLR*FullLoadOutAirHumRat) + ((1.0-PLR)*FanOut_W),
+    Set OutletAirTemp = @TdbFnHW OutAir_H OutAir_W,
+    Set TotCapTest = AirSupMdotDesign * (DesiredZone_H - OutAir_H),
+    Set Error = (ABS_QdotReq - TotCapTest)/ABS_QdotReq,
+    Set ABS_Error = @ABS Error,
+    IF (ABS_Error > ErrorTol),
+    Set DelPLR = (ABS_QdotReq - TotCapTest) / ABS_FullTotCapSens,
+    Set PLR = PLR + Relax * DelPLR,
+    Set PLR = @min PLR 1.0,
+    ENDIF,
+    Set Iter = Iter + 1,
+    If (Iter == 16),
+    Set Relax = 0.5,
+    ENDIF,
+    ENDWHILE,
+    ELSE,
+    Set PLR = 1.0,
+    Set OutAir_H = FullLoadOutAirEnth,
+    Set OutAir_W = FullLoadOutAirHumRat,
+    Set OutletAirTemp = FullLoadOutAirTemp,
+    ENDIF,
+    Set PLF = @CurveValue WindACPLFFPLR PLR dummy dummy dummy dummy,
+    Set CoilRTF = PLR / PLF,
+    Set CoilRTF = @Min CoilRTF 1.0,
+    Set EIRTempModFac = @CurveValue WindACEIRFT FanOut_Twb OA_Tdb dummy dummy dummy,
+    Set EIRFlowModFac = @CurveValue WindACEIRFFF 1.0 dummy dummy dummy dummy,
+    Set EIR = RatedEIR * EIRTempModFac * EIRFlowModFac,
+    Set DXElecPower = TotCap * CoilRTF * EIR,
+    Set ElectPower = DXElecPower + FanPower,
+    Set ElectEnergy = ElectPower * SystemTimeStep * 3600,
+    Set tot_cool_Power = ABS_FullTotCapSens * PLR,
+    Set PrimAir_MdotOut = AirSupMdotDesign,
+    Set PrimAir_MdotIn  = AirSupMdotDesign,
+    Set PrimAir_Tout  = OutletAirTemp,
+    SEt PrimAir_Wout = OutAir_W,
+    Set OA_MdotIn = AirOAMdotDesign;
 
   EnergyManagementSystem:GlobalVariable,
     PrimAir_Tinlet,          !- Erl Variable 1 Name
