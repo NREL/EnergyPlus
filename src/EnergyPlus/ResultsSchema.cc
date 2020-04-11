@@ -485,9 +485,6 @@ namespace ResultsFramework {
 
         json vals = json::array();
 
-        // if DataFrame is enabled and control reaches here, there must be at least one o/p variable
-        assert(TS.size() == variableMap.begin()->second.numValues());
-
         for (size_t row = 0; row < TS.size(); ++row) {
             vals.clear();
 
@@ -530,18 +527,18 @@ namespace ResultsFramework {
         if (cols.empty())
             return root;
 
-        std::vector<double> vals;
-        vals.reserve(10000);
-
-        // if DataFrame is enabled and control reaches here, there must be at least one o/p variable
-        assert(TS.size() == meterMap.begin()->second.numValues());
+        json vals = json::array();
 
         for (size_t row = 0; row < TS.size(); ++row) {
             vals.clear();
 
             for (auto const &varMap : meterMap) {
                 if (!(meterOnlyCheck && varMap.second.meterOnly())) {
-                    vals.push_back(varMap.second.value(row));
+                    if (row < varMap.second.numValues()) {
+                        vals.push_back(varMap.second.value(row));
+                    } else {
+                        vals.push_back(nullptr);
+                    }
                 }
             }
             rows.push_back({{TS.at(row), vals}});
@@ -1299,7 +1296,7 @@ namespace ResultsFramework {
             item.second.erase(std::remove_if(item.second.begin(), item.second.end(),
                            [&item, &outputVariableIndices](const std::string& d) { auto pos = (&d - &*item.second.begin()); return !outputVariableIndices[pos];}), item.second.end());
             auto result = std::find_if(item.second.rbegin(), item.second.rend(), [](std::string const & v) { return !v.empty(); } );
-            auto last = item.second.end();
+            auto last = item.second.end() - 1;
             if (result != item.second.rend()) {
                 last = (result + 1).base();
             }
