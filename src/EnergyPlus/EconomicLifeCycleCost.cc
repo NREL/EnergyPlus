@@ -2164,8 +2164,8 @@ namespace EconomicLifeCycleCost {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters");
             }
 
@@ -2203,8 +2203,8 @@ namespace EconomicLifeCycleCost {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation");
             }
             columnHead.deallocate();
@@ -2240,8 +2240,8 @@ namespace EconomicLifeCycleCost {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment");
                 }
                 columnHead.deallocate();
@@ -2285,8 +2285,8 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody,
                     rowHead,
                     columnHead,
@@ -2329,13 +2329,13 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Energy and Water Cost Cash Flows (Without Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                        rowHead,
-                                                                                        columnHead,
-                                                                                        "Life-Cycle Cost Report",
-                                                                                        "Entire Facility",
-                                                                                        "Energy and Water Cost Cash Flows (Without Escalation)");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Life-Cycle Cost Report",
+                                                                                            "Entire Facility",
+                                                                                            "Energy and Water Cost Cash Flows (Without Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2379,13 +2379,13 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Energy and Water Cost Cash Flows (With Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                        rowHead,
-                                                                                        columnHead,
-                                                                                        "Life-Cycle Cost Report",
-                                                                                        "Entire Facility",
-                                                                                        "Energy and Water Cost Cash Flows (With Escalation)");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Life-Cycle Cost Report",
+                                                                                            "Entire Facility",
+                                                                                            "Energy and Water Cost Cash Flows (With Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2420,13 +2420,13 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Capital Cash Flow by Category (Without Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                        rowHead,
-                                                                                        columnHead,
-                                                                                        "Life-Cycle Cost Report",
-                                                                                        "Entire Facility",
-                                                                                        "Capital Cash Flow by Category (Without Escalation)");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Life-Cycle Cost Report",
+                                                                                            "Entire Facility",
+                                                                                            "Capital Cash Flow by Category (Without Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2473,13 +2473,13 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Operating Cash Flow by Category (Without Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                        rowHead,
-                                                                                        columnHead,
-                                                                                        "Life-Cycle Cost Report",
-                                                                                        "Entire Facility",
-                                                                                        "Operating Cash Flow by Category (Without Escalation)");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Life-Cycle Cost Report",
+                                                                                            "Entire Facility",
+                                                                                            "Operating Cash Flow by Category (Without Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2528,13 +2528,13 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Operating Cash Flow by Category (With Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                        rowHead,
-                                                                                        columnHead,
-                                                                                        "Life-Cycle Cost Report",
-                                                                                        "Entire Facility",
-                                                                                        "Operating Cash Flow by Category (With Escalation)");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Life-Cycle Cost Report",
+                                                                                            "Entire Facility",
+                                                                                            "Operating Cash Flow by Category (With Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2581,8 +2581,8 @@ namespace EconomicLifeCycleCost {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
                 }
                 columnHead.deallocate();
@@ -2614,8 +2614,8 @@ namespace EconomicLifeCycleCost {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)");
             }
             columnHead.deallocate();
@@ -2706,8 +2706,8 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody,
                     rowHead,
                     columnHead,
@@ -2767,8 +2767,8 @@ namespace EconomicLifeCycleCost {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category");
             }
             columnHead.deallocate();
@@ -2807,8 +2807,8 @@ namespace EconomicLifeCycleCost {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year");
             }
             columnHead.deallocate();
@@ -2849,8 +2849,8 @@ namespace EconomicLifeCycleCost {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate");
                 }
                 columnHead.deallocate();

@@ -82,7 +82,7 @@ protected:
 
     std::string & convertToMonth(std::string &datetime)
     {
-        return ResultsFramework::OutputSchema->convertToMonth(datetime);
+        return ResultsFramework::CSVWriter::convertToMonth(datetime);
     }
 };
 

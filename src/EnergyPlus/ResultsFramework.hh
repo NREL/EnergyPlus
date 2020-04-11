@@ -314,6 +314,31 @@ namespace ResultsFramework {
         Report rpt;
     };
 
+    class CSVWriter : public BaseResultObject {
+    public:
+        CSVWriter() = default;
+        explicit CSVWriter(std::size_t num_output_variables) {
+            outputVariableIndices = std::vector<bool>(num_output_variables, false);
+        }
+
+        void writeOutput(std::vector<std::string> const & outputVariables, OutputFile & outputFile, bool outputControl);
+        void parseTSOutputs(json const &data, std::vector<std::string> const& outputVariables, OutputProcessor::ReportingFrequency reportingFrequency);
+
+    private:
+        friend class EnergyPlus::EnergyPlusFixture;
+        friend class EnergyPlus::ResultsFrameworkFixture;
+
+        char s[129] = {0};
+        OutputProcessor::ReportingFrequency smallestReportingFrequency = OutputProcessor::ReportingFrequency::Hourly;
+        std::map<std::string, std::vector<std::string>> outputs;
+        std::vector<bool> outputVariableIndices;
+
+        static std::string &convertToMonth(std::string &datetime);
+        void updateReportingFrequency(OutputProcessor::ReportingFrequency reportingFrequency);
+        // void readRVI();
+        // void readMVI();
+    };
+
     class ResultsFramework : public BaseResultObject {
     public:
         ResultsFramework() = default;
@@ -370,8 +395,6 @@ namespace ResultsFramework {
         void addReportMeter(std::string const &meter,
                             std::string const &units,
                             OutputProcessor::ReportingFrequency const reportingInterval);
-        // void readRVI();
-        // void readMVI();
 
         SimInfo SimulationInformation;
 
@@ -396,17 +419,6 @@ namespace ResultsFramework {
     private:
         friend class EnergyPlus::EnergyPlusFixture;
         friend class EnergyPlus::ResultsFrameworkFixture;
-        char s[129] = {0};
-
-        void parseTSOutputs(json const &data,
-                            std::map<std::string, std::vector<std::string>> &outputs,
-                            std::vector<bool> & outputVariableIndices);
-
-        std::string &convertToMonth(std::string &datetime);
-        void writeCSVToFile(OutputFile & outputFile,
-                            std::map<std::string, std::vector<std::string>> & outputs,
-                            std::vector<bool> const & outputVariableIndices,
-                            OutputProcessor::ReportingFrequency reportingFrequency);
 
     protected:
         inline bool hasRIDetailedZoneTSData() {
@@ -466,7 +478,7 @@ namespace ResultsFramework {
         inline bool hasOutputData() { return hasTSData() || hasMeterData(); };
     };
 
-    extern std::unique_ptr<ResultsFramework> OutputSchema;
+    extern std::unique_ptr<ResultsFramework> resultsFramework;
 
     void clear_state();
 } // namespace ResultsFramework

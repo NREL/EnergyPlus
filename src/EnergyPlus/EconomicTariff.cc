@@ -4299,8 +4299,8 @@ namespace EconomicTariff {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
                 }
                 columnHead.deallocate();
@@ -4356,8 +4356,8 @@ namespace EconomicTariff {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
                 }
                 columnHead.deallocate();
@@ -4437,9 +4437,9 @@ namespace EconomicTariff {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName, "General");
                     }
-                    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report",
-                                                                                                tariff(iTariff).tariffName, "General");
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report",
+                                                                                                    tariff(iTariff).tariffName, "General");
                     }
                     columnHead.deallocate();
                     rowHead.deallocate();
@@ -4816,9 +4816,9 @@ namespace EconomicTariff {
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
         }
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report", forString,
-                                                                                    titleString);
+        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report", forString,
+                                                                                        titleString);
         }
         columnHead.deallocate();
         rowHead.deallocate();

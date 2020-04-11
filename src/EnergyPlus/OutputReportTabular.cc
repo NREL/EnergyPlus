@@ -7216,8 +7216,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, "Custom Monthly Report");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, "Custom Monthly Report");
                 }
             } // jTables
@@ -7419,8 +7419,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
                 }
                 // create statistics table
@@ -7467,8 +7467,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Statistics");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Statistics");
                 }
             }
@@ -7971,8 +7971,8 @@ namespace OutputReportTabular {
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy");
                 }
 
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Site and Source Energy");
                 }
             }
@@ -8125,13 +8125,13 @@ namespace OutputReportTabular {
                                                            "Site to Source Energy Conversion Factors");
                 }
 
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Site to Source Energy Conversion Factors");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Site to Source Energy Conversion Factors");
                 }
             }
 
@@ -8176,8 +8176,8 @@ namespace OutputReportTabular {
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area");
                 }
 
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Building Area");
                 }
             }
@@ -8431,8 +8431,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses");
                 }
             }
@@ -8602,13 +8602,13 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "End Uses By Subcategory");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBodyTemp,
-                                                                                            rowHeadTemp,
-                                                                                            columnHeadTemp,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "End Uses By Subcategory");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
+                                                                                                rowHeadTemp,
+                                                                                                columnHeadTemp,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "End Uses By Subcategory");
                 }
                 rowHeadTemp.deallocate();
                 tableBodyTemp.deallocate();
@@ -8767,13 +8767,13 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Utility Use Per Conditioned Floor Area");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Utility Use Per Conditioned Floor Area");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Utility Use Per Conditioned Floor Area");
                 }
             }
             //---- Normalized by Total Area Sub-Table
@@ -8797,13 +8797,13 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Utility Use Per Total Floor Area");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Utility Use Per Total Floor Area");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Utility Use Per Total Floor Area");
                 }
             }
 
@@ -8885,8 +8885,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Electric Loads Satisfied");
                 }
             }
@@ -8961,8 +8961,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "On-Site Thermal Sources");
                 }
             }
@@ -9056,8 +9056,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Water Source Summary");
                 }
             }
@@ -9095,13 +9095,13 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Setpoint Not Met Criteria");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Setpoint Not Met Criteria");
                 }
             }
 
@@ -9138,13 +9138,13 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Comfort and Setpoint Not Met Summary");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Comfort and Setpoint Not Met Summary");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Comfort and Setpoint Not Met Summary");
                 }
             }
 
@@ -9398,13 +9398,13 @@ namespace OutputReportTabular {
                                                        "Entire Facility",
                                                        "Source Energy End Use Components Summary");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                        rowHead,
-                                                                                        columnHead,
-                                                                                        "Source Energy End Use Components Summary",
-                                                                                        "Entire Facility",
-                                                                                        "Source Energy End Use Components Summary");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Source Energy End Use Components Summary",
+                                                                                            "Entire Facility",
+                                                                                            "Source Energy End Use Components Summary");
             }
 
             // Normalized by Area tables
@@ -9480,8 +9480,8 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Source Energy End Use Component Per Conditioned Floor Area");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody,
                         rowHead,
                         columnHead,
@@ -9516,13 +9516,13 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Source Energy End Use Components Per Total Floor Area");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Source Energy End Use Components Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Source Energy End Use Components Per Total Floor Area");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Source Energy End Use Components Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Source Energy End Use Components Per Total Floor Area");
                 }
             } // End of Normalized by Total Area
 
@@ -9846,8 +9846,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
             }
 
@@ -9969,8 +9969,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBodyTemp, rowHeadTemp, columnHeadTemp, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBodyTemp, rowHeadTemp, columnHeadTemp, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
             }
             rowHeadTemp.deallocate();
@@ -10221,8 +10221,8 @@ namespace OutputReportTabular {
             sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
         }
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
         }
 
@@ -10278,8 +10278,8 @@ namespace OutputReportTabular {
             sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
         }
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
         }
     }
@@ -10555,8 +10555,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
             }
 
@@ -10789,8 +10789,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
             }
 
@@ -10857,8 +10857,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Conditioned Window-Wall Ratio");
             }
 
@@ -10891,8 +10891,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
             }
 
@@ -11144,8 +11144,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
             }
         }
@@ -11240,8 +11240,8 @@ namespace OutputReportTabular {
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
             }
         }
@@ -11500,8 +11500,8 @@ namespace OutputReportTabular {
                             sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility", subTable(jSubTable).name);
                         }
-                        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                                 tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility", subTable(jSubTable).name);
                         }
                     }
@@ -11723,8 +11723,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry(foundEntry).typeField);
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody,
                         rowHead,
                         columnHead,
@@ -11870,8 +11870,8 @@ namespace OutputReportTabular {
                                                                "Entire Facility",
                                                                "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
                     }
-                    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody,
                             rowHead,
                             columnHead,
@@ -11889,8 +11889,8 @@ namespace OutputReportTabular {
                                                                "Entire Facility",
                                                                "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
                     }
-                    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody,
                             rowHead,
                             columnHead,
@@ -14121,8 +14121,8 @@ namespace OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
                 }
 
@@ -14203,8 +14203,8 @@ namespace OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
                 }
 
@@ -14251,8 +14251,8 @@ namespace OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
                 }
 
@@ -14286,8 +14286,8 @@ namespace OutputReportTabular {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
                     }
-                    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
                     }
                 }

@@ -630,10 +630,10 @@ int AbortEnergyPlus()
     if (Seconds < 0.0) Seconds = 0.0;
     ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
 
-    ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+    ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
     ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                 " Severe Errors.");
@@ -655,7 +655,7 @@ int AbortEnergyPlus()
     // Output detailed ZONE time series data
     SimulationManager::OpenOutputJsonFiles();
 
-    ResultsFramework::OutputSchema->writeOutputs();
+    ResultsFramework::resultsFramework->writeOutputs();
 
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);
@@ -899,10 +899,10 @@ int EndEnergyPlus()
     if (Seconds < 0.0) Seconds = 0.0;
     ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
 
-    ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-    ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+    ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
     if (DataGlobals::createPerfLog) {
         UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
@@ -928,7 +928,7 @@ int EndEnergyPlus()
     // Output detailed ZONE time series data
     SimulationManager::OpenOutputJsonFiles();
 
-    ResultsFramework::OutputSchema->writeOutputs();
+    ResultsFramework::resultsFramework->writeOutputs();
 
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);

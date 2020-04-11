@@ -258,8 +258,8 @@ int initializeEnergyPlus(std::string const & filepath) {
 
     CreateCurrentDateTimeString(DataStringGlobals::CurrentDateTime);
 
-    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
-    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
+    ResultsFramework::resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
+    ResultsFramework::resultsFramework->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
 
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
@@ -343,8 +343,8 @@ int initializeAsLibrary() {
 
     CreateCurrentDateTimeString(DataStringGlobals::CurrentDateTime);
 
-    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
-    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
+    ResultsFramework::resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
+    ResultsFramework::resultsFramework->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
 
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
