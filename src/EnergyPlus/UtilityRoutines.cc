@@ -86,7 +86,7 @@ extern "C" {
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>

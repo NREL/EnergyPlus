@@ -129,7 +129,7 @@ extern "C" {
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimulationManager.hh>

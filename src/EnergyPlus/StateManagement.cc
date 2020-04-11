@@ -195,7 +195,7 @@
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>

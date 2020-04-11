@@ -210,7 +210,7 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>

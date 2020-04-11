@@ -314,11 +314,11 @@ namespace ResultsFramework {
         Report rpt;
     };
 
-    class ResultsSchema : public BaseResultObject {
+    class ResultsFramework : public BaseResultObject {
     public:
-        ResultsSchema() = default;
+        ResultsFramework() = default;
 
-        virtual ~ResultsSchema() = default;
+        virtual ~ResultsFramework() = default;
 
         void setupOutputOptions();
 
@@ -466,7 +466,7 @@ namespace ResultsFramework {
         inline bool hasOutputData() { return hasTSData() || hasMeterData(); };
     };
 
-    extern std::unique_ptr<ResultsSchema> OutputSchema;
+    extern std::unique_ptr<ResultsFramework> OutputSchema;
 
     void clear_state();
 } // namespace ResultsFramework

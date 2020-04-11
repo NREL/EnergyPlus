@@ -79,7 +79,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -98,7 +98,7 @@ namespace ResultsFramework {
     using OutputProcessor::RealVariableType;
     using OutputProcessor::RealVariables;
 
-    std::unique_ptr<ResultsSchema> OutputSchema(new ResultsSchema);
+    std::unique_ptr<ResultsFramework> OutputSchema(new ResultsFramework);
 
     // trim string
     std::string trim(std::string str)
@@ -773,7 +773,7 @@ namespace ResultsFramework {
         return root;
     }
 
-    void ResultsSchema::setupOutputOptions()
+    void ResultsFramework::setupOutputOptions()
     {
         auto & outputFiles = OutputFiles::getSingleton();
         if (outputFiles.outputControl.csv) {
@@ -821,35 +821,35 @@ namespace ResultsFramework {
         }
     }
 
-    bool ResultsSchema::timeSeriesEnabled() const
+    bool ResultsFramework::timeSeriesEnabled() const
     {
         return tsEnabled;
     }
 
-    bool ResultsSchema::timeSeriesAndTabularEnabled() const
+    bool ResultsFramework::timeSeriesAndTabularEnabled() const
     {
         return tsAndTabularEnabled;
     }
 
-    bool ResultsSchema::JSONEnabled() const
+    bool ResultsFramework::JSONEnabled() const
     {
         return outputJSON;
     }
 
-    bool ResultsSchema::CBOREnabled() const
+    bool ResultsFramework::CBOREnabled() const
     {
         return outputCBOR;
     }
 
-    bool ResultsSchema::MsgPackEnabled() const
+    bool ResultsFramework::MsgPackEnabled() const
     {
         return outputMsgPack;
     }
 
-    void ResultsSchema::initializeRTSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
-                                               const Array1D<RealVariableType> &RVariableTypes,
-                                               const int NumOfRVariable,
-                                               const OutputProcessor::TimeStepType timeStepType)
+    void ResultsFramework::initializeRTSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
+                                                  const Array1D<RealVariableType> &RVariableTypes,
+                                                  const int NumOfRVariable,
+                                                  const OutputProcessor::TimeStepType timeStepType)
     {
         Reference<RealVariables> RVar;
 
@@ -940,10 +940,10 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsSchema::initializeITSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
-                                               const Array1D<IntegerVariableType> &IVariableTypes,
-                                               const int NumOfIVariable,
-                                               const OutputProcessor::TimeStepType timeStepType)
+    void ResultsFramework::initializeITSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
+                                                  const Array1D<IntegerVariableType> &IVariableTypes,
+                                                  const int NumOfIVariable,
+                                                  const OutputProcessor::TimeStepType timeStepType)
     {
         Reference<IntegerVariables> IVar;
 
@@ -1029,8 +1029,8 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsSchema::initializeMeters(const Array1D<OutputProcessor::MeterType> &EnergyMeters,
-                                         const OutputProcessor::ReportingFrequency reportFrequency)
+    void ResultsFramework::initializeMeters(const Array1D<OutputProcessor::MeterType> &EnergyMeters,
+                                            const OutputProcessor::ReportingFrequency reportFrequency)
     {
         switch (reportFrequency) {
         case OutputProcessor::ReportingFrequency::EachCall:
@@ -1172,7 +1172,7 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsSchema::writeOutputs()
+    void ResultsFramework::writeOutputs()
     {
         if (OutputFiles::getSingleton().outputControl.csv) {
             writeCSVOutput();
@@ -1187,7 +1187,7 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsSchema::parseTSOutputs(json const & data, std::map<std::string, std::vector<std::string>> & outputs, std::vector<bool> & outputVariableIndices)
+    void ResultsFramework::parseTSOutputs(json const & data, std::map<std::string, std::vector<std::string>> & outputs, std::vector<bool> & outputVariableIndices)
     {
         if (data.empty()) return;
         std::vector<int> indices;
@@ -1246,7 +1246,7 @@ namespace ResultsFramework {
         }
     }
 
-    std::string & ResultsSchema::convertToMonth(std::string & datetime) {
+    std::string & ResultsFramework::convertToMonth(std::string & datetime) {
         // if running this function, there should only ever be 12 + design days values to change
         static const std::map<std::string, std::string> months({{"01", "January"},
                                                                 {"02", "February"},
@@ -1274,7 +1274,7 @@ namespace ResultsFramework {
         return datetime;
     }
 
-    void ResultsSchema::writeCSVToFile(OutputFile & outputFile, std::map<std::string, std::vector<std::string>> & outputs, std::vector<bool> const & outputVariableIndices, OutputProcessor::ReportingFrequency reportingFrequency)
+    void ResultsFramework::writeCSVToFile(OutputFile & outputFile, std::map<std::string, std::vector<std::string>> & outputs, std::vector<bool> const & outputVariableIndices, OutputProcessor::ReportingFrequency reportingFrequency)
     {
         print(outputFile, "{}", "Date/Time,");
         std::string sep;
@@ -1305,7 +1305,7 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsSchema::writeCSVOutput()
+    void ResultsFramework::writeCSVOutput()
     {
         if (!hasOutputData()) {
             return;
@@ -1419,7 +1419,7 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsSchema::writeTimeSeriesReports()
+    void ResultsFramework::writeTimeSeriesReports()
     {
         // Output detailed Zone time series data
         if (hasRIDetailedZoneTSData()) {
@@ -1462,7 +1462,7 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsSchema::writeReport()
+    void ResultsFramework::writeReport()
     {
         json root, outputVars, rdd, meterVars, meterData;
         json rddvals = json::array();
@@ -1591,17 +1591,17 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsSchema::addReportVariable(std::string const & keyedValue,
-                                          std::string const & variableName,
-                                          std::string const & units,
-                                          OutputProcessor::ReportingFrequency const reportingInterval)
+    void ResultsFramework::addReportVariable(std::string const & keyedValue,
+                                             std::string const & variableName,
+                                             std::string const & units,
+                                             OutputProcessor::ReportingFrequency const reportingInterval)
     {
         outputVariables.emplace_back(fmt::format("{0}:{1} [{2}]({3})", keyedValue, variableName, units, reportingFrequency(reportingInterval)));
     }
 
-    void ResultsSchema::addReportMeter(std::string const & meter,
-                                       std::string const & units,
-                                       OutputProcessor::ReportingFrequency const reportingInterval)
+    void ResultsFramework::addReportMeter(std::string const & meter,
+                                          std::string const & units,
+                                          OutputProcessor::ReportingFrequency const reportingInterval)
     {
         outputVariables.emplace_back(fmt::format("{0} [{1}]({2})", meter, units, reportingFrequency(reportingInterval)));
     }

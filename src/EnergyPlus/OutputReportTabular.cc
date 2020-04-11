@@ -119,7 +119,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>

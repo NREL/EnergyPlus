@@ -53,7 +53,7 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 
 namespace EnergyPlus {
 

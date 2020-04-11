@@ -68,7 +68,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>

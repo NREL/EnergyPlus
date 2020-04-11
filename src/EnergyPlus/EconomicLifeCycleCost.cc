@@ -62,7 +62,7 @@
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
