@@ -109,6 +109,8 @@ class DataExchange:
         self.api.getPluginTrendVariableSum.restype = RealEP
         self.api.getPluginTrendVariableDirection.argtypes = [c_int, c_int]
         self.api.getPluginTrendVariableDirection.restype = RealEP
+        self.api.getConstructionHandle.argtypes = [c_char_p]
+        self.api.getConstructionHandle.restype = c_int
 
     def list_available_api_data_csv(self) -> bytes:
         """
@@ -313,6 +315,27 @@ class DataExchange:
         :return: Floating point representation of the internal variable value
         """
         return self.api.getInternalVariableValue(variable_handle)
+
+    def get_construction_handle(self, var_name: Union[str, bytes]) -> int:
+        """
+        Get a handle to a constructions in a running simulation.  This is only used for Python Plugin applications!
+
+        Some actuators allow specifying different constructions to allow switchable construction control.
+        This function returns an index that can be used in those functions.  The construction is specified by name.
+
+        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
+        automatically converts values to upper-case when finding matches to internal variables in the simulation.
+
+        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
+        as needed.
+
+        :return: An integer ID for this construction, or -1 if one could not be found.
+        """
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_construction_handle is only available as part of a Python Plugin workflow")
+        if isinstance(var_name, str):
+            var_name = var_name.encode('utf-8')
+        return self.api.getConstructionHandle(var_name)
 
     def get_global_handle(self, var_name: Union[str, bytes]) -> int:
         """
