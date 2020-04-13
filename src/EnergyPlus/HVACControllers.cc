@@ -452,7 +452,7 @@ namespace HVACControllers {
                 // Update the current Controller to the outlet nodes
                 UpdateController(ControlNum);
 
-                CheckTempAndHumRatCtrl(ControlNum, IsConvergedFlag);
+                if (!FirstHVACIteration) CheckTempAndHumRatCtrl(ControlNum, IsConvergedFlag);
 
             } else if (SELECT_CASE_var == iControllerOpEnd) {
                 // With the correct ControlNum Initialize all Controller related parameters
@@ -2240,8 +2240,8 @@ namespace HVACControllers {
     {
 
         {
-            auto &thisController(ControllerProps(ControlNum));
             if (IsConvergedFlag) {
+                auto &thisController(ControllerProps(ControlNum));
                 if (thisController.ControlVar == iTemperatureAndHumidityRatio) {
                     // For temperature and humidity control, after temperature control is converged, check if humidity setpoint is met
                     if (!thisController.HumRatCtrlOverride) {
@@ -2256,6 +2256,7 @@ namespace HVACControllers {
                             }
                             // Do a cold start reset, same as iControllerOpColdStart
                             ResetController(ControlNum, false, IsConvergedFlag);
+                            UpdateController(ControlNum);
                         }
                     }
                 }
