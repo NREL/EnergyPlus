@@ -120,8 +120,7 @@ extension_renaming = {
     'CondenserEquipmentList': 'equipment',
     'AirLoopHVAC:Mixer': 'nodes',
     'AirLoopHVAC:Splitter': 'nodes',
-    'AirLoopHVAC:DedicatedOutdoorAirSystem': 'airloophvacs',
-    'PythonPlugin:Variables': 'global_py_vars'
+    'AirLoopHVAC:DedicatedOutdoorAirSystem': 'airloophvacs'
 }
 remaining_objects = [
     'Site:SpectrumData',
