@@ -247,8 +247,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
 {
     std::string const idf_objects = delimited_string({
-        "  Output:Diagnostics,",
-        "    ;                        !- Key 1",
+        "  Output:Diagnostics;",
     });
 
     EXPECT_TRUE(process_idf(idf_objects));
