@@ -753,7 +753,7 @@ namespace SimulationManager {
         static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string Alphas(8);
+        Array1D_string Alphas(12);   // Output:Diagnostics is extensible, but has 12 (documented) keys, so extending it to 12.
         Array1D<Real64> Number(4);
         int NumAlpha;
         int NumNumber;
