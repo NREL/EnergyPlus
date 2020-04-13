@@ -14406,13 +14406,9 @@
     AllSummary;              !- Report 1 Name
 
   Output:Diagnostics,
-    DisplayUnusedSchedules;  !- Key 1
-
-  Output:Diagnostics,
-    DisplayZoneAirHeatBalanceOffBalance;  !- Key 1
-
-  Output:Diagnostics,
-    DisplayAdvancedReportVariables;  !- Key 1
+    DisplayUnusedSchedules,  !- Key 1
+    DisplayZoneAirHeatBalanceOffBalance,  !- Key 2
+    DisplayAdvancedReportVariables;  !- Key 3
 
   Output:SQLite,
     Simple;                  !- Option Type
