@@ -1075,7 +1075,14 @@ namespace SimulationManager {
                         auto diagnosticsExtensiblesArray = diagnosticsExtensibles.value();
                         for (auto diagnosticsExtensible : diagnosticsExtensiblesArray) {
 
-                            std::string diagnosticName = diagnosticsExtensible.at("key");
+                            // We want to avoid cryptic failures such as this one: "[json.exception.out_of_range.403] key 'key' not found"
+                            // Which happens if you put an "empty" entry in the extensible portion
+                            auto it = diagnosticsExtensible.find("key");
+                            if (it == diagnosticsExtensible.end()) {
+                                ShowWarningError(CurrentModuleObject + ": empty key found, consider removing it to avoid this warning.");
+                                continue;
+                            }
+                            std::string diagnosticName = *it;
 
                             if (UtilityRoutines::SameString(diagnosticName, "DisplayExtraWarnings")) {
                                 DisplayExtraWarnings = true;

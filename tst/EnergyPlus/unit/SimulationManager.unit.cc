@@ -433,3 +433,35 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
     // no error message from
     EXPECT_TRUE(compare_err_stream("", true));
 }
+
+// We want to avoid cryptic failures such as this one: "[json.exception.out_of_range.403] key 'key' not found"
+TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
+{
+    std::string const idf_objects = delimited_string({
+        "  Output:Diagnostics,",
+        "    ,                                  !- Key 1",
+        "    DisplayAdvancedReportVariables;    !- Key 2",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    ASSERT_NO_THROW(SimulationManager::GetProjectData(outputFiles()));
+
+    EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
+    EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
+    EXPECT_FALSE(DataGlobals::DisplayUnusedObjects);
+    EXPECT_FALSE(DataGlobals::DisplayUnusedSchedules);
+
+    EXPECT_TRUE(DataGlobals::DisplayAdvancedReportVariables);
+
+    EXPECT_FALSE(DataGlobals::DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
+    EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
+    EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
+    EXPECT_FALSE(DataEnvironment::DisplayWeatherMissingDataWarnings);
+    EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
+    EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
+
+    // Warning that an empty key was entered
+    EXPECT_TRUE(compare_err_stream("   ** Warning ** Output:Diagnostics: empty key found, consider removing it to avoid this warning.\n", true));
+}
