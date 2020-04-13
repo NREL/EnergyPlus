@@ -1843,4 +1843,6 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:DEBUGGINGDATA ===========
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup

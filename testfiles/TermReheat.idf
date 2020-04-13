@@ -2240,7 +2240,9 @@
 
   Output:VariableDictionary,Regular;
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   SetpointManager:Scheduled,
     Supply Air Temp Manager, !- Name
