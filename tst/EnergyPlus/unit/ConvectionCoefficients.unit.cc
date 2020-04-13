@@ -1577,9 +1577,6 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections_BadInput)
         ";                                   !- Simple Buoyancy Unstable Horizontal Equation User Curve Name",
         });
 
-    ASSERT_TRUE(process_idf(idf_objects));
-
-    // Expect Severe Error
-
+    ASSERT_DEATH(process_idf(idf_objects), "");
 }
 
