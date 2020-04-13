@@ -52,6 +52,7 @@
 #include <string>
 #include <utility>
 #include <unordered_map>
+#include <array>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -893,11 +894,10 @@ namespace ConvectionCoefficients {
         return AgainstWind;
     }
 
-    bool SetAdaptiveConvectionAlgoCoefficient(int* InsideFaceAdaptiveConvectionAlgoParam, std::string equationName, std::string curveName, std::string sourceFieldName, std::string curveFieldName){
+    bool SetAdaptiveConvectionAlgoCoefficient(int* const InsideFaceAdaptiveConvectionAlgoParam, const std::string equationName, const std::string curveName, const std::string sourceFieldName, const std::string curveFieldName){
 
         static std::string const RoutineName("GetUserConvectionCoefficients");
         static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
-        int const NumValidIntConvectionValueTypes(34);
         bool ErrorsFound = false;
         bool IsValidType = true;
 
@@ -2085,7 +2085,10 @@ namespace ConvectionCoefficients {
             InsideFaceAdaptiveConvectionAlgo.Name = cAlphaArgs(1); // not used by E+, unique object
             InsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
 
-            std::vector<std::pair<int*, int>> AdaptiveConvectionAlgoDefaults = //(45,
+            // The following array maps the inputs for the SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections algorithm input fields
+            // to the corresponding defaults by making a pair with a pointer to the InsideFaceAdaptiveConvectionAlgo algorithm int parameter
+            // to the default int value
+            std::array<std::pair<int* const, const int>, 45> AdaptiveConvectionAlgoDefaults =
                 {
                     std::make_pair (&InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum, HcInt_FohannoPolidoriVerticalWall),
                     std::make_pair (&InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum, HcInt_AlamdariHammondStableHorizontal),
