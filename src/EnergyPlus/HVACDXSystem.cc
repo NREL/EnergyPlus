@@ -143,6 +143,8 @@ namespace HVACDXSystem {
     int const ChargeOnlyMode(4);
     int const DischargeOnlyMode(5);
 
+    Real64 const LatCapTimeConst(45.0);
+
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
@@ -220,7 +222,7 @@ namespace HVACDXSystem {
         static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
         static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
         static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
+        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
 
@@ -1099,7 +1101,7 @@ namespace HVACDXSystem {
         QZnReq = 0.0;
         QLatReq = 0.0;
         MaxONOFFCyclesperHour = 4.0; // default number
-        HPTimeConstant = 0.0;
+        HPTimeConstant = LatCapTimeConst;
         FanDelayTime = 0.0;
         OnOffAirFlowRatio = 1.0;
         TempSpeedOut = 0.0;
@@ -2200,7 +2202,7 @@ namespace HVACDXSystem {
                         QZnReq = 0.0;
                         QLatReq = 0.0;
                         MaxONOFFCyclesperHour = 4.0; // default number
-                        HPTimeConstant = 0.0;
+                        HPTimeConstant = LatCapTimeConst;
                         FanDelayTime = 0.0;
                         OnOffAirFlowRatio = 1.0;
                         SpeedRatio = 0.0;
@@ -3566,7 +3568,7 @@ namespace HVACDXSystem {
         static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
         static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
         static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
+        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
         static Real64 SpeedRatio(0.0);            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
@@ -3644,7 +3646,7 @@ namespace HVACDXSystem {
         static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
         static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
         static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
+        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
         static Real64 PartLoadRatio(1.0);         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
@@ -3721,7 +3723,7 @@ namespace HVACDXSystem {
         static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
         static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
         static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
+        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
         static Real64 SpeedRatio(0.0);            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
@@ -3800,7 +3802,7 @@ namespace HVACDXSystem {
         static Real64 QZnReq(0.001);              // Zone load (W), input to variable-speed DX coil
         static Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
         static Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-        static Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
+        static Real64 HPTimeConstant(LatCapTimeConst); // Heat pump time constant [s]
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
         static Real64 PartLoadRatio(1.0);         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
