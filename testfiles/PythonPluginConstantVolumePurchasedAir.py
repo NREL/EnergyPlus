@@ -1,4 +1,5 @@
 from pyenergyplus.plugin import EnergyPlusPlugin
+import math
 
 
 class Set_Purch_Air(EnergyPlusPlugin):
@@ -7,17 +8,17 @@ class Set_Purch_Air(EnergyPlusPlugin):
         super().__init__()
         self.need_to_get_handles = True
 
-    def get_handles(self):
-        if self.need_to_get_handles and self.api.exchange.api_data_fully_ready():
+    def on_after_predictor_after_hvac_managers(self) -> int:
 
-            self.need_to_get_handles = False
+        # check if API ready
+        if self.api.exchange.api_data_fully_ready():
+            # get handles if needed
+            if self.need_to_get_handles:
+                self.need_to_get_handles = False
+            # calculations
             return 0
         else:
             return 0
-
-    def on_after_predictor_after_hvac_managers(self) -> int:
-        self.get_handles()
-        return 0
 
 
 class Set_Shade_Control_State(EnergyPlusPlugin):
@@ -25,18 +26,73 @@ class Set_Shade_Control_State(EnergyPlusPlugin):
     def __init__(self):
         super().__init__()
         self.need_to_get_handles = True
+        self.Solar_Beam_Incident_Cos_handle = None
+        self.Zn001_Wall001_Win001_Shading_Deploy_Status_handle = None
+        self.Zone_Sensible_Cool_Rate_handle = None
+        self.Shade_Status_Off_handle = None
+        self.Shade_Status_Interior_Blind_On_handle = None
+        self.IncidentAngle_handle = None
 
-    def get_handles(self):
-        if self.need_to_get_handles and self.api.exchange.api_data_fully_ready():
+    @staticmethod
+    def rad_to_deg(rad):
+        return 180 * rad / math.pi
 
-            self.need_to_get_handles = False
+    def on_begin_timestep_before_predictor(self) -> int:
+
+        # check if API ready
+        if self.api.exchange.api_data_fully_ready():
+            # get handles if needed
+            if self.need_to_get_handles:
+                self.Solar_Beam_Incident_Cos_handle = self.api.exchange.get_variable_handle(
+                    "Surface Outside Face Beam Solar Incident Angle Cosine Value",
+                    "Zn001:Wall001:Win001"
+                )
+
+                self.Zn001_Wall001_Win001_Shading_Deploy_Status_handle = self.api.exchange.get_actuator_handle(
+                    "Window Shading Control",
+                    "Control Status",
+                    "Zn001:Wall001:Win001"
+                )
+
+                self.Zone_Sensible_Cool_Rate_handle = self.api.exchange.get_variable_handle(
+                    "Zone Air System Sensible Cooling Rate",
+                    "WEST ZONE"
+                )
+
+                self.Shade_Status_Off_handle = self.api.exchange.get_global_handle(
+                    "Shade_Status_Off")
+
+                self.Shade_Status_Interior_Blind_On_handle = self.api.exchange.get_global_handle(
+                    "Shade_Status_Interior_Blind_On")
+
+                self.IncidentAngle_handle = self.api.exchange.get_global_handle("IncidentAngle")
+
+                self.need_to_get_handles = False
+
+            # calculations
+            Solar_Beam_Incident_Cos_handle = self.api.exchange.get_variable_value(self.Solar_Beam_Incident_Cos_handle)
+            IncidentAngleRad = math.acos(Solar_Beam_Incident_Cos_handle)
+            IncidentAngle = self.rad_to_deg(IncidentAngleRad)
+            self.api.exchange.set_global_value(self.IncidentAngle_handle, IncidentAngle)
+
+            Zone_Sensible_Cool_Rate = self.api.exchange.get_variable_value(self.Zone_Sensible_Cool_Rate_handle)
+            shade_status_off = self.api.exchange.get_global_value(self.Shade_Status_Off_handle)
+            shade_status_interior_blind_on = self.api.exchange.get_global_value(
+                self.Shade_Status_Interior_Blind_On_handle)
+
+            if IncidentAngle < 45.0:
+                self.api.exchange.set_actuator_value(self.Zn001_Wall001_Win001_Shading_Deploy_Status_handle,
+                                                     shade_status_interior_blind_on)
+            elif Zone_Sensible_Cool_Rate > 20.0:
+                self.api.exchange.set_actuator_value(self.Zn001_Wall001_Win001_Shading_Deploy_Status_handle,
+                                                     shade_status_interior_blind_on)
+
+            else:
+                self.api.exchange.set_actuator_value(self.Zn001_Wall001_Win001_Shading_Deploy_Status_handle,
+                                                     shade_status_off)
             return 0
         else:
             return 0
-
-    def on_begin_timestep_before_predictor(self) -> int:
-        self.get_handles()
-        return 0
 
 
 class InitializeShadeControlFlags(EnergyPlusPlugin):
@@ -44,64 +100,64 @@ class InitializeShadeControlFlags(EnergyPlusPlugin):
     def __init__(self):
         super().__init__()
         self.need_to_get_handles = True
-        self.Shade_Status_None_handle = None
+        # self.Shade_Status_None_handle = None
         self.Shade_Status_Off_handle = None
-        self.Shade_Status_Interior_Shade_On_handle = None
-        self.Shade_Status_Switchable_Dark_handle = None
-        self.Shade_Status_Exterior_Shade_On_handle = None
+        # self.Shade_Status_Interior_Shade_On_handle = None
+        # self.Shade_Status_Switchable_Dark_handle = None
+        # self.Shade_Status_Exterior_Shade_On_handle = None
         self.Shade_Status_Interior_Blind_On_handle = None
-        self.Shade_Status_Exterior_Blind_On_handle = None
-        self.Shade_Status_Between_Glass_Shade_On_handle = None
-        self.Shade_Status_Between_Glass_Blind_On_handle = None
-
-    def get_handles(self):
-        if self.need_to_get_handles and self.api.exchange.api_data_fully_ready():
-            self.Shade_Status_None_handle = self.api.exchange.get_global_handle(
-                "Shade_Status_None")
-
-            attr = "Shade_Status_None"
-            print(f"{attr}: {getattr(self, attr)}")
-
-            self.Shade_Status_Off_handle = self.api.exchange.get_global_handle(
-                "Shade_Status_Off")
-
-            self.Shade_Status_Interior_Shade_On_handle = self.api.exchange.get_global_handle(
-                "Shade_Status_Interior_Shade_On")
-
-            self.Shade_Status_Switchable_Dark_handle = self.api.exchange.get_global_handle(
-                "Shade_Status_Switchable_Dark")
-
-            self.Shade_Status_Exterior_Shade_On_handle = self.api.exchange.get_global_handle(
-                "Shade_Status_Exterior_Shade_On")
-
-            self.Shade_Status_Interior_Blind_On_handle = self.api.exchange.get_global_handle(
-                "Shade_Status_Interior_Blind_On")
-
-            self.Shade_Status_Exterior_Blind_On_handle = self.api.exchange.get_global_handle(
-                "Shade_Status_Exterior_Blind_On")
-
-            self.Shade_Status_Between_Glass_Shade_On_handle = self.api.exchange.get_global_handle(
-                "Shade_Status_Between_Glass_Shade_On")
-
-            self.Shade_Status_Between_Glass_Blind_On_handle = self.api.exchange.get_global_handle(
-                "Shade_Status_Between_Glass_Blind_On")
-
-            self.need_to_get_handles = False
-            return 0
-        else:
-            return 0
+        # self.Shade_Status_Exterior_Blind_On_handle = None
+        # self.Shade_Status_Between_Glass_Shade_On_handle = None
+        # self.Shade_Status_Between_Glass_Blind_On_handle = None
 
     def on_begin_new_environment(self) -> int:
-        self.get_handles()
 
-        self.api.exchange.set_global_value(self.Shade_Status_None_handle, -1.0)
-        self.api.exchange.set_global_value(self.Shade_Status_Off_handle, 0.0)
-        self.api.exchange.set_global_value(self.Shade_Status_Interior_Shade_On_handle, 1.0)
-        self.api.exchange.set_global_value(self.Shade_Status_Switchable_Dark_handle, 2.0)
-        self.api.exchange.set_global_value(self.Shade_Status_Exterior_Shade_On_handle, 3.0)
-        self.api.exchange.set_global_value(self.Shade_Status_Interior_Blind_On_handle, 6.0)
-        self.api.exchange.set_global_value(self.Shade_Status_Exterior_Blind_On_handle, 7.0)
-        self.api.exchange.set_global_value(self.Shade_Status_Between_Glass_Shade_On_handle, 8.0)
-        self.api.exchange.set_global_value(self.Shade_Status_Between_Glass_Blind_On_handle, 9.0)
+        # check if API ready
+        if self.api.exchange.api_data_fully_ready():
 
-        return 0
+            # get handles if needed
+            if self.need_to_get_handles:
+                # self.Shade_Status_None_handle = self.api.exchange.get_global_handle(
+                #     "Shade_Status_None")
+
+                self.Shade_Status_Off_handle = self.api.exchange.get_global_handle(
+                    "Shade_Status_Off")
+
+                # self.Shade_Status_Interior_Shade_On_handle = self.api.exchange.get_global_handle(
+                #     "Shade_Status_Interior_Shade_On")
+                #
+                # self.Shade_Status_Switchable_Dark_handle = self.api.exchange.get_global_handle(
+                #     "Shade_Status_Switchable_Dark")
+                #
+                # self.Shade_Status_Exterior_Shade_On_handle = self.api.exchange.get_global_handle(
+                #     "Shade_Status_Exterior_Shade_On")
+
+                self.Shade_Status_Interior_Blind_On_handle = self.api.exchange.get_global_handle(
+                    "Shade_Status_Interior_Blind_On")
+
+                # self.Shade_Status_Exterior_Blind_On_handle = self.api.exchange.get_global_handle(
+                #     "Shade_Status_Exterior_Blind_On")
+                #
+                # self.Shade_Status_Between_Glass_Shade_On_handle = self.api.exchange.get_global_handle(
+                #     "Shade_Status_Between_Glass_Shade_On")
+                #
+                # self.Shade_Status_Between_Glass_Blind_On_handle = self.api.exchange.get_global_handle(
+                #     "Shade_Status_Between_Glass_Blind_On")
+
+                self.need_to_get_handles = False
+
+            # calculations
+            # self.api.exchange.set_global_value(self.Shade_Status_None_handle, -1.0)
+            self.api.exchange.set_global_value(self.Shade_Status_Off_handle, 0.0)
+            # self.api.exchange.set_global_value(self.Shade_Status_Interior_Shade_On_handle, 1.0)
+            # self.api.exchange.set_global_value(self.Shade_Status_Switchable_Dark_handle, 2.0)
+            # self.api.exchange.set_global_value(self.Shade_Status_Exterior_Shade_On_handle, 3.0)
+            self.api.exchange.set_global_value(self.Shade_Status_Interior_Blind_On_handle, 6.0)
+            # self.api.exchange.set_global_value(self.Shade_Status_Exterior_Blind_On_handle, 7.0)
+            # self.api.exchange.set_global_value(self.Shade_Status_Between_Glass_Shade_On_handle, 8.0)
+            # self.api.exchange.set_global_value(self.Shade_Status_Between_Glass_Blind_On_handle, 9.0)
+
+            return 0
+        else:
+            # API not ready, return
+            return 0

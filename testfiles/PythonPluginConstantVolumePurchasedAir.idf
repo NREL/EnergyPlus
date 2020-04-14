@@ -1,7 +1,7 @@
-! EMSConstantVolumePurchAir.idf
+! PythonPluginConstantVolumePurchAir.idf
 !
 !
-! Highlights:              This file illustrates using Energy Management System with the ideal loads air system
+! Highlights:              This file illustrates using Python Plugin System with the ideal loads air system
 !                          in such a way that the flow rates are prescribed at a constant volume and the system
 !                          can modulate to meet load when capacity is sufficient.
 !
@@ -1450,15 +1450,21 @@
     NORTH ZONE,              !- Output:Variable or Output:Meter Index Key Name
     Zone Predicted Sensible Load to Setpoint Heat Transfer Rate;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:ProgramCallingManager,
-    Window Shading Device EMS Controller,  !- Name
-    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
-    Set_Shade_Control_State; !- Program Name 1
+!  EnergyManagementSystem:ProgramCallingManager,
+!    Window Shading Device EMS Controller,  !- Name
+!    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
+!    Set_Shade_Control_State; !- Program Name 1
 
-  EnergyManagementSystem:Sensor,
-    Solar_Beam_Incident_Cos, !- Name
-    Zn001:Wall001:Win001,    !- Output:Variable or Output:Meter Index Key Name
-    Surface Outside Face Beam Solar Incident Angle Cosine Value;  !- Output:Variable or Output:Meter Name
+  PythonPlugin:Instance,
+    Window Shading Device EMS Controller,  !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginConstantVolumePurchasedAir, !- Python Module Name
+    Set_Shade_Control_State;        !- Plugin Class Name
+
+!  EnergyManagementSystem:Sensor,
+!    Solar_Beam_Incident_Cos, !- Name
+!    Zn001:Wall001:Win001,    !- Output:Variable or Output:Meter Index Key Name
+!    Surface Outside Face Beam Solar Incident Angle Cosine Value;  !- Output:Variable or Output:Meter Name
 
   Output:Variable,Zn001:Wall001:Win001,Surface Outside Face Beam Solar Incident Angle Cosine Value,Timestep;
 
@@ -1467,54 +1473,75 @@
     WEST ZONE,               !- Output:Variable or Output:Meter Index Key Name
     Zone Air System Sensible Heating Rate;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    Zone_Sensible_Cool_Rate, !- Name
-    WEST ZONE,               !- Output:Variable or Output:Meter Index Key Name
-    Zone Air System Sensible Cooling Rate;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    Zone_Sensible_Cool_Rate, !- Name
+!    WEST ZONE,               !- Output:Variable or Output:Meter Index Key Name
+!    Zone Air System Sensible Cooling Rate;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    Zn001_Wall001_Win001_Shading_Deploy_Status,  !- Name
-    Zn001:Wall001:Win001,    !- Actuated Component Unique Name
-    Window Shading Control,  !- Actuated Component Type
-    Control Status;          !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    Zn001_Wall001_Win001_Shading_Deploy_Status,  !- Name
+!    Zn001:Wall001:Win001,    !- Actuated Component Unique Name
+!    Window Shading Control,  !- Actuated Component Type
+!    Control Status;          !- Actuated Component Control Type
 
-  !
-  !
+!  EnergyManagementSystem:Program,
+!    Set_Shade_Control_State, !- Name
+!    Set IncidentAngleRad = @ArcCos Solar_Beam_Incident_Cos,  !- Program Line 1
+!    Set IncidentAngle   = @RadToDeg IncidentAngleRad,  !- Program Line 2
+!    IF IncidentAngle < 45,   !- <none>
+!    Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Interior_Blind_On,  !- <none>
+!    ELSEIF Zone_Sensible_Cool_Rate > 20,  !- <none>
+!    Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Interior_Blind_On,  !- <none>
+!    Else,                    !- <none>
+!    Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Off,  !- <none>
+!    ENDIF;                   !- <none>
 
-  EnergyManagementSystem:Program,
-    Set_Shade_Control_State, !- Name
-    Set IncidentAngleRad = @ArcCos Solar_Beam_Incident_Cos,  !- Program Line 1
-    Set IncidentAngle   = @RadToDeg IncidentAngleRad,  !- Program Line 2
-    IF IncidentAngle < 45,   !- <none>
-    Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Interior_Blind_On,  !- <none>
-    ELSEIF Zone_Sensible_Cool_Rate > 20,  !- <none>
-    Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Interior_Blind_On,  !- <none>
-    Else,                    !- <none>
-    Set Zn001_Wall001_Win001_Shading_Deploy_Status = Shade_Status_Off,  !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:OutputVariable,
+  PythonPlugin:OutputVariable,
     Erl Shading Control Status,  !- Name
-    Zn001_Wall001_Win001_Shading_Deploy_Status,  !- EMS Variable Name
+    Zn001_Wall001_Win001_Shading_Deploy_Status,     !- PythonPlugin:Variable Name
     Averaged,                !- Type of Data in Variable
-    ZoneTimeStep,            !- Update Frequency
-    ,                        !- EMS Program or Subroutine Name
+    ZoneTimestep,            !- Update Frequency
     ;                        !- Units
 
-  EnergyManagementSystem:OutputVariable,
+  Output:Variable,
+    Erl Shading Control Status,
+    PythonPlugin:OutputVariable,
+    Timestep;
+
+!  EnergyManagementSystem:OutputVariable,
+!    Erl Shading Control Status,  !- Name
+!    Zn001_Wall001_Win001_Shading_Deploy_Status,  !- EMS Variable Name
+!    Averaged,                !- Type of Data in Variable
+!    ZoneTimeStep,            !- Update Frequency
+!    ,                        !- EMS Program or Subroutine Name
+!    ;                        !- Units
+
+!  EnergyManagementSystem:OutputVariable,
+!    Erl Zn001:Wall001:Win001 Incident Angle,  !- Name
+!    IncidentAngle,           !- EMS Variable Name
+!    Averaged,                !- Type of Data in Variable
+!    ZoneTimeStep,            !- Update Frequency
+!    ,                        !- EMS Program or Subroutine Name
+!    deg;                     !- Units
+
+!  EnergyManagementSystem:GlobalVariable,
+!    IncidentAngle;           !- Erl Variable 1 Name
+
+  PythonPlugin:OutputVariable,
     Erl Zn001:Wall001:Win001 Incident Angle,  !- Name
-    IncidentAngle,           !- EMS Variable Name
+    IncidentAngle,     !- PythonPlugin:Variable Name
     Averaged,                !- Type of Data in Variable
-    ZoneTimeStep,            !- Update Frequency
-    ,                        !- EMS Program or Subroutine Name
-    deg;                     !- Units
+    ZoneTimestep,            !- Update Frequency
+    ;                        !- Units
 
-  EnergyManagementSystem:GlobalVariable,
-    IncidentAngle;           !- Erl Variable 1 Name
+  Output:Variable,
+    Erl Zn001:Wall001:Win001 Incident Angle,
+    PythonPlugin:OutputVariable,
+    Timestep;
 
-  Output:Variable,*,Erl Shading Control Status,Timestep;
+!  Output:Variable,*,Erl Shading Control Status,Timestep;
 
-  Output:Variable,*,Erl Zn001:Wall001:Win001 Incident Angle,Timestep;
+!  Output:Variable,*,Erl Zn001:Wall001:Win001 Incident Angle,Timestep;
 
 !  EnergyManagementSystem:ProgramCallingManager,
 !    Init Window Shading Device Control Constants,  !- Name
@@ -1528,16 +1555,20 @@
     InitializeShadeControlFlags;        !- Plugin Class Name
 
   PythonPlugin:Variables,
-    MyGlobalVariables,       !- Name
-    Shade_Status_None,       !- Variable Name 1
+    ShadeStatusVars,
     Shade_Status_Off,
-    Shade_Status_Interior_Shade_On,
-    Shade_Status_Switchable_Dark,
-    Shade_Status_Exterior_Shade_On,
     Shade_Status_Interior_Blind_On,
-    Shade_Status_Exterior_Blind_On,
-    Shade_Status_Between_Glass_Shade_On,
-    Shade_Status_Between_Glass_Blind_On;
+    ZN001_WALL001_WIN001_SHADING_DEPLOY_STATUS,
+    IncidentAngle;
+
+! -- Unused Global Variables
+!    Shade_Status_None,
+!    Shade_Status_Interior_Shade_On,
+!    Shade_Status_Switchable_Dark,
+!    Shade_Status_Exterior_Shade_On,
+!    Shade_Status_Exterior_Blind_On,
+!    Shade_Status_Between_Glass_Shade_On,
+!    Shade_Status_Between_Glass_Blind_On;
 
 !  EnergyManagementSystem:GlobalVariable,
 !    Shade_Status_None;       !- Erl Variable 1 Name
