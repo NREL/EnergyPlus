@@ -2512,7 +2512,6 @@ namespace EnergyPlus {
                             for (auto &e : PlantLoop(LoopNum).LoopSide(LoopSideNum).Pumps)
                                 e.PumpHeatToFluid = 0.0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowRequest = 0.0;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).TimeElapsed = 0.0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = 0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.TemperatureHistory = 0.0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.MassFlowRateHistory = 0.0;
@@ -2728,8 +2727,6 @@ namespace EnergyPlus {
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
             //       DATE WRITTEN   Sept 2010
-            //       MODIFIED       na
-            //       RE-ENGINEERED  na
 
             // PURPOSE OF THIS SUBROUTINE:
             // update temperature history for plant capacitance model and other
@@ -2737,32 +2734,31 @@ namespace EnergyPlus {
             // METHODOLOGY EMPLOYED:
             // copy current values into "LastTimestep" values
 
-            // REFERENCES:
-            // na
-
-            // USE STATEMENTS:
-            // na
-
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-            // na
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            // na
-
-            // INTERFACE BLOCK SPECIFICATIONS:
-            // na
-
-            // DERIVED TYPE DEFINITIONS:
-            // na
-
-            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-            // na
-
-            // array assignment
             if (NumOfNodes > 0) {
                 for (auto &e : Node) { // MA
                     e.TempLastTimestep = e.Temp;
                     e.EnthalpyLastTimestep = e.Enthalpy;
+                }
+            }
+            if (DataPlant::TotNumLoops > 0) {
+                for (auto &loop : PlantLoop) {
+                    for (auto &side : loop.LoopSide) {
+                        side.LastTempInterfaceTankOutlet = side.TempInterfaceTankOutlet;
+                        if (!DataGlobals::WarmupFlag && (loop.OutletNodeFlowrate > 0.0)) {
+                            // Accumulate total time loop is active
+                            side.LoopSideInlet_TotalTime += TimeStepSys;
+                            // Determine excessive storage
+                            if ((side.LoopSideInlet_McpDTdt > DataHVACGlobals::SmallLoad) &&
+                                (side.LoopSideInlet_MdotCpDeltaT < side.LoopSideInlet_McpDTdt)) {
+                                side.LoopSideInlet_CapExcessStorageTimeReport = TimeStepSys;
+                                side.LoopSideInlet_CapExcessStorageTime += TimeStepSys;
+                            } else {
+                                side.LoopSideInlet_CapExcessStorageTimeReport = 0;
+                            }
+                        } else {
+                            side.LoopSideInlet_CapExcessStorageTimeReport = 0;
+                        }
+                    }
                 }
             }
         }
@@ -4348,8 +4344,8 @@ namespace EnergyPlus {
                     ShowWarningError("Plant Loop: " + PlantLoop(LoopNum).Name +
                                      " Demand Side is storing excess heat the majority of the time.");
                 }
-                if (PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime >
-                    PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
+                if (PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime >
+                    PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TotalTime / 2) {
                     ShowWarningError("Plant Loop: " + PlantLoop(LoopNum).Name +
                                      " Supply Side is storing excess heat the majority of the time.");
                 }

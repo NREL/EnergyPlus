@@ -629,7 +629,6 @@ namespace HVACInterfaceManager {
         Real64 TankInletTemp;      // temporary variable
         Real64 LastTankOutletTemp; // temporary variable
         Real64 Cp;                 // specific heat
-        Real64 TimeElapsed;        // temporary value based on current clock time during simulation, fractional hours
 
         Real64 TimeStepSeconds;
         Real64 MassFlowRate;
@@ -646,14 +645,6 @@ namespace HVACInterfaceManager {
         TankOutletNode = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).NodeNumIn;
 
         TankInletTemp = Node(TankInletNode).Temp;
-
-        // This needs to be based on time to deal with system downstepping and repeated timesteps
-        TimeElapsed = (HourOfDay - 1) + TimeStep * TimeStepZone + SysTimeElapsed;
-        if (PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
-            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
-                PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;
-            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed = TimeElapsed;
-        }
 
         LastTankOutletTemp = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
 
@@ -711,20 +702,10 @@ namespace HVACInterfaceManager {
         // update last tank outlet temperature
         PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet = TankFinalTemp;
 
-        // update heat trasport and heat storage rates
+        // update heat transport and heat storage rates
         PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_MdotCpDeltaT = (TankInletTemp - TankFinalTemp) * Cp * MassFlowRate;
         PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_McpDTdt =
             (ThisTankMass * Cp * (TankFinalTemp - LastTankOutletTemp)) / TimeStepSeconds;
-
-        // Determine excessive storage
-        if (PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_MdotCpDeltaT <
-            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_McpDTdt) {
-            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_CapExcessStorageTimeReport = TimeStepSys;
-            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_CapExcessStorageTime += TimeStepSys;
-        } else {
-            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_CapExcessStorageTimeReport = 0;
-        }
-        PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_TotalTime += TimeStepSys;
 
         // update report variable
         PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_TankTemp = TankAverageTemp;
@@ -797,7 +778,6 @@ namespace HVACInterfaceManager {
         Real64 TankInletTemp;      // temporary variable
         Real64 LastTankOutletTemp; // temporary variable
         Real64 Cp;                 // specific heat
-        Real64 TimeElapsed;        // temporary value based on current clock time during simulation, fractional hours
 
         Real64 FracTotLoopMass; // Fraction of total loop mass assigned to the half loop
         Real64 TimeStepSeconds;
@@ -821,14 +801,6 @@ namespace HVACInterfaceManager {
             FracTotLoopMass = 0.25;
         } else {
             FracTotLoopMass = 0.75;
-        }
-
-        // This needs to be based on time to deal with system downstepping and repeated timesteps
-        TimeElapsed = (HourOfDay - 1) + TimeStep * TimeStepZone + SysTimeElapsed;
-        if (PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
-            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
-                PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;
-            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed = TimeElapsed;
         }
 
         LastTankOutletTemp = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
