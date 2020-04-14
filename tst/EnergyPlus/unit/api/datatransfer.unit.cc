@@ -244,7 +244,8 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     std::string csvDataEmpty = listAllAPIDataCSV();
 
     // then as we add stuff, and make sure it appears in the output
-    this->preRequestRealVariable("Boiler Heat Transfer", "Boiler 1");
+    this->preRequestRealVariable("Boiler Heat Transfer", "Boiler 1");  // output variable
+    this->preRequestRealVariable("Chiller Electric Energy", "Chiller 1", 3.14, true);  // meter
     this->setupVariablesOnceAllAreRequested();
     this->preRequestActuator("Chiller:Electric", "Max Flow Rate", "Chiller 1", ActuatorType::REAL);
     this->setupActuatorsOnceAllAreRequested();
@@ -253,12 +254,14 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     this->addTrendWithNewGlobal("NewGlobalVarHere", "Trend 1", 3);
     std::string csvData = listAllAPIDataCSV();
     std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
+    std::size_t foundAddedMeter = csvData.find("CHILLER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
     std::size_t foundAddedActuator = csvData.find("Chiller:Electric") != std::string::npos;
     std::size_t foundAddedIV = csvData.find("Zone 1") != std::string::npos;
     std::size_t foundAddedGlobal =
         csvData.find("PLUGIN_GLOBAL_VAR_NAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
     std::size_t foundAddedTrend = csvData.find("Trend 1") != std::string::npos;
     EXPECT_TRUE(foundAddedBoiler);
+    EXPECT_TRUE(foundAddedMeter);
     EXPECT_TRUE(foundAddedActuator);
     EXPECT_TRUE(foundAddedIV);
     EXPECT_TRUE(foundAddedGlobal);
