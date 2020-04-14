@@ -1,4 +1,3 @@
-
 from pyenergyplus.plugin import EnergyPlusPlugin
 
 
@@ -73,3 +72,67 @@ class CoolingSetPoint(EnergyPlusPlugin):
         elif hour > 22:
             self.actuate(30)
         return 0
+
+
+class AverageZoneTemps(EnergyPlusPlugin):
+
+    def __init__(self):
+        super().__init__()
+        self.need_to_get_handles = True
+        self.T1_handle = None
+        self.T2_handle = None
+        self.T3_handle = None
+        self.T4_handle = None
+        self.T5_handle = None
+
+        self.Zn1vol = None
+        self.Zn2vol = None
+        self.Zn3vol = None
+        self.Zn4vol = None
+        self.Zn5vol = None
+
+        self.ave_bldg_temp_handle = None
+
+    def on_end_of_zone_timestep_before_zone_reporting(self) -> int:
+
+        # check if API ready
+        if self.api.exchange.api_data_fully_ready():
+            # get handles if needed
+            if self.need_to_get_handles:
+                self.T1_handle = self.api.exchange.get_variable_handle("Zone Mean Air Temperature", "Perimeter_ZN_1")
+                self.T2_handle = self.api.exchange.get_variable_handle("Zone Mean Air Temperature", "Perimeter_ZN_2")
+                self.T3_handle = self.api.exchange.get_variable_handle("Zone Mean Air Temperature", "Perimeter_ZN_3")
+                self.T4_handle = self.api.exchange.get_variable_handle("Zone Mean Air Temperature", "Perimeter_ZN_4")
+                self.T5_handle = self.api.exchange.get_variable_handle("Zone Mean Air Temperature", "Core_ZN")
+
+                Zn1vol_handle = self.api.exchange.get_internal_variable_handle("Zone Air Volume", "Perimeter_ZN_1")
+                Zn2vol_handle = self.api.exchange.get_internal_variable_handle("Zone Air Volume", "Perimeter_ZN_2")
+                Zn3vol_handle = self.api.exchange.get_internal_variable_handle("Zone Air Volume", "Perimeter_ZN_3")
+                Zn4vol_handle = self.api.exchange.get_internal_variable_handle("Zone Air Volume", "Perimeter_ZN_4")
+                Zn5vol_handle = self.api.exchange.get_internal_variable_handle("Zone Air Volume", "Core_ZN")
+
+                self.Zn1vol = self.api.exchange.get_internal_variable_value(Zn1vol_handle)
+                self.Zn2vol = self.api.exchange.get_internal_variable_value(Zn2vol_handle)
+                self.Zn3vol = self.api.exchange.get_internal_variable_value(Zn3vol_handle)
+                self.Zn4vol = self.api.exchange.get_internal_variable_value(Zn4vol_handle)
+                self.Zn5vol = self.api.exchange.get_internal_variable_value(Zn5vol_handle)
+
+                self.ave_bldg_temp_handle = self.api.exchange.get_global_handle("AverageBuildingTemp")
+
+                self.need_to_get_handles = False
+
+            # calculations
+            T1 = self.api.exchange.get_variable_value(self.T1_handle)
+            T2 = self.api.exchange.get_variable_value(self.T2_handle)
+            T3 = self.api.exchange.get_variable_value(self.T3_handle)
+            T4 = self.api.exchange.get_variable_value(self.T4_handle)
+            T5 = self.api.exchange.get_variable_value(self.T5_handle)
+
+            num = T1 * self.Zn1vol + T2 * self.Zn2vol + T3 * self.Zn3vol + T4 * self.Zn4vol + T5 * self.Zn5vol
+            den = self.Zn1vol + self.Zn2vol + self.Zn3vol + self.Zn4vol + self.Zn5vol
+
+            self.api.exchange.set_global_value(self.ave_bldg_temp_handle, num / den)
+
+            return 0
+        else:
+            return 0
