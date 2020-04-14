@@ -50,6 +50,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -704,7 +705,7 @@ namespace DataGlobalConstants {
             FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
 
         } else {
-            ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
             ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + FuelTypeInput);
             // Set to Electric to avoid errors when setting up output variables
             FuelTypeForOutputVar = "Electric";
