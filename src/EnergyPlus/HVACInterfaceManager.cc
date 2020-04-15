@@ -727,15 +727,7 @@ namespace HVACInterfaceManager {
         // tank. Note that this routine is called repeatedly to re calculate
         // loop capacitance based on current plant conditions
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataGlobals::HourOfDay;
         using DataGlobals::SecInHour;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
-        using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
         using DataPlant::CommonPipe_Single;
@@ -744,21 +736,8 @@ namespace HVACInterfaceManager {
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENTS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("UpdateCommonPipe");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TankOutletLoopSide;    // inlet loopsidenumber
         int TankInletNode;         // inlet loop side outlet node
         int TankOutletNode;        // inlet loop side outlet node
