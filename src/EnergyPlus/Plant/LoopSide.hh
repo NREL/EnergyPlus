@@ -68,6 +68,7 @@ namespace DataPlant {
         bool SimNonZoneEquipNeeded;   // Plant requests resimulate non zone Equip
         bool SimElectLoadCentrNeeded; // Plant requests resimulate generators
         bool OncePerTimeStepOperations;
+        Real64 TimeElapsed;            // store time for dynamic updates for last time
         Real64 FlowRequest;            // Flow request in the half loop
         Real64 FlowRequestTemperature; // Average Flow request outlet Temp in the half loop
         // It's necessary to hold the values here since AIR and GROUND SPs aren't associated with either a node or a SP manager
@@ -141,7 +142,7 @@ namespace DataPlant {
         // Default Constructor
         HalfLoopData()
             : SimLoopSideNeeded(true), SimZoneEquipNeeded(true), SimAirLoopsNeeded(true), SimNonZoneEquipNeeded(true), SimElectLoadCentrNeeded(true),
-              OncePerTimeStepOperations(true), FlowRequest(0.0), FlowRequestTemperature(0.0),
+              OncePerTimeStepOperations(true), TimeElapsed(0.0), FlowRequest(0.0), FlowRequestTemperature(0.0),
               TempSetPoint(DataLoopNode::SensedNodeFlagValue), TempSetPointHi(DataLoopNode::SensedNodeFlagValue),
               TempSetPointLo(DataLoopNode::SensedNodeFlagValue), TempInterfaceTankOutlet(0.0), LastTempInterfaceTankOutlet(0.0), TotalBranches(0),
               NodeNumIn(0), NodeNumOut(0), TotalPumps(0),

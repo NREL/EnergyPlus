@@ -601,21 +601,41 @@ namespace HVACInterfaceManager {
         // tank. Note that this routine is called repeatedly to re calculate
         // loop capacitance based on current plant conditions
 
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using DataGlobals::HourOfDay;
         using DataGlobals::SecInHour;
+        using DataGlobals::TimeStep;
+        using DataGlobals::TimeStepZone;
+        using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
+        // Locals
+        // SUBROUTINE ARGUMENTS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
         static std::string const RoutineName("UpdateHalfLoopInletTemp");
 
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TankOutletLoopSide;    // inlet loopsidenumber
         int TankInletNode;         // inlet loop side outlet node
         int TankOutletNode;        // inlet loop side outlet node
         Real64 TankInletTemp;      // temporary variable
         Real64 LastTankOutletTemp; // temporary variable
         Real64 Cp;                 // specific heat
+        Real64 TimeElapsed;        // temporary value based on current clock time during simulation, fractional hours
 
         Real64 TimeStepSeconds;
         Real64 MassFlowRate;
@@ -632,6 +652,14 @@ namespace HVACInterfaceManager {
         TankOutletNode = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).NodeNumIn;
 
         TankInletTemp = Node(TankInletNode).Temp;
+
+        // This needs to be based on time to deal with system downstepping and repeated timesteps
+        TimeElapsed = (HourOfDay - 1) + TimeStep * TimeStepZone + SysTimeElapsed;
+        if (PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
+            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
+                PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;
+            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed = TimeElapsed;
+        }
 
         LastTankOutletTemp = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
 
@@ -727,7 +755,15 @@ namespace HVACInterfaceManager {
         // tank. Note that this routine is called repeatedly to re calculate
         // loop capacitance based on current plant conditions
 
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+        using DataGlobals::HourOfDay;
         using DataGlobals::SecInHour;
+        using DataGlobals::TimeStep;
+        using DataGlobals::TimeStepZone;
+        using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
         using DataPlant::CommonPipe_Single;
@@ -736,14 +772,28 @@ namespace HVACInterfaceManager {
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
+        // Locals
+        // SUBROUTINE ARGUMENTS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("UpdateCommonPipe");
 
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TankOutletLoopSide;    // inlet loopsidenumber
         int TankInletNode;         // inlet loop side outlet node
         int TankOutletNode;        // inlet loop side outlet node
         Real64 TankInletTemp;      // temporary variable
         Real64 LastTankOutletTemp; // temporary variable
         Real64 Cp;                 // specific heat
+        Real64 TimeElapsed;        // temporary value based on current clock time during simulation, fractional hours
 
         Real64 FracTotLoopMass; // Fraction of total loop mass assigned to the half loop
         Real64 TimeStepSeconds;
@@ -767,6 +817,14 @@ namespace HVACInterfaceManager {
             FracTotLoopMass = 0.25;
         } else {
             FracTotLoopMass = 0.75;
+        }
+
+        // This needs to be based on time to deal with system downstepping and repeated timesteps
+        TimeElapsed = (HourOfDay - 1) + TimeStep * TimeStepZone + SysTimeElapsed;
+        if (PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
+            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
+                PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;
+            PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed = TimeElapsed;
         }
 
         LastTankOutletTemp = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;

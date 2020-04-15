@@ -2512,6 +2512,7 @@ namespace EnergyPlus {
                             for (auto &e : PlantLoop(LoopNum).LoopSide(LoopSideNum).Pumps)
                                 e.PumpHeatToFluid = 0.0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowRequest = 0.0;
+                        PlantLoop(LoopNum).LoopSide(LoopSideNum).TimeElapsed = 0.0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = 0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.TemperatureHistory = 0.0;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.MassFlowRateHistory = 0.0;
@@ -2743,7 +2744,6 @@ namespace EnergyPlus {
             if (DataPlant::TotNumLoops > 0) {
                 for (auto &loop : PlantLoop) {
                     for (auto &side : loop.LoopSide) {
-                        side.LastTempInterfaceTankOutlet = side.TempInterfaceTankOutlet;
                         if (!DataGlobals::WarmupFlag && (loop.OutletNodeFlowrate > 0.0)) {
                             // Accumulate total time loop is active
                             side.LoopSideInlet_TotalTime += TimeStepSys;
