@@ -561,8 +561,14 @@ namespace HVACInterfaceManager {
         }
 
         // Set out of tolerance flags
-        if (convergence.PlantMassFlowNotConverged || convergence.PlantTempNotConverged) {
-            OutOfToleranceFlag = true;
+        if (ThisLoopSideNum == DemandSide) {
+            if (convergence.PlantMassFlowNotConverged || convergence.PlantTempNotConverged) {
+                OutOfToleranceFlag = true;
+            }
+        } else {
+            if (convergence.PlantMassFlowNotConverged) {
+                OutOfToleranceFlag = true;
+            }
         }
     }
 

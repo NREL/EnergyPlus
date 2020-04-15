@@ -703,7 +703,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.ActuatedNodePlantLoopBranchNum = 0;
     thisController.ActuatedNodePlantLoopNum = 0;
     thisController.ActuatedNodePlantLoopSide = 0;
-    thisController.ActuatorVar = HVACControllers::iFlow;
 
     // Case 1 - not converged yet, no override yet, return untouched
     isConverged = false;
