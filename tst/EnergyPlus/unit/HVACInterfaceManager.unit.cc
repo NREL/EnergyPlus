@@ -81,6 +81,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     PlantLoop(1).FluidIndex = 1;
     PlantLoop(1).LoopSide(1).NodeNumOut = 1;
     PlantLoop(1).LoopSide(1).NodeNumIn = 1;
+    // Note LastTempInterfaceTankOutlet ends up getting reset to zero on the first pass
     PlantLoop(1).LoopSide(2).LastTempInterfaceTankOutlet = 80;
     PlantLoop(1).LoopSide(2).TotalPumpHeat = 500;
     DataLoopNode::Node.allocate(TotNumLoops);

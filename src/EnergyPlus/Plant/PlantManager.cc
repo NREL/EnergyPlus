@@ -2749,7 +2749,7 @@ namespace EnergyPlus {
                             side.LoopSideInlet_TotalTime += TimeStepSys;
                             // Determine excessive storage
                             if ((side.LoopSideInlet_McpDTdt > DataHVACGlobals::SmallLoad) &&
-                                (side.LoopSideInlet_MdotCpDeltaT < side.LoopSideInlet_McpDTdt)) {
+                                (abs(side.LoopSideInlet_MdotCpDeltaT) < side.LoopSideInlet_McpDTdt)) {
                                 side.LoopSideInlet_CapExcessStorageTimeReport = TimeStepSys;
                                 side.LoopSideInlet_CapExcessStorageTime += TimeStepSys;
                             } else {
