@@ -595,34 +595,15 @@ namespace HVACInterfaceManager {
         // tank. Note that this routine is called repeatedly to re calculate
         // loop capacitance based on current plant conditions
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataGlobals::HourOfDay;
         using DataGlobals::SecInHour;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
-        using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENTS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
         static std::string const RoutineName("UpdateHalfLoopInletTemp");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TankOutletLoopSide;    // inlet loopsidenumber
         int TankInletNode;         // inlet loop side outlet node
         int TankOutletNode;        // inlet loop side outlet node
