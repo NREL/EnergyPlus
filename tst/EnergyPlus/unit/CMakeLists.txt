@@ -1,11 +1,3 @@
-
-# this is repeated from the core E+ build, which is unfortunate
-# we need to either:
-# - figure out how to build the unit tests without the Python dependency, which would mean putting a conditional DEFINE in the PluginManager.hh code, or
-# - just get this once at highest level configure time and save it for everywhere
-find_package(PythonLibs 3 REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
-
 set( test_src
   TestHelpers/IdfParser.cc
   TestHelpers/IdfParser.hh
@@ -24,7 +16,6 @@ set( test_src
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
-  api/datatransfer.unit.cc
   BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc
@@ -213,23 +204,23 @@ set( test_src
   ZoneTempPredictorCorrector.unit.cc
   main.cc
 )
+
 set( test_dependencies
   energyplusapi
- )
+)
+
+if(LINK_WITH_PYTHON)
+  find_package(PythonLibs 3 REQUIRED)
+  include_directories(${PYTHON_INCLUDE_DIRS})
+  list(APPEND test_src api/datatransfer.unit.cc)
+  list(APPEND test_dependencies ${PYTHON_LIBRARIES} )
+endif()
 
 if(CMAKE_HOST_UNIX)
   if(NOT APPLE)
     list(APPEND test_dependencies dl )
   endif()
 endif()
-
-if(LINK_WITH_PYTHON)
-  add_definitions("-DLINK_WITH_PYTHON=1")
-else()
-  add_definitions("-DLINK_WITH_PYTHON=0")
-endif()
-
-list(APPEND test_dependencies ${PYTHON_LIBRARIES} )
 
 # Executable name will be EnergyPlus_tests
 # Execute energyplus_tests --help for options using gtest runner

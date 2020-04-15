@@ -830,7 +830,7 @@ if(LINK_WITH_PYTHON)
   # along with the python standard lib
   add_custom_command(
           TARGET energyplusapi
-          POST_BUILD
+          POST_BUILD  # TODO: I don't think we want to quote the generator expression here
           COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_standard_lib"
   )
 endif()

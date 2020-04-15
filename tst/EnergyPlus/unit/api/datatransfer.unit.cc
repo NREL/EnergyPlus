@@ -67,9 +67,6 @@ using namespace EnergyPlus;
 class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
 {
     // create a plugin manager instance
-    // TODO: Note that this requires the Python package to be built next to the E+ unit test binary
-    //       Right now, this is built inside the E+ src/EnergyPlus/CMakeLists.txt file, it should probably be a separate project
-    //       so that both E+ and the unit test binary can depend on it.
     EnergyPlus::PluginManagement::PluginManager pluginManager;
 
     struct DummyRealVariable
