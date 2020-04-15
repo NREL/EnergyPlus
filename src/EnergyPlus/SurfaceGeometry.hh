@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
 
@@ -81,6 +82,12 @@ namespace SurfaceGeometry {
     extern int const UnreconciledZoneSurface; // interim value between entering surfaces ("Surface") and reconciling
     // surface names in other zones
 
+    enum enclosureType
+    {
+        RadiantEnclosures,
+        SolarEnclosures
+    };
+    
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
@@ -346,8 +353,7 @@ namespace SurfaceGeometry {
 
     bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
 
-    void ProcessSurfaceVertices(int const ThisSurf, // Surface Number
-                                bool &ErrorsFound);
+    void ProcessSurfaceVertices(OutputFiles &outputFiles, int const ThisSurf, bool &ErrorsFound);
 
     void CalcCoordinateTransformation(int const SurfNum,            // Surface Number
                                       Vector &CompCoordTranslVector // Coordinate Translation Vector
@@ -378,9 +384,9 @@ namespace SurfaceGeometry {
 
     void SetupShadeSurfacesForSolarCalcs();
 
-    void SetupRadiantEnclosuresAndAirBoundaries(bool &ErrorsFound); // Set to true if errors found
-
-    void SetupSolarEnclosuresAndAirBoundaries(bool &ErrorsFound); // Set to true if errors found
+    void SetupEnclosuresAndAirBoundaries(Array1D<DataViewFactorInformation::ZoneViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
+                                         SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
+                                         bool &ErrorsFound);                                                        // Set to true if errors found
 
     void CheckConvexity(int const SurfNum, // Current surface number
                         int const NSides   // Number of sides to figure

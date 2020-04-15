@@ -60,6 +60,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReports.hh>
@@ -129,7 +130,7 @@ namespace CommandLineInterface {
         // Define options
         ezOptionParser opt;
 
-        opt.overview = VerString;
+        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage();
 
         opt.syntax = "energyplus [options] [input-file]";
 
@@ -383,13 +384,13 @@ namespace CommandLineInterface {
         }
 
         // EnergyPlus files
-        outputAuditFileName = outputFilePrefix + normalSuffix + ".audit";
+        OutputFiles::getSingleton().audit.fileName = outputFilePrefix + normalSuffix + ".audit";
         outputBndFileName = outputFilePrefix + normalSuffix + ".bnd";
         outputDxfFileName = outputFilePrefix + normalSuffix + ".dxf";
         OutputFiles::getSingleton().eio.fileName = outputFilePrefix + normalSuffix + ".eio";
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
-        outputEsoFileName = outputFilePrefix + normalSuffix + ".eso";
+        OutputFiles::getSingleton().eso.fileName = outputFilePrefix + normalSuffix + ".eso";
 
         outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
         outputTSZoneJsonFileName = outputFilePrefix + normalSuffix + "_detailed_zone.json";
@@ -875,7 +876,7 @@ namespace CommandLineInterface {
             if (iostatus != 0) {
                 ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             }
-            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputEsoFileName;
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << OutputFiles::getSingleton().eso.fileName;
             ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputCsvFileName;
             ObjexxFCL::gio::close(fileUnitNumber);
         }

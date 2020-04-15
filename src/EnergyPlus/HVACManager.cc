@@ -153,7 +153,6 @@ namespace HVACManager {
     using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::NumOfZones;
     using DataGlobals::OutputFileDebug;
-    using DataGlobals::OutputFileStandard;
     using DataGlobals::RunOptCondEntTemp;
     using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
@@ -301,10 +300,9 @@ namespace HVACManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
         static constexpr auto EndOfHeaderString("End of Data Dictionary");          // End of data dictionary marker
-        static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
         static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -554,14 +552,20 @@ namespace HVACManager {
                 if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
-                        ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
+                        print(outputFiles.eso, "{}\n", EndOfHeaderString);
                         print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                         PrintEndDataDictionary = false;
                     }
                     if (DoOutputReporting && !PrintedWarmup) {
-                        ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
-                            << "1"
-                            << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
+
+                        print(outputFiles.eso,
+                              EnvironmentStampFormatStr,
+                              "1",
+                              "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                              Latitude,
+                              Longitude,
+                              TimeZoneNumber,
+                              Elevation);
                         print(outputFiles.mtr,
                               EnvironmentStampFormatStr,
                               "1",
@@ -587,14 +591,19 @@ namespace HVACManager {
                 if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
-                        ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
+                        print(outputFiles.eso, "{}\n", EndOfHeaderString);
                         print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                         PrintEndDataDictionary = false;
                     }
                     if (DoOutputReporting && !PrintedWarmup) {
-                        ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
-                            << "1"
-                            << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
+                        print(outputFiles.eso,
+                              EnvironmentStampFormatStr,
+                              "1",
+                              "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                              Latitude,
+                              Longitude,
+                              TimeZoneNumber,
+                              Elevation);
                         print(outputFiles.mtr,
                               EnvironmentStampFormatStr,
                               "1",

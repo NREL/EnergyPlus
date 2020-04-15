@@ -1887,6 +1887,7 @@ namespace WindowManager {
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             if (Construct(ConstrNum).FromWindow5DataFile) continue;
             if (Construct(ConstrNum).WindowTypeBSDF) continue;
+            if (Construct(ConstrNum).TypeIsAirBoundaryInteriorWindow) continue;
             Construct(ConstrNum).TransDiff = 0.0;
             Construct(ConstrNum).TransDiffVis = 0.0;
             Construct(ConstrNum).AbsDiffBackShade = 0.0;
