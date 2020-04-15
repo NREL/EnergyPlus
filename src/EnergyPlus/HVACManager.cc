@@ -463,10 +463,12 @@ namespace HVACManager {
 
                 UpdateInternalGainValues(true, true);
 
-                ManageZoneAirUpdates(iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                ManageZoneAirUpdates(iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                     PriorTimeStep);
 
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                    ManageZoneContaminanUpdates(iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                                PriorTimeStep);
                 SimHVAC();
 
                 if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !WarmupFlag) {
@@ -481,13 +483,17 @@ namespace HVACManager {
                 // Need to set the flag back since we do not need to shift the temps back again in the correct step.
                 ShortenTimeStepSys = false;
 
-                ManageZoneAirUpdates(iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                ManageZoneAirUpdates(iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                     PriorTimeStep);
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                    ManageZoneContaminanUpdates(iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                                PriorTimeStep);
 
-                ManageZoneAirUpdates(iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                ManageZoneAirUpdates(iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys,
+                                     UseZoneTimeStepHistory, PriorTimeStep);
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(iPushSystemTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                    ManageZoneContaminanUpdates(iPushSystemTimestepHistories, ShortenTimeStepSys,
+                                                UseZoneTimeStepHistory, PriorTimeStep);
                 PreviousTimeStep = TimeStepSys;
             }
 
@@ -515,7 +521,9 @@ namespace HVACManager {
             // Update the plant and condenser loop capacitance model temperature history.
             UpdateNodeThermalHistory();
 
-            OutputReportTabular::CalcHeatEmissionReport();
+            if (OutputReportTabular::displayHeatEmissionsSummary) {
+                OutputReportTabular::CalcHeatEmissionReport();
+            }
 
             ManageEMS(emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
 
