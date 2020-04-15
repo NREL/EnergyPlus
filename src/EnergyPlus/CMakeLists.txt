@@ -776,11 +776,11 @@ set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 
 # bring in the Python API layer right next to the executable
 add_custom_command(
-        TARGET energyplus
+        TARGET energyplusapi
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
         -DREPO_ROOT=${PROJECT_SOURCE_DIR}
-        -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
+        -DEXECUTABLE_PATH=$<TARGET_FILE:energyplusapi>
         -DCMAKE_VERSION_MAJOR="${CMAKE_VERSION_MAJOR}"
         -DCMAKE_VERSION_MINOR="${CMAKE_VERSION_MINOR}"
         -DCMAKE_VERSION_PATCH="${CMAKE_VERSION_PATCH}"
@@ -799,11 +799,11 @@ if(LINK_WITH_PYTHON)
     # Windows is being ugly and linking against the Python DLL but not running unless it's close by
     # Force it here.
     add_custom_command(
-        TARGET energyplus
+        TARGET energyplusapi
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
           -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
-          -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
+          -DEXECUTABLE_PATH=$<TARGET_FILE:energyplusapi>
           -P ${PROJECT_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
     )
   endif()
@@ -829,9 +829,9 @@ if(LINK_WITH_PYTHON)
   endif()
   # along with the python standard lib
   add_custom_command(
-          TARGET energyplus
+          TARGET energyplusapi
           POST_BUILD
-          COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplus>" "python_standard_lib"
+          COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_standard_lib"
   )
 endif()
 
@@ -839,6 +839,7 @@ if(BUILD_PACKAGE)
   # if we are building package, we need to drop in some API/Plugin stuff
   if(LINK_WITH_PYTHON)
     # we'll want to grab the standard lib for python plugins
+    # TODO: I don't think we want to quote the generator expression
     install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/python_standard_lib/"
             DESTINATION "./python_standard_lib")
   endif()
@@ -848,6 +849,7 @@ if(BUILD_PACKAGE)
             DESTINATION "./include/EnergyPlus/api")
   endforeach()
   # we'll want to always grab the python API wrapper
+  # TODO: I don't think we want to quote the generator expression
   install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/pyenergyplus/"
           DESTINATION "./pyenergyplus")
 endif()
