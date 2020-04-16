@@ -41,8 +41,12 @@ SRC_DIR = os.path.abspath(os.path.join(REPO_ROOT, 'src', 'EnergyPlus'))
 # Files for which to ignore missing header warning
 EXPECT_MISSING_HEADER = ['src/EnergyPlus/main.cc',
                          'src/EnergyPlus/test_ep_as_library.cc',
-                         'EnergyPlusPgm.cc',
-                         'src/EnergyPlus/PythonLibWrapper.cc']
+                         'EnergyPlusPgm.cc']
+
+EXPECT_MISSING_NAMESPACE = [
+    'src/EnergyPlus/PythonLibWrapper.cc',
+    'src/EnergyPlus/PythonLibWrapper.hh'
+]
 
 # Finds a boolean argument passed by reference
 # Optional_bool acts like one, Array_XD_bool is another possibility
@@ -753,16 +757,17 @@ def get_all_errors(source_files):
         try:
             found_functions = parse_function_signatures_in_header(header_file)
         except ValueError as e:
-            if IS_CI:
-                ci_msg = {
-                    'tool': 'find_byref_bool_override',
-                    'file': rel_file,
-                    'messagetype': 'warning',
-                    'message': str(e)
-                }
-                print(json.dumps(ci_msg))
-            else:
-                warnings.warn(str(e))
+            if (rel_file not in EXPECT_MISSING_NAMESPACE) and INCLUDE_WARNINGS:
+                if IS_CI:
+                    ci_msg = {
+                        'tool': 'find_byref_bool_override',
+                        'file': rel_file,
+                        'messagetype': 'warning',
+                        'message': str(e)
+                    }
+                    print(json.dumps(ci_msg))
+                else:
+                    warnings.warn(str(e))
             continue
         if not found_functions:
             # print("No problem for {}".format(rel_file))
