@@ -57,35 +57,41 @@
 #include <Python.h>
 #endif
 
+#if _WIN32 || _MSC_VER
+#define PYTHONWRAP_API __declspec(dllexport)
+#else
+#define PYTHONWRAP_API
+#endif
+
 extern "C" {
-    const char * EP_Wrap_Py_GetVersion() {return Py_GetVersion();}
-    wchar_t * EP_Wrap_Py_DecodeLocale(const char * s, unsigned long * size) {return Py_DecodeLocale(s, size);}
-    void EP_Wrap_Py_InitializeEx(int i) {Py_InitializeEx(i);}
-    int EP_Wrap_PyRun_SimpleString(const char * c) {return PyRun_SimpleString(c);}
-    int EP_Wrap_Py_FinalizeEx() {return Py_FinalizeEx();}
-    void EP_Wrap_PyErr_Fetch(PyObject **a, PyObject **b, PyObject **c) {PyErr_Fetch(a, b, c);}
-    PyObject * EP_Wrap_PyObject_Repr(PyObject * o) {return PyObject_Repr(o);}
-    PyObject * EP_Wrap_PyUnicode_AsEncodedString(PyObject *a, const char *b, const char *c) {return PyUnicode_AsEncodedString(a, b, c);}
-    char * EP_Wrap_PyBytes_AsString(PyObject *o) {return PyBytes_AsString(o);}
-    PyObject * EP_Wrap_PyUnicode_DecodeFSDefault(const char *s) {return PyUnicode_DecodeFSDefault(s);}
-    PyObject * EP_Wrap_PyImport_Import(PyObject *name) {return PyImport_Import(name);}
-    void EP_Wrap_Py_DECREF(PyObject *o) {Py_DECREF(o);}
-    PyObject * EP_Wrap_PyErr_Occurred() {return PyErr_Occurred();}
-    PyObject * EP_Wrap_PyModule_GetDict(PyObject *module) {return PyModule_GetDict(module);}
-    PyObject * EP_Wrap_PyDict_GetItemString(PyObject *p, const char *key) {return PyDict_GetItemString(p, key);}
-    const char * EP_Wrap_PyUnicode_AsUTF8(PyObject *unicode) {return PyUnicode_AsUTF8(unicode);}
-    PyObject * EP_Wrap_PyUnicode_AsUTF8String(PyObject *unicode) {return PyUnicode_AsUTF8String(unicode);}
-    int EP_Wrap_PyCallable_Check(PyObject *o) {return PyCallable_Check(o);}
-    PyObject * EP_Wrap_PyObject_CallObject(PyObject *callable, PyObject *args) {return PyObject_CallObject(callable, args);}
-    PyObject * EP_Wrap_PyObject_GetAttrString(PyObject *o, const char *attr_name) {return PyObject_GetAttrString(o, attr_name);}
-    PyObject * EP_Wrap_PyObject_CallFunction(PyObject *callable, const char *format) {return PyObject_CallFunction(callable, format);}
-    PyObject * EP_Wrap_PyObject_CallMethod(PyObject *obj, const char *name, const char *format) {return PyObject_CallMethod(obj, name, format);}
-    int EP_Wrap_PyList_Check(PyObject *p) {return PyList_Check(p);} // NOLINT(hicpp-signed-bitwise)
-    unsigned long EP_Wrap_PyList_Size(PyObject *list) {return PyList_Size(list);}
-    PyObject * EP_Wrap_PyList_GetItem(PyObject *list, Py_ssize_t index) {return PyList_GetItem(list, index);}
-    int EP_Wrap_PyUnicode_Check(PyObject *o) {return PyUnicode_Check(o);} // NOLINT(hicpp-signed-bitwise)
-    int EP_Wrap_PyLong_Check(PyObject *p) {return PyLong_Check(p);} // NOLINT(hicpp-signed-bitwise)
-    long EP_Wrap_PyLong_AsLong(PyObject *obj) {return PyLong_AsLong(obj);}
-    void EP_Wrap_Py_SetPath(const wchar_t *t) {return Py_SetPath(t);}
-    void EP_Wrap_Py_SetPythonHome(const wchar_t *home) {return Py_SetPythonHome(home);}
+    PYTHONWRAP_API const char * EP_Wrap_Py_GetVersion() {return Py_GetVersion();}
+    PYTHONWRAP_API wchar_t * EP_Wrap_Py_DecodeLocale(const char * s, size_t * size) {return Py_DecodeLocale(s, size);}
+    PYTHONWRAP_API void EP_Wrap_Py_InitializeEx(int i) {Py_InitializeEx(i);}
+    PYTHONWRAP_API int EP_Wrap_PyRun_SimpleString(const char * c) {return PyRun_SimpleString(c);}
+    PYTHONWRAP_API int EP_Wrap_Py_FinalizeEx() {return Py_FinalizeEx();}
+    PYTHONWRAP_API void EP_Wrap_PyErr_Fetch(PyObject **a, PyObject **b, PyObject **c) {PyErr_Fetch(a, b, c);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_Repr(PyObject * o) {return PyObject_Repr(o);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyUnicode_AsEncodedString(PyObject *a, const char *b, const char *c) {return PyUnicode_AsEncodedString(a, b, c);}
+    PYTHONWRAP_API char * EP_Wrap_PyBytes_AsString(PyObject *o) {return PyBytes_AsString(o);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyUnicode_DecodeFSDefault(const char *s) {return PyUnicode_DecodeFSDefault(s);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyImport_Import(PyObject *name) {return PyImport_Import(name);}
+    PYTHONWRAP_API void EP_Wrap_Py_DECREF(PyObject *o) {Py_DECREF(o);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyErr_Occurred() {return PyErr_Occurred();}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyModule_GetDict(PyObject *module) {return PyModule_GetDict(module);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyDict_GetItemString(PyObject *p, const char *key) {return PyDict_GetItemString(p, key);}
+    PYTHONWRAP_API const char * EP_Wrap_PyUnicode_AsUTF8(PyObject *unicode) {return PyUnicode_AsUTF8(unicode);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyUnicode_AsUTF8String(PyObject *unicode) {return PyUnicode_AsUTF8String(unicode);}
+    PYTHONWRAP_API int EP_Wrap_PyCallable_Check(PyObject *o) {return PyCallable_Check(o);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallObject(PyObject *callable, PyObject *args) {return PyObject_CallObject(callable, args);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_GetAttrString(PyObject *o, const char *attr_name) {return PyObject_GetAttrString(o, attr_name);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallFunction(PyObject *callable, const char *format) {return PyObject_CallFunction(callable, format);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallMethod(PyObject *obj, const char *name, const char *format) {return PyObject_CallMethod(obj, name, format);}
+    PYTHONWRAP_API int EP_Wrap_PyList_Check(PyObject *p) {return PyList_Check(p);} // NOLINT(hicpp-signed-bitwise)
+    PYTHONWRAP_API unsigned long EP_Wrap_PyList_Size(PyObject *list) {return PyList_Size(list);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyList_GetItem(PyObject *list, Py_ssize_t index) {return PyList_GetItem(list, index);}
+    PYTHONWRAP_API int EP_Wrap_PyUnicode_Check(PyObject *o) {return PyUnicode_Check(o);} // NOLINT(hicpp-signed-bitwise)
+    PYTHONWRAP_API int EP_Wrap_PyLong_Check(PyObject *p) {return PyLong_Check(p);} // NOLINT(hicpp-signed-bitwise)
+    PYTHONWRAP_API long EP_Wrap_PyLong_AsLong(PyObject *obj) {return PyLong_AsLong(obj);}
+    PYTHONWRAP_API void EP_Wrap_Py_SetPath(const wchar_t *t) {return Py_SetPath(t);}
+    PYTHONWRAP_API void EP_Wrap_Py_SetPythonHome(wchar_t *home) {return Py_SetPythonHome(home);}
 }
