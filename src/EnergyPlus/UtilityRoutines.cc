@@ -699,7 +699,6 @@ void CloseMiscOpenFiles()
     // na
 
     // Using/Aliasing
-    using DataGlobals::OutputFileDebug;
     using DataReportingFlags::DebugOutput;
     using DaylightingManager::CloseDFSFile;
     using DaylightingManager::CloseReportIllumMaps;
@@ -716,9 +715,6 @@ void CloseMiscOpenFiles()
     // DERIVED TYPE DEFINITIONS
     // na
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string DebugPosition;
-
     //      LOGICAL :: exists, opened
     //      INTEGER :: UnitNumber
     //      INTEGER :: ios
@@ -726,26 +722,10 @@ void CloseMiscOpenFiles()
     CloseReportIllumMaps();
     CloseDFSFile();
 
-    //  In case some debug output was produced, it appears that the
-    //  position on the INQUIRE will not be 'ASIS' (3 compilers tested)
-    //  So, will want to keep....
-
-    {
-        IOFlags flags;
-        ObjexxFCL::gio::inquire(OutputFileDebug, flags);
-        DebugPosition = flags.POSITION();
-    }
-    if (DebugPosition != "ASIS") {
-        DebugOutput = true;
-    }
-    if (DebugOutput) {
-        ObjexxFCL::gio::close(OutputFileDebug);
+    if (DebugOutput || OutputFiles::getSingleton().debug.position() > 0) {
+        OutputFiles::getSingleton().debug.close();
     } else {
-        {
-            IOFlags flags;
-            flags.DISPOSE("DELETE");
-            ObjexxFCL::gio::close(OutputFileDebug, flags);
-        }
+        OutputFiles::getSingleton().debug.del();
     }
 }
 

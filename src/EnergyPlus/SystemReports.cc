@@ -251,7 +251,7 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports()
+    void InitEnergyReports(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -957,7 +957,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -977,7 +977,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -997,7 +997,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -1016,7 +1016,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -1036,7 +1036,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -1056,7 +1056,7 @@ namespace SystemReports {
                 LoopCount = 1;
 
                 if (LoopType > 0 && LoopNum > 0) {
-                    FindFirstLastPtr(LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
+                    FindFirstLastPtr(outputFiles, LoopType, LoopNum, ArrayCount, LoopCount, ConnectionFlag);
                 } else {
                     ConnectionFlag = false;
                 }
@@ -1203,7 +1203,7 @@ namespace SystemReports {
         // initialize energy report variables
     }
 
-    void FindFirstLastPtr(int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag)
+    void FindFirstLastPtr(OutputFiles &outputFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -1308,7 +1308,7 @@ namespace SystemReports {
                             DemandSideConnect(ArrayCount).CompNum = DemandSideCompNum;
 
                             found = false;
-                            ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "1271=lstacksize" << size(LoopStack);
+                            print(outputFiles.debug, "1271=lstacksize {}\n", size(LoopStack));
                             for (Idx = 1; Idx <= isize(LoopStack); ++Idx) {
                                 if (DemandSideLoopNum == LoopStack(Idx).LoopNum && DemandSideLoopType == LoopStack(Idx).LoopType) {
                                     found = true;
@@ -1374,7 +1374,7 @@ namespace SystemReports {
                     }
                 }
             } else {
-                ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "1361=error";
+                print(outputFiles.debug, "{}\n", "1361=error");
                 // error
             }
 

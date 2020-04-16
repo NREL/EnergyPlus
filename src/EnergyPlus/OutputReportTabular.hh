@@ -808,7 +808,7 @@ namespace OutputReportTabular {
 
     void WriteCompCostTable();
 
-    void WriteVeriSumTable();
+    void WriteVeriSumTable(OutputFiles &outputFiles);
 
     void WriteAdaptiveComfortTable();
 
