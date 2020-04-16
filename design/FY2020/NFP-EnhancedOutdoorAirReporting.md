@@ -719,7 +719,7 @@ from the old report to the new report, and add subtables and new columns to supp
 - Update OutputReportTabular::FillRemainingPredefinedEntries() to support the new report columns and remove unused columns
 of results from the old report.
 
-- Update SystemReports::ReportMaxVentilationLoads() wqhich calculates the OA mass flow rate for each zone for both zone 
+- Update SystemReports::ReportMaxVentilationLoads() which calculates the OA mass flow rate for each zone for both zone 
 equipment and air loops. 
 
 - Update DataZoneEquipment::CalcDesignSpecificationOutdoorAir() which is called by SingleDuct.cc::CalcOAMassFlow() 
