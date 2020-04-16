@@ -201,7 +201,7 @@ namespace ReportSizingManager {
                        std::string const &SizingString,   // string containing info for eio report
                        Real64 &SizingResult,              // result of the sizing procedure
                        bool const PrintWarningFlag,       // TRUE when requesting output (eio) reporting
-                       std::string const &CallingRoutine, // name of calling routine for warning messages
+                       std::string_view CallingRoutine, // name of calling routine for warning messages
                        Real64 const fraction)
     {
         // SUBROUTINE INFORMATION :
@@ -486,7 +486,7 @@ namespace ReportSizingManager {
                 AutosizeDes = DataConstantUsedForSizing * DataFractionUsedForSizing;
                 HardSizeNoDesRun = false;
             } else {
-                ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName);
+                ShowSevereError(format("{} {} {}", CallingRoutine, CompType, CompName));
                 ShowContinueError("... DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " + SizingString +
                                   " must both be greater than 0.");
                 ShowFatalError("Preceding conditions cause termination.");
@@ -1884,7 +1884,7 @@ namespace ReportSizingManager {
                     AutosizeDes -= fanDeltaT;
 
                     if (AutosizeDes < DataDesInletWaterTemp && DataWaterFlowUsedForSizing > 0.0) { // flow here is water vol flow rate
-                        ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
+                        ShowWarningError(std::string{CallingRoutine} + ":" + " Coil=\"" + CompName +
                                          "\", Cooling Coil has leaving air temperature < entering water temperature.");
                         ShowContinueError("    Tair,out  =  " + RoundSigDigits(AutosizeDes, 3));
                         ShowContinueError("    Twater,in = " + RoundSigDigits(DataDesInletWaterTemp, 3));
@@ -1917,7 +1917,7 @@ namespace ReportSizingManager {
                     }
                     if (AutosizeDes > DataDesInletAirHumRat && (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
                                                                 UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
-                        ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
+                        ShowWarningError(std::string{CallingRoutine} + ":" + " Coil=\"" + CompName +
                                          "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.");
                         ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6));
                         ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
@@ -1937,7 +1937,7 @@ namespace ReportSizingManager {
                         if (AutosizeDes < DataDesInletAirHumRat && (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
                                                                     UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
                             ShowWarningError(
-                                CallingRoutine + ":" + " Coil=\"" + CompName +
+                                std::string{CallingRoutine} + ":" + " Coil=\"" + CompName +
                                 "\", Cooling Coil is running dry for sizing and has minimum humidity ratio at saturation for inlet chilled water "
                                 "temperature > coil entering air humidity ratio.");
                             ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6));
@@ -2114,7 +2114,7 @@ namespace ReportSizingManager {
                     AutosizeDes = AutosizeDes * DataFracOfAutosizedCoolingCapacity;
                     DataDesAccountForFanHeat = true; // reset for next water coil
                     if (DisplayExtraWarnings && AutosizeDes <= 0.0) {
-                        ShowWarningMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
+                        ShowWarningMessage(std::string{CallingRoutine} + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                         ShowContinueError("...Rated Total Cooling Capacity = " + TrimSigDigits(AutosizeDes, 2) + " [W]");
                         if (ZoneEqSizing(CurZoneEqNum).CoolingCapacity) {
                             ShowContinueError("...Capacity passed by parent object to size child component = " + TrimSigDigits(AutosizeDes, 2) +
@@ -2229,7 +2229,7 @@ namespace ReportSizingManager {
                         AutosizeDes = NominalCapacityDes * DataHeatSizeRatio * DataFracOfAutosizedHeatingCapacity;
                     }
                     if (DisplayExtraWarnings && AutosizeDes <= 0.0) {
-                        ShowWarningMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
+                        ShowWarningMessage(std::string{CallingRoutine} + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                         ShowContinueError("...Rated Total Heating Capacity = " + TrimSigDigits(AutosizeDes, 2) + " [W]");
                         if (ZoneEqSizing(CurZoneEqNum).HeatingCapacity || (DataCoolCoilCap > 0.0 && DataFlowUsedForSizing > 0.0)) {
                             ShowContinueError(
@@ -2286,7 +2286,7 @@ namespace ReportSizingManager {
                     }
                     AutosizeDes = NominalCapacityDes * DataHeatSizeRatio;
                     if (DisplayExtraWarnings && AutosizeDes <= 0.0) {
-                        ShowWarningMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
+                        ShowWarningMessage(std::string{CallingRoutine} + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                         ShowContinueError("...Rated Total Heating Capacity = " + TrimSigDigits(AutosizeDes, 2) + " [W]");
                         ShowContinueError("...Air flow rate used for sizing = " + TrimSigDigits(DesMassFlow / StdRhoAir, 5) + " [m3/s]");
                         if (TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil || ZoneEqUnitHeater) {
@@ -2480,7 +2480,7 @@ namespace ReportSizingManager {
                                       (DataCapacityUsedForSizing /
                                        (DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnW(FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat)));
                     } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
+                        ShowSevereError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
                         ShowContinueError("SizingString = " + SizingString +
                                           ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
                         ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
@@ -2491,7 +2491,7 @@ namespace ReportSizingManager {
                                       (DataCapacityUsedForSizing /
                                        (DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnW(FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat)));
                     } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
+                        ShowSevereError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
                         ShowContinueError("SizingString = " + SizingString +
                                           ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
                         ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
@@ -2502,7 +2502,7 @@ namespace ReportSizingManager {
                                       (DataCapacityUsedForSizing /
                                        (DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnW(FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak)));
                     } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
+                        ShowSevereError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
                         ShowContinueError("SizingString = " + SizingString +
                                           ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
                         ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
@@ -2513,7 +2513,7 @@ namespace ReportSizingManager {
                                       (DataCapacityUsedForSizing /
                                        (DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnW(FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtHeatPeak)));
                     } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
+                        ShowSevereError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
                         ShowContinueError("SizingString = " + SizingString +
                                           ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
                         ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
@@ -2966,7 +2966,7 @@ namespace ReportSizingManager {
                         AutosizeDes -= fanDeltaT;
                     }
                     if (AutosizeDes < DataDesInletWaterTemp && DataWaterFlowUsedForSizing > 0.0) {
-                        ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
+                        ShowWarningError(std::string{CallingRoutine} + ":" + " Coil=\"" + CompName +
                                          "\", Cooling Coil has leaving air temperature < entering water temperature.");
                         ShowContinueError("    Tair,out  =  " + RoundSigDigits(AutosizeDes, 3));
                         ShowContinueError("    Twater,in = " + RoundSigDigits(DataDesInletWaterTemp, 3));
@@ -3014,7 +3014,7 @@ namespace ReportSizingManager {
                     if (AutosizeDes > DataDesInletAirHumRat &&
                         (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
                          UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) { // flow here is water vol flow rate
-                        ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
+                        ShowWarningError(std::string{CallingRoutine} + ":" + " Coil=\"" + CompName +
                                          "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.");
                         ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]");
                         ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [kgWater/kgDryAir]");
@@ -3033,7 +3033,7 @@ namespace ReportSizingManager {
                     if (AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat) {
                         if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER") ||
                             UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
-                            ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
+                            ShowWarningError(std::string{CallingRoutine} + ":" + " Coil=\"" + CompName +
                                              "\", Cooling Coil is running dry for sizing because minimum humidity ratio at saturation for inlet "
                                              "chilled water temperature > design air entering humidity ratio.");
                             ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]");
@@ -3114,7 +3114,7 @@ namespace ReportSizingManager {
                             AutosizeDes *= fraction;
                         }
                     } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName);
+                        ShowSevereError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName);
                         ShowContinueError("... DataFlowUsedForSizing and DataCapacityUsedForSizing " + SizingString +
                                           " must both be greater than 0.");
                         ShowFatalError("Preceding conditions cause termination.");
@@ -3317,7 +3317,7 @@ namespace ReportSizingManager {
                     }                                                                // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
                     DataDesAccountForFanHeat = true;                                 // reset for next water coil
                     if (DisplayExtraWarnings && AutosizeDes <= 0.0) {
-                        ShowWarningMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
+                        ShowWarningMessage(std::string{CallingRoutine} + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                         ShowContinueError("...Rated Total Cooling Capacity = " + TrimSigDigits(AutosizeDes, 2) + " [W]");
                         if (OASysFlag || AirLoopSysFlag || FinalSysSizing(CurSysNum).CoolingCapMethod == CapacityPerFloorArea ||
                             (FinalSysSizing(CurSysNum).CoolingCapMethod == CoolingDesignCapacity && FinalSysSizing(CurSysNum).CoolingTotalCapacity)) {
@@ -3478,7 +3478,7 @@ namespace ReportSizingManager {
                     }
                     AutosizeDes = NominalCapacityDes * DataHeatSizeRatio * DataFracOfAutosizedHeatingCapacity;
                     if (DisplayExtraWarnings && AutosizeDes <= 0.0) {
-                        ShowWarningMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
+                        ShowWarningMessage(std::string{CallingRoutine} + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                         ShowContinueError("...Rated Total Heating Capacity = " + TrimSigDigits(AutosizeDes, 2) + " [W]");
                         if (CoilOutTemp > -999.0) {
                             ShowContinueError("...Air flow rate used for sizing = " + TrimSigDigits(DesVolFlow, 5) + " [m3/s]");
@@ -3689,7 +3689,7 @@ namespace ReportSizingManager {
                         }
                         AutosizeDes = CoilInTemp - (DataCapacityUsedForSizing / (DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnW(CoilInHumRat)));
                     } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
+                        ShowSevereError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
                         ShowContinueError("SizingString = " + SizingString +
                                           ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
                         ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
@@ -3718,7 +3718,7 @@ namespace ReportSizingManager {
                         }
                         AutosizeDes = CoilInTemp + (DataCapacityUsedForSizing / (DataFlowUsedForSizing * StdRhoAir * PsyCpAirFnW(CoilInHumRat)));
                     } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
+                        ShowSevereError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
                         ShowContinueError("SizingString = " + SizingString +
                                           ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
                         ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
@@ -3729,7 +3729,7 @@ namespace ReportSizingManager {
                                       (DataCapacityUsedForSizing / (DataFlowUsedForSizing * StdRhoAir *
                                                                     PsyCpAirFnW(FinalZoneSizing(DataZoneUsedForSizing).ZoneHumRatAtCoolPeak)));
                     } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
+                        ShowSevereError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
                         ShowContinueError("SizingString = " + SizingString +
                                           ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
                         ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
@@ -3742,7 +3742,7 @@ namespace ReportSizingManager {
                                       (DataCapacityUsedForSizing / (DataFlowUsedForSizing * StdRhoAir *
                                                                     PsyCpAirFnW(FinalZoneSizing(DataZoneUsedForSizing).ZoneHumRatAtHeatPeak)));
                     } else {
-                        ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
+                        ShowSevereError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
                         ShowContinueError("SizingString = " + SizingString +
                                           ", DataCapacityUsedForSizing = " + TrimSigDigits(DataCapacityUsedForSizing, 1));
                         ShowContinueError("SizingString = " + SizingString + ", DataFlowUsedForSizing = " + TrimSigDigits(DataFlowUsedForSizing, 1));
@@ -3771,7 +3771,7 @@ namespace ReportSizingManager {
                     }
                     if (DisplayExtraWarnings) {
                         if ((std::abs(AutosizeDes - AutosizeUser) / AutosizeUser) > AutoVsHardSizingThreshold) {
-                            ShowMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
+                            ShowMessage(std::string{CallingRoutine} + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                             ShowContinueError("User-Specified " + SizingString + " = " + RoundSigDigits(AutosizeUser, 5));
                             ShowContinueError("differs from Design Size " + SizingString + " = " + RoundSigDigits(AutosizeDes, 5));
                             ShowContinueError("This may, or may not, indicate mismatched component sizes.");
@@ -3779,7 +3779,7 @@ namespace ReportSizingManager {
                         }
                     }
                 } else {
-                    ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
+                    ShowSevereError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete.");
                     ShowContinueError("SizingString = " + SizingString + ", SizingResult = " + TrimSigDigits(SizingResult, 1));
                     // ShowFatalError( " Previous errors cause program termination" );
                 }
@@ -3862,7 +3862,7 @@ namespace ReportSizingManager {
                     }
                     if (RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap(DXCT)) {
                         if (!DataEMSOverride && DisplayExtraWarnings && PrintWarningFlag) {
-                            ShowWarningError(CallingRoutine + ' ' + CompType + ' ' + CompName);
+                            ShowWarningError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName);
                             ShowContinueError("..." + SizingString +
                                               " will be limited by the minimum rated volume flow per rated total capacity ratio.");
                             ShowContinueError("...DX coil volume flow rate (m3/s ) = " + TrimSigDigits(DesVolFlow, 6));
@@ -3880,7 +3880,7 @@ namespace ReportSizingManager {
                         }
                     } else if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
                         if (!DataEMSOverride && DisplayExtraWarnings && PrintWarningFlag) {
-                            ShowWarningError(CallingRoutine + ' ' + CompType + ' ' + CompName);
+                            ShowWarningError(std::string{CallingRoutine} + ' ' + CompType + ' ' + CompName);
                             ShowContinueError("..." + SizingString +
                                               " will be limited by the maximum rated volume flow per rated total capacity ratio.");
                             ShowContinueError("...DX coil volume flow rate ( m3/s ) = " + TrimSigDigits(DesVolFlow, 6));
@@ -3918,7 +3918,7 @@ namespace ReportSizingManager {
                     }
                     if (DisplayExtraWarnings && PrintWarningFlag) {
                         if ((std::abs(AutosizeDes - AutosizeUser) / AutosizeUser) > AutoVsHardSizingThreshold) {
-                            ShowMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
+                            ShowMessage(std::string{CallingRoutine} + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                             ShowContinueError("User-Specified " + SizingString + " = " + RoundSigDigits(AutosizeUser, 5));
                             ShowContinueError("differs from Design Size " + SizingString + " = " + RoundSigDigits(AutosizeDes, 5));
                             ShowContinueError("This may, or may not, indicate mismatched component sizes.");
@@ -3956,7 +3956,7 @@ namespace ReportSizingManager {
                     }
                     if (DisplayExtraWarnings) {
                         if ((std::abs(AutosizeDes - AutosizeUser) / AutosizeUser) > AutoVsHardSizingThreshold) {
-                            ShowMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
+                            ShowMessage(std::string{CallingRoutine} + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                             ShowContinueError("User-Specified " + SizingString + " = " + RoundSigDigits(AutosizeUser, 5));
                             ShowContinueError("differs from Design Size " + SizingString + " = " + RoundSigDigits(AutosizeDes, 5));
                             ShowContinueError("This may, or may not, indicate mismatched component sizes.");
@@ -3968,7 +3968,7 @@ namespace ReportSizingManager {
                     ReportSizingOutput(CompType, CompName, "Design Size " + SizingString, AutosizeDes, ScalableSM + SizingString, AutosizeUser);
                     if (DisplayExtraWarnings) {
                         if ((std::abs(AutosizeDes - AutosizeUser) / AutosizeUser) > AutoVsHardSizingThreshold) {
-                            ShowMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
+                            ShowMessage(std::string{CallingRoutine} + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                             ShowContinueError(ScalableSM + SizingString + " = " + RoundSigDigits(AutosizeUser, 5));
                             ShowContinueError("differs from Design Size " + SizingString + " = " + RoundSigDigits(AutosizeDes, 5));
                             ShowContinueError("This may, or may not, indicate mismatched component sizes.");

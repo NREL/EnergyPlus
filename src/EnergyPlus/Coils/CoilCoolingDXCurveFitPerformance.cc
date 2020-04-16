@@ -377,7 +377,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
             "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')\n");
     print(outputFiles.eio, Format_890);
 
-    std::string const RoutineName = "CoilCoolingDXCurveFitPerformance::calcStandardRatings";
+    static constexpr std::string_view RoutineName{"CoilCoolingDXCurveFitPerformance::calcStandardRatings"};
 
     // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
     // specifies a nominal/default fan electric power consumption per rated air

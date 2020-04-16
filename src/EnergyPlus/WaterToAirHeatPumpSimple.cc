@@ -617,7 +617,7 @@ namespace WaterToAirHeatPumpSimple {
         NumArray.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found getting input. Program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors found getting input. Program terminates.");
         }
 
         for (HPNum = 1; HPNum <= NumWatertoAirHPs; ++HPNum) {
@@ -1835,7 +1835,7 @@ namespace WaterToAirHeatPumpSimple {
                 if (SimpleWatertoAirHP(HPNum).RatedCapCoolSens > SimpleWatertoAirHP(HPNum).RatedCapCoolTotal) {
                     ShowWarningError("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
                                      SimpleWatertoAirHP(HPNum).Name + "\"");
-                    ShowContinueError(RoutineName + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
+                    ShowContinueError(std::string{RoutineName} + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
                     ShowContinueError("Each of these capacity inputs have been autosized.");
                     ShowContinueError("Rated Sensible Cooling Capacity = " + TrimSigDigits(SimpleWatertoAirHP(HPNum).RatedCapCoolSens, 2) + " W");
                     ShowContinueError("Rated Total Cooling Capacity    = " + TrimSigDigits(SimpleWatertoAirHP(HPNum).RatedCapCoolTotal, 2) + " W");
@@ -1861,7 +1861,7 @@ namespace WaterToAirHeatPumpSimple {
                 if (SimpleWatertoAirHP(HPNum).RatedCapCoolSens > SimpleWatertoAirHP(HPNum).RatedCapCoolTotal) {
                     ShowWarningError("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
                                      SimpleWatertoAirHP(HPNum).Name + "\"");
-                    ShowContinueError(RoutineName + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
+                    ShowContinueError(std::string{RoutineName} + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
                     ShowContinueError("Only the rated total capacity input is autosized, consider autosizing both inputs.");
                     ShowContinueError("Rated Sensible Cooling Capacity = " + TrimSigDigits(SimpleWatertoAirHP(HPNum).RatedCapCoolSens, 2) + " W");
                     ShowContinueError("Rated Total Cooling Capacity    = " + TrimSigDigits(SimpleWatertoAirHP(HPNum).RatedCapCoolTotal, 2) + " W");
@@ -1896,7 +1896,7 @@ namespace WaterToAirHeatPumpSimple {
                 if (RatedCapHeatDes == AutoSize) {
                     ShowWarningError("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
                                      SimpleWatertoAirHP(HPNum).Name + "\"");
-                    ShowContinueError(RoutineName + ": Heating coil could not be autosized since cooling coil was not previously sized.");
+                    ShowContinueError(std::string{RoutineName} + ": Heating coil could not be autosized since cooling coil was not previously sized.");
                     ShowContinueError("... Cooling coil must be upstream of heating coil.");
                     ShowContinueError("... Manually sizing this heating coil will be required.");
                 }

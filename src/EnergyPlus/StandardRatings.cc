@@ -2793,7 +2793,7 @@ namespace StandardRatings {
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
                     if (DisplayExtraWarnings) {
-                        ShowContinueError(RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
@@ -2943,7 +2943,7 @@ namespace StandardRatings {
                     ShowContinueError(" Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
                     if (DisplayExtraWarnings) {
-                        ShowContinueError(RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
@@ -3008,7 +3008,7 @@ namespace StandardRatings {
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
                     if (DisplayExtraWarnings) {
-                        ShowContinueError(RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
@@ -3119,7 +3119,7 @@ namespace StandardRatings {
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
                     if (DisplayExtraWarnings) {
-                        ShowContinueError(RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }

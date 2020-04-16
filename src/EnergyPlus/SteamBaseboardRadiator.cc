@@ -393,7 +393,7 @@ namespace SteamBaseboardRadiator {
             } else {
                 SteamBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (SteamBaseboard(BaseboardNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
+                    ShowSevereError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2) + "\" not found.");
                     ErrorsFound = true;
                 }
@@ -475,13 +475,13 @@ namespace SteamBaseboardRadiator {
             // Maximum steam flow rate
             SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = rNumericArgs(5);
             if (SteamBaseboard(BaseboardNum).SteamVolFlowRateMax >= MaxSteamFlowRate) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(5) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(5) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxSteamFlowRate, 2) + "].");
                 SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = MaxSteamFlowRate;
             } else if (SteamBaseboard(BaseboardNum).SteamVolFlowRateMax <= MinSteamFlowRate &&
                        SteamBaseboard(BaseboardNum).SteamVolFlowRateMax != AutoSize) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
                                  " was less than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinSteamFlowRate, 2) + "].");
                 SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = MinSteamFlowRate;
@@ -491,19 +491,19 @@ namespace SteamBaseboardRadiator {
             // Set default convergence tolerance
             if (SteamBaseboard(BaseboardNum).Offset <= 0.0) {
                 SteamBaseboard(BaseboardNum).Offset = 0.001;
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(6) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(6) +
                                  " was less than the allowable minimum.");
                 ShowContinueError("...reset to default value=[0.001].");
             }
             // Fraction of radiant heat out of the total heating rate of the unit
             SteamBaseboard(BaseboardNum).FracRadiant = rNumericArgs(7);
             if (SteamBaseboard(BaseboardNum).FracRadiant < MinFraction) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
                                  " was lower than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinFraction, 3) + "].");
                 SteamBaseboard(BaseboardNum).FracRadiant = MinFraction;
             } else if (SteamBaseboard(BaseboardNum).FracRadiant > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 3) + "].");
                 SteamBaseboard(BaseboardNum).FracRadiant = MaxFraction;
@@ -512,7 +512,7 @@ namespace SteamBaseboardRadiator {
             // Remaining fraction is added to the zone as convective heat transfer
             AllFracsSummed = SteamBaseboard(BaseboardNum).FracRadiant;
             if (AllFracsSummed > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) +
                                  "\", Fraction Radiant was higher than the allowable maximum.");
                 SteamBaseboard(BaseboardNum).FracRadiant = MaxFraction;
                 SteamBaseboard(BaseboardNum).FracConvect = 0.0;
@@ -522,13 +522,13 @@ namespace SteamBaseboardRadiator {
             // Fraction of radiant heat addition to the people within the radiant heating capacity specified by the user
             SteamBaseboard(BaseboardNum).FracDistribPerson = rNumericArgs(8);
             if (SteamBaseboard(BaseboardNum).FracDistribPerson < MinFraction) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(8) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(8) +
                                  " was lower than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinFraction, 3) + "].");
                 SteamBaseboard(BaseboardNum).FracDistribPerson = MinFraction;
             }
             if (SteamBaseboard(BaseboardNum).FracDistribPerson > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(8) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(8) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 3) + "].");
                 SteamBaseboard(BaseboardNum).FracDistribPerson = MaxFraction;
@@ -542,7 +542,7 @@ namespace SteamBaseboardRadiator {
             //        SteamBaseboard(BaseboardNum)%TotSurfToDistrib = MaxDistribSurfaces
             //      END IF
             if ((SteamBaseboard(BaseboardNum).TotSurfToDistrib < MinDistribSurfaces) && (SteamBaseboard(BaseboardNum).FracRadiant > MinFraction)) {
-                ShowSevereError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) +
+                ShowSevereError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) +
                                 "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.");
                 ShowContinueError("...the minimum that must be entered=[" + RoundSigDigits(MinDistribSurfaces) + "].");
                 ErrorsFound = true;
@@ -566,7 +566,7 @@ namespace SteamBaseboardRadiator {
                 }
             }
             if (SteamBaseboard(BaseboardNum).ZonePtr <= 0) {
-                ShowSevereError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + SteamBaseboard(BaseboardNum).EquipID +
+                ShowSevereError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + SteamBaseboard(BaseboardNum).EquipID +
                                 "\" is not on any ZoneHVAC:EquipmentList.");
                 ErrorsFound = true;
                 continue;
@@ -583,13 +583,13 @@ namespace SteamBaseboardRadiator {
                                                                        ErrorsFound);
                 SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 8);
                 if (SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) > MaxFraction) {
-                    ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
+                    ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
                                      "was greater than the allowable maximum.");
                     ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 1) + "].");
                     SteamBaseboard(BaseboardNum).TotSurfToDistrib = MaxFraction;
                 }
                 if (SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) < MinFraction) {
-                    ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
+                    ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
                                      "was less than the allowable minimum.");
                     ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MinFraction, 1) + "].");
                     SteamBaseboard(BaseboardNum).TotSurfToDistrib = MinFraction;
@@ -609,7 +609,7 @@ namespace SteamBaseboardRadiator {
             if ((AllFracsSummed < (MaxFraction - 0.01)) &&
                 (SteamBaseboard(BaseboardNum).FracRadiant >
                  MinFraction)) { // User didn't distribute all of the | radiation warn that some will be lost
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) +
                                  "\", Summed radiant fractions for people + surface groups < 1.0");
                 ShowContinueError("The rest of the radiant energy delivered by the baseboard heater will be lost");
             }
@@ -617,7 +617,7 @@ namespace SteamBaseboardRadiator {
             if (SteamIndex == 0 && BaseboardNum == 1) {
                 SteamIndex = FindRefrigerant("Steam");
                 if (SteamIndex == 0) {
-                    ShowSevereError(RoutineName + "Steam Properties for " + cAlphaArgs(1) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Steam Properties for " + cAlphaArgs(1) + " not found.");
                     if (SteamMessageNeeded) ShowContinueError("Steam Fluid Properties should have been included in the input file.");
                     ErrorsFound = true;
                     SteamMessageNeeded = false;
@@ -628,7 +628,7 @@ namespace SteamBaseboardRadiator {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + cCMO_BBRadiator_Steam + "Errors found getting input. Program terminates.");
+            ShowFatalError(std::string{RoutineName} + cCMO_BBRadiator_Steam + "Errors found getting input. Program terminates.");
         }
 
         // Setup Report variables for the Coils

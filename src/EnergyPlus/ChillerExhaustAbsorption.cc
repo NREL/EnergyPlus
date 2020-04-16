@@ -635,7 +635,7 @@ namespace ChillerExhaustAbsorption {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        std::string const RoutineName("InitExhaustAbsorber");
+        static constexpr std::string_view RoutineName("InitExhaustAbsorber");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CondInletNode;  // node number of water inlet node to the condenser
@@ -901,7 +901,7 @@ namespace ChillerExhaustAbsorption {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        std::string const RoutineName("SizeExhaustAbsorber");
+        static constexpr std::string_view RoutineName("SizeExhaustAbsorber");
 
         bool ErrorsFound; // If errors detected in input
         std::string equipName;
@@ -1262,7 +1262,7 @@ namespace ChillerExhaustAbsorption {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
-        std::string const RoutineName("CalcExhaustAbsorberChillerModel");
+        static constexpr std::string_view RoutineName("CalcExhaustAbsorberChillerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // Local copies of ExhaustAbsorberSpecs Type

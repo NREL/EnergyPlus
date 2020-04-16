@@ -1867,7 +1867,7 @@ namespace PlantUtilities {
         }
     }
 
-    void ScanPlantLoopsForNodeNum(std::string const &CallerName, // really used for error messages
+    void ScanPlantLoopsForNodeNum(std::string_view CallerName, // really used for error messages
                                   int const NodeNum,             // index in Node structure of node to be scanned
                                   int &LoopNum,                  // return value for plant loop
                                   int &LoopSideNum,              // return value for plant loop side
@@ -1958,9 +1958,9 @@ namespace PlantUtilities {
             ShowSevereError("ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops");
             ShowContinueError("Node Name=\"" + DataLoopNode::NodeID(NodeNum) + "\"");
             if (!DoingSizing) {
-                ShowContinueError("called by " + CallerName);
+                ShowContinueError("called by " + std::string{CallerName});
             } else {
-                ShowContinueError("during sizing: called by " + CallerName);
+                ShowContinueError("during sizing: called by " + std::string{CallerName});
             }
             if (outFoundCount > 0) ShowContinueError("Node was found as outlet node (for component) " + RoundSigDigits(outFoundCount) + " time(s).");
             ShowContinueError("Possible error in Branch inputs.  For more information, look for other error messages related to this node name.");

@@ -954,7 +954,7 @@ namespace OutdoorAirUnit {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + '.');
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + '.');
         }
 
         AlphArray.deallocate();

@@ -1119,7 +1119,7 @@ namespace PackagedTerminalHeatPump {
                     }
                 }
                 if (ZoneNodeNotFound) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError("..Heat Pumps air inlet node name must be the same as a zone exhaust node name.");
                     ShowContinueError("..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError("..Heat pumps inlet node name = " + NodeID(PTUnit(PTUnitNum).AirInNode));
@@ -1140,7 +1140,7 @@ namespace PackagedTerminalHeatPump {
                     }
                 }
                 if (ZoneNodeNotFound) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError("..Heat Pumps air outlet node name must be the same as a zone inlet node name.");
                     ShowContinueError("..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError("..Heat pumps outlet node name = " + NodeID(PTUnit(PTUnitNum).AirOutNode));
@@ -1938,7 +1938,7 @@ namespace PackagedTerminalHeatPump {
                     }
                 }
                 if (ZoneNodeNotFound) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError("..Air-conditioners air inlet node name must be the same as a zone exhaust node name.");
                     ShowContinueError("..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError("..Air-conditioners inlet node name = " + NodeID(PTUnit(PTUnitNum).AirInNode));
@@ -1959,7 +1959,7 @@ namespace PackagedTerminalHeatPump {
                     }
                 }
                 if (ZoneNodeNotFound) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError("..Air-conditioners air outlet node name must be the same as a zone inlet node name.");
                     ShowContinueError("..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError("..Air-conditioners outlet node name = " + NodeID(PTUnit(PTUnitNum).AirOutNode));
@@ -2003,7 +2003,7 @@ namespace PackagedTerminalHeatPump {
 
                     // OA mixer return node must equal air-conditioner air inlet node
                     if (PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError("..Heat Pump air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
                         ShowContinueError("..Heat Pump air inlet node name         = " + NodeID(PTUnit(PTUnitNum).AirInNode));
                         ShowContinueError("..OutdoorAir:Mixer return air node name = " + NodeID(OANodeNums(3)));
@@ -2037,7 +2037,7 @@ namespace PackagedTerminalHeatPump {
                 if (!PTUnit(PTUnitNum).ATMixerExists && OANodeNums(4) == 0) {
                     // For no OA Mixer fan inlet node name must be the same as the Air-conditioner's inlet air node name
                     if (PTUnit(PTUnitNum).AirInNode != FanInletNodeNum) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError("..Fan inlet node name must be the same as the Air-conditioners inlet air node name");
                         ShowContinueError("..when blow through " + cAlphaFields(16) + " is specified and an outdoor air mixer is not used.");
                         ShowContinueError("..Fan inlet node name           = " + NodeID(FanInletNodeNum));
@@ -2396,7 +2396,7 @@ namespace PackagedTerminalHeatPump {
             } else {
                 PTUnit(PTUnitNum).SchedPtr = GetScheduleIndex(Alphas(2));
                 if (PTUnit(PTUnitNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\" invalid data.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\" invalid data.");
                     ShowContinueError("invalid-not found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                     ErrorsFound = true;
                 }
@@ -2537,7 +2537,7 @@ namespace PackagedTerminalHeatPump {
                         GetCoilOutletNodeVariableSpeed(PTUnit(PTUnitNum).DXHeatCoilType, PTUnit(PTUnitNum).DXHeatCoilName, errFlag);
                 }
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
                 ShowContinueError("Illegal " + cAlphaFields(9) + " = " + Alphas(9));
                 ErrorsFound = true;
             }
@@ -2584,7 +2584,7 @@ namespace PackagedTerminalHeatPump {
                         GetCoilOutletNodeVariableSpeed(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                 }
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
                 ShowContinueError("Illegal " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
                 ErrorsFound = true;
             }
@@ -2621,7 +2621,7 @@ namespace PackagedTerminalHeatPump {
                     PTUnit(PTUnitNum).useVSCoilModel = true;
                 }
             } else {
-                ShowContinueError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
+                ShowContinueError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
                 ShowContinueError("Cooling coil and heating coil should use the equation fit model and be of same general type");
                 ErrorsFound = true;
             }
@@ -2737,7 +2737,7 @@ namespace PackagedTerminalHeatPump {
                                                                        ObjectIsNotParent);
                 // need better verification.
                 if (!CheckOutAirNodeNumber(PTUnit(PTUnitNum).CondenserNodeNum)) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
                     ShowContinueError(" Node name of outdoor dry-bulb temperature sensor not valid outdoor air node=\"" + Alphas(15) + "\"");
                     ShowContinueError("...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ErrorsFound = true;
@@ -2747,7 +2747,7 @@ namespace PackagedTerminalHeatPump {
             if (UtilityRoutines::SameString(Alphas(16), "BlowThrough")) PTUnit(PTUnitNum).FanPlace = BlowThru;
             if (UtilityRoutines::SameString(Alphas(16), "DrawThrough")) PTUnit(PTUnitNum).FanPlace = DrawThru;
             if (PTUnit(PTUnitNum).FanPlace == 0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
                 ShowContinueError("Illegal " + cAlphaFields(16) + "=\"" + Alphas(16) + "\".");
                 ErrorsFound = true;
             }
@@ -2806,7 +2806,7 @@ namespace PackagedTerminalHeatPump {
                 ErrorsFound = true;
             }
             if (SuppHeatOutletNodeNum != PTUnit(PTUnitNum).AirOutNode) { // check that supp HC out = heat pump air outlet
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError("..Supplemental heating coil outlet node name must be the same as the heat pumps outlet node name.");
                 ShowContinueError("..Supplemental heating coil outlet node name = " + NodeID(SuppHeatOutletNodeNum));
                 ShowContinueError("..Heat pumps outlet node name                   = " + NodeID(PTUnit(PTUnitNum).AirOutNode));
@@ -2825,7 +2825,7 @@ namespace PackagedTerminalHeatPump {
                     }
                 }
                 if (ZoneNodeNotFound) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError("..Heat Pumps air inlet node name must be the same as a zone exhaust node name.");
                     ShowContinueError("..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError("..Heat pumps inlet node name = " + NodeID(PTUnit(PTUnitNum).AirInNode));
@@ -2846,7 +2846,7 @@ namespace PackagedTerminalHeatPump {
                     }
                 }
                 if (ZoneNodeNotFound) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError("..Heat Pumps air outlet node name must be the same as a zone inlet node name.");
                     ShowContinueError("..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError("..Heat pumps outlet node name = " + NodeID(PTUnit(PTUnitNum).AirOutNode));
@@ -2886,7 +2886,7 @@ namespace PackagedTerminalHeatPump {
             // check connectivity for blow through fan
             if (PTUnit(PTUnitNum).FanPlace == BlowThru) {
                 if (CoolCoilInletNodeNum != FanOutletNodeNum) { // check that fan outlet equals cooling coil inlet
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError("..Fan outlet node name must be the same as the cooling coil inlet node name");
                     ShowContinueError("..when blow through " + cAlphaFields(16) + " is specified.");
                     ShowContinueError("..Fan outlet node name         = " + NodeID(FanOutletNodeNum));
@@ -2894,7 +2894,7 @@ namespace PackagedTerminalHeatPump {
                     ErrorsFound = true;
                 }
                 if (HeatCoilOutletNodeNum != SuppHeatInletNodeNum) { // check that heating coil outlet equals supp heating coil inlet
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError("..Heating coil outlet node name must be the same as the supplemental heating coil inlet node name");
                     ShowContinueError("..when blow through " + cAlphaFields(16) + " is specified.");
                     ShowContinueError("..Heating coil outlet node name              = " + NodeID(HeatCoilOutletNodeNum));
@@ -2904,7 +2904,7 @@ namespace PackagedTerminalHeatPump {
                 if (!PTUnit(PTUnitNum).ATMixerExists && OANodeNums(4) > 0) {
                     // Fan inlet node name must be the same as the heat pump's OA mixer mixed air node name
                     if (OANodeNums(4) != FanInletNodeNum) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError("..Fan inlet node name must be the same as the heat pumps OutdoorAir:Mixer mixed air node name");
                         ShowContinueError("..when blow through " + cAlphaFields(16) + " is specified.");
                         ShowContinueError("..Fan inlet node name                   = " + NodeID(FanInletNodeNum));
@@ -2913,7 +2913,7 @@ namespace PackagedTerminalHeatPump {
                     }
                     // OA mixer return node must equal heat pump air inlet node
                     if (PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError("..Heat Pump air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
                         ShowContinueError("..Heat Pump air inlet node name         = " + NodeID(PTUnit(PTUnitNum).AirInNode));
                         ShowContinueError("..OutdoorAir:Mixer return air node name = " + NodeID(OANodeNums(3)));
@@ -2923,7 +2923,7 @@ namespace PackagedTerminalHeatPump {
                 if (OANodeNums(4) == 0) {
                     // For no OA Mixer fan inlet node name must be the same as the heat pump's inlet air node name
                     if (PTUnit(PTUnitNum).AirInNode != FanInletNodeNum) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError("..Fan inlet node name must be the same as the heat pumps inlet air node name");
                         ShowContinueError("..when blow through " + cAlphaFields(16) + " is specified and an outdoor air mixer is not used.");
                         ShowContinueError("..Fan inlet node name           = " + NodeID(FanInletNodeNum));
@@ -2946,7 +2946,7 @@ namespace PackagedTerminalHeatPump {
             // check connectivity for draw through fan
             if (PTUnit(PTUnitNum).FanPlace == DrawThru) {
                 if (HeatCoilOutletNodeNum != FanInletNodeNum) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError("..Heating coil outlet node name must be the same as the fan inlet node name");
                     ShowContinueError("..when draw through " + cAlphaFields(16) + " is specified.");
                     ShowContinueError("..Heating coil outlet node name = " + NodeID(HeatCoilOutletNodeNum));
@@ -2954,7 +2954,7 @@ namespace PackagedTerminalHeatPump {
                     ErrorsFound = true;
                 }
                 if (SuppHeatInletNodeNum != FanOutletNodeNum) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError("..Fan outlet node name must be the same as the supplemental heating coil inlet node name ");
                     ShowContinueError("..when draw through " + cAlphaFields(16) + " is specified.");
                     ShowContinueError("..Fan outlet node = " + NodeID(FanOutletNodeNum));
@@ -2964,7 +2964,7 @@ namespace PackagedTerminalHeatPump {
                 if (OANodeNums(4) == 0) {
                     // For no OA mixer, cooling coil inlet node name must be the same as the heat pump's inlet air node name
                     if (CoolCoilInletNodeNum != PTUnit(PTUnitNum).AirInNode) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError("..Heat pump air inlet node name must be the same as the cooling coil inlet node name");
                         ShowContinueError("..when draw through " + cAlphaFields(16) + " is specified and an outdoor air mixer is not used.");
                         ShowContinueError("..Heat pump air inlet node name = " + NodeID(PTUnit(PTUnitNum).AirInNode));
@@ -2984,7 +2984,7 @@ namespace PackagedTerminalHeatPump {
                     }
                     // check OA Mixer return node
                     if (PTUnit(PTUnitNum).AirInNode != OANodeNums(3)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                         ShowContinueError("..Heat Pump air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
                         ShowContinueError("..Heat Pump air inlet node name         = " + NodeID(PTUnit(PTUnitNum).AirInNode));
                         ShowContinueError("..OutdoorAir:Mixer return air node name = " + NodeID(OANodeNums(3)));
@@ -3103,21 +3103,21 @@ namespace PackagedTerminalHeatPump {
 
             PTUnit(PTUnitNum).MaxCoolAirVolFlow = Numbers(1);
             if (PTUnit(PTUnitNum).MaxCoolAirVolFlow <= 0 && PTUnit(PTUnitNum).MaxCoolAirVolFlow != AutoSize) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(" illegal value " + cNumericFields(1) + " = " + TrimSigDigits(Numbers(1), 7));
                 ErrorsFound = true;
             }
 
             PTUnit(PTUnitNum).MaxHeatAirVolFlow = Numbers(2);
             if (PTUnit(PTUnitNum).MaxHeatAirVolFlow <= 0 && PTUnit(PTUnitNum).MaxHeatAirVolFlow != AutoSize) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(" illegal " + cNumericFields(2) + " = " + TrimSigDigits(Numbers(2), 7));
                 ErrorsFound = true;
             }
 
             PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = Numbers(3);
             if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow < 0 && PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow != AutoSize) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                 ShowContinueError(" illegal " + cNumericFields(3) + " = " + TrimSigDigits(Numbers(3), 7));
                 ErrorsFound = true;
             }
@@ -3132,7 +3132,7 @@ namespace PackagedTerminalHeatPump {
             if (OANodeNums(1) > 0) {
                 PTUnit(PTUnitNum).CoolOutAirVolFlow = Numbers(4);
                 if (PTUnit(PTUnitNum).CoolOutAirVolFlow < 0 && PTUnit(PTUnitNum).CoolOutAirVolFlow != AutoSize) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(" illegal " + cNumericFields(4) + " = " + TrimSigDigits(Numbers(4), 7));
                     ErrorsFound = true;
                 }
@@ -3140,7 +3140,7 @@ namespace PackagedTerminalHeatPump {
                 //     only check that SA flow in cooling is >= OA flow in cooling when either or both are not autosized
                 if (PTUnit(PTUnitNum).CoolOutAirVolFlow > PTUnit(PTUnitNum).MaxCoolAirVolFlow && PTUnit(PTUnitNum).CoolOutAirVolFlow != AutoSize &&
                     PTUnit(PTUnitNum).MaxCoolAirVolFlow != AutoSize) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(".." + cNumericFields(4) + " cannot be greater than " + cNumericFields(1));
                     ShowContinueError(".." + cNumericFields(1) + " = " + TrimSigDigits(Numbers(1), 7));
                     ShowContinueError(".." + cNumericFields(4) + " = " + TrimSigDigits(Numbers(4), 7));
@@ -3149,7 +3149,7 @@ namespace PackagedTerminalHeatPump {
 
                 PTUnit(PTUnitNum).HeatOutAirVolFlow = Numbers(5);
                 if (PTUnit(PTUnitNum).HeatOutAirVolFlow < 0 && PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(" illegal " + cNumericFields(5) + " = " + TrimSigDigits(Numbers(5), 7));
                     ErrorsFound = true;
                 }
@@ -3157,7 +3157,7 @@ namespace PackagedTerminalHeatPump {
                 //     only check that SA flow in heating is >= OA flow in heating when either or both are not autosized
                 if (PTUnit(PTUnitNum).HeatOutAirVolFlow > PTUnit(PTUnitNum).MaxHeatAirVolFlow && PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize &&
                     PTUnit(PTUnitNum).MaxHeatAirVolFlow != AutoSize) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(".." + cNumericFields(5) + " cannot be greater than " + cNumericFields(2));
                     ShowContinueError(".." + cNumericFields(2) + " = " + TrimSigDigits(Numbers(2), 7));
                     ShowContinueError(".." + cNumericFields(5) + " = " + TrimSigDigits(Numbers(5), 7));
@@ -3166,7 +3166,7 @@ namespace PackagedTerminalHeatPump {
 
                 PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow = Numbers(6);
                 if (PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow < 0 && PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow != AutoSize) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(" illegal " + cNumericFields(6) + " = " + TrimSigDigits(Numbers(6), 7));
                     ErrorsFound = true;
                 }
@@ -3287,7 +3287,7 @@ namespace PackagedTerminalHeatPump {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting input.");
             ShowContinueError("... Preceding condition causes termination.");
         }
 
@@ -8284,7 +8284,7 @@ namespace PackagedTerminalHeatPump {
                             if (SolFlag == -1) {
                                 if (PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex == 0) {
                                     ShowWarningMessage("RoutineName//Hot water coil control failed for " + PTUnit(PTUnitNum).UnitType + "=\"" +
-                                                       PTUnit(PTUnitNum).Name + "\""); // Autodesk:Bug? Meant RoutineName + "Hot water...
+                                                       PTUnit(PTUnitNum).Name + "\""); // Autodesk:Bug? Meant std::string{RoutineName} + "Hot water...
                                     ShowContinueErrorTimeStamp("");
                                     ShowContinueError("  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
                                                       "] exceeded in calculating hot water mass flow rate");
@@ -8292,12 +8292,12 @@ namespace PackagedTerminalHeatPump {
                                 ShowRecurringWarningErrorAtEnd(
                                     "RoutineName//Hot water coil control failed (iteration limit [" + RoundSigDigits(SolveMaxIter) + "]) for " +
                                         PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name,
-                                    PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex); // Autodesk:Bug? Meant RoutineName + "Hot water...
+                                    PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex); // Autodesk:Bug? Meant std::string{RoutineName} + "Hot water...
                             } else if (SolFlag == -2) {
                                 if (PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2 == 0) {
                                     ShowWarningMessage("RoutineName//Hot water coil control failed (maximum flow limits) for " +
                                                        PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name +
-                                                       "\""); // Autodesk:Bug? Meant RoutineName + "Hot water...
+                                                       "\""); // Autodesk:Bug? Meant std::string{RoutineName} + "Hot water...
                                     ShowContinueErrorTimeStamp("");
                                     ShowContinueError("...Bad hot water maximum flow rate limits");
                                     ShowContinueError("...Given minimum water flow rate=" + RoundSigDigits(MinWaterFlow, 3) + " kg/s");
@@ -8310,7 +8310,7 @@ namespace PackagedTerminalHeatPump {
                                                                MinWaterFlow,
                                                                _,
                                                                "[kg/s]",
-                                                               "[kg/s]"); // Autodesk:Bug? Meant RoutineName + "Hot water...
+                                                               "[kg/s]"); // Autodesk:Bug? Meant std::string{RoutineName} + "Hot water...
                             }
                             QActual = SupHeaterLoad;
                             // simulate the hot water supplemental heating coil

@@ -335,7 +335,7 @@ namespace CurveManager {
 
     bool CheckCurveDims(int const CurveIndex,
                         std::vector<int> validDims,
-                        std::string routineName,
+                        std::string_view routineName,
                         std::string objectType,
                         std::string objectName,
                         std::string curveFieldText);

@@ -368,7 +368,7 @@ namespace HVACDXHeatPumpSystem {
             } else {
                 DXHeatPumpSystem(DXHeatSysNum).SchedPtr = GetScheduleIndex(Alphas(2));
                 if (DXHeatPumpSystem(DXHeatSysNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
@@ -439,7 +439,7 @@ namespace HVACDXHeatPumpSystem {
         } // End of the DX System Loop
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Program terminates.");
         }
 
         for (DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum) {

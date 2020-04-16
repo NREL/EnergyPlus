@@ -437,7 +437,7 @@ namespace PlantChillers {
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
                     ElectricChiller(ChillerNum).FlowMode = NotModulated;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                     ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
@@ -497,7 +497,7 @@ namespace PlantChillers {
                     if (!lAlphaFieldBlanks(11)) {
                         ElectricChiller(ChillerNum).HeatRecInletLimitSchedNum = GetScheduleIndex(cAlphaArgs(11));
                         if (ElectricChiller(ChillerNum).HeatRecInletLimitSchedNum == 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                             ShowContinueError("Invalid " + cAlphaFieldNames(11) + '=' + cAlphaArgs(11));
                             ErrorsFound = true;
                         }
@@ -2498,7 +2498,7 @@ namespace PlantChillers {
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
                     EngineDrivenChiller(ChillerNum).FlowMode = NotModulated;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + cAlphaFieldNames(15) + '=' + cAlphaArgs(15));
                     ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
@@ -4409,7 +4409,7 @@ namespace PlantChillers {
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
                     GTChiller(ChillerNum).FlowMode = NotModulated;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + cAlphaFieldNames(9) + '=' + cAlphaArgs(9));
                     ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
@@ -6304,7 +6304,7 @@ namespace PlantChillers {
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
                     ConstCOPChiller(ChillerNum).FlowMode = NotModulated;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                     ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");

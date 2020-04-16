@@ -1325,7 +1325,7 @@ namespace MixedAir {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + '.');
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + '.');
         }
 
         AlphArray.deallocate();
@@ -1504,7 +1504,7 @@ namespace MixedAir {
                 lAlphaBlanks.deallocate();
                 cAlphaFields.deallocate();
                 cNumericFields.deallocate();
-                ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " inputs.");
+                ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " inputs.");
             }
         }
 
@@ -1655,7 +1655,7 @@ namespace MixedAir {
                         DesignSpecOAObjIndex(groupNum) = ObjIndex;
 
                         if (ObjIndex == 0) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid");
                             ShowContinueError("... not found " + cAlphaFields((groupNum - 1) * 3 + 6) + "=\"" + DesignSpecOAObjName(groupNum) +
                                               "\".");
                             ErrorsFound = true;
@@ -1670,7 +1670,7 @@ namespace MixedAir {
 
                         if (ObjIndex == 0) {
                             // Cannot find the design specification Zone Air Distribution object
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid");
                             ShowContinueError("... not found " + cAlphaFields((groupNum - 1) * 3 + 7) + "=\"" + DesignSpecZoneADObjName(groupNum) +
                                               "\".");
                             ErrorsFound = true;
@@ -1848,7 +1848,7 @@ namespace MixedAir {
                         if (thisVentilationMechanical.SystemOAMethod == SOAM_ProportionalControlDesOARate) {
                             if (thisVentilationMechanical.ZoneOAPeopleRate(ventMechZoneNum) == 0.0 &&
                                 thisVentilationMechanical.ZoneOAAreaRate(ventMechZoneNum) == 0.0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name +
+                                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name +
                                                 "\", invalid input with System Outdoor Air Method = ProportionalControlBasedOnDesignOARate.");
                                 ShowContinueError(" The values of Outdoor Air Flow per Person and Outdoor Air Flow per Zone Floor Area in the same "
                                                   "object can not be zero.");
@@ -1864,7 +1864,7 @@ namespace MixedAir {
                         thisVentilationMechanical.ZoneOAACHRate = 0.0;
                         thisVentilationMechanical.ZoneOAFlowMethod(ventMechZoneNum) = OAFlowPPer;
                         thisVentilationMechanical.ZoneOASchPtr(ventMechZoneNum) = ScheduleAlwaysOn;
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name);
+                        ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name);
                         ShowContinueError("Cannot locate a matching DesignSpecification:OutdoorAir object for Zone=\"" +
                                           thisVentilationMechanical.VentMechZoneName(ventMechZoneNum) + "\".");
                         ShowContinueError("Using default OA of 0.00944 m3/s-person and 0.0 m3/s-m2.");
@@ -1880,7 +1880,7 @@ namespace MixedAir {
                         thisVentilationMechanical.ZoneADEffCooling(ventMechZoneNum) = 1.0;
                         thisVentilationMechanical.ZoneADEffHeating(ventMechZoneNum) = 1.0;
                         thisVentilationMechanical.ZoneSecondaryRecirculation(ventMechZoneNum) = 0.0;
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name);
+                        ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name);
                         ShowContinueError("Cannot locate a matching DesignSpecification:ZoneAirDistribution object for Zone=\"" +
                                           thisVentilationMechanical.VentMechZoneName(ventMechZoneNum) + "\".");
                         ShowContinueError("Using default zone air distribution effectiveness of 1.0 for heating and cooling.");
@@ -2076,7 +2076,7 @@ namespace MixedAir {
         cNumericFields.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found when getting " + CurrentModuleObject + " inputs.");
+            ShowFatalError(std::string{RoutineName} + "Errors found when getting " + CurrentModuleObject + " inputs.");
         }
     }
 
@@ -2215,7 +2215,7 @@ namespace MixedAir {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject);
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject);
         }
 
         GetOAMixerInputFlag = false;
@@ -4122,7 +4122,7 @@ namespace MixedAir {
                                             ZoneOAMin = ZoneOAMax;
                                             ++this->OAMaxMinLimitErrorCount;
                                             if (this->OAMaxMinLimitErrorCount < 2) {
-                                                ShowSevereError(RoutineName + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                 ShowContinueError("For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum "
                                                                   "zone outdoor air rate (" +
                                                                   RoundSigDigits(ZoneOAMax, 4) +
@@ -4167,7 +4167,7 @@ namespace MixedAir {
                                                 ++this->CO2MaxMinLimitErrorCount;
                                                 if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc) {
                                                     if (this->CO2MaxMinLimitErrorCount < 2) {
-                                                        ShowSevereError(RoutineName + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                         ShowContinueError("For System Outdoor Air Method = "
                                                                           "ProportionalControlBasedonOccupancySchedule, maximum target CO2 "
                                                                           "concentration (" +
@@ -4189,7 +4189,7 @@ namespace MixedAir {
                                                 }
                                                 if (this->SystemOAMethod == SOAM_ProportionalControlDesOcc) {
                                                     if (this->CO2MaxMinLimitErrorCount < 2) {
-                                                        ShowSevereError(RoutineName + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                         ShowContinueError("For System Outdoor Air Method = "
                                                                           "ProportionalControlBasedonDesignOccupancy, maximum target CO2 "
                                                                           "concentration (" +
@@ -4211,7 +4211,7 @@ namespace MixedAir {
                                                 }
                                                 if (this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
                                                     if (this->CO2MaxMinLimitErrorCount < 2) {
-                                                        ShowSevereError(RoutineName + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                         ShowContinueError("For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, "
                                                                           "maximum target CO2 concentration (" +
                                                                           RoundSigDigits(ZoneMaxCO2, 2) +
@@ -4253,7 +4253,7 @@ namespace MixedAir {
                                                 ++this->CO2GainErrorCount;
                                                 if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc) {
                                                     if (this->CO2GainErrorCount < 2) {
-                                                        ShowSevereError(RoutineName + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                         ShowContinueError("For System Outdoor Air Method = "
                                                                           "ProportionalControlBasedonOccupancySchedule, CO2 generation from people "
                                                                           "is not greater than zero. Occurs in Zone =\"" +
@@ -4272,7 +4272,7 @@ namespace MixedAir {
                                                 }
                                                 if (this->SystemOAMethod == SOAM_ProportionalControlDesOcc) {
                                                     if (this->CO2GainErrorCount < 2) {
-                                                        ShowSevereError(RoutineName + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                         ShowContinueError("For System Outdoor Air Method = "
                                                                           "ProportionalControlBasedonDesignOccupancy, CO2 generation from people is "
                                                                           "not greater than zero. Occurs in Zone =\"" +

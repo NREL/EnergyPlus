@@ -446,7 +446,7 @@ namespace HeatingCoils {
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     InputErrorsFound = true;
                 }
@@ -546,7 +546,7 @@ namespace HeatingCoils {
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     InputErrorsFound = true;
                 }
@@ -655,7 +655,7 @@ namespace HeatingCoils {
             } else {
                 coil.SchedPtr = GetScheduleIndex(Alphas(2));
                 if (coil.SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     InputErrorsFound = true;
                 }
@@ -670,7 +670,7 @@ namespace HeatingCoils {
                   coil.FuelType_Num == iRT_Gasoline || coil.FuelType_Num == iRT_FuelOil_1 || coil.FuelType_Num == iRT_FuelOil_2 ||
                   coil.FuelType_Num == iRT_OtherFuel1 || coil.FuelType_Num == iRT_OtherFuel2) ||
                 coil.FuelType_Num == 0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(3) + " entered =" + Alphas(3) + " for " +
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(3) + " entered =" + Alphas(3) + " for " +
                                 cAlphaFields(1) + '=' + Alphas(1));
                 InputErrorsFound = true;
             }
@@ -791,7 +791,7 @@ namespace HeatingCoils {
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     InputErrorsFound = true;
                 }
@@ -947,7 +947,7 @@ namespace HeatingCoils {
             } else {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     InputErrorsFound = true;
                 }
@@ -1206,7 +1206,7 @@ namespace HeatingCoils {
         }
 
         if (InputErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Program terminates.");
         }
 
         Alphas.deallocate();

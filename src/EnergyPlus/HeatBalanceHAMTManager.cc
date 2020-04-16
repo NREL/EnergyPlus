@@ -765,39 +765,39 @@ namespace HeatBalanceHAMTManager {
             for (lid = 1; lid <= Construct(conid).TotLayers; ++lid) {
                 matid = Construct(conid).LayerPoint(lid);
                 if (Material(matid).ROnly) {
-                    ShowSevereError(RoutineName + "Construction=" + Construct(conid).Name + " cannot contain R-only value materials.");
+                    ShowSevereError(std::string{RoutineName} + "Construction=" + Construct(conid).Name + " cannot contain R-only value materials.");
                     ShowContinueError("Reference Material=\"" + Material(matid).Name + "\".");
                     ++errorCount;
                     continue;
                 }
 
                 if (Material(matid).nmu < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + Construct(conid).Name);
+                    ShowSevereError(std::string{RoutineName} + "Construction=" + Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + Material(matid).Name +
                                       "\" does not have required Water Vapor Diffusion Resistance Factor (mu) data.");
                     ++errorCount;
                 }
 
                 if (Material(matid).niso < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + Construct(conid).Name);
+                    ShowSevereError(std::string{RoutineName} + "Construction=" + Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + Material(matid).Name + "\" does not have required isotherm data.");
                     ++errorCount;
                 }
                 if (Material(matid).nsuc < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + Construct(conid).Name);
+                    ShowSevereError(std::string{RoutineName} + "Construction=" + Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + Material(matid).Name +
                                       "\" does not have required liquid transport coefficient (suction) data.");
                     ++errorCount;
                 }
                 if (Material(matid).nred < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + Construct(conid).Name);
+                    ShowSevereError(std::string{RoutineName} + "Construction=" + Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + Material(matid).Name +
                                       "\" does not have required liquid transport coefficient (redistribution) data.");
                     ++errorCount;
                 }
                 if (Material(matid).ntc < 0) {
                     if (Material(matid).Conductivity > 0) {
-                        ShowWarningError(RoutineName + "Construction=" + Construct(conid).Name);
+                        ShowWarningError(std::string{RoutineName} + "Construction=" + Construct(conid).Name);
                         ShowContinueError("Reference Material=\"" + Material(matid).Name +
                                           "\" does not have thermal conductivity data. Using fixed value.");
                         Material(matid).ntc = 2;
@@ -806,7 +806,7 @@ namespace HeatBalanceHAMTManager {
                         Material(matid).tcwater(2) = Material(matid).isodata(Material(matid).niso);
                         Material(matid).tcdata(2) = Material(matid).Conductivity;
                     } else {
-                        ShowSevereError(RoutineName + "Construction=" + Construct(conid).Name);
+                        ShowSevereError(std::string{RoutineName} + "Construction=" + Construct(conid).Name);
                         ShowContinueError("Reference Material=\"" + Material(matid).Name + "\" does not have required thermal conductivity data.");
                         ++errorCount;
                     }
@@ -829,7 +829,7 @@ namespace HeatBalanceHAMTManager {
                     if (testlen > adjdist) break;
                     --Material(matid).divs;
                     if (Material(matid).divs < 1) {
-                        ShowSevereError(RoutineName + "Construction=" + Construct(conid).Name);
+                        ShowSevereError(std::string{RoutineName} + "Construction=" + Construct(conid).Name);
                         ShowContinueError("Reference Material=\"" + Material(matid).Name + "\" is too thin.");
                         ++errorCount;
                         break;

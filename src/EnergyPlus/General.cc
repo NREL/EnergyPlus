@@ -3551,7 +3551,7 @@ namespace General {
         }
     }
 
-    void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
+    void CheckCreatedZoneItemName(std::string_view calledFrom,                  // routine called from
                                   std::string const &CurrentObject,               // object being parsed
                                   std::string const &ZoneName,                    // Zone Name associated
                                   std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -3605,7 +3605,7 @@ namespace General {
         ResultName = ZoneName + ' ' + ItemName;
         bool TooLong = false;
         if (ItemLength > MaxNameLength) {
-            ShowWarningError(calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
+            ShowWarningError(std::string{calledFrom} + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
             ShowContinueError("Object Name=\"" + ItemName + "\".");
             ShowContinueError("ZoneList/Zone Name=\"" + ZoneName + "\".");
             ShowContinueError("Item length=[" + RoundSigDigits(int(ItemLength)) + "] > Maximum Length=[" + RoundSigDigits(MaxNameLength) +
@@ -3619,7 +3619,7 @@ namespace General {
         int FoundItem = UtilityRoutines::FindItemInList(ResultName, ItemNames, NumItems);
 
         if (FoundItem != 0) {
-            ShowSevereError(calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
+            ShowSevereError(std::string{calledFrom} + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
             ShowContinueError("name=\"" + ResultName + "\" has already been generated or entered as " + CurrentObject + " item=[" +
                               RoundSigDigits(FoundItem) + "].");
             if (TooLong) ShowContinueError("Duplicate name likely caused by the previous \"too long\" warning.");

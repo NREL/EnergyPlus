@@ -299,7 +299,7 @@ namespace ChillerReformulatedEIR {
             ElecReformEIRChiller(EIRChillerNum).ChillerCapFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(2));
             ElecReformEIRChiller(EIRChillerNum).CAPFTName = DataIPShortCuts::cAlphaArgs(2);
             if (ElecReformEIRChiller(EIRChillerNum).ChillerCapFTIndex == 0) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                 ErrorsFound = true;
             }
@@ -307,7 +307,7 @@ namespace ChillerReformulatedEIR {
             ElecReformEIRChiller(EIRChillerNum).ChillerEIRFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(3));
             ElecReformEIRChiller(EIRChillerNum).EIRFTName = DataIPShortCuts::cAlphaArgs(3);
             if (ElecReformEIRChiller(EIRChillerNum).ChillerEIRFTIndex == 0) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
                 ErrorsFound = true;
             }
@@ -323,7 +323,7 @@ namespace ChillerReformulatedEIR {
             ElecReformEIRChiller(EIRChillerNum).EIRFPLRName = DataIPShortCuts::cAlphaArgs(5);
             ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(5));
             if (ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex == 0) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + DataIPShortCuts::cAlphaArgs(5));
                 ErrorsFound = true;
             }
@@ -336,7 +336,7 @@ namespace ChillerReformulatedEIR {
                        CurveManager::PerfCurve(ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex).NumDims == 3) {
                 ElecReformEIRChiller(EIRChillerNum).PartLoadCurveType = PLR_Lift;
             } else {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + DataIPShortCuts::cAlphaArgs(5) + " for " +
                                   DataIPShortCuts::cAlphaFieldNames(4) + '=' + DataIPShortCuts::cAlphaArgs(4));
                 ErrorsFound = true;
@@ -344,12 +344,12 @@ namespace ChillerReformulatedEIR {
 
             // Chilled water inlet/outlet node names are necessary
             if (DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cAlphaFieldNames(6) + " is blank.");
                 ErrorsFound = true;
             }
             if (DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cAlphaFieldNames(7) + " is blank.");
                 ErrorsFound = true;
             }
@@ -380,12 +380,12 @@ namespace ChillerReformulatedEIR {
 
             // Condenser inlet/outlet node names are necessary
             if (DataIPShortCuts::lAlphaFieldBlanks(8)) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cAlphaFieldNames(8) + " is blank.");
                 ErrorsFound = true;
             }
             if (DataIPShortCuts::lAlphaFieldBlanks(9)) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cAlphaFieldNames(9) + " is blank.");
                 ErrorsFound = true;
             }
@@ -422,7 +422,7 @@ namespace ChillerReformulatedEIR {
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
                     ElecReformEIRChiller(EIRChillerNum).FlowMode = NotModulated;
                 } else {
-                    ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                    ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + DataIPShortCuts::cAlphaArgs(10));
                     ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
@@ -436,7 +436,7 @@ namespace ChillerReformulatedEIR {
                 ElecReformEIRChiller(EIRChillerNum).RefCapWasAutoSized = true;
             }
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
                 ErrorsFound = true;
@@ -444,7 +444,7 @@ namespace ChillerReformulatedEIR {
 
             ElecReformEIRChiller(EIRChillerNum).RefCOP = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(2) == 0.0) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 2));
                 ErrorsFound = true;
@@ -453,7 +453,7 @@ namespace ChillerReformulatedEIR {
             ElecReformEIRChiller(EIRChillerNum).TempRefEvapOut = DataIPShortCuts::rNumericArgs(3);
             ElecReformEIRChiller(EIRChillerNum).TempRefCondOut = DataIPShortCuts::rNumericArgs(4);
             if (ElecReformEIRChiller(EIRChillerNum).TempRefEvapOut >= ElecReformEIRChiller(EIRChillerNum).TempRefCondOut) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(3) + " [" + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(3), 2) +
                                   "] >= " + DataIPShortCuts::cNumericFieldNames(4) + " [" +
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(4), 2) + ']');
@@ -477,7 +477,7 @@ namespace ChillerReformulatedEIR {
             if (ElecReformEIRChiller(EIRChillerNum).SizFac <= 0.0) ElecReformEIRChiller(EIRChillerNum).SizFac = 1.0;
 
             if (ElecReformEIRChiller(EIRChillerNum).MinPartLoadRat > ElecReformEIRChiller(EIRChillerNum).MaxPartLoadRat) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(7) + " [" + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(7), 3) +
                                   "] > " + DataIPShortCuts::cNumericFieldNames(8) + " [" +
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(8), 3) + ']');
@@ -487,7 +487,7 @@ namespace ChillerReformulatedEIR {
 
             if (ElecReformEIRChiller(EIRChillerNum).MinUnloadRat < ElecReformEIRChiller(EIRChillerNum).MinPartLoadRat ||
                 ElecReformEIRChiller(EIRChillerNum).MinUnloadRat > ElecReformEIRChiller(EIRChillerNum).MaxPartLoadRat) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(10) + " = " + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(10), 3));
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(10) + " must be greater than or equal to the " +
                                   DataIPShortCuts::cNumericFieldNames(7));
@@ -498,7 +498,7 @@ namespace ChillerReformulatedEIR {
 
             if (ElecReformEIRChiller(EIRChillerNum).OptPartLoadRat < ElecReformEIRChiller(EIRChillerNum).MinPartLoadRat ||
                 ElecReformEIRChiller(EIRChillerNum).OptPartLoadRat > ElecReformEIRChiller(EIRChillerNum).MaxPartLoadRat) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(9) + " = " + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(9), 3));
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(9) + " must be greater than or equal to the " +
                                   DataIPShortCuts::cNumericFieldNames(7));
@@ -511,7 +511,7 @@ namespace ChillerReformulatedEIR {
 
             if (ElecReformEIRChiller(EIRChillerNum).CompPowerToCondenserFrac < 0.0 ||
                 ElecReformEIRChiller(EIRChillerNum).CompPowerToCondenserFrac > 1.0) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(11) + " = " + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(11), 3));
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(11) + " must be greater than or equal to zero");
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(11) + " must be less than or equal to one");
@@ -537,7 +537,7 @@ namespace ChillerReformulatedEIR {
                                                                                                               3,
                                                                                                               DataLoopNode::ObjectIsNotParent);
                 if (ElecReformEIRChiller(EIRChillerNum).HeatRecInletNodeNum == 0) {
-                    ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + DataIPShortCuts::cAlphaArgs(11));
                     ErrorsFound = true;
                 }
@@ -551,12 +551,12 @@ namespace ChillerReformulatedEIR {
                                                         3,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (ElecReformEIRChiller(EIRChillerNum).HeatRecOutletNodeNum == 0) {
-                    ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + '=' + DataIPShortCuts::cAlphaArgs(12));
                     ErrorsFound = true;
                 }
                 if (ElecReformEIRChiller(EIRChillerNum).CondenserType != WaterCooled) {
-                    ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError("Heat Recovery requires a Water Cooled Condenser.");
                     ErrorsFound = true;
                 }
@@ -586,7 +586,7 @@ namespace ChillerReformulatedEIR {
                         ElecReformEIRChiller(EIRChillerNum).HeatRecInletLimitSchedNum =
                             ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(13));
                         if (ElecReformEIRChiller(EIRChillerNum).HeatRecInletLimitSchedNum == 0) {
-                            ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                            ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                             ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(13) + '=' + DataIPShortCuts::cAlphaArgs(13));
                             ErrorsFound = true;
                         }
@@ -621,7 +621,7 @@ namespace ChillerReformulatedEIR {
                 ElecReformEIRChiller(EIRChillerNum).HeatRecInletNodeNum = 0;
                 ElecReformEIRChiller(EIRChillerNum).HeatRecOutletNodeNum = 0;
                 if ((!DataIPShortCuts::lAlphaFieldBlanks(11)) || (!DataIPShortCuts::lAlphaFieldBlanks(12))) {
-                    ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
+                    ShowWarningError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowWarningError("Since Reference Heat Reclaim Volume Flow Rate = 0.0, heat recovery is inactive.");
                     ShowContinueError("However, node names were specified for heat recovery inlet or outlet nodes.");
                 }

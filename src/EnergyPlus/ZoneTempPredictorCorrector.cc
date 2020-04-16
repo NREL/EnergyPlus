@@ -3153,7 +3153,7 @@ namespace ZoneTempPredictorCorrector {
         for (Loop = 1; Loop <= NumTempControlledZones; ++Loop) {
             if (ZoneEquipInputsFilled && !ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(TempControlledZone(Loop).ZoneName)) {
-                    ShowSevereError(RoutineName + "Zone=\"" + TempControlledZone(Loop).ZoneName +
+                    ShowSevereError(std::string{RoutineName} + "Zone=\"" + TempControlledZone(Loop).ZoneName +
                                     "\" has specified a Thermostatic control but is not a controlled zone.");
                     ShowContinueError("...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
                     ErrorsFound = true;
@@ -3210,7 +3210,7 @@ namespace ZoneTempPredictorCorrector {
         for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
             if (ZoneEquipInputsFilled && !ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(ComfortControlledZone(Loop).ZoneName)) {
-                    ShowSevereError(RoutineName + "Zone=\"" + ComfortControlledZone(Loop).ZoneName +
+                    ShowSevereError(std::string{RoutineName} + "Zone=\"" + ComfortControlledZone(Loop).ZoneName +
                                     "\" has specified a Comfort control but is not a controlled zone.");
                     ShowContinueError("...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
                     ErrorsFound = true;

@@ -382,7 +382,7 @@ namespace DualDuct {
                     } else {
                         CurrentModuleObject = "*invalid*";
                     }
-                    ShowSevereError(RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
+                    ShowSevereError(std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
                                     dd_airterminal(DDNum).Name + "].");
                     ShowContinueError("...should have outlet node=" + NodeID(dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
@@ -521,7 +521,7 @@ namespace DualDuct {
                     } else {
                         CurrentModuleObject = "*invalid*";
                     }
-                    ShowSevereError(RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
+                    ShowSevereError(std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
                                      dd_airterminal(DDNum).Name + "].");
                     ShowContinueError("...should have outlet node=" + NodeID( dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
@@ -701,7 +701,7 @@ namespace DualDuct {
                     } else {
                         CurrentModuleObject = "*invalid*";
                     }
-                    ShowSevereError(RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
+                    ShowSevereError(std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
                                     dd_airterminal(DDNum).Name + "].");
                     ShowContinueError("...should have outlet node=" + NodeID(  dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
@@ -808,7 +808,7 @@ namespace DualDuct {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 

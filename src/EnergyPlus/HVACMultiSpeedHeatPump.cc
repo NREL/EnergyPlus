@@ -821,7 +821,7 @@ namespace HVACMultiSpeedHeatPump {
                     ShowSevereError("Configuration error in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(cAlphaFields(11) + " \"" + Alphas(11) + "\" not found.");
                     ShowContinueError(cAlphaFields(10) + " must be Coil:Heating:DX:MultiSpeed ");
-                    ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject +
+                    ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject +
                                    " input. Preceding condition(s) causes termination.");
                     ErrorsFound = true;
                 }
@@ -868,7 +868,7 @@ namespace HVACMultiSpeedHeatPump {
                         ShowSevereError("Configuration error in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                         ShowContinueError(cAlphaFields(11) + " \"" + Alphas(11) + "\" not found.");
                         ShowContinueError(cAlphaFields(10) + " must be Coil:Heating:Electric:MultiStage ");
-                        ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject +
+                        ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject +
                                        " input. Preceding condition(s) causes termination.");
                         ErrorsFound = true;
                     }
@@ -879,7 +879,7 @@ namespace HVACMultiSpeedHeatPump {
                         ShowSevereError("Configuration error in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                         ShowContinueError(cAlphaFields(11) + " \"" + Alphas(11) + "\" not found.");
                         ShowContinueError(cAlphaFields(10) + " must be Coil:Heating:Gas:MultiStage ");
-                        ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject +
+                        ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject +
                                        " input. Preceding condition(s) causes termination.");
                         ErrorsFound = true;
                     }
@@ -1048,7 +1048,7 @@ namespace HVACMultiSpeedHeatPump {
                     ShowSevereError("Configuration error in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(cAlphaFields(13) + " \"" + Alphas(13) + "\" not found.");
                     ShowContinueError(cAlphaFields(12) + " must be Coil:Cooling:DX:MultiSpeed ");
-                    ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject +
+                    ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject +
                                    " input. Preceding condition(s) causes termination.");
                     ErrorsFound = true;
                 }
@@ -1576,7 +1576,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination.");
         }
         // End of multispeed heat pump
 

@@ -140,7 +140,7 @@ namespace WindowEquivalentLayer {
     );
 
     Real64 P01(Real64 const P,         // property
-               std::string const &WHAT // identifier for err msg
+               std::string_view WHAT // identifier for err msg
     );
 
     Real64 HEMINT(std::function<Real64(Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function

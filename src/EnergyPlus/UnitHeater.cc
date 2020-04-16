@@ -365,7 +365,7 @@ namespace UnitHeater {
             } else {
                 UnitHeat(UnitHeatNum).SchedPtr = GetScheduleIndex(Alphas(2)); // convert schedule name to pointer
                 if (UnitHeat(UnitHeatNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
@@ -405,7 +405,7 @@ namespace UnitHeater {
                                 ErrorsFound = true;
                             }
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + " = \"" + Alphas(1) + "\"");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = \"" + Alphas(1) + "\"");
                             ShowContinueError("Fan Type must be Fan:ConstantVolume or Fan:VariableVolume");
                             ErrorsFound = true;
                         }
@@ -638,7 +638,7 @@ namespace UnitHeater {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowFatalError(RoutineName + "Errors found in input");
+        if (ErrorsFound) ShowFatalError(std::string{RoutineName} + "Errors found in input");
 
         // Setup Report variables for the Unit Heaters, CurrentModuleObject='ZoneHVAC:UnitHeater'
         for (UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum) {

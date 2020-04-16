@@ -257,11 +257,11 @@ namespace SwimmingPool {
                 }
             }
             if (Pool(Item).SurfacePtr <= 0) {
-                ShowSevereError(RoutineName + "Invalid " + cAlphaFields(2) + " = " + Alphas(2));
+                ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " = " + Alphas(2));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             } else if (DataSurfaces::Surface(Pool(Item).SurfacePtr).PartOfVentSlabOrRadiantSurface) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                 ShowContinueError(cAlphaFields(2) + "=\"" + Alphas(2) + "\" has been used in another radiant system, ventilated slab, or pool.");
                 ShowContinueError(
                     "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
@@ -291,7 +291,7 @@ namespace SwimmingPool {
                 Pool(Item).SurfaceToPoolIndex(Pool(Item).SurfacePtr) = Item;
                 // Check to make sure pool surface is a floor
                 if (DataSurfaces::Surface(Pool(Item).SurfacePtr).Class != DataSurfaces::SurfaceClass_Floor) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " contains a surface name that is NOT a floor.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " contains a surface name that is NOT a floor.");
                     ShowContinueError(
                         "A swimming pool must be associated with a surface that is a FLOOR.  Association with other surface types is not permitted.");
                     ErrorsFound = true;
@@ -301,10 +301,10 @@ namespace SwimmingPool {
 
             Pool(Item).AvgDepth = Numbers(1);
             if (Pool(Item).AvgDepth < MinDepth) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too small.");
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too small.");
                 ShowContinueError("The pool average depth has been reset to the minimum allowed depth.");
             } else if (Pool(Item).AvgDepth > MaxDepth) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too large.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too large.");
                 ShowContinueError("The pool depth must be less than the maximum average depth of 10 meters.");
                 ErrorsFound = true;
             }
@@ -335,34 +335,34 @@ namespace SwimmingPool {
 
             Pool(Item).CoverEvapFactor = Numbers(2);
             if (Pool(Item).CoverEvapFactor < MinCoverFactor) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has an evaporation cover factor less than zero.");
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has an evaporation cover factor less than zero.");
                 ShowContinueError("The evaporation cover factor has been reset to zero.");
                 Pool(Item).CoverEvapFactor = MinCoverFactor;
             } else if (Pool(Item).CoverEvapFactor > MaxCoverFactor) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has an evaporation cover factor greater than one.");
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has an evaporation cover factor greater than one.");
                 ShowContinueError("The evaporation cover factor has been reset to one.");
                 Pool(Item).CoverEvapFactor = MaxCoverFactor;
             }
 
             Pool(Item).CoverConvFactor = Numbers(3);
             if (Pool(Item).CoverConvFactor < MinCoverFactor) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has a convection cover factor less than zero.");
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has a convection cover factor less than zero.");
                 ShowContinueError("The convection cover factor has been reset to zero.");
                 Pool(Item).CoverConvFactor = MinCoverFactor;
             } else if (Pool(Item).CoverConvFactor > MaxCoverFactor) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has a convection cover factor greater than one.");
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has a convection cover factor greater than one.");
                 ShowContinueError("The convection cover factor has been reset to one.");
                 Pool(Item).CoverConvFactor = MaxCoverFactor;
             }
 
             Pool(Item).CoverSWRadFactor = Numbers(4);
             if (Pool(Item).CoverSWRadFactor < MinCoverFactor) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " has a short-wavelength radiation cover factor less than zero.");
                 ShowContinueError("The short-wavelength radiation cover factor has been reset to zero.");
                 Pool(Item).CoverSWRadFactor = MinCoverFactor;
             } else if (Pool(Item).CoverSWRadFactor > MaxCoverFactor) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " has a short-wavelength radiation cover factor greater than one.");
                 ShowContinueError("The short-wavelength radiation cover factor has been reset to one.");
                 Pool(Item).CoverSWRadFactor = MaxCoverFactor;
@@ -370,12 +370,12 @@ namespace SwimmingPool {
 
             Pool(Item).CoverLWRadFactor = Numbers(5);
             if (Pool(Item).CoverLWRadFactor < MinCoverFactor) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " has a long-wavelength radiation cover factor less than zero.");
                 ShowContinueError("The long-wavelength radiation cover factor has been reset to zero.");
                 Pool(Item).CoverLWRadFactor = MinCoverFactor;
             } else if (Pool(Item).CoverLWRadFactor > MaxCoverFactor) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " has a long-wavelength radiation cover factor greater than one.");
                 ShowContinueError("The long-wavelength radiation cover factor has been reset to one.");
                 Pool(Item).CoverLWRadFactor = MaxCoverFactor;
@@ -405,7 +405,7 @@ namespace SwimmingPool {
             Pool(Item).WaterVolFlowMax = Numbers(6);
             Pool(Item).MiscPowerFactor = Numbers(7);
             if (Pool(Item).MiscPowerFactor < MinPowerFactor) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has a miscellaneous power factor less than zero.");
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has a miscellaneous power factor less than zero.");
                 ShowContinueError("The miscellaneous power factor has been reset to zero.");
                 Pool(Item).MiscPowerFactor = MinPowerFactor;
             }
@@ -425,7 +425,7 @@ namespace SwimmingPool {
 
             Pool(Item).MaxNumOfPeople = Numbers(8);
             if (Pool(Item).MaxNumOfPeople < 0.0) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " was entered with negative people.  This is not allowed.");
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " was entered with negative people.  This is not allowed.");
                 ShowContinueError("The number of people has been reset to zero.");
                 Pool(Item).MaxNumOfPeople = 0.0;
             }
@@ -455,7 +455,7 @@ namespace SwimmingPool {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in swimming pool input. Preceding conditions cause termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in swimming pool input. Preceding conditions cause termination.");
         }
     }
 
@@ -552,13 +552,13 @@ namespace SwimmingPool {
             this->CurActivityFactor = ScheduleManager::GetCurrentScheduleValue(this->ActivityFactorSchedPtr);
             if (this->CurActivityFactor < MinActivityFactor) {
                 this->CurActivityFactor = MinActivityFactor;
-                ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " Activity Factor Schedule =\"" + this->ActivityFactorSchedName +
+                ShowWarningError(std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " Activity Factor Schedule =\"" + this->ActivityFactorSchedName +
                                  " has a negative value.  This is not allowed.");
                 ShowContinueError("The activity factor has been reset to zero.");
             }
             if (this->CurActivityFactor > MaxActivityFactor) {
                 this->CurActivityFactor = 1.0;
-                ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " Activity Factor Schedule =\"" + this->ActivityFactorSchedName +
+                ShowWarningError(std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " Activity Factor Schedule =\"" + this->ActivityFactorSchedName +
                                  " has a value larger than 10.  This is not allowed.");
                 ShowContinueError("The activity factor has been reset to unity.");
             }
@@ -579,14 +579,14 @@ namespace SwimmingPool {
         // determine the current heat gain from people
         if (this->PeopleHeatGainSchedPtr > 0) {
             if (HeatGainPerPerson < 0.0) {
-                ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " Heat Gain Schedule =\"" + this->PeopleHeatGainSchedName +
+                ShowWarningError(std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " Heat Gain Schedule =\"" + this->PeopleHeatGainSchedName +
                                  " has a negative value.  This is not allowed.");
                 ShowContinueError("The heat gain per person has been reset to zero.");
                 HeatGainPerPerson = 0.0;
             }
             if (this->PeopleSchedPtr > 0) {
                 if (PeopleModifier < 0.0) {
-                    ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " People Schedule =\"" + this->PeopleSchedName +
+                    ShowWarningError(std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " People Schedule =\"" + this->PeopleSchedName +
                                      " has a negative value.  This is not allowed.");
                     ShowContinueError("The number of people has been reset to zero.");
                     PeopleModifier = 0.0;
@@ -604,12 +604,12 @@ namespace SwimmingPool {
         if (this->CoverSchedPtr > 0) {
             this->CurCoverSchedVal = ScheduleManager::GetCurrentScheduleValue(this->CoverSchedPtr);
             if (this->CurCoverSchedVal > 1.0) {
-                ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " Cover Schedule =\"" + this->CoverSchedName +
+                ShowWarningError(std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " Cover Schedule =\"" + this->CoverSchedName +
                                  " has a value greater than 1.0 (100%).  This is not allowed.");
                 ShowContinueError("The cover has been reset to one or fully covered.");
                 this->CurCoverSchedVal = 1.0;
             } else if (this->CurCoverSchedVal < 0.0) {
-                ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " Cover Schedule =\"" + this->CoverSchedName +
+                ShowWarningError(std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " Cover Schedule =\"" + this->CoverSchedName +
                                  " has a negative value.  This is not allowed.");
                 ShowContinueError("The cover has been reset to zero or uncovered.");
                 this->CurCoverSchedVal = 0.0;
@@ -727,7 +727,7 @@ namespace SwimmingPool {
                                                         this->WaterInletNode,
                                                         _);
                 if (errFlag) {
-                    ShowFatalError(RoutineName + ": Program terminated due to previous condition(s).");
+                    ShowFatalError(std::string{RoutineName} + ": Program terminated due to previous condition(s).");
                 }
             }
             this->MyPlantScanFlagPool = false;

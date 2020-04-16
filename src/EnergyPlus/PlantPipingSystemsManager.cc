@@ -448,7 +448,7 @@ namespace EnergyPlus {
                                ErrorsFound);
 
             // Report errors that are purely input problems
-            if (ErrorsFound) ShowFatalError(RoutineName + ": Preceding input errors cause program termination.");
+            if (ErrorsFound) ShowFatalError(std::string{RoutineName} + ": Preceding input errors cause program termination.");
 
             // Setup output variables
             SetupPipingSystemOutputVariables();
@@ -487,7 +487,7 @@ namespace EnergyPlus {
                     for (auto &thisSegment : thisCircuit->pipeSegments) {
                         if ((thisSegment->PipeLocation.X > thisDomain.Extents.xMax) || (thisSegment->PipeLocation.X < 0.0) ||
                             (thisSegment->PipeLocation.Y > thisDomain.Extents.yMax) || (thisSegment->PipeLocation.Y < 0.0)) {
-                            ShowSevereError("PipingSystems::" + RoutineName +
+                            ShowSevereError("PipingSystems::" + std::string{RoutineName} +
                                             ": A pipe was outside of the domain extents after performing corrections for basement or burial depth.");
                             ShowContinueError("Pipe segment name:" + thisSegment->Name);
                             ShowContinueError("Corrected pipe location: ( x,y )=( " +
@@ -501,7 +501,7 @@ namespace EnergyPlus {
 
             // If we encountered any other errors that we couldn't handle separately than stop now
             if (ErrorsFound) {
-                ShowFatalError(RoutineName + ':' + ObjName_ug_GeneralDomain + ": Errors found in input.");
+                ShowFatalError(std::string{RoutineName} + ':' + ObjName_ug_GeneralDomain + ": Errors found in input.");
             }
         }
 
@@ -557,7 +557,7 @@ namespace EnergyPlus {
                     } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
                         thisDomain.Mesh.X.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
                         if (mod(thisDomain.Mesh.X.RegionMeshCount, 2) != 0) {
-                            ShowWarningError("PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
+                            ShowWarningError("PipingSystems:" + std::string{RoutineName} + ": Invalid mesh type-count combination.");
                             ShowContinueError("Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
                             ShowContinueError(
                                     "An ODD-valued X mesh count was found in the input for symmetric geometric configuration.");
@@ -587,7 +587,7 @@ namespace EnergyPlus {
                     } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
                         thisDomain.Mesh.Y.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
                         if (mod(thisDomain.Mesh.Y.RegionMeshCount, 2) != 0) {
-                            ShowWarningError("PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
+                            ShowWarningError("PipingSystems:" + std::string{RoutineName} + ": Invalid mesh type-count combination.");
                             ShowContinueError("Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
                             ShowContinueError(
                                     "An ODD-valued Y mesh count was found in the input for symmetric geometric configuration.");
@@ -617,7 +617,7 @@ namespace EnergyPlus {
                     } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
                         thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
                         if (mod(thisDomain.Mesh.Z.RegionMeshCount, 2) != 0) {
-                            ShowWarningError("PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
+                            ShowWarningError("PipingSystems:" + std::string{RoutineName} + ": Invalid mesh type-count combination.");
                             ShowContinueError("Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
                             ShowContinueError(
                                     "An ODD-valued Z mesh count was found in the input for symmetric geometric configuration.");
@@ -1085,7 +1085,7 @@ namespace EnergyPlus {
                         thisDomain.SlabWidth ||
                         2 * (thisDomain.HorizInsWidth + thisDomain.VertInsThickness) >
                         thisDomain.SlabLength) {
-                        ShowContinueError(RoutineName + ": Perimeter insulation width is too large.");
+                        ShowContinueError(std::string{RoutineName} + ": Perimeter insulation width is too large.");
                         ShowContinueError("This would cause overlapping insulation. Check inputs.");
                         ShowContinueError("Defaulting to full horizontal insulation.");
                         ShowContinueError("Found in: " + thisDomain.Name);
@@ -1454,7 +1454,7 @@ namespace EnergyPlus {
                         thisDomain.BasementZone.Width / 2.0 ||
                         (thisDomain.HorizInsWidth + thisDomain.VertInsThickness) >
                         thisDomain.BasementZone.Length / 2.0) {
-                        ShowContinueError(RoutineName + ": Perimeter insulation width is too large.");
+                        ShowContinueError(std::string{RoutineName} + ": Perimeter insulation width is too large.");
                         ShowContinueError("This would cause overlapping insulation. Check inputs.");
                         ShowContinueError("Defaulting to full horizontal insulation.");
                         ShowContinueError("Found in: " + thisDomain.Name);
@@ -1667,7 +1667,7 @@ namespace EnergyPlus {
 
                 // Issue a severe if Inner >= Outer diameter
                 if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
-                    ShowSevereError(RoutineName + ": " + ObjName_HorizTrench + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has invalid pipe diameters.");
+                    ShowSevereError(std::string{RoutineName} + ": " + ObjName_HorizTrench + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has invalid pipe diameters.");
                     ShowContinueError("Outer diameter [" + General::TrimSigDigits(thisCircuit.PipeSize.OuterDia, 3)
                             + "] must be greater than inner diameter [" + General::TrimSigDigits(thisCircuit.PipeSize.InnerDia, 3) + "].");
                     ErrorsFound = true;
@@ -2145,7 +2145,7 @@ namespace EnergyPlus {
                                                         _);
                 if (errFlag) {
                     ShowFatalError(
-                            "PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s).");
+                            "PipingSystems:" + std::string{RoutineName} + ": Program terminated due to previous condition(s).");
                 }
 
                 // Once we find ourselves on the plant loop, we can do other things
@@ -2165,7 +2165,7 @@ namespace EnergyPlus {
                 for (auto &thisDomainCircuit : this->circuits) {
                     for (auto &segment : thisDomainCircuit->pipeSegments) {
                         if (!segment->PipeCellCoordinatesSet) {
-                            ShowSevereError("PipingSystems:" + RoutineName + ":Pipe segment index not set.");
+                            ShowSevereError("PipingSystems:" + std::string{RoutineName} + ":Pipe segment index not set.");
                             ShowContinueError("...Possibly because pipe segment was placed outside of the domain.");
                             ShowContinueError("...Verify piping system domain inputs, circuits, and segments.");
                             ShowFatalError("Preceding error causes program termination");
@@ -2238,7 +2238,7 @@ namespace EnergyPlus {
                                                                  out_cell.Z).PipeCellData.Fluid.Temperature;
         }
 
-        void IssueSevereInputFieldError(std::string const &RoutineName,
+        void IssueSevereInputFieldError(std::string_view RoutineName,
                                         std::string const &ObjectName,
                                         std::string const &InstanceName,
                                         std::string const &FieldName,
@@ -2252,17 +2252,17 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            ShowSevereError(RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" +
+            ShowSevereError(std::string{RoutineName} + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" +
                             FieldEntry +
                             "\", Condition: " + Condition);
             ErrorsFound = true;
         }
 
-        void IssueSevereInputFieldError(std::string const &RoutineName,
+        void IssueSevereInputFieldError(std::string_view RoutineName,
                                         std::string const &ObjectName,
                                         std::string const &InstanceName,
                                         std::string const &FieldName,
-                                        Real64 const FieldEntry,
+                                        Real64 FieldEntry,
                                         std::string const &Condition,
                                         bool &ErrorsFound) {
 
@@ -2272,7 +2272,7 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            ShowSevereError(RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" +
+            ShowSevereError(std::string{RoutineName} + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" +
                             General::TrimSigDigits(FieldEntry, 3) + "\", Condition: " + Condition);
             ErrorsFound = true;
         }
@@ -3111,7 +3111,7 @@ namespace EnergyPlus {
 
                 // check to make sure this location is valid
                 if (CellLeft < 0.0 || CellRight > DirExtentMax) {
-                    ShowSevereError("PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
+                    ShowSevereError("PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.");
                     ShowContinueError("Occurs during mesh development for domain=" + this->Name);
                     ShowContinueError("A pipe or basement is located outside of the domain extents.");
                     ShowFatalError("Preceding error causes program termination.");
@@ -3128,7 +3128,7 @@ namespace EnergyPlus {
                                           thisPartitionRegionSubIndex.Max)) {
 
                             ShowSevereError(
-                                    "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
+                                    "PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.");
                             ShowContinueError("Occurs during mesh development for domain=" + this->Name);
                             ShowContinueError("A mesh conflict was encountered where partitions were overlapping.");
                             ShowContinueError(
@@ -3144,7 +3144,7 @@ namespace EnergyPlus {
                                           thisPartitionRegionSubIndex.Max)) {
 
                             ShowSevereError(
-                                    "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
+                                    "PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.");
                             ShowContinueError("Occurs during mesh development for domain=" + this->Name);
                             ShowContinueError("A mesh conflict was encountered where partitions were overlapping.");
                             ShowContinueError(
@@ -5895,19 +5895,19 @@ namespace EnergyPlus {
             bool OutOfRange = this->CheckForOutOfRangeTemps();
             if (OutOfRange) {
                 if (this->HasZoneCoupledSlab) {
-                    ShowSevereError("Site:GroundDomain:Slab" + RoutineName +
+                    ShowSevereError("Site:GroundDomain:Slab" + std::string{RoutineName} +
                                     ": Out of range temperatures detected in the ground domain.");
                     ShowContinueError("This could be due to the size of the loads on the domain.");
                     ShowContinueError("Verify inputs are correct. If problem persists, notify EnergyPlus support.");
                     ShowFatalError("Preceding error(s) cause program termination");
                 } else if (this->HasZoneCoupledBasement) {
-                    ShowSevereError("Site:GroundDomain:Basement" + RoutineName +
+                    ShowSevereError("Site:GroundDomain:Basement" + std::string{RoutineName} +
                                     ": Out of range temperatures detected in the ground domain.");
                     ShowContinueError("This could be due to the size of the loads on the domain.");
                     ShowContinueError("Verify inputs are correct. If problem persists, notify EnergyPlus support.");
                     ShowFatalError("Preceding error(s) cause program termination");
                 } else {
-                    ShowSevereError("PipingSystems:" + RoutineName +
+                    ShowSevereError("PipingSystems:" + std::string{RoutineName} +
                                     ": Out of range temperatures detected in piping system simulation.");
                     ShowContinueError(
                             "This could be due to the size of the pipe circuit in relation to the loads being imposed.");

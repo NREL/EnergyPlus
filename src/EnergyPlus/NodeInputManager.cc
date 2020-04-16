@@ -221,7 +221,7 @@ namespace NodeInputManager {
 
         if (NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric &&
             NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown) {
-            ShowSevereError(RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type.");
+            ShowSevereError(std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type.");
             ShowContinueError("..Invalid FluidType=" + std::to_string(NodeFluidType));
             ErrorsFound = true;
             ShowFatalError("Preceding issue causes termination.");
@@ -235,7 +235,7 @@ namespace NodeInputManager {
                 for (Loop = 1; Loop <= NumNodes; ++Loop) {
                     if (NodeFluidType != NodeType_Unknown && Node(NodeNumbers(Loop)).FluidType != NodeType_Unknown) {
                         if (Node(NodeNumbers(Loop)).FluidType != NodeFluidType) {
-                            ShowSevereError(RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
+                            ShowSevereError(std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
                             if (present(InputFieldName)) ShowContinueError("...Ref field=" + InputFieldName);
                             ShowContinueError("Existing Fluid type for node, incorrect for request. Node=" + NodeID(NodeNumbers(Loop)));
                             ShowContinueError("Existing Fluid type=" + ValidNodeFluidTypes(Node(NodeNumbers(Loop)).FluidType) +
@@ -613,9 +613,9 @@ namespace NodeInputManager {
             NodeLists(NCount).NumOfNodesInList = NumAlphas - 1;
             if (NumAlphas <= 1) {
                 if (NumAlphas == 1) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=<blank> does not have any nodes or nodelist name.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=<blank> does not have any nodes or nodelist name.");
                 }
                 localErrorsFound = true;
                 continue;
@@ -624,10 +624,10 @@ namespace NodeInputManager {
             for (Loop1 = 1; Loop1 <= NumAlphas - 1; ++Loop1) {
                 NodeLists(NCount).NodeNames(Loop1) = cAlphas(Loop1 + 1);
                 if (cAlphas(Loop1 + 1).empty()) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", blank node name in list.");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\", blank node name in list.");
                     --NodeLists(NCount).NumOfNodesInList;
                     if (NodeLists(NCount).NumOfNodesInList <= 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
                         localErrorsFound = true;
                         break;
                     }
@@ -635,7 +635,7 @@ namespace NodeInputManager {
                 }
                 NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(NodeLists(NCount).NodeNames(Loop1), NodeType_Unknown, localErrorsFound);
                 if (UtilityRoutines::SameString(NodeLists(NCount).NodeNames(Loop1), NodeLists(NCount).Name)) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
                     ShowContinueError("... Node " + TrimSigDigits(Loop1) + " Name=\"" + cAlphas(Loop1 + 1) + "\", duplicates NodeList Name.");
                     localErrorsFound = true;
                 }
@@ -646,7 +646,7 @@ namespace NodeInputManager {
                 for (Loop2 = Loop1 + 1; Loop2 <= NodeLists(NCount).NumOfNodesInList; ++Loop2) {
                     if (NodeLists(NCount).NodeNumbers(Loop1) != NodeLists(NCount).NodeNumbers(Loop2)) continue;
                     if (flagError) { // only list nodelist name once
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" has duplicate nodes:");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" has duplicate nodes:");
                         flagError = false;
                     }
                     ShowContinueError("...list item=" + TrimSigDigits(Loop1) + ", \"" + NodeID(NodeLists(NCount).NodeNumbers(Loop1)) +
@@ -662,7 +662,7 @@ namespace NodeInputManager {
                 for (Loop1 = 1; Loop1 <= NumOfNodeLists; ++Loop1) {
                     if (Loop == Loop1) continue; // within a nodelist have already checked to see if node name duplicates nodelist name
                     if (!UtilityRoutines::SameString(NodeLists(Loop).NodeNames(Loop2), NodeLists(Loop1).Name)) continue;
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + NodeLists(Loop1).Name + "\", invalid node name in list.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + NodeLists(Loop1).Name + "\", invalid node name in list.");
                     ShowContinueError("... Node " + TrimSigDigits(Loop2) + " Name=\"" + NodeLists(Loop).NodeNames(Loop2) +
                                       "\", duplicates NodeList Name.");
                     ShowContinueError("... NodeList=\"" + NodeLists(Loop1).Name + "\", is duplicated.");
@@ -676,7 +676,7 @@ namespace NodeInputManager {
         rNumbers.deallocate();
 
         if (localErrorsFound) {
-            ShowFatalError(RoutineName + CurrentModuleObject + ": Error getting input - causes termination.");
+            ShowFatalError(std::string{RoutineName} + CurrentModuleObject + ": Error getting input - causes termination.");
             ErrorsFound = true;
         }
     }
@@ -857,7 +857,7 @@ namespace NodeInputManager {
                     InputFieldName);
 
         if (NumNodes > 1) {
-            ShowSevereError(RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
+            ShowSevereError(std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
             if (present(InputFieldName)) ShowContinueError("...Ref field=" + InputFieldName);
             ShowContinueError("Only 1st Node used from NodeList=\"" + NodeName + "\".");
             ShowContinueError("...a Nodelist may not be valid in this context.");

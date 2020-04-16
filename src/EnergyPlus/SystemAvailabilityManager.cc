@@ -627,7 +627,7 @@ namespace SystemAvailabilityManager {
 
                 SchedSysAvailMgrData(SysAvailNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (SchedSysAvailMgrData(SysAvailNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
@@ -668,7 +668,7 @@ namespace SystemAvailabilityManager {
 
                 SchedOnSysAvailMgrData(SysAvailNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (SchedOnSysAvailMgrData(SysAvailNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
@@ -709,7 +709,7 @@ namespace SystemAvailabilityManager {
 
                 SchedOffSysAvailMgrData(SysAvailNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (SchedOffSysAvailMgrData(SysAvailNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
@@ -754,14 +754,14 @@ namespace SystemAvailabilityManager {
                 NCycSysAvailMgrData(SysAvailNum).CyclingTimeSteps = CyclingTimeSteps;
                 NCycSysAvailMgrData(SysAvailNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (NCycSysAvailMgrData(SysAvailNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
                 NCycSysAvailMgrData(SysAvailNum).FanSched = cAlphaArgs(3);
                 NCycSysAvailMgrData(SysAvailNum).FanSchedPtr = GetScheduleIndex(cAlphaArgs(3));
                 if (NCycSysAvailMgrData(SysAvailNum).FanSchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
@@ -785,8 +785,8 @@ namespace SystemAvailabilityManager {
                     } else if (SELECT_CASE_var == "CYCLEONANYHEATINGZONEFANSONLY") {
                         NCycSysAvailMgrData(SysAvailNum).CtrlType = CycleOnAnyHeatingZoneFansOnly;
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
-                        ShowSevereError(RoutineName + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -802,8 +802,8 @@ namespace SystemAvailabilityManager {
                         } else if (SELECT_CASE_var == "THERMOSTATWITHMINIMUMRUNTIME") {
                             NCycSysAvailMgrData(SysAvailNum).CycRunTimeCntrlType = ThermostatWithMinimumRunTime;
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
-                            ShowSevereError(RoutineName + "incorrect value: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                            ShowSevereError(std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                             ErrorsFound = true;
                         }
                     }
@@ -828,7 +828,7 @@ namespace SystemAvailabilityManager {
                                 NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs(ZoneNumInList) = ZoneList(ZoneListNum).Zone(ZoneNumInList);
                             }
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + "=\"" +
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + "=\"" +
                                             cAlphaArgs(6) + "\" not found.");
                             ErrorsFound = true;
                         }
@@ -854,7 +854,7 @@ namespace SystemAvailabilityManager {
                                 NCycSysAvailMgrData(SysAvailNum).CoolingZonePtrs(ZoneNumInList) = ZoneList(ZoneListNum).Zone(ZoneNumInList);
                             }
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(7) + "=\"" +
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(7) + "=\"" +
                                             cAlphaArgs(7) + "\" not found.");
                             ErrorsFound = true;
                         }
@@ -880,7 +880,7 @@ namespace SystemAvailabilityManager {
                                 NCycSysAvailMgrData(SysAvailNum).HeatingZonePtrs(ZoneNumInList) = ZoneList(ZoneListNum).Zone(ZoneNumInList);
                             }
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(8) + "=\"" +
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(8) + "=\"" +
                                             cAlphaArgs(8) + "\" not found.");
                             ErrorsFound = true;
                         }
@@ -906,7 +906,7 @@ namespace SystemAvailabilityManager {
                                 NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs(ZoneNumInList) = ZoneList(ZoneListNum).Zone(ZoneNumInList);
                             }
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(9) + "=\"" +
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(9) + "=\"" +
                                             cAlphaArgs(9) + "\" not found.");
                             ErrorsFound = true;
                         }
@@ -949,14 +949,14 @@ namespace SystemAvailabilityManager {
                 OptStartSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_OptimumStart;
                 OptStartSysAvailMgrData(SysAvailNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (OptStartSysAvailMgrData(SysAvailNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
                 OptStartSysAvailMgrData(SysAvailNum).FanSched = cAlphaArgs(3);
                 OptStartSysAvailMgrData(SysAvailNum).FanSchedPtr = GetScheduleIndex(cAlphaArgs(3));
                 if (OptStartSysAvailMgrData(SysAvailNum).FanSchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
@@ -973,8 +973,8 @@ namespace SystemAvailabilityManager {
                         OptStartSysAvailMgrData(SysAvailNum).CtrlType = MaximumOfZoneList;
                     } else {
                         OptStartSysAvailMgrData(SysAvailNum).CtrlType = ControlZone;
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
-                        ShowSevereError(RoutineName + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -983,7 +983,7 @@ namespace SystemAvailabilityManager {
                     OptStartSysAvailMgrData(SysAvailNum).CtrlZoneName = cAlphaArgs(5);
                     OptStartSysAvailMgrData(SysAvailNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(5), Zone);
                     if (OptStartSysAvailMgrData(SysAvailNum).ZoneNum == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                         ShowSevereError("not found: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                         ErrorsFound = true;
                     }
@@ -1002,7 +1002,7 @@ namespace SystemAvailabilityManager {
                     }
                     OptStartSysAvailMgrData(SysAvailNum).NumOfZones = UtilityRoutines::FindItemInList(cAlphaArgs(6), ZoneList);
                     if (OptStartSysAvailMgrData(SysAvailNum).NumOfZones == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                         ShowSevereError("not found: " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
                         ErrorsFound = true;
                     }
@@ -1020,8 +1020,8 @@ namespace SystemAvailabilityManager {
                         OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType = ConstantStartTime;
                     } else {
                         OptStartSysAvailMgrData(SysAvailNum).CtrlAlgType = AdaptiveASHRAE;
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
-                        ShowSevereError(RoutineName + "incorrect value: " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -1120,7 +1120,7 @@ namespace SystemAvailabilityManager {
                 }
 
                 if (DiffTSysAvailMgrData(SysAvailNum).TempDiffOff > DiffTSysAvailMgrData(SysAvailNum).TempDiffOn) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + " = \"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("The " + cNumericFieldNames(2) + " is greater than the " + cNumericFieldNames(1) + '.');
                     ErrorsFound = true;
                 }
@@ -1265,7 +1265,7 @@ namespace SystemAvailabilityManager {
                 if (!lAlphaFieldBlanks(3)) {
                     LoTurnOffSysAvailMgrData(SysAvailNum).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
                     if (LoTurnOffSysAvailMgrData(SysAvailNum).SchedPtr == 0) {
-                        ShowSevereError(RoutineName + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\" not found.");
+                        ShowSevereError(std::string{RoutineName} + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\" not found.");
                         ShowContinueError("Occurs in " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
                         ErrorsFound = true;
                     }
@@ -1355,21 +1355,21 @@ namespace SystemAvailabilityManager {
 
                 NVentSysAvailMgrData(SysAvailNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (NVentSysAvailMgrData(SysAvailNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
                 NVentSysAvailMgrData(SysAvailNum).FanSched = cAlphaArgs(3);
                 NVentSysAvailMgrData(SysAvailNum).FanSchedPtr = GetScheduleIndex(cAlphaArgs(3));
                 if (NVentSysAvailMgrData(SysAvailNum).FanSchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
                 NVentSysAvailMgrData(SysAvailNum).VentTempSched = cAlphaArgs(4);
                 NVentSysAvailMgrData(SysAvailNum).VentTempSchedPtr = GetScheduleIndex(cAlphaArgs(4));
                 if (NVentSysAvailMgrData(SysAvailNum).VentTempSchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ErrorsFound = true;
                 }
@@ -1379,7 +1379,7 @@ namespace SystemAvailabilityManager {
                 NVentSysAvailMgrData(SysAvailNum).CtrlZoneName = cAlphaArgs(5);
                 NVentSysAvailMgrData(SysAvailNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(5), Zone);
                 if (NVentSysAvailMgrData(SysAvailNum).ZoneNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -1402,7 +1402,7 @@ namespace SystemAvailabilityManager {
         lNumericFieldBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 
@@ -4194,14 +4194,14 @@ namespace SystemAvailabilityManager {
             // Check zone number
             HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
             if (HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid");
                 ShowContinueError("not found: " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 ErrorsFound = true;
             }
 
             HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr = GetScheduleIndex(cAlphaArgs(4));
             if (HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid");
                 ShowContinueError("not found: " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                 ErrorsFound = true;
             }
@@ -4210,24 +4210,24 @@ namespace SystemAvailabilityManager {
             SchedMin = GetScheduleMinValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr);
             SchedMax = GetScheduleMaxValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr);
             if (SchedMin == 0 && SchedMax == 0) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError(cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\" specifies control mode 0 for all entries.");
                 ShowContinueError("All zones using this " + cAlphaFieldNames(4) + " have no hybrid ventilation control.");
             }
             if (SchedMax > 7.0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError(cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\", the maximum schedule value should be 7. However, ");
                 ShowContinueError("the maximum entered value in the schedule is " + TrimSigDigits(SchedMax, 1));
                 ErrorsFound = true;
             }
             if (SchedMin < 0.0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError(cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "the minimum schedule value should be 0. However, ");
                 ShowContinueError("the minimum entered value in the schedule is " + TrimSigDigits(SchedMin, 1));
                 ErrorsFound = true;
             }
             if (SchedMax == 7.0 && !Contaminant.CO2Simulation) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError(cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
                                   "\", When the schedule value is 7, carbon dioxide (CO2) control is requested. ");
                 ShowContinueError("However, CO2 simulation is not enabled. Please use ZoneAirContaminantBalance object to simulate CO2.");
@@ -4239,7 +4239,7 @@ namespace SystemAvailabilityManager {
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "NO")) {
                 HybridVentSysAvailMgrData(SysAvailNum).UseRainIndicator = false;
             } else {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError("..invalid value: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                 ShowContinueError("Valid choices are Yes or No.");
                 ErrorsFound = true;
@@ -4249,7 +4249,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 0) {
                 HybridVentSysAvailMgrData(SysAvailNum).MaxWindSpeed = rNumericArgs(1);
                 if (rNumericArgs(1) > 40.0 || rNumericArgs(1) < 0.0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(cNumericFieldNames(1) + " is beyond the range.");
                     ShowContinueError("The input value is " + TrimSigDigits(rNumericArgs(1), 0) + ". The allowed value must be >= 0 and <= 40 m/s");
                     ErrorsFound = true;
@@ -4260,7 +4260,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 1) {
                 HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorTemp = rNumericArgs(2);
                 if (rNumericArgs(2) > 100.0 || rNumericArgs(2) < -100.0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(cNumericFieldNames(2) + " is beyond the range.");
                     ShowContinueError("The input value is " + TrimSigDigits(rNumericArgs(2), 0) +
                                       ". The allowed value must be between -100 C and +100 C");
@@ -4270,7 +4270,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 2) {
                 HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorTemp = rNumericArgs(3);
                 if (rNumericArgs(3) > 100.0 || rNumericArgs(3) < -100.0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(cNumericFieldNames(3) + " is beyond the range.");
                     ShowContinueError("The input value is " + TrimSigDigits(rNumericArgs(3), 0) +
                                       ". The allowed value must be between -100 C and +100 C");
@@ -4279,7 +4279,7 @@ namespace SystemAvailabilityManager {
             }
             // Ensure MaxTemp >= MinTemp
             if (rNumericArgs(2) >= rNumericArgs(3)) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(2) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(2) +
                                 " must be less than the " + cNumericFieldNames(3));
                 ShowContinueError("The " + cNumericFieldNames(2) + " is " + TrimSigDigits(rNumericArgs(2), 0) + ". The " + cNumericFieldNames(3) +
                                   " is " + TrimSigDigits(rNumericArgs(3), 0) + '.');
@@ -4290,7 +4290,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 3) {
                 HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorEnth = rNumericArgs(4);
                 if (rNumericArgs(4) > 300000.0 || rNumericArgs(4) < 0.0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(cNumericFieldNames(4) + " is beyond the range.");
                     ShowContinueError("The input value is " + TrimSigDigits(rNumericArgs(4), 0) +
                                       ". The allowed value must be between 0 and 300000 J/kg");
@@ -4300,7 +4300,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 4) {
                 HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorEnth = rNumericArgs(5);
                 if (rNumericArgs(5) > 300000.0 || rNumericArgs(5) < 0.0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(cNumericFieldNames(5) + " is beyond the range.");
                     ShowContinueError("The input value is " + TrimSigDigits(rNumericArgs(5), 0) +
                                       ". The allowed value must be between 0 and 300000 J/kg");
@@ -4309,7 +4309,7 @@ namespace SystemAvailabilityManager {
             }
             // Ensure MaxEnth >= MiniEnth
             if (rNumericArgs(4) >= rNumericArgs(5)) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(4) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(4) +
                                 " must be less than the " + cNumericFieldNames(5));
                 ShowContinueError("The " + cNumericFieldNames(4) + " is " + TrimSigDigits(rNumericArgs(4), 0) + ". The " + cNumericFieldNames(5) +
                                   " is " + TrimSigDigits(rNumericArgs(5), 0) + '.');
@@ -4320,7 +4320,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 5) {
                 HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorDewPoint = rNumericArgs(6);
                 if (rNumericArgs(6) > 100.0 || rNumericArgs(6) < -100.0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(cNumericFieldNames(6) + " is beyond the range.");
                     ShowContinueError("The input value is " + TrimSigDigits(rNumericArgs(6), 0) +
                                       ". The allowed value must be between -100 C and +100 C");
@@ -4330,7 +4330,7 @@ namespace SystemAvailabilityManager {
             if (NumNumbers > 6) {
                 HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorDewPoint = rNumericArgs(7);
                 if (rNumericArgs(7) > 100.0 || rNumericArgs(7) < -100.0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(cNumericFieldNames(7) + " is beyond the range.");
                     ShowContinueError("The input value is " + TrimSigDigits(rNumericArgs(7), 0) +
                                       ". The allowed value must be between -100 C and +100 C");
@@ -4339,7 +4339,7 @@ namespace SystemAvailabilityManager {
             }
             // Ensure MaxTemp >= MinTemp
             if (rNumericArgs(6) >= rNumericArgs(7)) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(6) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(6) +
                                 " must be less than the " + cNumericFieldNames(7));
                 ShowContinueError("The " + cNumericFieldNames(6) + " is " + TrimSigDigits(rNumericArgs(6), 0) + ". The " + cNumericFieldNames(7) +
                                   " is " + TrimSigDigits(rNumericArgs(7), 0) + '.');
@@ -4349,13 +4349,13 @@ namespace SystemAvailabilityManager {
             HybridVentSysAvailMgrData(SysAvailNum).MinOASched = cAlphaArgs(6);
             HybridVentSysAvailMgrData(SysAvailNum).MinOASchedPtr = GetScheduleIndex(cAlphaArgs(6));
             if (HybridVentSysAvailMgrData(SysAvailNum).MinOASchedPtr == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
                 ShowContinueError("..not found: " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
                 ErrorsFound = true;
             }
             SchedMin = GetScheduleMinValue(HybridVentSysAvailMgrData(SysAvailNum).MinOASchedPtr);
             if (SchedMin < 0.0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Schedule value must be >= 0 in " +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Schedule value must be >= 0 in " +
                                 cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
                 ShowContinueError("The minimum schedule value is " + TrimSigDigits(SchedMin, 1));
                 ErrorsFound = true;
@@ -4364,13 +4364,13 @@ namespace SystemAvailabilityManager {
             if (!lAlphaFieldBlanks(7)) {
                 HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS = GetCurveIndex(cAlphaArgs(7));
                 if (HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS <= 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(" not found: " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
                     ErrorsFound = true;
                 } else {
                     GetCurveMinMaxValues(HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, CurveMin, CurveMax);
                     if (CurveMin < 0.0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                         ShowContinueError("The minimum wind speed used in " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) +
                                           "should be greater than or equal to 0.0 (m/s)");
                         ShowContinueError("Curve minimum value appears to be less than 0.");
@@ -4378,7 +4378,7 @@ namespace SystemAvailabilityManager {
                     }
                     CurveVal = CurveValue(HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, CurveMin);
                     if (CurveVal < 0.0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                         ShowContinueError("The minimum value of " + cAlphaFieldNames(7) +
                                           " must be greater than or equal to 0.0 at the minimum value of wind speed.");
                         ShowContinueError(cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
@@ -4387,7 +4387,7 @@ namespace SystemAvailabilityManager {
                     }
                     CurveVal = CurveValue(HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, CurveMax);
                     if (CurveVal > 1.0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                         ShowContinueError("The maximum value of " + cAlphaFieldNames(7) +
                                           " must be less than or equal to 1.0 at the maximum value of wind speed.");
                         ShowContinueError(cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
@@ -4413,14 +4413,14 @@ namespace SystemAvailabilityManager {
                 SchedMax = GetScheduleMaxValue(HybridVentSysAvailMgrData(SysAvailNum).ANControlTypeSchedPtr);
                 HybridVentSysAvailANCtrlStatus(SysAvailNum) = HybridVentSysAvailMgrData(SysAvailNum).ANControlTypeSchedPtr;
                 if (SchedMax > 1.0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(" For " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) + "\",");
                     ShowContinueError("the maximum schedule value should be 1. However, ");
                     ShowContinueError("the maximum entered value in the schedule is " + TrimSigDigits(SchedMax, 1));
                     ErrorsFound = true;
                 }
                 if (SchedMin < 0.0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError("For " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) + "\",");
                     ShowContinueError("the minimum schedule value should be 0. However, ");
                     ShowContinueError("the minimum entered value in the schedule is " + TrimSigDigits(SchedMin, 1));
@@ -4431,7 +4431,7 @@ namespace SystemAvailabilityManager {
             HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr = GetScheduleIndex(cAlphaArgs(9));
             if (HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0 &&
                 HybridVentSysAvailMgrData(SysAvailNum).ANControlTypeSchedPtr > 0) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError("The inputs for" + cAlphaFieldNames(8) + " and " + cAlphaFieldNames(9) + " are valid.");
                 ShowContinueError("But both objects cannot work at the same time. The Simple Airflow Control is disabled");
                 HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr = 0;
@@ -4440,14 +4440,14 @@ namespace SystemAvailabilityManager {
                 SchedMin = GetScheduleMinValue(HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr);
                 SchedMax = GetScheduleMaxValue(HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr);
                 if (SchedMax > 1.0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError("For " + cAlphaFieldNames(9) + "=\"" + cAlphaArgs(9) + "\",");
                     ShowContinueError("the maximum schedule value should be 1. However, ");
                     ShowContinueError("the maximum entered value in the schedule is " + TrimSigDigits(SchedMax, 1));
                     ErrorsFound = true;
                 }
                 if (SchedMin < 0.0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError("For " + cAlphaFieldNames(9) + "=\"" + cAlphaArgs(9) + "\",");
                     ShowContinueError("the minimum schedule value should be 0. However, ");
                     ShowContinueError("the minimum entered value in the schedule is " + TrimSigDigits(SchedMin, 1));
@@ -4462,7 +4462,7 @@ namespace SystemAvailabilityManager {
                     HybridVentSysAvailMaster(SysAvailNum) = HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                     SchedMax = GetScheduleMaxValue(HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr);
                     if (HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr <= 0 && int(SchedMax) == 1) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                         ShowContinueError(cAlphaFieldNames(10) + "=\"" + cAlphaArgs(10) + "\" is required and not found.");
                         ErrorsFound = true;
                     } // Otherwise check later
@@ -4473,7 +4473,7 @@ namespace SystemAvailabilityManager {
             if (HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0 && HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr > 0) {
                 if (HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum !=
                     Ventilation(HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr).ZonePtr) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError("The Zone name specified in the Ventilation object " +
                                       Zone(Ventilation(HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr).ZonePtr).Name);
                     ShowContinueError("is not equal to the " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
@@ -4483,7 +4483,7 @@ namespace SystemAvailabilityManager {
 
             if (HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0 &&
                 AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                 ShowContinueError("The simple airflow objects are used for natural ventilation calculation.");
                 ShowContinueError("The Airflow Network model is not allowed to perform. Please set the control type = NoMultizoneOrDistribution");
                 ErrorsFound = true;
@@ -4491,10 +4491,10 @@ namespace SystemAvailabilityManager {
 
             if (HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr == 0) {
                 if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
+                    ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                     ShowContinueError("The Airflow Network model is not available for Hybrid Ventilation Control.");
                 } else if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
+                    ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                     ShowContinueError("Please check the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.");
                     ShowContinueError("The suggested choices are MultizoneWithDistribution or MultizoneWithoutDistribution.");
                 }
@@ -4503,7 +4503,7 @@ namespace SystemAvailabilityManager {
             // Disallow combination of simple control and OA control mode
             SchedMax = GetScheduleMaxValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr);
             if (HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0 && SchedMax == 4.0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError("The outdoor ventilation air control type defined in " + cAlphaArgs(4) + " cannot work together with " +
                                   cAlphaFieldNames(9));
                 ErrorsFound = true;
@@ -4544,7 +4544,7 @@ namespace SystemAvailabilityManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
         }
 
         // Set up output variables

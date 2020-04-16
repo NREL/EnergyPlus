@@ -249,7 +249,7 @@ namespace BoilerSteam {
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
 
                 } else {
-                    ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                    ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
 
                     // Set to Electric to avoid errors when setting up output variables
@@ -280,20 +280,20 @@ namespace BoilerSteam {
             if (Boiler(BoilerNum).SizFac <= 0.0) Boiler(BoilerNum).SizFac = 1.0;
 
             if ((DataIPShortCuts::rNumericArgs(8) + DataIPShortCuts::rNumericArgs(9) + DataIPShortCuts::rNumericArgs(10)) == 0.0) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError(" Sum of fuel use curve coefficients = 0.0");
                 ErrorsFound = true;
             }
 
             if (DataIPShortCuts::rNumericArgs(5) < 0.0) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(5) + '=' +
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(5), 3));
                 ErrorsFound = true;
             }
 
             if (DataIPShortCuts::rNumericArgs(3) == 0.0) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(3) + '=' +
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(3), 3));
                 ErrorsFound = true;
@@ -323,7 +323,7 @@ namespace BoilerSteam {
             if (SteamFluidIndex == 0 && BoilerNum == 1) {
                 SteamFluidIndex = FluidProperties::FindRefrigerant("Steam");
                 if (SteamFluidIndex == 0) {
-                    ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                    ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                     ShowContinueError("Steam Properties not found; Steam Fluid Properties must be included in the input file.");
                     ErrorsFound = true;
                 }
@@ -339,7 +339,7 @@ namespace BoilerSteam {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input.");
         }
     }
 

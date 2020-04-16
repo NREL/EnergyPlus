@@ -941,7 +941,7 @@ namespace WaterCoils {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting input.");
         }
 
         AlphArray.deallocate();
@@ -6148,7 +6148,7 @@ namespace WaterCoils {
                         CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(SensorNodeNum, iCtrlVarType_Temp)) {
-                                ShowWarningError(RoutineName + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");
+                                ShowWarningError(std::string{RoutineName} + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(" ..Temperature setpoint not found on coil air outlet node.");
                                 ShowContinueError(
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -6159,7 +6159,7 @@ namespace WaterCoils {
                         CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(SensorNodeNum, iCtrlVarType_MaxHumRat)) {
-                                ShowWarningError(RoutineName + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");
+                                ShowWarningError(std::string{RoutineName} + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(" ..Humidity ratio setpoint not found on coil air outlet node.");
                                 ShowContinueError(
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -6170,7 +6170,7 @@ namespace WaterCoils {
                         CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(SensorNodeNum, iCtrlVarType_Temp)) {
-                                ShowWarningError(RoutineName + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");
+                                ShowWarningError(std::string{RoutineName} + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(" ..Temperature setpoint not found on coil air outlet node.");
                                 ShowContinueError(
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -6181,7 +6181,7 @@ namespace WaterCoils {
                         CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(SensorNodeNum, iCtrlVarType_MaxHumRat)) {
-                                ShowWarningError(RoutineName + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");
+                                ShowWarningError(std::string{RoutineName} + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(" ..Humidity ratio setpoint not found on coil air outlet node.");
                                 ShowContinueError(
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");

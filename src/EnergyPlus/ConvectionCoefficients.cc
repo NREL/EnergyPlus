@@ -1545,7 +1545,7 @@ namespace ConvectionCoefficients {
                             UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
                             UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
                             if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                ShowSevereError(format("{}{}=\"{}\", out of range value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
                                                   RoundSigDigits(Numbers(NumField), 5) + "].");
                                 ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
@@ -1559,7 +1559,7 @@ namespace ConvectionCoefficients {
                             UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
                             UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
                             if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                ShowWarningError(format("{}{}=\"{}\", duplicate value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
                                                   '=' + Alphas(Ptr + 2) + " is ignored.");
                             }
@@ -1571,7 +1571,7 @@ namespace ConvectionCoefficients {
                             UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSchedule;
                             UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
                             if (UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                 ErrorsFound = true;
                             } else {
@@ -1587,7 +1587,7 @@ namespace ConvectionCoefficients {
                             UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcOutsideUserCurve);
                             if (UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                 ErrorsFound = true;
                             }
@@ -1602,12 +1602,12 @@ namespace ConvectionCoefficients {
                             PotentialAssignedValue = TotExtConvCoeff;
 
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
+                            ShowSevereError(format("{}{}=\"{}\", check input", RoutineName, CurrentModuleObject, Alphas(1)));
                             ShowContinueError("Check Input Entered :" + Alphas(Ptr + 1));
                             ErrorsFound = true;
                         }
                         if (Surface(Found).ExtConvCoeff != 0) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                            ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                             ShowContinueError("Duplicate (Outside) assignment attempt");
                             ErrorsFound = true;
                         } else {
@@ -1632,7 +1632,7 @@ namespace ConvectionCoefficients {
                             UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
                             UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
                             if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                ShowSevereError(format("{}{}=\"{}\", out of range value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
                                                   RoundSigDigits(Numbers(NumField), 5) + "].");
                                 ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
@@ -1646,7 +1646,7 @@ namespace ConvectionCoefficients {
                             UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
                             UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
                             if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                ShowWarningError(format("{}{}=\"{}\", duplicate value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 1) + "\", " + cAlphaFieldNames(Ptr + 2) +
                                                   '=' + Alphas(Ptr + 2) + " is ignored.");
                             }
@@ -1658,7 +1658,7 @@ namespace ConvectionCoefficients {
                             UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSchedule;
                             UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
                             if (UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                 ErrorsFound = true;
                             } else {
@@ -1673,7 +1673,7 @@ namespace ConvectionCoefficients {
                             UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcInsideUserCurve);
                             if (UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                 ErrorsFound = true;
                             }
@@ -1691,20 +1691,20 @@ namespace ConvectionCoefficients {
                             // treat CeilingDiffuser and TrombeWall special
                             if (UtilityRoutines::SameString(Alphas(Ptr + 1), "CEILINGDIFFUSER") ||
                                 UtilityRoutines::SameString(Alphas(Ptr + 1), "TROMBEWALL")) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError("Invalid Value Entered, for " + cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
                                 ShowContinueError("invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1) +
                                                   "\". This type is only applicable at a Zone level.");
                                 ErrorsFound = true;
                             } else { // really invalid
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError("Invalid Value Entered, for " + cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
                                 ShowContinueError("invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1));
                                 ErrorsFound = true;
                             }
                         }
                         if (Surface(Found).IntConvCoeff != 0) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate (inside)");
+                            ShowSevereError(format("{}{}=\"{}\", duplicate (inside)", RoutineName, CurrentModuleObject, Alphas(1)));
                             ShowContinueError("Duplicate (Inside) assignment attempt.");
                             ErrorsFound = true;
                         } else {
@@ -1714,7 +1714,7 @@ namespace ConvectionCoefficients {
                     } else if (SELECT_CASE_var == BlankString) { // Blank
 
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                         ShowContinueError("Invalid Value Entered, for " + cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
                         ErrorsFound = true;
                     }
@@ -1748,7 +1748,7 @@ namespace ConvectionCoefficients {
                 break;
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                 ShowContinueError("illegal value for " + cAlphaFieldNames(1) + '=' + Alphas(1));
                 ErrorsFound = true;
                 continue;
@@ -1777,7 +1777,7 @@ namespace ConvectionCoefficients {
                             UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
                             UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
                             if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                ShowSevereError(format("{}{}=\"{}\", out of range value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
                                                   RoundSigDigits(Numbers(NumField), 5) + "].");
                                 ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
@@ -1791,7 +1791,7 @@ namespace ConvectionCoefficients {
                             UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
                             UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
                             if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                ShowWarningError(format("{}{}=\"{}\", duplicate value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
                                                   '=' + Alphas(Ptr + 2) + " is ignored.");
                             }
@@ -1803,7 +1803,7 @@ namespace ConvectionCoefficients {
                             UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSchedule;
                             UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
                             if (UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                 ErrorsFound = true;
                             } else {
@@ -1818,7 +1818,7 @@ namespace ConvectionCoefficients {
                             UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcOutsideUserCurve);
                             if (UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                 ErrorsFound = true;
                             }
@@ -1835,7 +1835,7 @@ namespace ConvectionCoefficients {
                             PotentialAssignedValue = TotExtConvCoeff;
                             ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
+                            ShowSevereError(format("{}{}=\"{}\", check input", RoutineName, CurrentModuleObject, Alphas(1)));
                             ShowContinueError("Check Input Entered :" + Alphas(Ptr + 1));
                             ErrorsFound = true;
                         }
@@ -1857,7 +1857,7 @@ namespace ConvectionCoefficients {
                             UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
                             UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
                             if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                ShowSevereError(format("{}{}=\"{}\", out of range value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
                                                   RoundSigDigits(Numbers(NumField), 5) + "].");
                                 ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
@@ -1871,7 +1871,7 @@ namespace ConvectionCoefficients {
                             UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
                             UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
                             if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                ShowWarningError(format("{}{}=\"{}\", duplicate value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
                                                   '=' + Alphas(Ptr + 2) + " is ignored.");
                             }
@@ -1883,7 +1883,7 @@ namespace ConvectionCoefficients {
                             UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSchedule;
                             UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
                             if (UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                 ErrorsFound = true;
                             } else {
@@ -1899,7 +1899,7 @@ namespace ConvectionCoefficients {
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcInsideUserCurve);
                             if (UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex == 0) {
 
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                 ErrorsFound = true;
                             }
@@ -1919,13 +1919,13 @@ namespace ConvectionCoefficients {
                             // treat CeilingDiffuser and TrombeWall special
                             if (UtilityRoutines::SameString(Alphas(Ptr + 1), "CEILINGDIFFUSER") ||
                                 UtilityRoutines::SameString(Alphas(Ptr + 1), "TROMBEWALL")) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
                                 ShowContinueError("invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1) +
                                                   "\". This type is only applicable at a Zone level.");
                                 ErrorsFound = true;
                             } else { // really invalid
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 1) + " entered=" + Alphas(Ptr + 1));
                                 ErrorsFound = true;
                             }
@@ -1934,7 +1934,7 @@ namespace ConvectionCoefficients {
                     } else if (SELECT_CASE_var == BlankString) { // Blank
 
                     } else { // Error Case
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                         ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
                         ErrorsFound = true;
                     }
@@ -1950,7 +1950,7 @@ namespace ConvectionCoefficients {
             if (UserIntConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
             if (UserIntConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
             if (CheckScheduleValueMinMax(UserIntConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
-            ShowSevereError(RoutineName + "Surface=\"" + UserIntConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
+            ShowSevereError(std::string{RoutineName} + "Surface=\"" + UserIntConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
             ShowContinueError("Out-of-range value found in schedule=" + UserIntConvectionCoeffs(Loop).ScheduleName);
             ShowContinueError("User supplied convection coefficients must be in range [>=" + RoundSigDigits(LowHConvLimit, 9) +
                               ", <=" + RoundSigDigits(HighHConvLimit, 1) + ']');
@@ -1962,7 +1962,7 @@ namespace ConvectionCoefficients {
             if (UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
             if (UserExtConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
             if (CheckScheduleValueMinMax(UserExtConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
-            ShowSevereError(RoutineName + "Surface=\"" + UserExtConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
+            ShowSevereError(std::string{RoutineName} + "Surface=\"" + UserExtConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
             ShowContinueError("Out-of-range value found in schedule=" + UserExtConvectionCoeffs(Loop).ScheduleName);
             ShowContinueError("User supplied convection coefficients must be in range [>=" + RoundSigDigits(LowHConvLimit, 9) +
                               ", <=" + RoundSigDigits(HighHConvLimit, 1) + ']');
@@ -1985,14 +1985,14 @@ namespace ConvectionCoefficients {
                      UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSpecifiedModel)) {
                     ++Count;
                     if (DisplayExtraWarnings) {
-                        ShowSevereError(RoutineName + "Surface=\"" + UserExtConvectionCoeffs(Loop).SurfaceName + "\", mixed algorithms.");
+                        ShowSevereError(std::string{RoutineName} + "Surface=\"" + UserExtConvectionCoeffs(Loop).SurfaceName + "\", mixed algorithms.");
                         ShowContinueError(
                             "Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for this surface.");
                     }
                 }
             }
             if (Count > 0) {
-                ShowSevereMessage(RoutineName + RoundSigDigits(Count) + " surfaces had different outside convection algorithms specified when");
+                ShowSevereMessage(std::string{RoutineName} + RoundSigDigits(Count) + " surfaces had different outside convection algorithms specified when");
                 ShowContinueError(
                     "the Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for these surfaces.");
                 if (!DisplayExtraWarnings) {
@@ -2033,7 +2033,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(3), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                         ShowContinueError(" Invalid " + cAlphaFieldNames(3) + " entered=" + cAlphaArgs(3));
                         ErrorsFound = true;
                     }
@@ -2041,7 +2041,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                 ErrorsFound = true;
             }
@@ -2057,7 +2057,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(5), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
                         ErrorsFound = true;
                     }
@@ -2065,7 +2065,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                 ErrorsFound = true;
             }
@@ -2081,7 +2081,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(7), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                         ErrorsFound = true;
                     }
@@ -2089,7 +2089,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
                 ErrorsFound = true;
             }
@@ -2105,7 +2105,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(9), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(9) + '=' + cAlphaArgs(9));
                         ErrorsFound = true;
                     }
@@ -2113,7 +2113,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(8) + '=' + cAlphaArgs(8));
                 ErrorsFound = true;
             }
@@ -2129,7 +2129,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(11), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(11) + '=' + cAlphaArgs(11));
                         ErrorsFound = true;
                     }
@@ -2137,7 +2137,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(10) + '=' + cAlphaArgs(10));
                 ErrorsFound = true;
             }
@@ -2153,7 +2153,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(13), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(13) + '=' + cAlphaArgs(13));
                         ErrorsFound = true;
                     }
@@ -2161,7 +2161,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(12) + '=' + cAlphaArgs(12));
                 ErrorsFound = true;
             }
@@ -2177,7 +2177,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(15), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(15) + '=' + cAlphaArgs(15));
                         ErrorsFound = true;
                     }
@@ -2185,7 +2185,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(14) + '=' + cAlphaArgs(14));
                 ErrorsFound = true;
             }
@@ -2201,7 +2201,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(17), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(17) + '=' + cAlphaArgs(17));
                         ErrorsFound = true;
                     }
@@ -2209,7 +2209,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(16) + '=' + cAlphaArgs(16));
                 ErrorsFound = true;
             }
@@ -2225,7 +2225,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(19), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(19) + '=' + cAlphaArgs(19));
                         ErrorsFound = true;
                     }
@@ -2233,7 +2233,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(18) + '=' + cAlphaArgs(18));
                 ErrorsFound = true;
             }
@@ -2249,7 +2249,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(21), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(21) + '=' + cAlphaArgs(21));
                         ErrorsFound = true;
                     }
@@ -2257,7 +2257,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(20) + '=' + cAlphaArgs(20));
                 ErrorsFound = true;
             }
@@ -2273,7 +2273,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(23), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(23) + '=' + cAlphaArgs(23));
                         ErrorsFound = true;
                     }
@@ -2281,7 +2281,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(22) + '=' + cAlphaArgs(22));
                 ErrorsFound = true;
             }
@@ -2297,7 +2297,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(25), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(25) + '=' + cAlphaArgs(25));
                         ErrorsFound = true;
                     }
@@ -2305,7 +2305,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(24) + '=' + cAlphaArgs(24));
                 ErrorsFound = true;
             }
@@ -2321,7 +2321,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(27), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(27) + '=' + cAlphaArgs(27));
                         ErrorsFound = true;
                     }
@@ -2329,7 +2329,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(26) + '=' + cAlphaArgs(26));
                 ErrorsFound = true;
             }
@@ -2345,7 +2345,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(29), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(29) + '=' + cAlphaArgs(29));
                         ErrorsFound = true;
                     }
@@ -2353,7 +2353,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(28) + '=' + cAlphaArgs(28));
                 ErrorsFound = true;
             }
@@ -2369,7 +2369,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(31), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(31) + '=' + cAlphaArgs(31));
                         ErrorsFound = true;
                     }
@@ -2377,7 +2377,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(30) + '=' + cAlphaArgs(30));
                 ErrorsFound = true;
             }
@@ -2393,7 +2393,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(33), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(33) + '=' + cAlphaArgs(33));
                         ErrorsFound = true;
                     }
@@ -2401,7 +2401,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(32) + '=' + cAlphaArgs(32));
                 ErrorsFound = true;
             }
@@ -2417,7 +2417,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(35), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(35) + '=' + cAlphaArgs(35));
                         ErrorsFound = true;
                     }
@@ -2425,7 +2425,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(34) + '=' + cAlphaArgs(34));
                 ErrorsFound = true;
             }
@@ -2441,7 +2441,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(37), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(37) + '=' + cAlphaArgs(37));
                         ErrorsFound = true;
                     }
@@ -2449,7 +2449,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(36) + '=' + cAlphaArgs(36));
                 ErrorsFound = true;
             }
@@ -2465,7 +2465,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(39), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(39) + '=' + cAlphaArgs(39));
                         ErrorsFound = true;
                     }
@@ -2473,7 +2473,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(38) + '=' + cAlphaArgs(38));
                 ErrorsFound = true;
             }
@@ -2489,7 +2489,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(41), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(41) + '=' + cAlphaArgs(41));
                         ErrorsFound = true;
                     }
@@ -2497,7 +2497,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(40) + '=' + cAlphaArgs(40));
                 ErrorsFound = true;
             }
@@ -2513,7 +2513,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(43), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(43) + '=' + cAlphaArgs(43));
                         ErrorsFound = true;
                     }
@@ -2521,7 +2521,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(42) + '=' + cAlphaArgs(42));
                 ErrorsFound = true;
             }
@@ -2537,7 +2537,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(45), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(45) + '=' + cAlphaArgs(45));
                         ErrorsFound = true;
                     }
@@ -2545,7 +2545,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(44) + '=' + cAlphaArgs(44));
                 ErrorsFound = true;
             }
@@ -2561,7 +2561,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(47), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(47) + '=' + cAlphaArgs(47));
                         ErrorsFound = true;
                     }
@@ -2569,7 +2569,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(46) + '=' + cAlphaArgs(46));
                 ErrorsFound = true;
             }
@@ -2585,7 +2585,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(49), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(49) + '=' + cAlphaArgs(49));
                         ErrorsFound = true;
                     }
@@ -2593,7 +2593,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(48) + '=' + cAlphaArgs(48));
                 ErrorsFound = true;
             }
@@ -2609,7 +2609,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(51), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(51) + '=' + cAlphaArgs(51));
                         ErrorsFound = true;
                     }
@@ -2617,7 +2617,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(50) + '=' + cAlphaArgs(50));
                 ErrorsFound = true;
             }
@@ -2633,7 +2633,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(53), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(53) + '=' + cAlphaArgs(53));
                         ErrorsFound = true;
                     }
@@ -2641,7 +2641,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(52) + '=' + cAlphaArgs(52));
                 ErrorsFound = true;
             }
@@ -2657,7 +2657,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(55), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(55) + '=' + cAlphaArgs(55));
                         ErrorsFound = true;
                     }
@@ -2665,7 +2665,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(54) + '=' + cAlphaArgs(54));
                 ErrorsFound = true;
             }
@@ -2681,7 +2681,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(57), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(57) + '=' + cAlphaArgs(57));
                         ErrorsFound = true;
                     }
@@ -2689,7 +2689,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(56) + '=' + cAlphaArgs(56));
                 ErrorsFound = true;
             }
@@ -2704,7 +2704,7 @@ namespace ConvectionCoefficients {
                     //   A59, \field Central Air Diffuser Wall Equation User Curve Name
                     InsideFaceAdaptiveConvectionAlgo.CentralAirWallUserCurveNum = UtilityRoutines::FindItemInList(cAlphaArgs(59), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.CentralAirWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(59) + '=' + cAlphaArgs(59));
                         ErrorsFound = true;
                     }
@@ -2712,7 +2712,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(58) + '=' + cAlphaArgs(58));
                 ErrorsFound = true;
             }
@@ -2728,7 +2728,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(61), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(61) + '=' + cAlphaArgs(61));
                         ErrorsFound = true;
                     }
@@ -2736,7 +2736,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(60) + '=' + cAlphaArgs(60));
                 ErrorsFound = true;
             }
@@ -2751,7 +2751,7 @@ namespace ConvectionCoefficients {
                     //  A63, \field Central Air Diffuser Floor Equation User Curve Name
                     InsideFaceAdaptiveConvectionAlgo.CentralAirFloorUserCurveNum = UtilityRoutines::FindItemInList(cAlphaArgs(63), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.CentralAirFloorUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(63) + '=' + cAlphaArgs(63));
                         ErrorsFound = true;
                     }
@@ -2759,7 +2759,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(62) + '=' + cAlphaArgs(62));
                 ErrorsFound = true;
             }
@@ -2775,7 +2775,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(65), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(65) + '=' + cAlphaArgs(65));
                         ErrorsFound = true;
                     }
@@ -2783,7 +2783,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(64) + '=' + cAlphaArgs(64));
                 ErrorsFound = true;
             }
@@ -2799,7 +2799,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(67), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(67) + '=' + cAlphaArgs(67));
                         ErrorsFound = true;
                     }
@@ -2807,7 +2807,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(66) + '=' + cAlphaArgs(66));
                 ErrorsFound = true;
             }
@@ -2823,7 +2823,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(69), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(69) + '=' + cAlphaArgs(69));
                         ErrorsFound = true;
                     }
@@ -2831,7 +2831,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(68) + '=' + cAlphaArgs(68));
                 ErrorsFound = true;
             }
@@ -2847,7 +2847,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(71), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(71) + '=' + cAlphaArgs(71));
                         ErrorsFound = true;
                     }
@@ -2855,7 +2855,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(70) + '=' + cAlphaArgs(70));
                 ErrorsFound = true;
             }
@@ -2871,7 +2871,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(73), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(73) + '=' + cAlphaArgs(73));
                         ErrorsFound = true;
                     }
@@ -2879,7 +2879,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(72) + '=' + cAlphaArgs(72));
                 ErrorsFound = true;
             }
@@ -2895,7 +2895,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(75), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(75) + '=' + cAlphaArgs(75));
                         ErrorsFound = true;
                     }
@@ -2903,7 +2903,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(74) + '=' + cAlphaArgs(74));
                 ErrorsFound = true;
             }
@@ -2919,7 +2919,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(77), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(77) + '=' + cAlphaArgs(77));
                         ErrorsFound = true;
                     }
@@ -2927,7 +2927,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(76) + '=' + cAlphaArgs(76));
                 ErrorsFound = true;
             }
@@ -2943,7 +2943,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(79), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(79) + '=' + cAlphaArgs(79));
                         ErrorsFound = true;
                     }
@@ -2951,7 +2951,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(78) + '=' + cAlphaArgs(78));
                 ErrorsFound = true;
             }
@@ -2967,7 +2967,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(81), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(81) + '=' + cAlphaArgs(81));
                         ErrorsFound = true;
                     }
@@ -2975,7 +2975,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(80) + '=' + cAlphaArgs(80));
                 ErrorsFound = true;
             }
@@ -2991,7 +2991,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.MixedStableFloorUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(83), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.MixedStableFloorUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(83) + '=' + cAlphaArgs(83));
                         ErrorsFound = true;
                     }
@@ -2999,7 +2999,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(82) + '=' + cAlphaArgs(82));
                 ErrorsFound = true;
             }
@@ -3015,7 +3015,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(85), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(85) + '=' + cAlphaArgs(85));
                         ErrorsFound = true;
                     }
@@ -3023,7 +3023,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(84) + '=' + cAlphaArgs(84));
                 ErrorsFound = true;
             }
@@ -3039,7 +3039,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(87), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(87) + '=' + cAlphaArgs(87));
                         ErrorsFound = true;
                     }
@@ -3047,7 +3047,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(86) + '=' + cAlphaArgs(86));
                 ErrorsFound = true;
             }
@@ -3063,7 +3063,7 @@ namespace ConvectionCoefficients {
                     InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(89), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(89) + '=' + cAlphaArgs(89));
                         ErrorsFound = true;
                     }
@@ -3071,7 +3071,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(88) + '=' + cAlphaArgs(88));
                 ErrorsFound = true;
             }
@@ -3086,7 +3086,7 @@ namespace ConvectionCoefficients {
                     //   A91; \field Mixed Regime Window Equation User Curve Name
                     InsideFaceAdaptiveConvectionAlgo.MixedWindowsUserCurveNum = UtilityRoutines::FindItemInList(cAlphaArgs(91), HcInsideUserCurve);
                     if (InsideFaceAdaptiveConvectionAlgo.MixedWindowsUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(91) + '=' + cAlphaArgs(91));
                         ErrorsFound = true;
                     }
@@ -3094,7 +3094,7 @@ namespace ConvectionCoefficients {
                 break; // found it
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(90) + '=' + cAlphaArgs(90));
                 ErrorsFound = true;
             }
@@ -3130,7 +3130,7 @@ namespace ConvectionCoefficients {
                     OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(3), HcOutsideUserCurve);
                     if (OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                         ErrorsFound = true;
                     }
@@ -3138,7 +3138,7 @@ namespace ConvectionCoefficients {
                 break;
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                 ErrorsFound = true;
             }
@@ -3154,7 +3154,7 @@ namespace ConvectionCoefficients {
                     OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(5), HcOutsideUserCurve);
                     if (OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
                         ErrorsFound = true;
                     }
@@ -3162,7 +3162,7 @@ namespace ConvectionCoefficients {
                 break;
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                 ErrorsFound = true;
             }
@@ -3177,7 +3177,7 @@ namespace ConvectionCoefficients {
                     //  A7 , \field Wind Convection Horizontal Roof User Curve Name
                     OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofUserCurveNum = UtilityRoutines::FindItemInList(cAlphaArgs(7), HcOutsideUserCurve);
                     if (OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                         ErrorsFound = true;
                     }
@@ -3185,7 +3185,7 @@ namespace ConvectionCoefficients {
                 break;
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
                 ErrorsFound = true;
             }
@@ -3200,7 +3200,7 @@ namespace ConvectionCoefficients {
                     //  A9 , \field Natural Convection Vertical Wall Equation User Curve Name
                     OutsideFaceAdaptiveConvectionAlgo.HNatVertWallUserCurveNum = UtilityRoutines::FindItemInList(cAlphaArgs(9), HcOutsideUserCurve);
                     if (OutsideFaceAdaptiveConvectionAlgo.HNatVertWallUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(9) + '=' + cAlphaArgs(9));
                         ErrorsFound = true;
                     }
@@ -3208,7 +3208,7 @@ namespace ConvectionCoefficients {
                 break;
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(8) + '=' + cAlphaArgs(8));
                 ErrorsFound = true;
             }
@@ -3224,7 +3224,7 @@ namespace ConvectionCoefficients {
                     OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(11), HcOutsideUserCurve);
                     if (OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(11) + '=' + cAlphaArgs(11));
                         ErrorsFound = true;
                     }
@@ -3232,7 +3232,7 @@ namespace ConvectionCoefficients {
                 break;
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(10) + '=' + cAlphaArgs(10));
                 ErrorsFound = true;
             }
@@ -3248,7 +3248,7 @@ namespace ConvectionCoefficients {
                     OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizUserCurveNum =
                         UtilityRoutines::FindItemInList(cAlphaArgs(13), HcOutsideUserCurve);
                     if (OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizUserCurveNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                        ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError("Invalid Name choice Entered, for " + cAlphaFieldNames(13) + '=' + cAlphaArgs(13));
                         ErrorsFound = true;
                     }
@@ -3256,7 +3256,7 @@ namespace ConvectionCoefficients {
                 break;
             }
             if (!IsValidType) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + ", invalid value");
+                ShowSevereError(format("{}{}=\"{}\", invalid value", RoutineName, CurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError("Invalid Key choice Entered, for " + cAlphaFieldNames(12) + '=' + cAlphaArgs(12));
                 ErrorsFound = true;
             }
@@ -3264,7 +3264,7 @@ namespace ConvectionCoefficients {
         } // end of 'SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections'
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found getting input.  Program termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found getting input.  Program termination.");
         }
 
         SetupAdaptiveConvectionStaticMetaData(OutputFiles::getSingleton());

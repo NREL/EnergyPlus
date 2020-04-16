@@ -398,7 +398,7 @@ namespace WaterToAirHeatPump {
                     WatertoAirHP(HPNum).LeakRateCoeff = NumArray(17);
 
                 } else {
-                    ShowSevereError(RoutineName + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject + '=' +
+                    ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject + '=' +
                                     WatertoAirHP(HPNum).Name);
                     ErrorsFound = true;
                 }
@@ -544,7 +544,7 @@ namespace WaterToAirHeatPump {
                     WatertoAirHP(HPNum).LeakRateCoeff = NumArray(14);
 
                 } else {
-                    ShowSevereError(RoutineName + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject + '=' +
+                    ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject + '=' +
                                     WatertoAirHP(HPNum).Name);
                     ErrorsFound = true;
                 }
@@ -609,7 +609,7 @@ namespace WaterToAirHeatPump {
         NumArray.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found getting input. Program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors found getting input. Program terminates.");
         }
 
         for (HPNum = 1; HPNum <= NumWatertoAirHPs; ++HPNum) {

@@ -371,7 +371,7 @@ namespace CoolingPanelSimple {
             } else {
                 ThisCP.SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (ThisCP.SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
+                    ShowSevereError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2) + "\" not found.");
                     ErrorsFound = true;
                 }
@@ -388,12 +388,12 @@ namespace CoolingPanelSimple {
 
             ThisCP.RatedWaterTemp = rNumericArgs(1);
             if (ThisCP.RatedWaterTemp > MaxWaterTempAvg + 0.001) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxWaterTempAvg, 2) + "].");
                 ThisCP.RatedWaterTemp = MaxWaterTempAvg;
             } else if (ThisCP.RatedWaterTemp < MinWaterTempAvg - 0.001) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
                                  " was lower than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinWaterTempAvg, 2) + "].");
                 ThisCP.RatedWaterTemp = MinWaterTempAvg;
@@ -401,12 +401,12 @@ namespace CoolingPanelSimple {
 
             ThisCP.RatedZoneAirTemp = rNumericArgs(2);
             if (ThisCP.RatedZoneAirTemp > MaxWaterTempAvg + 0.001) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxWaterTempAvg, 2) + "].");
                 ThisCP.RatedZoneAirTemp = MaxWaterTempAvg;
             } else if (ThisCP.RatedZoneAirTemp < MinWaterTempAvg - 0.001) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
                                  " was lower than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinWaterTempAvg, 2) + "].");
                 ThisCP.RatedZoneAirTemp = MinWaterTempAvg;
@@ -414,7 +414,7 @@ namespace CoolingPanelSimple {
 
             ThisCP.RatedWaterFlowRate = rNumericArgs(3);
             if (ThisCP.RatedWaterFlowRate < 0.00001 || ThisCP.RatedWaterFlowRate > 10.0) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
                                  " is an invalid Standard Water mass flow rate.");
                 ShowContinueError("...reset to a default value=[" + RoundSigDigits(WaterMassFlowDefault, 1) + "].");
                 ThisCP.RatedWaterFlowRate = WaterMassFlowDefault;
@@ -481,12 +481,12 @@ namespace CoolingPanelSimple {
 
             ThisCP.WaterVolFlowRateMax = rNumericArgs(7);
             if ((ThisCP.WaterVolFlowRateMax <= MinWaterFlowRate) && ThisCP.WaterVolFlowRateMax != DataSizing::AutoSize) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
                                  " was less than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinWaterFlowRate, 2) + "].");
                 ThisCP.WaterVolFlowRateMax = MinWaterFlowRate;
             } else if (ThisCP.WaterVolFlowRateMax > MaxWaterFlowRate) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxWaterFlowRate, 2) + "].");
                 ThisCP.WaterVolFlowRateMax = MaxWaterFlowRate;
@@ -509,7 +509,7 @@ namespace CoolingPanelSimple {
                 ThisCP.ControlType = ZoneConvectiveLoadControl;
             } else {
                 ShowWarningError("Invalid " + cAlphaFieldNames(6) + " =" + cAlphaArgs(6));
-                ShowContinueError("Occurs in " + RoutineName + " = " + cAlphaArgs(1));
+                ShowContinueError("Occurs in " + std::string{RoutineName} + " = " + cAlphaArgs(1));
                 ShowContinueError("Control reset to MAT control for this Simple Cooling Panel.");
                 ThisCP.ControlType = MATControl;
             }
@@ -525,7 +525,7 @@ namespace CoolingPanelSimple {
             ThisCP.ColdSetptSchedPtr = GetScheduleIndex(cAlphaArgs(7));
             if ((ThisCP.ColdSetptSchedPtr == 0) && (!lAlphaFieldBlanks(7))) {
                 ShowSevereError(cAlphaFieldNames(7) + " not found: " + cAlphaArgs(7));
-                ShowContinueError("Occurs in " + RoutineName + " = " + cAlphaArgs(1));
+                ShowContinueError("Occurs in " + std::string{RoutineName} + " = " + cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -543,13 +543,13 @@ namespace CoolingPanelSimple {
 
             ThisCP.FracRadiant = rNumericArgs(10);
             if (ThisCP.FracRadiant < MinFraction) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(10) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(10) +
                                  " was lower than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinFraction, 2) + "].");
                 ThisCP.FracRadiant = MinFraction;
             }
             if (ThisCP.FracRadiant > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(10) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(10) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 2) + "].");
                 ThisCP.FracRadiant = MaxFraction;
@@ -558,7 +558,7 @@ namespace CoolingPanelSimple {
             // Remaining fraction is added to the zone as convective heat transfer
             AllFracsSummed = ThisCP.FracRadiant;
             if (AllFracsSummed > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
                                  "\", Fraction Radiant was higher than the allowable maximum.");
                 ThisCP.FracRadiant = MaxFraction;
                 ThisCP.FracConvect = 0.0;
@@ -568,13 +568,13 @@ namespace CoolingPanelSimple {
 
             ThisCP.FracDistribPerson = rNumericArgs(11);
             if (ThisCP.FracDistribPerson < MinFraction) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(11) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(11) +
                                  " was lower than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinFraction, 3) + "].");
                 ThisCP.FracDistribPerson = MinFraction;
             }
             if (ThisCP.FracDistribPerson > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(11) +
+                ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(11) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 3) + "].");
                 ThisCP.FracDistribPerson = MaxFraction;
@@ -582,7 +582,7 @@ namespace CoolingPanelSimple {
 
             ThisCP.TotSurfToDistrib = NumNumbers - 11;
             if ((ThisCP.TotSurfToDistrib < MinDistribSurfaces) && (ThisCP.FracRadiant > MinFraction)) {
-                ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
+                ShowSevereError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
                                 "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.");
                 ShowContinueError("...the minimum that must be entered=[" + RoundSigDigits(MinDistribSurfaces) + "].");
                 ErrorsFound = true;
@@ -606,7 +606,7 @@ namespace CoolingPanelSimple {
                 }
             }
             if (ThisCP.ZonePtr <= 0) {
-                ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + ThisCP.EquipID +
+                ShowSevereError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + ThisCP.EquipID +
                     "\" is not on any ZoneHVAC:EquipmentList.");
                 ErrorsFound = true;
                 continue;
@@ -619,13 +619,13 @@ namespace CoolingPanelSimple {
                     cCMO_CoolingPanel_Simple, ThisCP.EquipID, ThisCP.ZonePtr, ThisCP.SurfaceName(SurfNum), ErrorsFound);
                 ThisCP.FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 11);
                 if (ThisCP.FracDistribToSurf(SurfNum) > MaxFraction) {
-                    ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
+                    ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
                                      "was greater than the allowable maximum.");
                     ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 2) + "].");
                     ThisCP.TotSurfToDistrib = MaxFraction;
                 }
                 if (ThisCP.FracDistribToSurf(SurfNum) < MinFraction) {
-                    ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
+                    ShowWarningError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
                                      "was less than the allowable minimum.");
                     ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MinFraction, 2) + "].");
                     ThisCP.TotSurfToDistrib = MinFraction;
@@ -638,13 +638,13 @@ namespace CoolingPanelSimple {
             } // Surfaces
 
             if (AllFracsSummed > (MaxFraction + 0.01)) {
-                ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
+                ShowSevereError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
                                 "\", Summed radiant fractions for people + surface groups > 1.0");
                 ErrorsFound = true;
             }
             if ((AllFracsSummed < (MaxFraction - 0.01)) &&
                 (ThisCP.FracRadiant > MinFraction)) { // User didn't distribute all of the | radiation warn that some will be lost
-                ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
+                ShowSevereError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) +
                                 "\", Summed radiant fractions for people + surface groups < 1.0");
                 ShowContinueError("This would result in some of the radiant energy delivered by the high temp radiant heater being lost.");
                 ShowContinueError("The sum of all radiation fractions to surfaces = " +
@@ -661,7 +661,7 @@ namespace CoolingPanelSimple {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + cCMO_CoolingPanel_Simple + "Errors found getting input. Program terminates.");
+            ShowFatalError(std::string{RoutineName} + cCMO_CoolingPanel_Simple + "Errors found getting input. Program terminates.");
         }
 
         // Setup Report variables for the Coils
@@ -1023,7 +1023,7 @@ namespace CoolingPanelSimple {
                     DataScalableCapSizingON = false;
                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (ThisCP.WaterVolFlowRateMax == AutoSize) {
-                        ShowSevereError(RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + ThisCP.EquipID + "\".");
+                        ShowSevereError(std::string{RoutineName} + ": auto-sizing cannot be done for " + CompType + " = " + ThisCP.EquipID + "\".");
                         ShowContinueError("The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the "
                                           "Cooling Design Capacity Method = \"FractionOfAutosizedCoolingCapacity\".");
                         ErrorsFound = true;

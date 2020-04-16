@@ -486,7 +486,7 @@ namespace PlantCondLoopOperation {
                             } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:UNCONTROLLED") {
                                 PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = UncontrolledOpSchemeType;
                             } else { // invalid op scheme type for plant loop
-                                ShowSevereError(RoutineName + "Invalid " + cAlphaFieldNames(Num * 3 - 1) + '=' + cAlphaArgs(Num * 3 - 1) +
+                                ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFieldNames(Num * 3 - 1) + '=' + cAlphaArgs(Num * 3 - 1) +
                                                 ", entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
                                 ErrorsFound = true;
                             }
@@ -496,7 +496,7 @@ namespace PlantCondLoopOperation {
                         PlantLoop(LoopNum).OpScheme(Num).Sched = cAlphaArgs(Num * 3 + 1);
                         PlantLoop(LoopNum).OpScheme(Num).SchedPtr = GetScheduleIndex(PlantLoop(LoopNum).OpScheme(Num).Sched);
                         if (PlantLoop(LoopNum).OpScheme(Num).SchedPtr == 0) {
-                            ShowSevereError(RoutineName + "Invalid " + cAlphaFieldNames(Num * 3 + 1) + " = \"" + cAlphaArgs(Num * 3 + 1) +
+                            ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFieldNames(Num * 3 + 1) + " = \"" + cAlphaArgs(Num * 3 + 1) +
                                             "\", entered in " + CurrentModuleObject + "= \"" + cAlphaArgs(1) + "\".");
                             ErrorsFound = true;
                         }
@@ -507,14 +507,14 @@ namespace PlantCondLoopOperation {
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(RoutineName + PlantLoopObject + '=' + PlantLoop(LoopNum).Name + " is expecting");
+                ShowSevereError(std::string{RoutineName} + PlantLoopObject + '=' + PlantLoop(LoopNum).Name + " is expecting");
                 ShowContinueError(CurrentModuleObject + '=' + PlantOpSchemeName + ", but not found.");
                 ErrorsFound = true;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes");
         }
     }
 
@@ -757,7 +757,7 @@ namespace PlantCondLoopOperation {
 
         // Validate that component names/types in each list correspond to a valid component in input file
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found getting inputs. Previous error(s) cause program termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found getting inputs. Previous error(s) cause program termination.");
         }
     }
 

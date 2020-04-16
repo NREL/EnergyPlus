@@ -184,7 +184,7 @@ namespace IceThermalStorage {
                                         Real64 &EP_UNUSED(CurLoad),
                                         bool RunFlag)
     {
-        std::string const RoutineName("SimpleIceStorageData::simulate");
+        static constexpr std::string_view RoutineName("SimpleIceStorageData::simulate");
 
         // this was happening in PlantLoopEquip before
         auto &thisComp(DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum));
@@ -344,7 +344,7 @@ namespace IceThermalStorage {
         Real64 const SIEquiv100GPMinMassFlowRate(6.31); // Used to non-dimensionalize flow rate for use in CubicLinear charging equation
                                                         // Flow rate divided by nominal 100GPM used to non-dimensionalize volume flow rate
                                                         // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
-        std::string const RoutineName("DetailedIceStorageData::SimDetailedIceStorage");
+        static constexpr std::string_view RoutineName("DetailedIceStorageData::SimDetailedIceStorage");
 
         int NodeNumIn = this->PlantInNodeNum;               // Plant loop inlet node number for component
         int NodeNumOut = this->PlantOutNodeNum;             // Plant loop outlet node number for component
@@ -1524,7 +1524,7 @@ namespace IceThermalStorage {
                                                        Real64 const MaxCap  // Max possible discharge rate (positive value)
     )
     {
-        std::string const RoutineName("SimpleIceStorageData::CalcIceStorageDischarge");
+        static constexpr std::string_view RoutineName("SimpleIceStorageData::CalcIceStorageDischarge");
 
         // Initialize processed Rate and Energy
         this->ITSMassFlowRate = 0.0;

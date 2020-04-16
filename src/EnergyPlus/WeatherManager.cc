@@ -953,7 +953,7 @@ namespace WeatherManager {
             AllocateWeatherData();
             if (NumIntervalsPerHour != 1) {
                 if (NumIntervalsPerHour != NumOfTimeStepInHour) {
-                    ShowSevereError(RoutineName +
+                    ShowSevereError(std::string{RoutineName} +
                                     "Number of intervals per hour on Weather file does not match specified number of Time Steps Per Hour");
                     ErrorsFound = true;
                 }
@@ -967,25 +967,25 @@ namespace WeatherManager {
                     CheckWeatherFileValidity();
                 }
                 if (ErrorsFound) {
-                    ShowSevereError(RoutineName + "No location specified, program will terminate.");
+                    ShowSevereError(std::string{RoutineName} + "No location specified, program will terminate.");
                 }
             } else {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + "No Design Days or Run Period(s) specified, program will terminate.");
+                ShowSevereError(std::string{RoutineName} + "No Design Days or Run Period(s) specified, program will terminate.");
             }
             if (DDOnly && TotDesDays == 0) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + "Requested Design Days only (DDOnly) but no Design Days specified, program will terminate.");
+                ShowSevereError(std::string{RoutineName} + "Requested Design Days only (DDOnly) but no Design Days specified, program will terminate.");
             }
             if (ReverseDD && TotDesDays == 1) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + "Requested Reverse Design Days (ReverseDD) but only 1 Design Day specified, program will terminate.");
+                ShowSevereError(std::string{RoutineName} + "Requested Reverse Design Days (ReverseDD) but only 1 Design Day specified, program will terminate.");
             }
 
             // Throw a Fatal now that we have said it'll terminalte
             if (ErrorsFound) {
                 CloseWeatherFile(); // will only close if opened.
-                ShowFatalError(RoutineName + "Errors found in Weater Data Input. Program terminates.");
+                ShowFatalError(std::string{RoutineName} + "Errors found in Weater Data Input. Program terminates.");
             }
 
             CurrentOverallSimDay = 0;
@@ -1019,7 +1019,7 @@ namespace WeatherManager {
                 if (AdaptiveComfortRequested_ASH55 || AdaptiveComfortRequested_CEN15251) {
                     if (KindOfSim == ksDesignDay) {
                         if (DoDesDaySim) {
-                            ShowWarningError(RoutineName + "Adaptive Comfort being reported during design day.");
+                            ShowWarningError(std::string{RoutineName} + "Adaptive Comfort being reported during design day.");
                             GrossApproxAvgDryBulb =
                                 (DesDayInput(Envrn).MaxDryBulb + (DesDayInput(Envrn).MaxDryBulb - DesDayInput(Envrn).DailyDBRange)) / 2.0;
                             if (AdaptiveComfortRequested_ASH55) CalcThermalComfortAdaptiveASH55(true, false, GrossApproxAvgDryBulb);
@@ -1098,7 +1098,7 @@ namespace WeatherManager {
                                 for (int year = Environment(Envrn).StartYear; year <= Environment(Envrn).EndYear; year++) {
                                     if (isLeapYear(year)) {
                                         ShowSevereError(
-                                            RoutineName + "Weatherfile does not support leap years but runperiod includes a leap year (" +
+                                            std::string{RoutineName} + "Weatherfile does not support leap years but runperiod includes a leap year (" +
                                             std::to_string(year) + ")");
                                         missingLeap = true;
                                     }
@@ -1113,7 +1113,7 @@ namespace WeatherManager {
                                     int runStartJulian = dataperiod.DataStJDay;
                                     int runEndJulian = dataperiod.DataEnJDay;
                                     if (!dataperiod.HasYearData) {
-                                        ShowSevereError(RoutineName + "Actual weather runperiod has been entered but weatherfile DATA PERIOD "
+                                        ShowSevereError(std::string{RoutineName} + "Actual weather runperiod has been entered but weatherfile DATA PERIOD "
                                                         "does not have year included in start/end date.");
                                         ShowContinueError("...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or");
                                         ShowContinueError("...set \"Treat Weather as Actual\" to \"No\".");
@@ -1147,14 +1147,14 @@ namespace WeatherManager {
                                 if (!Environment(Envrn).ActualWeather) {
                                     ObjexxFCL::gio::write(StDate, DateFormat) << Environment(Envrn).StartMonth << Environment(Envrn).StartDay;
                                     ObjexxFCL::gio::write(EnDate, DateFormat) << Environment(Envrn).EndMonth << Environment(Envrn).EndDay;
-                                    ShowSevereError(RoutineName + "Runperiod [mm/dd] (Start=" + StDate + ",End=" + EnDate +
+                                    ShowSevereError(std::string{RoutineName} + "Runperiod [mm/dd] (Start=" + StDate + ",End=" + EnDate +
                                                     ") requested not within Data Period(s) from Weather File");
                                 } else {
                                     ObjexxFCL::gio::write(StDate, DateFormatwithYear)
                                         << Environment(Envrn).StartMonth << Environment(Envrn).StartDay << Environment(Envrn).StartYear;
                                     ObjexxFCL::gio::write(EnDate, DateFormatwithYear)
                                         << Environment(Envrn).EndMonth << Environment(Envrn).EndDay << Environment(Envrn).EndYear;
-                                    ShowSevereError(RoutineName + "Runperiod [mm/dd/yyyy] (Start=" + StDate + ",End=" + EnDate +
+                                    ShowSevereError(std::string{RoutineName} + "Runperiod [mm/dd/yyyy] (Start=" + StDate + ",End=" + EnDate +
                                                     ") requested not within Data Period(s) from Weather File");
                                 }
                                 ObjexxFCL::gio::write(StDate, DateFormat) << DataPeriods(1).StMon << DataPeriods(1).StDay;
@@ -1176,12 +1176,12 @@ namespace WeatherManager {
                                 } else {
                                     ShowContinueError("Multiple Weather Data Periods 1st (Start=" + StDate + ",End=" + EnDate + ')');
                                 }
-                                ShowFatalError(RoutineName + "Program terminates due to preceding condition.");
+                                ShowFatalError(std::string{RoutineName} + "Program terminates due to preceding condition.");
                             }
 
                             if (missingLeap) {
                                 // Bail out now if we still need to
-                                ShowFatalError(RoutineName + "Program terminates due to preceding condition.");
+                                ShowFatalError(std::string{RoutineName} + "Program terminates due to preceding condition.");
                             }
 
                             // Following builds Environment start/end for ASHRAE 55 warnings
@@ -1251,13 +1251,13 @@ namespace WeatherManager {
                                 if ((KindOfSim == ksRunPeriodWeather && DoWeathSim)) {
                                     if (AdaptiveComfortRequested_ASH55 || AdaptiveComfortRequested_CEN15251) {
                                         if (WFAllowsLeapYears) {
-                                            ShowSevereError(RoutineName +
+                                            ShowSevereError(std::string{RoutineName} +
                                                             "AdaptiveComfort Reporting does not work correctly with leap years in weather files.");
                                             ErrorsFound = true;
                                         }
                                         if (NumDataPeriods != 1) {
                                             ShowSevereError(
-                                                RoutineName +
+                                                std::string{RoutineName} +
                                                 "AdaptiveComfort Reporting does not work correctly with multiple dataperiods in weather files.");
                                             ErrorsFound = true;
                                         }
@@ -1265,17 +1265,17 @@ namespace WeatherManager {
                                             RunStJDay = General::OrdinalDay(DataPeriods(1).StMon, DataPeriods(1).StDay, LeapYearAdd);
                                             RunEnJDay = General::OrdinalDay(DataPeriods(1).EnMon, DataPeriods(1).EnDay, LeapYearAdd);
                                             if (RunEnJDay - RunStJDay + 1 != 365) {
-                                                ShowSevereError(RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files "
+                                                ShowSevereError(std::string{RoutineName} + "AdaptiveComfort Reporting does not work correctly with weather files "
                                                                               "that do not contain 365 days.");
                                                 ErrorsFound = true;
                                             }
                                         } else {
-                                            ShowSevereError(RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files that "
+                                            ShowSevereError(std::string{RoutineName} + "AdaptiveComfort Reporting does not work correctly with weather files that "
                                                                           "do not start on 1 January.");
                                             ErrorsFound = true;
                                         }
                                         if (NumIntervalsPerHour != 1) {
-                                            ShowSevereError(RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files that "
+                                            ShowSevereError(std::string{RoutineName} + "AdaptiveComfort Reporting does not work correctly with weather files that "
                                                                           "have multiple interval records per hour.");
                                             ErrorsFound = true;
                                         }
@@ -1429,7 +1429,7 @@ namespace WeatherManager {
         }
 
         if (ErrorsFound && !DoingSizing && !KickOffSimulation) {
-            ShowSevereError(RoutineName + "Errors found in getting a new environment");
+            ShowSevereError(std::string{RoutineName} + "Errors found in getting a new environment");
             Available = false;
         } else if (ErrorsFound) {
             Available = false;
@@ -1895,7 +1895,7 @@ namespace WeatherManager {
             }
             ThisDay += 7 * (DST.StDay - 1);
             if (ThisDay > ActEndDayOfMonth(DST.StMon)) {
-                ShowSevereError(RoutineName + "Determining DST: DST Start Date, Nth Day of Month, not enough Nths");
+                ShowSevereError(std::string{RoutineName} + "Determining DST: DST Start Date, Nth Day of Month, not enough Nths");
                 ErrorsFound = true;
             } else {
                 ActStartMonth = DST.StMon;
@@ -1922,7 +1922,7 @@ namespace WeatherManager {
             if (ThisDay > ActEndDayOfMonth(DST.EnMon)) {
                 ActEndMonth = 0; // Suppress uninitialized warning
                 ActEndDay = 0;   // Suppress uninitialized warning
-                ShowSevereError(RoutineName + "Determining DST: DST End Date, Nth Day of Month, not enough Nths");
+                ShowSevereError(std::string{RoutineName} + "Determining DST: DST End Date, Nth Day of Month, not enough Nths");
                 ErrorsFound = true;
             } else {
                 ActEndMonth = DST.EnMon;
@@ -1938,7 +1938,7 @@ namespace WeatherManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Program terminates due to preceding condition(s).");
+            ShowFatalError(std::string{RoutineName} + "Program terminates due to preceding condition(s).");
         }
 
         if (present(DSTActStMon)) {
@@ -2033,7 +2033,7 @@ namespace WeatherManager {
                 }
                 ThisDay += 7 * (SpecialDays(Loop).Day - 1);
                 if (ThisDay > ActEndDayOfMonth(SpecialDays(Loop).Month)) {
-                    ShowSevereError(RoutineName + "Special Day Date, Nth Day of Month, not enough Nths, for SpecialDay=" + SpecialDays(Loop).Name);
+                    ShowSevereError(std::string{RoutineName} + "Special Day Date, Nth Day of Month, not enough Nths, for SpecialDay=" + SpecialDays(Loop).Name);
                     ErrorsFound = true;
                     continue;
                 }
@@ -2050,7 +2050,7 @@ namespace WeatherManager {
                 JDay = General::OrdinalDay(SpecialDays(Loop).Month, ThisDay, LeapYearAdd);
             }
             if (SpecialDayTypes(JDay) != 0) {
-                ShowWarningError(RoutineName + "Special Day definition (" + SpecialDays(Loop).Name +
+                ShowWarningError(std::string{RoutineName} + "Special Day definition (" + SpecialDays(Loop).Name +
                                  ") is overwriting previously entered special day period");
                 if (UseSpecialDays) {
                     ShowContinueError("...This could be caused by definitions on the Weather File.");
@@ -2067,7 +2067,7 @@ namespace WeatherManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Program terminates due to preceding condition(s).");
+            ShowFatalError(std::string{RoutineName} + "Program terminates due to preceding condition(s).");
         }
     }
 
@@ -7917,7 +7917,7 @@ namespace WeatherManager {
                     for (Count = 1; Count <= NumOfEnvrn; ++Count) {
                         if (Environment(Count).KindOfEnvrn != ksRunPeriodWeather) continue;
                         if (Environment(Count).WP_Type1 != 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                             "\", indicated Environment Name already assigned.");
                             if (!Environment(Count).Title.empty()) {
                                 ShowContinueError("...Environment=\"" + Environment(Count).Title + "\", already using " + cCurrentModuleObject +
@@ -7942,13 +7942,13 @@ namespace WeatherManager {
                     Found = UtilityRoutines::FindItemInList(cAlphaArgs(1), Environment, &EnvironmentData::Title);
                     envFound = Found;
                     if (Found == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid Environment Name referenced.");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid Environment Name referenced.");
                         ShowContinueError("...remainder of object not processed.");
                         ErrorsFound = true;
                         continue;
                     } else {
                         if (Environment(Found).WP_Type1 != 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                             "\", indicated Environment Name already assigned.");
                             ShowContinueError("...Environment=\"" + Environment(Found).Title + "\", already using " + cCurrentModuleObject + "=\"" +
                                               WPSkyTemperature(Environment(Found).WP_Type1).Name + "\".");
@@ -7995,7 +7995,7 @@ namespace WeatherManager {
                 WPSkyTemperature(Item).CalculationType = WP_ClarkAllenModel;
                 WPSkyTemperature(Item).IsSchedule = false;
             } else {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + '.');
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + '.');
                 ShowContinueError("...entered value=\"" + cAlphaArgs(2) +
                                   "\", should be one of: ScheduleValue, DifferenceScheduleDryBulbValue, DifferenceScheduleDewPointValue.");
                 ErrorsFound = true;
@@ -8009,7 +8009,7 @@ namespace WeatherManager {
                     // See if it's a schedule.
                     Found = GetScheduleIndex(cAlphaArgs(3));
                     if (Found == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " +
                                         cAlphaFieldNames(3) + '.');
                         ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
                         ShowContinueError(
@@ -8023,7 +8023,7 @@ namespace WeatherManager {
                 } else { // See if it's a valid schedule.
                     Found = GetDayScheduleIndex(cAlphaArgs(3));
                     if (Found == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " +
                                         cAlphaFieldNames(3) + '.');
                         ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
                         ShowContinueError(
@@ -8060,7 +8060,7 @@ namespace WeatherManager {
                 } else if (UtilityRoutines::SameString(cAlphaArgs(4), "No")) {
                     WPSkyTemperature(Item).UseWeatherFileHorizontalIR = false;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(4) + '.');
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(4) + '.');
                     ShowContinueError("...entered value=\"" + cAlphaArgs(4) + "\", should be Yes or No.");
                     ErrorsFound = true;
                 }

@@ -1400,7 +1400,7 @@ namespace HVACVariableRefrigerantFlow {
         GetVRFInputData(ErrorsFound);
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName +
+            ShowFatalError(std::string{RoutineName} +
                            "Errors found in getting AirConditioner:VariableRefrigerantFlow system input. Preceding condition(s) causes termination.");
         }
     }
@@ -1682,7 +1682,7 @@ namespace HVACVariableRefrigerantFlow {
                                                             cAlphaFieldNames(3));  // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + cCurrentModuleObject,
+                    checkCurveIsNormalizedToOne(std::string{RoutineName} + cCurrentModuleObject,
                                                 VRF(VRFNum).Name,
                                                 VRF(VRFNum).CoolCapFT,
                                                 cAlphaFieldNames(3),
@@ -1807,7 +1807,7 @@ namespace HVACVariableRefrigerantFlow {
                         CurveInput += 0.01;
                     }
                     if (MinCurveVal < 0.7) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                        ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                         ShowContinueError("..." + cAlphaFieldNames(12) + "=\"" + cAlphaArgs(12) + "\" has out of range values.");
                         ShowContinueError("...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits(MinCurvePLR, 2) + " is " +
                                           TrimSigDigits(MinCurveVal, 3));
@@ -1816,7 +1816,7 @@ namespace HVACVariableRefrigerantFlow {
                     }
 
                     if (MaxCurveVal > 1.0) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                        ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                         ShowContinueError("..." + cAlphaFieldNames(12) + " = " + cAlphaArgs(12) + " has out of range value.");
                         ShowContinueError("...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits(MaxCurvePLR, 2) + " is " +
                                           TrimSigDigits(MaxCurveVal, 3));
@@ -1853,7 +1853,7 @@ namespace HVACVariableRefrigerantFlow {
 
                 if (!ErrorsFound) {
                     if (UtilityRoutines::SameString(cAlphaArgs(19), "WETBULBTEMPERATURE")) {
-                        checkCurveIsNormalizedToOne(RoutineName + cCurrentModuleObject,
+                        checkCurveIsNormalizedToOne(std::string{RoutineName} + cCurrentModuleObject,
                                                     VRF(VRFNum).Name,
                                                     VRF(VRFNum).HeatCapFT,
                                                     cAlphaFieldNames(13),
@@ -1861,7 +1861,7 @@ namespace HVACVariableRefrigerantFlow {
                                                     RatedInletAirTempHeat,
                                                     RatedOutdoorWetBulbTempHeat);
                     } else if (UtilityRoutines::SameString(cAlphaArgs(19), "DRYBULBTEMPERATURE")) {
-                        checkCurveIsNormalizedToOne(RoutineName + cCurrentModuleObject,
+                        checkCurveIsNormalizedToOne(std::string{RoutineName} + cCurrentModuleObject,
                                                     VRF(VRFNum).Name,
                                                     VRF(VRFNum).HeatCapFT,
                                                     cAlphaFieldNames(13),
@@ -1997,7 +1997,7 @@ namespace HVACVariableRefrigerantFlow {
                         CurveInput += 0.01;
                     }
                     if (MinCurveVal < 0.7) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                        ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                         ShowContinueError("..." + cAlphaFieldNames(23) + "=\"" + cAlphaArgs(23) + "\" has out of range values.");
                         ShowContinueError("...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits(MinCurvePLR, 2) + " is " +
                                           TrimSigDigits(MinCurveVal, 3));
@@ -2006,7 +2006,7 @@ namespace HVACVariableRefrigerantFlow {
                     }
 
                     if (MaxCurveVal > 1.0) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                        ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                         ShowContinueError("..." + cAlphaFieldNames(23) + " = " + cAlphaArgs(23) + " has out of range value.");
                         ShowContinueError("...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits(MaxCurvePLR, 2) + " is " +
                                           TrimSigDigits(MaxCurveVal, 3));
@@ -2023,14 +2023,14 @@ namespace HVACVariableRefrigerantFlow {
             if (VRF(VRFNum).CoolEIRFPLR1 > 0) {
                 CurveManager::GetCurveMinMaxValues(VRF(VRFNum).CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
                 if (minEIRfLowPLRXInput > VRF(VRFNum).MinPLR) {
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                    ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(9) + " = " + cAlphaArgs(9) + " has out of range value.");
                     ShowContinueError("...Curve minimum value of X = " + TrimSigDigits(minEIRfLowPLRXInput, 3) +
                                       " must be <= Minimum Heat Pump Part-Load Ratio = " + TrimSigDigits(VRF(VRFNum).MinPLR, 3) + ".");
                     ErrorsFound = true;
                 }
                 if (maxEIRfLowPLRXInput < 1.0) {
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", suspicious");
+                    ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", suspicious");
                     ShowContinueError("..." + cAlphaFieldNames(9) + " = " + cAlphaArgs(9) + " has unexpected value.");
                     ShowContinueError("...Curve maximum value of X = " + TrimSigDigits(maxEIRfLowPLRXInput, 3) +
                         " should be 1 and will result in lower energy use than expected.");
@@ -2041,14 +2041,14 @@ namespace HVACVariableRefrigerantFlow {
             if (VRF(VRFNum).HeatEIRFPLR1 > 0) {
                 CurveManager::GetCurveMinMaxValues(VRF(VRFNum).HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
                 if (minEIRfLowPLRXInput > VRF(VRFNum).MinPLR) {
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                    ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(20) + " = " + cAlphaArgs(20) + " has out of range value.");
                     ShowContinueError("...Curve minimum value of X = " + TrimSigDigits(minEIRfLowPLRXInput, 3) +
                         " must be <= Minimum Heat Pump Part-Load Ratio = " + TrimSigDigits(VRF(VRFNum).MinPLR, 3) + ".");
                     ErrorsFound = true;
                 }
                 if (maxEIRfLowPLRXInput < 1.0) {
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", suspicious");
+                    ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", suspicious");
                     ShowContinueError("..." + cAlphaFieldNames(20) + " = " + cAlphaArgs(20) + " has unexpected value.");
                     ShowContinueError("...Curve maximum value of X = " + TrimSigDigits(maxEIRfLowPLRXInput, 3) +
                         " should be 1 and will result in lower energy use than expected.");
@@ -2584,10 +2584,10 @@ namespace HVACVariableRefrigerantFlow {
             // Verify curve name and type
             if (indexOUEvapTempCurve == 0) {
                 if (lAlphaFieldBlanks(6)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
                     ShowContinueError("...required " + cAlphaFieldNames(6) + " is blank.");
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
                 }
                 ErrorsFound = true;
@@ -2599,7 +2599,7 @@ namespace HVACVariableRefrigerantFlow {
                         VRF(VRFNum).C3Te = EnergyPlus::CurveManager::PerfCurve(indexOUEvapTempCurve).Coeff3;
 
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                         ShowContinueError("...illegal " + cAlphaFieldNames(6) +
                                           " type for this object = " + CurveManager::PerfCurve(indexOUEvapTempCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
@@ -2613,10 +2613,10 @@ namespace HVACVariableRefrigerantFlow {
             // Verify curve name and type
             if (indexOUCondTempCurve == 0) {
                 if (lAlphaFieldBlanks(7)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
                     ShowContinueError("...required " + cAlphaFieldNames(7) + " is blank.");
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
                 }
                 ErrorsFound = true;
@@ -2628,7 +2628,7 @@ namespace HVACVariableRefrigerantFlow {
                         VRF(VRFNum).C3Tc = EnergyPlus::CurveManager::PerfCurve(indexOUCondTempCurve).Coeff3;
 
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                         ShowContinueError("...illegal " + cAlphaFieldNames(7) +
                                           " type for this object = " + CurveManager::PerfCurve(indexOUCondTempCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
@@ -2764,10 +2764,10 @@ namespace HVACVariableRefrigerantFlow {
                     int indexOUEvapCapCurve = GetCurveIndex(cAlphaArgs(Count2Index + 2 * NumCompSpd)); // convert curve name to index number
                     if (indexOUEvapCapCurve == 0) {                                                    // Verify curve name and type
                         if (lAlphaFieldBlanks(Count2Index + 2 * NumCompSpd)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
                             ShowContinueError("...required " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd) + " is blank.");
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                             ShowContinueError("...not found " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd) + "=\"" +
                                               cAlphaArgs(Count2Index + 2 * NumCompSpd) + "\".");
                         }
@@ -2791,10 +2791,10 @@ namespace HVACVariableRefrigerantFlow {
                     int indexOUCompPwrCurve = GetCurveIndex(cAlphaArgs(Count2Index + 2 * NumCompSpd + 1)); // convert curve name to index number
                     if (indexOUCompPwrCurve == 0) {                                                        // Verify curve name and type
                         if (lAlphaFieldBlanks(Count2Index + 2 * NumCompSpd + 1)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
                             ShowContinueError("...required " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1) + " is blank.");
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                             ShowContinueError("...not found " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1) + "=\"" +
                                               cAlphaArgs(Count2Index + 2 * NumCompSpd + 1) + "\".");
                         }
@@ -2994,10 +2994,10 @@ namespace HVACVariableRefrigerantFlow {
             // Verify curve name and type
             if (indexOUEvapTempCurve == 0) {
                 if (lAlphaFieldBlanks(6)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
                     ShowContinueError("...required " + cAlphaFieldNames(6) + " is blank.");
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
                 }
                 ErrorsFound = true;
@@ -3007,7 +3007,7 @@ namespace HVACVariableRefrigerantFlow {
                     VRF(VRFNum).C2Te = EnergyPlus::CurveManager::PerfCurve(indexOUEvapTempCurve).Coeff2;
                     VRF(VRFNum).C3Te = EnergyPlus::CurveManager::PerfCurve(indexOUEvapTempCurve).Coeff3;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError("...illegal " + cAlphaFieldNames(6) +
                                       " type for this object = " + CurveManager::PerfCurve(indexOUEvapTempCurve).ObjectType);
                     ShowContinueError("... Curve type must be Quadratic.");
@@ -3020,10 +3020,10 @@ namespace HVACVariableRefrigerantFlow {
             // Verify curve name and type
             if (indexOUCondTempCurve == 0) {
                 if (lAlphaFieldBlanks(7)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
                     ShowContinueError("...required " + cAlphaFieldNames(7) + " is blank.");
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
                 }
                 ErrorsFound = true;
@@ -3033,7 +3033,7 @@ namespace HVACVariableRefrigerantFlow {
                     VRF(VRFNum).C2Tc = EnergyPlus::CurveManager::PerfCurve(indexOUCondTempCurve).Coeff2;
                     VRF(VRFNum).C3Tc = EnergyPlus::CurveManager::PerfCurve(indexOUCondTempCurve).Coeff3;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError("...illegal " + cAlphaFieldNames(7) +
                                       " type for this object = " + CurveManager::PerfCurve(indexOUCondTempCurve).ObjectType);
                     ShowContinueError("... Curve type must be Quadratic.");
@@ -3158,10 +3158,10 @@ namespace HVACVariableRefrigerantFlow {
                     int indexOUEvapCapCurve = GetCurveIndex(cAlphaArgs(Count2Index + 2 * NumCompSpd)); // convert curve name to index number
                     if (indexOUEvapCapCurve == 0) {                                                    // Verify curve name and type
                         if (lAlphaFieldBlanks(Count2Index + 2 * NumCompSpd)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
                             ShowContinueError("...required " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd) + " is blank.");
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                             ShowContinueError("...not found " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd) + "=\"" +
                                               cAlphaArgs(Count2Index + 2 * NumCompSpd) + "\".");
                         }
@@ -3185,10 +3185,10 @@ namespace HVACVariableRefrigerantFlow {
                     int indexOUCompPwrCurve = GetCurveIndex(cAlphaArgs(Count2Index + 2 * NumCompSpd + 1)); // convert curve name to index number
                     if (indexOUCompPwrCurve == 0) {                                                        // Verify curve name and type
                         if (lAlphaFieldBlanks(Count2Index + 2 * NumCompSpd + 1)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", missing");
                             ShowContinueError("...required " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1) + " is blank.");
                         } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + VRF(VRFNum).Name + "\", invalid");
                             ShowContinueError("...not found " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1) + "=\"" +
                                               cAlphaArgs(Count2Index + 2 * NumCompSpd + 1) + "\".");
                         }
@@ -5133,7 +5133,7 @@ namespace HVACVariableRefrigerantFlow {
                                            errFlag);
 
                 if (errFlag) {
-                    ShowFatalError(RoutineName + ": Program terminated for previous conditions.");
+                    ShowFatalError(std::string{RoutineName} + ": Program terminated for previous conditions.");
                 }
                 VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow =
                     WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
@@ -5170,7 +5170,7 @@ namespace HVACVariableRefrigerantFlow {
                                                         _,
                                                         _);
                 if (errFlag) {
-                    ShowFatalError(RoutineName + ": Program terminated for previous conditions.");
+                    ShowFatalError(std::string{RoutineName} + ": Program terminated for previous conditions.");
                 }
                 VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = SteamCoils::GetCoilMaxSteamFlowRate(VRFTU(VRFTUNum).SuppHeatCoilIndex, ErrorsFound);
                 if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
@@ -6751,7 +6751,7 @@ namespace HVACVariableRefrigerantFlow {
         SetAverageAirFlow(VRFTUNum, 0.0, OnOffAirFlowRatio);
     
         if (ErrorsFound) {
-            ShowFatalError(RoutineName +
+            ShowFatalError(std::string{RoutineName} +
                 ": Errors found in getting ZoneHVAC:TerminalUnit:VariableRefrigerantFlow system input. Preceding condition(s) causes termination.");
         }
     }

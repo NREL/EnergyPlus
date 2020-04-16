@@ -764,7 +764,7 @@ namespace HeatBalanceManager {
                 SiteWindBLHeight = 370.0;
                 AlphaName(2) = "Urban";
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + ": " + cAlphaFieldNames(2) + " invalid=" + AlphaName(2));
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": " + cAlphaFieldNames(2) + " invalid=" + AlphaName(2));
                 SiteWindExp = 0.14;
                 SiteWindBLHeight = 270.0;
                 AlphaName(2) = AlphaName(2) + "-invalid";
@@ -773,14 +773,14 @@ namespace HeatBalanceManager {
             // Loads Convergence Tolerance Value
             LoadsConvergTol = BuildingNumbers(2);
             if (LoadsConvergTol <= 0.0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + ": " + cNumericFieldNames(2) + " value invalid, [" +
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": " + cNumericFieldNames(2) + " value invalid, [" +
                                 RoundSigDigits(LoadsConvergTol, 3) + ']');
                 ErrorsFound = true;
             }
             // Temperature Convergence Tolerance Value
             TempConvergTol = BuildingNumbers(3);
             if (TempConvergTol <= 0.0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + ": " + cNumericFieldNames(2) + " value invalid, [" +
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": " + cNumericFieldNames(2) + " value invalid, [" +
                                 RoundSigDigits(TempConvergTol, 3) + ']');
                 ErrorsFound = true;
             }
@@ -806,7 +806,7 @@ namespace HeatBalanceManager {
                 AlphaName(3) = "FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces";
                 CalcSolRefl = true;
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + ": " + cAlphaFieldNames(3) + " invalid=" + AlphaName(3));
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": " + cAlphaFieldNames(3) + " invalid=" + AlphaName(3));
                 ErrorsFound = true;
                 AlphaName(3) = AlphaName(3) + "-invalid";
             }
@@ -814,7 +814,7 @@ namespace HeatBalanceManager {
             if (!lNumericFieldBlanks(4)) {
                 MaxNumberOfWarmupDays = BuildingNumbers(4);
                 if (MaxNumberOfWarmupDays <= 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": " + cNumericFieldNames(4) + " invalid, [" +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": " + cNumericFieldNames(4) + " invalid, [" +
                                     RoundSigDigits(MaxNumberOfWarmupDays) + "], " + RoundSigDigits(DefaultMaxNumberOfWarmupDays) + " will be used");
                     MaxNumberOfWarmupDays = DefaultMaxNumberOfWarmupDays;
                 }
@@ -825,7 +825,7 @@ namespace HeatBalanceManager {
             if (!lNumericFieldBlanks(5)) {
                 MinNumberOfWarmupDays = BuildingNumbers(5);
                 if (MinNumberOfWarmupDays <= 0) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + ": " + cNumericFieldNames(5) + " invalid, [" +
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + ": " + cNumericFieldNames(5) + " invalid, [" +
                                      RoundSigDigits(MinNumberOfWarmupDays) + "], " + RoundSigDigits(DefaultMinNumberOfWarmupDays) + " will be used");
                     MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
                 }
@@ -833,14 +833,14 @@ namespace HeatBalanceManager {
                 MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
             }
             if (MinNumberOfWarmupDays > MaxNumberOfWarmupDays) {
-                ShowWarningError(RoutineName + CurrentModuleObject + ": " + cNumericFieldNames(5) + " [" + RoundSigDigits(MinNumberOfWarmupDays) +
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + ": " + cNumericFieldNames(5) + " [" + RoundSigDigits(MinNumberOfWarmupDays) +
                                  "]  is greater than " + cNumericFieldNames(4) + " [" + RoundSigDigits(MaxNumberOfWarmupDays) + "], " +
                                  RoundSigDigits(MinNumberOfWarmupDays) + " will be used.");
                 MaxNumberOfWarmupDays = MinNumberOfWarmupDays;
             }
 
         } else {
-            ShowSevereError(RoutineName + " A " + CurrentModuleObject + " Object must be entered.");
+            ShowSevereError(std::string{RoutineName} + " A " + CurrentModuleObject + " Object must be entered.");
             ErrorsFound = true;
             BuildingName = "NOT ENTERED";
             AlphaName(2) = "NOT ENTERED";
@@ -3985,7 +3985,7 @@ namespace HeatBalanceManager {
             SpectralData(Loop).Name = SpecDataNames(1);
             TotLam = SpecDataNumProp / 4;
             if (mod(SpecDataNumProp, 4) != 0) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
                 ShowContinueError("... set not even multiple of 4 items (Wavelength,Trans,ReflFront,ReflBack), number of items in dataset = " +
                                   TrimSigDigits(SpecDataNumProp));
                 ShowContinueError("... remainder after div by 4 = " + TrimSigDigits(mod(SpecDataNumProp, 4)) +
@@ -3994,7 +3994,7 @@ namespace HeatBalanceManager {
             }
             if (TotLam > MaxSpectralDataElements) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
                 ShowContinueError("... More than max [" + TrimSigDigits(MaxSpectralDataElements) +
                                   "] (Wavelength,Trans,ReflFront,ReflBack) entries in set.");
                 continue;
@@ -4025,7 +4025,7 @@ namespace HeatBalanceManager {
                 if (LamNum < TotLam) {
                     if (SpectralData(Loop).WaveLength(LamNum + 1) <= Lam) {
                         ErrorsFound = true;
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
                         ShowContinueError("... Wavelengths not in increasing order. at wavelength#=" + TrimSigDigits(LamNum) + ", value=[" +
                                           TrimSigDigits(Lam, 4) + "], next is [" + TrimSigDigits(SpectralData(Loop).WaveLength(LamNum + 1), 4) +
                                           "].");
@@ -4034,7 +4034,7 @@ namespace HeatBalanceManager {
 
                 if (Lam < 0.1 || Lam > 4.0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
                     ShowContinueError("... A wavelength is not in the range 0.1 to 4.0 microns; at wavelength#=" + TrimSigDigits(LamNum) +
                                       ", value=[" + TrimSigDigits(Lam, 4) + "].");
                 }
@@ -4044,14 +4044,14 @@ namespace HeatBalanceManager {
                 //  Relax rules to allow directly use of spectral data from IGDB
                 if (Tau > 1.01) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
                     ShowContinueError("... A transmittance is > 1.0; at wavelength#=" + TrimSigDigits(LamNum) + ", value=[" + TrimSigDigits(Tau, 4) +
                                       "].");
                 }
 
                 if (RhoF < 0.0 || RhoF > 1.02 || RhoB < 0.0 || RhoB > 1.02) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
                     ShowContinueError("... A reflectance is < 0.0 or > 1.0; at wavelength#=" + TrimSigDigits(LamNum) + ", RhoF value=[" +
                                       TrimSigDigits(RhoF, 4) + "].");
                     ShowContinueError("... A reflectance is < 0.0 or > 1.0; at wavelength#=" + TrimSigDigits(LamNum) + ", RhoB value=[" +
@@ -4060,7 +4060,7 @@ namespace HeatBalanceManager {
 
                 if ((Tau + RhoF) > 1.03 || (Tau + RhoB) > 1.03) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid value.");
                     ShowContinueError("... Transmittance + reflectance) > 1.0 for an entry; at wavelength#=" + TrimSigDigits(LamNum) +
                                       ", value(Tau+RhoF)=[" + TrimSigDigits((Tau + RhoF), 4) + "], value(Tau+RhoB)=[" +
                                       TrimSigDigits((Tau + RhoB), 4) + "].");
@@ -4774,7 +4774,7 @@ namespace HeatBalanceManager {
 
                 ZoneList(ListNum).Name = cAlphaArgs(1);
                 if (UtilityRoutines::FindItemInList(ZoneList(ListNum).Name, Zone) > 0) {
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  is a duplicate of a zone name.");
+                    ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  is a duplicate of a zone name.");
                     ShowContinueError("This could be a problem in places where either a Zone Name or a Zone List can be used.");
                 }
 
@@ -4782,7 +4782,7 @@ namespace HeatBalanceManager {
                 ZoneList(ListNum).NumOfZones = NumAlphas - 1;
 
                 if (ZoneList(ListNum).NumOfZones < 1) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  No zones specified.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  No zones specified.");
                     ErrorsFound = true;
                 } else {
                     ZoneList(ListNum).Zone.allocate(ZoneList(ListNum).NumOfZones);
@@ -4793,7 +4793,7 @@ namespace HeatBalanceManager {
                         ZoneList(ListNum).MaxZoneNameLength = max(ZoneList(ListNum).MaxZoneNameLength, len(ZoneName));
                         ZoneList(ListNum).Zone(ZoneNum) = UtilityRoutines::FindItemInList(ZoneName, Zone);
                         if (ZoneList(ListNum).Zone(ZoneNum) == 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(ZoneNum + 1) +
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(ZoneNum + 1) +
                                             ' ' + ZoneName + " not found.");
                             ErrorsFound = true;
                         }
@@ -4801,7 +4801,7 @@ namespace HeatBalanceManager {
                         // Check for duplicate zones
                         for (Loop = 1; Loop <= ZoneNum - 1; ++Loop) {
                             if (ZoneList(ListNum).Zone(ZoneNum) == ZoneList(ListNum).Zone(Loop)) {
-                                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(ZoneNum + 1) +
+                                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(ZoneNum + 1) +
                                                 ' ' + ZoneName + " appears more than once in list.");
                                 ErrorsFound = true;
                             }
@@ -4843,14 +4843,14 @@ namespace HeatBalanceManager {
                 ZoneGroup(GroupNum).ZoneList = ListNum;
 
                 if (ListNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(2) + " named " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(2) + " named " +
                                     cAlphaArgs(2) + " not found.");
                     ErrorsFound = true;
                 } else {
                     // Check to make sure list is not in use by another ZONE GROUP
                     for (Loop = 1; Loop <= GroupNum - 1; ++Loop) {
                         if (ZoneGroup(GroupNum).ZoneList == ZoneGroup(Loop).ZoneList) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(2) +
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(2) +
                                             " already used by " + cCurrentModuleObject + " named " + ZoneGroup(Loop).Name + '.');
                             ErrorsFound = true;
                         }
@@ -4866,7 +4866,7 @@ namespace HeatBalanceManager {
                                 Zone(ZoneNum).ListMultiplier = ZoneGroup(GroupNum).Multiplier;
                                 Zone(ZoneNum).ListGroup = ListNum;
                             } else {
-                                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  Zone " + Zone(ZoneNum).Name +
+                                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  Zone " + Zone(ZoneNum).Name +
                                                 " in ZoneList already exists in ZoneList of another ZoneGroup.");
                                 ShowContinueError("Previous ZoneList=" + ZoneList(Zone(ZoneNum).ListGroup).Name);
                                 ErrorsFound = true;
@@ -4962,7 +4962,7 @@ namespace HeatBalanceManager {
                 // Assign zone number
                 ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
                 if (ZoneNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(2) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(2) + " entered value = \"" + cAlphaArgs(2) +
                                       "\" no corresponding zone has been found in the input file.");
@@ -4975,7 +4975,7 @@ namespace HeatBalanceManager {
                 NodeNum = GetOnlySingleNode(
                     cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
                 if (NodeNum == 0 && CheckOutAirNodeNumber(NodeNum)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(3) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(3) + " entered value = \"" + cAlphaArgs(3) +
                                       "\" no corresponding schedule has been found in the input file.");
@@ -5081,7 +5081,7 @@ namespace HeatBalanceManager {
                     Zone(ZoneLoop).InsideConvectionAlgo = AdaptiveConvectionAlgorithm;
 
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Zone(ZoneLoop).Name + "\".");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + Zone(ZoneLoop).Name + "\".");
                     ShowContinueError("Invalid value for " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                     // Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAETARP;
@@ -5112,7 +5112,7 @@ namespace HeatBalanceManager {
                     Zone(ZoneLoop).OutsideConvectionAlgo = AdaptiveConvectionAlgorithm;
 
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Zone(ZoneLoop).Name + "\".");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + Zone(ZoneLoop).Name + "\".");
                     ShowContinueError("Invalid value for " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                     // Zone( ZoneLoop ).OutsideConvectionAlgo = AdaptiveConvectionAlgorithm;
@@ -5131,7 +5131,7 @@ namespace HeatBalanceManager {
             } else if (UtilityRoutines::SameString("Yes", cAlphaArgs(4)) || lAlphaFieldBlanks(4)) {
                 Zone(ZoneLoop).isPartOfTotalArea = true;
             } else {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Zone(ZoneLoop).Name + "\".");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + Zone(ZoneLoop).Name + "\".");
                 ShowContinueError("Invalid value for " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                 ErrorsFound = true;
             }
@@ -7617,7 +7617,7 @@ namespace HeatBalanceManager {
                         auto &schedName = fields.at("simple_mixing_schedule_name");
                         thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(UtilityRoutines::MakeUPPERCase(schedName));
                         if (thisConstruct.AirBoundaryMixingSched == 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + thisConstruct.Name + "\", invalid (not found) " +
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisConstruct.Name + "\", invalid (not found) " +
                                             "Simple Mixing Schedule Name" + "=\"" + schedName.get<std::string>() + "\".");
                             errorsFound = true;
                         }
@@ -7680,7 +7680,7 @@ namespace HeatBalanceManager {
         // Check if IDD definition is correct
         inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumArgs, NumAlpha, NumNumeric);
         if (NumAlpha != 4) {
-            ShowSevereError(RoutineName + cCurrentModuleObject +
+            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject +
                             ": Object Definition indicates not = 4 Alpha Objects, Number Indicated=" + TrimSigDigits(NumAlpha));
             ErrorsFound = true;
         }
@@ -7714,7 +7714,7 @@ namespace HeatBalanceManager {
                 // Assign surface number
                 SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Surface);
                 if (SurfNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(2) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(2) + " entered value = \"" + cAlphaArgs(2) +
                                       "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
@@ -7726,7 +7726,7 @@ namespace HeatBalanceManager {
                 // Assign construction number
                 ConstrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Construct);
                 if (ConstrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(3) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(3) + " entered value = \"" + cAlphaArgs(3) +
                                       "\" no corresponding construction (ref Construction) has been found in the input file.");
@@ -7738,7 +7738,7 @@ namespace HeatBalanceManager {
                 // Assign schedule number
                 ScheduleNum = GetScheduleIndex(cAlphaArgs(4));
                 if (ScheduleNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(4) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(4) + " entered value = \"" + cAlphaArgs(4) +
                                       "\" no corresponding schedule has been found in the input file.");
@@ -7783,7 +7783,7 @@ namespace HeatBalanceManager {
                 // Assign surface number
                 SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Surface);
                 if (SurfNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(2) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(2) + " entered value = \"" + cAlphaArgs(2) +
                                       "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
@@ -7795,7 +7795,7 @@ namespace HeatBalanceManager {
                 // Assign construction number
                 ConstrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Construct);
                 if (ConstrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(3) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(3) + " entered value = \"" + cAlphaArgs(3) +
                                       "\" no corresponding construction (ref Construction) has been found in the input file.");
@@ -7811,7 +7811,7 @@ namespace HeatBalanceManager {
 
                     if (!NumOfLayersMatch) {
                         ShowSevereError(
-                            RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                             ", object. Number of scheduled surface gains for each layer does not match number of layers in referenced construction.");
                         ShowContinueError(cAlphaArgs(1) + " have " + TrimSigDigits(NumOfScheduledLayers) + " scheduled layers and " + cAlphaArgs(3) +
                                           " have " + TrimSigDigits(Construct(ConstrNum).TotSolidLayers) + " layers.");
@@ -7827,7 +7827,7 @@ namespace HeatBalanceManager {
                     for (i = 1; i <= NumOfScheduledLayers; ++i) {
                         ScheduleNum = GetScheduleIndex(cAlphaArgs(i + 3));
                         if (ScheduleNum == 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                             cAlphaFieldNames(NumOfScheduledLayers + 3) + " has been found.");
                             ShowContinueError(cAlphaFieldNames(NumOfScheduledLayers + 3) + " entered value = \"" +
                                               cAlphaArgs(NumOfScheduledLayers + 3) +
@@ -8278,7 +8278,7 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
                                 " has been found.");
                 ShowContinueError("...All Material names must be unique regardless of subtype.");
                 continue;
@@ -8290,14 +8290,14 @@ namespace HeatBalanceManager {
 
             if (rNumericArgs(1) <= 0.0) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(1) + " must be > 0, entered value = " + RoundSigDigits(rNumericArgs(1), 2));
             }
 
             if (rNumericArgs(2) <= 0.0) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(2) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(2) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(2) + " must be > 0, entered value = " + RoundSigDigits(rNumericArgs(2), 2));
             }
@@ -8320,7 +8320,7 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
                                 " has been found.");
                 ShowContinueError("...All Material names must be unique regardless of subtype.");
                 continue;
@@ -8330,7 +8330,7 @@ namespace HeatBalanceManager {
             DeflectionState(Loop).DeflectedThickness = rNumericArgs(1);
             if (rNumericArgs(1) < 0.0) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(1) + " must be >= 0, entered value = " + RoundSigDigits(rNumericArgs(1), 2));
             }
@@ -8368,7 +8368,7 @@ namespace HeatBalanceManager {
             Material(MaterNum).Thickness = rNumericArgs(1);
             if (rNumericArgs(1) <= 0.0) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(1) + " must be > 0, entered " + RoundSigDigits(rNumericArgs(1), 2));
             }
@@ -8376,7 +8376,7 @@ namespace HeatBalanceManager {
             Material(MaterNum).Pressure = rNumericArgs(2);
             if (rNumericArgs(2) <= 0.0) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(2) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(2) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(2) + " must be > 0, entered " + RoundSigDigits(rNumericArgs(2), 2));
             }
@@ -8384,7 +8384,7 @@ namespace HeatBalanceManager {
             if (!lAlphaFieldBlanks(2)) {
                 Material(MaterNum).GasPointer = UtilityRoutines::FindItemInList(cAlphaArgs(2), Material);
             } else {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
                                 " has been found.");
                 ShowContinueError(cCurrentModuleObject + " does not have assigned WindowMaterial:Gas or WindowMaterial:GasMixutre.");
             }
@@ -8417,7 +8417,7 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
                                 " has been found.");
                 ShowContinueError("...All Material names must be unique regardless of subtype.");
                 continue;
@@ -8451,7 +8451,7 @@ namespace HeatBalanceManager {
                     ComplexShade(Loop).LayerType = csBSDF;
                 } else {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(2) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(2) + " entered value = \"" + cAlphaArgs(2) +
                                       "\" should be OtherShadingType, Venetian, Woven, Perforated or BSDF.");
@@ -8494,70 +8494,70 @@ namespace HeatBalanceManager {
 
             if (rNumericArgs(1) <= 0.0) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(1) + " must be > 0, entered value = " + RoundSigDigits(rNumericArgs(1), 2));
             }
 
             if (rNumericArgs(2) <= 0.0) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(2) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(2) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(2) + " must be > 0, entered value = " + RoundSigDigits(rNumericArgs(2), 2));
             }
 
             if ((rNumericArgs(3) < 0.0) || (rNumericArgs(3) > 1.0)) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(3) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(3) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(3) + " value must be >= 0 and <= 1, entered value = " + RoundSigDigits(rNumericArgs(3), 2));
             }
 
             if ((rNumericArgs(4) <= 0.0) || (rNumericArgs(4) > 1.0)) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(4) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(4) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(4) + " value must be >= 0 and <= 1, entered value = " + RoundSigDigits(rNumericArgs(4), 2));
             }
 
             if ((rNumericArgs(5) <= 0.0) || (rNumericArgs(5) > 1.0)) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(5) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(5) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(5) + " value must be >= 0 and <= 1, entered value = " + RoundSigDigits(rNumericArgs(5), 2));
             }
 
             if ((rNumericArgs(6) < 0.0) || (rNumericArgs(6) > 1.0)) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(6) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(6) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(6) + " must be >= 0 or <= 1, entered value = " + RoundSigDigits(rNumericArgs(6), 2));
             }
 
             if ((rNumericArgs(7) < 0.0) || (rNumericArgs(7) > 1.0)) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(7) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(7) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(7) + " must be >=0 or <=1, entered " + RoundSigDigits(rNumericArgs(7), 2));
             }
 
             if ((rNumericArgs(8) < 0.0) || (rNumericArgs(8) > 1.0)) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(8) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(8) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(8) + " must be >=0 or <=1, entered value = " + RoundSigDigits(rNumericArgs(8), 2));
             }
 
             if ((rNumericArgs(9) < 0.0) || (rNumericArgs(9) > 1.0)) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(9) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(9) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(9) + " must be >=0 or <=1, entered value = " + RoundSigDigits(rNumericArgs(9), 2));
             }
 
             if ((rNumericArgs(10) < 0.0) || (rNumericArgs(10) > 1.0)) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(10) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(10) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(10) + " must be >=0 or <=1, entered value = " + RoundSigDigits(rNumericArgs(10), 2));
             }
@@ -8565,42 +8565,42 @@ namespace HeatBalanceManager {
             if (ComplexShade(Loop).LayerType == csVenetianHorizontal || ComplexShade(Loop).LayerType == csVenetianVertical) {
                 if (rNumericArgs(11) <= 0.0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cNumericFieldNames(11) + " has been found.");
                     ShowContinueError(cNumericFieldNames(11) + " must be >0, entered value = " + RoundSigDigits(rNumericArgs(11), 2));
                 }
 
                 if (rNumericArgs(12) <= 0.0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cNumericFieldNames(12) + " has been found.");
                     ShowContinueError(cNumericFieldNames(12) + " must be >0, entered value = " + RoundSigDigits(rNumericArgs(12), 2));
                 }
 
                 if (rNumericArgs(13) <= 0.0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cNumericFieldNames(13) + " has been found.");
                     ShowContinueError(cNumericFieldNames(13) + " must be >0, entered value = " + RoundSigDigits(rNumericArgs(13), 2));
                 }
 
                 if ((rNumericArgs(14) < -90.0) || (rNumericArgs(14) > 90.0)) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cNumericFieldNames(14) + " has been found.");
                     ShowContinueError(cNumericFieldNames(14) + " must be >=-90 and <=90, entered value = " + RoundSigDigits(rNumericArgs(14), 2));
                 }
 
                 if (rNumericArgs(15) <= 0.0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cNumericFieldNames(15) + " has been found.");
                     ShowContinueError(cNumericFieldNames(15) + " must be >0, entered value = " + RoundSigDigits(rNumericArgs(15), 2));
                 }
 
                 if ((rNumericArgs(16) < 0.0) || ((rNumericArgs(16) > 0.0) && (rNumericArgs(16) < (rNumericArgs(11) / 2)))) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cNumericFieldNames(16) + " has been found.");
                     ShowContinueError(cNumericFieldNames(16) +
                                       " must be =0 or greater than SlatWidth/2, entered value = " + RoundSigDigits(rNumericArgs(16), 2));
@@ -8693,7 +8693,7 @@ namespace HeatBalanceManager {
             WindowThermalModel(Loop).SDScalar = rNumericArgs(1);
             if ((rNumericArgs(1) < 0.0) || (rNumericArgs(1) > 1.0)) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(1) + " should be >= 0.0 and <= 1.0, entered value = " + RoundSigDigits(rNumericArgs(1), 2));
             }
@@ -8708,7 +8708,7 @@ namespace HeatBalanceManager {
                     WindowThermalModel(Loop).CalculationStandard = csEN673Design;
                 } else {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(2) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(2) + " entered value = \"" + cAlphaArgs(2) +
                                       "\" should be ISO15099, EN673Declared or EN673Design.");
@@ -8727,7 +8727,7 @@ namespace HeatBalanceManager {
                     WindowThermalModel(Loop).ThermalModel = tmConvectiveScalarModel_WithSDThickness;
                 } else {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(3) + " has been found.");
                     ShowContinueError(
                         cAlphaFieldNames(3) + " entered value = \"" + cAlphaArgs(3) +
@@ -8745,7 +8745,7 @@ namespace HeatBalanceManager {
                     WindowThermalModel(Loop).DeflectionModel = dmMeasuredDeflection;
                 } else {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(4) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(4) + " entered value = \"" + cAlphaArgs(4) +
                                       "\" should be NoDeflection, TemperatureAndPressureInput or MeasuredDeflection.");
@@ -8756,7 +8756,7 @@ namespace HeatBalanceManager {
                 WindowThermalModel(Loop).VacuumPressureLimit = rNumericArgs(2);
                 if (rNumericArgs(2) <= 0.0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cNumericFieldNames(2) + " has been found.");
                     ShowContinueError(cNumericFieldNames(2) + " must be > 0, entered value = " + RoundSigDigits(rNumericArgs(2), 2));
                 }
@@ -8764,7 +8764,7 @@ namespace HeatBalanceManager {
                 WindowThermalModel(Loop).InitialTemperature = rNumericArgs(3);
                 if (rNumericArgs(3) <= 0.0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cNumericFieldNames(3) + " has been found.");
                     ShowContinueError(cNumericFieldNames(3) + " must be > 0, entered value = " + RoundSigDigits(rNumericArgs(3), 2));
                 }
@@ -8772,7 +8772,7 @@ namespace HeatBalanceManager {
                 WindowThermalModel(Loop).InitialPressure = rNumericArgs(4);
                 if (rNumericArgs(4) <= 0.0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cNumericFieldNames(4) + " has been found.");
                     ShowContinueError(cNumericFieldNames(4) + " must be > 0, entered value = " + RoundSigDigits(rNumericArgs(4), 2));
                 }
@@ -8835,7 +8835,7 @@ namespace HeatBalanceManager {
                 } else {
                     // throw error
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
                                     locAlphaFieldNames(2) + " has been found.");
                     ShowContinueError(locAlphaFieldNames(2) + " entered value=\"" + locAlphaArgs(2) + "\" should be LBNLWindow or UserDefined.");
                 }
@@ -8850,7 +8850,7 @@ namespace HeatBalanceManager {
                 } else {
                     // throw error
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
                                     locAlphaFieldNames(3) + " has been found.");
                     ShowContinueError(locAlphaFieldNames(3) + " entered value = \"" + locAlphaArgs(3) + "\" should be Axisymmetric or None.");
                 }
@@ -8859,7 +8859,7 @@ namespace HeatBalanceManager {
             // Simon: Assign thermal model number
             ThermalModelNum = UtilityRoutines::FindItemInList(locAlphaArgs(4), WindowThermalModel);
             if (ThermalModelNum == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
                                 locAlphaFieldNames(4) + " has been found.");
                 ShowContinueError(locAlphaFieldNames(4) + " entered value = \"" + locAlphaArgs(4) +
                                   "\" no corresponding thermal model (WindowThermalModel:Params) found in the input file.");
@@ -8877,7 +8877,7 @@ namespace HeatBalanceManager {
 
             if (NumCols != 2 && NumCols != 1) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
                                 locAlphaFieldNames(5) + " has been found.");
                 ShowContinueError(locAlphaFieldNames(5) + " entered value=\"" + locAlphaArgs(5) +
                                   "\" invalid matrix dimensions.  Basis matrix dimension can only be 2 x 1.");
@@ -8900,7 +8900,7 @@ namespace HeatBalanceManager {
             if (mod((NumAlphas - 9), 3) != 0) {
                 // throw warning if incomplete field set
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Incomplete field set found.");
+                ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Incomplete field set found.");
                 ShowContinueError(locAlphaArgs(1) + " is missing some of the layers or/and gaps.");
             }
 
@@ -8919,7 +8919,7 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
                     ShowContinueError(
                         "Solar front transmittance matrix \"" + locAlphaArgs(6) +
                         "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
@@ -8928,7 +8928,7 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
                     ShowContinueError("Solar front transmittance matrix \"" + locAlphaArgs(6) + "\" must have the same number of rows and columns.");
                 }
 
@@ -8940,7 +8940,7 @@ namespace HeatBalanceManager {
                 Construct(ConstrNum).BSDFInput.SolFrtTrans.allocate(NumCols, NumRows);
                 if (Construct(ConstrNum).BSDFInput.SolFrtTransIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(6) + "\" is missing from the input file.");
                 } else {
@@ -8957,7 +8957,7 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
                     ShowContinueError(
                         "Solar back reflectance matrix \"" + locAlphaArgs(7) +
                         "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
@@ -8966,14 +8966,14 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
                     ShowContinueError("Solar bakc reflectance matrix \"" + locAlphaArgs(7) + "\" must have the same number of rows and columns.");
                 }
 
                 Construct(ConstrNum).BSDFInput.SolBkRefl.allocate(NumCols, NumRows);
                 if (Construct(ConstrNum).BSDFInput.SolBkReflIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(7) + "\" is missing from the input file.");
                 } else {
@@ -8990,7 +8990,7 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
                     ShowContinueError(
                         "Visible front transmittance matrix \"" + locAlphaArgs(8) +
                         "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
@@ -8999,7 +8999,7 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
                     ShowContinueError("Visible front transmittance matrix \"" + locAlphaArgs(8) +
                                       "\" must have the same number of rows and columns.");
                 }
@@ -9007,7 +9007,7 @@ namespace HeatBalanceManager {
                 Construct(ConstrNum).BSDFInput.VisFrtTrans.allocate(NumCols, NumRows);
                 if (Construct(ConstrNum).BSDFInput.VisFrtTransIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(8) +
                                       "\" is missing from the input file.");
@@ -9025,7 +9025,7 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
                     ShowContinueError(
                         "Visible back reflectance matrix \"" + locAlphaArgs(9) +
                         "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
@@ -9034,14 +9034,14 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
                     ShowContinueError("Visible back reflectance \"" + locAlphaArgs(9) + "\" must have the same number of rows and columns.");
                 }
 
                 Construct(ConstrNum).BSDFInput.VisBkRefl.allocate(NumCols, NumRows);
                 if (Construct(ConstrNum).BSDFInput.VisBkReflIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Visble back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(9) + "\" is missing from the input file.");
                 } else {
@@ -9068,7 +9068,7 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
                                             "\", object. Incorrect matrix dimension.");
                             ShowContinueError("Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " must have only one row.");
@@ -9076,7 +9076,7 @@ namespace HeatBalanceManager {
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
                                             "\", object. Incorrect matrix dimension.");
                             ShowContinueError("Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) +
@@ -9089,7 +9089,7 @@ namespace HeatBalanceManager {
                         Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbs.allocate(NumCols, NumRows);
                         if (Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex == 0) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                             ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                             ShowContinueError("Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " is missing from the input file.");
@@ -9107,7 +9107,7 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
                                             "\", object. Incorrect matrix dimension.");
                             ShowContinueError("Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " must have only one row.");
@@ -9115,7 +9115,7 @@ namespace HeatBalanceManager {
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
                                             "\", object. Incorrect matrix dimension.");
                             ShowContinueError("Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) +
@@ -9127,7 +9127,7 @@ namespace HeatBalanceManager {
                         Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbs.allocate(NumCols, NumRows);
                         if (Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex == 0) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                             ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                             ShowContinueError("Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " is missing from the input file.");
@@ -9152,7 +9152,7 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
                     ShowContinueError(
                         "Solar front transmittance matrix \"" + locAlphaArgs(6) +
                         "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
@@ -9161,14 +9161,14 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
                     ShowContinueError("Solar front transmittance matrix \"" + locAlphaArgs(6) + "\" must have the same number of rows and columns.");
                 }
 
                 Construct(ConstrNum).BSDFInput.SolFrtTrans.allocate(NBasis, NBasis);
                 if (Construct(ConstrNum).BSDFInput.SolFrtTransIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(6) + "\" is missing from the input file.");
                 } else {
@@ -9190,7 +9190,7 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
                     ShowContinueError(
                         "Solar back reflectance matrix \"" + locAlphaArgs(7) +
                         "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
@@ -9199,14 +9199,14 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
                     ShowContinueError("Solar back reflectance matrix \"" + locAlphaArgs(7) + "\" must have the same number of rows and columns.");
                 }
 
                 Construct(ConstrNum).BSDFInput.SolBkRefl.allocate(NBasis, NBasis);
                 if (Construct(ConstrNum).BSDFInput.SolBkReflIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(7) + "\" is missing from the input file.");
                 } else {
@@ -9227,7 +9227,7 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
                     ShowContinueError(
                         "Visible front transmittance matrix \"" + locAlphaArgs(8) +
                         "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
@@ -9236,7 +9236,7 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
                     ShowContinueError("Visible front transmittance matrix \"" + locAlphaArgs(8) +
                                       "\" must have the same number of rows and columns.");
                 }
@@ -9244,7 +9244,7 @@ namespace HeatBalanceManager {
                 Construct(ConstrNum).BSDFInput.VisFrtTrans.allocate(NBasis, NBasis);
                 if (Construct(ConstrNum).BSDFInput.VisFrtTransIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(8) +
                                       "\" is missing from the input file.");
@@ -9266,7 +9266,7 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NBasis) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal matrix size has been found.");
                     ShowContinueError(
                         "Visible back reflectance matrix \"" + locAlphaArgs(9) +
                         "\" is not the same size as it is defined by basis definition. Basis size is defined by Matrix:TwoDimension = \"" +
@@ -9275,14 +9275,14 @@ namespace HeatBalanceManager {
 
                 if (NumRows != NumCols) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) + "\", object. Invalid BSDF matrix dimensions.");
                     ShowContinueError("Visible back reflectance matrix \"" + locAlphaArgs(9) + "\" must have the same number of rows and columns.");
                 }
 
                 Construct(ConstrNum).BSDFInput.VisBkRefl.allocate(NBasis, NBasis);
                 if (Construct(ConstrNum).BSDFInput.VisBkReflIndex == 0) {
                     ErrorsFound = true;
-                    ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                    ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError("Visible back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(9) + "\" is missing from the input file.");
                 } else {
@@ -9322,7 +9322,7 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
                                             "\", object. Incorrect matrix dimension.");
                             ShowContinueError("Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " must have only one row.");
@@ -9330,7 +9330,7 @@ namespace HeatBalanceManager {
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
                                             "\", object. Incorrect matrix dimension.");
                             ShowContinueError("Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) +
@@ -9344,7 +9344,7 @@ namespace HeatBalanceManager {
 
                         if (Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex == 0) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                             ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                             ShowContinueError("Front absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " is missing from the input file.");
@@ -9362,7 +9362,7 @@ namespace HeatBalanceManager {
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
                                             "\", object. Incorrect matrix dimension.");
                             ShowContinueError("Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " must have only one row.");
@@ -9370,7 +9370,7 @@ namespace HeatBalanceManager {
 
                         if (NumCols != NBasis) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + " = \"" + locAlphaArgs(1) +
                                             "\", object. Incorrect matrix dimension.");
                             ShowContinueError("Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) +
@@ -9383,7 +9383,7 @@ namespace HeatBalanceManager {
 
                         if (Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex == 0) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
+                            ShowSevereError(std::string{RoutineName} + locCurrentModuleObject + "=\"" + locAlphaArgs(1) +
                                             ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                             ShowContinueError("Back absorbtance Matrix:TwoDimension = \"" + locAlphaArgs(AlphaIndex) + "\" for layer " +
                                               RoundSigDigits(currentOpticalLayer) + " is missing from the input file.");

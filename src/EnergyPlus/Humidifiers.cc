@@ -334,7 +334,7 @@ namespace Humidifiers {
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
@@ -383,7 +383,7 @@ namespace Humidifiers {
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
@@ -409,7 +409,7 @@ namespace Humidifiers {
                     Humidifier(HumNum).Name,        // Object Name
                     cAlphaFields(3));               // Field Name
             } else if (!lAlphaBlanks(3)) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\",");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\",");
                 ShowContinueError("Invalid " + cAlphaFields(3) + '=' + Alphas(3));
                 ShowSevereError("..." + cAlphaFields(3) + " not found.");
                 ErrorsFound = true;
@@ -593,7 +593,7 @@ namespace Humidifiers {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.");
         }
     }
 

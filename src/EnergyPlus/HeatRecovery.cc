@@ -427,7 +427,7 @@ namespace HeatRecovery {
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -509,7 +509,7 @@ namespace HeatRecovery {
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -641,7 +641,7 @@ namespace HeatRecovery {
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -1242,7 +1242,7 @@ namespace HeatRecovery {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Program terminates.");
         }
     }
 

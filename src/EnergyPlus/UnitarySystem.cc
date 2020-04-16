@@ -1625,7 +1625,7 @@ namespace UnitarySystems {
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
             } else {
                 // should never happen
-                ShowSevereError(RoutineName + ": " + CompType + " = " + CompName);
+                ShowSevereError(std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowContinueError("Illegal entry for Cooling Supply Air Flow Rate Method.");
             }
 
@@ -1730,7 +1730,7 @@ namespace UnitarySystems {
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
             } else {
                 // should never happen
-                ShowSevereError(RoutineName + ": " + CompType + " = " + CompName);
+                ShowSevereError(std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowContinueError("Illegal entry for Heating Supply Air Flow Rate Method.");
             }
 
@@ -1876,7 +1876,7 @@ namespace UnitarySystems {
             this->m_DesignFanVolFlowRate = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
             if (this->m_ActualFanVolFlowRate > 0.0) this->m_DesignFanVolFlowRate = this->m_ActualFanVolFlowRate;
             if (this->m_DesignFanVolFlowRate <= 0.0) {
-                ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowFatalError("Unable to determine fan air flow rate.");
             }
         }
@@ -2035,7 +2035,7 @@ namespace UnitarySystems {
                                                       0.0,
                                                       0.0); // conduct the sizing operation in the VS WSHP
             if (this->m_NumOfSpeedCooling != VariableSpeedCoils::VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds) {
-                ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowContinueError("Number of cooling speeds does not match coil object.");
                 ShowFatalError("Cooling coil = " + VariableSpeedCoils::VarSpeedCoil(this->m_CoolingCoilIndex).VarSpeedCoilType + ": " +
                                VariableSpeedCoils::VarSpeedCoil(this->m_CoolingCoilIndex).Name);
@@ -2084,7 +2084,7 @@ namespace UnitarySystems {
             auto &newCoil = coilCoolingDXs[this->m_CoolingCoilIndex];
             // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
             if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
-                ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowContinueError("Number of cooling speeds does not match coil object.");
                 ShowFatalError("Cooling coil = Coil:Cooling:DX: " + newCoil.name);
             }
@@ -2220,7 +2220,7 @@ namespace UnitarySystems {
                         if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
                             if (designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter - 1] < 1.0 && this->m_ControlType == ControlType::Setpoint) {
-                                ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
+                                ShowWarningError(std::string{RoutineName} + ": " + CompType + " = " + CompName);
                                 ShowContinueError("Design specification object = " + designSpecMSHP[MSHPIndex].name);
                                 ShowContinueError("When control type = SetPointBased the outlet air temperature must change with coil capacity, if "
                                                   "air flow also changes outlet air temperature will be relatively constant.");
@@ -2283,7 +2283,7 @@ namespace UnitarySystems {
                                                       0.0); // conduct the sizing operation in the VS WSHP
 
             if (this->m_NumOfSpeedHeating != VariableSpeedCoils::VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds) {
-                ShowWarningError(RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowContinueError("Number of heating speeds does not match coil object.");
                 ShowFatalError("Heating coil = " + VariableSpeedCoils::VarSpeedCoil(this->m_HeatingCoilIndex).VarSpeedCoilType + ": " +
                                VariableSpeedCoils::VarSpeedCoil(this->m_HeatingCoilIndex).Name);
@@ -15564,10 +15564,10 @@ namespace UnitarySystems {
                 }
             }
             if (!UnitarySysFound) {
-                ShowSevereError(RoutineName + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
+                ShowSevereError(std::string{RoutineName} + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
             }
         } else {
-            ShowSevereError(RoutineName + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
+            ShowSevereError(std::string{RoutineName} + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
         }
     }
 

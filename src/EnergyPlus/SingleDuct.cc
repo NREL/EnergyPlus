@@ -627,7 +627,7 @@ namespace SingleDuct {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (sd_airterminal(SysNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
+                ShowSevereError(std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
                                 "].");
                 ShowContinueError("...should have outlet node = " + NodeID(sd_airterminal(SysNum).ReheatAirOutletNode));
                 ErrorsFound = true;
@@ -898,7 +898,7 @@ namespace SingleDuct {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (sd_airterminal(SysNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
+                ShowSevereError(std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
                                 "].");
                 ShowContinueError("...should have outlet node = " + NodeID(sd_airterminal(SysNum).ReheatAirOutletNode));
                 ErrorsFound = true;
@@ -1104,7 +1104,7 @@ namespace SingleDuct {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (sd_airterminal(SysNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
+                ShowSevereError(std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
                                 "].");
                 ShowContinueError("...should have outlet node = " + NodeID(sd_airterminal(SysNum).ReheatAirOutletNode));
                 ErrorsFound = true;
@@ -1232,7 +1232,7 @@ namespace SingleDuct {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (sd_airterminal(SysNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
+                ShowSevereError(std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
                                 "].");
                 ShowContinueError("...should have outlet node = " + NodeID(sd_airterminal(SysNum).OutletNodeNum));
                 ErrorsFound = true;
@@ -1271,7 +1271,7 @@ namespace SingleDuct {
             } else {
                 sd_airterminal(SysNum).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(5), DataSizing::OARequirements);
                 if (sd_airterminal(SysNum).OARequirementsPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                     ShowContinueError("..invalid " + cAlphaFields(5) + "=\"" + Alphas(5) + "\".");
                     ErrorsFound = true;
                 } else {
@@ -1288,7 +1288,7 @@ namespace SingleDuct {
                     sd_airterminal(SysNum).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
                 } else {
                     sd_airterminal(SysNum).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                     ShowContinueError("..invalid " + cAlphaFields(6) + "=\"" + Alphas(6) + "\". The default input of CurrentOccupancy is assigned");
                 }
             }
@@ -1448,7 +1448,7 @@ namespace SingleDuct {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (sd_airterminal(SysNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
+                ShowSevereError(std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
                                 "].");
                 ShowContinueError("...should have outlet node = " + NodeID(sd_airterminal(SysNum).ReheatAirOutletNode));
                 ErrorsFound = true;
@@ -1615,7 +1615,7 @@ namespace SingleDuct {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (sd_airterminal(SysNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
+                ShowSevereError(std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
                                 "].");
                 ShowContinueError("...should have outlet node = " + NodeID(sd_airterminal(SysNum).ReheatAirOutletNode));
                 ErrorsFound = true;
@@ -1778,7 +1778,7 @@ namespace SingleDuct {
 
             AirTermSysInletNodeName = NodeID(sd_airterminal(SysNum).InletNodeNum);
             if (!UtilityRoutines::SameString(Alphas(3), AirTermSysInletNodeName)) {
-                ShowWarningError(RoutineName + "Invalid air terminal object air inlet node name in " + sd_airterminal(SysNum).SysType + " = " +
+                ShowWarningError(std::string{RoutineName} + "Invalid air terminal object air inlet node name in " + sd_airterminal(SysNum).SysType + " = " +
                                  sd_airterminal(SysNum).SysName);
                 ShowContinueError(" Specified air inlet node name is = " + Alphas(3) + ".");
                 ShowContinueError(" Expected air inlet node name is = " + AirTermSysInletNodeName + ".");
@@ -1853,7 +1853,7 @@ namespace SingleDuct {
             //                            NodeType_Air,NodeConnectionType_Outlet,1,ObjectIsParent)
             AirTermSysOutletNodeName = NodeID(sd_airterminal(SysNum).ReheatAirOutletNode);
             if (!UtilityRoutines::SameString(Alphas(4), AirTermSysOutletNodeName)) {
-                ShowWarningError(RoutineName + "Invalid air terminal object air outlet node name in " + sd_airterminal(SysNum).SysType + " = " +
+                ShowWarningError(std::string{RoutineName} + "Invalid air terminal object air outlet node name in " + sd_airterminal(SysNum).SysType + " = " +
                                  sd_airterminal(SysNum).SysName);
                 ShowContinueError(" Specified air outlet node name is = " + Alphas(4) + ".");
                 ShowContinueError(" Expected air outlet node name is = " + AirTermSysOutletNodeName + ".");
@@ -1887,7 +1887,7 @@ namespace SingleDuct {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (sd_airterminal(SysNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
+                ShowSevereError(std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" + sd_airterminal(SysNum).SysType + ',' + sd_airterminal(SysNum).SysName +
                                 "].");
                 ShowContinueError("...should have outlet node = " + NodeID(sd_airterminal(SysNum).ReheatAirOutletNode));
                 ErrorsFound = true;
@@ -1971,7 +1971,7 @@ namespace SingleDuct {
                     if (DoZoneSizing) {
                         if (FinalZoneSizing(ZoneSizIndex).ActualZoneNum == sd_airterminal(SysIndex).ActualZoneNum) {
                             if (FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation > 0.0) {
-                                ShowWarningError(RoutineName + "A zone secondary recirculation fraction is specified for zone served by ");
+                                ShowWarningError(std::string{RoutineName} + "A zone secondary recirculation fraction is specified for zone served by ");
                                 ShowContinueError("...terminal unit \"" + sd_airterminal(SysIndex).SysName + "\" , that indicates a single path system");
                                 ShowContinueError("...The zone secondary recirculation for that zone was set to 0.0");
                                 FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation = 0.0;
@@ -1992,7 +1992,7 @@ namespace SingleDuct {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 
@@ -5563,7 +5563,7 @@ namespace SingleDuct {
             } else {
                 SysATMixer(ATMixerNum).OARequirementsPtr = UtilityRoutines::FindItemInList(cAlphaArgs(8), DataSizing::OARequirements);
                 if (SysATMixer(ATMixerNum).OARequirementsPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) + "\".");
                     ErrorsFound = true;
                 } else {
@@ -5580,7 +5580,7 @@ namespace SingleDuct {
                     SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
                 } else {
                     SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
+                    ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(9) + "=\"" + cAlphaArgs(9) +
                                       "\". The default input of CurrentOccupancy is assigned");
                 }
@@ -5612,7 +5612,7 @@ namespace SingleDuct {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (SysATMixer(ATMixerNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for System = [" + cCurrentModuleObject + ',' +
+                ShowSevereError(std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" + cCurrentModuleObject + ',' +
                                 SysATMixer(ATMixerNum).Name + "].");
                 ShowContinueError("...should have outlet node = " + NodeID(SysATMixer(ATMixerNum).MixedAirOutNode));
                 ErrorsFound = true;
@@ -5691,7 +5691,7 @@ namespace SingleDuct {
                     for (int SizingInputNum = 1; SizingInputNum <= NumZoneSizingInput; ++SizingInputNum) {
                         if (ZoneSizingInput(SizingInputNum).ZoneNum == SysATMixer(ATMixerNum).ZoneNum) {
                             if (ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex == 0) {
-                                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
+                                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                                 ShowContinueError(cAlphaFieldNames(8) + " is blank in both the mixer and the Sizing:Zone object for the same zone.");
                                 ShowContinueError("The mixer outdoor airflow rate is set to zero.");
                                 SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = 0.0;
@@ -5713,7 +5713,7 @@ namespace SingleDuct {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Program terminates.");
         }
     }
 

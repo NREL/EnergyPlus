@@ -296,7 +296,7 @@ namespace OutAirNodeManager {
             }
 
             if (ErrorsFound) {
-                ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " input.");
+                ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.");
             }
         }
 
@@ -368,7 +368,7 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 1 && !lAlphaBlanks(2)) {
                     Node(NodeNums(1)).OutAirDryBulbSchedNum = GetScheduleIndex(Alphas(2));
                     if (Node(NodeNums(1)).OutAirDryBulbSchedNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(2) + "\", invalid schedule.");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(2) + "\", invalid schedule.");
                         ShowContinueError("Dry Bulb Temperature Schedule not found=\"" + Alphas(2) + "\".");
                         ErrorsFound = true;
                     }
@@ -377,7 +377,7 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 2 && !lAlphaBlanks(3)) {
                     Node(NodeNums(1)).OutAirWetBulbSchedNum = GetScheduleIndex(Alphas(3));
                     if (Node(NodeNums(1)).OutAirWetBulbSchedNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(3) + "\", invalid schedule.");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(3) + "\", invalid schedule.");
                         ShowContinueError("Wet Bulb Temperature Schedule not found=\"" + Alphas(3) + "\".");
                         ErrorsFound = true;
                     }
@@ -386,7 +386,7 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 3 && !lAlphaBlanks(4)) {
                     Node(NodeNums(1)).OutAirWindSpeedSchedNum = GetScheduleIndex(Alphas(4));
                     if (Node(NodeNums(1)).OutAirWindSpeedSchedNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(4) + "\", invalid schedule.");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(4) + "\", invalid schedule.");
                         ShowContinueError("Wind Speed Schedule not found=\"" + Alphas(4) + "\".");
                         ErrorsFound = true;
                     }
@@ -395,7 +395,7 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 4 && !lAlphaBlanks(5)) {
                     Node(NodeNums(1)).OutAirWindDirSchedNum = GetScheduleIndex(Alphas(5));
                     if (Node(NodeNums(1)).OutAirWindDirSchedNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\", invalid schedule.");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\", invalid schedule.");
                         ShowContinueError("Wind Direction Schedule not found=\"" + Alphas(5) + "\".");
                         ErrorsFound = true;
                     }
@@ -412,7 +412,7 @@ namespace OutAirNodeManager {
                 }
             }
             if (ErrorsFound) {
-                ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " input.");
+                ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.");
             }
         }
 

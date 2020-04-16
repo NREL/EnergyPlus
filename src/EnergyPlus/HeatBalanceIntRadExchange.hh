@@ -84,7 +84,7 @@ namespace HeatBalanceIntRadExchange {
                                  int const SurfIterations,                // Number of iterations in calling subroutine
                                  Array1D<Real64> &NetLWRadToSurf,          // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
-                                 std::string const &CalledFrom = "");
+                                 std::string_view CalledFrom = "");
 
     void UpdateMovableInsulationFlag(bool &MovableInsulationChange, // set to true if there is a change in the movable insulation state
                                      int const SurfNum              // surface number of surface being investigated

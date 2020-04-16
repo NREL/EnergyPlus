@@ -347,7 +347,7 @@ namespace PurchasedAirManager {
                 } else {
                     PurchAir(PurchAirNum).AvailSchedPtr = GetScheduleIndex(cAlphaArgs(2));
                     if (PurchAir(PurchAirNum).AvailSchedPtr == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                         ShowContinueError("Invalid-not found " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                         ErrorsFound = true;
                     }
@@ -423,7 +423,7 @@ namespace PurchasedAirManager {
                         PurchAir(PurchAirNum).HeatingLimit = LimitFlowRateAndCapacity;
                     }
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                     ShowContinueError("Invalid-entry " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
                     ShowContinueError("Valid entries are NoLimit, LimitFlowRate, LimitCapacity, or LimitFlowRateAndCapacity");
                     ErrorsFound = true;
@@ -456,7 +456,7 @@ namespace PurchasedAirManager {
                         PurchAir(PurchAirNum).CoolingLimit = LimitFlowRateAndCapacity;
                     }
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                     ShowContinueError("Invalid-entry " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
                     ShowContinueError("Valid entries are NoLimit, LimitFlowRate, LimitCapacity, or LimitFlowRateAndCapacity");
                     ErrorsFound = true;
@@ -471,7 +471,7 @@ namespace PurchasedAirManager {
                 } else {
                     PurchAir(PurchAirNum).HeatSchedPtr = GetScheduleIndex(cAlphaArgs(8));
                     if (PurchAir(PurchAirNum).HeatSchedPtr == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                         ShowContinueError("Invalid-not found " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) + "\".");
                         ErrorsFound = true;
                     }
@@ -483,7 +483,7 @@ namespace PurchasedAirManager {
                 } else {
                     PurchAir(PurchAirNum).CoolSchedPtr = GetScheduleIndex(cAlphaArgs(9));
                     if (PurchAir(PurchAirNum).CoolSchedPtr == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                         ShowContinueError("Invalid-not found " + cAlphaFieldNames(9) + "=\"" + cAlphaArgs(9) + "\".");
                         ErrorsFound = true;
                     }
@@ -498,7 +498,7 @@ namespace PurchasedAirManager {
                 } else if (UtilityRoutines::SameString(cAlphaArgs(10), "ConstantSupplyHumidityRatio")) {
                     PurchAir(PurchAirNum).DehumidCtrlType = ConstantSupplyHumidityRatio;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                     ShowContinueError("Invalid-entry " + cAlphaFieldNames(10) + "=\"" + cAlphaArgs(10) + "\".");
                     ShowContinueError("Valid entries are ConstantSensibleHeatRatio, Humidistat, or ConstantSupplyHumidityRatio");
                     ErrorsFound = true;
@@ -513,7 +513,7 @@ namespace PurchasedAirManager {
                 } else if (UtilityRoutines::SameString(cAlphaArgs(11), "ConstantSupplyHumidityRatio")) {
                     PurchAir(PurchAirNum).HumidCtrlType = ConstantSupplyHumidityRatio;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                     ShowContinueError("Invalid-entry " + cAlphaFieldNames(11) + "=\"" + cAlphaArgs(11) + "\".");
                     ShowContinueError("Valid entries are None, Humidistat, or ConstantSupplyHumidityRatio");
                     ErrorsFound = true;
@@ -523,7 +523,7 @@ namespace PurchasedAirManager {
                 if (!lAlphaFieldBlanks(12)) {
                     PurchAir(PurchAirNum).OARequirementsPtr = UtilityRoutines::FindItemInList(cAlphaArgs(12), OARequirements);
                     if (PurchAir(PurchAirNum).OARequirementsPtr == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                         ShowContinueError("Invalid-not found" + cAlphaFieldNames(12) + "=\"" + cAlphaArgs(12) + "\".");
                         ErrorsFound = true;
                     } else {
@@ -541,7 +541,7 @@ namespace PurchasedAirManager {
                             cAlphaArgs(13) = cAlphaArgs(1).substr(0, 75) + " OUTDOOR AIR INLET NODE";
                         }
                         if (DisplayExtraWarnings) {
-                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field");
+                            ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field");
                             ShowContinueError(cAlphaFieldNames(13) + " is blank, but there is outdoor air requested for this system.");
                             ShowContinueError("Creating node name =" + cAlphaArgs(13));
                         }
@@ -558,7 +558,7 @@ namespace PurchasedAirManager {
                     // Check if OA node is initialized in OutdoorAir:Node or OutdoorAir:Nodelist
                     CheckAndAddAirNodeNumber(PurchAir(PurchAirNum).OutdoorAirNodeNum, IsOANodeListed);
                     if ((!IsOANodeListed) && DisplayExtraWarnings) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " missing data");
+                        ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " missing data");
                         ShowContinueError(cAlphaArgs(13) + " does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                         ShowContinueError("Adding OutdoorAir:Node=" + cAlphaArgs(13));
                     }
@@ -576,14 +576,14 @@ namespace PurchasedAirManager {
                             PurchAir(PurchAirNum).DCVType = CO2SetPoint;
                         } else {
                             PurchAir(PurchAirNum).DCVType = NoDCV;
-                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                            ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                             ShowContinueError(cAlphaFieldNames(14) + '=' + cAlphaArgs(14) + " but CO2 simulation is not active.");
                             ShowContinueError("Resetting " + cAlphaFieldNames(14) + " to NoDCV");
                             ShowContinueError("To activate CO2 simulation, use ZoneAirContaminantBalance object and specify \"Carbon Dioxide "
                                               "Concentration\"=\"Yes\".");
                         }
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                         ShowContinueError("Invalid-entry " + cAlphaFieldNames(14) + '=' + cAlphaArgs(14));
                         ShowContinueError("Valid entries are None, OccupancySchedule, or CO2Setpoint");
                         ErrorsFound = true;
@@ -596,7 +596,7 @@ namespace PurchasedAirManager {
                     } else if (UtilityRoutines::SameString(cAlphaArgs(15), "DifferentialEnthalpy")) {
                         PurchAir(PurchAirNum).EconomizerType = DifferentialEnthalpy;
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                         ShowContinueError("Invalid-entry " + cAlphaFieldNames(15) + '=' + cAlphaArgs(15));
                         ShowContinueError("Valid entries are NoEconomizer, DifferentialDryBulb, or DifferentialEnthalpy");
                         ErrorsFound = true;
@@ -609,7 +609,7 @@ namespace PurchasedAirManager {
                     } else if (UtilityRoutines::SameString(cAlphaArgs(16), "Enthalpy")) {
                         PurchAir(PurchAirNum).HtRecType = Enthalpy;
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                         ShowContinueError("Invalid-entry " + cAlphaFieldNames(16) + '=' + cAlphaArgs(16));
                         ShowContinueError("Valid entries are None, Sensible, or Enthalpy");
                         ErrorsFound = true;
@@ -1082,7 +1082,7 @@ namespace PurchasedAirManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input. Preceding conditions cause termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input. Preceding conditions cause termination.");
         }
     }
 

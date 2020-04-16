@@ -203,7 +203,7 @@ namespace SurfaceGeometry {
                             int &NeedToAddSubSurfaces     // Number of surfaces to add, based on unentered IZ surfaces
     );
 
-    void CheckWindowShadingControlFrameDivider(std::string const &cRoutineName, // routine name calling this one (for error messages)
+    void CheckWindowShadingControlFrameDivider(std::string_view cRoutineName, // routine name calling this one (for error messages)
                                                bool &ErrorsFound,               // true if errors have been found or are found here
                                                int const SurfNum,               // current surface number
                                                int const FrameField             // field number for frame/divider

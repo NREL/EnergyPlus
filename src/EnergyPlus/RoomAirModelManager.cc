@@ -390,7 +390,7 @@ namespace RoomAirModelManager {
             // first get zone ID
             ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (ZoneNum == 0) { // throw error
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                 ShowContinueError("Invalid-not found " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
                 return; // halt to avoid hard crash
@@ -405,7 +405,7 @@ namespace RoomAirModelManager {
             } else {
                 AirPatternZoneInfo(ZoneNum).AvailSchedID = GetScheduleIndex(cAlphaArgs(3));
                 if (AirPatternZoneInfo(ZoneNum).AvailSchedID == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                     ShowContinueError("Invalid-not found " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
@@ -414,7 +414,7 @@ namespace RoomAirModelManager {
             AirPatternZoneInfo(ZoneNum).PatternCntrlSched = cAlphaArgs(4); // Schedule Name for Leading Pattern Control for this Zone
             AirPatternZoneInfo(ZoneNum).PatternSchedID = GetScheduleIndex(cAlphaArgs(4));
             if (AirPatternZoneInfo(ZoneNum).PatternSchedID == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                 ShowContinueError("Invalid-not found " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                 ErrorsFound = true;
             }
@@ -447,7 +447,7 @@ namespace RoomAirModelManager {
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (AirModel(ZoneNum).AirModelType != RoomAirModel_UserDefined) continue;
             if (AirPatternZoneInfo(ZoneNum).IsUsed) continue; // There is a Room Air Temperatures object for this zone
-            ShowSevereError(RoutineName + "AirModel for Zone=[" + Zone(ZoneNum).Name + "] is indicated as \"User Defined\".");
+            ShowSevereError(std::string{RoutineName} + "AirModel for Zone=[" + Zone(ZoneNum).Name + "] is indicated as \"User Defined\".");
             ShowContinueError("...but missing a " + cCurrentModuleObject + " object for control.");
             ErrorsFound = true;
         }

@@ -524,7 +524,7 @@ namespace LowTempRadiantSystem {
             HydrRadSys(Item).ZoneName = Alphas(3);
             HydrRadSys(Item).ZonePtr = UtilityRoutines::FindItemInList(Alphas(3), Zone);
             if (HydrRadSys(Item).ZonePtr == 0) {
-                ShowSevereError(RoutineName + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
+                ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
@@ -558,11 +558,11 @@ namespace LowTempRadiantSystem {
                 HydrRadSys(Item).NumCircuits(1) = 0.0;
                 // Error checking for single surfaces
                 if (HydrRadSys(Item).SurfacePtr(1) == 0) {
-                    ShowSevereError(RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
+                    ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else if (Surface(HydrRadSys(Item).SurfacePtr(1)).PartOfVentSlabOrRadiantSurface) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
@@ -868,7 +868,7 @@ namespace LowTempRadiantSystem {
             CFloRadSys(Item).ZoneName = Alphas(3);
             CFloRadSys(Item).ZonePtr = UtilityRoutines::FindItemInList(Alphas(3), Zone);
             if (CFloRadSys(Item).ZonePtr == 0) {
-                ShowSevereError(RoutineName + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
+                ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
@@ -905,11 +905,11 @@ namespace LowTempRadiantSystem {
                 CFloRadSys(Item).NumCircuits(1) = 0.0;
                 // Error checking for single surfaces
                 if (CFloRadSys(Item).SurfacePtr(1) == 0) {
-                    ShowSevereError(RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
+                    ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else if (Surface(CFloRadSys(Item).SurfacePtr(1)).PartOfVentSlabOrRadiantSurface) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
@@ -1127,7 +1127,7 @@ namespace LowTempRadiantSystem {
             ElecRadSys(Item).ZoneName = Alphas(3);
             ElecRadSys(Item).ZonePtr = UtilityRoutines::FindItemInList(Alphas(3), Zone);
             if (ElecRadSys(Item).ZonePtr == 0) {
-                ShowSevereError(RoutineName + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
+                ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
@@ -1155,11 +1155,11 @@ namespace LowTempRadiantSystem {
                 ElecRadSys(Item).SurfacePowerFrac(1) = 1.0;
                 // Error checking for single surfaces
                 if (ElecRadSys(Item).SurfacePtr(1) == 0) {
-                    ShowSevereError(RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
+                    ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else if (Surface(ElecRadSys(Item).SurfacePtr(1)).PartOfVentSlabOrRadiantSurface) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
@@ -1376,7 +1376,7 @@ namespace LowTempRadiantSystem {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input. Preceding conditions cause termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input. Preceding conditions cause termination.");
         }
 
         // Set up the output variables for low temperature radiant systems
@@ -2356,7 +2356,7 @@ namespace LowTempRadiantSystem {
                         DataScalableCapSizingON = false;
                         ElecRadSys(RadSysNum).MaxElecPower = TempSize;
                     } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                        ShowSevereError(RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + ElecRadSys(RadSysNum).Name + "\".");
+                        ShowSevereError(std::string{RoutineName} + ": auto-sizing cannot be done for " + CompType + " = " + ElecRadSys(RadSysNum).Name + "\".");
                         ShowContinueError("The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the "
                                           "Heating Design Capacity Method = \"FractionOfAutosizedHeatingCapacity\".");
                         ErrorsFound = true;
@@ -2436,7 +2436,7 @@ namespace LowTempRadiantSystem {
                         DataScalableCapSizingON = false;
                     } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                         if (HydrRadSys(RadSysNum).WaterVolFlowMaxHeat == AutoSize) {
-                            ShowSevereError(RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + HydrRadSys(RadSysNum).Name +
+                            ShowSevereError(std::string{RoutineName} + ": auto-sizing cannot be done for " + CompType + " = " + HydrRadSys(RadSysNum).Name +
                                             "\".");
                             ShowContinueError("The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when "
                                               "the Heating Design Capacity Method = \"FractionOfAutosizedHeatingCapacity\".");
@@ -2587,7 +2587,7 @@ namespace LowTempRadiantSystem {
                         DataScalableCapSizingON = false;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                         if (HydrRadSys(RadSysNum).WaterVolFlowMaxCool == AutoSize) {
-                            ShowSevereError(RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + HydrRadSys(RadSysNum).Name +
+                            ShowSevereError(std::string{RoutineName} + ": auto-sizing cannot be done for " + CompType + " = " + HydrRadSys(RadSysNum).Name +
                                             "\".");
                             ShowContinueError("The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when "
                                               "the Cooling Design Capacity Method = \"FractionOfAutosizedCoolingCapacity\".");

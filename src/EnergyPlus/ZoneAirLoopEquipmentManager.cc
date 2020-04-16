@@ -495,7 +495,7 @@ namespace ZoneAirLoopEquipmentManager {
             }
         }
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " Input");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " Input");
         }
     }
 

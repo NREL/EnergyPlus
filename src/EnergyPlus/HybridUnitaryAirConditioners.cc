@@ -631,7 +631,7 @@ namespace HybridUnitaryAirConditioners {
                 int Numberofoperatingmodes = 0;
                 if (lNumericBlanks(4)) {
                     ShowSevereError("Invalid number of operating modes" + cNumericFields(5));
-                    ShowFatalError(RoutineName + "Errors found in getting input.");
+                    ShowFatalError(std::string{RoutineName} + "Errors found in getting input.");
                     ShowContinueError(
                         "... Preceding condition causes terminascaler*1.2041*pZoneHybridUnitaryAirConditioner->SystemMaximumSupplyAirFlowRatetion.");
                 } else {
@@ -649,7 +649,7 @@ namespace HybridUnitaryAirConditioners {
                 // A17, \ OA requirement pointer
                 ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(17), OARequirements);
                 if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Alphas(1) + " invalid data");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + Alphas(1) + " invalid data");
                     ShowContinueError("Invalid-not found" + cAlphaFieldNames(17) + "=\"" + Alphas(17) + "\".");
                     ErrorsFound = true;
                 } else {
@@ -660,7 +660,7 @@ namespace HybridUnitaryAirConditioners {
                     ErrorsFound = ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(
                         Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
                     if (ErrorsFound) {
-                        ShowFatalError(RoutineName + "Errors found parsing modes");
+                        ShowFatalError(std::string{RoutineName} + "Errors found parsing modes");
                         ShowContinueError("... Preceding condition causes termination.");
                         break;
                     }
@@ -1174,7 +1174,7 @@ namespace HybridUnitaryAirConditioners {
         }
         Errors = ErrorsFound;
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting input.");
             ShowContinueError("... Preceding condition causes termination.");
         }
     }

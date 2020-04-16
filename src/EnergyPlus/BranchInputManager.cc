@@ -1407,7 +1407,7 @@ namespace BranchInputManager {
                 lAlphaBlanks.deallocate();
                 lNumericBlanks.deallocate();
                 if (ErrFound) {
-                    ShowSevereError(RoutineName + " Invalid " + CurrentModuleObject +
+                    ShowSevereError(std::string{RoutineName} + " Invalid " + CurrentModuleObject +
                                     " Input, preceding condition(s) will likely cause termination.");
                     InvalidBranchDefinitions = true;
                 }
@@ -1417,7 +1417,7 @@ namespace BranchInputManager {
         }
     }
 
-    void GetSingleBranchInput(std::string const RoutineName,
+    void GetSingleBranchInput(const std::string_view RoutineName,
                               int const BCount,
                               Array1D_string &Alphas,
                               Array1D_string &cAlphaFields,
@@ -1442,7 +1442,7 @@ namespace BranchInputManager {
         Branch(BCount).Name = Alphas(1);
         GetPressureCurveTypeAndIndex(Alphas(2), PressureCurveType, PressureCurveIndex);
         if (PressureCurveType == PressureCurve_Error) {
-            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
             ShowContinueError("..Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
             ShowContinueError("This curve could not be found in the input deck.  Ensure that this curve has been entered");
             ShowContinueError(" as either a Curve:Functional:PressureDrop or one of Curve:{Linear,Quadratic,Cubic,Exponent}");
@@ -1458,13 +1458,13 @@ namespace BranchInputManager {
         Comp = 1;
         for (int Loop = 3; Loop <= NumAlphas; Loop += 4) {
             if (UtilityRoutines::SameString(Alphas(Loop), cSPLITTER) || UtilityRoutines::SameString(Alphas(Loop), cMIXER)) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError("Connector:Splitter/Connector:Mixer not allowed in object " + CurrentModuleObject);
                 ErrFound = true;
                 continue;
             }
             if (Comp > NumInComps) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError("...Number of Arguments indicate [" + RoundSigDigits(NumInComps) + "], but count of fields indicates [" +
                                   RoundSigDigits(Comp) + ']');
                 ShowContinueError("...examine " + CurrentModuleObject + " carefully.");
@@ -1498,7 +1498,7 @@ namespace BranchInputManager {
                             _,
                             cAlphaFields(Loop + 2));
                 if (NumNodes > 1) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                     ShowContinueError("..invalid " + cAlphaFields(Loop + 2) + "=\"" + Branch(BCount).Component(Comp).InletNodeName +
                                       "\" must be a single node - appears to be a list.");
                     ShowContinueError("Occurs on " + cAlphaFields(Loop) + "=\"" + Alphas(Loop) + "\", " + cAlphaFields(Loop + 1) + "=\"" +
@@ -1508,7 +1508,7 @@ namespace BranchInputManager {
                     Branch(BCount).Component(Comp).InletNode = NodeNums(1);
                 }
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError("blank required field: " + cAlphaFields(Loop + 2));
                 ShowContinueError("Occurs on " + cAlphaFields(Loop) + "=\"" + Alphas(Loop) + "\", " + cAlphaFields(Loop + 1) + "=\"" +
                                   Alphas(Loop + 1) + "\".");
@@ -1535,7 +1535,7 @@ namespace BranchInputManager {
                             _,
                             cAlphaFields(Loop + 3));
                 if (NumNodes > 1) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                     ShowContinueError("..invalid " + cAlphaFields(Loop + 2) + "=\"" + Branch(BCount).Component(Comp).InletNodeName +
                                       "\" must be a single node - appears to be a list.");
                     ShowContinueError("Occurs on " + cAlphaFields(Loop) + "=\"" + Alphas(Loop) + "\", " + cAlphaFields(Loop + 1) + "=\"" +
@@ -1545,7 +1545,7 @@ namespace BranchInputManager {
                     Branch(BCount).Component(Comp).OutletNode = NodeNums(1);
                 }
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError("blank required field: " + cAlphaFields(Loop + 3));
                 ShowContinueError("Occurs on " + cAlphaFields(Loop) + "=\"" + Alphas(Loop) + "\", " + cAlphaFields(Loop + 1) + "=\"" +
                                   Alphas(Loop + 1) + "\".");
@@ -1652,7 +1652,7 @@ namespace BranchInputManager {
         lNumericBlanks.dimension(NumNumbers, true);
 
         if (NumNumbers > 0) {
-            ShowSevereError(RoutineName + CurrentModuleObject +
+            ShowSevereError(std::string{RoutineName} + CurrentModuleObject +
                             " Object definition contains numbers, cannot be decoded by GetBranchListInput routine.");
             ErrFound = true;
         }
@@ -1677,7 +1677,7 @@ namespace BranchInputManager {
             BranchList(BCount).NumOfBranchNames = NumAlphas - 1;
             BranchList(BCount).BranchNames.allocate(NumAlphas - 1);
             if (BranchList(BCount).NumOfBranchNames == 0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + BranchList(BCount).Name + "\", No branch names entered.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + BranchList(BCount).Name + "\", No branch names entered.");
                 ErrFound = true;
             } else {
                 BranchList(BCount).BranchNames({1, NumAlphas - 1}) = Alphas({2, NumAlphas});
@@ -1689,7 +1689,7 @@ namespace BranchInputManager {
                     if (!BranchList(BCount).BranchNames(Loop).empty()) {
                         Found = UtilityRoutines::FindItemInList(BranchList(BCount).BranchNames(Loop), Branch);
                         if (Found == 0) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + BranchList(BCount).Name + "\", invalid data.");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + BranchList(BCount).Name + "\", invalid data.");
                             ShowContinueError("..invalid Branch Name not found=\"" + BranchList(BCount).BranchNames(Loop) + "\".");
                             ErrFound = true;
                         }
@@ -1704,7 +1704,7 @@ namespace BranchInputManager {
             TestName = BranchList(Count).BranchNames(1);
             for (Loop = 2; Loop <= BranchList(Count).NumOfBranchNames; ++Loop) {
                 if (TestName != BranchList(Count).BranchNames(Loop)) continue;
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + BranchList(BCount).Name + "\", invalid data.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + BranchList(BCount).Name + "\", invalid data.");
                 ShowContinueError("..invalid: duplicate branch name specified in the list.");
                 ShowContinueError("..Branch Name=" + TestName);
                 ShowContinueError("..Branch Name #" + TrimSigDigits(Loop) + " is duplicate.");
@@ -1713,7 +1713,7 @@ namespace BranchInputManager {
         }
 
         if (ErrFound) {
-            ShowSevereError(RoutineName + " Invalid Input -- preceding condition(s) will likely cause termination.");
+            ShowSevereError(std::string{RoutineName} + " Invalid Input -- preceding condition(s) will likely cause termination.");
         }
         NumOfBranchLists = BCount;
         Alphas.deallocate();

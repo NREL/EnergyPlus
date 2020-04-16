@@ -337,7 +337,7 @@ namespace SplitterComponent {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting input.");
         }
     }
 

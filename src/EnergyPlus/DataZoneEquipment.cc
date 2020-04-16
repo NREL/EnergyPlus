@@ -402,16 +402,16 @@ namespace DataZoneEquipment {
         UniqueZoneEquipListNames.reserve(NumOfZones);
 
         if (NumOfZoneEquipLists != NumOfControlledZones) {
-            ShowSevereError(RoutineName + "Number of Zone Equipment lists [" + TrimSigDigits(NumOfZoneEquipLists) +
+            ShowSevereError(std::string{RoutineName} + "Number of Zone Equipment lists [" + TrimSigDigits(NumOfZoneEquipLists) +
                             "] not equal Number of Controlled Zones [" + TrimSigDigits(NumOfControlledZones) + ']');
             ShowContinueError("..Each Controlled Zone [ZoneHVAC:EquipmentConnections] must have a corresponding (unique) ZoneHVAC:EquipmentList");
             ShowFatalError("GetZoneEquipment: Incorrect number of zone equipment lists");
         }
 
         if (NumOfControlledZones > NumOfZones) {
-            ShowSevereError(RoutineName + "Number of Controlled Zone objects [" + TrimSigDigits(NumOfControlledZones) +
+            ShowSevereError(std::string{RoutineName} + "Number of Controlled Zone objects [" + TrimSigDigits(NumOfControlledZones) +
                             "] greater than Number of Zones [" + TrimSigDigits(NumOfZones) + ']');
-            ShowFatalError(RoutineName + "Too many ZoneHVAC:EquipmentConnections objects.");
+            ShowFatalError(std::string{RoutineName} + "Too many ZoneHVAC:EquipmentConnections objects.");
         }
 
         InitUniqueNodeCheck("ZoneHVAC:EquipmentConnections");
@@ -438,14 +438,14 @@ namespace DataZoneEquipment {
             ControlledZoneNum = UtilityRoutines::FindItemInList(AlphArray(1), Zone);
 
             if (ControlledZoneNum == 0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\"");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\"");
                 ShowContinueError("..Requested Controlled Zone not among Zones, remaining items for this object not processed.");
                 GetZoneEquipmentDataErrorsFound = true;
                 continue;
             } else {
                 //    Zone(ZoneEquipConfig(ControlledZoneNum)%ActualZoneNum)%ZoneEquipConfigNum = ControlledZoneNum
                 if (Zone(ControlledZoneNum).IsControlled) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\"");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\"");
                     ShowContinueError("..Duplicate Controlled Zone entered, only one " + CurrentModuleObject + " per zone is allowed.");
                     GetZoneEquipmentDataErrorsFound = true;
                     continue;
@@ -475,7 +475,7 @@ namespace DataZoneEquipment {
                                                                             1,
                                                                             ObjectIsNotParent); // all zone air state variables are
             if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == 0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\", invalid");
                 ShowContinueError(cAlphaFields(5) + " must be present.");
                 GetZoneEquipmentDataErrorsFound = true;
             } else {
@@ -497,7 +497,7 @@ namespace DataZoneEquipment {
             } else {
                 ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum = GetScheduleIndex(AlphArray(7));
                 if (ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(7) + " entered =" + AlphArray(7) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(7) + " entered =" + AlphArray(7) + " for " +
                                     cAlphaFields(1) + '=' + AlphArray(1));
                     GetZoneEquipmentDataErrorsFound = true;
                 }
@@ -538,7 +538,7 @@ namespace DataZoneEquipment {
                     } else if (UtilityRoutines::SameString(AlphArray(2), "SequentialUniformPLR")) {
                         thisZoneEquipList.LoadDistScheme = DataZoneEquipment::LoadDist::SequentialUniformPLRLoading;
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\", Invalid choice.");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\", Invalid choice.");
                         ShowContinueError("..." + cAlphaFields(2) + "=\"" + AlphArray(2) + "\".");
                         GetZoneEquipmentDataErrorsFound = true;
                     }
@@ -556,7 +556,7 @@ namespace DataZoneEquipment {
                         ++maxEquipCount;
                         continue;
                     }
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + thisZoneEquipList.Name +
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + thisZoneEquipList.Name +
                                      "\", truncated list at blank field; object count=" + RoundSigDigits(maxEquipCount));
                     break;
                 }
@@ -601,7 +601,7 @@ namespace DataZoneEquipment {
                     thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) = nint(NumArray(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 1));
                     if ((thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) < 0) ||
                         (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                         ShowContinueError("invalid " + cNumericFields(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 1) + "=[" +
                                           RoundSigDigits(thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum)) + "].");
                         ShowContinueError("equipment sequence must be > 0 and <= number of equipments in the list.");
@@ -613,7 +613,7 @@ namespace DataZoneEquipment {
                     thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) = nint(NumArray(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 2));
                     if ((thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) < 0) ||
                         (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                         ShowContinueError("invalid " + cNumericFields(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 2) + "=[" +
                                           RoundSigDigits(thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum)) + "].");
                         ShowContinueError("equipment sequence must be > 0 and <= number of equipments in the list.");
@@ -628,7 +628,7 @@ namespace DataZoneEquipment {
                     } else {
                         thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(AlphArray(coolingFractionArrayIdx));
                         if (thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                             ShowContinueError("invalid " + cAlphaFields(coolingFractionArrayIdx)  + "=[" + AlphArray(coolingFractionArrayIdx) + "].");
                             ShowContinueError("Schedule does not exist.");
                             GetZoneEquipmentDataErrorsFound = true;
@@ -641,7 +641,7 @@ namespace DataZoneEquipment {
                     } else {
                         thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(AlphArray(heatingFractionArrayIdx));
                         if (thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                             ShowContinueError("invalid " + cAlphaFields(heatingFractionArrayIdx)  + "=[" + AlphArray(heatingFractionArrayIdx) + "].");
                             ShowContinueError("Schedule does not exist.");
                             GetZoneEquipmentDataErrorsFound = true;
@@ -760,7 +760,7 @@ namespace DataZoneEquipment {
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = ZoneHybridEvaporativeCooler_Num;
 
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = " + thisZoneEquipList.Name);
                             ShowContinueError("..Invalid Equipment Type = " + thisZoneEquipList.EquipType(ZoneEquipTypeNum));
                             GetZoneEquipmentDataErrorsFound = true;
                         }
@@ -769,30 +769,30 @@ namespace DataZoneEquipment {
 
                 for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= thisZoneEquipList.NumOfEquipTypes; ++ZoneEquipTypeNum) {
                     if (count_eq(thisZoneEquipList.CoolingPriority, ZoneEquipTypeNum) > 1) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = " + thisZoneEquipList.Name);
                         ShowContinueError("...multiple assignments for Zone Equipment Cooling Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
                                           ", must be 1-1 correspondence between sequence assignments and number of equipments.");
                         GetZoneEquipmentDataErrorsFound = true;
                     } else if (count_eq(thisZoneEquipList.CoolingPriority, ZoneEquipTypeNum) == 0) {
-                        ShowWarningError(RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
+                        ShowWarningError(std::string{RoutineName} + CurrentModuleObject + " = " + thisZoneEquipList.Name);
                         ShowContinueError("...zero assigned to Zone Equipment Cooling Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
                                           ", apparent gap in sequence assignments in this equipment list.");
                     }
                     if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) > 1) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = " + thisZoneEquipList.Name);
                         ShowContinueError(
                             "...multiple assignments for Zone Equipment Heating or No-Load Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
                             ", must be 1-1 correspondence between sequence assignments and number of equipments.");
                         GetZoneEquipmentDataErrorsFound = true;
                     } else if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) == 0) {
-                        ShowWarningError(RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
+                        ShowWarningError(std::string{RoutineName} + CurrentModuleObject + " = " + thisZoneEquipList.Name);
                         ShowContinueError("...zero assigned to Zone Equipment Heating or No-Load Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
                                           ", apparent gap in sequence assignments in this equipment list.");
                     }
                 }
 
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + " not found = " + ZoneEquipConfig(ControlledZoneNum).EquipListName);
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " not found = " + ZoneEquipConfig(ControlledZoneNum).EquipListName);
                 ShowContinueError("In ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 GetZoneEquipmentDataErrorsFound = true;
             }
@@ -962,7 +962,7 @@ namespace DataZoneEquipment {
             }
         }
         if (GetZoneEquipmentDataErrorsFound) {
-            ShowWarningError(RoutineName + CurrentModuleObject + ", duplicate items NOT CHECKED due to previous errors.");
+            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + ", duplicate items NOT CHECKED due to previous errors.");
             overallEquipCount = 0;
         }
         if (overallEquipCount > 0) {
@@ -983,7 +983,7 @@ namespace DataZoneEquipment {
                         ZoneEquipListAcct(Loop1).ObjectName != ZoneEquipListAcct(Loop2).ObjectName)
                         continue;
                     // Duplicated -- not allowed
-                    ShowSevereError(RoutineName + CurrentModuleObject + ", duplicate items in ZoneHVAC:EquipmentList.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ", duplicate items in ZoneHVAC:EquipmentList.");
                     ShowContinueError("Equipment: Type=" + ZoneEquipListAcct(Loop1).ObjectType + ", Name=" + ZoneEquipListAcct(Loop1).ObjectName);
                     ShowContinueError("Found on List=\"" + ZoneEquipList(ZoneEquipListAcct(Loop1).OnListNum).Name + "\".");
                     ShowContinueError("Equipment Duplicated on List=\"" + ZoneEquipList(ZoneEquipListAcct(Loop2).OnListNum).Name + "\".");
@@ -1055,7 +1055,7 @@ namespace DataZoneEquipment {
                     if (AlphArray(Counter) == "AIRLOOPHVAC:SUPPLYPLENUM") SupplyAirPath(PathNum).ComponentType_Num(CompNum) = ZoneSupplyPlenum_Type;
 
                 } else {
-                    ShowSevereError(RoutineName + cAlphaFields(1) + "=\"" + SupplyAirPath(PathNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + cAlphaFields(1) + "=\"" + SupplyAirPath(PathNum).Name + "\"");
                     ShowContinueError("Unhandled component type =\"" + AlphArray(Counter) + "\".");
                     ShowContinueError("Must be \"AirLoopHVAC:ZoneSplitter\" or \"AirLoopHVAC:SupplyPlenum\"");
                     GetZoneEquipmentDataErrorsFound = true;
@@ -1120,7 +1120,7 @@ namespace DataZoneEquipment {
                     if (AlphArray(Counter) == "AIRLOOPHVAC:ZONEMIXER") ReturnAirPath(PathNum).ComponentType_Num(CompNum) = ZoneMixer_Type;
                     if (AlphArray(Counter) == "AIRLOOPHVAC:RETURNPLENUM") ReturnAirPath(PathNum).ComponentType_Num(CompNum) = ZoneReturnPlenum_Type;
                 } else {
-                    ShowSevereError(RoutineName + cAlphaFields(1) + "=\"" + ReturnAirPath(PathNum).Name + "\"");
+                    ShowSevereError(std::string{RoutineName} + cAlphaFields(1) + "=\"" + ReturnAirPath(PathNum).Name + "\"");
                     ShowContinueError("Unhandled component type =\"" + AlphArray(Counter) + "\".");
                     ShowContinueError("Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"");
                     GetZoneEquipmentDataErrorsFound = true;
@@ -1142,7 +1142,7 @@ namespace DataZoneEquipment {
         SetupZoneEquipmentForConvectionFlowRegime();
 
         if (GetZoneEquipmentDataErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting Zone Equipment input.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting Zone Equipment input.");
         }
     }
 

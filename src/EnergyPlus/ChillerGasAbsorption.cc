@@ -651,7 +651,7 @@ namespace ChillerGasAbsorption {
 
         // Uses the status flags to trigger initializations.
 
-        std::string const RoutineName("InitGasAbsorber");
+        static constexpr std::string_view RoutineName("InitGasAbsorber");
 
         int CondInletNode;  // node number of water inlet node to the condenser
         int CondOutletNode; // node number of water outlet node from the condenser
@@ -913,7 +913,7 @@ namespace ChillerGasAbsorption {
         // the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-        std::string const RoutineName("SizeGasAbsorber");
+        static constexpr std::string_view RoutineName("SizeGasAbsorber");
 
         bool ErrorsFound; // If errors detected in input
         std::string equipName;
@@ -1270,7 +1270,7 @@ namespace ChillerGasAbsorption {
         // FlowLock = 0  if mass flow rates may be changed by loop components
         // FlowLock = 1  if mass flow rates may not be changed by loop components
 
-        std::string const RoutineName("CalcGasAbsorberChillerModel");
+        static constexpr std::string_view RoutineName("CalcGasAbsorberChillerModel");
 
         // Local copies of GasAbsorberSpecs Type
         // all variables that are local copies of data structure
@@ -1645,7 +1645,7 @@ namespace ChillerGasAbsorption {
         //                 below Setpoint
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        std::string const RoutineName("CalcGasAbsorberHeaterModel");
+        static constexpr std::string_view RoutineName("CalcGasAbsorberHeaterModel");
 
         // Local copies of GasAbsorberSpecs Type
         // all variables that are local copies of data structure

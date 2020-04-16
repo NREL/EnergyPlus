@@ -232,7 +232,7 @@ namespace HVACDuct {
         // No output variables
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + " Errors found in input");
+            ShowFatalError(std::string{RoutineName} + " Errors found in input");
         }
     }
 

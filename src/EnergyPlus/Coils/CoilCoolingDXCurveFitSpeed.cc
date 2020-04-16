@@ -399,7 +399,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
         A0 = -std::log(RatedCBF) * RatedAirMassFlowRate;
     } else {
         // This is bad - results in CBF = 1.0 which results in divide by zero below: hADP = inletState.h - hDelta / (1.0 - CBF)
-        ShowFatalError(RoutineName + "Rated CBF=" + General::RoundSigDigits(RatedCBF, 6) + " is <= 0.0 for " + object_name + "=" + name);
+        ShowFatalError(std::string{RoutineName} + "Rated CBF=" + General::RoundSigDigits(RatedCBF, 6) + " is <= 0.0 for " + object_name + "=" + name);
         A0 = 0.0;
     }
     Real64 ADiff = -A0 / AirMassFlow;
@@ -535,7 +535,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
             outtdb = outletAirTempSat + 0.005;
             outw = Psychrometrics::PsyWFnTdbH(outtdb, outh, RoutineName);
             Real64 adjustedSHR = (Psychrometrics::PsyHFnTdbW(tdb, outw) - outh) / deltaH;
-            ShowWarningError(RoutineName + object_name + " \"" + name +
+            ShowWarningError(std::string{RoutineName} + object_name + " \"" + name +
                              "\", SHR adjusted to achieve valid outlet air properties and the simulation continues.");
             ShowContinueError("Initial SHR = " + General::RoundSigDigits(this->grossRatedSHR, 5));
             ShowContinueError("Adjusted SHR = " + General::RoundSigDigits(adjustedSHR, 5));
@@ -558,7 +558,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
     if (deltaT > 0.0) slopeAtConds = deltaHumRat / deltaT;
     if (slopeAtConds <= 0.0) {
         // TODO: old dx coil protects against slopeAtConds < 0, but no = 0 - not sure why, 'cause that'll cause divide by zero
-        ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation invalid input conditions.");
+        ShowSevereError(std::string{RoutineName} + object_name + " \"" + name + "\" -- coil bypass factor calculation invalid input conditions.");
         ShowContinueError("deltaT = " + General::RoundSigDigits(deltaT, 3) +
             " and deltaHumRat = " + General::RoundSigDigits(deltaHumRat, 3));
         ShowFatalError("Errors found in calculating coil bypass factors");
@@ -592,7 +592,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
     calcCBF = min(1.0, (outh - adp_h) / (h - adp_h));
 
     if (iter > maxIter) {
-        ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation did not converge after max iterations.");
+        ShowSevereError(std::string{RoutineName} + object_name + " \"" + name + "\" -- coil bypass factor calculation did not converge after max iterations.");
         ShowContinueError("The RatedSHR of [" + General::RoundSigDigits(this->grossRatedSHR, 3) +
                           "], entered by the user or autosized (see *.eio file),");
         ShowContinueError("may be causing this. The line defined by the coil rated inlet air conditions");
@@ -607,13 +607,13 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
         cbfErrors = true; // Didn't converge within MaxIter iterations
     }
     if (calcCBF < 0.0) {
-        ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- negative coil bypass factor calculated.");
+        ShowSevereError(std::string{RoutineName} + object_name + " \"" + name + "\" -- negative coil bypass factor calculated.");
         ShowContinueErrorTimeStamp("");
         cbfErrors = true; // Negative CBF not valid
     }
     // Show fatal error for specific coil that caused a CBF error
     if (cbfErrors) {
-        ShowFatalError(RoutineName + object_name + " \"" + name + "\" Errors found in calculating coil bypass factors");
+        ShowFatalError(std::string{RoutineName} + object_name + " \"" + name + "\" Errors found in calculating coil bypass factors");
     }
     return calcCBF;
 }

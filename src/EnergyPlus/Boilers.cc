@@ -279,7 +279,7 @@ namespace Boilers {
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
 
                 } else {
-                    ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                    ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                     // Set to Electric to avoid errors when setting up output variables
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
@@ -290,7 +290,7 @@ namespace Boilers {
 
             Boiler(BoilerNum).NomCap = DataIPShortCuts::rNumericArgs(1);
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
                 ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(1) + " must be greater than 0.0");
@@ -302,7 +302,7 @@ namespace Boilers {
 
             Boiler(BoilerNum).Effic = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(2) == 0.0) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 3));
                 ShowSevereError("..." + DataIPShortCuts::cNumericFieldNames(2) + " must be greater than 0.0");
@@ -330,14 +330,14 @@ namespace Boilers {
                 if (CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).NumDims == 2) { // curve uses water temperature
                     if (Boiler(BoilerNum).CurveTempMode == BoilerTempModeNotSet) {                // throw error
                         if (!DataIPShortCuts::lAlphaFieldBlanks(3)) {
-                            ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                            ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                             ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
                             ShowContinueError("Boiler using curve type of " +
                                               CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).ObjectType + " must specify " +
                                               DataIPShortCuts::cAlphaFieldNames(3));
                             ShowContinueError("Available choices are EnteringBoiler or LeavingBoiler");
                         } else {
-                            ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                            ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                             ShowContinueError("Field " + DataIPShortCuts::cAlphaFieldNames(3) + " is blank");
                             ShowContinueError("Boiler using curve type of " +
                                               CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).ObjectType +
@@ -348,7 +348,7 @@ namespace Boilers {
                 }
 
             } else if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + DataIPShortCuts::cAlphaArgs(4));
                 ShowSevereError("..." + DataIPShortCuts::cAlphaFieldNames(4) + " not found.");
                 ErrorsFound = true;
@@ -400,7 +400,7 @@ namespace Boilers {
             } else if (DataIPShortCuts::cAlphaArgs(7) == "NOTMODULATED") {
                 Boiler(BoilerNum).FlowMode = NotModulated;
             } else {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
                 ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
@@ -417,7 +417,7 @@ namespace Boilers {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input.");
         }
     }
 

@@ -240,14 +240,14 @@ namespace Psychrometrics {
                                  Real64 const tdb,                            // dry bulb temperature (Celsius)
                                  Real64 const dw,                             // humidity ratio (kgWater/kgDryAir)
                                  Real64 const rhoair,                         // density of air
-                                 std::string const &CalledFrom = blank_string // routine this function was called from (error messages) !unused1208
+                                 std::string_view CalledFrom = blank_string // routine this function was called from (error messages) !unused1208
     );
 #endif
 
     inline Real64 PsyRhoAirFnPbTdbW(Real64 const pb,                             // barometric pressure (Pascals)
                                     Real64 const tdb,                            // dry bulb temperature (Celsius)
                                     Real64 const dw,                             // humidity ratio (kgWater/kgDryAir)
-                                    std::string const &CalledFrom = blank_string // routine this function was called from (error messages) !unused1208
+                                    std::string_view CalledFrom = blank_string // routine this function was called from (error messages) !unused1208
     )
     {
         // FUNCTION INFORMATION:
@@ -522,13 +522,13 @@ namespace Psychrometrics {
     void PsyRhFnTdbRhovLBnd0C_error(Real64 const Tdb,             // dry-bulb temperature {C}
                                     Real64 const Rhovapor,        // vapor density in air {kg/m3}
                                     Real64 const RHValue,         // relative humidity value (0.0-1.0)
-                                    std::string const &CalledFrom // routine this function was called from (error messages)
+                                    std::string_view CalledFrom // routine this function was called from (error messages)
     );
 #endif
 
     inline Real64 PsyRhFnTdbRhovLBnd0C(Real64 const Tdb,                            // dry-bulb temperature {C}
                                        Real64 const Rhovapor,                       // vapor density in air {kg/m3}
-                                       std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                                       std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:
@@ -573,13 +573,13 @@ namespace Psychrometrics {
     Real64 PsyTwbFnTdbWPb(Real64 const Tdb,                            // dry-bulb temperature {C}
                           Real64 const W,                              // humidity ratio
                           Real64 const Pb,                             // barometric pressure {Pascals}
-                          std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                          std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     );
 
     Real64 PsyTwbFnTdbWPb_raw(Real64 const TDB,                            // dry-bulb temperature {C}
                               Real64 const dW,                             // humidity ratio
                               Real64 const Patm,                           // barometric pressure {Pascals}
-                              std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                              std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     );
 
 #else
@@ -587,7 +587,7 @@ namespace Psychrometrics {
     Real64 PsyTwbFnTdbWPb(Real64 const TDB,                            // dry-bulb temperature {C}
                           Real64 const dW,                             // humidity ratio
                           Real64 const Patm,                           // barometric pressure {Pascals}
-                          std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                          std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     );
 
 #endif
@@ -597,14 +597,14 @@ namespace Psychrometrics {
                             Real64 const w,               // humidity ratio
                             Real64 const PB,              // barometric pressure {Pascals}
                             Real64 const V,               // specific volume {m3/kg}
-                            std::string const &CalledFrom // routine this function was called from (error messages)
+                            std::string_view CalledFrom // routine this function was called from (error messages)
     );
 #endif
 
     inline Real64 PsyVFnTdbWPb(Real64 const TDB,                            // dry-bulb temperature {C}
                                Real64 const dW,                             // humidity ratio
                                Real64 const PB,                             // barometric pressure {Pascals}
-                               std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                               std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:
@@ -642,13 +642,13 @@ namespace Psychrometrics {
     void PsyWFnTdbH_error(Real64 const TDB,             // dry-bulb temperature {C}
                           Real64 const H,               // enthalpy {J/kg}
                           Real64 const W,               // humidity ratio
-                          std::string const &CalledFrom // routine this function was called from (error messages)
+                          std::string_view CalledFrom // routine this function was called from (error messages)
     );
 #endif
 
     inline Real64 PsyWFnTdbH(Real64 const TDB,                             // dry-bulb temperature {C}
                              Real64 const H,                               // enthalpy {J/kg}
-                             std::string const &CalledFrom = blank_string, // routine this function was called from (error messages)
+                             std::string_view CalledFrom = blank_string, // routine this function was called from (error messages)
                              bool const SuppressWarnings = false           // if calling function is calculating an intermediate state
     )
     {
@@ -685,11 +685,11 @@ namespace Psychrometrics {
 #ifdef EP_cache_PsyPsatFnTemp
 
     Real64 PsyPsatFnTemp_raw(Real64 const T,                              // dry-bulb temperature {C}
-                             std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                             std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     );
 
     inline Real64 PsyPsatFnTemp(Real64 const T,                              // dry-bulb temperature {C}
-                                std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                                std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:
@@ -734,7 +734,7 @@ namespace Psychrometrics {
 #else
 
     Real64 PsyPsatFnTemp(Real64 const T,                              // dry-bulb temperature {C}
-                         std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                         std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     );
 
 #endif
@@ -742,11 +742,11 @@ namespace Psychrometrics {
 #ifdef EP_cache_PsyTsatFnHPb
     Real64 PsyTsatFnHPb_raw(Real64 const H,                              // enthalpy {J/kg}
                             Real64 const PB,                             // barometric pressure {Pascals}
-                            std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                            std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     );
     inline Real64 PsyTsatFnHPb(Real64 const H,
                                Real64 const Pb,                             // barometric pressure {Pascals}
-                               std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                               std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
 
@@ -789,14 +789,14 @@ namespace Psychrometrics {
 
     Real64 PsyTsatFnHPb(Real64 const H,                              // enthalpy {J/kg}
                         Real64 const PB,                             // barometric pressure {Pascals}
-                        std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                        std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     );
 
 #endif
 
     inline Real64 PsyRhovFnTdbRh(Real64 const Tdb,                            // dry-bulb temperature {C}
                                  Real64 const RH,                             // relative humidity value (0.0-1.0)
-                                 std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                                 std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:
@@ -826,13 +826,13 @@ namespace Psychrometrics {
     void PsyRhFnTdbRhov_error(Real64 const Tdb,                            // dry-bulb temperature {C}
                               Real64 const Rhovapor,                       // vapor density in air {kg/m3}
                               Real64 const RHValue,                        // relative humidity
-                              std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                              std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     );
 #endif
 
     inline Real64 PsyRhFnTdbRhov(Real64 const Tdb,                            // dry-bulb temperature {C}
                                  Real64 const Rhovapor,                       // vapor density in air {kg/m3}
-                                 std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                                 std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:
@@ -880,14 +880,14 @@ namespace Psychrometrics {
     void PsyRhFnTdbWPb_error(Real64 const TDB,             // dry-bulb temperature {C}
                              Real64 const W,               // humidity ratio
                              Real64 const RHValue,         // relative humidity (0.0-1.0)
-                             std::string const &CalledFrom // routine this function was called from (error messages)
+                             std::string_view CalledFrom // routine this function was called from (error messages)
     );
 #endif
 
     inline Real64 PsyRhFnTdbWPb(Real64 const TDB,                            // dry-bulb temperature {C}
                                 Real64 const dW,                             // humidity ratio
                                 Real64 const PB,                             // barometric pressure {Pascals}
-                                std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                                std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:
@@ -937,13 +937,13 @@ namespace Psychrometrics {
                            Real64 const PB,              // barometric pressure {Pascals}
                            Real64 const W,               // humidity ratio
                            Real64 const DeltaT,          // Reduced temperature difference of dew point
-                           std::string const &CalledFrom // routine this function was called from (error messages)
+                           std::string_view CalledFrom // routine this function was called from (error messages)
     );
 #endif
 
     inline Real64 PsyWFnTdpPb(Real64 const TDP,                            // dew-point temperature {C}
                               Real64 const PB,                             // barometric pressure {Pascals}
-                              std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                              std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:
@@ -996,14 +996,14 @@ namespace Psychrometrics {
                              Real64 const RH,              // relative humidity value (0.0-1.0)
                              Real64 const PB,              // barometric pressure {Pascals}
                              Real64 const W,               // humidity ratio
-                             std::string const &CalledFrom // routine this function was called from (error messages)
+                             std::string_view CalledFrom // routine this function was called from (error messages)
     );
 #endif
 
     inline Real64 PsyWFnTdbRhPb(Real64 const TDB,                            // dry-bulb temperature {C}
                                 Real64 const RH,                             // relative humidity value (0.0-1.0)
                                 Real64 const PB,                             // barometric pressure {Pascals}
-                                std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                                std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:
@@ -1050,14 +1050,14 @@ namespace Psychrometrics {
     void PsyWFnTdbTwbPb_temperature_error(Real64 const TDB,             // dry-bulb temperature {C}
                                           Real64 const TWB,             // wet-bulb temperature {C}
                                           Real64 const PB,              // barometric pressure {Pascals}
-                                          std::string const &CalledFrom // routine this function was called from (error messages)
+                                          std::string_view CalledFrom // routine this function was called from (error messages)
     );
 
     void PsyWFnTdbTwbPb_humidity_error(Real64 const TDB,             // dry-bulb temperature {C}
                                        Real64 const TWB,             // wet-bulb temperature {C}
                                        Real64 const PB,              // barometric pressure {Pascals}
                                        Real64 const W,               // humidity ratio
-                                       std::string const &CalledFrom // routine this function was called from (error messages)
+                                       std::string_view CalledFrom // routine this function was called from (error messages)
     );
 
 #endif
@@ -1065,7 +1065,7 @@ namespace Psychrometrics {
     inline Real64 PsyWFnTdbTwbPb(Real64 const TDB,                            // dry-bulb temperature {C}
                                  Real64 const TWBin,                          // wet-bulb temperature {C}
                                  Real64 const PB,                             // barometric pressure {Pascals}
-                                 std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                                 std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:
@@ -1117,7 +1117,7 @@ namespace Psychrometrics {
     inline Real64 PsyHFnTdbRhPb(Real64 const TDB,                            // dry-bulb temperature {C}
                                 Real64 const RH,                             // relative humidity value (0.0 - 1.0)
                                 Real64 const PB,                             // barometric pressure (N/M**2) {Pascals}
-                                std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                                std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:
@@ -1142,11 +1142,11 @@ namespace Psychrometrics {
 #ifdef EP_cache_PsyTsatFnPb
 
     Real64 PsyTsatFnPb_raw(Real64 const Press,                          // barometric pressure {Pascals}
-                           std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                           std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     );
 
     inline Real64 PsyTsatFnPb(Real64 const Press,                          // barometric pressure {Pascals}
-                              std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                              std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
 
@@ -1166,13 +1166,13 @@ namespace Psychrometrics {
 
 #else
     Real64 PsyTsatFnPb(Real64 const Press,                          // barometric pressure {Pascals}
-                       std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                       std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     );
 #endif
 
     inline Real64 PsyTdpFnWPb(Real64 const W,                              // humidity ratio
                               Real64 const PB,                             // barometric pressure (N/M**2) {Pascals}
-                              std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                              std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:
@@ -1201,14 +1201,14 @@ namespace Psychrometrics {
                                 Real64 const PB,              // barometric pressure (N/M**2) {Pascals}
                                 Real64 const W,               // humidity ratio
                                 Real64 const TDP,             // dew-point temperature {C}
-                                std::string const &CalledFrom // routine this function was called from (error messages)
+                                std::string_view CalledFrom // routine this function was called from (error messages)
     );
 #endif
 
     inline Real64 PsyTdpFnTdbTwbPb(Real64 const TDB,                            // dry-bulb temperature {C}
                                    Real64 const TWB,                            // wet-bulb temperature {C}
                                    Real64 const PB,                             // barometric pressure (N/M**2) {Pascals}
-                                   std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+                                   std::string_view CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
         // FUNCTION INFORMATION:

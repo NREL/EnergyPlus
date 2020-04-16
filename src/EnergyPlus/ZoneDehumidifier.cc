@@ -390,7 +390,7 @@ namespace ZoneDehumidifier {
             ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex = GetCurveIndex(Alphas(5)); // Convert curve name to index number
             if (ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex == 0) {
                 if (lAlphaBlanks(5)) {
-                    ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\" is required, missing for " +
+                    ShowSevereError(std::string{RoutineName} + ':' + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\" is required, missing for " +
                                     cAlphaFields(1) + " = " + ZoneDehumid(ZoneDehumidIndex).Name);
                 } else {
                     ShowSevereError(cAlphaFields(5) + " not found = " + Alphas(5));
@@ -420,7 +420,7 @@ namespace ZoneDehumidifier {
             ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex = GetCurveIndex(Alphas(6)); // convert curve name to number
             if (ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex == 0) {
                 if (lAlphaBlanks(6)) {
-                    ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields(6) + "\" is required, missing for " +
+                    ShowSevereError(std::string{RoutineName} + ':' + CurrentModuleObject + "=\"" + cAlphaFields(6) + "\" is required, missing for " +
                                     cAlphaFields(1) + " = " + ZoneDehumid(ZoneDehumidIndex).Name);
                 } else {
                     ShowSevereError(cAlphaFields(6) + " not found = " + Alphas(6));
@@ -450,7 +450,7 @@ namespace ZoneDehumidifier {
             ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex = GetCurveIndex(Alphas(7)); // convert curve name to number
             if (ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex == 0) {
                 if (lAlphaBlanks(7)) {
-                    ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields(7) + "\" is required, missing for " +
+                    ShowSevereError(std::string{RoutineName} + ':' + CurrentModuleObject + "=\"" + cAlphaFields(7) + "\" is required, missing for " +
                                     cAlphaFields(1) + " = " + ZoneDehumid(ZoneDehumidIndex).Name);
                 } else {
                     ShowSevereError(cAlphaFields(7) + " not found = " + Alphas(7));
@@ -514,7 +514,7 @@ namespace ZoneDehumidifier {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + ':' + CurrentModuleObject + ": Errors found in input.");
+            ShowFatalError(std::string{RoutineName} + ':' + CurrentModuleObject + ": Errors found in input.");
         }
 
         for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex) {

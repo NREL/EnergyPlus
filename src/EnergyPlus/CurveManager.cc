@@ -60,6 +60,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -2622,7 +2623,7 @@ namespace CurveManager {
 
     bool CheckCurveDims(int const CurveIndex,
                         std::vector<int> validDims,
-                        std::string routineName,
+                        std::string_view routineName,
                         std::string objectType,
                         std::string objectName,
                         std::string curveFieldText)
@@ -2634,7 +2635,7 @@ namespace CurveManager {
             return false;
         } else {
             // Not compatible
-            ShowSevereError(routineName + objectType + "=\"" + objectName + "\"");
+            ShowSevereError(format("{}{}=\"{}\"", routineName, objectType, objectName));
             ShowContinueError("...Invalid curve for " + curveFieldText + ".");
             std::string validString = std::to_string(validDims[0]);
             for (std::size_t i = 1; i < validDims.size(); i++) {

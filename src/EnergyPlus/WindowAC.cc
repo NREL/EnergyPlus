@@ -713,7 +713,7 @@ namespace WindowAC {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition causes termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition causes termination.");
         }
 
         for (WindACNum = 1; WindACNum <= NumWindAC; ++WindACNum) {

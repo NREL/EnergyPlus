@@ -702,7 +702,7 @@ namespace DXCoils {
                        Real64 const TotCap,              // coil total capacity [W]
                        Real64 const AirMassFlow,         // coil air mass flow rate [kg/s]
                        Real64 const InitialSHR,          // coil sensible heat ratio []
-                       std::string const &CallingRoutine // function name calling this routine
+                       std::string_view CallingRoutine // function name calling this routine
     );
 
     Real64 CalcEffectiveSHR(int const DXCoilNum,                  // Index number for cooling coil

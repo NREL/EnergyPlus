@@ -581,13 +581,13 @@ namespace SimAirServingZones {
             PrimaryAirSystem(AirSysNum).Name = Alphas(1);
             AirToZoneNodeInfo(AirSysNum).AirLoopName = Alphas(1);
             if (NumAlphas < 9) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", insufficient information.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", insufficient information.");
                 ShowContinueError("...Have supplied less than 9 alpha fields.");
                 ErrorsFound = true;
                 continue;
             }
             if (NumNumbers < 1) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", insufficient information.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", insufficient information.");
                 ShowContinueError("...Have supplied less than 1 numeric field.");
                 ErrorsFound = true;
                 continue;
@@ -621,7 +621,7 @@ namespace SimAirServingZones {
                 TestUniqueNodes(TestUniqueNodesNum).FieldName = cAlphaFields(6);
                 TestUniqueNodes(TestUniqueNodesNum).NodeNameUsed = true;
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name.");
                 ShowContinueError("...used for " + cAlphaFields(6) + "=\"" + Alphas(6) + "\"");
                 ShowContinueError("...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes(test).AirLoopName + "\" for " +
                                   TestUniqueNodes(test).FieldName);
@@ -636,7 +636,7 @@ namespace SimAirServingZones {
                     TestUniqueNodes(TestUniqueNodesNum).FieldName = cAlphaFields(7);
                     TestUniqueNodes(TestUniqueNodesNum).NodeNameUsed = true;
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name.");
                     ShowContinueError("...used for " + cAlphaFields(7) + "=\"" + Alphas(7) + "\"");
                     ShowContinueError("...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes(test).AirLoopName + "\" for " +
                                       TestUniqueNodes(test).FieldName);
@@ -651,7 +651,7 @@ namespace SimAirServingZones {
                 TestUniqueNodes(TestUniqueNodesNum).FieldName = cAlphaFields(8);
                 TestUniqueNodes(TestUniqueNodesNum).NodeNameUsed = true;
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name/list.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name/list.");
                 ShowContinueError("...used for " + cAlphaFields(8) + "=\"" + Alphas(8) + "\"");
                 ShowContinueError("...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes(test).AirLoopName + "\" for " +
                                   TestUniqueNodes(test).FieldName);
@@ -665,7 +665,7 @@ namespace SimAirServingZones {
                 TestUniqueNodes(TestUniqueNodesNum).FieldName = cAlphaFields(9);
                 TestUniqueNodes(TestUniqueNodesNum).NodeNameUsed = true;
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name/list.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate node name/list.");
                 ShowContinueError("...used for " + cAlphaFields(9) + "=\"" + Alphas(9) + "\"");
                 ShowContinueError("...first used in " + CurrentModuleObject + "=\"" + TestUniqueNodes(test).AirLoopName + "\" for " +
                                   TestUniqueNodes(test).FieldName);
@@ -690,7 +690,7 @@ namespace SimAirServingZones {
                 }
             }
             if ((test == 0) && (AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0) && !lAlphaBlanks(7)) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid.");
                 ShowContinueError(cAlphaFields(7) + " (Return Air Path or ZoneHVAC:EquipmentConnections) not valid = \"" + Alphas(7) + "\".");
                 ErrorsFound = true;
             }
@@ -715,12 +715,12 @@ namespace SimAirServingZones {
             }
             // Allow at most 3 supply nodes (for a 3 deck system)
             if (NumNodes > 3) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", too many nodes.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", too many nodes.");
                 ShowContinueError("Only 1st 3 Nodes will be used from " + cAlphaFields(8) + "=\"" + Alphas(8) + "\".");
                 ErrorsFound = true;
             }
             if (NumNodes == 0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", too few nodes.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", too few nodes.");
                 ShowContinueError("There must be at least 1 supply node in the system.");
                 ErrorsFound = true;
             }
@@ -753,7 +753,7 @@ namespace SimAirServingZones {
                 ErrorsFound = true;
             }
             if (NumNodes != AirToZoneNodeInfo(AirSysNum).NumSupplyNodes) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", node mismatch.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", node mismatch.");
                 ShowContinueError("...number of air system exit nodes [" + RoundSigDigits(NumNodes) +
                                   "] must match number of zone equip inlet nodes [" + RoundSigDigits(AirToZoneNodeInfo(AirSysNum).NumSupplyNodes) +
                                   "].");
@@ -771,7 +771,7 @@ namespace SimAirServingZones {
             ConnectorListName = Alphas(5);
             PrimaryAirSystem(AirSysNum).NumBranches = NumBranchesInBranchList(BranchListName);
             if (PrimaryAirSystem(AirSysNum).NumBranches == 0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", insufficient information.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", insufficient information.");
                 ShowContinueError("...there must be at least 1 branch specified.");
                 ErrorsFound = true;
             }
@@ -785,7 +785,7 @@ namespace SimAirServingZones {
                 PrimaryAirSystem(AirSysNum).Branch(BranchNum).Name = BranchNames(BranchNum);
                 NumCompsOnBranch = NumCompsInBranch(BranchNames(BranchNum));
                 if (NumCompsOnBranch <= 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", insufficient information.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", insufficient information.");
                     ShowContinueError("...Branch=\"" + BranchNames(BranchNum) + "\", no components on branch.");
                     ErrorsFound = true;
                     continue;
@@ -842,7 +842,7 @@ namespace SimAirServingZones {
                     // Check for Outside Air system; if there, store its connection node numbers to primary air system
                     if (UtilityRoutines::SameString(CompTypes(CompNum), "AirLoopHVAC:OutdoorAirSystem")) {
                         if (PrimaryAirSystem(AirSysNum).OASysExists) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name +
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name +
                                             "\", too many outdoor air systems.");
                             ShowContinueError("Only one AirLoopHVAC:OutdoorAirSystem allowed.");
                             ErrorsFound = true;
@@ -865,12 +865,12 @@ namespace SimAirServingZones {
                             if (OAMixNum > 0) {
                                 PrimaryAirSystem(AirSysNum).OAMixOAInNodeNum = GetOAMixerInletNodeNumber(OAMixNum);
                             } else {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", item not found.");
+                                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", item not found.");
                                 ShowContinueError("OutdoorAir:Mixer for AirLoopHVAC:OutdoorAirSystem=\"" + CompNames(CompNum) + "\" not found.");
                                 ErrorsFound = true;
                             }
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", item not found.");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", item not found.");
                             ShowContinueError("AirLoopHVAC:OutdoorAirSystem=\"" + CompNames(CompNum) + "\" not found.");
                             ShowContinueError("  referenced in Branch=\"" + PrimaryAirSystem(AirSysNum).Branch(BranchNum).Name + "\".");
                             ErrorsFound = true;
@@ -935,7 +935,7 @@ namespace SimAirServingZones {
             //  Check for errors
             for (OutBranchNum = 1; OutBranchNum <= PrimaryAirSystem(AirSysNum).NumOutletBranches; ++OutBranchNum) {
                 if (PrimaryAirSystem(AirSysNum).OutletBranchNum(OutBranchNum) != 0) continue;
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", branch in error.");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", branch in error.");
                 ShowContinueError("Probable missing or misspelled node referenced in the branch(es):");
                 for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirSysNum).NumBranches; ++BranchNum) {
                     ShowContinueError("Possible Error in Branch Object=\"" + PrimaryAirSystem(AirSysNum).Branch(BranchNum).Name + "\".");
@@ -954,7 +954,7 @@ namespace SimAirServingZones {
                     }
                 }
                 if (PrimaryAirSystem(AirSysNum).InletBranchNum(InBranchNum) == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", connection to zone.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", connection to zone.");
                     ShowContinueError("No Connection found for Return Air from Zone");
                     ShowContinueError("Expected node name =\"" + NodeID(AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum(InBranchNum)) + "\".");
                     ErrorsFound = true;
@@ -977,7 +977,7 @@ namespace SimAirServingZones {
                         MixerExists = true;
                     }
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", connector list object.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", connector list object.");
                     ShowContinueError("ConnectorList object=\"" + ConnectorListName + "\" not found in input.");
                 }
                 errFlag = false;
@@ -1130,7 +1130,7 @@ namespace SimAirServingZones {
                         IsNotOK = false;
                         ValidateComponent(ControllerType, ControllerName, IsNotOK, CurrentModuleObject);
                         if (IsNotOK) {
-                            ShowContinueError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name +
+                            ShowContinueError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name +
                                               "\", for ControllerList=\"" + ControllerListName + "\".");
                             ErrorsFound = true;
                         }
@@ -1138,7 +1138,7 @@ namespace SimAirServingZones {
                         PrimaryAirSystem(AirSysNum).CanBeLockedOutByEcono(ControllerNum) = false;
                     } // End of ControllerListNum Loop
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", controller list object.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", controller list object.");
                     ShowContinueError("ControllerList object=\"" + ControllerListName + "\" not found in input.");
                     ErrorsFound = true;
                 }
@@ -1216,7 +1216,7 @@ namespace SimAirServingZones {
             }
             if (NumControllers + NumOASysSimpControllers == 0) {
                 if (!PackagedUnit(AirSysNum)) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\" has no Controllers.");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\" has no Controllers.");
                 }
                 PrimaryAirSystem(AirSysNum).NumControllers = 0;
                 PrimaryAirSystem(AirSysNum).ControllerName.allocate(0);
@@ -1375,7 +1375,7 @@ namespace SimAirServingZones {
                                    componentType == "COIL:HEATING:DX:SINGLESPEED" ||
                                    componentType == "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ||
                                    componentType == "COIL:COOLING:DX:MULTISPEED" || componentType == "COIL:HEATING:DX:MULTISPEED") {
-                            ShowSevereError(RoutineName + CurrentModuleObject + " = \"" + PrimaryAirSystem(AirSysNum).Name + "\".");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = \"" + PrimaryAirSystem(AirSysNum).Name + "\".");
                             ShowContinueError("..Invalid Air Loop Component Type = \"" +
                                               PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf + "\".");
                             ShowContinueError("..Air Loop Component Name = \"" + PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name +
@@ -1386,7 +1386,7 @@ namespace SimAirServingZones {
                             ErrorsFound = true;
 
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + " = \"" + PrimaryAirSystem(AirSysNum).Name + "\".");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = \"" + PrimaryAirSystem(AirSysNum).Name + "\".");
                             ShowContinueError("..Invalid Air Loop Component Type = \"" +
                                               PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf + "\".");
                             ShowContinueError("..Air Loop Component Name = \"" + PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name +
@@ -1412,7 +1412,7 @@ namespace SimAirServingZones {
                         CheckCoilWaterInletNode(WaterCoilNodeNum, NodeNotFound);
                         if (NodeNotFound) {
                             ErrorsFound = true;
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" +
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" +
                                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name + "\", invalid actuator.");
                             ShowContinueError("...this coil requires a water coil controller and the inlet node of a water coil must also be an "
                                               "actuator node of a water coil controller.");
@@ -1432,7 +1432,7 @@ namespace SimAirServingZones {
                     CheckCoilWaterInletNode(WaterCoilNodeNum, NodeNotFound);
                     if (NodeNotFound) {
                         ErrorsFound = true;
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + GetOACompName(OASysNum, OACompNum) + "\", invalid actuator.");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + GetOACompName(OASysNum, OACompNum) + "\", invalid actuator.");
                         ShowContinueError("...this coil requires a water coil controller and the inlet node of a water coil must also be an actuator "
                                           "node of a water coil controller.");
                     }
@@ -1441,7 +1441,7 @@ namespace SimAirServingZones {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found retrieving input for " + CurrentModuleObject + '.');
+            ShowFatalError(std::string{RoutineName} + "Errors found retrieving input for " + CurrentModuleObject + '.');
         }
 
         for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {

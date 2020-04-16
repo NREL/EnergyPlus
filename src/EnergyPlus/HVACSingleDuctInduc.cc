@@ -354,7 +354,7 @@ namespace HVACSingleDuctInduc {
             } else {
                 IndUnit(IUNum).SchedPtr = GetScheduleIndex(Alphas(2)); // convert schedule name to pointer
                 if (IndUnit(IUNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
@@ -437,7 +437,7 @@ namespace HVACSingleDuctInduc {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (IndUnit(IUNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for Unit = [" + IndUnit(IUNum).UnitType + ',' +
+                ShowSevereError(std::string{RoutineName} + "No matching Air Distribution Unit, for Unit = [" + IndUnit(IUNum).UnitType + ',' +
                                 IndUnit(IUNum).Name + "].");
                 ShowContinueError("...should have outlet node=" + NodeID(IndUnit(IUNum).OutAirNode));
                 ErrorsFound = true;
@@ -482,7 +482,7 @@ namespace HVACSingleDuctInduc {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input. Preceding conditions cause termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting input. Preceding conditions cause termination.");
         }
     }
 

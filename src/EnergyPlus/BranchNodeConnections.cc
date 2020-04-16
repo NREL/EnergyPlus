@@ -52,6 +52,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -117,7 +118,7 @@ namespace BranchNodeConnections {
 
         ErrorsFoundHere = false;
         if (!IsValidConnectionType(ConnectionType)) {
-            ShowSevereError(RoutineName + "Invalid ConnectionType=" + ConnectionType);
+            ShowSevereError(format("{}Invalid ConnectionType={}", RoutineName, ConnectionType));
             ShowContinueError("Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             ErrorsFoundHere = true;
         }
@@ -130,7 +131,7 @@ namespace BranchNodeConnections {
             if (!UtilityRoutines::SameString(NodeConnections(Count).ConnectionType, ConnectionType)) continue;
             if (NodeConnections(Count).FluidStream != FluidStream) continue;
             if ((NodeConnections(Count).ObjectIsParent && !IsParent) || (!NodeConnections(Count).ObjectIsParent && IsParent)) {
-                ShowSevereError(RoutineName + "Node registered for both Parent and \"not\" Parent");
+                ShowSevereError(format("{}Node registered for both Parent and \"not\" Parent", RoutineName));
                 ShowContinueError("Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
                 ErrorsFoundHere = true;
             }
@@ -168,7 +169,7 @@ namespace BranchNodeConnections {
                 Found =
                     UtilityRoutines::FindItemInList(NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, NumOfAirTerminalNodes - 1);
                 if (Found != 0) { // Nodename already used
-                    ShowSevereError(RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated.");
+                    ShowSevereError(format("{}{}=\"{}\" node name duplicated.", RoutineName, ObjectType, ObjectName));
                     ShowContinueError("NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType);
                     ShowContinueError("In Field=" + InputFieldName());
                     ShowContinueError("Already used in " + AirTerminalNodeConnections(Found).ObjectType + "=\"" +
@@ -184,7 +185,7 @@ namespace BranchNodeConnections {
                     AirTerminalNodeConnections(NumOfAirTerminalNodes).InputFieldName = InputFieldName;
                 }
             } else {
-                ShowSevereError(RoutineName + ObjectType + ", Developer Error: Input Field Name not included.");
+                ShowSevereError(format("{}{}, Developer Error: Input Field Name not included.", RoutineName, ObjectType));
                 ShowContinueError("Node names not checked for duplication.");
             }
         }
@@ -217,7 +218,7 @@ namespace BranchNodeConnections {
         static constexpr std::string_view RoutineName("ModifyNodeConnectionType: ");
 
         if (!IsValidConnectionType(ConnectionType)) {
-            ShowSevereError(RoutineName + "Invalid ConnectionType=" + ConnectionType);
+            ShowSevereError(format("{}Invalid ConnectionType={}", RoutineName, ConnectionType));
             ShowContinueError("Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             errFlag = true;
         }
@@ -236,7 +237,7 @@ namespace BranchNodeConnections {
         if (Found > 0) {
             NodeConnections(Found).ConnectionType = ConnectionType;
         } else {
-            ShowSevereError(RoutineName + "Existing node connection not found.");
+            ShowSevereError(format("{}Existing node connection not found.", RoutineName));
             ShowContinueError("Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             errFlag = true;
         }

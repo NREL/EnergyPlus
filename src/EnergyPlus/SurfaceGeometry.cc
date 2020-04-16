@@ -481,18 +481,18 @@ namespace SurfaceGeometry {
                 if (AverageHeight > 0.0) {
                     if (std::abs(AverageHeight - Zone(ZoneNum).CeilingHeight) / Zone(ZoneNum).CeilingHeight > 0.05) {
                         if (ErrCount == 1 && !DisplayExtraWarnings) {
-                            ShowWarningError(RoutineName +
+                            ShowWarningError(std::string{RoutineName} +
                                              "Entered Ceiling Height for some zone(s) significantly different from calculated Ceiling Height");
                             ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on each max iteration exceeded.");
                         }
                         if (DisplayExtraWarnings) {
-                            ShowWarningError(RoutineName + "Entered Ceiling Height for Zone=\"" + Zone(ZoneNum).Name +
+                            ShowWarningError(std::string{RoutineName} + "Entered Ceiling Height for Zone=\"" + Zone(ZoneNum).Name +
                                              "\" significantly different from calculated Ceiling Height");
                             ObjexxFCL::gio::write(String1, ValFmt) << Zone(ZoneNum).CeilingHeight;
                             strip(String1);
                             ObjexxFCL::gio::write(String2, ValFmt) << AverageHeight;
                             strip(String2);
-                            ShowContinueError(RoutineName + "Entered Ceiling Height=" + String1 + ", Calculated Ceiling Height=" + String2 +
+                            ShowContinueError(std::string{RoutineName} + "Entered Ceiling Height=" + String1 + ", Calculated Ceiling Height=" + String2 +
                                               ", entered height will be used in calculations.");
                         }
                     }
@@ -540,7 +540,7 @@ namespace SurfaceGeometry {
                 Zone(ZoneNum).Centroid.z /= TotSurfArea;
             }
             if (!nonInternalMassSurfacesPresent) {
-                ShowSevereError(RoutineName + "Zone=\"" + Zone(ZoneNum).Name +
+                ShowSevereError(std::string{RoutineName} + "Zone=\"" + Zone(ZoneNum).Name +
                                 "\" has only internal mass surfaces.  Need at least one other surface.");
                 ErrorsFound = true;
             }
@@ -990,7 +990,7 @@ namespace SurfaceGeometry {
                 if (Zone(ZoneNum).RelNorth != 0.0) RelWarning = true;
             }
             if (RelWarning && !WarningDisplayed) {
-                ShowWarningError(RoutineName +
+                ShowWarningError(std::string{RoutineName} +
                                  "World Coordinate System selected.  Any non-zero Building/Zone North Axes or non-zero Zone Origins are ignored.");
                 ShowContinueError("These may be used in daylighting reference point coordinate calculations but not in normal geometry inputs.");
                 WarningDisplayed = true;
@@ -1002,7 +1002,7 @@ namespace SurfaceGeometry {
                 if (Zone(ZoneNum).OriginZ != 0.0) RelWarning = true;
             }
             if (RelWarning && !WarningDisplayed) {
-                ShowWarningError(RoutineName +
+                ShowWarningError(std::string{RoutineName} +
                                  "World Coordinate System selected.  Any non-zero Building/Zone North Axes or non-zero Zone Origins are ignored.");
                 ShowContinueError("These may be used in daylighting reference point coordinate calculations but not in normal geometry inputs.");
                 WarningDisplayed = true;
@@ -1115,7 +1115,7 @@ namespace SurfaceGeometry {
         TotSurfaces = SurfNum + AddedSubSurfaces + NeedToAddSurfaces + NeedToAddSubSurfaces;
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors discovered, program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors discovered, program terminates.");
         }
 
         // Have to make room for added surfaces, if needed
@@ -1234,7 +1234,7 @@ namespace SurfaceGeometry {
                     // Debug        write(outputfiledebug,*) ' subsurf, extboundcondname=',TRIM(SurfaceTmp(CurNewSurf)%ExtBoundCondName)
                     // Debug        write(outputfiledebug,*) ' subsurf, basesurf=',TRIM('iz-'//SurfaceTmp(SurfNum)%BaseSurfName)
                 } else {
-                    ShowSevereError(RoutineName + "Adding unentered subsurface, could not find base surface=" + "iz-" +
+                    ShowSevereError(std::string{RoutineName} + "Adding unentered subsurface, could not find base surface=" + "iz-" +
                                     SurfaceTmp(SurfNum).BaseSurfName);
                     SurfError = true;
                 }
@@ -1259,9 +1259,9 @@ namespace SurfaceGeometry {
                     if (SurfaceTmp(SurfNum).HeatTransSurf) ++SurfaceTmp(Found).NumSubSurfaces;
                     if (SurfaceTmp(SurfNum).Class < SurfaceClass_Window || SurfaceTmp(SurfNum).Class > SurfaceClass_TDD_Diffuser) {
                         if (SurfaceTmp(SurfNum).Class == 0) {
-                            ShowSevereError(RoutineName + "Invalid SubSurface detected, Surface=" + SurfaceTmp(SurfNum).Name);
+                            ShowSevereError(std::string{RoutineName} + "Invalid SubSurface detected, Surface=" + SurfaceTmp(SurfNum).Name);
                         } else {
-                            ShowSevereError(RoutineName + "Invalid SubSurface detected, Surface=" + SurfaceTmp(SurfNum).Name +
+                            ShowSevereError(std::string{RoutineName} + "Invalid SubSurface detected, Surface=" + SurfaceTmp(SurfNum).Name +
                                             ", class=" + BaseSurfCls(SurfaceTmp(SurfNum).Class) + " invalid class for subsurface");
                             SurfError = true;
                         }
@@ -1357,17 +1357,17 @@ namespace SurfaceGeometry {
             strip(ClassMsg);
             ObjexxFCL::gio::write(Msg2, fmtLD) << TotSurfaces;
             strip(Msg2);
-            ShowSevereError(RoutineName + "Reordered # of Surfaces (" + ClassMsg + ") not = Total # of Surfaces (" + Msg2 + ')');
+            ShowSevereError(std::string{RoutineName} + "Reordered # of Surfaces (" + ClassMsg + ") not = Total # of Surfaces (" + Msg2 + ')');
             SurfError = true;
             for (Loop = 1; Loop <= TotSurfaces; ++Loop) {
                 if (SurfaceTmp(Loop).Class != SurfaceClass_Moved) {
                     if (SurfaceTmp(Loop).Class > 100) {
-                        ShowSevereError(RoutineName + "Error in Surface= \"" + SurfaceTmp(Loop).Name + "\" Class=" +
+                        ShowSevereError(std::string{RoutineName} + "Error in Surface= \"" + SurfaceTmp(Loop).Name + "\" Class=" +
                                         cSurfaceClass(SurfaceTmp(Loop).Class - 100) + " indicated Zone=\"" + SurfaceTmp(Loop).ZoneName + "\"");
                     }
                 }
             }
-            ShowWarningError(RoutineName + "Remaining surface checks will use \"reordered number of surfaces\", not number of original surfaces");
+            ShowWarningError(std::string{RoutineName} + "Remaining surface checks will use \"reordered number of surfaces\", not number of original surfaces");
         }
 
         SurfaceTmp.deallocate(); // DeAllocate the Temp Surface derived type
@@ -1417,7 +1417,7 @@ namespace SurfaceGeometry {
                         Surface(SurfNum).ExtBoundCond = Found;
                         // Check that matching surface is also "OtherZoneSurface"
                         if (Surface(Found).ExtBoundCond <= 0 && Surface(Found).ExtBoundCond != UnreconciledZoneSurface) {
-                            ShowSevereError(RoutineName + "Potential \"OtherZoneSurface\" is not matched correctly:");
+                            ShowSevereError(std::string{RoutineName} + "Potential \"OtherZoneSurface\" is not matched correctly:");
 
                             ShowContinueError("Surface=" + Surface(SurfNum).Name + ", Zone=" + Surface(SurfNum).ZoneName);
                             ShowContinueError("Nonmatched Other/InterZone Surface=" + Surface(Found).Name + ", Zone=" + Surface(Found).ZoneName);
@@ -1429,12 +1429,12 @@ namespace SurfaceGeometry {
                             if (Surface(SurfNum).Zone == Surface(Found).Zone) {
                                 ++ErrCount2;
                                 if (ErrCount2 == 1 && !DisplayExtraWarnings) {
-                                    ShowWarningError(RoutineName + "CAUTION -- Interzone surfaces are occuring in the same zone(s).");
+                                    ShowWarningError(std::string{RoutineName} + "CAUTION -- Interzone surfaces are occuring in the same zone(s).");
                                     ShowContinueError(
                                         "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual occurrences.");
                                 }
                                 if (DisplayExtraWarnings) {
-                                    ShowWarningError(RoutineName + "CAUTION -- Interzone surfaces are usually in different zones");
+                                    ShowWarningError(std::string{RoutineName} + "CAUTION -- Interzone surfaces are usually in different zones");
                                     ShowContinueError("Surface=" + Surface(SurfNum).Name + ", Zone=" + Surface(SurfNum).ZoneName);
                                     ShowContinueError("Surface=" + Surface(Found).Name + ", Zone=" + Surface(Found).ZoneName);
                                 }
@@ -1453,7 +1453,7 @@ namespace SurfaceGeometry {
                             if (TotLay != TotLayFound) { // Different number of layers
                                 // match on like Uvalues (nominal)
                                 if (std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound)) > 0.001) {
-                                    ShowSevereError(RoutineName + "Construction " + Construct(ConstrNum).Name + " of interzone surface " +
+                                    ShowSevereError(std::string{RoutineName} + "Construction " + Construct(ConstrNum).Name + " of interzone surface " +
                                                     Surface(SurfNum).Name + " does not have the same number of layers as the construction " +
                                                     Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
                                     if (!Construct(ConstrNum).ReverseConstructionNumLayersWarning ||
@@ -1470,7 +1470,7 @@ namespace SurfaceGeometry {
                                 // ok if same nominal U
                                 CheckForReversedLayers(izConstDiff, ConstrNum, ConstrNumFound, TotLay);
                                 if (izConstDiff && std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound)) > 0.001) {
-                                    ShowSevereError(RoutineName + "Construction " + Construct(ConstrNum).Name + " of interzone surface " +
+                                    ShowSevereError(std::string{RoutineName} + "Construction " + Construct(ConstrNum).Name + " of interzone surface " +
                                                     Surface(SurfNum).Name +
                                                     " does not have the same materials in the reverse order as the construction " +
                                                     Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
@@ -1483,7 +1483,7 @@ namespace SurfaceGeometry {
                                     }
                                     SurfError = true;
                                 } else if (izConstDiff) {
-                                    ShowWarningError(RoutineName + "Construction " + Construct(ConstrNum).Name + " of interzone surface " +
+                                    ShowWarningError(std::string{RoutineName} + "Construction " + Construct(ConstrNum).Name + " of interzone surface " +
                                                      Surface(SurfNum).Name +
                                                      " does not have the same materials in the reverse order as the construction " +
                                                      Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
@@ -1514,14 +1514,14 @@ namespace SurfaceGeometry {
                                     ++ErrCount4;
                                     if (ErrCount4 == 1 && !DisplayExtraWarnings) {
                                         ShowWarningError(
-                                            RoutineName +
+                                            std::string{RoutineName} +
                                             "InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:");
                                         ShowContinueError(
                                             "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual mismatches.");
                                     }
                                     if (DisplayExtraWarnings) {
                                         ShowWarningError(
-                                            RoutineName +
+                                            std::string{RoutineName} +
                                             "InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:");
 
                                         if (MultFound == 1 && MultSurfNum == 1) {
@@ -1547,7 +1547,7 @@ namespace SurfaceGeometry {
                             // Check opposites Azimuth and Tilt
                             // Tilt
                             if (std::abs(std::abs(Surface(Found).Tilt + Surface(SurfNum).Tilt) - 180.0) > 1.0) {
-                                ShowWarningError(RoutineName + "InterZone Surface Tilts do not match as expected.");
+                                ShowWarningError(std::string{RoutineName} + "InterZone Surface Tilts do not match as expected.");
                                 ShowContinueError("  Tilt=" + TrimSigDigits(Surface(SurfNum).Tilt, 1) + " in Surface=" + Surface(SurfNum).Name +
                                                   ", Zone=" + Surface(SurfNum).ZoneName);
                                 ShowContinueError("  Tilt=" + TrimSigDigits(Surface(Found).Tilt, 1) + " in Surface=" + Surface(Found).Name +
@@ -1556,7 +1556,7 @@ namespace SurfaceGeometry {
                             // check surface class match.  interzone surface.
                             if ((Surface(SurfNum).Class == SurfaceClass_Wall && Surface(Found).Class != SurfaceClass_Wall) ||
                                 (Surface(SurfNum).Class != SurfaceClass_Wall && Surface(Found).Class == SurfaceClass_Wall)) {
-                                ShowWarningError(RoutineName + "InterZone Surface Classes do not match as expected.");
+                                ShowWarningError(std::string{RoutineName} + "InterZone Surface Classes do not match as expected.");
                                 ShowContinueError("Surface=\"" + Surface(SurfNum).Name +
                                                   "\", surface class=" + cSurfaceClass(Surface(SurfNum).Class));
                                 ShowContinueError("Adjacent Surface=\"" + Surface(Found).Name +
@@ -1565,7 +1565,7 @@ namespace SurfaceGeometry {
                             }
                             if ((Surface(SurfNum).Class == SurfaceClass_Roof && Surface(Found).Class != SurfaceClass_Floor) ||
                                 (Surface(SurfNum).Class != SurfaceClass_Roof && Surface(Found).Class == SurfaceClass_Floor)) {
-                                ShowWarningError(RoutineName + "InterZone Surface Classes do not match as expected.");
+                                ShowWarningError(std::string{RoutineName} + "InterZone Surface Classes do not match as expected.");
                                 ShowContinueError("Surface=\"" + Surface(SurfNum).Name +
                                                   "\", surface class=" + cSurfaceClass(Surface(SurfNum).Class));
                                 ShowContinueError("Adjacent Surface=\"" + Surface(Found).Name +
@@ -1584,7 +1584,7 @@ namespace SurfaceGeometry {
                                 if (std::abs(std::abs(Surface(SurfNum).Azimuth - Surface(Found).Azimuth) - 180.0) > 1.0) {
                                     if (std::abs(Surface(SurfNum).SinTilt) > 0.5 || DisplayExtraWarnings) {
                                         // if horizontal surfaces, then these are windows/doors/etc in those items.
-                                        ShowWarningError(RoutineName + "InterZone Surface Azimuths do not match as expected.");
+                                        ShowWarningError(std::string{RoutineName} + "InterZone Surface Azimuths do not match as expected.");
                                         ShowContinueError("  Azimuth=" + TrimSigDigits(Surface(SurfNum).Azimuth, 1) +
                                                           ", Tilt=" + TrimSigDigits(Surface(SurfNum).Tilt, 1) +
                                                           ", in Surface=" + Surface(SurfNum).Name + ", Zone=" + Surface(SurfNum).ZoneName);
@@ -1599,14 +1599,14 @@ namespace SurfaceGeometry {
 
                             // Make sure exposures (Sun, Wind) are the same.....and are "not"
                             if (Surface(SurfNum).ExtSolar || Surface(Found).ExtSolar) {
-                                ShowWarningError(RoutineName + "Interzone surfaces cannot be \"SunExposed\" -- removing SunExposed");
+                                ShowWarningError(std::string{RoutineName} + "Interzone surfaces cannot be \"SunExposed\" -- removing SunExposed");
                                 ShowContinueError("  Surface=" + Surface(SurfNum).Name + ", Zone=" + Surface(SurfNum).ZoneName);
                                 ShowContinueError("  Surface=" + Surface(Found).Name + ", Zone=" + Surface(Found).ZoneName);
                                 Surface(SurfNum).ExtSolar = false;
                                 Surface(Found).ExtSolar = false;
                             }
                             if (Surface(SurfNum).ExtWind || Surface(Found).ExtWind) {
-                                ShowWarningError(RoutineName + "Interzone surfaces cannot be \"WindExposed\" -- removing WindExposed");
+                                ShowWarningError(std::string{RoutineName} + "Interzone surfaces cannot be \"WindExposed\" -- removing WindExposed");
                                 ShowContinueError("  Surface=" + Surface(SurfNum).Name + ", Zone=" + Surface(SurfNum).ZoneName);
                                 ShowContinueError("  Surface=" + Surface(Found).Name + ", Zone=" + Surface(Found).ZoneName);
                                 Surface(SurfNum).ExtWind = false;
@@ -1621,7 +1621,7 @@ namespace SurfaceGeometry {
                                 // if not internal subsurface
                                 if (Surface(Surface(SurfNum).BaseSurf).ExtBoundCond == Surface(SurfNum).BaseSurf) {
                                     // base surface is not interzone surface
-                                    ShowSevereError(RoutineName + "SubSurface=\"" + Surface(SurfNum).Name + "\" is an interzone subsurface.");
+                                    ShowSevereError(std::string{RoutineName} + "SubSurface=\"" + Surface(SurfNum).Name + "\" is an interzone subsurface.");
                                     ShowContinueError("..but the Base Surface is not an interzone surface, Surface=\"" +
                                                       Surface(Surface(SurfNum).BaseSurf).Name + "\".");
                                     SurfError = true;
@@ -1631,7 +1631,7 @@ namespace SurfaceGeometry {
                     } else {
                         //  Seems unlikely that an internal surface would be missing itself, so this message
                         //  only indicates for adjacent (interzone) surfaces.
-                        ShowSevereError(RoutineName + "Adjacent Surface not found: " + Surface(SurfNum).ExtBoundCondName + " adjacent to surface " +
+                        ShowSevereError(std::string{RoutineName} + "Adjacent Surface not found: " + Surface(SurfNum).ExtBoundCondName + " adjacent to surface " +
                                         Surface(SurfNum).Name);
                         NonMatch = true;
                         SurfError = true;
@@ -1640,17 +1640,17 @@ namespace SurfaceGeometry {
                     if (Surface(Surface(SurfNum).BaseSurf).ExtBoundCond > 0 &&
                         Surface(Surface(SurfNum).BaseSurf).ExtBoundCond !=
                             Surface(SurfNum).BaseSurf) { // If Interzone surface, subsurface must be also.
-                        ShowSevereError(RoutineName + "SubSurface on Interzone Surface must be an Interzone SubSurface.");
+                        ShowSevereError(std::string{RoutineName} + "SubSurface on Interzone Surface must be an Interzone SubSurface.");
                         ShowContinueError("...OutsideFaceEnvironment is blank, in Surface=" + Surface(SurfNum).Name);
                         SurfError = true;
                     } else {
                         ++ErrCount3;
                         if (ErrCount3 == 1 && !DisplayExtraWarnings) {
-                            ShowWarningError(RoutineName + "Blank name for Outside Boundary Condition Objects.");
+                            ShowWarningError(std::string{RoutineName} + "Blank name for Outside Boundary Condition Objects.");
                             ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                         }
                         if (DisplayExtraWarnings) {
-                            ShowWarningError(RoutineName + "Blank name for Outside Boundary Condition Object, in surface=" + Surface(SurfNum).Name);
+                            ShowWarningError(std::string{RoutineName} + "Blank name for Outside Boundary Condition Object, in surface=" + Surface(SurfNum).Name);
                             ShowContinueError("Resetting this surface to be an internal zone surface, zone=" + Surface(SurfNum).ZoneName);
                         }
                         Surface(SurfNum).ExtBoundCondName = Surface(SurfNum).Name;
@@ -1659,11 +1659,11 @@ namespace SurfaceGeometry {
                 } else {
                     ++ErrCount3;
                     if (ErrCount3 == 1 && !DisplayExtraWarnings) {
-                        ShowSevereError(RoutineName + "Blank name for Outside Boundary Condition Objects.");
+                        ShowSevereError(std::string{RoutineName} + "Blank name for Outside Boundary Condition Objects.");
                         ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                     }
                     if (DisplayExtraWarnings) {
-                        ShowWarningError(RoutineName + "Blank name for Outside Boundary Condition Object, in surface=" + Surface(SurfNum).Name);
+                        ShowWarningError(std::string{RoutineName} + "Blank name for Outside Boundary Condition Object, in surface=" + Surface(SurfNum).Name);
                         ShowContinueError("Resetting this surface to be an internal zone (adiabatic) surface, zone=" + Surface(SurfNum).ZoneName);
                     }
                     Surface(SurfNum).ExtBoundCondName = Surface(SurfNum).Name;
@@ -1674,7 +1674,7 @@ namespace SurfaceGeometry {
 
         } // ...end of the Surface DO loop for finding BaseSurf
         if (NonMatch) {
-            ShowSevereError(RoutineName + "Non matching interzone surfaces found");
+            ShowSevereError(std::string{RoutineName} + "Non matching interzone surfaces found");
         }
 
         //**********************************************************************************
@@ -1687,23 +1687,23 @@ namespace SurfaceGeometry {
             if (Surface(Surface(SurfNum).BaseSurf).ExtBoundCond <= 0) {                                 // exterior or other base surface
                 if (Surface(SurfNum).ExtBoundCond != Surface(Surface(SurfNum).BaseSurf).ExtBoundCond) { // should match base surface
                     if (Surface(SurfNum).ExtBoundCond == SurfNum) {
-                        ShowSevereError(RoutineName + "Subsurface=\"" + Surface(SurfNum).Name +
+                        ShowSevereError(std::string{RoutineName} + "Subsurface=\"" + Surface(SurfNum).Name +
                                         "\" exterior condition [adiabatic surface] in a base surface=\"" + Surface(Surface(SurfNum).BaseSurf).Name +
                                         "\" with exterior condition [" + cExtBoundCondition(Surface(Surface(SurfNum).BaseSurf).ExtBoundCond) + ']');
                         SurfError = true;
                     } else if (Surface(SurfNum).ExtBoundCond > 0) {
-                        ShowSevereError(RoutineName + "Subsurface=\"" + Surface(SurfNum).Name +
+                        ShowSevereError(std::string{RoutineName} + "Subsurface=\"" + Surface(SurfNum).Name +
                                         "\" exterior condition [interzone surface] in a base surface=\"" + Surface(Surface(SurfNum).BaseSurf).Name +
                                         "\" with exterior condition [" + cExtBoundCondition(Surface(Surface(SurfNum).BaseSurf).ExtBoundCond) + ']');
                         SurfError = true;
                     } else if (Surface(Surface(SurfNum).BaseSurf).ExtBoundCond == OtherSideCondModeledExt) {
-                        ShowWarningError(RoutineName + "Subsurface=\"" + Surface(SurfNum).Name + "\" exterior condition [" +
+                        ShowWarningError(std::string{RoutineName} + "Subsurface=\"" + Surface(SurfNum).Name + "\" exterior condition [" +
                                          cExtBoundCondition(Surface(SurfNum).ExtBoundCond) + "] in a base surface=\"" +
                                          Surface(Surface(SurfNum).BaseSurf).Name + "\" with exterior condition [" +
                                          cExtBoundCondition(Surface(Surface(SurfNum).BaseSurf).ExtBoundCond) + ']');
                         ShowContinueError("...SubSurface will not use the exterior condition model of the base surface.");
                     } else {
-                        ShowSevereError(RoutineName + "Subsurface=\"" + Surface(SurfNum).Name + "\" exterior condition [" +
+                        ShowSevereError(std::string{RoutineName} + "Subsurface=\"" + Surface(SurfNum).Name + "\" exterior condition [" +
                                         cExtBoundCondition(Surface(SurfNum).ExtBoundCond) + "] in a base surface=\"" +
                                         Surface(Surface(SurfNum).BaseSurf).Name + "\" with exterior condition [" +
                                         cExtBoundCondition(Surface(Surface(SurfNum).BaseSurf).ExtBoundCond) + ']');
@@ -1718,11 +1718,11 @@ namespace SurfaceGeometry {
                 // adiabatic surface. make sure subsurfaces match
                 if (Surface(SurfNum).ExtBoundCond != SurfNum) { // not adiabatic surface
                     if (Surface(SurfNum).ExtBoundCond > 0) {
-                        ShowSevereError(RoutineName + "Subsurface=\"" + Surface(SurfNum).Name +
+                        ShowSevereError(std::string{RoutineName} + "Subsurface=\"" + Surface(SurfNum).Name +
                                         "\" exterior condition [interzone surface] in a base surface=\"" + Surface(Surface(SurfNum).BaseSurf).Name +
                                         "\" with exterior condition [adiabatic surface]");
                     } else {
-                        ShowSevereError(RoutineName + "Subsurface=\"" + Surface(SurfNum).Name + "\" exterior condition [" +
+                        ShowSevereError(std::string{RoutineName} + "Subsurface=\"" + Surface(SurfNum).Name + "\" exterior condition [" +
                                         cExtBoundCondition(Surface(SurfNum).ExtBoundCond) + "] in a base surface=\"" +
                                         Surface(Surface(SurfNum).BaseSurf).Name + "\" with exterior condition [adiabatic surface]");
                     }
@@ -1734,7 +1734,7 @@ namespace SurfaceGeometry {
                 }
             } else if (Surface(Surface(SurfNum).BaseSurf).ExtBoundCond > 0) { // interzone surface
                 if (Surface(SurfNum).ExtBoundCond == SurfNum) {
-                    ShowSevereError(RoutineName + "Subsurface=\"" + Surface(SurfNum).Name +
+                    ShowSevereError(std::string{RoutineName} + "Subsurface=\"" + Surface(SurfNum).Name +
                                     "\" is an adiabatic surface in an Interzone base surface=\"" + Surface(Surface(SurfNum).BaseSurf).Name + "\"");
                     if (!SubSurfaceSevereDisplayed) {
                         ShowContinueError("...calculations for heat balance would be compromised.");
@@ -1767,7 +1767,7 @@ namespace SurfaceGeometry {
 
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (Zone(ZoneNum).SurfaceFirst == 0) {
-                ShowSevereError(RoutineName + "Zone has no surfaces, Zone=" + Zone(ZoneNum).Name);
+                ShowSevereError(std::string{RoutineName} + "Zone has no surfaces, Zone=" + Zone(ZoneNum).Name);
                 SurfError = true;
             }
         }
@@ -1798,12 +1798,12 @@ namespace SurfaceGeometry {
                             if (diffp > 0.05) {
                                 ++ErrCount;
                                 if (ErrCount == 1 && !DisplayExtraWarnings) {
-                                    ShowWarningError(RoutineName + "Entered Zone Floor Areas differ from calculated Zone Floor Area(s).");
+                                    ShowWarningError(std::string{RoutineName} + "Entered Zone Floor Areas differ from calculated Zone Floor Area(s).");
                                     ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
                                 }
                                 if (DisplayExtraWarnings) {
                                     // Warn user of using specified Zone Floor Area
-                                    ShowWarningError(RoutineName + "Entered Floor Area entered for Zone=\"" + Zone(ZoneNum).Name +
+                                    ShowWarningError(std::string{RoutineName} + "Entered Floor Area entered for Zone=\"" + Zone(ZoneNum).Name +
                                                      "\" significantly different from calculated Floor Area");
                                     ShowContinueError("Entered Zone Floor Area value=" + RoundSigDigits(Zone(ZoneNum).UserEnteredFloorArea, 2) +
                                                       ", Calculated Zone Floor Area value=" + RoundSigDigits(Zone(ZoneNum).CalcFloorArea, 2) +
@@ -1822,12 +1822,12 @@ namespace SurfaceGeometry {
 
         for (SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
             if (Surface(SurfNum).Area < 1.e-06) {
-                ShowSevereError(RoutineName + "Zero or negative surface area[" + RoundSigDigits(Surface(SurfNum).Area, 5) +
+                ShowSevereError(std::string{RoutineName} + "Zero or negative surface area[" + RoundSigDigits(Surface(SurfNum).Area, 5) +
                                 "], Surface=" + Surface(SurfNum).Name);
                 SurfError = true;
             }
             if (Surface(SurfNum).Area >= 1.e-06 && Surface(SurfNum).Area < 0.001) {
-                ShowWarningError(RoutineName + "Very small surface area[" + RoundSigDigits(Surface(SurfNum).Area, 5) +
+                ShowWarningError(std::string{RoutineName} + "Very small surface area[" + RoundSigDigits(Surface(SurfNum).Area, 5) +
                                  "], Surface=" + Surface(SurfNum).Name);
             }
         }
@@ -1937,7 +1937,7 @@ namespace SurfaceGeometry {
             }
             if (OpaqueHTSurfsWithWin == 1 && OpaqueHTSurfs == 1 && InternalMassSurfs == 0) {
                 SurfError = true;
-                ShowSevereError(RoutineName + "Zone " + Zone(ZoneNum).Name + " has only one floor, wall or roof, and this surface has a window.");
+                ShowSevereError(std::string{RoutineName} + "Zone " + Zone(ZoneNum).Name + " has only one floor, wall or roof, and this surface has a window.");
                 ShowContinueError("Add more floors, walls or roofs, or an internal mass surface.");
             }
         }
@@ -1956,7 +1956,7 @@ namespace SurfaceGeometry {
                 continue;
             }
             if (LayNumOutside != Construct(Surface(SurfNum).Construction).LayerPoint(1)) {
-                ShowSevereError(RoutineName + "Only one EcoRoof Material is currently allowed for all constructions.");
+                ShowSevereError(std::string{RoutineName} + "Only one EcoRoof Material is currently allowed for all constructions.");
                 ShowContinueError("... first material=" + Material(LayNumOutside).Name);
                 ShowContinueError("... conflicting Construction=" + Construct(Surface(SurfNum).Construction).Name +
                                   " uses material=" + Material(Construct(Surface(SurfNum).Construction).LayerPoint(1)).Name);
@@ -2028,12 +2028,12 @@ namespace SurfaceGeometry {
                 if (!DisplayExtraWarnings) {
                     ++iTmp1;
                 } else {
-                    ShowWarningError(RoutineName + "Surface=\"" + Surface(SurfNum).Name +
+                    ShowWarningError(std::string{RoutineName} + "Surface=\"" + Surface(SurfNum).Name +
                                      "\" uses InfraredTransparent construction in a non-interzone surface. (illegal use)");
                 }
             }
             if (iTmp1 > 0) {
-                ShowWarningError(RoutineName + "Surfaces use InfraredTransparent constructions " + TrimSigDigits(iTmp1) +
+                ShowWarningError(std::string{RoutineName} + "Surfaces use InfraredTransparent constructions " + TrimSigDigits(iTmp1) +
                                  " in non-interzone surfaces. (illegal use)");
                 ShowContinueError("For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
             }
@@ -2042,40 +2042,40 @@ namespace SurfaceGeometry {
         // Note, could do same for Window Area and detecting if Interzone Surface in Zone
 
         if (Warning1Count > 0) {
-            ShowWarningMessage(RoutineName + "Window dimensions differ from Window 5/6 data file dimensions, " + TrimSigDigits(Warning1Count) +
+            ShowWarningMessage(std::string{RoutineName} + "Window dimensions differ from Window 5/6 data file dimensions, " + TrimSigDigits(Warning1Count) +
                                " times.");
             ShowContinueError("This will affect the frame heat transfer calculation if the frame in the Data File entry");
             ShowContinueError("is not uniform, i.e., has sections with different geometry and/or thermal properties.");
             ShowContinueError("For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
         }
         if (Warning2Count > 0) {
-            ShowWarningMessage(RoutineName + "Exterior Windows have been replaced with Window 5/6 two glazing systems, " +
+            ShowWarningMessage(std::string{RoutineName} + "Exterior Windows have been replaced with Window 5/6 two glazing systems, " +
                                TrimSigDigits(Warning2Count) + " times.");
             ShowContinueError("Note that originally entered dimensions are overridden.");
             ShowContinueError("For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
         }
         if (Warning3Count > 0) {
-            ShowWarningMessage(RoutineName + "Interior Windows have been replaced with Window 5/6 two glazing systems, " +
+            ShowWarningMessage(std::string{RoutineName} + "Interior Windows have been replaced with Window 5/6 two glazing systems, " +
                                TrimSigDigits(Warning3Count) + " times.");
             ShowContinueError("Note that originally entered dimensions are overridden.");
             ShowContinueError("For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
         }
 
         if (TotalMultipliedWindows > 0) {
-            ShowWarningMessage(RoutineName + "There are " + TrimSigDigits(TotalMultipliedWindows) +
+            ShowWarningMessage(std::string{RoutineName} + "There are " + TrimSigDigits(TotalMultipliedWindows) +
                                " window/glass door(s) that may cause inaccurate shadowing due to Solar Distribution.");
             ShowContinueError("For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
             TotalWarningErrors += TotalMultipliedWindows;
         }
         if (TotalCoincidentVertices > 0) {
             ShowWarningMessage(
-                RoutineName + "There are " + TrimSigDigits(TotalCoincidentVertices) +
+                std::string{RoutineName} + "There are " + TrimSigDigits(TotalCoincidentVertices) +
                 " coincident/collinear vertices; These have been deleted unless the deletion would bring the number of surface sides < 3.");
             ShowContinueError("For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
             TotalWarningErrors += TotalCoincidentVertices;
         }
         if (TotalDegenerateSurfaces > 0) {
-            ShowSevereMessage(RoutineName + "There are " + TrimSigDigits(TotalDegenerateSurfaces) +
+            ShowSevereMessage(std::string{RoutineName} + "There are " + TrimSigDigits(TotalDegenerateSurfaces) +
                               " degenerate surfaces; Degenerate surfaces are those with number of sides < 3.");
             ShowContinueError("These surfaces should be deleted.");
             ShowContinueError("For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
@@ -2097,14 +2097,14 @@ namespace SurfaceGeometry {
 
         if (SurfError || ErrorsFound) {
             ErrorsFound = true;
-            ShowFatalError(RoutineName + "Errors discovered, program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors discovered, program terminates.");
         }
 
         int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
                           TotOverhangsProjection + TotFins + TotFinsProjection;
         int NumDElightCmplxFen = inputProcessor->getNumObjectsFound("Daylighting:DElight:ComplexFenestration");
         if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight())) {
-            ShowWarningError(RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
+            ShowWarningError(std::string{RoutineName} + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
         }
     }
 
@@ -4449,7 +4449,7 @@ namespace SurfaceGeometry {
         }
     }
 
-    void CheckWindowShadingControlFrameDivider(std::string const &cRoutineName, // routine name calling this one (for error messages)
+    void CheckWindowShadingControlFrameDivider(std::string_view cRoutineName, // routine name calling this one (for error messages)
                                                bool &ErrorsFound,               // true if errors have been found or are found here
                                                int const SurfNum,               // current surface number
                                                int const FrameField             // field number for frame/divider
@@ -4589,7 +4589,7 @@ namespace SurfaceGeometry {
                                       "with the Window Construction rather than a shaded construction.");
                 }
                 if (Construct(ConstrNum).LayerPoint(TotLayers) != Construct(ConstrNumSh).LayerPoint(TotShLayers)) {
-                    ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
+                    ShowSevereError(std::string{cRoutineName} + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
                     ShowContinueError("Unshaded construction=" + Construct(ConstrNum).Name +
                                       ", Material=" + Material(Construct(ConstrNum).LayerPoint(TotLayers)).Name);
                     ShowContinueError("Shaded construction=" + Construct(ConstrNumSh).Name +
@@ -4597,7 +4597,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
                 if (Construct(ConstrNum).LayerPoint(1) != Construct(ConstrNumSh).LayerPoint(1)) {
-                    ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
+                    ShowSevereError(std::string{cRoutineName} + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
                     ShowContinueError("Unshaded construction=" + Construct(ConstrNum).Name +
                                       ", Material=" + Material(Construct(ConstrNum).LayerPoint(1)).Name);
                     ShowContinueError("Shaded construction=" + Construct(ConstrNumSh).Name +
@@ -4612,7 +4612,7 @@ namespace SurfaceGeometry {
                     if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
                         MatGapCalc = std::abs(Material(MatGap).Thickness - (Material(MatGap1).Thickness + Material(MatGap2).Thickness));
                         if (MatGapCalc > 0.001) {
-                            ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + Construct(ConstrNum).Name);
+                            ShowSevereError(std::string{cRoutineName} + ": The gap width(s) for the unshaded window construction " + Construct(ConstrNum).Name);
                             ShowContinueError("are inconsistent with the gap widths for shaded window construction " + Construct(ConstrNumSh).Name);
                             ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass blind.");
                             ShowContinueError("..Material=" + Material(MatGap).Name + " thickness=" + RoundSigDigits(Material(MatGap).Thickness, 3) +
@@ -4627,7 +4627,7 @@ namespace SurfaceGeometry {
                         MatGapCalc = std::abs(Material(MatGap).Thickness -
                                               (Material(MatGap1).Thickness + Material(MatGap2).Thickness + Material(MatSh).Thickness));
                         if (MatGapCalc > 0.001) {
-                            ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + Construct(ConstrNum).Name);
+                            ShowSevereError(std::string{cRoutineName} + ": The gap width(s) for the unshaded window construction " + Construct(ConstrNum).Name);
                             ShowContinueError("are inconsistent with the gap widths for shaded window construction " + Construct(ConstrNumSh).Name);
                             ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass shade.");
                             ShowContinueError("..Material=" + Material(MatGap).Name + " thickness=" + RoundSigDigits(Material(MatGap).Thickness, 3) +
@@ -4743,7 +4743,7 @@ namespace SurfaceGeometry {
         if ((SurfaceTmp(SurfNum).Class == SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass_GlassDoor) &&
             SolarDistribution > MinimalShadowing && SurfaceTmp(SurfNum).Multiplier > 1.0) {
             if (DisplayExtraWarnings) {
-                ShowWarningError(cRoutineName + ": A Multiplier > 1.0 for window/glass door " + SurfaceTmp(SurfNum).Name);
+                ShowWarningError(std::string{cRoutineName} + ": A Multiplier > 1.0 for window/glass door " + SurfaceTmp(SurfNum).Name);
                 ShowContinueError("in conjunction with SolarDistribution = FullExterior or FullInteriorExterior");
                 ShowContinueError("can cause inaccurate shadowing on the window and/or");
                 ShowContinueError("inaccurate interior solar distribution from the window.");
@@ -4762,7 +4762,7 @@ namespace SurfaceGeometry {
                 if (Material(LayerPtr).Group == Shade || Material(LayerPtr).Group == WindowBlind || Material(LayerPtr).Group == Screen) ++NumShades;
             }
             if (NumShades != 0) {
-                ShowSevereError(cRoutineName + ": Window \"" + SubSurfaceName + "\" must not directly reference");
+                ShowSevereError(std::string{cRoutineName} + ": Window \"" + SubSurfaceName + "\" must not directly reference");
                 ShowContinueError("a Construction (i.e, \"" + SubSurfaceConstruction + "\") with a shading device.");
                 ShowContinueError("Use WindowShadingControl to specify a shading device for a window.");
                 ErrorsFound = true;
@@ -4778,7 +4778,7 @@ namespace SurfaceGeometry {
                 for (Lay = 1; Lay <= Construct(ConstrNum).TotLayers; ++Lay) {
                     LayerPtr = Construct(ConstrNum).LayerPoint(Lay);
                     if (Material(LayerPtr).Group == WindowGlass && Material(LayerPtr).GlassTransDirtFactor < 1.0) {
-                        ShowSevereError(cRoutineName + ": Interior Window or GlassDoor " + SubSurfaceName + " has a glass layer with");
+                        ShowSevereError(std::string{cRoutineName} + ": Interior Window or GlassDoor " + SubSurfaceName + " has a glass layer with");
                         ShowContinueError("Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
                         ShowContinueError("A value less than 1.0 for this factor is only allowed for exterior windows and glass doors.");
                         ErrorsFound = true;
@@ -4817,7 +4817,7 @@ namespace SurfaceGeometry {
                     }
 
                     if (SurfaceTmp(SurfaceTmp(SurfNum).BaseSurf).Area <= 0.0) {
-                        ShowSevereError(cRoutineName +
+                        ShowSevereError(std::string{cRoutineName} +
                                         ": Surface Openings have too much area for base surface=" + SurfaceTmp(SurfaceTmp(SurfNum).BaseSurf).Name);
                         ShowContinueError("Opening Surface creating error=" + SurfaceTmp(SurfNum).Name);
                         ErrorsFound = true;
@@ -5673,7 +5673,7 @@ namespace SurfaceGeometry {
             }
 
             if (errFlag) {
-                ShowSevereError(RoutineName + "Errors with invalid names in " + cCurrentModuleObject + " objects.");
+                ShowSevereError(std::string{RoutineName} + "Errors with invalid names in " + cCurrentModuleObject + " objects.");
                 ShowContinueError("...These will not be read in.  Other errors may occur.");
                 NumIntMassSurfaces = 0;
             }
@@ -6442,7 +6442,7 @@ namespace SurfaceGeometry {
                 // Assign surface number
                 SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Surface);
                 if (SurfNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(2) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(2) + " entered value = \"" + cAlphaArgs(2) +
                                       "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
@@ -6455,7 +6455,7 @@ namespace SurfaceGeometry {
                 if (!lAlphaFieldBlanks(3)) {
                     ExtShadingSchedNum = GetScheduleIndex(cAlphaArgs(3));
                     if (ExtShadingSchedNum == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                         cAlphaFieldNames(3) + " has been found.");
                         ShowContinueError(cAlphaFieldNames(3) + " entered value = \"" + cAlphaArgs(3) +
                                           "\" no corresponding schedule has been found in the input file.");
@@ -6469,7 +6469,7 @@ namespace SurfaceGeometry {
                 if (!lAlphaFieldBlanks(4)) {
                     SurroundingSurfsNum = UtilityRoutines::FindItemInList(cAlphaArgs(4), SurroundingSurfsProperty);
                     if (SurroundingSurfsNum == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                         cAlphaFieldNames(4) + " has been found.");
                         ShowContinueError(cAlphaFieldNames(4) + " entered value = \"" + cAlphaArgs(4) +
                                           "\" no corresponding surrounding surfaces properties has been found in the input file.");
@@ -6484,7 +6484,7 @@ namespace SurfaceGeometry {
                     NodeNum = GetOnlySingleNode(
                         cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
                     if (NodeNum == 0 && CheckOutAirNodeNumber(NodeNum)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                         cAlphaFieldNames(5) + " has been found.");
                         ShowContinueError(cAlphaFieldNames(5) + " entered value = \"" + cAlphaArgs(5) +
                                           "\" no corresponding outdoor air node has been found in the input file.");
@@ -7389,7 +7389,7 @@ namespace SurfaceGeometry {
             DistanceCheck = distance(SurfaceTmp(SurfNum).Vertex(SurfaceTmp(SurfNum).Sides), SurfaceTmp(SurfNum).Vertex(1));
             if (DistanceCheck < 0.01) {
                 if (DisplayExtraWarnings) {
-                    ShowWarningError(RoutineName + "Distance between two vertices < .01, possibly coincident. for Surface=" +
+                    ShowWarningError(std::string{RoutineName} + "Distance between two vertices < .01, possibly coincident. for Surface=" +
                                      SurfaceTmp(SurfNum).Name + ", in Zone=" + SurfaceTmp(SurfNum).ZoneName);
                     ShowContinueError("Vertex [" + RoundSigDigits(SurfaceTmp(SurfNum).Sides) + "]=(" +
                                       RoundSigDigits(SurfaceTmp(SurfNum).Vertex(SurfaceTmp(SurfNum).Sides).x, 2) + ',' +
@@ -7423,7 +7423,7 @@ namespace SurfaceGeometry {
                 DistanceCheck = distance(SurfaceTmp(SurfNum).Vertex(Vrt), SurfaceTmp(SurfNum).Vertex(Vrt - 1));
                 if (DistanceCheck < 0.01) {
                     if (DisplayExtraWarnings) {
-                        ShowWarningError(RoutineName + "Distance between two vertices < .01, possibly coincident. for Surface=" +
+                        ShowWarningError(std::string{RoutineName} + "Distance between two vertices < .01, possibly coincident. for Surface=" +
                                          SurfaceTmp(SurfNum).Name + ", in Zone=" + SurfaceTmp(SurfNum).ZoneName);
                         ShowContinueError("Vertex [" + RoundSigDigits(Vrt) + "]=(" + RoundSigDigits(SurfaceTmp(SurfNum).Vertex(Vrt).x, 2) + ',' +
                                           RoundSigDigits(SurfaceTmp(SurfNum).Vertex(Vrt).y, 2) + ',' +
@@ -7498,25 +7498,25 @@ namespace SurfaceGeometry {
             dotp = dot(SurfaceTmp(SurfNum).NewellSurfaceNormalVector, TestVector);
             if (SurfaceTmp(SurfNum).Class == SurfaceClass_Roof && dotp < -0.000001) {
                 TiltString = RoundSigDigits(SurfTilt, 1);
-                ShowWarningError(RoutineName + "Roof/Ceiling is upside down! Tilt angle=[" + TiltString + "], should be near 0, Surface=\"" +
+                ShowWarningError(std::string{RoutineName} + "Roof/Ceiling is upside down! Tilt angle=[" + TiltString + "], should be near 0, Surface=\"" +
                                  SurfaceTmp(SurfNum).Name + "\", in Zone=\"" + SurfaceTmp(SurfNum).ZoneName + "\".");
                 ShowContinueError("Automatic fix is attempted.");
                 ReverseAndRecalculate(SurfNum, SurfaceTmp(SurfNum).Sides, SurfWorldAz, SurfTilt);
             } else if (SurfaceTmp(SurfNum).Class == SurfaceClass_Roof && SurfTilt > 80.0) {
                 TiltString = RoundSigDigits(SurfTilt, 1);
-                ShowWarningError(RoutineName + "Roof/Ceiling is not oriented correctly! Tilt angle=[" + TiltString +
+                ShowWarningError(std::string{RoutineName} + "Roof/Ceiling is not oriented correctly! Tilt angle=[" + TiltString +
                                  "], should be near 0, Surface=\"" + SurfaceTmp(SurfNum).Name + "\", in Zone=\"" + SurfaceTmp(SurfNum).ZoneName +
                                  "\".");
             }
             if (SurfaceTmp(SurfNum).Class == SurfaceClass_Floor && dotp > 0.000001) {
                 TiltString = RoundSigDigits(SurfTilt, 1);
-                ShowWarningError(RoutineName + "Floor is upside down! Tilt angle=[" + TiltString + "], should be near 180, Surface=\"" +
+                ShowWarningError(std::string{RoutineName} + "Floor is upside down! Tilt angle=[" + TiltString + "], should be near 180, Surface=\"" +
                                  SurfaceTmp(SurfNum).Name + "\", in Zone=\"" + SurfaceTmp(SurfNum).ZoneName + "\".");
                 ShowContinueError("Automatic fix is attempted.");
                 ReverseAndRecalculate(SurfNum, SurfaceTmp(SurfNum).Sides, SurfWorldAz, SurfTilt);
             } else if (SurfaceTmp(SurfNum).Class == SurfaceClass_Floor && SurfTilt < 158.2) { // slope/grade = 40%!
                 TiltString = RoundSigDigits(SurfTilt, 1);
-                ShowWarningError(RoutineName + "Floor is not oriented correctly! Tilt angle=[" + TiltString + "], should be near 180, Surface=\"" +
+                ShowWarningError(std::string{RoutineName} + "Floor is not oriented correctly! Tilt angle=[" + TiltString + "], should be near 180, Surface=\"" +
                                  SurfaceTmp(SurfNum).Name + "\", in Zone=\"" + SurfaceTmp(SurfNum).ZoneName + "\".");
             }
             SurfaceTmp(SurfNum).Azimuth = SurfWorldAz;
@@ -7553,7 +7553,7 @@ namespace SurfaceGeometry {
             TransformVertsByAspect(SurfNum, SurfaceTmp(SurfNum).Sides);
 
         } else {
-            ShowFatalError(RoutineName + "Called with less than 2 sides, Surface=" + SurfaceTmp(SurfNum).Name);
+            ShowFatalError(std::string{RoutineName} + "Called with less than 2 sides, Surface=" + SurfaceTmp(SurfNum).Name);
         }
 
         // Preliminary Height/Width
@@ -7641,11 +7641,11 @@ namespace SurfaceGeometry {
                                 SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
         if (SurfaceTmp(SurfNum).Class == SurfaceClass_Roof && SurfTilt > 80.0) {
             TiltString = RoundSigDigits(SurfTilt, 1);
-            ShowWarningError(RoutineName + "Roof/Ceiling is still upside down! Tilt angle=[" + TiltString +
+            ShowWarningError(std::string{RoutineName} + "Roof/Ceiling is still upside down! Tilt angle=[" + TiltString +
                              "], should be near 0, please fix manually.");
         }
         if (SurfaceTmp(SurfNum).Class == SurfaceClass_Floor && SurfTilt < 158.2) { // 40% grade!
-            ShowWarningError(RoutineName + "Floor is still upside down! Tilt angle=[" + TiltString + "], should be near 180, please fix manually.");
+            ShowWarningError(std::string{RoutineName} + "Floor is still upside down! Tilt angle=[" + TiltString + "], should be near 180, please fix manually.");
         }
     }
 
@@ -8575,7 +8575,7 @@ namespace SurfaceGeometry {
         using namespace DataIPShortCuts;
         using ScheduleManager::GetScheduleIndex;
 
-        std::string const RoutineName("GetWindowGapAirflowControlData");
+        static constexpr std::string_view RoutineName("GetWindowGapAirflowControlData");
         int IOStat;               // IO Status when calling get input subroutine
         int ControlNumAlpha;      // Number of control alpha names being passed
         int ControlNumProp;       // Number of control properties being passed
@@ -8711,7 +8711,7 @@ namespace SurfaceGeometry {
                     SurfaceWindow(SurfNum).AirflowReturnNodePtr =
                         DataZoneEquipment::GetReturnAirNodeForZone(Surface(SurfNum).ZoneName, retNodeName, callDescription);
                     if (SurfaceWindow(SurfNum).AirflowReturnNodePtr == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Surface(SurfNum).Name +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + Surface(SurfNum).Name +
                                         "\", airflow window return air node not found for " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
                         if (!lAlphaFieldBlanks(7))
                             ShowContinueError(cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\" did not find a matching return air node.");
@@ -10776,10 +10776,10 @@ namespace SurfaceGeometry {
             CalcCoPlanarNess(Surface(ThisSurf).Vertex, Surface(ThisSurf).Sides, IsCoPlanar, OutOfLine, LastVertexInError);
             if (!IsCoPlanar) {
                 if (OutOfLine > 0.01) {
-                    ShowSevereError(RoutineName + "Suspected non-planar surface:\"" + Surface(ThisSurf).Name +
+                    ShowSevereError(std::string{RoutineName} + "Suspected non-planar surface:\"" + Surface(ThisSurf).Name +
                                     "\", Max \"out of line\"=" + TrimSigDigits(OutOfLine, 5) + " at Vertex # " + TrimSigDigits(LastVertexInError));
                 } else {
-                    ShowWarningError(RoutineName + "Possible non-planar surface:\"" + Surface(ThisSurf).Name +
+                    ShowWarningError(std::string{RoutineName} + "Possible non-planar surface:\"" + Surface(ThisSurf).Name +
                                      "\", Max \"out of line\"=" + TrimSigDigits(OutOfLine, 5) + " at Vertex # " + TrimSigDigits(LastVertexInError));
                 }
                 //       ErrorInSurface=.TRUE.
@@ -10866,7 +10866,7 @@ namespace SurfaceGeometry {
 
                     PlaneEquation(Surface(Surface(ThisSurf).BaseSurf).Vertex, Surface(Surface(ThisSurf).BaseSurf).Sides, BasePlane, SError);
                     if (SError) {
-                        ShowSevereError(RoutineName + "Degenerate surface (likely two vertices equal):\"" + Surface(ThisSurf).Name + "\".");
+                        ShowSevereError(std::string{RoutineName} + "Degenerate surface (likely two vertices equal):\"" + Surface(ThisSurf).Name + "\".");
                         ErrorInSurface = true;
                     }
                     ThisReveal = -Pt2Plane(Surface(ThisSurf).Vertex(2), BasePlane);
@@ -10892,7 +10892,7 @@ namespace SurfaceGeometry {
                         MakeEquivalentRectangle(ThisSurf, ErrorsFound);
 
                         if (DisplayExtraWarnings) {
-                            ShowWarningError(RoutineName + "Suspected 4-sided but non-rectangular Window, Door or GlassDoor:");
+                            ShowWarningError(std::string{RoutineName} + "Suspected 4-sided but non-rectangular Window, Door or GlassDoor:");
                             ShowContinueError("Surface=" + Surface(ThisSurf).Name +
                                               " is transformed into an equivalent rectangular surface with the same area and aspect ratio. ");
                         }
@@ -10929,7 +10929,7 @@ namespace SurfaceGeometry {
                                      Surface(ThisSurf).Area / Surface(ThisSurf).Multiplier;
                             SurfaceWindow(ThisSurf).FrameArea = FrArea * Surface(ThisSurf).Multiplier;
                             if ((Surface(Surface(ThisSurf).BaseSurf).Area - SurfaceWindow(ThisSurf).FrameArea) <= 0.0) {
-                                ShowSevereError(RoutineName + "Base Surface=\"" + Surface(Surface(ThisSurf).BaseSurf).Name + "\", ");
+                                ShowSevereError(std::string{RoutineName} + "Base Surface=\"" + Surface(Surface(ThisSurf).BaseSurf).Name + "\", ");
                                 ShowContinueError("Window Surface=\"" + Surface(ThisSurf).Name +
                                                   "\" area (with frame) is too large to fit on the surface.");
                                 ShowContinueError("Base surface area (-windows and doors)=[" +
@@ -10947,14 +10947,14 @@ namespace SurfaceGeometry {
                                                   FrameDivider(FrDivNum).HorDividers * FrameDivider(FrDivNum).VertDividers * DivWidth);
                             SurfaceWindow(ThisSurf).DividerArea = DivArea * Surface(ThisSurf).Multiplier;
                             if ((Surface(ThisSurf).Area - SurfaceWindow(ThisSurf).DividerArea) <= 0.0) {
-                                ShowSevereError(RoutineName + "Divider area exceeds glazed opening for window " + Surface(ThisSurf).Name);
+                                ShowSevereError(std::string{RoutineName} + "Divider area exceeds glazed opening for window " + Surface(ThisSurf).Name);
                                 ShowContinueError("Window surface area=[" + TrimSigDigits(Surface(ThisSurf).Area, 2) + "] m2, divider area=[" +
                                                   TrimSigDigits(SurfaceWindow(ThisSurf).DividerArea, 2) + "] m2.");
                                 ErrorInSurface = true;
                             }
                             Surface(ThisSurf).Area -= SurfaceWindow(ThisSurf).DividerArea; // Glazed area
                             if (DivArea <= 0.0) {
-                                ShowWarningError(RoutineName + "Calculated Divider Area <= 0.0 for Window=" + Surface(ThisSurf).Name);
+                                ShowWarningError(std::string{RoutineName} + "Calculated Divider Area <= 0.0 for Window=" + Surface(ThisSurf).Name);
                                 if (FrameDivider(FrDivNum).HorDividers == 0) {
                                     ShowContinueError("..Number of Horizontal Dividers = 0.");
                                 }
@@ -10990,7 +10990,7 @@ namespace SurfaceGeometry {
 
                     PlaneEquation(Surface(Surface(ThisSurf).BaseSurf).Vertex, Surface(Surface(ThisSurf).BaseSurf).Sides, BasePlane, SError);
                     if (SError) {
-                        ShowSevereError(RoutineName + "Degenerate surface (likely two vertices equal):\"" + Surface(ThisSurf).Name + "\".");
+                        ShowSevereError(std::string{RoutineName} + "Degenerate surface (likely two vertices equal):\"" + Surface(ThisSurf).Name + "\".");
                         ErrorInSurface = true;
                     }
                     ThisReveal = -Pt2Plane(Surface(ThisSurf).Vertex(2), BasePlane);
@@ -11110,7 +11110,7 @@ namespace SurfaceGeometry {
 
                 } else {
                     // Error Condition
-                    ShowSevereError(RoutineName + "Incorrect surface shape number.", OptionalOutputFileRef{outputFiles.eso});
+                    ShowSevereError(std::string{RoutineName} + "Incorrect surface shape number.", OptionalOutputFileRef{outputFiles.eso});
                     ShowContinueError("Please notify EnergyPlus support of this error and send input file.");
                     ErrorInSurface = true;
                 }
@@ -12676,7 +12676,7 @@ namespace SurfaceGeometry {
             solarSetup = true;
             RadiantOrSolar = "Solar";
         } else {
-            ShowFatalError(RoutineName + ": Illegal call to this function. Second argument must be 'RadiantEnclosures' or 'SolarEnclosures'");
+            ShowFatalError(std::string{RoutineName} + ": Illegal call to this function. Second argument must be 'RadiantEnclosures' or 'SolarEnclosures'");
         }
         if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsAirBoundary; })) {
             int errorCount = 0;
@@ -12693,7 +12693,7 @@ namespace SurfaceGeometry {
                     if (!DisplayExtraWarnings) {
                         ++errorCount;
                     } else {
-                        ShowSevereError(RoutineName + ": Surface=\"" + surf.Name + "\" uses Construction:AirBoundary in a non-interzone surface.");
+                        ShowSevereError(std::string{RoutineName} + ": Surface=\"" + surf.Name + "\" uses Construction:AirBoundary in a non-interzone surface.");
                     }
                 } else {
                     // Process air boundary - set surface properties and set up enclosures
@@ -12819,7 +12819,7 @@ namespace SurfaceGeometry {
                         }
                     } else {
                         ErrorsFound = true;
-                        ShowSevereError(RoutineName + ": Surface=" + surf.Name + " uses Construction:AirBoundary with illegal option:");
+                        ShowSevereError(std::string{RoutineName} + ": Surface=" + surf.Name + " uses Construction:AirBoundary with illegal option:");
                         if (radiantSetup) {
                             ShowContinueError("Radiant Exchange Method must be either GroupedZones or IRTSurface.");
                         } else {
@@ -12853,7 +12853,7 @@ namespace SurfaceGeometry {
                 }
             }
             if (errorCount > 0) {
-                ShowSevereError(RoutineName + ": " + General::TrimSigDigits(errorCount) +
+                ShowSevereError(std::string{RoutineName} + ": " + General::TrimSigDigits(errorCount) +
                                 " surfaces use Construction:AirBoundary in non-interzone surfaces.");
                 ShowContinueError("For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
             }

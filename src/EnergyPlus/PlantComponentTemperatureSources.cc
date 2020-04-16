@@ -163,7 +163,7 @@ namespace PlantComponentTemperatureSources {
                                                     this->InletNodeNum,
                                                     _);
             if (errFlag) {
-                ShowFatalError(RoutineName + ": Program terminated due to previous condition(s).");
+                ShowFatalError(std::string{RoutineName} + ": Program terminated due to previous condition(s).");
             }
             this->MyFlag = false;
         }

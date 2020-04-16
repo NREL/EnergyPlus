@@ -379,7 +379,7 @@ namespace HWBaseboardRadiator {
             } else {
                 HWBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                 if (HWBaseboard(BaseboardNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
+                    ShowSevereError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2) + "\" not found.");
                     ErrorsFound = true;
                 }
@@ -396,12 +396,12 @@ namespace HWBaseboardRadiator {
 
             HWBaseboard(BaseboardNum).WaterTempAvg = rNumericArgs(1);
             if (HWBaseboard(BaseboardNum).WaterTempAvg > MaxWaterTempAvg + 0.001) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxWaterTempAvg, 2) + "].");
                 HWBaseboard(BaseboardNum).WaterTempAvg = MaxWaterTempAvg;
             } else if (HWBaseboard(BaseboardNum).WaterTempAvg < MinWaterTempAvg - 0.001) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
                                  " was lower than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinWaterTempAvg, 2) + "].");
                 HWBaseboard(BaseboardNum).WaterTempAvg = MinWaterTempAvg;
@@ -410,7 +410,7 @@ namespace HWBaseboardRadiator {
             HWBaseboard(BaseboardNum).WaterMassFlowRateStd = rNumericArgs(2);
             if (HWBaseboard(BaseboardNum).WaterMassFlowRateStd < LowWaterMassFlowRate - 0.0001 ||
                 HWBaseboard(BaseboardNum).WaterMassFlowRateStd > HighWaterMassFlowRate + 0.0001) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
                                  " is an invalid Standard Water mass flow rate.");
                 ShowContinueError("...reset to a default value=[" + RoundSigDigits(WaterMassFlowDefault, 1) + "].");
                 HWBaseboard(BaseboardNum).WaterMassFlowRateStd = WaterMassFlowDefault;
@@ -480,12 +480,12 @@ namespace HWBaseboardRadiator {
 
             HWBaseboard(BaseboardNum).WaterVolFlowRateMax = rNumericArgs(6);
             if (std::abs(HWBaseboard(BaseboardNum).WaterVolFlowRateMax) <= MinWaterFlowRate) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(6) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(6) +
                                  " was less than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinWaterFlowRate, 2) + "].");
                 HWBaseboard(BaseboardNum).WaterVolFlowRateMax = MinWaterFlowRate;
             } else if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax > MaxWaterFlowRate) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(6) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(6) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxWaterFlowRate, 2) + "].");
                 HWBaseboard(BaseboardNum).WaterVolFlowRateMax = MaxWaterFlowRate;
@@ -494,7 +494,7 @@ namespace HWBaseboardRadiator {
             HWBaseboard(BaseboardNum).Offset = rNumericArgs(7);
             // Set default convergence tolerance
             if (HWBaseboard(BaseboardNum).Offset <= 0.0) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(7) +
                                  " was less than the allowable minimum.");
                 ShowContinueError("...reset to a default value=[" + RoundSigDigits(MaxFraction, 2) + "].");
                 HWBaseboard(BaseboardNum).Offset = 0.001;
@@ -502,13 +502,13 @@ namespace HWBaseboardRadiator {
 
             HWBaseboard(BaseboardNum).FracRadiant = rNumericArgs(8);
             if (HWBaseboard(BaseboardNum).FracRadiant < MinFraction) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(8) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(8) +
                                  " was lower than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinFraction, 2) + "].");
                 HWBaseboard(BaseboardNum).FracRadiant = MinFraction;
             }
             if (HWBaseboard(BaseboardNum).FracRadiant > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(8) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(8) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 2) + "].");
                 HWBaseboard(BaseboardNum).FracRadiant = MaxFraction;
@@ -517,7 +517,7 @@ namespace HWBaseboardRadiator {
             // Remaining fraction is added to the zone as convective heat transfer
             AllFracsSummed = HWBaseboard(BaseboardNum).FracRadiant;
             if (AllFracsSummed > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
                                  "\", Fraction Radiant was higher than the allowable maximum.");
                 HWBaseboard(BaseboardNum).FracRadiant = MaxFraction;
                 HWBaseboard(BaseboardNum).FracConvect = 0.0;
@@ -527,13 +527,13 @@ namespace HWBaseboardRadiator {
 
             HWBaseboard(BaseboardNum).FracDistribPerson = rNumericArgs(9);
             if (HWBaseboard(BaseboardNum).FracDistribPerson < MinFraction) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(9) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(9) +
                                  " was lower than the allowable minimum.");
                 ShowContinueError("...reset to minimum value=[" + RoundSigDigits(MinFraction, 3) + "].");
                 HWBaseboard(BaseboardNum).FracDistribPerson = MinFraction;
             }
             if (HWBaseboard(BaseboardNum).FracDistribPerson > MaxFraction) {
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(9) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(9) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 3) + "].");
                 HWBaseboard(BaseboardNum).FracDistribPerson = MaxFraction;
@@ -548,7 +548,7 @@ namespace HWBaseboardRadiator {
             //        HWBaseboard(BaseboardNum)%TotSurfToDistrib = MaxDistribSurfaces
             //      END IF
             if ((HWBaseboard(BaseboardNum).TotSurfToDistrib < MinDistribSurfaces) && (HWBaseboard(BaseboardNum).FracRadiant > MinFraction)) {
-                ShowSevereError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
+                ShowSevereError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
                                 "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.");
                 ShowContinueError("...the minimum that must be entered=[" + RoundSigDigits(MinDistribSurfaces) + "].");
                 ErrorsFound = true;
@@ -572,7 +572,7 @@ namespace HWBaseboardRadiator {
                 }
             }
             if (HWBaseboard(BaseboardNum).ZonePtr <= 0) {
-                ShowSevereError(RoutineName + cCMO_BBRadiator_Water + "=\"" + HWBaseboard(BaseboardNum).EquipID +
+                ShowSevereError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + HWBaseboard(BaseboardNum).EquipID +
                                 "\" is not on any ZoneHVAC:EquipmentList.");
                 ErrorsFound = true;
                 continue;
@@ -589,13 +589,13 @@ namespace HWBaseboardRadiator {
                                                                        ErrorsFound);
                 HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 9);
                 if (HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) > MaxFraction) {
-                    ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 9) +
+                    ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 9) +
                                      "was greater than the allowable maximum.");
                     ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MaxFraction, 2) + "].");
                     HWBaseboard(BaseboardNum).TotSurfToDistrib = MaxFraction;
                 }
                 if (HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) < MinFraction) {
-                    ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 9) +
+                    ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 9) +
                                      "was less than the allowable minimum.");
                     ShowContinueError("...reset to maximum value=[" + RoundSigDigits(MinFraction, 2) + "].");
                     HWBaseboard(BaseboardNum).TotSurfToDistrib = MinFraction;
@@ -608,20 +608,20 @@ namespace HWBaseboardRadiator {
             } // Surfaces
 
             if (AllFracsSummed > (MaxFraction + 0.01)) {
-                ShowSevereError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
+                ShowSevereError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
                                 "\", Summed radiant fractions for people + surface groups > 1.0");
                 ErrorsFound = true;
             }
             if ((AllFracsSummed < (MaxFraction - 0.01)) &&
                 (HWBaseboard(BaseboardNum).FracRadiant > MinFraction)) { // User didn't distribute all of the | radiation warn that some will be lost
-                ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
+                ShowWarningError(std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
                                  "\", Summed radiant fractions for people + surface groups < 1.0");
                 ShowContinueError("The rest of the radiant energy delivered by the baseboard heater will be lost");
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + cCMO_BBRadiator_Water + "Errors found getting input. Program terminates.");
+            ShowFatalError(std::string{RoutineName} + cCMO_BBRadiator_Water + "Errors found getting input. Program terminates.");
         }
 
         // Setup Report variables for the Coils

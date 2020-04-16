@@ -700,7 +700,7 @@ namespace WaterThermalTanks {
     bool getDesuperHtrInput()
     {
         bool ErrorsFound = false;
-        std::string const RoutineName = "getDesuperHtrInput";
+        static constexpr std::string_view RoutineName = "getDesuperHtrInput";
 
         DataIPShortCuts::cCurrentModuleObject = cCoilDesuperheater;
         for (int DesuperheaterNum = 1; DesuperheaterNum <= numWaterHeaterDesuperheater; ++DesuperheaterNum) {
@@ -2214,7 +2214,7 @@ namespace WaterThermalTanks {
     {
         bool ErrorsFound = false;
         DataIPShortCuts::cCurrentModuleObject = cMixedWHModuleObj;
-        std::string const RoutineName = "getWaterHeaterMixedInputs";
+        static constexpr std::string_view RoutineName = "getWaterHeaterMixedInputs";
 
         for (int WaterThermalTankNum = 1; WaterThermalTankNum <= numWaterHeaterMixed; ++WaterThermalTankNum) {
             int NumAlphas;
@@ -2262,7 +2262,7 @@ namespace WaterThermalTanks {
 
             Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(2));
             if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", missing data.");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", missing data.");
                 ShowContinueError("blank field, missing " + DataIPShortCuts::cAlphaFieldNames(2) + " is required");
                 ErrorsFound = true;
             } else if (Tank.SetPointTempSchedule == 0) {
@@ -2743,7 +2743,7 @@ namespace WaterThermalTanks {
     bool getWaterHeaterStratifiedInput()
     {
         bool ErrorsFound = false;
-        std::string const RoutineName = "getWaterHeaterStratifiedInput";
+        static constexpr std::string_view RoutineName = "getWaterHeaterStratifiedInput";
 
         DataIPShortCuts::cCurrentModuleObject = cStratifiedWHModuleObj; //'WaterHeater:Stratified'
 
@@ -2844,7 +2844,7 @@ namespace WaterThermalTanks {
 
             Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(5));
             if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", missing data.");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", missing data.");
                 ShowContinueError("blank field, missing " + DataIPShortCuts::cAlphaFieldNames(5) + " is required");
                 ErrorsFound = true;
             } else if (Tank.SetPointTempSchedule == 0) {
@@ -2886,7 +2886,7 @@ namespace WaterThermalTanks {
 
             Tank.SetPointTempSchedule2 = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(6));
             if (DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", missing data.");
+                ShowSevereError(std::string{RoutineName} + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", missing data.");
                 ShowContinueError("blank field, missing " + DataIPShortCuts::cAlphaFieldNames(6) + " is required");
                 ErrorsFound = true;
             } else if (Tank.SetPointTempSchedule2 == 0) {
@@ -3669,7 +3669,7 @@ namespace WaterThermalTanks {
     bool getWaterTankStratifiedInput()
     {
         bool ErrorsFound = false;
-        std::string const RoutineName = "getWaterTankStratifiedInput";
+        static constexpr std::string_view RoutineName = "getWaterTankStratifiedInput";
 
         DataIPShortCuts::cCurrentModuleObject = cStratifiedCWTankModuleObj; // 'ThermalStorage:ChilledWater:Stratified'
 
@@ -6901,7 +6901,7 @@ namespace WaterThermalTanks {
             // Warn for potential freezing when avg of final temp over all nodes is below 2°C (nearing 0°C)
             if (this->TankTemp < 2) {
                 if (this->FreezingErrorIndex == 0) {
-                    ShowWarningError(RoutineName + ": " + this->Type + " = '" + this->Name +
+                    ShowWarningError(std::string{RoutineName} + ": " + this->Type + " = '" + this->Name +
                                      "':  Temperature of tank < 2C indicates of possibility of freeze. Tank Temperature = " +
                                      General::RoundSigDigits(this->TankTemp, 2) + " C.");
                     ShowContinueErrorTimeStamp("");
@@ -7768,7 +7768,7 @@ namespace WaterThermalTanks {
             // Warn for potential freezing when avg of final temp over all nodes is below 2°C (nearing 0°C)
             if (this->TankTemp < 2) {
                 if (this->FreezingErrorIndex == 0) {
-                    ShowWarningError(RoutineName + ": " + this->Type + " = '" + this->Name +
+                    ShowWarningError(std::string{RoutineName} + ": " + this->Type + " = '" + this->Name +
                                      "':  Temperature of tank < 2C indicates of possibility of freeze. Tank Temperature = " +
                                      General::RoundSigDigits(this->TankTemp, 2) + " C.");
                     ShowContinueErrorTimeStamp("");

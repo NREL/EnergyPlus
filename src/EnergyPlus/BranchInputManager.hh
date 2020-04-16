@@ -297,7 +297,7 @@ namespace BranchInputManager {
 
     void GetBranchInput();
 
-    void GetSingleBranchInput(std::string const RoutineName,
+    void GetSingleBranchInput(const std::string_view RoutineName,
                               int const BCount,
                               Array1D_string &Alphas,
                               Array1D_string &cAlphaFields,

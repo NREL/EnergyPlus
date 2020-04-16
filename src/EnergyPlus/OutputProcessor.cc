@@ -1109,7 +1109,7 @@ namespace OutputProcessor {
     }
 
     TimeStepType ValidateTimeStepType(std::string const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
-                                      std::string const &CalledFrom       // Routine called from (for error messages)
+                                      std::string_view CalledFrom       // Routine called from (for error messages)
     )
     {
 
@@ -1143,7 +1143,7 @@ namespace OutputProcessor {
 
         //  The following should never happen to a user!!!!
         ShowSevereError("OutputProcessor/ValidateTimeStepType: Invalid Index Key passed to ValidateTimeStepType=" + TimeStepTypeKey);
-        ShowContinueError("..Should be \"ZONE\", \"SYSTEM\", \"HVAC\", or \"PLANT\"... was called from:" + CalledFrom);
+        ShowContinueError("..Should be \"ZONE\", \"SYSTEM\", \"HVAC\", or \"PLANT\"... was called from:" + std::string{CalledFrom});
         ShowFatalError("Preceding condition causes termination.");
 
         return TimeStepType::TimeStepZone;

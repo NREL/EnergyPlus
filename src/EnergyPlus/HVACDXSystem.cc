@@ -452,7 +452,7 @@ namespace HVACDXSystem {
             } else {
                 DXCoolingSystem(DXCoolSysNum).SchedPtr = GetScheduleIndex(Alphas(2));
                 if (DXCoolingSystem(DXCoolSysNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
@@ -668,7 +668,7 @@ namespace HVACDXSystem {
         } // End of the DX System Loop
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Program terminates.");
         }
 
         for (DXSystemNum = 1; DXSystemNum <= NumDXSystem; ++DXSystemNum) {

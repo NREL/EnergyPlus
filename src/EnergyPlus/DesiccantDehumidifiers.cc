@@ -424,7 +424,7 @@ namespace DesiccantDehumidifiers {
             } else {
                 DesicDehum(DesicDehumNum).SchedPtr = GetScheduleIndex(Alphas(2)); // convert schedule name to pointer
                 if (DesicDehum(DesicDehumNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
@@ -445,7 +445,7 @@ namespace DesiccantDehumidifiers {
                 Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Internal, 2, ObjectIsParent);
 
             if (UtilityRoutines::SameString(Alphas(7), "LEAVING HUMRAT:BYPASS")) {
-                ShowWarningError(RoutineName + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                 ShowContinueError("Obsolete " + cAlphaFields(7) + " = " + Alphas(7));
                 ShowContinueError("setting to LeavingMaximumHumidityRatioSetpoint");
                 DesicDehum(DesicDehumNum).ControlType = FixedHumratBypass;
@@ -455,7 +455,7 @@ namespace DesiccantDehumidifiers {
             if (UtilityRoutines::SameString(Alphas(7), "SystemNodeMaximumHumidityRatioSetpoint"))
                 DesicDehum(DesicDehumNum).ControlType = NodeHumratBypass;
             if (DesicDehum(DesicDehumNum).ControlType == 0) {
-                ShowWarningError(RoutineName + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                 ShowContinueError("Invalid " + cAlphaFields(7) + " = " + Alphas(7));
                 ShowContinueError("setting to LeavingMaximumHumidityRatioSetpoint");
                 DesicDehum(DesicDehumNum).ControlType = FixedHumratBypass;
@@ -493,7 +493,7 @@ namespace DesiccantDehumidifiers {
                     errFlag = false;
                     DesicDehum(DesicDehumNum).RegenCoilIndex = GetWaterCoilIndex("COIL:HEATING:WATER", RegenCoilName, errFlag);
                     if (DesicDehum(DesicDehumNum).RegenCoilIndex == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " illegal " + cAlphaFields(9) + " = " + RegenCoilName);
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " illegal " + cAlphaFields(9) + " = " + RegenCoilName);
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                         ErrorsFound = true;
                     }
@@ -543,7 +543,7 @@ namespace DesiccantDehumidifiers {
                     errFlag = false;
                     DesicDehum(DesicDehumNum).RegenCoilIndex = GetSteamCoilIndex("COIL:HEATING:STEAM", RegenCoilName, errFlag);
                     if (DesicDehum(DesicDehumNum).RegenCoilIndex == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + " illegal " + cAlphaFields(9) + " = " + RegenCoilName);
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " illegal " + cAlphaFields(9) + " = " + RegenCoilName);
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                         ErrorsFound = true;
                     }
@@ -583,7 +583,7 @@ namespace DesiccantDehumidifiers {
                     }
                 }
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = " + Alphas(1));
                 ShowContinueError("Illegal " + cAlphaFields(8) + " = " + DesicDehum(DesicDehumNum).RegenCoilType);
                 ErrorsFound = true;
             }
@@ -601,7 +601,7 @@ namespace DesiccantDehumidifiers {
             SetUpCompSets(DesicDehum(DesicDehumNum).DehumType, DesicDehum(DesicDehumNum).Name, Alphas(10), Alphas(11), Alphas(6), "UNDEFINED");
 
             if ((!UtilityRoutines::SameString(Alphas(12), "Default")) && (UtilityRoutines::SameString(Alphas(12), "UserCurves"))) {
-                ShowWarningError(RoutineName + CurrentModuleObject + ": Invalid" + cAlphaFields(12) + " = " + Alphas(12));
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + ": Invalid" + cAlphaFields(12) + " = " + Alphas(12));
                 ShowContinueError("resetting to Default");
                 DesicDehum(DesicDehumNum).PerformanceModel_Num = PM_Default;
             }
@@ -610,46 +610,46 @@ namespace DesiccantDehumidifiers {
                 DesicDehum(DesicDehumNum).PerformanceModel_Num = PM_UserCurves;
                 DesicDehum(DesicDehumNum).ProcDryBulbCurvefTW = GetCurveIndex(Alphas(13));
                 if (DesicDehum(DesicDehumNum).ProcDryBulbCurvefTW == 0) {
-                    ShowSevereError(RoutineName + "Curve object=" + Alphas(13) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Curve object=" + Alphas(13) + " not found.");
                     ErrorsFound2 = true;
                 }
                 DesicDehum(DesicDehumNum).ProcDryBulbCurvefV = GetCurveIndex(Alphas(14));
                 if (DesicDehum(DesicDehumNum).ProcDryBulbCurvefV == 0) {
-                    ShowSevereError(RoutineName + "Curve object=" + Alphas(14) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Curve object=" + Alphas(14) + " not found.");
                     ErrorsFound2 = true;
                 }
                 DesicDehum(DesicDehumNum).ProcHumRatCurvefTW = GetCurveIndex(Alphas(15));
                 if (DesicDehum(DesicDehumNum).ProcHumRatCurvefTW == 0) {
-                    ShowSevereError(RoutineName + "Curve object=" + Alphas(15) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Curve object=" + Alphas(15) + " not found.");
                     ErrorsFound2 = true;
                 }
                 DesicDehum(DesicDehumNum).ProcHumRatCurvefV = GetCurveIndex(Alphas(16));
                 if (DesicDehum(DesicDehumNum).ProcHumRatCurvefV == 0) {
-                    ShowSevereError(RoutineName + "Curve object=" + Alphas(16) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Curve object=" + Alphas(16) + " not found.");
                     ErrorsFound2 = true;
                 }
                 DesicDehum(DesicDehumNum).RegenEnergyCurvefTW = GetCurveIndex(Alphas(17));
                 if (DesicDehum(DesicDehumNum).RegenEnergyCurvefTW == 0) {
-                    ShowSevereError(RoutineName + "Curve object=" + Alphas(17) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Curve object=" + Alphas(17) + " not found.");
                     ErrorsFound2 = true;
                 }
                 DesicDehum(DesicDehumNum).RegenEnergyCurvefV = GetCurveIndex(Alphas(18));
                 if (DesicDehum(DesicDehumNum).RegenEnergyCurvefV == 0) {
-                    ShowSevereError(RoutineName + "Curve object=" + Alphas(18) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Curve object=" + Alphas(18) + " not found.");
                     ErrorsFound2 = true;
                 }
                 DesicDehum(DesicDehumNum).RegenVelCurvefTW = GetCurveIndex(Alphas(19));
                 if (DesicDehum(DesicDehumNum).RegenVelCurvefTW == 0) {
-                    ShowSevereError(RoutineName + "Curve object=" + Alphas(19) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Curve object=" + Alphas(19) + " not found.");
                     ErrorsFound2 = true;
                 }
                 DesicDehum(DesicDehumNum).RegenVelCurvefV = GetCurveIndex(Alphas(20));
                 if (DesicDehum(DesicDehumNum).RegenVelCurvefV == 0) {
-                    ShowSevereError(RoutineName + "Curve object=" + Alphas(20) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Curve object=" + Alphas(20) + " not found.");
                     ErrorsFound2 = true;
                 }
                 if (ErrorsFound2) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " = " + Alphas(1));
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError("Errors found in getting performance curves.");
                     ErrorsFound = true;
                 }
@@ -784,7 +784,7 @@ namespace DesiccantDehumidifiers {
             } else {
                 DesicDehum(DesicDehumNum).SchedPtr = GetScheduleIndex(Alphas(2)); // convert schedule name to pointer
                 if (DesicDehum(DesicDehumNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }

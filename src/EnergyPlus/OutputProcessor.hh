@@ -641,7 +641,7 @@ namespace OutputProcessor {
     }
 
     TimeStepType ValidateTimeStepType(std::string const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
-                                      std::string const &CalledFrom    // Routine called from (for error messages)
+                                      std::string_view CalledFrom    // Routine called from (for error messages)
     );
 
     std::string StandardTimeStepTypeKey(TimeStepType const timeStepType);

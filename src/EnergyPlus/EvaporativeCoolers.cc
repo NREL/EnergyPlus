@@ -3976,7 +3976,7 @@ namespace EvaporativeCoolers {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting input.");
             ShowContinueError("... Preceding condition causes termination.");
         }
 

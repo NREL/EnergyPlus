@@ -407,7 +407,7 @@ namespace Pumps {
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "Intermittent")) {
                 PumpEquip(PumpNum).PumpControl = Intermittent;
             } else {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
                 ShowContinueError("Entered Value=[" + cAlphaArgs(4) + "]. " + cAlphaFieldNames(4) + " has been set to Continuous for this pump.");
                 PumpEquip(PumpNum).PumpControl = Continuous;
             }
@@ -416,7 +416,7 @@ namespace Pumps {
             PumpEquip(PumpNum).PumpSchedule = cAlphaArgs(5);
             PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(cAlphaArgs(5));
             if (!lAlphaFieldBlanks(5) && !(PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
                 ShowContinueError("Schedule named =[" + cAlphaArgs(5) + "]. was not found and will not be used.");
             }
 
@@ -441,7 +441,7 @@ namespace Pumps {
             } else if (!PumpEquip(PumpNum).NomVolFlowRateWasAutoSized &&
                        (PumpEquip(PumpNum).MinVolFlowRate > PumpEquip(PumpNum).NomVolFlowRate)) {
                 // Check that the minimum isn't greater than the maximum
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name
                         + "\", Invalid '" + cNumericFieldNames(10) +"'");
                 ShowContinueError("Entered Value=[" + General::TrimSigDigits(PumpEquip(PumpNum).MinVolFlowRate, 5) + "] is above the "
                         + cNumericFieldNames(1) + "=["
@@ -491,13 +491,13 @@ namespace Pumps {
                     PumpEquip(PumpNum).VFD.ManualRPMSchedName = cAlphaArgs(8);
                     PumpEquip(PumpNum).VFD.ManualRPMSchedIndex = GetScheduleIndex(cAlphaArgs(8));
                     if (PumpEquip(PumpNum).VFD.ManualRPMSchedIndex <= 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
                                         "\", At least one scheduled VFD schedule input was invalid.");
                         ShowContinueError("Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                         ErrorsFound = true;
                     } else if (!CheckScheduleValueMinMax(PumpEquip(PumpNum).VFD.ManualRPMSchedIndex, ">", 0.0) ||
                                !CheckScheduleValueMinMax(PumpEquip(PumpNum).VFD.ManualRPMSchedIndex, ">", 0.0)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
                                         "\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.");
                         ErrorsFound = true;
                     }
@@ -515,18 +515,18 @@ namespace Pumps {
                             PumpEquip(PumpNum).VFD.UpperPsetSchedIndex,
                             PumpEquip(PumpNum).VFD.MinRPMSchedIndex,
                             PumpEquip(PumpNum).VFD.MaxRPMSchedIndex) <= 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
                                         "\", At least one scheduled VFD schedule input was invalid.");
                         ShowContinueError("Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                         ErrorsFound = true;
                     } else if (!CheckScheduleValueMinMax(PumpEquip(PumpNum).VFD.MinRPMSchedIndex, ">", 0.0) ||
                                !CheckScheduleValueMinMax(PumpEquip(PumpNum).VFD.MaxRPMSchedIndex, ">", 0.0)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
                                         "\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
                                     "\", VFD Control type entered is invalid.  Use one of the key choice entries.");
                     ErrorsFound = true;
                 }
@@ -552,7 +552,7 @@ namespace Pumps {
                 } else if (cAlphaArgs(14) == "POWERPERFLOWPERPRESSURE") {
                     PumpEquip(PumpNum).powerSizingMethod = sizePowerPerFlowPerPressure;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                     ErrorsFound = true;
                 }
@@ -637,7 +637,7 @@ namespace Pumps {
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "Intermittent")) {
                 PumpEquip(PumpNum).PumpControl = Intermittent;
             } else {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
                 ShowContinueError("Entered Value=[" + cAlphaArgs(4) + "]. " + cAlphaFieldNames(4) + " has been set to Continuous for this pump.");
                 PumpEquip(PumpNum).PumpControl = Continuous;
             }
@@ -646,7 +646,7 @@ namespace Pumps {
             PumpEquip(PumpNum).PumpSchedule = cAlphaArgs(5);
             PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(cAlphaArgs(5));
             if (!lAlphaFieldBlanks(5) && !(PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
                 ShowContinueError("Schedule named =[" + cAlphaArgs(5) + "]. was not found and will not be used.");
             }
 
@@ -698,7 +698,7 @@ namespace Pumps {
                 } else if (cAlphaArgs(8) == "POWERPERFLOWPERPRESSURE") {
                     PumpEquip(PumpNum).powerSizingMethod = sizePowerPerFlowPerPressure;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                     ErrorsFound = true;
                 }
@@ -755,7 +755,7 @@ namespace Pumps {
             PumpEquip(PumpNum).PumpSchedule = cAlphaArgs(4);
             PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(cAlphaArgs(4));
             if (!lAlphaFieldBlanks(4) && !(PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
                 ShowContinueError("Schedule named =[" + cAlphaArgs(4) + "]. was not found and will not be used.");
             }
 
@@ -809,7 +809,7 @@ namespace Pumps {
                 } else if (cAlphaArgs(6) == "POWERPERFLOWPERPRESSURE") {
                     PumpEquip(PumpNum).powerSizingMethod = sizePowerPerFlowPerPressure;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                     ErrorsFound = true;
                 }
@@ -866,7 +866,7 @@ namespace Pumps {
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "SupplyEquipmentAssigned")) {
                 PumpEquip(PumpNum).SequencingScheme = UserDefined;
             } else {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
                 ShowContinueError("Entered Value=[" + cAlphaArgs(4) + "]. " + cAlphaFieldNames(4) + " has been set to Sequential for this pump.");
                 PumpEquip(PumpNum).SequencingScheme = SequentialScheme;
             }
@@ -877,7 +877,7 @@ namespace Pumps {
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "Intermittent")) {
                 PumpEquip(PumpNum).PumpControl = Intermittent;
             } else {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
                 ShowContinueError("Entered Value=[" + cAlphaArgs(5) + "]. " + cAlphaFieldNames(5) + " has been set to Continuous for this pump.");
                 PumpEquip(PumpNum).PumpControl = Continuous;
             }
@@ -886,7 +886,7 @@ namespace Pumps {
             PumpEquip(PumpNum).PumpSchedule = cAlphaArgs(6);
             PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(cAlphaArgs(6));
             if (!lAlphaFieldBlanks(6) && !(PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(6));
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(6));
                 ShowContinueError("Schedule named =[" + cAlphaArgs(6) + "]. was not found and will not be used.");
             }
 
@@ -929,7 +929,7 @@ namespace Pumps {
                 } else if (cAlphaArgs(8) == "POWERPERFLOWPERPRESSURE") {
                     PumpEquip(PumpNum).powerSizingMethod = sizePowerPerFlowPerPressure;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                     ErrorsFound = true;
                 }
@@ -986,7 +986,7 @@ namespace Pumps {
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "Sequential")) {
                 PumpEquip(PumpNum).SequencingScheme = SequentialScheme;
             } else {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
                 ShowContinueError("Entered Value=[" + cAlphaArgs(4) + "]. " + cAlphaFieldNames(4) + " has been set to Sequential for this pump.");
                 PumpEquip(PumpNum).SequencingScheme = SequentialScheme;
                 //      PumpEquip(PumpNum)%PumpBankFlowSeqControl = 'Optimal'
@@ -998,7 +998,7 @@ namespace Pumps {
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "Intermittent")) {
                 PumpEquip(PumpNum).PumpControl = Intermittent;
             } else {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
                 ShowContinueError("Entered Value=[" + cAlphaArgs(5) + "]. " + cAlphaFieldNames(5) + " has been set to Continuous for this pump.");
                 PumpEquip(PumpNum).PumpControl = Continuous;
             }
@@ -1007,7 +1007,7 @@ namespace Pumps {
             PumpEquip(PumpNum).PumpSchedule = cAlphaArgs(6);
             PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(cAlphaArgs(6));
             if (!lAlphaFieldBlanks(6) && !(PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(6));
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(6));
                 ShowContinueError("Schedule named =[" + cAlphaArgs(6) + "]. was not found and will not be used.");
             }
 
@@ -1050,7 +1050,7 @@ namespace Pumps {
                 } else if (cAlphaArgs(8) == "POWERPERFLOWPERPRESSURE") {
                     PumpEquip(PumpNum).powerSizingMethod = sizePowerPerFlowPerPressure;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                     ErrorsFound = true;
                 }
@@ -1915,7 +1915,7 @@ namespace Pumps {
         //****************************!
         if (Power < 0.0) {
             if (PumpEquip(PumpNum).PowerErrIndex1 == 0) {
-                ShowWarningMessage(RoutineName + " Calculated Pump Power < 0, Type=" + cPumpTypes(PumpType) + ", Name=\"" + PumpEquip(PumpNum).Name +
+                ShowWarningMessage(std::string{RoutineName} + " Calculated Pump Power < 0, Type=" + cPumpTypes(PumpType) + ", Name=\"" + PumpEquip(PumpNum).Name +
                                    "\".");
                 ShowContinueErrorTimeStamp("");
                 ShowContinueError("...PartLoadRatio=[" + RoundSigDigits(PartLoadRatio, 4) +
@@ -1924,7 +1924,7 @@ namespace Pumps {
                 ShowContinueError("...Pump coefficients should be checked for producing this negative value.");
             }
             Power = 0.0;
-            ShowRecurringWarningErrorAtEnd(RoutineName + " Calculated Pump Power < 0, " + cPumpTypes(PumpType) + ", Name=\"" +
+            ShowRecurringWarningErrorAtEnd(std::string{RoutineName} + " Calculated Pump Power < 0, " + cPumpTypes(PumpType) + ", Name=\"" +
                                                PumpEquip(PumpNum).Name + "\", PLR=",
                                            PumpEquip(PumpNum).PowerErrIndex1,
                                            PartLoadRatio,
@@ -1943,7 +1943,7 @@ namespace Pumps {
                 TotalEffic = PumpEquip(PumpNum).PumpEffic * PumpEquip(PumpNum).MotorEffic;
                 // Efficiency errors are caught previously, but it doesn't hurt to add another catch before dividing by zero!!!
                 if (TotalEffic == 0.0) {
-                    ShowSevereError(RoutineName + " Plant pressure simulation encountered a pump with zero efficiency: " + PumpEquip(PumpNum).Name);
+                    ShowSevereError(std::string{RoutineName} + " Plant pressure simulation encountered a pump with zero efficiency: " + PumpEquip(PumpNum).Name);
                     ShowContinueError("Check efficiency inputs for this pump component.");
                     ShowFatalError("Errors in plant calculation would result in divide-by-zero cause program termination.");
                 }
@@ -1956,7 +1956,7 @@ namespace Pumps {
             TotalEffic = PumpEquip(PumpNum).PumpEffic * PumpEquip(PumpNum).MotorEffic;
             // Efficiency errors are caught previously, but it doesn't hurt to add another catch before dividing by zero!!!
             if (TotalEffic == 0.0) {
-                ShowSevereError(RoutineName + " Plant pump simulation encountered a pump with zero efficiency: " + PumpEquip(PumpNum).Name);
+                ShowSevereError(std::string{RoutineName} + " Plant pump simulation encountered a pump with zero efficiency: " + PumpEquip(PumpNum).Name);
                 ShowContinueError("Check efficiency inputs for this pump component.");
                 ShowFatalError("Errors in plant calculation would result in divide-by-zero cause program termination.");
             }

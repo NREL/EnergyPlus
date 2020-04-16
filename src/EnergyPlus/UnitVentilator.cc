@@ -393,7 +393,7 @@ namespace UnitVentilator {
             } else {
                 UnitVent(UnitVentNum).SchedPtr = GetScheduleIndex(Alphas(2)); // convert schedule name to pointer
                 if (UnitVent(UnitVentNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid");
                     ShowContinueError("not found: " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                     ErrorsFound = true;
                 }
@@ -407,7 +407,7 @@ namespace UnitVentilator {
             UnitVent(UnitVentNum).MinOASchedName = Alphas(4);
             UnitVent(UnitVentNum).MinOASchedPtr = GetScheduleIndex(Alphas(4)); // convert schedule name to pointer
             if (UnitVent(UnitVentNum).MinOASchedPtr == 0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
                 ShowContinueError("not found: " + cAlphaFields(4) + "=\"" + Alphas(4) + "\".");
                 ErrorsFound = true;
             }
@@ -423,11 +423,11 @@ namespace UnitVentilator {
                     UnitVent(UnitVentNum).MaxOASchedName = Alphas(5);
                     UnitVent(UnitVentNum).MaxOASchedPtr = GetScheduleIndex(Alphas(5)); // convert schedule name to pointer
                     if (UnitVent(UnitVentNum).MaxOASchedPtr == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError("not found:" + cAlphaFields(5) + "=\"" + UnitVent(UnitVentNum).MaxOASchedName + "\".");
                         ErrorsFound = true;
                     } else if (!CheckScheduleValueMinMax(UnitVent(UnitVentNum).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError("out of range [0,1]: " + cAlphaFields(5) + "=\"" + UnitVent(UnitVentNum).MaxOASchedName + "\".");
                         ErrorsFound = true;
                     }
@@ -440,7 +440,7 @@ namespace UnitVentilator {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + UnitVent(UnitVentNum).Name);
                         ErrorsFound = true;
                     } else if (!CheckScheduleValueMinMax(UnitVent(UnitVentNum).MaxOASchedPtr, ">=0", 0.0)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError("out of range [0,1]: " + cAlphaFields(5) + "=\"" + UnitVent(UnitVentNum).MaxOASchedName + "\".");
                         ErrorsFound = true;
                     }
@@ -449,12 +449,12 @@ namespace UnitVentilator {
                     UnitVent(UnitVentNum).TempSchedName = Alphas(5);
                     UnitVent(UnitVentNum).TempSchedPtr = GetScheduleIndex(Alphas(5)); // convert schedule name to pointer
                     if (UnitVent(UnitVentNum).TempSchedPtr == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(" not found: " + cAlphaFields(5) + "=\"" + UnitVent(UnitVentNum).MaxOASchedName + "\".");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
                     ShowContinueError("Illegal " + cAlphaFields(3) + "=\"" + Alphas(3) + "\".");
                 }
             }
@@ -527,7 +527,7 @@ namespace UnitVentilator {
                                 GetFanVolFlow(FanIndex, FanVolFlow);
                                 if (FanVolFlow != AutoSize && UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize &&
                                     FanVolFlow < UnitVent(UnitVentNum).MaxAirVolFlow) {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
+                                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
                                     ShowContinueError("...air flow rate [" + TrimSigDigits(FanVolFlow, 7) + "] in fan object " +
                                                       UnitVent(UnitVentNum).FanName +
                                                       " is less than the unit ventilator maximum supply air flow rate [" +
@@ -536,11 +536,11 @@ namespace UnitVentilator {
                                         "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate.");
                                     ErrorsFound = true;
                                 } else if (FanVolFlow == AutoSize && UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize) {
-                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
+                                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
                                     ShowContinueError("...the fan flow rate is autosized while the unit ventilator flow rate is not.");
                                     ShowContinueError("...this can lead to unexpected results where the fan flow rate is less than required.");
                                 } else if (FanVolFlow != AutoSize && UnitVent(UnitVentNum).MaxAirVolFlow == AutoSize) {
-                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
+                                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
                                     ShowContinueError("...the unit ventilator flow rate is autosized while the fan flow rate is not.");
                                     ShowContinueError("...this can lead to unexpected results where the fan flow rate is less than required.");
                                 }
@@ -554,7 +554,7 @@ namespace UnitVentilator {
                                 }
                             }
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
                             ShowContinueError("Fan Type must be Fan:ConstantVolume or Fan:VariableVolume.");
                             ErrorsFound = true;
                         }
@@ -567,18 +567,18 @@ namespace UnitVentilator {
                     FanVolFlow = HVACFan::fanObjs[UnitVent(UnitVentNum).Fan_Index]->designAirVolFlowRate;
                     if (FanVolFlow != AutoSize && UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize &&
                         FanVolFlow < UnitVent(UnitVentNum).MaxAirVolFlow) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
                         ShowContinueError("...air flow rate [" + TrimSigDigits(FanVolFlow, 7) + "] in fan object " + UnitVent(UnitVentNum).FanName +
                                           " is less than the unit ventilator maximum supply air flow rate [" +
                                           TrimSigDigits(UnitVent(UnitVentNum).MaxAirVolFlow, 7) + "].");
                         ShowContinueError("...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate.");
                         ErrorsFound = true;
                     } else if (FanVolFlow == AutoSize && UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize) {
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
+                        ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
                         ShowContinueError("...the fan flow rate is autosized while the unit ventilator flow rate is not.");
                         ShowContinueError("...this can lead to unexpected results where the fan flow rate is less than required.");
                     } else if (FanVolFlow != AutoSize && UnitVent(UnitVentNum).MaxAirVolFlow == AutoSize) {
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
+                        ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
                         ShowContinueError("...the unit ventilator flow rate is autosized while the fan flow rate is not.");
                         ShowContinueError("...this can lead to unexpected results where the fan flow rate is less than required.");
                     }
@@ -603,7 +603,7 @@ namespace UnitVentilator {
                 if (!lAlphaBlanks(8)) {
                     CheckAndAddAirNodeNumber(UnitVent(UnitVentNum).OutsideAirNode, IsValid);
                     if (!IsValid) {
-                        ShowWarningError(RoutineName + CurrentModuleObject + ", Adding " + cAlphaFields(8) + '=' + Alphas(8));
+                        ShowWarningError(std::string{RoutineName} + CurrentModuleObject + ", Adding " + cAlphaFields(8) + '=' + Alphas(8));
                     }
                 }
 
@@ -628,7 +628,7 @@ namespace UnitVentilator {
                 UnitVent(UnitVentNum).OutsideAirNode = UnitVent(UnitVentNum).ATMixerPriNode;
                 UnitVent(UnitVentNum).OAMixerOutNode = UnitVent(UnitVentNum).ATMixerOutNode;
                 if (!lAlphaBlanks(8) || !lAlphaBlanks(9) || !lAlphaBlanks(10)) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\" is connected to central DOA.");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\" is connected to central DOA.");
                     if (!lAlphaBlanks(8)) {
                         ShowContinueError("... input field " + cAlphaFields(8) + " should have been blank. Specified = " + Alphas(8));
                     }
@@ -708,7 +708,7 @@ namespace UnitVentilator {
                 } else if (SELECT_CASE_var == "NONE") {
                     UnitVent(UnitVentNum).CoilOption = NoneOption;
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
                     ShowContinueError("illegal value: " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                     ErrorsFound = true;
                 }
@@ -771,7 +771,7 @@ namespace UnitVentilator {
                         } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
                             UnitVent(UnitVentNum).HCoilType = Heating_GasCoilType;
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
                             ShowContinueError("illegal value: " + cAlphaFields(15) + "=\"" + Alphas(15) + "\".");
                             ErrorsFound = true;
                             errFlag = true;
@@ -835,7 +835,7 @@ namespace UnitVentilator {
                         }
                     }
                 } else { // heating coil is required for these options
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", missing heating coil");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", missing heating coil");
                     ShowContinueError("a heating coil is required for " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                     ErrorsFound = true;
                 } // IF (.NOT. lAlphaBlanks(15)) THEN - from the start of heating coil information
@@ -879,7 +879,7 @@ namespace UnitVentilator {
                             } else if (UtilityRoutines::SameString(UnitVent(UnitVentNum).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry")) {
                                 UnitVent(UnitVentNum).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
                             } else {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
+                                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
                                 ShowContinueError("For: " + cAlphaFields(17) + "=\"" + Alphas(17) + "\".");
                                 ShowContinueError("Invalid Coil Type=" + UnitVent(UnitVentNum).CCoilPlantType +
                                                   ", Name=" + UnitVent(UnitVentNum).CCoilPlantName);
@@ -887,7 +887,7 @@ namespace UnitVentilator {
                                 ErrorsFound = true;
                             }
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", invalid");
                             ShowContinueError("illegal value: " + cAlphaFields(17) + "=\"" + cCoolingCoilType + "\".");
                             ErrorsFound = true;
                             errFlag = true;
@@ -939,7 +939,7 @@ namespace UnitVentilator {
                         }
                     }
                 } else { // Cooling Coil is required for this/these options
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", missing cooling coil");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\", missing cooling coil");
                     ShowContinueError("a cooling coil is required for " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                     ErrorsFound = true;
                 } // IF (.NOT. lAlphaBlanks(17)) THEN - from the start of cooling coil information
@@ -1096,7 +1096,7 @@ namespace UnitVentilator {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowFatalError(RoutineName + "Errors found in input.");
+        if (ErrorsFound) ShowFatalError(std::string{RoutineName} + "Errors found in input.");
 
         // Setup Report variables for the Unit Ventilators, CurrentModuleObject='ZoneHVAC:UnitVentilator'
         for (UnitVentNum = 1; UnitVentNum <= NumOfUnitVents; ++UnitVentNum) {

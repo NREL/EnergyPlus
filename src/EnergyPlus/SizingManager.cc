@@ -237,7 +237,7 @@ namespace SizingManager {
         // okay, check sizing inputs vs desires vs requirements
         if (DoZoneSizing || DoSystemSizing) {
             if ((NumSysSizInput > 0 && NumZoneSizingInput == 0) || (!DoZoneSizing && DoSystemSizing && NumSysSizInput > 0)) {
-                ShowSevereError(RoutineName + "Requested System Sizing but did not request Zone Sizing.");
+                ShowSevereError(std::string{RoutineName} + "Requested System Sizing but did not request Zone Sizing.");
                 ShowContinueError("System Sizing cannot be done without Zone Sizing");
                 ShowFatalError("Program terminates for preceding conditions.");
             }
@@ -254,11 +254,11 @@ namespace SizingManager {
             if (isUserReqCompLoadReport) {
                 if (fileHasSizingPeriodDays) {
                     ShowWarningError(
-                        RoutineName +
+                        std::string{RoutineName} +
                         "The ZoneComponentLoadSummary report was requested but no sizing objects were found so that report cannot be generated.");
                 } else {
                     ShowWarningError(
-                        RoutineName +
+                        std::string{RoutineName} +
                         "The ZoneComponentLoadSummary report was requested but no SizingPeriod:DesignDay or SizingPeriod:WeatherFileDays objects were found so that report cannot be generated.");
                 }
             }
@@ -271,7 +271,7 @@ namespace SizingManager {
 
         if ((DoZoneSizing) && (NumZoneSizingInput == 0)) {
             ShowWarningError(
-                RoutineName +
+                std::string{RoutineName} +
                 "For a zone sizing run, there must be at least 1 Sizing:Zone input object. SimulationControl Zone Sizing option ignored.");
         }
 
@@ -449,7 +449,7 @@ namespace SizingManager {
                     UpdateFacilitySizing(EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
-                    ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
+                    ShowSevereError(std::string{RoutineName} + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
                     ErrorsFound = true;
                 }
 
@@ -475,7 +475,7 @@ namespace SizingManager {
 
         if ((DoSystemSizing) && (NumSysSizInput == 0) && (NumAirLoops > 0)) {
             ShowWarningError(
-                RoutineName +
+                std::string{RoutineName} +
                 "For a system sizing run, there must be at least 1 Sizing:System object input. SimulationControl System Sizing option ignored.");
         }
 
@@ -608,7 +608,7 @@ namespace SizingManager {
                 UpdateSysSizing(outputFiles, EndSysSizingCalc);
                 SysSizingRunDone = true;
             } else {
-                ShowSevereError(RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
+                ShowSevereError(std::string{RoutineName} + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
                 ErrorsFound = true;
             }
         } else if ((NumZoneSizingInput > 0) && (DoZoneSizing || DoSystemSizing || DoPlantSizing)) {
@@ -732,14 +732,14 @@ namespace SizingManager {
                 curName = FinalSysSizing(AirLoopNum).AirPriLoopName;
                 PreDefTableEntry(pdchSysSizCalcClAir, curName, CalcSysSizing(AirLoopNum).DesCoolVolFlow);
                 if (std::abs(CalcSysSizing(AirLoopNum).DesCoolVolFlow) <= 1.e-8) {
-                    ShowWarningError(RoutineName + "Calculated Cooling Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName +
+                    ShowWarningError(std::string{RoutineName} + "Calculated Cooling Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName +
                                      " is zero.");
                     ShowContinueError("Check Sizing:Zone and ZoneControl:Thermostat inputs.");
                 }
                 PreDefTableEntry(pdchSysSizUserClAir, curName, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
                 PreDefTableEntry(pdchSysSizCalcHtAir, curName, CalcSysSizing(AirLoopNum).DesHeatVolFlow);
                 if (std::abs(CalcSysSizing(AirLoopNum).DesHeatVolFlow) <= 1.e-8) {
-                    ShowWarningError(RoutineName + "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName +
+                    ShowWarningError(std::string{RoutineName} + "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName +
                                      " is zero.");
                     ShowContinueError("Check Sizing:Zone and ZoneControl:Thermostat inputs.");
                 }
@@ -813,7 +813,7 @@ namespace SizingManager {
 
         if ((DoPlantSizing) && (NumPltSizInput == 0)) {
             ShowWarningError(
-                RoutineName +
+                std::string{RoutineName} +
                 "For a plant sizing run, there must be at least 1 Sizing:Plant object input. SimulationControl Plant Sizing option ignored.");
         }
 
@@ -2124,7 +2124,7 @@ namespace SizingManager {
             lNumericBlanks.deallocate();
 
             if (ErrorsFound) {
-                ShowFatalError(RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+                ShowFatalError(std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
             }
         }
     }
@@ -2203,7 +2203,7 @@ namespace SizingManager {
                            Alphas(2), "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY")) { // Proportional Control based on ASHRAE Standard 62.1-2004
                 OARequirements(OAIndex).OAFlowMethod = ZOAM_ProportionalControlDesOcc;
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
                 ShowContinueError("...Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\",");
                 ShowContinueError("...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, IndoorAirQualityProcedure, "
                                   "ProportionalControlBasedOnDesignOccupancy, and ProportionalControlBasedonOccupancySchedule.");
@@ -2263,13 +2263,13 @@ namespace SizingManager {
                 OARequirements(OAIndex).OAFlowFracSchPtr = GetScheduleIndex(Alphas(3));
                 if (OARequirements(OAIndex).OAFlowFracSchPtr > 0) {
                     if (!CheckScheduleValueMinMax(OARequirements(OAIndex).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
                         ShowContinueError("Error found in " + cAlphaFields(3) + " = " + Alphas(3));
                         ShowContinueError("Schedule values must be (>=0., <=1.)");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
                     ShowContinueError("...Not Found " + cAlphaFields(3) + "=\"" + Alphas(3) + "\".");
                     ErrorsFound = true;
                 }
@@ -2281,13 +2281,13 @@ namespace SizingManager {
                 OARequirements(OAIndex).OAPropCtlMinRateSchPtr = GetScheduleIndex(Alphas(4));
                 if (OARequirements(OAIndex).OAPropCtlMinRateSchPtr > 0) {
                     if (!CheckScheduleValueMinMax(OARequirements(OAIndex).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
                         ShowContinueError("Error found in " + cAlphaFields(4) + " = " + Alphas(4));
                         ShowContinueError("Schedule values must be (>=0., <=1.)");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
                     ShowContinueError("...Not Found " + cAlphaFields(4) + "=\"" + Alphas(4) + "\".");
                     ErrorsFound = true;
                 }
@@ -2407,13 +2407,13 @@ namespace SizingManager {
                         ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr = GetScheduleIndex(Alphas(2));
                         if (ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr > 0) {
                             if (!CheckScheduleValueMinMax(ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr, ">", 0.0)) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + ZoneAirDistribution(ZADIndex).Name + "\",");
+                                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + ZoneAirDistribution(ZADIndex).Name + "\",");
                                 ShowContinueError("Error found in " + cAlphaFields(2) + " = " + Alphas(2));
                                 ShowContinueError("Schedule values must be >0.0)");
                                 ErrorsFound = true;
                             }
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + ZoneAirDistribution(ZADIndex).Name + "\",");
+                            ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + ZoneAirDistribution(ZADIndex).Name + "\",");
                             ShowContinueError("...Not Found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                             ErrorsFound = true;
                         }
@@ -2429,7 +2429,7 @@ namespace SizingManager {
             lNumericBlanks.deallocate();
 
             if (ErrorsFound) {
-                ShowFatalError(RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+                ShowFatalError(std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
             }
         }
     }
@@ -4715,7 +4715,7 @@ namespace SizingManager {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 
@@ -4776,7 +4776,7 @@ namespace SizingManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 

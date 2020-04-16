@@ -651,7 +651,7 @@ namespace HVACControllers {
                         //        CASE ('FLOW')
                         //          ControllerProps(Num)%ControlVar  = iFlow
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                         ShowSevereError("...Invalid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                         "\", must be Temperature, HumidityRatio, or TemperatureAndHumidityRatio.");
                         ErrorsFound = true;
@@ -664,14 +664,14 @@ namespace HVACControllers {
                 } else if (lAlphaBlanks(3)) {
                     ControllerProps(Num).Action = 0;
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ShowSevereError("...Invalid " + cAlphaFields(3) + "=\"" + AlphArray(3) + "\", must be \"Normal\", \"Reverse\" or blank.");
                     ErrorsFound = true;
                 }
                 if (AlphArray(4) == "FLOW") {
                     ControllerProps(Num).ActuatorVar = iFlow;
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ShowContinueError("...Invalid " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\", only FLOW is allowed.");
                     ErrorsFound = true;
                 }
@@ -690,7 +690,7 @@ namespace HVACControllers {
                 ControllerProps(Num).MinVolFlowActuated = NumArray(3);
 
                 if (!CheckForControllerWaterCoil(CurrentModuleObject, AlphArray(1))) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\" not found on any AirLoopHVAC:ControllerList.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\" not found on any AirLoopHVAC:ControllerList.");
                     ErrorsFound = true;
                 }
 
@@ -703,7 +703,7 @@ namespace HVACControllers {
 
                     if (NodeNotFound) {
                         // the sensor node is not on the water coil air outlet node
-                        ShowWarningError(RoutineName + ControllerProps(Num).ControllerType + "=\"" + ControllerProps(Num).ControllerName + "\". ");
+                        ShowWarningError(std::string{RoutineName} + ControllerProps(Num).ControllerType + "=\"" + ControllerProps(Num).ControllerName + "\". ");
                         ShowContinueError(" ..Sensor node not found on water coil air outlet node.");
                         ShowContinueError(" ..The sensor node may have been placed on a node downstream of the coil or on an airloop outlet node.");
                     } else {
@@ -763,14 +763,14 @@ namespace HVACControllers {
             CheckActuatorNode(ControllerProps(Num).ActuatedNode, iNodeType, ActuatorNodeNotFound);
             if (ActuatorNodeNotFound) {
                 ErrorsFound = true;
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
                 ShowContinueError("...the actuator node must also be a water inlet node of a water coil");
             } else { // Node found, check type and action
                 if (iNodeType == CoilType_Cooling) {
                     if (ControllerProps(Num).Action == 0) {
                         ControllerProps(Num).Action = iReverseAction;
                     } else if (ControllerProps(Num).Action == iNormalAction) {
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
+                        ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
                         ShowContinueError("...Normal action has been specified for a cooling coil - should be Reverse.");
                         ShowContinueError("...overriding user input action with Reverse Action.");
                         ControllerProps(Num).Action = iReverseAction;
@@ -779,7 +779,7 @@ namespace HVACControllers {
                     if (ControllerProps(Num).Action == 0) {
                         ControllerProps(Num).Action = iNormalAction;
                     } else if (ControllerProps(Num).Action == iReverseAction) {
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
+                        ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
                         ShowContinueError("...Reverse action has been specified for a heating coil - should be Normal.");
                         ShowContinueError("...overriding user input action with Normal Action.");
                         ControllerProps(Num).Action = iNormalAction;
@@ -799,7 +799,7 @@ namespace HVACControllers {
         CheckControllerListOrder();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " input.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.");
         }
     }
 
@@ -1148,11 +1148,11 @@ namespace HVACControllers {
 
             // Check to make sure that the Minimum Flow rate is less than the max.
             if (ControllerProps(ControlNum).MaxVolFlowActuated == 0.0) {
-                ShowWarningError(RoutineName + ": Controller:WaterCoil=\"" + ControllerProps(ControlNum).ControllerName +
+                ShowWarningError(std::string{RoutineName} + ": Controller:WaterCoil=\"" + ControllerProps(ControlNum).ControllerName +
                                  "\", Maximum Actuated Flow is zero.");
                 ControllerProps(ControlNum).MinVolFlowActuated = 0.0;
             } else if (ControllerProps(ControlNum).MinVolFlowActuated >= ControllerProps(ControlNum).MaxVolFlowActuated) {
-                ShowFatalError(RoutineName + ": Controller:WaterCoil=\"" + ControllerProps(ControlNum).ControllerName +
+                ShowFatalError(std::string{RoutineName} + ": Controller:WaterCoil=\"" + ControllerProps(ControlNum).ControllerName +
                                "\", Minimum control flow is > or = Maximum control flow.");
             }
 

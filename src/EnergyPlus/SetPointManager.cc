@@ -516,7 +516,7 @@ namespace SetPointManager {
         GetSetPointManagerInputData(ErrorsFound);
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Program terminates.");
         }
     }
 
@@ -857,7 +857,7 @@ namespace SetPointManager {
             } else if (UtilityRoutines::SameString(SchSetPtMgr(SetPtMgrNum).CtrlVarType, "MinimumMassFlowRate")) {
                 SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinMassFlow;
             } else {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid values are \"Temperature\",\"MaximumTemperature\",\"MinimumTemperature\",");
                 ShowContinueError("     \"HumidityRatio\",\"MaximumHumidityRatio\",\"MinimumHumidityRatio\",\"MassFlowRate\",");
@@ -869,10 +869,10 @@ namespace SetPointManager {
             SchSetPtMgr(SetPtMgrNum).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
             if (SchSetPtMgr(SetPtMgrNum).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank required field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank required field.");
                     ShowContinueError("..required field " + cAlphaFieldNames(3));
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 }
                 ErrorsFound = true;
@@ -948,7 +948,7 @@ namespace SetPointManager {
                 DualSchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid value is \"Temperature\".");
                 ErrorsFound = true;
@@ -957,10 +957,10 @@ namespace SetPointManager {
             DualSchSetPtMgr(SetPtMgrNum).SchedPtrHi = GetScheduleIndex(cAlphaArgs(3));
             if (DualSchSetPtMgr(SetPtMgrNum).SchedPtrHi == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank required field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank required field.");
                     ShowContinueError("..required field " + cAlphaFieldNames(3));
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 }
                 ErrorsFound = true;
@@ -969,10 +969,10 @@ namespace SetPointManager {
             DualSchSetPtMgr(SetPtMgrNum).SchedPtrLo = GetScheduleIndex(cAlphaArgs(4));
             if (DualSchSetPtMgr(SetPtMgrNum).SchedPtrLo == 0) {
                 if (lAlphaFieldBlanks(4)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank required field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank required field.");
                     ShowContinueError("..required field " + cAlphaFieldNames(4));
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                 }
                 ErrorsFound = true;
@@ -1053,7 +1053,7 @@ namespace SetPointManager {
                 OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinTemp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid value is \"Temperature\".");
                 ErrorsFound = true;
@@ -1064,7 +1064,7 @@ namespace SetPointManager {
             OutAirSetPtMgr(SetPtMgrNum).OutHigh1 = rNumericArgs(4);
             OutAirSetPtMgr(SetPtMgrNum).CtrlNodeListName = cAlphaArgs(3);
             if (OutAirSetPtMgr(SetPtMgrNum).OutHigh1 < OutAirSetPtMgr(SetPtMgrNum).OutLow1) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid setpoints.");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid setpoints.");
                 ShowContinueError("..." + cNumericFieldNames(4) + "=[" + RoundSigDigits(OutAirSetPtMgr(SetPtMgrNum).OutHigh1, 1) + "] is less than " +
                                   cNumericFieldNames(2) + "=[" + RoundSigDigits(OutAirSetPtMgr(SetPtMgrNum).OutLow1, 1) + "].");
             }
@@ -1078,7 +1078,7 @@ namespace SetPointManager {
                 OutAirSetPtMgr(SetPtMgrNum).OutHighSetPt2 = rNumericArgs(7);
                 OutAirSetPtMgr(SetPtMgrNum).OutHigh2 = rNumericArgs(8);
                 if (OutAirSetPtMgr(SetPtMgrNum).OutHigh2 < OutAirSetPtMgr(SetPtMgrNum).OutLow2) {
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid setpoints.");
+                    ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid setpoints.");
                     ShowContinueError("..." + cNumericFieldNames(8) + "=[" + RoundSigDigits(OutAirSetPtMgr(SetPtMgrNum).OutHigh2, 1) +
                                       "] is less than " + cNumericFieldNames(6) + "=[" + RoundSigDigits(OutAirSetPtMgr(SetPtMgrNum).OutLow2, 1) +
                                       "].");
@@ -1160,7 +1160,7 @@ namespace SetPointManager {
                 SingZoneRhSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid value is \"Temperature\".");
                 ErrorsFound = true;
@@ -1169,7 +1169,7 @@ namespace SetPointManager {
             SingZoneRhSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(1);
             SingZoneRhSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (SingZoneRhSetPtMgr(SetPtMgrNum).MaxSetTemp < SingZoneRhSetPtMgr(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(SingZoneRhSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(SingZoneRhSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
                                   "].");
@@ -1210,7 +1210,7 @@ namespace SetPointManager {
             // get the actual zone number of the control zone
             SingZoneRhSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
             if (SingZoneRhSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 ErrorsFound = true;
             }
@@ -1256,7 +1256,7 @@ namespace SetPointManager {
                 SingZoneHtSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid value is \"Temperature\".");
                 ErrorsFound = true;
@@ -1265,7 +1265,7 @@ namespace SetPointManager {
             SingZoneHtSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(1);
             SingZoneHtSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (SingZoneHtSetPtMgr(SetPtMgrNum).MaxSetTemp < SingZoneHtSetPtMgr(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(SingZoneHtSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(SingZoneHtSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
                                   "].");
@@ -1306,7 +1306,7 @@ namespace SetPointManager {
             // get the actual zone number of the control zone
             SingZoneHtSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
             if (SingZoneHtSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 ErrorsFound = true;
             }
@@ -1351,7 +1351,7 @@ namespace SetPointManager {
                 SingZoneClSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid value is \"Temperature\".");
                 ErrorsFound = true;
@@ -1360,7 +1360,7 @@ namespace SetPointManager {
             SingZoneClSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(1);
             SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp < SingZoneClSetPtMgr(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(SingZoneClSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
                                   "].");
@@ -1401,7 +1401,7 @@ namespace SetPointManager {
             // get the actual zone number of the control zone
             SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
             if (SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 ErrorsFound = true;
             }
@@ -1496,7 +1496,7 @@ namespace SetPointManager {
             SZMinHumSetPtMgr(SetPtMgrNum).NumZones = NumZones;
             // only allow one control zone for now
             if (NumNodes > 1) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", entered nodelist.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", entered nodelist.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 ShowContinueError("..only one control zone is allowed.");
                 ErrorsFound = true;
@@ -1601,7 +1601,7 @@ namespace SetPointManager {
             SZMaxHumSetPtMgr(SetPtMgrNum).NumZones = NumZones;
             // only allow one control zone for now
             if (NumNodes > 1) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", entered nodelist.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", entered nodelist.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                 ShowContinueError("..only one control zone is allowed.");
                 ErrorsFound = true;
@@ -1657,7 +1657,7 @@ namespace SetPointManager {
                 MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid value is \"Temperature\".");
                 ErrorsFound = true;
@@ -1700,7 +1700,7 @@ namespace SetPointManager {
             Found = FindNumberInList(
                 MixedAirSetPtMgr(SetPtMgrNum).RefNode, MixedAirSetPtMgr(SetPtMgrNum).CtrlNodes, MixedAirSetPtMgr(SetPtMgrNum).NumCtrlNodes);
             if (Found > 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", reference node.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", reference node.");
                 if (MixedAirSetPtMgr(SetPtMgrNum).NumCtrlNodes > 1) {
                     ShowContinueError("..Reference Node is the same as one of the nodes in SetPoint NodeList");
                 } else {
@@ -1771,7 +1771,7 @@ namespace SetPointManager {
                     OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinHumRat;
                 } else {
                     // should not come here if idd type choice and key list is working
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ShowContinueError("..Valid values are \"Temperature\",\"HumidityRatio\",\"MaximumHumidityRatio\" or \"MinimumHumidityRatio\".");
                     ErrorsFound = true;
@@ -1781,7 +1781,7 @@ namespace SetPointManager {
             OAPretreatSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(1);
             OAPretreatSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (OAPretreatSetPtMgr(SetPtMgrNum).MaxSetTemp < OAPretreatSetPtMgr(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(OAPretreatSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(OAPretreatSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
                                   "].");
@@ -1789,7 +1789,7 @@ namespace SetPointManager {
             OAPretreatSetPtMgr(SetPtMgrNum).MinSetHumRat = rNumericArgs(3);
             OAPretreatSetPtMgr(SetPtMgrNum).MaxSetHumRat = rNumericArgs(4);
             if (OAPretreatSetPtMgr(SetPtMgrNum).MaxSetHumRat < OAPretreatSetPtMgr(SetPtMgrNum).MinSetHumRat) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(4) + "=[" + RoundSigDigits(OAPretreatSetPtMgr(SetPtMgrNum).MaxSetHumRat, 1) +
                                   "] is less than " + cNumericFieldNames(3) + "=[" + RoundSigDigits(OAPretreatSetPtMgr(SetPtMgrNum).MinSetHumRat, 1) +
                                   "].");
@@ -1798,12 +1798,12 @@ namespace SetPointManager {
             // Because a zero humidity ratio setpoint is a special value indicating "off" or "no load"
             // must not allow MinSetHumRat or MaxSetHumRat to be <=0.0
             if (OAPretreatSetPtMgr(SetPtMgrNum).MinSetHumRat <= 0.0) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value.");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value.");
                 ShowContinueError("Minimum setpoint humidity ratio <=0.0, resetting to 0.00001");
                 OAPretreatSetPtMgr(SetPtMgrNum).MinSetHumRat = 0.00001;
             }
             if (OAPretreatSetPtMgr(SetPtMgrNum).MaxSetHumRat <= 0.0) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value.");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value.");
                 ShowContinueError("Maximum setpoint humidity ratio <=0.0, resetting to 0.00001");
                 OAPretreatSetPtMgr(SetPtMgrNum).MaxSetHumRat = 0.00001;
             }
@@ -1848,7 +1848,7 @@ namespace SetPointManager {
             Found = FindNumberInList(
                 OAPretreatSetPtMgr(SetPtMgrNum).RefNode, OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes, OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes);
             if (Found > 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", reference node.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", reference node.");
                 if (OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes > 1) {
                     ShowContinueError("..Reference Node is the same as one of the nodes in SetPoint NodeList");
                 } else {
@@ -1898,7 +1898,7 @@ namespace SetPointManager {
                 WarmestSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid value is \"Temperature\".");
                 ErrorsFound = true;
@@ -1908,7 +1908,7 @@ namespace SetPointManager {
             WarmestSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(1);
             WarmestSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (WarmestSetPtMgr(SetPtMgrNum).MaxSetTemp < WarmestSetPtMgr(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(WarmestSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(WarmestSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
                                   "].");
@@ -1919,7 +1919,7 @@ namespace SetPointManager {
                 if (SELECT_CASE_var == "MAXIMUMTEMPERATURE") {
                     WarmestSetPtMgr(SetPtMgrNum).Strategy = MaxTemp;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ShowContinueError("..Valid value is \"MaximumTemperature\".");
                     ErrorsFound = true;
@@ -1995,7 +1995,7 @@ namespace SetPointManager {
                 ColdestSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid value is \"Temperature\".");
                 ErrorsFound = true;
@@ -2005,7 +2005,7 @@ namespace SetPointManager {
             ColdestSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(1);
             ColdestSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (ColdestSetPtMgr(SetPtMgrNum).MaxSetTemp < ColdestSetPtMgr(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(ColdestSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(ColdestSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
                                   "].");
@@ -2016,7 +2016,7 @@ namespace SetPointManager {
                 if (SELECT_CASE_var == "MINIMUMTEMPERATURE") {
                     ColdestSetPtMgr(SetPtMgrNum).Strategy = MinTemp;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ShowContinueError("..Valid value is \"MinimumTemperature\".");
                     ErrorsFound = true;
@@ -2093,7 +2093,7 @@ namespace SetPointManager {
                 WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid value is \"Temperature\".");
                 ErrorsFound = true;
@@ -2103,14 +2103,14 @@ namespace SetPointManager {
             WarmestSetPtMgrTempFlow(SetPtMgrNum).MinSetTemp = rNumericArgs(1);
             WarmestSetPtMgrTempFlow(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (WarmestSetPtMgrTempFlow(SetPtMgrNum).MaxSetTemp < WarmestSetPtMgrTempFlow(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(WarmestSetPtMgrTempFlow(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" +
                                   RoundSigDigits(WarmestSetPtMgrTempFlow(SetPtMgrNum).MinSetTemp, 1) + "].");
             }
             WarmestSetPtMgrTempFlow(SetPtMgrNum).MinTurndown = rNumericArgs(3);
             if (WarmestSetPtMgrTempFlow(SetPtMgrNum).MinTurndown >= 0.8) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(3) + "=[" + RoundSigDigits(WarmestSetPtMgrTempFlow(SetPtMgrNum).MinTurndown, 2) +
                                   "] is greater than 0.8;");
                 ShowContinueError("...typical values for " + cNumericFieldNames(3) + " are less than 0.8.");
@@ -2122,7 +2122,7 @@ namespace SetPointManager {
                 } else if (SELECT_CASE_var == "FLOWFIRST") {
                     WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy = FlowFirst;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ShowContinueError("..Valid values are \"TemperatureFirst\" or \"FlowFirst\".");
                     ErrorsFound = true;
@@ -2202,7 +2202,7 @@ namespace SetPointManager {
                 RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MassFlow;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid value is \"Temperature\".");
                 ErrorsFound = true;
@@ -2213,10 +2213,10 @@ namespace SetPointManager {
             RABFlowSetPtMgr(SetPtMgrNum).SchedPtr = GetScheduleIndex(cAlphaArgs(4));
             if (RABFlowSetPtMgr(SetPtMgrNum).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(4)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank required field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", blank required field.");
                     ShowContinueError("..required field " + cAlphaFieldNames(4));
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                 }
                 ErrorsFound = true;
@@ -2267,7 +2267,7 @@ namespace SetPointManager {
             MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
 
             if (MZAverageCoolingSetPtMgr(SetPtMgrNum).MaxSetTemp < MZAverageCoolingSetPtMgr(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(MZAverageCoolingSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" +
                                   RoundSigDigits(MZAverageCoolingSetPtMgr(SetPtMgrNum).MinSetTemp, 1) + "].");
@@ -2345,7 +2345,7 @@ namespace SetPointManager {
             MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
 
             if (MZAverageHeatingSetPtMgr(SetPtMgrNum).MaxSetTemp < MZAverageHeatingSetPtMgr(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(MZAverageHeatingSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" +
                                   RoundSigDigits(MZAverageHeatingSetPtMgr(SetPtMgrNum).MinSetTemp, 1) + "].");
@@ -2423,7 +2423,7 @@ namespace SetPointManager {
             MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinHumRat;
 
             if (MZAverageMinHumSetPtMgr(SetPtMgrNum).MaxSetHum < MZAverageMinHumSetPtMgr(SetPtMgrNum).MinSetHum) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(MZAverageMinHumSetPtMgr(SetPtMgrNum).MaxSetHum, 3) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" +
                                   RoundSigDigits(MZAverageMinHumSetPtMgr(SetPtMgrNum).MinSetHum, 3) + "].");
@@ -2502,7 +2502,7 @@ namespace SetPointManager {
             MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxHumRat;
 
             if (MZAverageMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum < MZAverageMaxHumSetPtMgr(SetPtMgrNum).MinSetHum) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(MZAverageMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum, 3) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" +
                                   RoundSigDigits(MZAverageMaxHumSetPtMgr(SetPtMgrNum).MinSetHum, 3) + "].");
@@ -2581,7 +2581,7 @@ namespace SetPointManager {
             MZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinHumRat;
 
             if (MZMinHumSetPtMgr(SetPtMgrNum).MaxSetHum < MZMinHumSetPtMgr(SetPtMgrNum).MinSetHum) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(MZMinHumSetPtMgr(SetPtMgrNum).MaxSetHum, 3) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(MZMinHumSetPtMgr(SetPtMgrNum).MinSetHum, 3) +
                                   "].");
@@ -2660,7 +2660,7 @@ namespace SetPointManager {
             MZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxHumRat;
 
             if (MZMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum < MZMaxHumSetPtMgr(SetPtMgrNum).MinSetHum) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(MZMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum, 3) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(MZMaxHumSetPtMgr(SetPtMgrNum).MinSetHum, 3) +
                                   "].");
@@ -2742,7 +2742,7 @@ namespace SetPointManager {
                 FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinTemp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid values are \"Temperature\",\"MaximumTemperature\" or \"MinimumTemperature\".");
                 ErrorsFound = true;
@@ -2753,7 +2753,7 @@ namespace SetPointManager {
             } else if (UtilityRoutines::SameString(FollowOATempSetPtMgr(SetPtMgrNum).RefTempType, "OutdoorAirDryBulb")) {
                 FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefTempType_DryBulb;
             } else {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 ShowContinueError("..Valid values are \"OutdoorAirWetBulb\" or \"OutdoorAirDryBulb\".");
                 ErrorsFound = true;
@@ -2762,7 +2762,7 @@ namespace SetPointManager {
             FollowOATempSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             FollowOATempSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(3);
             if (FollowOATempSetPtMgr(SetPtMgrNum).MaxSetTemp < FollowOATempSetPtMgr(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(FollowOATempSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(3) + "=[" + RoundSigDigits(FollowOATempSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
                                   "].");
@@ -2844,7 +2844,7 @@ namespace SetPointManager {
                 FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinTemp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid values are \"Temperature\",\"MaximumTemperature\" or \"MinimumTemperature\".");
                 ErrorsFound = true;
@@ -2858,7 +2858,7 @@ namespace SetPointManager {
                 FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefTempType_DryBulb;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 ShowContinueError("..Valid values are \"NodeWetBulb\" or \"NodeDryBulb\".");
                 ErrorsFound = true;
@@ -2867,7 +2867,7 @@ namespace SetPointManager {
             FollowSysNodeTempSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             FollowSysNodeTempSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(3);
             if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).MaxSetTemp < FollowSysNodeTempSetPtMgr(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(FollowSysNodeTempSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(3) + "=[" +
                                   RoundSigDigits(FollowSysNodeTempSetPtMgr(SetPtMgrNum).MinSetTemp, 1) + "].");
@@ -2949,7 +2949,7 @@ namespace SetPointManager {
                 GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinTemp;
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ShowContinueError("..Valid values are \"Temperature\",\"MaximumTemperature\" or \"MinimumTemperature\".");
                 ErrorsFound = true;
@@ -2959,7 +2959,7 @@ namespace SetPointManager {
                 GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefGroundTempObjType_BuildingSurface;
                 if (NoSurfaceGroundTempObjWarning) {
                     if (!GroundTempObjInput) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                        ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\" requires \"Site:GroundTemperature:BuildingSurface\" in the input.");
                         ShowContinueError("Defaults, constant throughout the year of (" + RoundSigDigits(GroundTemp, 1) + ") will be used.");
                     }
@@ -2969,7 +2969,7 @@ namespace SetPointManager {
                 GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefGroundTempObjType_Shallow;
                 if (NoShallowGroundTempObjWarning) {
                     if (!GroundTemp_SurfaceObjInput) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                        ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\" requires \"Site:GroundTemperature:Shallow\" in the input.");
                         ShowContinueError("Defaults, constant throughout the year of (" + RoundSigDigits(GroundTemp_Surface, 1) + ") will be used.");
                     }
@@ -2979,7 +2979,7 @@ namespace SetPointManager {
                 GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefGroundTempObjType_Deep;
                 if (NoDeepGroundTempObjWarning) {
                     if (!GroundTemp_DeepObjInput) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                        ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\" requires \"Site:GroundTemperature:Deep\" in the input.");
                         ShowContinueError("Defaults, constant throughout the year of (" + RoundSigDigits(GroundTemp_Deep, 1) + ") will be used.");
                     }
@@ -2989,7 +2989,7 @@ namespace SetPointManager {
                 GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefGroundTempObjType_FCfactorMethod;
                 if (NoFCGroundTempObjWarning) {
                     if (!FCGroundTemps) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                        ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\" requires \"Site:GroundTemperature:FCfactorMethod\" in the input.");
                         ShowContinueError("Defaults, constant throughout the year of (" + RoundSigDigits(GroundTempFC, 1) + ") will be used.");
                     }
@@ -2997,7 +2997,7 @@ namespace SetPointManager {
                 }
             } else {
                 // should not come here if idd type choice and key list is working
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                 ShowContinueError("..Valid values are \"Site:GroundTemperature:BuildingSurface\", \"Site:GroundTemperature:Shallow\",");
                 ShowContinueError("     \"Site:GroundTemperature:Deep\" or \"Site:GroundTemperature:FCfactorMethod\".");
@@ -3007,7 +3007,7 @@ namespace SetPointManager {
             GroundTempSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             GroundTempSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(3);
             if (GroundTempSetPtMgr(SetPtMgrNum).MaxSetTemp < GroundTempSetPtMgr(SetPtMgrNum).MinSetTemp) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(GroundTempSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
                                   "] is less than " + cNumericFieldNames(3) + "=[" + RoundSigDigits(GroundTempSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
                                   "].");
@@ -3114,7 +3114,7 @@ namespace SetPointManager {
             CondEntSetPtMgr(SetPtMgrNum).TowerDsnInletAirWetBulb = rNumericArgs(3);
             CondEntSetPtMgr(SetPtMgrNum).CtrlNodeListName = cAlphaArgs(7);
             if (CondEntSetPtMgr(SetPtMgrNum).MaxCondEntTemp < CondEntSetPtMgr(SetPtMgrNum).TowerDsnInletAirWetBulb) {
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(CondEntSetPtMgr(SetPtMgrNum).MaxCondEntTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" +
                                   RoundSigDigits(CondEntSetPtMgr(SetPtMgrNum).TowerDsnInletAirWetBulb, 1) + "].");
@@ -3271,7 +3271,7 @@ namespace SetPointManager {
 
             if (SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOffTemp < SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOnTemp) {
                 // throw warning, off must be warmer than on
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOffTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" +
                                   RoundSigDigits(SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOnTemp, 1) + "].");
@@ -3282,13 +3282,13 @@ namespace SetPointManager {
             // get the actual zone number of the control zone
             SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             } else {
                 if (allocated(StageZoneLogic)) {
                     if (!StageZoneLogic(SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                         ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                         ShowContinueError("Zone thermostat must use ZoneControl:Thermostat:StagedDualSetpoint.");
                         ErrorsFound = true;
@@ -3364,7 +3364,7 @@ namespace SetPointManager {
 
             if (SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOffTemp > SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOnTemp) {
                 // throw warning, off must be cooler than on
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowWarningError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOnTemp, 1) +
                                   "] is less than " + cNumericFieldNames(1) + "=[" +
                                   RoundSigDigits(SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOffTemp, 1) + "].");
@@ -3375,13 +3375,13 @@ namespace SetPointManager {
             // get the actual zone number of the control zone
             SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             } else {
                 if (allocated(StageZoneLogic)) {
                     if (!StageZoneLogic(SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                         ShowContinueError("..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                         ShowContinueError("Zone thermostat must use ZoneControl:Thermostat:StagedDualSetpoint.");
                         ErrorsFound = true;
@@ -3483,7 +3483,7 @@ namespace SetPointManager {
             if (UtilityRoutines::SameString(returnType, "SCHEDULED")) {
                 ReturnWaterResetChWSetPtMgr(SetPtMgrNum).returnTemperatureScheduleIndex = GetScheduleIndex(cAlphaArgs(5));
                 if (ReturnWaterResetChWSetPtMgr(SetPtMgrNum).returnTemperatureScheduleIndex == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -3492,7 +3492,7 @@ namespace SetPointManager {
             } else if (UtilityRoutines::SameString(returnType, "RETURNTEMPERATURESETPOINT")) {
                 ReturnWaterResetChWSetPtMgr(SetPtMgrNum).useReturnTempSetpoint = true;
             } else {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                 ErrorsFound = true;
             }
@@ -3565,7 +3565,7 @@ namespace SetPointManager {
             if (UtilityRoutines::SameString(returnType, "SCHEDULED")) {
                 ReturnWaterResetHWSetPtMgr(SetPtMgrNum).returnTemperatureScheduleIndex = GetScheduleIndex(cAlphaArgs(5));
                 if (ReturnWaterResetHWSetPtMgr(SetPtMgrNum).returnTemperatureScheduleIndex == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError("..invalid " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -3574,7 +3574,7 @@ namespace SetPointManager {
             } else if (UtilityRoutines::SameString(returnType, "RETURNTEMPERATURESETPOINT")) {
                 ReturnWaterResetHWSetPtMgr(SetPtMgrNum).useReturnTempSetpoint = true;
             } else {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError("..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                 ErrorsFound = true;
             }
@@ -8685,7 +8685,7 @@ namespace SetPointManager {
     SPMLoop_exit:;
 
         if (ResetCntrlVarType) {
-            ShowWarningError(RoutineName + cValidSPMTypes(AllSetPtMgr(SetPtMgrNumPtr).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNumPtr).Name + "\". ");
+            ShowWarningError(std::string{RoutineName} + cValidSPMTypes(AllSetPtMgr(SetPtMgrNumPtr).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNumPtr).Name + "\". ");
             ShowContinueError(" ..Humidity ratio control variable type specified is = " + cValidCtrlTypes(iCtrlVarType_HumRat));
             ShowContinueError(" ..Humidity ratio control variable type allowed with water coils is = " + cValidCtrlTypes(iCtrlVarType_MaxHumRat));
             ShowContinueError(" ..Setpointmanager control variable type is reset to = " + cValidCtrlTypes(iCtrlVarType_MaxHumRat));

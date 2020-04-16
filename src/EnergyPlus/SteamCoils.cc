@@ -346,7 +346,7 @@ namespace SteamCoils {
             } else {
                 SteamCoil(CoilNum).SchedPtr = GetScheduleIndex(AlphArray(2));
                 if (SteamCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\", invalid data.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\", invalid data.");
                     ShowContinueError(cAlphaFields(2) + " not found=" + AlphArray(2));
                     ErrorsFound = true;
                 }
@@ -376,7 +376,7 @@ namespace SteamCoils {
                     SteamCoil(CoilNum).TempSetPointNodeNum = GetOnlySingleNode(
                         AlphArray(8), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
                     if (SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
-                        ShowSevereError(RoutineName + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
+                        ShowSevereError(std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
                         ShowContinueError("..required for Temperature Setpoint Controlled Coils.");
                         ErrorsFound = true;
                     }
@@ -385,13 +385,13 @@ namespace SteamCoils {
                     SteamCoil(CoilNum).TypeOfCoil = ZoneLoadControl;
 
                     if (!lAlphaBlanks(8)) {
-                        ShowWarningError(RoutineName + "ZoneLoad Controlled Coil, so " + cAlphaFields(8) + " not needed");
+                        ShowWarningError(std::string{RoutineName} + "ZoneLoad Controlled Coil, so " + cAlphaFields(8) + " not needed");
                         ShowContinueError("for " + CurrentModuleObject + " = " + AlphArray(1));
                         SteamCoil(CoilNum).TempSetPointNodeNum = 0;
                     }
 
                 } else {
-                    ShowSevereError(RoutineName + "Invalid " + cAlphaFields(7) + " [" + AlphArray(7) + "] specified for " + CurrentModuleObject +
+                    ShowSevereError(std::string{RoutineName} + "Invalid " + cAlphaFields(7) + " [" + AlphArray(7) + "] specified for " + CurrentModuleObject +
                                     " = " + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -403,7 +403,7 @@ namespace SteamCoils {
             if (SteamIndex == 0 && CoilNum == 1) {
                 SteamIndex = FindRefrigerant("Steam");
                 if (SteamIndex == 0) {
-                    ShowSevereError(RoutineName + "Steam Properties for " + AlphArray(1) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Steam Properties for " + AlphArray(1) + " not found.");
                     ShowContinueError("Steam Fluid Properties should have been included in the input file.");
                     ErrorsFound = true;
                 }
@@ -460,7 +460,7 @@ namespace SteamCoils {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting input.");
         }
 
         AlphArray.deallocate();

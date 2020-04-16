@@ -313,7 +313,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESCoil(item).AvailSchedNum = GetScheduleIndex(cAlphaArgs(2));
                 if (TESCoil(item).AvailSchedNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
@@ -325,7 +325,7 @@ namespace PackagedThermalStorageCoil {
                 } else if (SELECT_CASE_var == "EMSCONTROLLED") {
                     TESCoil(item).ModeControlType = EMSActuatedOpModes;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ShowContinueError("Available choices are ScheduledModes or EMSControlled");
                     ErrorsFound = true;
@@ -333,14 +333,14 @@ namespace PackagedThermalStorageCoil {
             }
             if (lAlphaFieldBlanks(4)) {
                 if (TESCoil(item).ModeControlType == ScheduledOpModes) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError(cAlphaFieldNames(4) + " is blank but a schedule is needed");
                     ErrorsFound = true;
                 }
             } else {
                 TESCoil(item).ControlModeSchedNum = GetScheduleIndex(cAlphaArgs(4));
                 if (TESCoil(item).ControlModeSchedNum == 0 && TESCoil(item).ModeControlType == ScheduledOpModes) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ErrorsFound = true;
                 }
@@ -356,7 +356,7 @@ namespace PackagedThermalStorageCoil {
                 } else if (SELECT_CASE_var == "USERDEFINEDFLUIDTYPE") {
                     TESCoil(item).StorageMedia = FluidBased;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                     ShowContinueError("Available choices are Ice, Water, or UserDefindedFluidType");
                     ErrorsFound = true;
@@ -367,20 +367,20 @@ namespace PackagedThermalStorageCoil {
                 if (!(lAlphaFieldBlanks(6))) {
                     TESCoil(item).StorageFluidName = cAlphaArgs(6);
                     if (CheckFluidPropertyName(cAlphaArgs(6)) == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", missing fluid data");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", missing fluid data");
                         ShowContinueError("Check that fluid property data have been input for fluid name = " + cAlphaArgs(6));
                         ErrorsFound = true;
                     } else {
                         TESCoil(item).StorageFluidIndex = FindGlycol(cAlphaArgs(6));
                         if (TESCoil(item).StorageFluidIndex == 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid fluid data");
+                            ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid fluid data");
                             ShowContinueError("Check that correct fluid property data have been input for fluid name = " + cAlphaArgs(6));
                             ErrorsFound = true;
                         }
                     }
 
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("Storage Type is set to UserDefinedFluidType but no name of fluid was entered.");
                     ErrorsFound = true;
                 }
@@ -389,7 +389,7 @@ namespace PackagedThermalStorageCoil {
             if ((TESCoil(item).StorageMedia == FluidBased) && (!lNumericFieldBlanks(1))) {
                 TESCoil(item).FluidStorageVolume = rNumericArgs(1);
             } else if ((TESCoil(item).StorageMedia == FluidBased) && (lNumericFieldBlanks(1))) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                 ShowContinueError(cNumericFieldNames(1) + " cannot be blank for Water storage type");
                 ShowContinueError("Enter fluid storage tank volume in m3/s.");
                 ErrorsFound = true;
@@ -402,7 +402,7 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).IceStorageCapacity = rNumericArgs(2) * 1.e+09; // input in giga joules, used as joules internally
                 }
             } else if ((TESCoil(item).StorageMedia == IceBased) && (lNumericFieldBlanks(2))) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                 ShowContinueError(cNumericFieldNames(2) + " cannot be blank for Ice storage type");
                 ShowContinueError("Enter ice storage tank capacity in GJ.");
                 ErrorsFound = true;
@@ -440,7 +440,7 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).CoolingOnlyModeIsAvailable = false;
                 } else {
                     TESCoil(item).CoolingOnlyModeIsAvailable = false;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(10) + "=\"" + cAlphaArgs(10) + "\".");
                     ShowContinueError("Available choices are Yes or No.");
                     ErrorsFound = true;
@@ -456,10 +456,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingOnlyCapFTempCurve = GetCurveIndex(cAlphaArgs(11));
                 if (TESCoil(item).CoolingOnlyCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(11)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(11) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(11) + "=\"" + cAlphaArgs(11) + "\".");
                     }
                     ErrorsFound = true;
@@ -477,10 +477,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingOnlyCapFFlowCurve = GetCurveIndex(cAlphaArgs(12));
                 if (TESCoil(item).CoolingOnlyCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(12)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(12) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(12) + "=\"" + cAlphaArgs(12) + "\".");
                     }
                     ErrorsFound = true;
@@ -498,10 +498,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingOnlyEIRFTempCurve = GetCurveIndex(cAlphaArgs(13));
                 if (TESCoil(item).CoolingOnlyEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(13)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(13) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(13) + "=\"" + cAlphaArgs(13) + "\".");
                     }
                     ErrorsFound = true;
@@ -519,10 +519,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingOnlyEIRFFlowCurve = GetCurveIndex(cAlphaArgs(14));
                 if (TESCoil(item).CoolingOnlyEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(14)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(14) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(14) + "=\"" + cAlphaArgs(14) + "\".");
                     }
                     ErrorsFound = true;
@@ -540,10 +540,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingOnlyPLFFPLRCurve = GetCurveIndex(cAlphaArgs(15));
                 if (TESCoil(item).CoolingOnlyPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(15)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(15) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(15) + "=\"" + cAlphaArgs(15) + "\".");
                     }
                     ErrorsFound = true;
@@ -561,10 +561,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingOnlySHRFTempCurve = GetCurveIndex(cAlphaArgs(16));
                 if (TESCoil(item).CoolingOnlySHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(16)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(16) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(16) + "=\"" + cAlphaArgs(16) + "\".");
                     }
                     ErrorsFound = true;
@@ -582,10 +582,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingOnlySHRFFlowCurve = GetCurveIndex(cAlphaArgs(17));
                 if (TESCoil(item).CoolingOnlySHRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(17)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(17) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(17) + "=\"" + cAlphaArgs(17) + "\".");
                     }
                     ErrorsFound = true;
@@ -609,7 +609,7 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).CoolingAndChargeModeAvailable = false;
                 } else {
                     TESCoil(item).CoolingAndChargeModeAvailable = false;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(18) + "=\"" + cAlphaArgs(18) + "\".");
                     ShowContinueError("Available choices are Yes or No.");
                     ErrorsFound = true;
@@ -629,10 +629,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeCoolingCapFTempCurve = GetCurveIndex(cAlphaArgs(19));
                 if (TESCoil(item).CoolingAndChargeCoolingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(19)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(19) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(19) + "=\"" + cAlphaArgs(19) + "\".");
                     }
                     ErrorsFound = true;
@@ -650,10 +650,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve = GetCurveIndex(cAlphaArgs(20));
                 if (TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(20)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(20) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(20) + "=\"" + cAlphaArgs(20) + "\".");
                     }
                     ErrorsFound = true;
@@ -670,10 +670,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve = GetCurveIndex(cAlphaArgs(21));
                 if (TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(21)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(21) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(21) + "=\"" + cAlphaArgs(21) + "\".");
                     }
                     ErrorsFound = true;
@@ -691,10 +691,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve = GetCurveIndex(cAlphaArgs(22));
                 if (TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(22)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(22) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(22) + "=\"" + cAlphaArgs(22) + "\".");
                     }
                     ErrorsFound = true;
@@ -712,10 +712,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(23));
                 if (TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(23)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(23) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(23) + "=\"" + cAlphaArgs(23) + "\".");
                     }
                     ErrorsFound = true;
@@ -733,10 +733,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeChargingCapFTempCurve = GetCurveIndex(cAlphaArgs(24));
                 if (TESCoil(item).CoolingAndChargeChargingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(24)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(24) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(24) + "=\"" + cAlphaArgs(24) + "\".");
                     }
                     ErrorsFound = true;
@@ -754,10 +754,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve = GetCurveIndex(cAlphaArgs(25));
                 if (TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve == 0) {
                     if (lAlphaFieldBlanks(25)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(25) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(25) + "=\"" + cAlphaArgs(25) + "\".");
                     }
                     ErrorsFound = true;
@@ -775,10 +775,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeChargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(26));
                 if (TESCoil(item).CoolingAndChargeChargingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(26)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(26) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(26) + "=\"" + cAlphaArgs(26) + "\".");
                     }
                     ErrorsFound = true;
@@ -796,10 +796,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve = GetCurveIndex(cAlphaArgs(27));
                 if (TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve == 0) {
                     if (lAlphaFieldBlanks(27)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(27) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(27) + "=\"" + cAlphaArgs(27) + "\".");
                     }
                     ErrorsFound = true;
@@ -817,10 +817,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(28));
                 if (TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(28)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(28) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(28) + "=\"" + cAlphaArgs(28) + "\".");
                     }
                     ErrorsFound = true;
@@ -838,10 +838,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeSHRFTempCurve = GetCurveIndex(cAlphaArgs(29));
                 if (TESCoil(item).CoolingAndChargeSHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(29)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(29) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(29) + "=\"" + cAlphaArgs(29) + "\".");
                     }
                     ErrorsFound = true;
@@ -859,10 +859,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeSHRFFlowCurve = GetCurveIndex(cAlphaArgs(30));
                 if (TESCoil(item).CoolingAndChargeSHRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(30)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(30) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(30) + "=\"" + cAlphaArgs(30) + "\".");
                     }
                     ErrorsFound = true;
@@ -887,7 +887,7 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).CoolingAndDischargeModeAvailable = false;
                 } else {
                     TESCoil(item).CoolingAndDischargeModeAvailable = false;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(31) + "=\"" + cAlphaArgs(31) + "\".");
                     ShowContinueError("Available choices are Yes or No.");
                     ErrorsFound = true;
@@ -907,10 +907,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve = GetCurveIndex(cAlphaArgs(32));
                 if (TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(32)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(32) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(32) + "=\"" + cAlphaArgs(32) + "\".");
                     }
                     ErrorsFound = true;
@@ -928,10 +928,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve = GetCurveIndex(cAlphaArgs(33));
                 if (TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(33)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(33) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(33) + "=\"" + cAlphaArgs(33) + "\".");
                     }
                     ErrorsFound = true;
@@ -949,10 +949,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve = GetCurveIndex(cAlphaArgs(34));
                 if (TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(34)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(34) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(34) + "=\"" + cAlphaArgs(34) + "\".");
                     }
                     ErrorsFound = true;
@@ -970,10 +970,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve = GetCurveIndex(cAlphaArgs(35));
                 if (TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(35)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(35) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(35) + "=\"" + cAlphaArgs(35) + "\".");
                     }
                     ErrorsFound = true;
@@ -991,10 +991,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(36));
                 if (TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(36)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(36) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(36) + "=\"" + cAlphaArgs(36) + "\".");
                     }
                     ErrorsFound = true;
@@ -1012,10 +1012,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve = GetCurveIndex(cAlphaArgs(37));
                 if (TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(37)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(37) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(37) + "=\"" + cAlphaArgs(37) + "\".");
                     }
                     ErrorsFound = true;
@@ -1033,10 +1033,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve = GetCurveIndex(cAlphaArgs(38));
                 if (TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(38)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(38) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(38) + "=\"" + cAlphaArgs(38) + "\".");
                     }
                     ErrorsFound = true;
@@ -1054,10 +1054,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve = GetCurveIndex(cAlphaArgs(39));
                 if (TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve == 0) {
                     if (lAlphaFieldBlanks(39)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(39) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(39) + "=\"" + cAlphaArgs(39) + "\".");
                     }
                     ErrorsFound = true;
@@ -1075,10 +1075,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(40));
                 if (TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(40)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(40) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(40) + "=\"" + cAlphaArgs(40) + "\".");
                     }
                     ErrorsFound = true;
@@ -1096,10 +1096,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve = GetCurveIndex(cAlphaArgs(41));
                 if (TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve == 0) {
                     if (lAlphaFieldBlanks(41)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(41) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(41) + "=\"" + cAlphaArgs(41) + "\".");
                     }
                     ErrorsFound = true;
@@ -1117,10 +1117,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(42));
                 if (TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(42)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(42) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(42) + "=\"" + cAlphaArgs(42) + "\".");
                     }
                     ErrorsFound = true;
@@ -1138,10 +1138,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeSHRFTempCurve = GetCurveIndex(cAlphaArgs(43));
                 if (TESCoil(item).CoolingAndDischargeSHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(43)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(43) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(43) + "=\"" + cAlphaArgs(43) + "\".");
                     }
                     ErrorsFound = true;
@@ -1159,10 +1159,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeSHRFFlowCurve = GetCurveIndex(cAlphaArgs(44));
                 if (TESCoil(item).CoolingAndDischargeSHRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(44)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(44) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(44) + "=\"" + cAlphaArgs(44) + "\".");
                     }
                     ErrorsFound = true;
@@ -1187,7 +1187,7 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).ChargeOnlyModeAvailable = false;
                 } else {
                     TESCoil(item).ChargeOnlyModeAvailable = false;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(45) + "=\"" + cAlphaArgs(45) + "\".");
                     ShowContinueError("Available choices are Yes or No.");
                     ErrorsFound = true;
@@ -1203,10 +1203,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).ChargeOnlyChargingCapFTempCurve = GetCurveIndex(cAlphaArgs(46));
                 if (TESCoil(item).ChargeOnlyChargingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(46)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(46) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(46) + "=\"" + cAlphaArgs(46) + "\".");
                     }
                     ErrorsFound = true;
@@ -1224,10 +1224,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).ChargeOnlyChargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(47));
                 if (TESCoil(item).ChargeOnlyChargingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(47)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(47) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(47) + "=\"" + cAlphaArgs(47) + "\".");
                     }
                     ErrorsFound = true;
@@ -1252,7 +1252,7 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).DischargeOnlyModeAvailable = false;
                 } else {
                     TESCoil(item).DischargeOnlyModeAvailable = false;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(48) + "=\"" + cAlphaArgs(48) + "\".");
                     ShowContinueError("Available choices are Yes or No.");
                     ErrorsFound = true;
@@ -1268,10 +1268,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).DischargeOnlyCapFTempCurve = GetCurveIndex(cAlphaArgs(49));
                 if (TESCoil(item).DischargeOnlyCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(49)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(49) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(49) + "=\"" + cAlphaArgs(49) + "\".");
                     }
                     ErrorsFound = true;
@@ -1289,10 +1289,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).DischargeOnlyCapFFlowCurve = GetCurveIndex(cAlphaArgs(50));
                 if (TESCoil(item).DischargeOnlyCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(50)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(50) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(50) + "=\"" + cAlphaArgs(50) + "\".");
                     }
                     ErrorsFound = true;
@@ -1310,10 +1310,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).DischargeOnlyEIRFTempCurve = GetCurveIndex(cAlphaArgs(51));
                 if (TESCoil(item).DischargeOnlyEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(51)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(51) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(51) + "=\"" + cAlphaArgs(51) + "\".");
                     }
                     ErrorsFound = true;
@@ -1331,10 +1331,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).DischargeOnlyEIRFFlowCurve = GetCurveIndex(cAlphaArgs(52));
                 if (TESCoil(item).DischargeOnlyEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(52)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(52) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(52) + "=\"" + cAlphaArgs(52) + "\".");
                     }
                     ErrorsFound = true;
@@ -1352,10 +1352,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).DischargeOnlyPLFFPLRCurve = GetCurveIndex(cAlphaArgs(53));
                 if (TESCoil(item).DischargeOnlyPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(53)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(53) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(53) + "=\"" + cAlphaArgs(53) + "\".");
                     }
                     ErrorsFound = true;
@@ -1373,10 +1373,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).DischargeOnlySHRFTempCurve = GetCurveIndex(cAlphaArgs(54));
                 if (TESCoil(item).DischargeOnlySHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(54)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(54) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(54) + "=\"" + cAlphaArgs(54) + "\".");
                     }
                     ErrorsFound = true;
@@ -1394,10 +1394,10 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).DischargeOnlySHRFFLowCurve = GetCurveIndex(cAlphaArgs(55));
                 if (TESCoil(item).DischargeOnlySHRFFLowCurve == 0) {
                     if (lAlphaFieldBlanks(55)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Required " + cAlphaFieldNames(55) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                         ShowContinueError("Not found " + cAlphaFieldNames(55) + "=\"" + cAlphaArgs(55) + "\".");
                     }
                     ErrorsFound = true;
@@ -1444,7 +1444,7 @@ namespace PackagedThermalStorageCoil {
                 } else if (SELECT_CASE_var == "EVAPORATIVELYCOOLED") {
                     TESCoil(item).CondenserType = EvapCooled;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError(cAlphaFieldNames(58) + "=\"" + cAlphaArgs(58) + "\".");
                     ShowContinueError("Available choices are AirCooled or EvaporativelyCooled.");
                     ErrorsFound = true;
@@ -1460,7 +1460,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESCoil(item).BasinHeaterAvailSchedNum = GetScheduleIndex(cAlphaArgs(59));
                 if (TESCoil(item).BasinHeaterAvailSchedNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(59) + "=\"" + cAlphaArgs(59) + "\".");
                     ErrorsFound = true;
                 }
@@ -1511,7 +1511,7 @@ namespace PackagedThermalStorageCoil {
                                                                         ObjectIsNotParent);
             } else {
                 if (TESCoil(item).TESPlantConnectionAvailable) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFieldNames(63) + " cannot be blank.");
                     ErrorsFound = true;
                 }
@@ -1546,7 +1546,7 @@ namespace PackagedThermalStorageCoil {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition(s) causes termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition(s) causes termination.");
         }
 
         // setup reporting

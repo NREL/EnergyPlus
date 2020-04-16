@@ -311,7 +311,7 @@ namespace BaseboardElectric {
                 } else {
                     Baseboard(BaseboardNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
                     if (Baseboard(BaseboardNum).SchedPtr == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) +
                                         " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
@@ -391,7 +391,7 @@ namespace BaseboardElectric {
             }
 
             if (ErrorsFound) {
-                ShowFatalError(RoutineName + "Errors found in getting input.  Preceding condition(s) cause termination.");
+                ShowFatalError(std::string{RoutineName} + "Errors found in getting input.  Preceding condition(s) cause termination.");
             }
         }
 

@@ -509,7 +509,7 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(LoadingScheme, "SequentialUniformPLR")) {
                     this_loop.LoadDistribution = SequentialUniformPLRLoading;
                 } else {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                     ShowContinueError("..." + cAlphaFieldNames(14) + "=\"" + Alpha(14) + "\".");
                     ShowContinueError("Will default to SequentialLoad."); // TODO rename point
                     this_loop.LoadDistribution = SequentialLoading;
@@ -523,7 +523,7 @@ namespace EnergyPlus {
                     } else if (UtilityRoutines::SameString(Alpha(16), "DualSetpointDeadband")) {
                         if (this_loop.FluidType == NodeType_Steam) {
                             ShowWarningError(
-                                    RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                             ShowContinueError(cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\" not valid for " +
                                               cAlphaFieldNames(2) + "= Steam");
                             ShowContinueError("Will reset " + cAlphaFieldNames(16) +
@@ -535,7 +535,7 @@ namespace EnergyPlus {
                     } else if (UtilityRoutines::SameString(Alpha(16), "")) {
                         this_loop.LoopDemandCalcScheme = SingleSetPoint;
                     } else {
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                        ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                         ShowContinueError("..." + cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\".");
                         ShowContinueError("Will default to SingleSetPoint."); // TODO rename point
                         this_loop.LoopDemandCalcScheme = SingleSetPoint;
@@ -553,7 +553,7 @@ namespace EnergyPlus {
                     } else if (UtilityRoutines::SameString(Alpha(17), "None") || lAlphaFieldBlanks(17)) {
                         this_loop.CommonPipeType = CommonPipe_No;
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                         ShowContinueError("Invalid " + cAlphaFieldNames(17) + "=\"" + Alpha(17) + "\".");
                         ShowContinueError("Refer to I/O reference document for more details.");
                         ErrorsFound = true;
@@ -565,7 +565,7 @@ namespace EnergyPlus {
                 if (this_loop.CommonPipeType == CommonPipe_TwoWay) {
                     if (this_demand_side.InletNodeSetPt && this_supply_side.InletNodeSetPt) {
                         ShowSevereError(
-                                RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                         ShowContinueError(
                                 "While using a two way common pipe there can be setpoint on only one node other than Plant Supply Outlet node.");
                         ShowContinueError("Currently both Plant Demand inlet and plant supply inlet have setpoints.");
@@ -574,7 +574,7 @@ namespace EnergyPlus {
                     }
                     if (!this_demand_side.InletNodeSetPt && !this_supply_side.InletNodeSetPt) {
                         ShowSevereError(
-                                RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                         ShowContinueError(
                                 "While using a two way common pipe there must be a setpoint in addition to the Plant Supply Outlet node.");
                         ShowContinueError(
@@ -615,7 +615,7 @@ namespace EnergyPlus {
                         } else {
                             // We have an erroneous input, alert user
                             ShowSevereError(
-                                    RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                             ShowContinueError("Invalid " + cAlphaFieldNames(PressSimAlphaIndex) + "=\"" +
                                               Alpha(PressSimAlphaIndex) + "\".");
                             ShowContinueError("Currently only options are: ");
@@ -637,7 +637,7 @@ namespace EnergyPlus {
                     // if we made it this far, there was no match, and it wasn't blank
                     if (!MatchedPressureString) {
                         ShowSevereError(
-                                RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                         ShowContinueError(
                                 "Invalid " + cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) +
                                 "\".");
@@ -657,7 +657,7 @@ namespace EnergyPlus {
                 }
 
                 if (GetFirstBranchInletNodeName(this_demand_side.BranchList) != this_demand_side.NodeNameIn) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError("The inlet node of the first branch in the " + cAlphaFieldNames(12) + '=' +
                                       Alpha(12));                                                          //"Plant Demand Side Branch List"
                     ShowContinueError("is not the same as the " + cAlphaFieldNames(10) + '=' +
@@ -673,7 +673,7 @@ namespace EnergyPlus {
 
                 if (GetLastBranchOutletNodeName(this_demand_side.BranchList) != this_demand_side.NodeNameOut) {
                     //"Plant Demand Side Branch List"
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(
                             "The outlet node of the last branch in the " + cAlphaFieldNames(12) + '=' + Alpha(12));
                     //"Plant Demand Side Outlet Node Name"
@@ -688,7 +688,7 @@ namespace EnergyPlus {
 
                 if (GetFirstBranchInletNodeName(this_supply_side.BranchList) != this_supply_side.NodeNameIn) {
                     //"Plant Supply Side Branch List"
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(
                             "The inlet node of the first branch in the " + cAlphaFieldNames(8) + '=' + Alpha(8));
                     //"Plant Supply Side Inlet Node Name
@@ -703,7 +703,7 @@ namespace EnergyPlus {
 
                 if (GetLastBranchOutletNodeName(this_supply_side.BranchList) != this_supply_side.NodeNameOut) {
                     //"Plant Supply Side Branch List"
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(
                             "The outlet node of the last branch in the " + cAlphaFieldNames(8) + '=' + Alpha(8));
                     //"Plant Supply Side Outlet Node Name"
@@ -719,7 +719,7 @@ namespace EnergyPlus {
 
             if (ErrorsFound) {
                 ShowFatalError(
-                        RoutineName + "Errors found in processing input. Preceding conditions cause termination.");
+                        std::string{RoutineName} + "Errors found in processing input. Preceding conditions cause termination.");
             }
 
             // set up loop status (set by system availability managers) report variables

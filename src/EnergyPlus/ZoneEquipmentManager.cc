@@ -653,7 +653,7 @@ namespace ZoneEquipmentManager {
                     SupplyAirNode1 = ZoneEquipConfig(ControlledZoneNum).InletNode(1);
                     SupplyAirNode2 = 0;
                 } else {
-                    ShowSevereError(RoutineName + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing");
+                    ShowSevereError(std::string{RoutineName} + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing");
                     ShowContinueError("there must be at least one zone air inlet node");
                     ShowFatalError("Previous severe error causes abort ");
                 }
@@ -903,7 +903,7 @@ namespace ZoneEquipmentManager {
                 DOASSupHR = min(OutHR, W90L);
             }
         } else {
-            ShowFatalError(RoutineName + ":illegal DOAS design control strategy");
+            ShowFatalError(std::string{RoutineName} + ":illegal DOAS design control strategy");
         }
     }
 
@@ -3137,7 +3137,7 @@ namespace ZoneEquipmentManager {
                         if (FinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak == 0.0) {
                             // issue 6006, heating coils sizing to 0 when no heating load in zone
                             if (ZoneSizing(DDNumF, CtrlZoneNum).DesCoolSetPtSeq.empty()) {
-                                ShowSevereError(RoutineName + ":  Thermostat cooling set point temperatures are not initialized for Zone = " +
+                                ShowSevereError(std::string{RoutineName} + ":  Thermostat cooling set point temperatures are not initialized for Zone = " +
                                                 FinalZoneSizing(CtrlZoneNum).ZoneName);
                                 ShowFatalError("Please send your input file to the EnergyPlus support/development team for further investigation.");
                             } else {
@@ -3299,7 +3299,7 @@ namespace ZoneEquipmentManager {
                         if (FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak == 0.0) {
                             // issue 6006, heating coils sizing to 0 when no heating load in zone
                             if (ZoneSizing(DDNumF, CtrlZoneNum).DesHeatSetPtSeq.empty()) {
-                                ShowSevereError(RoutineName + ":  Thermostat heating set point temperatures not initialized for Zone = " +
+                                ShowSevereError(std::string{RoutineName} + ":  Thermostat heating set point temperatures not initialized for Zone = " +
                                                 FinalZoneSizing(CtrlZoneNum).ZoneName);
                                 ShowFatalError("Please send your input file to the EnergyPlus support/development team for further investigation.");
                             } else {

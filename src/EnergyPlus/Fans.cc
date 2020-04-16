@@ -430,7 +430,7 @@ namespace Fans {
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -492,7 +492,7 @@ namespace Fans {
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -574,7 +574,7 @@ namespace Fans {
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 } else {
@@ -615,12 +615,12 @@ namespace Fans {
             if (NumAlphas > 5 && !lAlphaFieldBlanks(6)) {
                 Fan(FanNum).FlowFractSchedNum = GetScheduleIndex(cAlphaArgs(6));
                 if (Fan(FanNum).FlowFractSchedNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " entered =" + cAlphaArgs(6) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " entered =" + cAlphaArgs(6) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 } else if (Fan(FanNum).FlowFractSchedNum > 0) {
                     if (!CheckScheduleValueMinMax(Fan(FanNum).FlowFractSchedNum, ">=", 0.0, "<=", 1.0)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " for " + cAlphaFieldNames(1) +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " for " + cAlphaFieldNames(1) +
                                         '=' + cAlphaArgs(1));
                         ShowContinueError("Error found in " + cAlphaFieldNames(6) + " = " + cAlphaArgs(6));
                         ShowContinueError("Schedule values must be (>=0., <=1.)");
@@ -639,7 +639,7 @@ namespace Fans {
                     } else if (SELECT_CASE_var == "DECOUPLED") {
                         Fan(FanNum).AvailManagerMode = ExhaustFanDecoupledFromAvailManagers;
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7) + " entered =" + cAlphaArgs(7) +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7) + " entered =" + cAlphaArgs(7) +
                                         " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
@@ -651,7 +651,7 @@ namespace Fans {
             if (NumAlphas > 7 && !lAlphaFieldBlanks(8)) {
                 Fan(FanNum).MinTempLimitSchedNum = GetScheduleIndex(cAlphaArgs(8));
                 if (Fan(FanNum).MinTempLimitSchedNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(8) + " entered =" + cAlphaArgs(8) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(8) + " entered =" + cAlphaArgs(8) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -662,12 +662,12 @@ namespace Fans {
             if (NumAlphas > 8 && !lAlphaFieldBlanks(9)) {
                 Fan(FanNum).BalancedFractSchedNum = GetScheduleIndex(cAlphaArgs(9));
                 if (Fan(FanNum).BalancedFractSchedNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " entered =" + cAlphaArgs(9) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " entered =" + cAlphaArgs(9) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 } else if (Fan(FanNum).BalancedFractSchedNum > 0) {
                     if (!CheckScheduleValueMinMax(Fan(FanNum).BalancedFractSchedNum, ">=", 0.0, "<=", 1.0)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " for " + cAlphaFieldNames(1) +
+                        ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " for " + cAlphaFieldNames(1) +
                                         '=' + cAlphaArgs(1));
                         ShowContinueError("Error found in " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
                         ShowContinueError("Schedule values must be (>=0., <=1.)");
@@ -711,7 +711,7 @@ namespace Fans {
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -858,7 +858,7 @@ namespace Fans {
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(cAlphaArgs(4));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(4) + " entered =" + cAlphaArgs(4) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(4) + " entered =" + cAlphaArgs(4) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -941,7 +941,7 @@ namespace Fans {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in input.  Program terminates.");
         }
 
         for (FanNum = 1; FanNum <= NumFans; ++FanNum) {

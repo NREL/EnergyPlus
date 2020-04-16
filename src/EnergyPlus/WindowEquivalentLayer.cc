@@ -546,7 +546,7 @@ namespace WindowEquivalentLayer {
             }
         }
         if (!CFSURated) {
-            ShowWarningMessage(RoutineName + "Fenestration U-Value calculation failed for " + FS.Name);
+            ShowWarningMessage(std::string{RoutineName} + "Fenestration U-Value calculation failed for " + FS.Name);
             ShowContinueError("...Calculated U-value = " + TrimSigDigits(U, 4));
             ShowContinueError("...Check consistency of inputs");
         }
@@ -672,7 +672,7 @@ namespace WindowEquivalentLayer {
                                         true);
 
         if (!CFSSHGC) {
-            ShowWarningMessage(RoutineName + "Solar heat gain coefficient calculation failed for " + FS.Name);
+            ShowWarningMessage(std::string{RoutineName} + "Solar heat gain coefficient calculation failed for " + FS.Name);
             ShowContinueError("...Calculated SHGC = " + TrimSigDigits(SHGC, 4));
             ShowContinueError("...Calculated U-Value = " + TrimSigDigits(UCG, 4));
             ShowContinueError("...Check consistency of inputs.");
@@ -1119,7 +1119,7 @@ namespace WindowEquivalentLayer {
     }
 
     Real64 P01(Real64 const P,         // property
-               std::string const &WHAT // identifier for err msg
+               std::string_view WHAT // identifier for err msg
     )
     {
         //       AUTHOR         ASHRAE 1311-RP
@@ -1157,8 +1157,8 @@ namespace WindowEquivalentLayer {
         // Flow
 
         if (P < -0.05 || P > 1.05) {
-            ShowWarningMessage(RoutineName + "property value should have been between 0 and 1");
-            ShowContinueError(WHAT + "=:  property value is =" + TrimSigDigits(P, 4));
+            ShowWarningMessage(std::string{RoutineName} + "property value should have been between 0 and 1");
+            ShowContinueError(std::string{WHAT} + "=:  property value is =" + TrimSigDigits(P, 4));
             if (P < 0.0) {
                 ShowContinueError("property value is reset to 0.0");
             } else if (P > 1.0) {
@@ -1317,7 +1317,7 @@ namespace WindowEquivalentLayer {
 
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
-            ShowWarningMessage(RoutineName + "Roller blind diffuse-diffuse properties are inconsistent");
+            ShowWarningMessage(std::string{RoutineName} + "Roller blind diffuse-diffuse properties are inconsistent");
             ShowContinueError("...The diffuse-diffuse reflectance = " + TrimSigDigits(RHO_DD, 4));
             ShowContinueError("...The diffuse-diffuse tansmittance = " + TrimSigDigits(TAU_DD, 4));
             ShowContinueError("...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits(SumRefAndTran, 4));
@@ -1503,7 +1503,7 @@ namespace WindowEquivalentLayer {
 
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
-            ShowWarningMessage(RoutineName + "Calculated insect screen diffuse-diffuse properties are inconsistent");
+            ShowWarningMessage(std::string{RoutineName} + "Calculated insect screen diffuse-diffuse properties are inconsistent");
             ShowContinueError("...The diffuse-diffuse reflectance = " + TrimSigDigits(RHO_DD, 4));
             ShowContinueError("...The diffuse-diffuse tansmittance = " + TrimSigDigits(TAU_DD, 4));
             ShowContinueError("...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits(SumRefAndTran, 4));
@@ -1784,7 +1784,7 @@ namespace WindowEquivalentLayer {
 
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
-            ShowWarningMessage(RoutineName + "Calculated drape fabric diffuse-diffuse properties are inconsistent");
+            ShowWarningMessage(std::string{RoutineName} + "Calculated drape fabric diffuse-diffuse properties are inconsistent");
             ShowContinueError("...The diffuse-diffuse reflectance = " + TrimSigDigits(RHO_DD, 4));
             ShowContinueError("...The diffuse-diffuse tansmittance = " + TrimSigDigits(TAU_DD, 4));
             ShowContinueError("...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits(SumRefAndTran, 4));
@@ -5435,12 +5435,12 @@ namespace WindowEquivalentLayer {
             if (FS.WEQLSolverErrorIndex < 1) {
                 ++FS.WEQLSolverErrorIndex;
                 ShowSevereError("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
-                ShowContinueError(RoutineName + "Net radiation analysis did not converge");
+                ShowContinueError(std::string{RoutineName} + "Net radiation analysis did not converge");
                 ShowContinueError("...Maximum error is = " + TrimSigDigits(MAXERR, 6));
                 ShowContinueError("...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
                 ShowContinueErrorTimeStamp("");
             } else {
-                ShowRecurringWarningErrorAtEnd("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
+                ShowRecurringWarningErrorAtEnd("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + std::string{RoutineName} +
                                                    "Net radiation analysis did not converge error continues.",
                                                FS.WEQLSolverErrorIndex);
             }
@@ -5922,12 +5922,12 @@ namespace WindowEquivalentLayer {
         //    if (FS.WEQLSolverErrorIndex < 1) {
         //        ++FS.WEQLSolverErrorIndex;
         //        ShowSevereError("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
-        //        ShowContinueError(RoutineName + "Net radiation analysis did not converge");
+        //        ShowContinueError(std::string{RoutineName} + "Net radiation analysis did not converge");
         //        ShowContinueError("...Maximum error is = " + TrimSigDigits(MAXERR, 6));
         //        ShowContinueError("...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
         //        ShowContinueErrorTimeStamp("");
         //    } else {
-        //        ShowRecurringWarningErrorAtEnd("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
+        //        ShowRecurringWarningErrorAtEnd("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + std::string{RoutineName} +
         //                                           "Net radiation analysis did not converge error continues.",
         //                                       FS.WEQLSolverErrorIndex);
         //    }
@@ -9134,7 +9134,7 @@ namespace WindowEquivalentLayer {
         // Flow
 
         if (TAS < GapThickMin) {
-            ShowSevereError(RoutineName + G.Name);
+            ShowSevereError(std::string{RoutineName} + G.Name);
             ShowContinueError("...specified gap thickness is < 0.0001 m.  Reset to 0.00001 m");
             TAS = GapThickMin;
         }
@@ -9423,7 +9423,7 @@ namespace WindowEquivalentLayer {
         } else if (L.LTYPE == ltyNONE || L.LTYPE == ltyROOM) {
             // none or room: do nothing
         } else {
-            ShowSevereError(RoutineName + L.Name + '.');
+            ShowSevereError(std::string{RoutineName} + L.Name + '.');
             ShowContinueError("...invalid layer type specified.");
         }
     }
@@ -9500,7 +9500,7 @@ namespace WindowEquivalentLayer {
             }
         }
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Program terminates for preceding reason(s).");
+            ShowFatalError(std::string{RoutineName} + "Program terminates for preceding reason(s).");
         }
     }
 

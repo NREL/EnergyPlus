@@ -358,7 +358,7 @@ namespace General {
         Array.redimension(ArrayMax += ArrayInc, 0.0);
     }
 
-    void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
+    void CheckCreatedZoneItemName(std::string_view calledFrom,                  // routine called from
                                   std::string const &CurrentObject,               // object being parsed
                                   std::string const &ZoneName,                    // Zone Name associated
                                   std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -370,7 +370,7 @@ namespace General {
     );
 
     template <typename T, class = typename std::enable_if<!std::is_same<T, std::string>::value>::type>
-    inline void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
+    inline void CheckCreatedZoneItemName(std::string_view calledFrom,                  // routine called from
                                          std::string const &CurrentObject,               // object being parsed
                                          std::string const &ZoneName,                    // Zone Name associated
                                          std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names

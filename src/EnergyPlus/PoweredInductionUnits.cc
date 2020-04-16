@@ -348,7 +348,7 @@ namespace PoweredInductionUnits {
             } else {
                 PIU(PIUNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2)); // convert schedule name to pointer
                 if (PIU(PIUNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -369,7 +369,7 @@ namespace PoweredInductionUnits {
                 PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
                 PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant("Steam");
                 if (PIU(PIUNum).HCoil_FluidIndex == 0) {
-                    ShowSevereError(RoutineName + "Steam Properties for " + cAlphaArgs(1) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Steam Properties for " + cAlphaArgs(1) + " not found.");
                     if (SteamMessageNeeded) ShowContinueError("Steam Fluid Properties should have been included in the input file.");
                     ErrorsFound = true;
                     SteamMessageNeeded = false;
@@ -483,7 +483,7 @@ namespace PoweredInductionUnits {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (PIU(PIUNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for PIU = [" + PIU(PIUNum).UnitType + ',' + PIU(PIUNum).Name +
+                ShowSevereError(std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" + PIU(PIUNum).UnitType + ',' + PIU(PIUNum).Name +
                                 "].");
                 ShowContinueError("...should have outlet node = " + NodeID(PIU(PIUNum).OutAirNode));
                 ErrorsFound = true;
@@ -541,7 +541,7 @@ namespace PoweredInductionUnits {
             } else {
                 PIU(PIUNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2)); // convert schedule name to pointer
                 if (PIU(PIUNum).SchedPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
@@ -561,7 +561,7 @@ namespace PoweredInductionUnits {
                 PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
                 PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant("Steam");
                 if (PIU(PIUNum).HCoil_FluidIndex == 0) {
-                    ShowSevereError(RoutineName + "Steam Properties for " + cAlphaArgs(1) + " not found.");
+                    ShowSevereError(std::string{RoutineName} + "Steam Properties for " + cAlphaArgs(1) + " not found.");
                     if (SteamMessageNeeded) ShowContinueError("Steam Fluid Properties should have been included in the input file.");
                     ErrorsFound = true;
                     SteamMessageNeeded = false;
@@ -690,7 +690,7 @@ namespace PoweredInductionUnits {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (PIU(PIUNum).ADUNum == 0) {
-                ShowSevereError(RoutineName + "No matching Air Distribution Unit, for PIU = [" + PIU(PIUNum).UnitType + ',' + PIU(PIUNum).Name +
+                ShowSevereError(std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" + PIU(PIUNum).UnitType + ',' + PIU(PIUNum).Name +
                                 "].");
                 ShowContinueError("...should have outlet node = " + NodeID(PIU(PIUNum).OutAirNode));
                 ErrorsFound = true;
@@ -722,7 +722,7 @@ namespace PoweredInductionUnits {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input.  Preceding conditions cause termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting input.  Preceding conditions cause termination.");
         }
 
         for (PIUNum = 1; PIUNum <= NumPIUs; ++PIUNum) {

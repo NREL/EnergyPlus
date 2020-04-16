@@ -957,7 +957,7 @@ namespace EnergyPlus {
 
         void SetupPipingSystemOutputVariables();
 
-        void IssueSevereInputFieldError(std::string const &RoutineName,
+        void IssueSevereInputFieldError(std::string_view RoutineName,
                                         std::string const &ObjectName,
                                         std::string const &InstanceName,
                                         std::string const &FieldName,
@@ -965,7 +965,7 @@ namespace EnergyPlus {
                                         std::string const &Condition,
                                         bool &ErrorsFound);
 
-        void IssueSevereInputFieldError(std::string const &RoutineName,
+        void IssueSevereInputFieldError(std::string_view RoutineName,
                                         std::string const &ObjectName,
                                         std::string const &InstanceName,
                                         std::string const &FieldName,

@@ -574,7 +574,7 @@ namespace VariableSpeedCoils {
 
             //   If (VarSpeedCoil(DXCoilNum)%NumOfSpeeds .LT. 2) Then
             if (VarSpeedCoil(DXCoilNum).NumOfSpeeds < 1) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(1) + " must be >= 1. entered number is " + TrimSigDigits(NumArray(1), 0));
                 ErrorsFound = true;
             }
@@ -584,7 +584,7 @@ namespace VariableSpeedCoils {
             }
 
             if ((VarSpeedCoil(DXCoilNum).NormSpedLevel > VarSpeedCoil(DXCoilNum).NumOfSpeeds) || (VarSpeedCoil(DXCoilNum).NormSpedLevel <= 0)) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(2) + " must be valid speed level entered number is " + TrimSigDigits(NumArray(2), 0));
                 ErrorsFound = true;
             }
@@ -593,17 +593,17 @@ namespace VariableSpeedCoils {
             VarSpeedCoil(DXCoilNum).PLFFPLR = GetCurveIndex(AlphArray(6)); // convert curve name to number
             if (VarSpeedCoil(DXCoilNum).PLFFPLR == 0) {
                 if (lAlphaBlanks(6)) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                     ShowContinueError("...required " + cAlphaFields(6) + " is blank.");
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(6) + "=\"" + AlphArray(6) + "\".");
                 }
                 ErrorsFound = true;
             } else {
                 CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).PLFFPLR, 1.0);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                     ShowContinueError("..." + cAlphaFields(6) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                     ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                 }
@@ -621,10 +621,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -640,7 +640,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletWetBulbTemp, RatedInletWaterTemp);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -651,10 +651,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -670,7 +670,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -681,10 +681,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -700,7 +700,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -711,10 +711,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -730,7 +730,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletWetBulbTemp, RatedInletWaterTemp);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -741,10 +741,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -760,7 +760,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -771,10 +771,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -790,7 +790,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -802,10 +802,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSWasteHeat(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSWasteHeat(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -821,7 +821,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSWasteHeat(I), RatedInletWaterTemp, RatedInletAirTemp);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -952,7 +952,7 @@ namespace VariableSpeedCoils {
             TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Air Nodes");
 
             if (VarSpeedCoil(DXCoilNum).NumOfSpeeds < 1) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(1) + " must be >= 1. entered number is " + TrimSigDigits(NumArray(1), 0));
                 ErrorsFound = true;
             }
@@ -962,7 +962,7 @@ namespace VariableSpeedCoils {
             }
 
             if ((VarSpeedCoil(DXCoilNum).NormSpedLevel > VarSpeedCoil(DXCoilNum).NumOfSpeeds) || (VarSpeedCoil(DXCoilNum).NormSpedLevel <= 0)) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(2) + " must be valid speed level entered number is " + TrimSigDigits(NumArray(2), 0));
                 ErrorsFound = true;
             }
@@ -971,17 +971,17 @@ namespace VariableSpeedCoils {
             VarSpeedCoil(DXCoilNum).PLFFPLR = GetCurveIndex(AlphArray(4)); // convert curve name to number
             if (VarSpeedCoil(DXCoilNum).PLFFPLR == 0) {
                 if (lAlphaBlanks(4)) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                     ShowContinueError("...required " + cAlphaFields(6) + " is blank.");
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\".");
                 }
                 ErrorsFound = true;
             } else {
                 CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).PLFFPLR, 1.0);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                     ShowContinueError("..." + cAlphaFields(4) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                     ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                 }
@@ -1001,7 +1001,7 @@ namespace VariableSpeedCoils {
                                                                                   ObjectIsNotParent);
 
                 if (!CheckOutAirNodeNumber(VarSpeedCoil(DXCoilNum).CondenserInletNodeNum)) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", may be invalid");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", may be invalid");
                     ShowContinueError(cAlphaFields(10) + "=\"" + AlphArray(5) +
                                       "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ShowContinueError(
@@ -1015,7 +1015,7 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).CondenserType = EvapCooled;
                 VarSpeedCoil(DXCoilNum).ReportEvapCondVars = true;
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cAlphaFields(6) + "=\"" + AlphArray(6) + "\":");
                 ShowContinueError("...must be AirCooled or EvaporativelyCooled.");
                 ErrorsFound = true;
@@ -1024,7 +1024,7 @@ namespace VariableSpeedCoils {
             VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower = NumArray(7);
 
             if (VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower < 0.0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(7) + " cannot be < 0.0.");
                 ShowContinueError("...entered value=[" + TrimSigDigits(NumArray(7), 2) + "].");
                 ErrorsFound = true;
@@ -1033,7 +1033,7 @@ namespace VariableSpeedCoils {
             // Set crankcase heater capacity
             VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity = NumArray(8);
             if (VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity < 0.0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(8) + " cannot be < 0.0.");
                 ShowContinueError("...entered value=[" + TrimSigDigits(NumArray(8), 2) + "].");
                 ErrorsFound = true;
@@ -1077,7 +1077,7 @@ namespace VariableSpeedCoils {
             //   Basin heater power as a function of temperature must be greater than or equal to 0
             VarSpeedCoil(DXCoilNum).BasinHeaterPowerFTempDiff = NumArray(11);
             if (NumArray(11) < 0.0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(11) + " must be >= 0.0.");
                 ShowContinueError("...entered value=[" + TrimSigDigits(NumArray(11), 2) + "].");
                 ErrorsFound = true;
@@ -1086,7 +1086,7 @@ namespace VariableSpeedCoils {
             VarSpeedCoil(DXCoilNum).BasinHeaterSetPointTemp = NumArray(12);
             if (VarSpeedCoil(DXCoilNum).BasinHeaterPowerFTempDiff > 0.0) {
                 if (VarSpeedCoil(DXCoilNum).BasinHeaterSetPointTemp < 2.0) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", freeze possible");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", freeze possible");
                     ShowContinueError("..." + cNumericFields(12) + " is < 2 {C}. Freezing could occur.");
                     ShowContinueError("...entered value=[" + TrimSigDigits(NumArray(12), 2) + "].");
                 }
@@ -1095,7 +1095,7 @@ namespace VariableSpeedCoils {
             if (!lAlphaBlanks(9)) {
                 VarSpeedCoil(DXCoilNum).BasinHeaterSchedulePtr = GetScheduleIndex(AlphArray(9));
                 if (VarSpeedCoil(DXCoilNum).BasinHeaterSchedulePtr == 0) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(14) + "=\"" + AlphArray(9) + "\".");
                     ShowContinueError("Basin heater will be available to operate throughout the simulation.");
                 }
@@ -1110,7 +1110,7 @@ namespace VariableSpeedCoils {
 
                 VarSpeedCoil(DXCoilNum).EvapCondEffect(I) = NumArray(18 + (I - 1) * 6);
                 if (VarSpeedCoil(DXCoilNum).EvapCondEffect(I) < 0.0 || VarSpeedCoil(DXCoilNum).EvapCondEffect(I) > 1.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cNumericFields(18 + (I - 1) * 6) + " cannot be < 0.0 or > 1.0.");
                     ShowContinueError("...entered value=[" + TrimSigDigits(NumArray(18 + (I - 1) * 6), 2) + "].");
                     ErrorsFound = true;
@@ -1120,10 +1120,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1139,7 +1139,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletWetBulbTemp, RatedAmbAirTemp);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1150,10 +1150,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1169,7 +1169,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1180,10 +1180,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1199,7 +1199,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletWetBulbTemp, RatedAmbAirTemp);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1210,10 +1210,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1229,7 +1229,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1351,7 +1351,7 @@ namespace VariableSpeedCoils {
 
             //       If (VarSpeedCoil(DXCoilNum)%NumOfSpeeds .LT. 2) Then
             if (VarSpeedCoil(DXCoilNum).NumOfSpeeds < 1) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(1) + " must be >= 1. entered number is " + TrimSigDigits(NumArray(1), 0));
                 ErrorsFound = true;
             }
@@ -1361,7 +1361,7 @@ namespace VariableSpeedCoils {
             }
 
             if ((VarSpeedCoil(DXCoilNum).NormSpedLevel > VarSpeedCoil(DXCoilNum).NumOfSpeeds) || (VarSpeedCoil(DXCoilNum).NormSpedLevel <= 0)) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(2) + " must be valid speed level entered number is " + TrimSigDigits(NumArray(2), 0));
                 ErrorsFound = true;
             }
@@ -1370,17 +1370,17 @@ namespace VariableSpeedCoils {
             VarSpeedCoil(DXCoilNum).PLFFPLR = GetCurveIndex(AlphArray(6)); // convert curve name to number
             if (VarSpeedCoil(DXCoilNum).PLFFPLR == 0) {
                 if (lAlphaBlanks(6)) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                     ShowContinueError("...required " + cAlphaFields(6) + " is blank.");
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(6) + "=\"" + AlphArray(6) + "\".");
                 }
                 ErrorsFound = true;
             } else {
                 CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).PLFFPLR, 1.0);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                     ShowContinueError("..." + cAlphaFields(6) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                     ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                 }
@@ -1397,10 +1397,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1416,7 +1416,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletAirTempHeat, RatedInletWaterTempHeat);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1427,10 +1427,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1446,7 +1446,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1457,10 +1457,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(14 + (I - 1) * 6) + "\".");
                     }
                     ErrorsFound = true;
@@ -1476,7 +1476,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1487,10 +1487,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1506,7 +1506,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletAirTempHeat, RatedInletWaterTempHeat);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1517,10 +1517,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(16 + (I - 1) * 6) + "\".");
                     }
                     ErrorsFound = true;
@@ -1536,7 +1536,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1547,10 +1547,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1566,7 +1566,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1578,10 +1578,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSWasteHeat(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSWasteHeat(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1597,7 +1597,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSWasteHeat(I), RatedInletAirTempHeat, RatedInletWaterTempHeat);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1696,7 +1696,7 @@ namespace VariableSpeedCoils {
             TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Air Nodes");
 
             if (VarSpeedCoil(DXCoilNum).NumOfSpeeds < 1) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(1) + " must be >= 1. entered number is " + TrimSigDigits(NumArray(1), 0));
                 ErrorsFound = true;
             }
@@ -1706,7 +1706,7 @@ namespace VariableSpeedCoils {
             }
 
             if ((VarSpeedCoil(DXCoilNum).NormSpedLevel > VarSpeedCoil(DXCoilNum).NumOfSpeeds) || (VarSpeedCoil(DXCoilNum).NormSpedLevel <= 0)) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(2) + " must be valid speed level entered number is " + TrimSigDigits(NumArray(2), 0));
                 ErrorsFound = true;
             }
@@ -1715,17 +1715,17 @@ namespace VariableSpeedCoils {
             VarSpeedCoil(DXCoilNum).PLFFPLR = GetCurveIndex(AlphArray(4)); // convert curve name to number
             if (VarSpeedCoil(DXCoilNum).PLFFPLR == 0) {
                 if (lAlphaBlanks(4)) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                     ShowContinueError("...required " + cAlphaFields(4) + " is blank.");
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\".");
                 }
                 ErrorsFound = true;
             } else {
                 CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).PLFFPLR, 1.0);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                     ShowContinueError("..." + cAlphaFields(4) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                     ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                 }
@@ -1736,11 +1736,11 @@ namespace VariableSpeedCoils {
             if (UtilityRoutines::SameString(AlphArray(6), "ReverseCycle")) {
                 if (VarSpeedCoil(DXCoilNum).DefrostEIRFT == 0) {
                     if (lAlphaBlanks(5)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(5) + " is blank.");
                         ShowContinueError("...field is required because " + cAlphaFields(6) + " is \"ReverseCycle\".");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(5) + "=\"" + AlphArray(5) + "\".");
                     }
                     ErrorsFound = true;
@@ -1758,7 +1758,7 @@ namespace VariableSpeedCoils {
             if (UtilityRoutines::SameString(AlphArray(6), "ReverseCycle")) VarSpeedCoil(DXCoilNum).DefrostStrategy = ReverseCycle;
             if (UtilityRoutines::SameString(AlphArray(6), "Resistive")) VarSpeedCoil(DXCoilNum).DefrostStrategy = Resistive;
             if (VarSpeedCoil(DXCoilNum).DefrostStrategy == 0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("...illegal " + cAlphaFields(6) + "=\"" + AlphArray(6) + "\".");
                 ShowContinueError("...valid values for this field are ReverseCycle or Resistive.");
                 ErrorsFound = true;
@@ -1767,7 +1767,7 @@ namespace VariableSpeedCoils {
             if (UtilityRoutines::SameString(AlphArray(7), "Timed")) VarSpeedCoil(DXCoilNum).DefrostControl = Timed;
             if (UtilityRoutines::SameString(AlphArray(7), "OnDemand")) VarSpeedCoil(DXCoilNum).DefrostControl = OnDemand;
             if (VarSpeedCoil(DXCoilNum).DefrostControl == 0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("...illegal " + cAlphaFields(7) + "=\"" + AlphArray(7) + "\".");
                 ShowContinueError("...valid values for this field are Timed or OnDemand.");
                 ErrorsFound = true;
@@ -1785,7 +1785,7 @@ namespace VariableSpeedCoils {
             // Set crankcase heater capacity
             VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity = NumArray(8);
             if (VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity < 0.0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(9) + " cannot be < 0.0.");
                 ShowContinueError("...entered value=[" + TrimSigDigits(NumArray(9), 2) + "].");
                 ErrorsFound = true;
@@ -1797,14 +1797,14 @@ namespace VariableSpeedCoils {
             // Set defrost time period
             VarSpeedCoil(DXCoilNum).DefrostTime = NumArray(10);
             if (VarSpeedCoil(DXCoilNum).DefrostTime == 0.0 && VarSpeedCoil(DXCoilNum).DefrostControl == 1) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", ");
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", ");
                 ShowContinueError("..." + cNumericFields(5) + " = 0.0 for defrost control = TIMED.");
             }
 
             // Set defrost capacity (for resistive defrost)
             VarSpeedCoil(DXCoilNum).DefrostCapacity = NumArray(11);
             if (VarSpeedCoil(DXCoilNum).DefrostCapacity == 0.0 && VarSpeedCoil(DXCoilNum).DefrostStrategy == 2) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", ");
+                ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", ");
                 ShowContinueError("..." + cNumericFields(6) + " = 0.0 for defrost strategy = RESISTIVE.");
             }
 
@@ -1814,7 +1814,7 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(14 + (I - 1) * 3);
 
                 if (VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) < 1.e-10) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid value");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid value");
                     ShowContinueError("...too small " + cNumericFields(12 + (I - 1) * 3) + "=[" +
                                       RoundSigDigits(VarSpeedCoil(DXCoilNum).MSRatedTotCap(I), 2) + "].");
                     ErrorsFound = true;
@@ -1824,10 +1824,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1843,7 +1843,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), RatedInletAirTempHeat, RatedAmbAirTempHeat);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1854,10 +1854,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1873,7 +1873,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1884,10 +1884,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1903,7 +1903,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), RatedInletAirTempHeat, RatedAmbAirTempHeat);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -1914,10 +1914,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -1933,7 +1933,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
                             ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
                         }
@@ -2022,7 +2022,7 @@ namespace VariableSpeedCoils {
             VarSpeedCoil(DXCoilNum).NormSpedLevel = int(NumArray(2));
 
             if (VarSpeedCoil(DXCoilNum).NumOfSpeeds < 1) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(1) +
                                   " must be >= 1."
                                   " entered number is " +
@@ -2035,7 +2035,7 @@ namespace VariableSpeedCoils {
             }
 
             if ((VarSpeedCoil(DXCoilNum).NormSpedLevel > VarSpeedCoil(DXCoilNum).NumOfSpeeds) || (VarSpeedCoil(DXCoilNum).NormSpedLevel <= 0)) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(2) +
                                   " must be valid speed level"
                                   " entered number is " +
@@ -2045,7 +2045,7 @@ namespace VariableSpeedCoils {
 
             VarSpeedCoil(DXCoilNum).RatedCapWH = NumArray(3);
             if (VarSpeedCoil(DXCoilNum).RatedCapWH <= 0.0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(3) + " must be > 0.0, entered value=[" + TrimSigDigits(NumArray(3), 2) + "].");
                 ErrorsFound = true;
             }
@@ -2059,7 +2059,7 @@ namespace VariableSpeedCoils {
 
             if (VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate != AutoCalculate) {
                 if (VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate <= 0.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cNumericFields(7) + " must be > 0.0.  entered value=[" + TrimSigDigits(NumArray(7), 3) + "].");
                     ErrorsFound = true;
                 }
@@ -2067,7 +2067,7 @@ namespace VariableSpeedCoils {
 
             if (VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate != AutoCalculate) {
                 if (VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate <= 0.0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cNumericFields(8) + " must be > 0.0  entered value=[" + TrimSigDigits(NumArray(8), 3) + "].");
                     ErrorsFound = true;
                 }
@@ -2080,7 +2080,7 @@ namespace VariableSpeedCoils {
                 else
                     VarSpeedCoil(DXCoilNum).FanPowerIncludedInCOP = true;
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(2) + ".  Entered choice = " + AlphArray(2));
                 ShowContinueError("Valid choices are Yes or No.");
                 ErrorsFound = true;
@@ -2093,7 +2093,7 @@ namespace VariableSpeedCoils {
                 else
                     VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP = false;
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(3) + ".  Entered choice = " + AlphArray(3));
                 ShowContinueError("Valid choices are Yes or No.");
                 ErrorsFound = true;
@@ -2106,7 +2106,7 @@ namespace VariableSpeedCoils {
                 else
                     VarSpeedCoil(DXCoilNum).CondPumpHeatInCapacity = false;
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(4) + ".  Entered choice = " + AlphArray(4));
                 ShowContinueError("Valid choices are Yes or No.");
                 ErrorsFound = true;
@@ -2114,7 +2114,7 @@ namespace VariableSpeedCoils {
 
             VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater = NumArray(9);
             if (VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater <= 0.0 || VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater > 1.0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(10) + " must be >= 0 and <= 1.  entered value=[" + TrimSigDigits(NumArray(9), 3) + "].");
                 ErrorsFound = true;
             }
@@ -2146,14 +2146,14 @@ namespace VariableSpeedCoils {
 
             VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity = NumArray(10);
             if (VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity < 0.0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(10) + " must be >= 0.0  entered value=[" + TrimSigDigits(NumArray(10), 1) + "].");
                 ErrorsFound = true;
             }
 
             VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater = NumArray(11);
             if (VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater < 0.0) {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cNumericFields(11) + " must be >= 0 {C}.  entered value=[" + TrimSigDigits(NumArray(11), 1) + "].");
                 ErrorsFound = true;
             }
@@ -2164,7 +2164,7 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).InletAirTemperatureType = WetBulbIndicator;
             } else {
                 //   wrong temperature type selection
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError("..." + cAlphaFields(9) + " must be DryBulbTemperature or WetBulbTemperature.");
                 ShowContinueError("...entered value=\"" + AlphArray(9) + "\".");
                 ErrorsFound = true;
@@ -2183,17 +2183,17 @@ namespace VariableSpeedCoils {
             VarSpeedCoil(DXCoilNum).PLFFPLR = GetCurveIndex(AlphArray(10)); // convert curve name to number
             if (VarSpeedCoil(DXCoilNum).PLFFPLR == 0) {
                 if (lAlphaBlanks(10)) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                     ShowContinueError("...required " + cAlphaFields(10) + " is blank.");
                 } else {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(10) + "=\"" + AlphArray(10) + "\".");
                 }
                 ErrorsFound = true;
             } else {
                 CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).PLFFPLR, 1.0);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                    ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                     ShowContinueError("..." + cAlphaFields(10) +
                                       " output is not equal to 1.0 "
                                       "(+ or - 10%) at rated conditions.");
@@ -2213,10 +2213,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -2232,7 +2232,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I), WHInletAirTemp, WHInletWaterTemp);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
                                               " output is not equal to 1.0 "
                                               "(+ or - 10%) at rated conditions.");
@@ -2245,10 +2245,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -2264,7 +2264,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
                                               " output is not equal to 1.0 "
                                               "(+ or - 10%) at rated conditions.");
@@ -2277,10 +2277,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -2296,7 +2296,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
                                               " output is not equal to 1.0 "
                                               "(+ or - 10%) at rated conditions.");
@@ -2309,10 +2309,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -2328,7 +2328,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I), WHInletAirTemp, WHInletWaterTemp);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
                                               " output is not equal to 1.0 "
                                               "(+ or - 10%) at rated conditions.");
@@ -2341,10 +2341,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -2360,7 +2360,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
                                               " output is not equal to 1.0 "
                                               "(+ or - 10%) at rated conditions.");
@@ -2373,10 +2373,10 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I) = GetCurveIndex(AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
                         ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                        ShowSevereError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
@@ -2392,7 +2392,7 @@ namespace VariableSpeedCoils {
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
+                            ShowWarningError(std::string{RoutineName} + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
                             ShowContinueError("..." + cAlphaFields(AlfaFieldIncre) +
                                               " output is not equal to 1.0 "
                                               "(+ or - 10%) at rated conditions.");
@@ -2483,7 +2483,7 @@ namespace VariableSpeedCoils {
         NumArray.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found getting input. Program terminates.");
+            ShowFatalError(std::string{RoutineName} + "Errors found getting input. Program terminates.");
         }
 
         for (DXCoilNum = 1; DXCoilNum <= NumVarSpeedCoils; ++DXCoilNum) {
@@ -3170,7 +3170,7 @@ namespace VariableSpeedCoils {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination.");
+            ShowFatalError(std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination.");
         }
     }
 
@@ -4264,7 +4264,7 @@ namespace VariableSpeedCoils {
                 if (RatedCapHeatDes == AutoSize) {
                     ShowWarningError("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" +
                                      VarSpeedCoil(DXCoilNum).Name + "\"");
-                    ShowContinueError(RoutineName + ": Heating coil could not be autosized since cooling coil was not previously sized.");
+                    ShowContinueError(std::string{RoutineName} + ": Heating coil could not be autosized since cooling coil was not previously sized.");
                     ShowContinueError("... Cooling coil must be upstream of heating coil.");
                     ShowContinueError("... Manually sizing this heating coil will be required.");
                 }
@@ -4958,7 +4958,7 @@ namespace VariableSpeedCoils {
             if (VarSpeedCoil(DXCoilNum).RatedCapCoolSens > VarSpeedCoil(DXCoilNum).RatedCapCoolTotal) {
                 ShowWarningError("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" +
                                  VarSpeedCoil(DXCoilNum).Name + "\"");
-                ShowContinueError(RoutineName + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
+                ShowContinueError(std::string{RoutineName} + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
                 ShowContinueError("Each of these capacity inputs have been autosized.");
                 ShowContinueError("Rated Sensible Cooling Capacity = " + TrimSigDigits(VarSpeedCoil(DXCoilNum).RatedCapCoolSens, 2) + " W");
                 ShowContinueError("Rated Total Cooling Capacity    = " + TrimSigDigits(VarSpeedCoil(DXCoilNum).RatedCapCoolTotal, 2) + " W");
@@ -4983,7 +4983,7 @@ namespace VariableSpeedCoils {
             if (VarSpeedCoil(DXCoilNum).RatedCapCoolSens > VarSpeedCoil(DXCoilNum).RatedCapCoolTotal) {
                 ShowWarningError("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT \"" +
                                  VarSpeedCoil(DXCoilNum).Name + "\"");
-                ShowContinueError(RoutineName + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
+                ShowContinueError(std::string{RoutineName} + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
                 ShowContinueError("Only the rated total capacity input is autosized, consider autosizing both inputs.");
                 ShowContinueError("Rated Sensible Cooling Capacity = " + TrimSigDigits(VarSpeedCoil(DXCoilNum).RatedCapCoolSens, 2) + " W");
                 ShowContinueError("Rated Total Cooling Capacity    = " + TrimSigDigits(VarSpeedCoil(DXCoilNum).RatedCapCoolTotal, 2) + " W");
