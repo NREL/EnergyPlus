@@ -749,7 +749,20 @@ def get_all_errors(source_files):
                     warnings.warn(msg)
             continue
 
-        found_functions = parse_function_signatures_in_header(header_file)
+        try:
+            found_functions = parse_function_signatures_in_header(header_file)
+        except ValueError as e:
+            if IS_CI:
+                ci_msg = {
+                    'tool': 'find_byref_bool_override',
+                    'file': rel_file,
+                    'messagetype': 'warning',
+                    'message': str(e)
+                }
+                print(json.dumps(ci_msg))
+            else:
+                warnings.warn(str(e))
+            continue
         if not found_functions:
             # print("No problem for {}".format(rel_file))
             pass
