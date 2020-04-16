@@ -257,7 +257,7 @@ namespace ChillerReformulatedEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will get the input required by the Reformulated Electric EIR Chiller model
 
-        static std::string const RoutineName("GetElecReformEIRChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetElecReformEIRChillerInput: "); // include trailing blank space
 
         bool ErrorsFound(false); // True when input errors found
 
@@ -765,7 +765,7 @@ namespace ChillerReformulatedEIR {
         // METHODOLOGY EMPLOYED:
         //  Uses the status flags to trigger initializations.
 
-        static std::string const RoutineName("InitElecReformEIRChiller");
+        static constexpr std::string_view RoutineName("InitElecReformEIRChiller");
 
         // Init more variables
         if (this->MyInitFlag) {
@@ -1027,7 +1027,7 @@ namespace ChillerReformulatedEIR {
         //  the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
         //  is calculated from the reference capacity, the COP, and the condenser loop design delta T.
 
-        static std::string const RoutineName("SizeElecReformEIRChiller");
+        static constexpr std::string_view RoutineName("SizeElecReformEIRChiller");
 
         bool ErrorsFound(false); // If errors detected in input
 
@@ -1655,7 +1655,7 @@ namespace ChillerReformulatedEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  Calculate the heat recovered from the chiller condenser
 
-        static std::string const RoutineName("EIRChillerHeatRecovery");
+        static constexpr std::string_view RoutineName("EIRChillerHeatRecovery");
 
         // inlet node to the heat recovery heat exchanger
         Real64 heatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
@@ -1839,7 +1839,7 @@ namespace ChillerReformulatedEIR {
         //    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
-        static std::string const RoutineName("CalcElecReformEIRChillerModel");
+        static constexpr std::string_view RoutineName("CalcElecReformEIRChillerModel");
 
         this->ChillerPartLoadRatio = 0.0;
         this->ChillerCyclingRatio = 0.0;

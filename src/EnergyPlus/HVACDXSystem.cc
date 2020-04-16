@@ -394,7 +394,7 @@ namespace HVACDXSystem {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static std::string const RoutineName("GetDXCoolingSystemInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetDXCoolingSystemInput: "); // include trailing blank space
         static bool ErrorsFound(false);                                    // If errors detected in input
         static bool ErrFound(false);                                       // used for mining functions
         bool IsNotOK;                                                      // Flag to verify name
@@ -3428,7 +3428,7 @@ namespace HVACDXSystem {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const RunOnSensible(1); // identifier for temperature (sensible load) control
         int const RunOnLatent(2);   // identifier for humidity (latent load) control
-        static std::string const RoutineName("FrostControlSetPointLimit");
+        static constexpr std::string_view RoutineName("FrostControlSetPointLimit");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

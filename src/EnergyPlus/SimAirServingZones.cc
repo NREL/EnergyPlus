@@ -403,7 +403,7 @@ namespace SimAirServingZones {
         using WaterCoils::GetCoilWaterInletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetAirPathData: ");
+        static constexpr std::string_view RoutineName("GetAirPathData: ");
 
         // SUBROUTINE LOCAL VARIABLE DEFINITIONS
         int NumNumbers;                // number of numbers returned by GetObjectItem
@@ -7260,7 +7260,7 @@ namespace SimAirServingZones {
         using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("UpdateSysSizingForScalableInputs: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("UpdateSysSizingForScalableInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TempSize;           // autosized value

@@ -444,7 +444,7 @@ namespace HVACInterfaceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("UpdatePlantLoopInterface");
+        static constexpr std::string_view RoutineName("UpdatePlantLoopInterface");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -620,7 +620,7 @@ namespace HVACInterfaceManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
-        static std::string const RoutineName("UpdateHalfLoopInletTemp");
+        static constexpr std::string_view RoutineName("UpdateHalfLoopInletTemp");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -786,7 +786,7 @@ namespace HVACInterfaceManager {
         // SUBROUTINE ARGUMENTS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("UpdateCommonPipe");
+        static constexpr std::string_view RoutineName("UpdateCommonPipe");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

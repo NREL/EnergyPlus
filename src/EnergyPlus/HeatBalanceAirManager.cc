@@ -372,7 +372,7 @@ namespace HeatBalanceAirManager {
         Real64 const VentilTempLimit(100.0);                               // degrees Celsius
         Real64 const MixingTempLimit(100.0);                               // degrees Celsius
         Real64 const VentilWSLimit(40.0);                                  // m/s
-        static std::string const RoutineName("GetSimpleAirModelInputs: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetSimpleAirModelInputs: "); // include trailing blank space
         // Refrigeration Door Mixing Protection types, factors used to moderate mixing flow.
         Real64 const RefDoorNone(0.0);
         Real64 const RefDoorAirCurtain(0.5);

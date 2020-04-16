@@ -304,7 +304,7 @@ namespace UnitHeater {
         int NumNumbers;                                               // Number of Numbers for each GetObjectItem call
         int NumFields;                                                // Total number of fields in object
         int UnitHeatNum;                                              // Item to be "gotten"
-        static std::string const RoutineName("GetUnitHeaterInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetUnitHeaterInput: "); // include trailing blank space
         Real64 FanVolFlow;                                            // Fan volumetric flow rate
         std::string CurrentModuleObject;
         Array1D_string Alphas;         // Alpha items for object
@@ -740,7 +740,7 @@ namespace UnitHeater {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitUnitHeater");
+        static constexpr std::string_view RoutineName("InitUnitHeater");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyEnvrnFlag;
@@ -979,7 +979,7 @@ namespace UnitHeater {
         using WaterCoils::WaterCoil;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeUnitHeater");
+        static constexpr std::string_view RoutineName("SizeUnitHeater");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop

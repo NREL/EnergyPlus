@@ -218,7 +218,7 @@ namespace SplitterComponent {
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSplitterInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetSplitterInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SplitterNum; // The Splitter that you are currently loading input into

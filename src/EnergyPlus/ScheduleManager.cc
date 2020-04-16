@@ -250,7 +250,7 @@ namespace ScheduleManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ProcessScheduleInput: ");
+        static constexpr std::string_view RoutineName("ProcessScheduleInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

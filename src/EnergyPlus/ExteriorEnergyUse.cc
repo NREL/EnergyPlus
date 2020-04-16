@@ -187,7 +187,7 @@ namespace ExteriorEnergyUse {
         using DataGlobals::AnyEnergyManagementSystemInModel;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetExteriorEnergyUseInput: ");
+        static constexpr std::string_view RoutineName("GetExteriorEnergyUseInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                       // Item to be "gotten"
@@ -532,7 +532,7 @@ namespace ExteriorEnergyUse {
         // valid values and sets the correct in the returned FuelTypeNumber.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ValidateFuelType: ");
+        static constexpr std::string_view RoutineName("ValidateFuelType: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

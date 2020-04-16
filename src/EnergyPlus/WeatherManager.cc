@@ -812,7 +812,7 @@ namespace WeatherManager {
         using ThermalComfort::CalcThermalComfortAdaptiveCEN15251;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetNextEnvironment: ");
+        static constexpr std::string_view RoutineName("GetNextEnvironment: ");
         static constexpr auto EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{},{}\n");
         static constexpr auto EnvDSTNFormat("Environment:Daylight Saving,No,{}\n");
         static constexpr auto EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
@@ -1863,7 +1863,7 @@ namespace WeatherManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SetDSTDateRanges: ");
+        static constexpr std::string_view RoutineName("SetDSTDateRanges: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1987,7 +1987,7 @@ namespace WeatherManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SetSpecialDayDates: ");
+        static constexpr std::string_view RoutineName("SetSpecialDayDates: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2519,7 +2519,7 @@ namespace WeatherManager {
         static char time_stamp[10];
         static char day_stamp[6];
         static char day_year_stamp[11];
-        static std::string const RoutineName("SetCurrentWeather");
+        static constexpr std::string_view RoutineName("SetCurrentWeather");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int NextHour;
@@ -4220,11 +4220,11 @@ namespace WeatherManager {
         Real64 const ZhangHuangModCoeff_C5(0.014);    // -0.0980d0
         Real64 const ZhangHuangModCoeff_D(-17.853);   // -10.8568d0
         Real64 const ZhangHuangModCoeff_K(0.843);     // 49.3112d0
-        static std::string const RoutineNamePsyWFnTdbTwbPb("SetUpDesignDay:PsyWFnTdbTwbPb");
-        static std::string const RoutineNamePsyWFnTdpPb("SetUpDesignDay:PsyWFnTdpPb");
-        static std::string const RoutineNamePsyWFnTdbH("SetUpDesignDay:PsyWFnTdbH");
+        static constexpr std::string_view RoutineNamePsyWFnTdbTwbPb("SetUpDesignDay:PsyWFnTdbTwbPb");
+        static constexpr std::string_view RoutineNamePsyWFnTdpPb("SetUpDesignDay:PsyWFnTdpPb");
+        static constexpr std::string_view RoutineNamePsyWFnTdbH("SetUpDesignDay:PsyWFnTdbH");
         static std::string const WeatherManager("WeatherManager");
-        static std::string const RoutineNameLong("WeatherManager.cc subroutine SetUpDesignDay");
+        static constexpr std::string_view RoutineNameLong("WeatherManager.cc subroutine SetUpDesignDay");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Hour;
@@ -7876,7 +7876,7 @@ namespace WeatherManager {
         using General::FindNumberInList;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetWeatherProperties:");
+        static constexpr std::string_view RoutineName("GetWeatherProperties:");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;

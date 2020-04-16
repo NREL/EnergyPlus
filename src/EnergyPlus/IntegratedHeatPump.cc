@@ -1107,7 +1107,7 @@ namespace IntegratedHeatPump {
         using VariableSpeedCoils::VarSpeedCoil;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetIHPInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetIHPInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DXCoilNum; // No of IHP DX system

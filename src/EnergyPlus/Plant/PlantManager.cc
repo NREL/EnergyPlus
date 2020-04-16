@@ -324,7 +324,7 @@ namespace EnergyPlus {
             using SystemAvailabilityManager::GetPlantAvailabilityManager;
 
             // SUBROUTINE PARAMETER DEFINITIONS:
-            static std::string const RoutineName("GetPlant/CondenserLoopData: ");
+            static constexpr std::string_view RoutineName("GetPlant/CondenserLoopData: ");
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int LoopNum;      // DO loop counter for loops
@@ -2431,8 +2431,8 @@ namespace EnergyPlus {
             // SUBROUTINE PARAMETER DEFINITIONS:
             Real64 const StartQuality(1.0);
             Real64 const StartHumRat(0.0);
-            static std::string const RoutineNameAlt("InitializeLoops");
-            static std::string const RoutineName("PlantManager:InitializeLoop");
+            static constexpr std::string_view RoutineNameAlt("InitializeLoops");
+            static constexpr std::string_view RoutineName("PlantManager:InitializeLoop");
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int LoopNum; // plant loop counter
@@ -3007,7 +3007,7 @@ namespace EnergyPlus {
             bool localInitLoopEquip(true);
 
             // SUBROUTINE PARAMETER DEFINITIONS:
-            static std::string const RoutineName("SizePlantLoop");
+            static constexpr std::string_view RoutineName("SizePlantLoop");
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int PlantSizNum(0);      // index of Plant Sizing data for this loop
@@ -3244,7 +3244,7 @@ namespace EnergyPlus {
             using ReportSizingManager::ReportSizingOutput;
 
             // SUBROUTINE PARAMETER DEFINITIONS:
-            static std::string const RoutineName("ResizePlantLoop");
+            static constexpr std::string_view RoutineName("ResizePlantLoop");
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int PlantSizNum(0);      // index of Plant Sizing data for this loop

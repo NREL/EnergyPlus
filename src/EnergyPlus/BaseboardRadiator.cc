@@ -318,7 +318,7 @@ namespace BaseboardRadiator {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetBaseboardInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetBaseboardInput: "); // include trailing blank space
         int const iHeatCAPMAlphaNum(5);             // get input index to water baseboard Radiator system heating capacity sizing method
         int const iHeatDesignCapacityNumericNum(1); // get input index to water baseboard Radiator system electric heating capacity
         int const iHeatCapacityPerFloorAreaNumericNum(
@@ -586,7 +586,7 @@ namespace BaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("BaseboardRadiator:InitBaseboard");
+        static constexpr std::string_view RoutineName("BaseboardRadiator:InitBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -740,7 +740,7 @@ namespace BaseboardRadiator {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Acc(0.0001); // Accuracy of result
         int const MaxIte(500);    // Maximum number of iterations
-        static std::string const RoutineName(cCMO_BBRadiator_Water + ":SizeBaseboard");
+        static constexpr std::string_view RoutineName(cCMO_BBRadiator_Water + ":SizeBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1115,7 +1115,7 @@ namespace BaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName(cCMO_BBRadiator_Water + ":SimHWConvective");
+        static constexpr std::string_view RoutineName(cCMO_BBRadiator_Water + ":SimHWConvective");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

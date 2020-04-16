@@ -183,7 +183,7 @@ namespace OutAirNodeManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetOutAirNodesInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetOutAirNodesInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumOutAirInletNodeLists;

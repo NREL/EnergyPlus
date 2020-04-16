@@ -1397,7 +1397,7 @@ namespace VentilatedSlab {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitVentilatedSlab");
+        static constexpr std::string_view RoutineName("InitVentilatedSlab");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1753,7 +1753,7 @@ namespace VentilatedSlab {
         using WaterCoils::WaterCoil;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeVentilatedSlab");
+        static constexpr std::string_view RoutineName("SizeVentilatedSlab");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop

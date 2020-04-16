@@ -310,7 +310,7 @@ namespace HWBaseboardRadiator {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetHWBaseboardInput:");
+        static constexpr std::string_view RoutineName("GetHWBaseboardInput:");
         Real64 const MaxFraction(1.0);
         Real64 const MinFraction(0.0);
         Real64 const MaxWaterTempAvg(150.0);        // Maximum limit of average water temperature in degree C
@@ -761,7 +761,7 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Constant(0.0062); // Constant of linear equation for air mass flow rate
         Real64 const Coeff(0.0000275); // Correlation coefficient to capacity
-        static std::string const RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
+        static constexpr std::string_view RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -959,8 +959,8 @@ namespace HWBaseboardRadiator {
         Real64 const CPAirStd(1005.0);      // Average specific heat of air at between 25C and 40C in J/kg-k
         Real64 const Constant(0.0062);      // Constant of linear equation for air mass flow rate
         Real64 const Coeff(0.0000275);      // Correlation coefficient to capacity
-        static std::string const RoutineName("SizeHWBaseboard");
-        static std::string const RoutineNameFull("BaseboardRadiatorWater:SizeHWBaseboard");
+        static constexpr std::string_view RoutineName("SizeHWBaseboard");
+        static constexpr std::string_view RoutineNameFull("BaseboardRadiatorWater:SizeHWBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1278,7 +1278,7 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
-        static std::string const RoutineName("CalcHWBaseboard");
+        static constexpr std::string_view RoutineName("CalcHWBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

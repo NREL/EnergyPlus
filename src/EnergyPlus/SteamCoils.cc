@@ -282,7 +282,7 @@ namespace SteamCoils {
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSteamCoilInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetSteamCoilInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum; // The SteamCoil that you are currently loading input into
@@ -501,7 +501,7 @@ namespace SteamCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitSteamCoil");
+        static constexpr std::string_view RoutineName("InitSteamCoil");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -701,7 +701,7 @@ namespace SteamCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeSteamCoil");
+        static constexpr std::string_view RoutineName("SizeSteamCoil");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1060,8 +1060,8 @@ namespace SteamCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcSteamAirCoil");
-        static std::string const RoutineNameSizeSteamCoil("SizeSteamCoil");
+        static constexpr std::string_view RoutineName("CalcSteamAirCoil");
+        static constexpr std::string_view RoutineNameSizeSteamCoil("SizeSteamCoil");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

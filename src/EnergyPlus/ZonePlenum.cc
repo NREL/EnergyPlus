@@ -346,7 +346,7 @@ namespace ZonePlenum {
         static bool ErrorsFound(false);
         bool NodeListError; // Flag for node list error
         bool UniqueNodeError;
-        static std::string const RoutineName("GetZonePlenumInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetZonePlenumInput: "); // include trailing blank space
         std::string InducedNodeListName;
 
         // Flow

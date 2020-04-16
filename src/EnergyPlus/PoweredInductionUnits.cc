@@ -305,7 +305,7 @@ namespace PoweredInductionUnits {
         int SupAirIn;                   // controlled zone supply air inlet index
         bool AirNodeFound;
         int ADUNum;
-        static std::string const RoutineName("GetPIUs: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetPIUs: "); // include trailing blank space
         bool SteamMessageNeeded;
         int FanType_Num; // integer representation of fan type
 
@@ -769,7 +769,7 @@ namespace PoweredInductionUnits {
         using PlantUtilities::ScanPlantLoopsForObject;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitPIU");
+        static constexpr std::string_view RoutineName("InitPIU");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PriNode;    // primary air inlet node number
@@ -996,7 +996,7 @@ namespace PoweredInductionUnits {
         using ReportSizingManager::ReportSizingOutput;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizePIU");
+        static constexpr std::string_view RoutineName("SizePIU");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop

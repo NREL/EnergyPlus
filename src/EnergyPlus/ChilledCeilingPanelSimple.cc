@@ -290,7 +290,7 @@ namespace CoolingPanelSimple {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetCoolingPanelInput:");
+        static constexpr std::string_view RoutineName("GetCoolingPanelInput:");
         Real64 const MaxFraction(1.0);
         Real64 const MinFraction(0.0);
         Real64 const MaxWaterTempAvg(30.0);       // Maximum limit of average water temperature in degree C
@@ -777,7 +777,7 @@ namespace CoolingPanelSimple {
         using PlantUtilities::ScanPlantLoopsForObject;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ChilledCeilingPanelSimple:InitCoolingPanel");
+        static constexpr std::string_view RoutineName("ChilledCeilingPanelSimple:InitCoolingPanel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ZoneEquipmentListChecked(false);
@@ -967,7 +967,7 @@ namespace CoolingPanelSimple {
         using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeCoolingPanel");
+        static constexpr std::string_view RoutineName("SizeCoolingPanel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);  // If errors detected in input
@@ -1246,7 +1246,7 @@ namespace CoolingPanelSimple {
         Real64 const MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
         int const Maxiter(20);        // Maximum number of iterations to achieve tolerance
         Real64 const IterTol(0.005);  // Tolerance of 0.5%
-        static std::string const RoutineName("CalcCoolingPanel");
+        static constexpr std::string_view RoutineName("CalcCoolingPanel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;

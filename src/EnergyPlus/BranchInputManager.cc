@@ -1337,7 +1337,7 @@ namespace BranchInputManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetBranchInput: ");
+        static constexpr std::string_view RoutineName("GetBranchInput: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1607,7 +1607,7 @@ namespace BranchInputManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetBranchListInput: ");
+        static constexpr std::string_view RoutineName("GetBranchListInput: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

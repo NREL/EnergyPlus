@@ -263,7 +263,7 @@ namespace InternalHeatGains {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static std::string const RoutineName("GetInternalHeatGains: ");
+        static constexpr std::string_view RoutineName("GetInternalHeatGains: ");
         int const noOtherFuelTypeZero = 0;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5661,7 +5661,7 @@ namespace InternalHeatGains {
         static Array1D<Real64> const RHMin(7, {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0});             // Minimum relative humidity [%]
         static Array1D<Real64> const RHMax(7, {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0});        // Maximum relative humidity [%]
 
-        static std::string const RoutineName("CalcZoneITEq");
+        static constexpr std::string_view RoutineName("CalcZoneITEq");
         int Loop;
         int NZ;
         int SupplyNodeNum;                                // Supply air node number (if zero, then not specified)

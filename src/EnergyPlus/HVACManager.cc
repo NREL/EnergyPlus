@@ -2404,7 +2404,7 @@ namespace HVACManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName3("ReportAirHeatBalance:3");
+        static constexpr std::string_view RoutineName3("ReportAirHeatBalance:3");
         // na
 
         // INTERFACE BLOCK SPECIFICATIONS:

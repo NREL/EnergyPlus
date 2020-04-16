@@ -286,7 +286,7 @@ namespace HVACSingleDuctInduc {
         using MixerComponent::GetZoneMixerIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetIndUnits "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetIndUnits "); // include trailing blank space
 
         int IUIndex;                     // loop index
         int IUNum;                       // current fan coil number
@@ -518,7 +518,7 @@ namespace HVACSingleDuctInduc {
         using PlantUtilities::ScanPlantLoopsForObject;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitIndUnit");
+        static constexpr std::string_view RoutineName("InitIndUnit");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PriNode;     // primary air inlet node number
@@ -764,7 +764,7 @@ namespace HVACSingleDuctInduc {
         using WaterCoils::SetCoilDesFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeIndUnit");
+        static constexpr std::string_view RoutineName("SizeIndUnit");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop

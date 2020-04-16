@@ -592,8 +592,8 @@ namespace PackagedTerminalHeatPump {
         using WaterToAirHeatPumpSimple::SetSimpleWSHPData;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetPTUnit: "); // include trailing blank space
-        static std::string const RoutineNameFull("GetPackagedTerminalHeatPumpInput");
+        static constexpr std::string_view RoutineName("GetPTUnit: "); // include trailing blank space
+        static constexpr std::string_view RoutineNameFull("GetPackagedTerminalHeatPumpInput");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PTUnitIndex;             // loop index
@@ -3726,8 +3726,8 @@ namespace PackagedTerminalHeatPump {
         Real64 SupHeaterLoad;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitPTUnit");
-        static std::string const RoutineNameSpace(" InitPTUnit");
+        static constexpr std::string_view RoutineName("InitPTUnit");
+        static constexpr std::string_view RoutineNameSpace(" InitPTUnit");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InNode;                                    // inlet node number in PTHP loop
@@ -4763,7 +4763,7 @@ namespace PackagedTerminalHeatPump {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizePTUnit: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("SizePTUnit: "); // include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -7956,7 +7956,7 @@ namespace PackagedTerminalHeatPump {
         using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcVarSpeedHeatPump: "); // for error messages
+        static constexpr std::string_view RoutineName("CalcVarSpeedHeatPump: "); // for error messages
         Real64 const ErrTolerance(0.001);                               // convergence limit for hotwater coil
         int const SolveMaxIter(50);
 

@@ -531,7 +531,7 @@ namespace DXCoils {
         using General::TrimSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SimDXCoilMultiMode");
+        static constexpr std::string_view RoutineName("SimDXCoilMultiMode");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DXCoilNum; // index of coil being simulated
@@ -885,7 +885,7 @@ namespace DXCoils {
         using WaterManager::SetupTankSupplyComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetDXCoils: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetDXCoils: "); // include trailing blank space
         static Real64 const minOATCompDXCooling = -25.0;      // min OAT for compressor operation for DX cooling coils
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -6071,7 +6071,7 @@ namespace DXCoils {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 SmallDifferenceTest(0.00000001);
-        static std::string const RoutineName("InitDXCoil");
+        static constexpr std::string_view RoutineName("InitDXCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyEnvrnFlag;   // One time environment flag
@@ -6673,7 +6673,7 @@ namespace DXCoils {
         using StandardRatings::CalcDXCoilStandardRating;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeDXCoil");
+        static constexpr std::string_view RoutineName("SizeDXCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CoilInTemp;                      // DX coil inlet temperature
@@ -8020,7 +8020,7 @@ namespace DXCoils {
         using General::TrimSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcHPWHDXCoil");
+        static constexpr std::string_view RoutineName("CalcHPWHDXCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RatedHeatingCapacity;     // Water heating rated capacity with or without condenser water pump heat (W)
@@ -8411,7 +8411,7 @@ namespace DXCoils {
         using General::TrimSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcDoe2DXCoil: ");
+        static constexpr std::string_view RoutineName("CalcDoe2DXCoil: ");
         static std::string const calcDoe2DXCoil("CalcDoe2DXCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -9405,7 +9405,7 @@ namespace DXCoils {
         //  REAL(r64), INTENT(IN), OPTIONAL :: CoolingHeatingPLR   ! used for cycling fan RH control
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcVRFCoolingCoil");
+        static constexpr std::string_view RoutineName("CalcVRFCoolingCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;       // dry air mass flow rate through coil [kg/s] (adjusted for bypass if any)
@@ -10057,8 +10057,8 @@ namespace DXCoils {
         using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcDXHeatingCoil");
-        static std::string const RoutineNameFullLoad("CalcDXHeatingCoil:fullload");
+        static constexpr std::string_view RoutineName("CalcDXHeatingCoil");
+        static constexpr std::string_view RoutineNameFullLoad("CalcDXHeatingCoil:fullload");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;           // dry air mass flow rate through coil [kg/s]
@@ -10516,10 +10516,10 @@ namespace DXCoils {
         // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcMultiSpeedDXCoil");
-        static std::string const RoutineNameHighSpeedOutlet("CalcMultiSpeedDXCoil:highspeedoutlet");
-        static std::string const RoutineNameLowSpeedOutlet("CalcMultiSpeedDXCoil:lowspeedoutlet");
-        static std::string const RoutineNameNewDewPointConditions("CalcMultiSpeedDXCoil:newdewpointconditions");
+        static constexpr std::string_view RoutineName("CalcMultiSpeedDXCoil");
+        static constexpr std::string_view RoutineNameHighSpeedOutlet("CalcMultiSpeedDXCoil:highspeedoutlet");
+        static constexpr std::string_view RoutineNameLowSpeedOutlet("CalcMultiSpeedDXCoil:lowspeedoutlet");
+        static constexpr std::string_view RoutineNameNewDewPointConditions("CalcMultiSpeedDXCoil:newdewpointconditions");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;         // dry air mass flow rate through coil [kg/s]
@@ -11112,7 +11112,7 @@ namespace DXCoils {
         Real64 CBF(0.0); // the result - the coil bypass factor
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcCBF");
+        static constexpr std::string_view RoutineName("CalcCBF");
         static Real64 SmallDifferenceTest(0.00000001);
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
@@ -11604,7 +11604,7 @@ namespace DXCoils {
         // and outside drybulb
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcTotCapSHR");
+        static constexpr std::string_view RoutineName("CalcTotCapSHR");
         int const MaxIter(30);               // Maximum number of iterations for dry evaporator calculations
         Real64 const RF(0.4);                // Relaxation factor for dry evaporator iterations
         Real64 const Tolerance(0.01);        // Error tolerance for dry evaporator iterations
@@ -11731,11 +11731,11 @@ namespace DXCoils {
         // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcMultiSpeedDXCoilCooling");
-        static std::string const RoutineNameHighSpeed("CalcMultiSpeedDXCoilCooling:highspeed");
-        static std::string const RoutineNameHighSpeedAlt("CalcMultiSpeedDXCoilCooling highspeed");
-        static std::string const RoutineNameHighSpeedOutlet("CalcMultiSpeedDXCoilCooling:highspeedoutlet");
-        static std::string const RoutineNameLowSpeedOutlet("CalcMultiSpeedDXCoilCooling:lowspeedoutlet");
+        static constexpr std::string_view RoutineName("CalcMultiSpeedDXCoilCooling");
+        static constexpr std::string_view RoutineNameHighSpeed("CalcMultiSpeedDXCoilCooling:highspeed");
+        static constexpr std::string_view RoutineNameHighSpeedAlt("CalcMultiSpeedDXCoilCooling highspeed");
+        static constexpr std::string_view RoutineNameHighSpeedOutlet("CalcMultiSpeedDXCoilCooling:highspeedoutlet");
+        static constexpr std::string_view RoutineNameLowSpeedOutlet("CalcMultiSpeedDXCoilCooling:lowspeedoutlet");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;         // dry air mass flow rate through coil [kg/s]
@@ -12552,9 +12552,9 @@ namespace DXCoils {
         // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcMultiSpeedDXCoilHeating");
-        static std::string const RoutineNameAverageLoad("CalcMultiSpeedDXCoilHeating:Averageload");
-        static std::string const RoutineNameFullLoad("CalcMultiSpeedDXCoilHeating:fullload");
+        static constexpr std::string_view RoutineName("CalcMultiSpeedDXCoilHeating");
+        static constexpr std::string_view RoutineNameAverageLoad("CalcMultiSpeedDXCoilHeating:Averageload");
+        static constexpr std::string_view RoutineNameFullLoad("CalcMultiSpeedDXCoilHeating:fullload");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;         // dry air mass flow rate through coil [kg/s]
@@ -13448,7 +13448,7 @@ namespace DXCoils {
         // indoor air circulting fan. Used if user doesn't enter a specific value.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("CalcTwoSpeedDXCoilStandardRating");
+        static constexpr std::string_view RoutineName("CalcTwoSpeedDXCoilStandardRating");
 
         static Real64 NetCoolingCapRated(0.0); // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
         static Real64 EER(0.0);                // Energy Efficiency Ratio in SI [W/W]
@@ -13995,7 +13995,7 @@ namespace DXCoils {
         // par(5) = supply air fan operating mode (ContFanCycCoil)
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("CalcTwoSpeedDXCoilIEERResidual");
+        static constexpr std::string_view RoutineName("CalcTwoSpeedDXCoilIEERResidual");
         int DXCoilNum;        // index of this coil
         Real64 OutletAirTemp; // outlet air temperature [C]
         Real64 TargetCoilLeavingDryBulb;
@@ -15167,7 +15167,7 @@ namespace DXCoils {
 
         // Locals
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcSHRUserDefinedCurves");
+        static constexpr std::string_view RoutineName("CalcSHRUserDefinedCurves");
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 SHRTempModFac; // Sensible Heat Ratio modifier (function of entering wetbulb, entering drybulb)
@@ -15255,7 +15255,7 @@ namespace DXCoils {
         using DataLoopNode::Node;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcSecondaryDXCoils");
+        static constexpr std::string_view RoutineName("CalcSecondaryDXCoils");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CondInletDryBulb;       // condenser entering air dry-bulb temperature (C)
@@ -15532,7 +15532,7 @@ namespace DXCoils {
         Real64 const RelaxationFactor(0.4);
         Real64 const Tolerance(0.1);
         Real64 const DryCoilTestEvapInletHumRatReset(0.00001);
-        static std::string const RoutineName("CalcSecondaryDXCoilsSHR");
+        static constexpr std::string_view RoutineName("CalcSecondaryDXCoilsSHR");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DryCoilTestEvapInletHumRat;  // evaporator coil inlet humidity ratio test for dry coil
@@ -15637,7 +15637,7 @@ namespace DXCoils {
         using namespace HVACVariableRefrigerantFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcVRFCoolingCoil_FluidTCtrl");
+        static constexpr std::string_view RoutineName("CalcVRFCoolingCoil_FluidTCtrl");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -16087,7 +16087,7 @@ namespace DXCoils {
         using namespace HVACVariableRefrigerantFlow;
 
         // INTERFACE BLOCK SPECIFICATIONS
-        static std::string const RoutineNameFullLoad("CalcVRFHeatingCoil_FluidTCtrl:fullload");
+        static constexpr std::string_view RoutineNameFullLoad("CalcVRFHeatingCoil_FluidTCtrl:fullload");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;           // dry air mass flow rate through coil [kg/s]

@@ -571,8 +571,8 @@ namespace HVACMultiSpeedHeatPump {
 
         // Locals
         // PARAMETERS
-        static std::string const RoutineName("GetMSHeatPumpInput: "); // include trailing blank space
-        static std::string const RoutineNameNoColon("GetMSHeatPumpInput");
+        static constexpr std::string_view RoutineName("GetMSHeatPumpInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineNameNoColon("GetMSHeatPumpInput");
 
         // LOCAL VARIABLES
         int MSHPNum;                      // Engine driven heat pump count
@@ -1784,7 +1784,7 @@ namespace HVACMultiSpeedHeatPump {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("InitMSHeatPump");
+        static constexpr std::string_view RoutineName("InitMSHeatPump");
         int InNode;                           // Inlet node number in MSHP loop
         int OutNode;                          // Outlet node number in MSHP loop
         int ZoneInNode;                       // Zone inlet node number in the controlled zone for MSHP
@@ -3969,7 +3969,7 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("MSHPHeatRecovery");
+        static constexpr std::string_view RoutineName("MSHPHeatRecovery");
 
         // DERIVMS TYPE DEFINITIONS:
         //  na

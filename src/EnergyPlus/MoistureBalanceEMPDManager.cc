@@ -476,7 +476,7 @@ namespace MoistureBalanceEMPDManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // Real64 const Lam( 2500000.0 ); // Heat of vaporization (J/kg)
-        static std::string const RoutineName("CalcMoistureEMPD");
+        static constexpr std::string_view RoutineName("CalcMoistureEMPD");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

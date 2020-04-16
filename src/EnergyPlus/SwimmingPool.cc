@@ -177,7 +177,7 @@ namespace SwimmingPool {
         // to simulate a swimming pool.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSwimmingPool: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetSwimmingPool: "); // include trailing blank space
         Real64 const MinCoverFactor(0.0);                          // minimum value for cover factors
         Real64 const MaxCoverFactor(1.0);                          // maximum value for cover factors
         Real64 const MinDepth(0.05);                               // minimum average pool depth (to avoid obvious input errors)
@@ -470,7 +470,7 @@ namespace SwimmingPool {
         // This subroutine initializes variables relating to indoor swimming pools.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitSwimmingPool");
+        static constexpr std::string_view RoutineName("InitSwimmingPool");
         Real64 const MinActivityFactor = 0.0;  // Minimum value for activity factor
         Real64 const MaxActivityFactor = 10.0; // Maximum value for activity factor (realistically)
 
@@ -709,7 +709,7 @@ namespace SwimmingPool {
         //       DATE WRITTEN   June 2017
 
         bool errFlag;
-        static std::string const RoutineName("InitSwimmingPoolPlantLoopIndex");
+        static constexpr std::string_view RoutineName("InitSwimmingPoolPlantLoopIndex");
 
         if (MyPlantScanFlagPool && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
@@ -798,7 +798,7 @@ namespace SwimmingPool {
         //     Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcSwimmingPool");
+        static constexpr std::string_view RoutineName("CalcSwimmingPool");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 EvapRate;  // evaporation rate for pool in kg/s
@@ -883,7 +883,7 @@ namespace SwimmingPool {
                                                 Real64 const HumRat // zone air humidity ratio
     )
     {
-        static std::string const RoutineName("CalcSwimmingPoolEvap");
+        static constexpr std::string_view RoutineName("CalcSwimmingPoolEvap");
         Real64 const CFinHg(0.00029613); // Multiple pressure in Pa by this constant to get inches of Hg
 
         // Evaporation calculation:
@@ -910,7 +910,7 @@ namespace SwimmingPool {
         // This subroutine does any updating that needs to be done for the swimming pool model.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("UpdateSwimmingPool");
+        static constexpr std::string_view RoutineName("UpdateSwimmingPool");
 
         int SurfNum = this->SurfacePtr; // surface number/pointer
 
@@ -1071,7 +1071,7 @@ namespace SwimmingPool {
         // This subroutine simply produces output for the swimming pool model.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ReportSwimmingPool");
+        static constexpr std::string_view RoutineName("ReportSwimmingPool");
         Real64 const MinDensity = 1.0; // to avoid a divide by zero
 
         for (int PoolNum = 1; PoolNum <= NumSwimmingPools; ++PoolNum) {

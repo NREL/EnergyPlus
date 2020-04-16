@@ -107,7 +107,7 @@ namespace BranchNodeConnections {
         // structure is intended to help with HVAC diagramming as well as validation of nodes.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("RegisterNodeConnection: ");
+        static constexpr std::string_view RoutineName("RegisterNodeConnection: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFoundHere;
@@ -214,7 +214,7 @@ namespace BranchNodeConnections {
         // structure is intended to help with HVAC diagramming as well as validation of nodes. This function
         // is a based on RegisterNodeConnection.
 
-        static std::string const RoutineName("ModifyNodeConnectionType: ");
+        static constexpr std::string_view RoutineName("ModifyNodeConnectionType: ");
 
         if (!IsValidConnectionType(ConnectionType)) {
             ShowSevereError(RoutineName + "Invalid ConnectionType=" + ConnectionType);

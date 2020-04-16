@@ -385,7 +385,7 @@ namespace PlantCondLoopOperation {
         using namespace DataIPShortCuts; // Data for field names, blank numerics
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetPlantOperationInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetPlantOperationInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int LoopNum;           // Loop counter (Plant or Cond)
@@ -544,7 +544,7 @@ namespace PlantCondLoopOperation {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetOperationSchemeInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetOperationSchemeInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SchemeNum;
@@ -2725,7 +2725,7 @@ namespace PlantCondLoopOperation {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PlantCondLoopOperation:DistributePlantLoad");
+        static constexpr std::string_view RoutineName("PlantCondLoopOperation:DistributePlantLoad");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2882,7 +2882,7 @@ namespace PlantCondLoopOperation {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("FindCompSPLoad");
+        static constexpr std::string_view RoutineName("FindCompSPLoad");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CompDemand;
@@ -3413,7 +3413,7 @@ namespace PlantCondLoopOperation {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS
-        static std::string const RoutineName("ActivateEMSControls");
+        static constexpr std::string_view RoutineName("ActivateEMSControls");
 
         // SUBROUTINE VARIABLE DEFINITIONS
         Real64 CurMassFlowRate;

@@ -328,7 +328,7 @@ namespace SteamBaseboardRadiator {
         using ReportSizingManager::ReportSizingOutput;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSteamBaseboardInput:");
+        static constexpr std::string_view RoutineName("GetSteamBaseboardInput:");
         Real64 const MaxFraction(1.0);       // Maximum limit of fractional values
         Real64 const MinFraction(0.0);       // Minimum limit of fractional values
         Real64 const MaxSteamFlowRate(10.0); // Maximum limit of steam volume flow rate in m3/s
@@ -746,7 +746,7 @@ namespace SteamBaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitSteamCoil");
+        static constexpr std::string_view RoutineName("InitSteamCoil");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -925,7 +925,7 @@ namespace SteamBaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeSteamBaseboard");
+        static constexpr std::string_view RoutineName("SizeSteamBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1121,7 +1121,7 @@ namespace SteamBaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcSteamBaseboard");
+        static constexpr std::string_view RoutineName("CalcSteamBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

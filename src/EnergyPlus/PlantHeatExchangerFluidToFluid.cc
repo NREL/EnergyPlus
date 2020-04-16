@@ -212,7 +212,7 @@ namespace PlantHeatExchangerFluidToFluid {
         // PURPOSE OF THIS SUBROUTINE:
         // get input for heat exchanger model
 
-        static std::string const RoutineName("GetFluidHeatExchangerInput: ");
+        static constexpr std::string_view RoutineName("GetFluidHeatExchangerInput: ");
 
         bool ErrorsFound(false);
         int NumAlphas;        // Number of elements in the alpha array
@@ -616,8 +616,8 @@ namespace PlantHeatExchangerFluidToFluid {
         // PURPOSE OF THIS SUBROUTINE:
         // Initialize heat exchanger model
 
-        static std::string const RoutineNameNoColon("InitFluidHeatExchanger");
-        static std::string const RoutineName("InitFluidHeatExchanger: ");
+        static constexpr std::string_view RoutineNameNoColon("InitFluidHeatExchanger");
+        static constexpr std::string_view RoutineName("InitFluidHeatExchanger: ");
 
         if (this->MyOneTimeFlag) {
             this->setupOutputVars();
@@ -842,7 +842,7 @@ namespace PlantHeatExchangerFluidToFluid {
         // the UA is sized for an effectiveness of 1.0 using sizing temps
         // the capacity uses the full HX model
 
-        static std::string const RoutineName("SizeFluidHeatExchanger");
+        static constexpr std::string_view RoutineName("SizeFluidHeatExchanger");
 
         // first deal with Loop Supply Side
         int PltSizNumSupSide = DataPlant::PlantLoop(this->SupplySideLoop.loopNum).PlantSizNum;
@@ -1050,7 +1050,7 @@ namespace PlantHeatExchangerFluidToFluid {
         // METHODOLOGY EMPLOYED:
         // long CASE statement for different control options
 
-        static std::string const RoutineName("ControlFluidHeatExchanger");
+        static constexpr std::string_view RoutineName("ControlFluidHeatExchanger");
 
         Real64 mdotSupSide;
         Real64 mdotDmdSide;
@@ -1876,7 +1876,7 @@ namespace PlantHeatExchangerFluidToFluid {
         // METHODOLOGY EMPLOYED:
         // apply heat transfer model depending on type of HX used
 
-        static std::string const RoutineName("CalcFluidHeatExchanger");
+        static constexpr std::string_view RoutineName("CalcFluidHeatExchanger");
 
         int const CmaxMixedCminUnmixed(40);
         int const CmaxUnMixedCminMixed(41);

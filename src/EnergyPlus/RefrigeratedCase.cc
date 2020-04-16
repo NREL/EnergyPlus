@@ -589,9 +589,9 @@ namespace RefrigeratedCase {
         // GetObjectItem is called to read refrigerated case information
 
         static std::string const TrackMessage("from refrigerated case");
-        static std::string const RoutineName("GetRefrigerationInput: ");
+        static constexpr std::string_view RoutineName("GetRefrigerationInput: ");
         static std::string const TrackMessageAlt("GetInput in RefrigeratedCase");
-        static std::string const RoutineNameNoColon("GetRefrigerationInput");
+        static constexpr std::string_view RoutineNameNoColon("GetRefrigerationInput");
 
         int const AlwaysOn(-1); // -1 pointer sent to schedule manager returns a value of 1.0
         //     input in both watts and flow rate
@@ -9223,7 +9223,7 @@ namespace RefrigeratedCase {
         // do inits that should only occur when component model routines
         // are entered from plant, for water cooled Condensers and Refrigeration Racks
 
-        static std::string const RoutineName("InitRefrigerationPlantConnections");
+        static constexpr std::string_view RoutineName("InitRefrigerationPlantConnections");
         static bool MyBeginEnvrnFlag(true);
 
         // initialize plant topology information, if applicable
@@ -10163,7 +10163,7 @@ namespace RefrigeratedCase {
         // Called from SimPlantEquip in PlantLoopEquipment , previously was called from Non-Zone Equipment Manager
         // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
 
-        static std::string const RoutineName("SimRefrigCondenser");
+        static constexpr std::string_view RoutineName("SimRefrigCondenser");
         int PlantInletNode(0);
         int PlantOutletNode(0);
         int PlantLoopIndex(0);
@@ -10320,7 +10320,7 @@ namespace RefrigeratedCase {
         // Called from SimPlantEquip in PlantLoopEquipment , previously was called from Non-Zone Equipment Manager
         // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
 
-        static std::string const RoutineName("SimRefrigCondenser");
+        static constexpr std::string_view RoutineName("SimRefrigCondenser");
         int PlantInletNode(0);
         int PlantOutletNode(0);
         int PlantLoopIndex(0);
@@ -10487,7 +10487,7 @@ namespace RefrigeratedCase {
         // The logical variable, UseSysTimeStep, determines whether we are evaluating only systems driven by
         // ZoneEquipmentManager on the system time step, or only system driven by HVACManager on the zone time step.
 
-        static std::string const RoutineName("SimulateDetailedRefrigerationSystems");
+        static constexpr std::string_view RoutineName("SimulateDetailedRefrigerationSystems");
         Real64 const MaxDelTFloatFrac(0.5); // max fraction allowed for difference between case and evaporator temperature
 
         Real64 LocalTimeStep = DataGlobals::TimeStepZone;
@@ -10906,7 +10906,7 @@ namespace RefrigeratedCase {
         // the load on the compressors. Iterations are used here to account for sharing of gas coolers
         // between independent refrigeration systems.
 
-        static std::string const RoutineName("SimulateDetailedTransRefrigSystems");
+        static constexpr std::string_view RoutineName("SimulateDetailedTransRefrigSystems");
 
         int LocalTimeStep = DataGlobals::TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
@@ -11671,7 +11671,7 @@ namespace RefrigeratedCase {
         //     Part II: System modifications and comparisons of different solutions. International Journal of
         //     Refrigeration 31: 525-534.
 
-        static std::string const RoutineName("RefrigeratedCase:CalcGasCooler");
+        static constexpr std::string_view RoutineName("RefrigeratedCase:CalcGasCooler");
 
         int GasCoolerCreditWarnIndex;     // Warning counter
         Real64 ActualFanPower;            // Fan power after adjustments for partially loaded gas cooler [W]
@@ -11840,7 +11840,7 @@ namespace RefrigeratedCase {
         Real64 const DelTSuctPipes(1.0);  // Tsat drop corresponding to P drop in suction pipes, ASHRAE 2006 p 2.4 (C)
         Real64 const DelTDischPipes(0.5); // Tsat drop corresponding to P drop in discharge pipes, ASHRAE 2006 p 2.5 (C)
 
-        static std::string const RoutineName("RefrigeratedCase:CalculateCompressors");
+        static constexpr std::string_view RoutineName("RefrigeratedCase:CalculateCompressors");
         Real64 CaseEnthalpyChangeRated;   // Enthalpy change in cases at compressor rated cond, J/kg
         Real64 CapacityCorrection;        // Capacity at existing subcool/superheat over cap at rated conditions
         Real64 CpSatVapCondense;          // Specific heat of vapor at cond temp J/kg-C
@@ -12199,7 +12199,7 @@ namespace RefrigeratedCase {
 
         Real64 const ErrorTol(0.001); // Iterative solution tolerance
 
-        static std::string const RoutineName("RefrigeratedCase:CalculateTransCompressors");
+        static constexpr std::string_view RoutineName("RefrigeratedCase:CalculateTransCompressors");
         int Iter;                           // Iteration counter
         Real64 CapacityCorrectionMT;        // Capacity at existing subcool/superheat over cap at rated conditions for MT loads
         Real64 CaseEnthalpyChangeRatedMT;   // Enthalpy change in medium temperature cases at compressor rated cond, J/kg
@@ -12581,7 +12581,7 @@ namespace RefrigeratedCase {
         // REFERENCES:
         // ASHRAE 1006 Section 2: Refrigeration Accessories
 
-        static std::string const RoutineName("CalculateSubcoolers");
+        static constexpr std::string_view RoutineName("CalculateSubcoolers");
         Real64 TLiqInActualLocal(0.0); // Liquid T in, after condenser, before any mechanical subcooler
 
         Real64 LocalTimeStep = DataGlobals::TimeStepZone;
@@ -13455,7 +13455,7 @@ namespace RefrigeratedCase {
 
         Real64 const DefaultWalkInDoorOpenFactor(0.05); // walk in door open factor (fraction time open)
 
-        static std::string const RoutineName("CalculateWalkIn");
+        static constexpr std::string_view RoutineName("CalculateWalkIn");
         Real64 CapApplied(0.0);          // Walk In total capacity at specific operating conditions
         Real64 DefrostSchedule(0.0);     // WalkIn defrost schedule, between 0 and 1
         Real64 DefrostEnergyNeeded(0.0); // Energy needed to melt all ice, used with temperature termination (J)

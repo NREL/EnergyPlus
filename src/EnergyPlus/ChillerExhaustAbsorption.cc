@@ -1697,7 +1697,7 @@ namespace ChillerExhaustAbsorption {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
-        static std::string const RoutineName("CalcExhaustAbsorberHeaterModel");
+        static constexpr std::string_view RoutineName("CalcExhaustAbsorberHeaterModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // Local copies of ExhaustAbsorberSpecs Type

@@ -4764,7 +4764,7 @@ namespace Furnaces {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Small5WLoad(5.0);
-        static std::string const RoutineName("InitFurnace");
+        static constexpr std::string_view RoutineName("InitFurnace");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

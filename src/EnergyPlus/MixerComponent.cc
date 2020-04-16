@@ -223,7 +223,7 @@ namespace MixerComponent {
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetMixerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetMixerInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int MixerNum; // The Mixer that you are currently loading input into

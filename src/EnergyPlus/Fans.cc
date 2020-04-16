@@ -332,7 +332,7 @@ namespace Fans {
         int checkNum;
         int IOStat;
         static bool ErrorsFound(false);                        // If errors detected in input
-        static std::string const RoutineName("GetFanInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetFanInput: "); // include trailing blank space
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;
@@ -1214,7 +1214,7 @@ namespace Fans {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeFan: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("SizeFan: "); // include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

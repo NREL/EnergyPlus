@@ -238,7 +238,7 @@ namespace BaseboardElectric {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetBaseboardInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetBaseboardInput: "); // include trailing blank space
         int const iHeatCAPMAlphaNum(3);                              // get input index to baseboard heating capacity sizing method
         int const iHeatDesignCapacityNumericNum(1);                  // get input index to baseboard heating capacity
         int const iHeatCapacityPerFloorAreaNumericNum(2);            // get input index to baseboard heating capacity per floor area sizing
@@ -555,7 +555,7 @@ namespace BaseboardElectric {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeElectricBaseboard");
+        static constexpr std::string_view RoutineName("SizeElectricBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

@@ -303,7 +303,7 @@ namespace PurchasedAirManager {
         int IOStat;
         int CtrlZone;                                              // zone index
         int NodeNum;                                               // node index
-        static std::string const RoutineName("GetPurchasedAir: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetPurchasedAir: "); // include trailing blank space
         static bool ErrorsFound(false);                            // If errors detected in input
         bool IsOANodeListed;                                       // Flag for OA node name listed in OutdoorAir:Node or Nodelist
         bool UniqueNodeError;                                      // Flag for non-unique node error(s)
@@ -1394,7 +1394,7 @@ namespace PurchasedAirManager {
         using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizePurchasedAir: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("SizePurchasedAir: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool IsAutoSize;               // Indicator to autosize
@@ -1962,7 +1962,7 @@ namespace PurchasedAirManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcPurchAirLoads");
+        static constexpr std::string_view RoutineName("CalcPurchAirLoads");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2837,7 +2837,7 @@ namespace PurchasedAirManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcPurchAirMixedAir");
+        static constexpr std::string_view RoutineName("CalcPurchAirMixedAir");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

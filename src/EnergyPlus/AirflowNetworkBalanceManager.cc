@@ -539,7 +539,7 @@ namespace AirflowNetworkBalanceManager {
         // REFERENCES:
         // na
 
-        static std::string const RoutineName{"getAirflowElementInput"};
+        static constexpr std::string_view RoutineName{"getAirflowElementInput"};
         std::string CurrentModuleObject;
         bool success{true};
 
@@ -1587,7 +1587,7 @@ namespace AirflowNetworkBalanceManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetAirflowNetworkInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetAirflowNetworkInput: "); // include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -9632,7 +9632,7 @@ namespace AirflowNetworkBalanceManager {
         using ZoneDehumidifier::GetZoneDehumidifierNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ValidateDistributionSystem: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("ValidateDistributionSystem: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -10470,7 +10470,7 @@ namespace AirflowNetworkBalanceManager {
         using DataZoneEquipment::ZoneExhaustFan_Num;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ValidateExhaustFanInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("ValidateExhaustFanInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -10601,7 +10601,7 @@ namespace AirflowNetworkBalanceManager {
         int const HybridVentCtrl_Close(2);                                  // Open windows or doors
         int const IndividualCtrlType(0);                                    // Individual window or door control
         int const GlobalCtrlType(1);                                        // Global window or door control
-        static std::string const RoutineName("HybridVentilationControl: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("HybridVentilationControl: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SysAvailNum;       // Hybrid ventilation control number

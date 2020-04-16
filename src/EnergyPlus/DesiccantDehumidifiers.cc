@@ -329,7 +329,7 @@ namespace DesiccantDehumidifiers {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetDesiccantDehumidifierInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetDesiccantDehumidifierInput: "); // include trailing blank space
         static std::string const dehumidifierDesiccantNoFans("Dehumidifier:Desiccant:NoFans");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1727,7 +1727,7 @@ namespace DesiccantDehumidifiers {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitDesiccantDehumidifier");
+        static constexpr std::string_view RoutineName("InitDesiccantDehumidifier");
         static std::string const initCBVAV("InitCBVAV");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

@@ -203,7 +203,7 @@ namespace ZoneAirLoopEquipmentManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneAirLoopEquipment: ");            // include trailing blank space
+        static constexpr std::string_view RoutineName("GetZoneAirLoopEquipment: ");            // include trailing blank space
         static std::string const CurrentModuleObject("ZoneHVAC:AirDistributionUnit"); // Object type for getting and error messages
 
         // INTERFACE BLOCK SPECIFICATIONS

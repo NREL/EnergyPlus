@@ -315,7 +315,7 @@ namespace HVACDXHeatPumpSystem {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static std::string const RoutineName("GetDXHeatPumpSystemInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetDXHeatPumpSystemInput: "); // include trailing blank space
         static bool ErrorsFound(false);                                     // If errors detected in input
         bool IsNotOK;                                                       // Flag to verify name
         int DXHeatSysNum;

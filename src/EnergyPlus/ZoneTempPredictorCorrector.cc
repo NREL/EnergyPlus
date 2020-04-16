@@ -425,7 +425,7 @@ namespace ZoneTempPredictorCorrector {
         using WeatherManager::NumDaysInYear;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneAirSetpoints: ");
+        static constexpr std::string_view RoutineName("GetZoneAirSetpoints: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TempControlledZoneNum; // The Splitter that you are currently loading input into
@@ -2753,7 +2753,7 @@ namespace ZoneTempPredictorCorrector {
         // Locals
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitZoneAirSetpoints: ");
+        static constexpr std::string_view RoutineName("InitZoneAirSetpoints: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -4458,7 +4458,7 @@ namespace ZoneTempPredictorCorrector {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcPredictedHumidityRatio");
+        static constexpr std::string_view RoutineName("CalcPredictedHumidityRatio");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 LatentGain; // Zone latent load
@@ -4861,7 +4861,7 @@ namespace ZoneTempPredictorCorrector {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CorrectZoneAirTemp");
+        static constexpr std::string_view RoutineName("CorrectZoneAirTemp");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpAir;                              // specific heat of air
@@ -5551,7 +5551,7 @@ namespace ZoneTempPredictorCorrector {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CorrectZoneHumRat");
+        static constexpr std::string_view RoutineName("CorrectZoneHumRat");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;
@@ -5845,7 +5845,7 @@ namespace ZoneTempPredictorCorrector {
         using DataEnvironment::DayOfYear;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InverseModelTemperature");
+        static constexpr std::string_view RoutineName("InverseModelTemperature");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpAir;                   // specific heat of air
@@ -5886,7 +5886,7 @@ namespace ZoneTempPredictorCorrector {
                                                                  // the System Time Increment
             if (HybridModelZone(ZoneNum).InfiltrationCalc_T && UseZoneTimeStepHistory) {
 
-                static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
+                static constexpr std::string_view RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
 
                 if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                     Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature =
@@ -6094,7 +6094,7 @@ namespace ZoneTempPredictorCorrector {
         using DataEnvironment::DayOfYear;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InverseModelHumidity");
+        static constexpr std::string_view RoutineName("InverseModelHumidity");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AA(0.0);

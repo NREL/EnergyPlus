@@ -248,7 +248,7 @@ namespace HVACCooledBeam {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetCoolBeams "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetCoolBeams "); // include trailing blank space
 
         int CBIndex;                     // loop index
         int CBNum;                       // current fan coil number
@@ -525,7 +525,7 @@ namespace HVACCooledBeam {
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitCoolBeam");
+        static constexpr std::string_view RoutineName("InitCoolBeam");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InAirNode;    // supply air inlet node number
@@ -709,7 +709,7 @@ namespace HVACCooledBeam {
         using ReportSizingManager::ReportSizingOutput;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("SizeCoolBeam");
+        static constexpr std::string_view RoutineName("SizeCoolBeam");
         static int PltSizCoolNum(0);          // index of plant sizing object for the cooling loop
         static int NumBeams(0);               // number of beams in the zone
         static int Iter(0);                   // beam length iteration index
@@ -1094,7 +1094,7 @@ namespace HVACCooledBeam {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcCoolBeam");
+        static constexpr std::string_view RoutineName("CalcCoolBeam");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

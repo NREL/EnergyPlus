@@ -721,7 +721,7 @@ namespace HeatBalanceHAMTManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const adjdist(0.00005); // Allowable distance between two cells, also used as limit on cell length
-        static std::string const RoutineName("InitCombinedHeatAndMoistureFiniteElement: ");
+        static constexpr std::string_view RoutineName("InitCombinedHeatAndMoistureFiniteElement: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

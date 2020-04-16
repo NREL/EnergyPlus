@@ -689,7 +689,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetProjectControlData: ");
+        static constexpr std::string_view RoutineName("GetProjectControlData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -3933,7 +3933,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetWindowGlassSpectralData: ");
+        static constexpr std::string_view RoutineName("GetWindowGlassSpectralData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -4665,7 +4665,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneData: ");
+        static constexpr std::string_view RoutineName("GetZoneData: ");
         //  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -4913,7 +4913,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneLocalEnvData: ");
+        static constexpr std::string_view RoutineName("GetZoneLocalEnvData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:na
         // DERIVED TYPE DEFINITIONS:na
@@ -5036,7 +5036,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ProcessZoneData: ");
+        static constexpr std::string_view RoutineName("ProcessZoneData: ");
         //  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -7656,7 +7656,7 @@ namespace HeatBalanceManager {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetScheduledSurfaceGains: ");
+        static constexpr std::string_view RoutineName("GetScheduledSurfaceGains: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumArgs;
@@ -8251,7 +8251,7 @@ namespace HeatBalanceManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS
-        static std::string const RoutineName("SetupComplexFenestrationMaterialInput: ");
+        static constexpr std::string_view RoutineName("SetupComplexFenestrationMaterialInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string MaterialNames(5);   // Number of Material Alpha names defined
@@ -8635,7 +8635,7 @@ namespace HeatBalanceManager {
         using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SetupComlexFenestrationStateInput: ");
+        static constexpr std::string_view RoutineName("SetupComlexFenestrationStateInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // The following moved to DataBSDFWindow module:

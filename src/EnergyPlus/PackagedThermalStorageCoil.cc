@@ -270,7 +270,7 @@ namespace PackagedThermalStorageCoil {
         using WaterManager::SetupTankSupplyComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetTESCoilInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetTESCoilInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int item;                       // do loop counter
@@ -2109,7 +2109,7 @@ namespace PackagedThermalStorageCoil {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeTESCoil ");
+        static constexpr std::string_view RoutineName("SizeTESCoil ");
         static std::string const calcTESWaterStorageTank("CalcTESWaterStorageTank");
         Real64 const FluidTankSizingDeltaT(10.0);
 
@@ -2487,7 +2487,7 @@ namespace PackagedThermalStorageCoil {
         int const MaxIter(30);
         Real64 const RelaxationFactor(0.4);
         Real64 const Tolerance(0.1);
-        static std::string const RoutineName("CalcTESCoilCoolingOnlyMode");
+        static constexpr std::string_view RoutineName("CalcTESCoilCoolingOnlyMode");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2795,7 +2795,7 @@ namespace PackagedThermalStorageCoil {
         int const MaxIter(30);
         Real64 const RelaxationFactor(0.4);
         Real64 const Tolerance(0.1);
-        static std::string const RoutineName("CalcTESCoilCoolingAndChargeMode");
+        static constexpr std::string_view RoutineName("CalcTESCoilCoolingAndChargeMode");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -3227,7 +3227,7 @@ namespace PackagedThermalStorageCoil {
         int const MaxIter(30);
         Real64 const RelaxationFactor(0.4);
         Real64 const Tolerance(0.1);
-        static std::string const RoutineName("CalcTESCoilCoolingAndDischargeMode");
+        static constexpr std::string_view RoutineName("CalcTESCoilCoolingAndDischargeMode");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -3611,7 +3611,7 @@ namespace PackagedThermalStorageCoil {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcTESCoilChargeOnlyMode");
+        static constexpr std::string_view RoutineName("CalcTESCoilChargeOnlyMode");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -3799,7 +3799,7 @@ namespace PackagedThermalStorageCoil {
         int const MaxIter(30);
         Real64 const RelaxationFactor(0.4);
         Real64 const Tolerance(0.1);
-        static std::string const RoutineName("CalcTESCoilDischargeOnlyMode");
+        static constexpr std::string_view RoutineName("CalcTESCoilDischargeOnlyMode");
         static std::string const StorageTankName("CalcTESWaterStorageTank");
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -4541,7 +4541,7 @@ namespace PackagedThermalStorageCoil {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcTESWaterStorageTank");
+        static constexpr std::string_view RoutineName("CalcTESWaterStorageTank");
         static std::string const calcTESIceStorageTank("CalcTESIceStorageTank");
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -4680,7 +4680,7 @@ namespace PackagedThermalStorageCoil {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 FreezingTemp(0.0); // zero degrees C
-        static std::string const RoutineName("CalcTESIceStorageTank");
+        static constexpr std::string_view RoutineName("CalcTESIceStorageTank");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

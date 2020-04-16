@@ -862,7 +862,7 @@ namespace PipeHeatTransfer {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitPipesHeatTransfer");
+        static constexpr std::string_view RoutineName("InitPipesHeatTransfer");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1676,7 +1676,7 @@ namespace PipeHeatTransfer {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PipeHeatTransfer::CalcPipeHeatTransCoef: ");
+        static constexpr std::string_view RoutineName("PipeHeatTransfer::CalcPipeHeatTransCoef: ");
         Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
         int const NumOfPropDivisions(13);  // intervals in property correlation
         static Array1D<Real64> const Temps(

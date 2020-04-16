@@ -204,7 +204,7 @@ namespace EnergyPlus {
             //       MODIFIED       by Sushobhit Acharya, March 2015
             //       RE-ENGINEERED  na
 
-            static std::string const RoutineName("InitAndSimGroundDomain");
+            static constexpr std::string_view RoutineName("InitAndSimGroundDomain");
 
 
             // Read input if necessary
@@ -418,7 +418,7 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            static std::string const RoutineName("GetPipingSystemsAndGroundDomainsInput");
+            static constexpr std::string_view RoutineName("GetPipingSystemsAndGroundDomainsInput");
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
@@ -514,7 +514,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // SUBROUTINE PARAMETER DEFINITIONS:
-            static std::string const RoutineName("ReadGeneralDomainInputs");
+            static constexpr std::string_view RoutineName("ReadGeneralDomainInputs");
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -831,7 +831,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // SUBROUTINE PARAMETER DEFINITIONS:
-            static std::string const RoutineName("ReadZoneCoupledDomainInputs");
+            static constexpr std::string_view RoutineName("ReadZoneCoupledDomainInputs");
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -1145,7 +1145,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // SUBROUTINE PARAMETER DEFINITIONS:
-            static std::string const RoutineName("ReadBasementInputs");
+            static constexpr std::string_view RoutineName("ReadBasementInputs");
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -1509,7 +1509,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // SUBROUTINE PARAMETER DEFINITIONS:
-            static std::string const RoutineName("ReadPipeCircuitInputs");
+            static constexpr std::string_view RoutineName("ReadPipeCircuitInputs");
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int NumAlphas;
@@ -1772,7 +1772,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // SUBROUTINE PARAMETER DEFINITIONS:
-            static std::string const RoutineName("ReadPipeSegmentInputs");
+            static constexpr std::string_view RoutineName("ReadPipeSegmentInputs");
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -1843,7 +1843,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // SUBROUTINE PARAMETER DEFINITIONS:
-            static std::string const RoutineName("ReadHorizontalTrenchInputs");
+            static constexpr std::string_view RoutineName("ReadHorizontalTrenchInputs");
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -2118,7 +2118,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // SUBROUTINE PARAMETER DEFINITIONS:
-            static std::string const RoutineName("InitPipingSystems");
+            static constexpr std::string_view RoutineName("InitPipingSystems");
 
             // Do any one-time initializations
             if (thisCircuit->NeedToFindOnPlantLoop) {
@@ -3092,7 +3092,7 @@ namespace EnergyPlus {
             std::vector<GridRegion> ThesePartitionRegions;
 
             // FUNCTION PARAMETER DEFINITIONS:
-            static std::string const RoutineName("CreatePartitionRegionList");
+            static constexpr std::string_view RoutineName("CreatePartitionRegionList");
 
             if (!PartitionsExist) {
                 return ThesePartitionRegions;
@@ -5714,7 +5714,7 @@ namespace EnergyPlus {
         }
 
         void Domain::DoStartOfTimeStepInitializations() {
-            static std::string const RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
+            static constexpr std::string_view RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
 
             // Update environmental conditions
             this->Cur.CurAirTemp = DataEnvironment::OutDryBulbTemp;
@@ -5774,7 +5774,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-            static std::string const RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
+            static constexpr std::string_view RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
             Real64 CellTemp;
             Real64 CellRhoCp;
             Real64 FluidCp;
@@ -5885,7 +5885,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // SUBROUTINE PARAMETER DEFINITIONS:
-            static std::string const RoutineName("DoEndOfIterationOperations");
+            static constexpr std::string_view RoutineName("DoEndOfIterationOperations");
 
             //'check if we have converged for this iteration
             Finished = this->IsConverged_CurrentToPrevIteration();

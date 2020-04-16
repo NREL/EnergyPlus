@@ -2722,7 +2722,7 @@ namespace RuntimeLanguageProcessor {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetRuntimeLanguageUserInput: ");
+        static constexpr std::string_view RoutineName("GetRuntimeLanguageUserInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GlobalNum;

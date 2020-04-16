@@ -583,7 +583,7 @@ namespace Psychrometrics {
         // FUNCTION PARAMETER DEFINITIONS:
         int const itmax(100); // Maximum No of Iterations
         static Real64 convTol(0.0001);
-        static std::string const RoutineName("PsyTwbFnTdbWPb");
+        static constexpr std::string_view RoutineName("PsyTwbFnTdbWPb");
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -1401,7 +1401,7 @@ namespace Psychrometrics {
         // FUNCTION PARAMETER DEFINITIONS:
         int const itmax(50); // Maximum number of iterations
         Real64 const convTol(0.0001);
-        static std::string const RoutineName("PsyTsatFnPb");
+        static constexpr std::string_view RoutineName("PsyTsatFnPb");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

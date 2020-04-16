@@ -236,7 +236,7 @@ namespace PlantChillers {
 
         // Locals
         // PARAMETERS
-        static std::string const RoutineName("GetElectricChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetElectricChillerInput: "); // include trailing blank space
         // LOCAL VARIABLES
         int ChillerNum; // chiller counter
         int NumAlphas;  // Number of elements in the alpha array
@@ -733,7 +733,7 @@ namespace PlantChillers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitElectricChiller");
+        static constexpr std::string_view RoutineName("InitElectricChiller");
 
         // Init more variables
         if (this->MyFlag) {
@@ -1031,7 +1031,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeElectricChiller");
+        static constexpr std::string_view RoutineName("SizeElectricChiller");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum(0);        // Plant Sizing index corresponding to CurLoopNum
@@ -1328,7 +1328,7 @@ namespace PlantChillers {
         Real64 _CondInletTemp; // C - condenser inlet temperature, water side
 
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
-        static std::string const RoutineName("CalcElectricChillerModel");
+        static constexpr std::string_view RoutineName("CalcElectricChillerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 _MinPartLoadRat;          // min allowed operating frac full load
@@ -1926,7 +1926,7 @@ namespace PlantChillers {
         Real64 _HeatRecInletTemp;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ChillerHeatRecovery");
+        static constexpr std::string_view RoutineName("ChillerHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QTotal;
@@ -2156,7 +2156,7 @@ namespace PlantChillers {
 
         // Locals
         // PARAMETERS
-        static std::string const RoutineName("GetEngineDrivenChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetEngineDrivenChillerInput: "); // include trailing blank space
         // LOCAL VARIABLES
         int ChillerNum; // chiller counter
         int NumAlphas;  // Number of elements in the alpha array
@@ -2718,7 +2718,7 @@ namespace PlantChillers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitEngineDrivenChiller");
+        static constexpr std::string_view RoutineName("InitEngineDrivenChiller");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CondInletNode; // node number of water inlet node to the condenser
@@ -2989,7 +2989,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeEngineDrivenChiller");
+        static constexpr std::string_view RoutineName("SizeEngineDrivenChiller");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound; // If errors detected in input
@@ -3299,7 +3299,7 @@ namespace PlantChillers {
         // value is reported.  This should be subtracted
         // off of when calculated exhaust energies.
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
-        static std::string const RoutineName("CalcEngineDrivenChillerModel");
+        static constexpr std::string_view RoutineName("CalcEngineDrivenChillerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 _MinPartLoadRat;          // min allowed operating frac full load
@@ -3949,7 +3949,7 @@ namespace PlantChillers {
         // performs a check to verify that
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ChillerHeatRecovery");
+        static constexpr std::string_view RoutineName("ChillerHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInNode;
@@ -4137,7 +4137,7 @@ namespace PlantChillers {
 
         // Locals
         // PARAMETERS
-        static std::string const RoutineName("GetGTChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetGTChillerInput: "); // include trailing blank space
         // LOCAL VARIABLES
         int ChillerNum; // chiller counter
         int NumAlphas;  // Number of elements in the alpha array
@@ -4642,7 +4642,7 @@ namespace PlantChillers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitGTChiller");
+        static constexpr std::string_view RoutineName("InitGTChiller");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CondInletNode;  // node number of water inlet node to the condenser
@@ -4910,7 +4910,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeGTChiller");
+        static constexpr std::string_view RoutineName("SizeGTChiller");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum;     // Plant Sizing index corresponding to CurLoopNum
@@ -5261,8 +5261,8 @@ namespace PlantChillers {
 
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
-        static std::string const RoutineName("CalcGTChillerModel");
-        static std::string const RoutineNameHeatRecovery("ChillerHeatRecovery");
+        static constexpr std::string_view RoutineName("CalcGTChillerModel");
+        static constexpr std::string_view RoutineNameHeatRecovery("ChillerHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 _MinPartLoadRat;          // min allowed operating frac full load
@@ -6119,7 +6119,7 @@ namespace PlantChillers {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetConstCOPChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetConstCOPChillerInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ChillerNum;
@@ -6436,7 +6436,7 @@ namespace PlantChillers {
         // Based on InitElectricChiller from Fred Buhl
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitConstCOPChiller");
+        static constexpr std::string_view RoutineName("InitConstCOPChiller");
         Real64 const TempDesCondIn(25.0); // Design condenser inlet temp. C
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -6640,7 +6640,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeConstCOPChiller");
+        static constexpr std::string_view RoutineName("SizeConstCOPChiller");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum;     // Plant Sizing index corresponding to CurLoopNum
@@ -6879,7 +6879,7 @@ namespace PlantChillers {
         //       RE-ENGINEERED  na
 
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
-        static std::string const RoutineName("CalcConstCOPChillerModel");
+        static constexpr std::string_view RoutineName("CalcConstCOPChillerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 EvapDeltaTemp;

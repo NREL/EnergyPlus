@@ -316,7 +316,7 @@ namespace UnitVentilator {
         using SingleDuct::GetATMixer;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetUnitVentilatorInput: "); // include trailing blank
+        static constexpr std::string_view RoutineName("GetUnitVentilatorInput: "); // include trailing blank
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
@@ -1279,7 +1279,7 @@ namespace UnitVentilator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitUnitVentilator");
+        static constexpr std::string_view RoutineName("InitUnitVentilator");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1630,7 +1630,7 @@ namespace UnitVentilator {
         using WaterCoils::WaterCoil;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeUnitVentilator");
+        static constexpr std::string_view RoutineName("SizeUnitVentilator");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop

@@ -381,7 +381,7 @@ namespace LowTempRadiantSystem {
         static std::string const OperativeTemperature("OperativeTemperature");
         static std::string const OutsideAirDryBulbTemperature("OutdoorDryBulbTemperature");
         static std::string const OutsideAirWetBulbTemperature("OutdoorWetBulbTemperature");
-        static std::string const RoutineName("GetLowTempRadiantSystem: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetLowTempRadiantSystem: "); // include trailing blank space
         static std::string const Off("Off");
         static std::string const SimpleOff("SimpleOff");
         static std::string const VariableOff("VariableOff");
@@ -1674,7 +1674,7 @@ namespace LowTempRadiantSystem {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ZeroTol(0.0000001); // Smallest non-zero value allowed
-        static std::string const RoutineName("InitLowTempRadiantSystem");
+        static constexpr std::string_view RoutineName("InitLowTempRadiantSystem");
         static ObjexxFCL::gio::Fmt fmtF102("(F10.2)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2286,7 +2286,7 @@ namespace LowTempRadiantSystem {
         using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeLowTempRadiantSystem");
+        static constexpr std::string_view RoutineName("SizeLowTempRadiantSystem");
         static int const OFF = 0;
         static int const ClgHtg = 1;
         static int const ClgOnly = 2;
@@ -3774,7 +3774,7 @@ namespace LowTempRadiantSystem {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const LowCpFluidValue(100.0); // lowest allowed Cp fluid value (to avoid dividing by zero) [J/kg-K]
-        static std::string const RoutineName("CalcLowTempCFloRadiantSystem");
+        static constexpr std::string_view RoutineName("CalcLowTempCFloRadiantSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpFluid;         // Specific heat of the fluid in the radiant system
@@ -4322,7 +4322,7 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const TempCheckLimit(0.1); // Maximum allowed temperature difference between outlet temperature calculations
         Real64 const ZeroSystemResp(0.1); // Response below which the system response is really zero
-        static std::string const RoutineName("CalcLowTempCFloRadSysComps");
+        static constexpr std::string_view RoutineName("CalcLowTempCFloRadSysComps");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ConstrNum;                // Index for construction number in Construct derived type
@@ -4953,7 +4953,7 @@ namespace LowTempRadiantSystem {
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("UpdateLowTempRadiantSystem");
+        static constexpr std::string_view RoutineName("UpdateLowTempRadiantSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 BypassMassFlow;  // Local bypass for a constant flow radiant system (could have recirculation and/or bypass)
@@ -5337,7 +5337,7 @@ namespace LowTempRadiantSystem {
             NumOfPropDivisions, {0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656}); // Conductivity, in W/mK
         static Array1D<Real64> const Pr(
             NumOfPropDivisions, {12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}); // Prandtl number (dimensionless)
-        static std::string const RoutineName("CalcRadSysHXEffectTerm");
+        static constexpr std::string_view RoutineName("CalcRadSysHXEffectTerm");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Index;
@@ -5580,7 +5580,7 @@ namespace LowTempRadiantSystem {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ReportLowTempRadiantSystem");
+        static constexpr std::string_view RoutineName("ReportLowTempRadiantSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpFluid;          // Specific heat of the fluid in the radiant system

@@ -329,7 +329,7 @@ namespace RoomAirModelManager {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetUserDefinedPatternData: ");
+        static constexpr std::string_view RoutineName("GetUserDefinedPatternData: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // number of alphas

@@ -262,7 +262,7 @@ namespace DualDuct {
         using ReportSizingManager::ReportSizingOutput;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetDualDuctInput: "); // include trailing bla
+        static constexpr std::string_view RoutineName("GetDualDuctInput: "); // include trailing bla
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1895,7 +1895,7 @@ namespace DualDuct {
 
         // FUNCTION PARAMETER DEFINITIONS:
         bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
-        static std::string const RoutineName("HVACDualDuctSystem:CalcOAOnlyMassFlow");
+        static constexpr std::string_view RoutineName("HVACDualDuctSystem:CalcOAOnlyMassFlow");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

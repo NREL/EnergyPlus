@@ -510,7 +510,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         // initialization
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitGshp");
+        static constexpr std::string_view RoutineName("InitGshp");
 
         // For each new environment
         if (BeginEnvrnFlag && this->beginEnvironFlag) {
@@ -594,12 +594,12 @@ namespace HeatPumpWaterToWaterCOOLING {
         Real64 const RelaxParam(0.6);
         Real64 const SmallNum(1.0e-20);
         int const IterationLimit(500);
-        static std::string const RoutineName("CalcGshpModel");
-        static std::string const RoutineNameLoadSideRefridgTemp("CalcGSHPModel:LoadSideRefridgTemp");
-        static std::string const RoutineNameSourceSideRefridgTemp("CalcGSHPModel:SourceSideRefridgTemp");
-        static std::string const RoutineNameCompressInletTemp("CalcGSHPModel:CompressInletTemp");
-        static std::string const RoutineNameSuctionPr("CalcGSHPModel:SuctionPr");
-        static std::string const RoutineNameCompSuctionTemp("CalcGSHPModel:CompSuctionTemp");
+        static constexpr std::string_view RoutineName("CalcGshpModel");
+        static constexpr std::string_view RoutineNameLoadSideRefridgTemp("CalcGSHPModel:LoadSideRefridgTemp");
+        static constexpr std::string_view RoutineNameSourceSideRefridgTemp("CalcGSHPModel:SourceSideRefridgTemp");
+        static constexpr std::string_view RoutineNameCompressInletTemp("CalcGSHPModel:CompressInletTemp");
+        static constexpr std::string_view RoutineNameSuctionPr("CalcGSHPModel:SuctionPr");
+        static constexpr std::string_view RoutineNameCompSuctionTemp("CalcGSHPModel:CompSuctionTemp");
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

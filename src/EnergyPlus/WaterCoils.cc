@@ -364,7 +364,7 @@ namespace WaterCoils {
         using namespace FaultsManager;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetWaterCoilInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetWaterCoilInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum; // The WaterCoil that you are currently loading input into
@@ -998,7 +998,7 @@ namespace WaterCoils {
         Real64 const SmallNo(1.e-9); // SmallNo number in place of zero
         int const itmax(10);
         int const MaxIte(500); // Maximum number of iterations
-        static std::string const RoutineName("InitWaterCoil");
+        static constexpr std::string_view RoutineName("InitWaterCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int tempCoilNum;                   // loop variable
@@ -2131,7 +2131,7 @@ namespace WaterCoils {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const InitWaterCoil("InitWaterCoil");
-        static std::string const RoutineName("SizeWaterCoil");
+        static constexpr std::string_view RoutineName("SizeWaterCoil");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2784,7 +2784,7 @@ namespace WaterCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcSimpleHeatingCoil");
+        static constexpr std::string_view RoutineName("CalcSimpleHeatingCoil");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2958,7 +2958,7 @@ namespace WaterCoils {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 const exp_47(std::exp(-0.41718));
         static Real64 const exp_35(std::exp(-0.3574));
-        static std::string const RoutineName("CalcDetailFlatFinCoolingCoil");
+        static constexpr std::string_view RoutineName("CalcDetailFlatFinCoolingCoil");
 
         Real64 const AirViscosity(1.846e-5); // Dynamic Viscosity of Air in kg/(m.s)
         Real64 const ConvK(1.0e-3);          // Unit conversion factor
@@ -3837,7 +3837,7 @@ namespace WaterCoils {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CoilCompletelyDry");
+        static constexpr std::string_view RoutineName("CoilCompletelyDry");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -3941,7 +3941,7 @@ namespace WaterCoils {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CoilCompletelyWet");
+        static constexpr std::string_view RoutineName("CoilCompletelyWet");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -4747,7 +4747,7 @@ namespace WaterCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ReportWaterCoil");
+        static constexpr std::string_view RoutineName("ReportWaterCoil");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -6098,7 +6098,7 @@ namespace WaterCoils {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CheckForSensorAndSetpointNode: ");
+        static constexpr std::string_view RoutineName("CheckForSensorAndSetpointNode: ");
         int const iTemperature(1);
         int const iHumidityRatio(2);
         int const iTemperatureAndHumidityRatio(3);
@@ -6699,7 +6699,7 @@ namespace WaterCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("EstimateCoilInletWaterTemp");
+        static constexpr std::string_view RoutineName("EstimateCoilInletWaterTemp");
         Real64 const EffectivnessMaxAssumed(0.80);
 
         // INTERFACE BLOCK SPECIFICATIONS

@@ -501,7 +501,7 @@ namespace HybridUnitaryAirConditioners {
         int UnitLoop;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
+        static constexpr std::string_view RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
         CurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
         NumZoneHybridEvap = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);

@@ -265,7 +265,7 @@ namespace WaterToAirHeatPump {
         using namespace OutputReportPredefined;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetWatertoAirHPInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetWatertoAirHPInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HPNum; // The Water to Air HP that you are currently loading input into
@@ -858,7 +858,7 @@ namespace WaterToAirHeatPump {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // REAL(r64), PARAMETER        :: CpWater=4210.d0          ! Specific heat of water J/kg_C
-        static std::string const RoutineName("InitWatertoAirHP");
+        static constexpr std::string_view RoutineName("InitWatertoAirHP");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1132,15 +1132,15 @@ namespace WaterToAirHeatPump {
         int const STOP2(1000); // Iteration stopper2
         int const STOP3(1000); // Iteration stopper3
 
-        static std::string const RoutineNameSourceSideInletTemp("CalcWatertoAirHPCooling:SourceSideInletTemp");
-        static std::string const RoutineNameSourceSideTemp("CalcWatertoAirHPCooling:SourceSideTemp");
-        static std::string const RoutineNameLoadSideTemp("CalcWatertoAirHPCooling:LoadSideTemp");
-        static std::string const RoutineNameLoadSideSurfaceTemp("CalcWatertoAirHPCooling:LoadSideSurfaceTemp");
-        static std::string const RoutineNameLoadSideEvapTemp("CalcWatertoAirHPCooling:LoadSideEvapTemp");
-        static std::string const RoutineNameLoadSideOutletEnthalpy("CalcWatertoAirHPCooling:LoadSideOutletEnthalpy");
-        static std::string const RoutineNameCompressInletTemp("CalcWatertoAirHPCooling:CompressInletTemp");
-        static std::string const RoutineNameSuctionPr("CalcWatertoAirHPCooling:SuctionPr");
-        static std::string const RoutineNameCompSuctionTemp("CalcWatertoAirHPCooling:CompSuctionTemp");
+        static constexpr std::string_view RoutineNameSourceSideInletTemp("CalcWatertoAirHPCooling:SourceSideInletTemp");
+        static constexpr std::string_view RoutineNameSourceSideTemp("CalcWatertoAirHPCooling:SourceSideTemp");
+        static constexpr std::string_view RoutineNameLoadSideTemp("CalcWatertoAirHPCooling:LoadSideTemp");
+        static constexpr std::string_view RoutineNameLoadSideSurfaceTemp("CalcWatertoAirHPCooling:LoadSideSurfaceTemp");
+        static constexpr std::string_view RoutineNameLoadSideEvapTemp("CalcWatertoAirHPCooling:LoadSideEvapTemp");
+        static constexpr std::string_view RoutineNameLoadSideOutletEnthalpy("CalcWatertoAirHPCooling:LoadSideOutletEnthalpy");
+        static constexpr std::string_view RoutineNameCompressInletTemp("CalcWatertoAirHPCooling:CompressInletTemp");
+        static constexpr std::string_view RoutineNameSuctionPr("CalcWatertoAirHPCooling:SuctionPr");
+        static constexpr std::string_view RoutineNameCompSuctionTemp("CalcWatertoAirHPCooling:CompSuctionTemp");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //      INTEGER                :: NumIteration1            ! Number of Iteration1
@@ -1732,7 +1732,7 @@ namespace WaterToAirHeatPump {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
+        static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1804,13 +1804,13 @@ namespace WaterToAirHeatPump {
         int const STOP2(1000);                // Iteration stopper2
         int const STOP3(1000);                // Iteration stopper3
 
-        static std::string const RoutineNameSourceSideInletTemp("CalcWatertoAirHPHeating:SourceSideInletTemp");
-        static std::string const RoutineNameSourceSideTemp("CalcWatertoAirHPHeating:SourceSideTemp");
-        static std::string const RoutineNameLoadSideTemp("CalcWatertoAirHPHeating:LoadSideTemp");
-        static std::string const RoutineNameLoadSideOutletEnthalpy("CalcWatertoAirHPHeating:LoadSideOutletEnthalpy");
-        static std::string const RoutineNameCompressInletTemp("CalcWatertoAirHPHeating:CompressInletTemp");
-        static std::string const RoutineNameSuctionPr("CalcWatertoAirHPHeating:SuctionPr");
-        static std::string const RoutineNameCompSuctionTemp("CalcWatertoAirHPHeating:CompSuctionTemp");
+        static constexpr std::string_view RoutineNameSourceSideInletTemp("CalcWatertoAirHPHeating:SourceSideInletTemp");
+        static constexpr std::string_view RoutineNameSourceSideTemp("CalcWatertoAirHPHeating:SourceSideTemp");
+        static constexpr std::string_view RoutineNameLoadSideTemp("CalcWatertoAirHPHeating:LoadSideTemp");
+        static constexpr std::string_view RoutineNameLoadSideOutletEnthalpy("CalcWatertoAirHPHeating:LoadSideOutletEnthalpy");
+        static constexpr std::string_view RoutineNameCompressInletTemp("CalcWatertoAirHPHeating:CompressInletTemp");
+        static constexpr std::string_view RoutineNameSuctionPr("CalcWatertoAirHPHeating:SuctionPr");
+        static constexpr std::string_view RoutineNameCompSuctionTemp("CalcWatertoAirHPHeating:CompSuctionTemp");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

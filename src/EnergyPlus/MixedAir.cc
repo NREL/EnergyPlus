@@ -992,7 +992,7 @@ namespace MixedAir {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetOutsideAirSysInputs: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetOutsideAirSysInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1374,7 +1374,7 @@ namespace MixedAir {
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetOAControllerInputs: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetOAControllerInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2117,7 +2117,7 @@ namespace MixedAir {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetOAMixerInputs: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetOAMixerInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2271,7 +2271,7 @@ namespace MixedAir {
         using SetPointManager::GetMixedAirNumWithCoilFreezingCheck;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetOAControllerInputs: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetOAControllerInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -3562,7 +3562,7 @@ namespace MixedAir {
         // SUBROUTINE ARGUMENT DEFINITIONS
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcOAController: ");
+        static constexpr std::string_view RoutineName("CalcOAController: ");
         static std::string const CurrentModuleObject(CurrentModuleObjects(CMO_OAController));
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -3849,7 +3849,7 @@ namespace MixedAir {
         using General::RoundSigDigits;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        static std::string const RoutineName("CalcMechVentController: ");
+        static constexpr std::string_view RoutineName("CalcMechVentController: ");
         static std::string const CurrentModuleObject(CurrentModuleObjects(CMO_MechVentilation));
 
         // new local variables for DCV
@@ -4424,7 +4424,7 @@ namespace MixedAir {
         using General::SolveRoot;
         using SetPointManager::GetCoilFreezingCheckFlag;
 
-        static std::string const RoutineName("CalcOAEconomizer: ");
+        static constexpr std::string_view RoutineName("CalcOAEconomizer: ");
         static std::string const CurrentModuleObject(CurrentModuleObjects(CMO_OAController));
         int const MaxIte(500);                 // Maximum number of iterations
         Real64 const Acc(0.0001);              // Accuracy of result
@@ -6138,7 +6138,7 @@ namespace MixedAir {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CheckControllerLists");
+        static constexpr std::string_view RoutineName("CheckControllerLists");
         static std::string const CurrentModuleObject("AirLoopHVAC:ControllerList");
         static std::string const AirLoopObject("AirLoopHVAC");
 

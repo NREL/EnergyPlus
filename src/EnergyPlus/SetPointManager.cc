@@ -511,7 +511,7 @@ namespace SetPointManager {
     {
         // wrapper for GetInput to allow unit testing when fatal inputs are detected
         static bool ErrorsFound(false);
-        static std::string const RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
 
         GetSetPointManagerInputData(ErrorsFound);
 
@@ -577,7 +577,7 @@ namespace SetPointManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphaFieldNames;
@@ -8646,7 +8646,7 @@ namespace SetPointManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ResetHumidityRatioCtrlVarType: ");
+        static constexpr std::string_view RoutineName("ResetHumidityRatioCtrlVarType: ");
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na

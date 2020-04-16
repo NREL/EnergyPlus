@@ -697,7 +697,7 @@ namespace FluidCoolers {
         // Based on InitTower subroutine by Don Shirey Sept/Oct 2002, F Buhl Oct 2002
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitFluidCooler");
+        static constexpr std::string_view RoutineName("InitFluidCooler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // Flag if input data errors are found
@@ -1443,7 +1443,7 @@ namespace FluidCoolers {
         // Based on SingleSpeedTower subroutine by Dan Fisher ,Sept 1998.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SingleSpeedFluidCooler");
+        static constexpr std::string_view RoutineName("SingleSpeedFluidCooler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TempSetPoint = 0.0;
@@ -1549,7 +1549,7 @@ namespace FluidCoolers {
         // Based on TwoSpeedTower by Dan Fisher ,Sept. 1998.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("TwoSpeedFluidCooler");
+        static constexpr std::string_view RoutineName("TwoSpeedFluidCooler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TempSetPoint = 0.0;
@@ -1643,7 +1643,7 @@ namespace FluidCoolers {
         Real64 _Qactual;        // Actual heat transfer rate between fluid cooler water and air [W]
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcFluidCoolerOutlet");
+        static constexpr std::string_view RoutineName("CalcFluidCoolerOutlet");
 
         if (UAdesign == 0.0) return;
 

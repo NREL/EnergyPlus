@@ -379,7 +379,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
 {
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("CalcSpeedOutput: ");
+    static constexpr std::string_view RoutineName("CalcSpeedOutput: ");
 
     if ((_PLR == 0.0) || (AirMassFlow == 0.0)) {
         outletNode.Temp = inletNode.Temp;
@@ -517,7 +517,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
 Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p)
 {
 
-    static std::string const RoutineName("CalcBypassFactor: ");
+    static constexpr std::string_view RoutineName("CalcBypassFactor: ");
     // Bypass factors are calculated at rated conditions at sea level (make sure in.p is Standard Pressure)
     Real64 calcCBF;
 

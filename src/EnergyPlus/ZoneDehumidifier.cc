@@ -279,7 +279,7 @@ namespace ZoneDehumidifier {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneDehumidifierInput");
+        static constexpr std::string_view RoutineName("GetZoneDehumidifierInput");
         static std::string const CurrentModuleObject("ZoneHVAC:Dehumidifier:DX");
         Real64 const RatedInletAirTemp(26.7);
         Real64 const RatedInletAirRH(60.0);
@@ -641,7 +641,7 @@ namespace ZoneDehumidifier {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitZoneDehumidifier");
+        static constexpr std::string_view RoutineName("InitZoneDehumidifier");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -797,7 +797,7 @@ namespace ZoneDehumidifier {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcZoneDehumidifier");
+        static constexpr std::string_view RoutineName("CalcZoneDehumidifier");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

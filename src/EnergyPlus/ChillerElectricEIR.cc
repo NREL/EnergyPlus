@@ -251,7 +251,7 @@ namespace ChillerElectricEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will get the input required by the Electric EIR Chiller model.
 
-        static std::string const RoutineName("GetElectricEIRChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetElectricEIRChillerInput: "); // include trailing blank space
 
         bool ErrorsFound(false); // True when input errors are found
 
@@ -963,7 +963,7 @@ namespace ChillerElectricEIR {
         // METHODOLOGY EMPLOYED:
         //  Uses the status flags to trigger initializations.
 
-        static std::string const RoutineName("InitElectricEIRChiller");
+        static constexpr std::string_view RoutineName("InitElectricEIRChiller");
 
         // Init more variables
         if (this->oneTimeFlag) {
@@ -1257,7 +1257,7 @@ namespace ChillerElectricEIR {
         //  the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
         //  is calculated from the reference capacity, the COP, and the condenser loop design delta T.
 
-        static std::string const RoutineName("SizeElectricEIRChiller");
+        static constexpr std::string_view RoutineName("SizeElectricEIRChiller");
 
         int PltSizCondNum = 0;
         bool ErrorsFound = false;
@@ -1584,7 +1584,7 @@ namespace ChillerElectricEIR {
         // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
-        static std::string const RoutineName("CalcElectricEIRChillerModel");
+        static constexpr std::string_view RoutineName("CalcElectricEIRChillerModel");
 
         Real64 EvapOutletTempSetPoint(0.0); // Evaporator outlet temperature setpoint [C]
         Real64 EvapDeltaTemp(0.0);          // Evaporator temperature difference [C]
@@ -2212,7 +2212,7 @@ namespace ChillerElectricEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  Calculate the heat recovered from the chiller condenser
 
-        static std::string const RoutineName("EIRChillerHeatRecovery");
+        static constexpr std::string_view RoutineName("EIRChillerHeatRecovery");
 
         // Inlet node to the heat recovery heat exchanger
         Real64 heatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;

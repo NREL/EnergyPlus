@@ -338,7 +338,7 @@ namespace WindowAC {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetWindowAC: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetWindowAC: "); // include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1024,7 +1024,7 @@ namespace WindowAC {
         using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeWindowAC: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("SizeWindowAC: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MaxAirVolFlowDes;  // Autosized maximum air flow for reporting

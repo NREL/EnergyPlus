@@ -302,7 +302,7 @@ namespace HVACHXAssistedCoolingCoil {
         auto &GetWaterCoilOutletNode(WaterCoils::GetCoilOutletNode);
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetHXAssistedCoolingCoilInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetHXAssistedCoolingCoilInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HXAssistedCoilNum;          // Index number of the HXAssistedCoolingCoil for which input data is being read from the idf

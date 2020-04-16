@@ -397,7 +397,7 @@ namespace PlantPressureSystem {
         using FluidProperties::GetViscosityGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcPlantPressureSystem");
+        static constexpr std::string_view RoutineName("CalcPlantPressureSystem");
         static std::string const DummyFluid;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -873,7 +873,7 @@ namespace PlantPressureSystem {
         Real64 ResolvedLoopMassFlowRate;
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ResolvedLoopMassFlowRate: ");
+        static constexpr std::string_view RoutineName("ResolvedLoopMassFlowRate: ");
         int const MaxIters(100);
         static std::string const DummyFluidName;
         Real64 const PressureConvergeCriteria(0.1); // Pa

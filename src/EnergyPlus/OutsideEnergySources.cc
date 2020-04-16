@@ -480,7 +480,7 @@ namespace OutsideEnergySources {
         //       RE-ENGINEERED  Sept 2010, Brent Griffith, plant rewrite
 
          // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SimDistrictEnergy");
+        static constexpr std::string_view RoutineName("SimDistrictEnergy");
 
         // set inlet and outlet nodes
         int const LoopNum = this->LoopNum;

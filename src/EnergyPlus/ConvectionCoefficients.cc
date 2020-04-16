@@ -970,7 +970,7 @@ namespace ConvectionCoefficients {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetUserConvectionCoefficients");
+        static constexpr std::string_view RoutineName("GetUserConvectionCoefficients");
         int const NumValidSurfaceTypes(11);
         static Array1D_string const ValidSurfaceTypes(11,
                                                       {"ALLEXTERIORSURFACES",
@@ -4730,7 +4730,7 @@ namespace ConvectionCoefficients {
         static Real64 const pow_5_25(0.56 * root_4(1.0E+5));
         static Real64 const pow_11_25(0.56 * root_4(1.0E+11));
         static Real64 const pow_11_2(0.58 * std::pow(1.0E+11, 0.2));
-        static std::string const RoutineName("WindowTempsForNominalCond");
+        static constexpr std::string_view RoutineName("WindowTempsForNominalCond");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DeltaTemp;       // Temperature difference between the zone air and the surface

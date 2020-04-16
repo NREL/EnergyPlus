@@ -161,7 +161,7 @@ namespace BoilerSteam {
         // Get all boiler data from input file
 
         // Locals
-        static std::string const RoutineName("GetBoilerInput: ");
+        static constexpr std::string_view RoutineName("GetBoilerInput: ");
 
         // LOCAL VARIABLES
         int BoilerNum;       // boiler identifier
@@ -358,7 +358,7 @@ namespace BoilerSteam {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitBoiler");
+        static constexpr std::string_view RoutineName("InitBoiler");
 
         // Init more variables
         if (this->myFlag) {
@@ -521,7 +521,7 @@ namespace BoilerSteam {
         // the hot water flow rate and the hot water loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeBoiler");
+        static constexpr std::string_view RoutineName("SizeBoiler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
@@ -619,7 +619,7 @@ namespace BoilerSteam {
         // load performance
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcBoilerModel");
+        static constexpr std::string_view RoutineName("CalcBoilerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 BoilerDeltaTemp(0.0); // C - boiler inlet to outlet temperature difference

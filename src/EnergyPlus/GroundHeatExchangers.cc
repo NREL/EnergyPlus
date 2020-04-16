@@ -674,7 +674,7 @@ namespace GroundHeatExchangers {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("calcShortTimestepGFunctions");
+        static constexpr std::string_view RoutineName("calcShortTimestepGFunctions");
 
         enum class CellType
         {
@@ -1746,7 +1746,7 @@ namespace GroundHeatExchangers {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS
-        static std::string const RoutineName("CalcGroundHeatExchanger");
+        static constexpr std::string_view RoutineName("CalcGroundHeatExchanger");
 
         // LOCAL PARAMETERS
         Real64 fluidDensity;
@@ -2035,7 +2035,7 @@ namespace GroundHeatExchangers {
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE ARGUMENT DEFINITIONS
-        static std::string const RoutineName("UpdateGroundHeatExchanger");
+        static constexpr std::string_view RoutineName("UpdateGroundHeatExchanger");
 
         Real64 fluidDensity;
         Real64 const deltaTempLimit(100.0); // temp limit for warnings
@@ -2912,7 +2912,7 @@ namespace GroundHeatExchangers {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("calcBHResistance");
+        static constexpr std::string_view RoutineName("calcBHResistance");
 
         if (massFlowRate <= 0.0) {
             return 0;
@@ -2949,7 +2949,7 @@ namespace GroundHeatExchangers {
         using FluidProperties::GetViscosityGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("calcPipeConvectionResistance");
+        static constexpr std::string_view RoutineName("calcPipeConvectionResistance");
 
         // Get fluid props
         inletTemp = Node(inletNodeNum).Temp;
@@ -3051,7 +3051,7 @@ namespace GroundHeatExchangers {
         using FluidProperties::GetViscosityGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcSlinkyGroundHeatExchanger");
+        static constexpr std::string_view RoutineName("CalcSlinkyGroundHeatExchanger");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 cpFluid;
@@ -3310,7 +3310,7 @@ namespace GroundHeatExchangers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("initGLHESimVars");
+        static constexpr std::string_view RoutineName("initGLHESimVars");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -3418,7 +3418,7 @@ namespace GroundHeatExchangers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("initGLHESimVars");
+        static constexpr std::string_view RoutineName("initGLHESimVars");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

@@ -3655,7 +3655,7 @@ namespace EvaporativeCoolers {
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetInputZoneEvaporativeCoolerUnit: ");
+        static constexpr std::string_view RoutineName("GetInputZoneEvaporativeCoolerUnit: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CurrentModuleObject; // Object type for getting and error messages
@@ -4292,7 +4292,7 @@ namespace EvaporativeCoolers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

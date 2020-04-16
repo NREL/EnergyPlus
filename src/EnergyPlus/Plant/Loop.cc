@@ -115,8 +115,8 @@ namespace DataPlant {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
-        static std::string const RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
+        static constexpr std::string_view RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
+        static constexpr std::string_view RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
 
         //~ General variables
         Real64 MassFlowRate;

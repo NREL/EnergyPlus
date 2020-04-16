@@ -485,7 +485,7 @@ namespace WindowEquivalentLayer {
         Real64 const Height(1.0); // window height, m
         Real64 const TOUT(-18.0); // outdoor air temperature, C
         Real64 const TIN(21.0);   // indoor air temperature, C
-        static std::string const RoutineName("CalcEQLWindowUvalue: ");
+        static constexpr std::string_view RoutineName("CalcEQLWindowUvalue: ");
         // INTERFACE BLOCK SPECIFICATIONS
         // na
 
@@ -589,7 +589,7 @@ namespace WindowEquivalentLayer {
         Real64 const TIN(297.15);
         Real64 const TOUT(305.15);
         Real64 const BeamSolarInc(783.0);
-        static std::string const RoutineName("CalcEQLWindowSHGCAndTransNormal: ");
+        static constexpr std::string_view RoutineName("CalcEQLWindowSHGCAndTransNormal: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1144,7 +1144,7 @@ namespace WindowEquivalentLayer {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("P01: ");
+        static constexpr std::string_view RoutineName("P01: ");
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
 
@@ -1201,7 +1201,7 @@ namespace WindowEquivalentLayer {
         static int const KMAX(8); // max steps
         static int const NPANMAX(std::pow(2, KMAX));
         Real64 const TOL(0.0005); // convergence tolerance
-        static std::string const RoutineName("HEMINT");
+        static constexpr std::string_view RoutineName("HEMINT");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1296,7 +1296,7 @@ namespace WindowEquivalentLayer {
         //   TAUFF_BT0 = TAUFF_BB0 + TAUFF_BD0
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("RB_DIFF: ");
+        static constexpr std::string_view RoutineName("RB_DIFF: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1482,7 +1482,7 @@ namespace WindowEquivalentLayer {
         //   TAU_BT0 = TAU_BB0 + TAU_BD0
         Array1D<Real64> P(hipDIM);
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("IS_DIFF: ");
+        static constexpr std::string_view RoutineName("IS_DIFF: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1759,7 +1759,7 @@ namespace WindowEquivalentLayer {
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //   (TAU_BT0 = TAU_BB0 + TAU_BD0)
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("FM_DIFF: ");
+        static constexpr std::string_view RoutineName("FM_DIFF: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -5073,7 +5073,7 @@ namespace WindowEquivalentLayer {
 
         // FUNCTION PARAMETER DEFINITIONS:
         int const MaxIter(100); // maximum number of iterations allowed
-        static std::string const RoutineName("ASHWAT_ThermalCalc: ");
+        static constexpr std::string_view RoutineName("ASHWAT_ThermalCalc: ");
         // INTERFACE BLOCK SPECIFICATIONS
         // na
 
@@ -5539,7 +5539,7 @@ namespace WindowEquivalentLayer {
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 const Height(1.0); // Window height (m) for standard ratings calculation
         int const MaxIter(100);   // maximum number of iterations allowed
-        static std::string const RoutineName("ASHWAT_ThermalRatings: ");
+        static constexpr std::string_view RoutineName("ASHWAT_ThermalRatings: ");
         // INTERFACE BLOCK SPECIFICATIONS
         // na
 
@@ -9121,7 +9121,7 @@ namespace WindowEquivalentLayer {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 GapThickMin(0.0001); // Minimum gap thickness allowed, m
-        static std::string const RoutineName("BuildGap: ");
+        static constexpr std::string_view RoutineName("BuildGap: ");
         // INTERFACE BLOCK SPECIFICATIONS
         // na
 
@@ -9387,7 +9387,7 @@ namespace WindowEquivalentLayer {
 
         // Locals
         // may be within L
-        static std::string const RoutineName("FillDefaultsSWP: ");
+        static constexpr std::string_view RoutineName("FillDefaultsSWP: ");
         bool OK;
         // Flow
 
@@ -9452,7 +9452,7 @@ namespace WindowEquivalentLayer {
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("FinalizeCFS: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("FinalizeCFS: "); // include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -9975,7 +9975,7 @@ namespace WindowEquivalentLayer {
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("HCInWindowStandardRatings");
+        static constexpr std::string_view RoutineName("HCInWindowStandardRatings");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

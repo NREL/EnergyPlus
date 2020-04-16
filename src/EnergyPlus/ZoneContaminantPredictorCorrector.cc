@@ -259,7 +259,7 @@ namespace ZoneContaminantPredictorCorrector {
         using ScheduleManager::GetScheduleMinValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSourcesAndSinks: ");
+        static constexpr std::string_view RoutineName("GetSourcesAndSinks: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string AlphaName;
@@ -1760,7 +1760,7 @@ namespace ZoneContaminantPredictorCorrector {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PredictZoneContaminants");
+        static constexpr std::string_view RoutineName("PredictZoneContaminants");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2316,7 +2316,7 @@ namespace ZoneContaminantPredictorCorrector {
         using DataEnvironment::DayOfYear;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InverseModelCO2");
+        static constexpr std::string_view RoutineName("InverseModelCO2");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AA(0.0);
@@ -2346,7 +2346,7 @@ namespace ZoneContaminantPredictorCorrector {
             ZoneAirCO2(ZoneNum) = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
 
             if (HybridModelZone(ZoneNum).InfiltrationCalc_C && UseZoneTimeStepHistory) {
-                static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
+                static constexpr std::string_view RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
 
                 // Conditionally calculate the CO2-dependent and CO2-independent terms.
                 if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
@@ -2487,7 +2487,7 @@ namespace ZoneContaminantPredictorCorrector {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CorrectZoneContaminants");
+        static constexpr std::string_view RoutineName("CorrectZoneContaminants");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

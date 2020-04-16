@@ -1442,7 +1442,7 @@ namespace UnitarySystems {
         // heating and cooling capacities are close but not identical.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeUnitarySystem");
+        static constexpr std::string_view RoutineName("SizeUnitarySystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Iter;                  // iteration count
@@ -15540,7 +15540,7 @@ namespace UnitarySystems {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CheckUnitarySysCoilInOASysExists: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("CheckUnitarySysCoilInOASysExists: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         if (UnitarySystems::getInputOnceFlag) {

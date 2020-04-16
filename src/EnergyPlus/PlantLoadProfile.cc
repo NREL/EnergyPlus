@@ -154,7 +154,7 @@ namespace PlantLoadProfile {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("SimulatePlantProfile");
+        static constexpr std::string_view RoutineName("SimulatePlantProfile");
         Real64 DeltaTemp;
 
         this->InitPlantProfile();
@@ -203,7 +203,7 @@ namespace PlantLoadProfile {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("InitPlantProfile");
+        static constexpr std::string_view RoutineName("InitPlantProfile");
         Real64 FluidDensityInit;
         bool errFlag;
 

@@ -356,7 +356,7 @@ namespace SingleDuct {
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::OARequirements;
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSysInput: "); // include trailing blank
+        static constexpr std::string_view RoutineName("GetSysInput: "); // include trailing blank
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2031,8 +2031,8 @@ namespace SingleDuct {
         auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitSys");
-        static std::string const RoutineNameFull("InitHVACSingleDuct");
+        static constexpr std::string_view RoutineName("InitSys");
+        static constexpr std::string_view RoutineNameFull("InitHVACSingleDuct");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
@@ -2405,8 +2405,8 @@ namespace SingleDuct {
         using WaterCoils::SetCoilDesFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeSys");
-        static std::string const RoutineNameFull("SizeHVACSingleDuct");
+        static constexpr std::string_view RoutineName("SizeSys");
+        static constexpr std::string_view RoutineNameFull("SizeHVACSingleDuct");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -5471,7 +5471,7 @@ namespace SingleDuct {
         int NumAlphas;  // Number of alphanumerics returned by GetObjectItem
         int ATMixerNum; // Index of inlet side mixer air terminal unit
         int IOStat;
-        static std::string const RoutineName("GetATMixers: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetATMixers: "); // include trailing blank space
         static bool ErrorsFound(false);                        // Error flag
         int NodeNum;                                           // Index to node number
         int CtrlZone;                                          // Index to control zone

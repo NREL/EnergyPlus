@@ -805,7 +805,7 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(Real64 const SupplyAirMassFlo
     // and calculates the residual as defined above
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    static std::string const RoutineName("CalcTwoSpeedDXCoilIEERResidual");
+    static constexpr std::string_view RoutineName("CalcTwoSpeedDXCoilIEERResidual");
     Real64 OutletAirTemp; // outlet air temperature [C]
     Real64 TargetCoilLeavingDryBulb;
     Real64 OutdoorUnitInletDryBulb;

@@ -244,7 +244,7 @@ namespace ChillerAbsorption {
         // METHODOLOGY EMPLOYED:
         // EnergyPlus input processor
 
-        static std::string const RoutineName("GetBLASTAbsorberInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetBLASTAbsorberInput: "); // include trailing blank space
 
         int AbsorberNum; // Absorber counter
         int NumAlphas;   // Number of elements in the alpha array
@@ -614,7 +614,7 @@ namespace ChillerAbsorption {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        static std::string const RoutineName("InitBLASTAbsorberModel");
+        static constexpr std::string_view RoutineName("InitBLASTAbsorberModel");
 
         // Init more variables
         if (this->MyOneTimeFlag) {
@@ -873,8 +873,8 @@ namespace ChillerAbsorption {
 
         //        Real64 SteamMassFlowRate; // steam mass flow rate through generator
 
-        static std::string const RoutineName("SizeAbsorpChiller");
-        static std::string const RoutineNameLong("SizeAbsorptionChiller");
+        static constexpr std::string_view RoutineName("SizeAbsorpChiller");
+        static constexpr std::string_view RoutineNameLong("SizeAbsorptionChiller");
 
         int PltSizSteamNum(0);   // Plant Sizing index for steam heating loop
         int PltSizHeatingNum(0); // Plant Sizing index for how water heating loop
@@ -1362,7 +1362,7 @@ namespace ChillerAbsorption {
         // 1.  BLAST User Manual
         // 2.  Absorber User Manual
 
-        static std::string const RoutineName("CalcBLASTAbsorberModel");
+        static constexpr std::string_view RoutineName("CalcBLASTAbsorberModel");
 
         Real64 EvapDeltaTemp(0.0); // C - evaporator temperature difference, water side
 

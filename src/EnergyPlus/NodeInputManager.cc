@@ -199,7 +199,7 @@ namespace NodeInputManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetNodeNums: ");
+        static constexpr std::string_view RoutineName("GetNodeNums: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -567,7 +567,7 @@ namespace NodeInputManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetNodeListsInput: ");
+        static constexpr std::string_view RoutineName("GetNodeListsInput: ");
         static std::string const CurrentModuleObject("NodeList");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -817,7 +817,7 @@ namespace NodeInputManager {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetOnlySingleNode: ");
+        static constexpr std::string_view RoutineName("GetOnlySingleNode: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1133,7 +1133,7 @@ namespace NodeInputManager {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcMoreNodeInfo");
+        static constexpr std::string_view RoutineName("CalcMoreNodeInfo");
         static std::string const NodeReportingCalc("NodeReportingCalc:");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

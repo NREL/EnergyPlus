@@ -1087,7 +1087,7 @@ namespace PlantUtilities {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("UpdateChillerComponentCondenserSide");
+        static constexpr std::string_view RoutineName("UpdateChillerComponentCondenserSide");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool DidAnythingChange(false); // set to true if conditions changed
@@ -1176,7 +1176,7 @@ namespace PlantUtilities {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("UpdateComponentHeatRecoverySide");
+        static constexpr std::string_view RoutineName("UpdateComponentHeatRecoverySide");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool DidAnythingChange(false); // set to true if conditions changed

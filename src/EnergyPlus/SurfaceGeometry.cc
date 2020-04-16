@@ -241,7 +241,7 @@ namespace SurfaceGeometry {
 
         static ObjexxFCL::gio::Fmt ValFmt("(F20.2)");
         static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static std::string const RoutineName("SetUpZoneGeometry: ");
+        static constexpr std::string_view RoutineName("SetUpZoneGeometry: ");
 
         Real64 AverageHeight; // Used to keep track of average height of a surface/zone
         int SurfNum;          // Surface number (DO loop counter)
@@ -884,7 +884,7 @@ namespace SurfaceGeometry {
         using namespace DataErrorTracking;
 
         int const SurfaceClass_Moved(-1);
-        static std::string const RoutineName("GetSurfaceData: ");
+        static constexpr std::string_view RoutineName("GetSurfaceData: ");
 
         int ConstrNum;                // Construction number
         int SubSurfNum;               // DO loop counter/index for sub-surface number
@@ -5609,7 +5609,7 @@ namespace SurfaceGeometry {
         using General::CheckCreatedZoneItemName;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetIntMassSurfaceData: ");
+        static constexpr std::string_view RoutineName("GetIntMassSurfaceData: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;                // IO Status when calling get input subroutine
@@ -6393,7 +6393,7 @@ namespace SurfaceGeometry {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSurfaceLocalEnvData: ");
+        static constexpr std::string_view RoutineName("GetSurfaceLocalEnvData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:na
         // DERIVED TYPE DEFINITIONS:na
@@ -6550,7 +6550,7 @@ namespace SurfaceGeometry {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSurfaceSrdSurfsData: ");
+        static constexpr std::string_view RoutineName("GetSurfaceSrdSurfsData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:na
         // DERIVED TYPE DEFINITIONS:na
@@ -7258,7 +7258,7 @@ namespace SurfaceGeometry {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetVertices: ");
+        static constexpr std::string_view RoutineName("GetVertices: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -7598,7 +7598,7 @@ namespace SurfaceGeometry {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ReverseAndRecalculate: ");
+        static constexpr std::string_view RoutineName("ReverseAndRecalculate: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -10666,7 +10666,7 @@ namespace SurfaceGeometry {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ProcessSurfaceVertices: ");
+        static constexpr std::string_view RoutineName("ProcessSurfaceVertices: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

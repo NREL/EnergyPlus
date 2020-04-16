@@ -1059,7 +1059,7 @@ void CalcPassiveExteriorBaffleGap(const Array1D_int &SurfPtrARR, // Array of ind
     Real64 const k(0.0267);          // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
     Real64 const Sigma(5.6697e-08);  // Stefan-Boltzmann constant
     Real64 const KelvinConv(273.15); // Conversion from Celsius to Kelvin
-    static std::string const RoutineName("CalcPassiveExteriorBaffleGap");
+    static constexpr std::string_view RoutineName("CalcPassiveExteriorBaffleGap");
     // INTERFACE BLOCK SPECIFICATIONS:
 
     // DERIVED TYPE DEFINITIONS:

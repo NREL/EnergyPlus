@@ -346,7 +346,7 @@ namespace HeatingCoils {
         using GlobalNames::VerifyUniqueCoilName;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetHeatingCoilInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetHeatingCoilInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum; // The HeatingCoil that you are currently loading input into
@@ -1507,7 +1507,7 @@ namespace HeatingCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeHeatingCoil: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("SizeHeatingCoil: "); // include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1888,9 +1888,9 @@ namespace HeatingCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcMultiStageElectricHeatingCoil");
-        static std::string const RoutineNameAverageLoad("CalcMultiStageElectricHeatingCoil:Averageload");
-        static std::string const RoutineNameFullLoad("CalcMultiStageElectricHeatingCoil:fullload");
+        static constexpr std::string_view RoutineName("CalcMultiStageElectricHeatingCoil");
+        static constexpr std::string_view RoutineNameAverageLoad("CalcMultiStageElectricHeatingCoil:Averageload");
+        static constexpr std::string_view RoutineNameFullLoad("CalcMultiStageElectricHeatingCoil:fullload");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2320,9 +2320,9 @@ namespace HeatingCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcMultiStageGasHeatingCoil");
-        static std::string const RoutineNameAverageLoad("CalcMultiStageGasHeatingCoil:Averageload");
-        static std::string const RoutineNameFullLoad("CalcMultiStageGasHeatingCoil:fullload");
+        static constexpr std::string_view RoutineName("CalcMultiStageGasHeatingCoil");
+        static constexpr std::string_view RoutineNameAverageLoad("CalcMultiStageGasHeatingCoil:Averageload");
+        static constexpr std::string_view RoutineNameFullLoad("CalcMultiStageGasHeatingCoil:fullload");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

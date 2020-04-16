@@ -341,7 +341,7 @@ namespace FanCoilUnits {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        static std::string const RoutineName("GetFanCoilUnits: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetFanCoilUnits: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanCoilIndex;                      // loop index
@@ -1104,7 +1104,7 @@ namespace FanCoilUnits {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitFanCoilUnits");
+        static constexpr std::string_view RoutineName("InitFanCoilUnits");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InNode;         // inlet node number in fan coil loop
@@ -1384,8 +1384,8 @@ namespace FanCoilUnits {
         using WaterCoils::WaterCoil;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeFanCoilUnit: "); // include trailing blank space
-        static std::string const RoutineNameNoSpace("SizeFanCoilUnit");
+        static constexpr std::string_view RoutineName("SizeFanCoilUnit: "); // include trailing blank space
+        static constexpr std::string_view RoutineNameNoSpace("SizeFanCoilUnit");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum;  // index of plant sizing object for 1st heating loop
@@ -3759,7 +3759,7 @@ namespace FanCoilUnits {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SimMultiStage4PipeFanCoil");
+        static constexpr std::string_view RoutineName("SimMultiStage4PipeFanCoil");
         // int const MaxIterCycl( 100 );
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -4123,7 +4123,7 @@ namespace FanCoilUnits {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcMultiStage4PipeFanCoil");
+        static constexpr std::string_view RoutineName("CalcMultiStage4PipeFanCoil");
         int const MaxIterCycl(100);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

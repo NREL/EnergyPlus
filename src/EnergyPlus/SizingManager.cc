@@ -189,7 +189,7 @@ namespace SizingManager {
         using OutputReportTabular::hasSizingPeriodsDays;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ManageSizing: ");
+        static constexpr std::string_view RoutineName("ManageSizing: ");
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2052,7 +2052,7 @@ namespace SizingManager {
         using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetOARequirements: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetOARequirements: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -2172,7 +2172,7 @@ namespace SizingManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetOARequirements: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetOARequirements: "); // include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2319,7 +2319,7 @@ namespace SizingManager {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneAirDistribution: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetZoneAirDistribution: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -4138,7 +4138,7 @@ namespace SizingManager {
         using General::TrimSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneHVACSizing: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetZoneHVACSizing: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -4733,7 +4733,7 @@ namespace SizingManager {
         using General::RoundSigDigits;
         using General::TrimSigDigits;
 
-        static std::string const RoutineName("GetAirTerminalSizing: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetAirTerminalSizing: "); // include trailing blank space
 
         int NumAlphas;           // Number of Alphas for each GetObjectItem call
         int NumNumbers;          // Number of Numbers for each GetObjectItem call

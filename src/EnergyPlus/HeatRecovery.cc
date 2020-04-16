@@ -379,7 +379,7 @@ namespace HeatRecovery {
         int IOStatus;                                                   // Used in GetObjectItem
         static bool ErrorsFound(false);                                 // Set to true if errors in input, fatal at end of routine
         static std::string HeatExchPerfType;                            // Desiccant balanced heat exchanger performance data type
-        static std::string const RoutineName("GetHeatRecoveryInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetHeatRecoveryInput: "); // include trailing blank space
 
         NumAirToAirPlateExchs = inputProcessor->getNumObjectsFound("HeatExchanger:AirToAir:FlatPlate");
         NumAirToAirGenericExchs = inputProcessor->getNumObjectsFound("HeatExchanger:AirToAir:SensibleAndLatent");
@@ -1619,7 +1619,7 @@ namespace HeatRecovery {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeHeatRecovery");
+        static constexpr std::string_view RoutineName("SizeHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool PrintFlag;           // true when sizing information is reported in the eio file

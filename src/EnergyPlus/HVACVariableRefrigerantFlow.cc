@@ -473,7 +473,7 @@ namespace HVACVariableRefrigerantFlow {
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::RhoH2O;
 
-        static std::string const RoutineName("VRFCondenser");
+        static constexpr std::string_view RoutineName("VRFCondenser");
 
         int NumTU;         // loop counter
         int TUIndex;       // Index to terminal unit
@@ -1391,7 +1391,7 @@ namespace HVACVariableRefrigerantFlow {
         // Calls "Get" routines to read in data.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetVRFInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetVRFInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
@@ -1458,7 +1458,7 @@ namespace HVACVariableRefrigerantFlow {
         using WaterManager::SetupTankDemandComponent;
         using WaterManager::SetupTankSupplyComponent;
 
-        static std::string const RoutineName("GetVRFInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetVRFInput: "); // include trailing blank space
 
         int NumVRFCTU; // The number of VRF constant volume TUs (anticipating different types of TU's)
         int VRFTUNum;  // Loop index to the total number of VRF terminal units
@@ -5009,7 +5009,7 @@ namespace HVACVariableRefrigerantFlow {
         using ScheduleManager::GetCurrentScheduleValue;
         using SingleDuct::SimATMixer;
 
-        static std::string const RoutineName("InitVRF");
+        static constexpr std::string_view RoutineName("InitVRF");
 
         int InNode;                       // TU inlet node
         int OutNode;                      // TU outlet node
@@ -6880,7 +6880,7 @@ namespace HVACVariableRefrigerantFlow {
         using ReportSizingManager::ReportSizingOutput;
         using ReportSizingManager::RequestSizing;
 
-        static std::string const RoutineName("SizeVRF: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("SizeVRF: "); // include trailing blank space
 
         static Array1D_bool CheckVRFCombinationRatio;
         bool FoundAll;                      // temporary variable used to check all terminal units
@@ -8020,7 +8020,7 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Set water-cooled plant flow rates.
 
-        static std::string const RoutineName("SizeVRFCondenser");
+        static constexpr std::string_view RoutineName("SizeVRFCondenser");
 
         int PltSizCondNum;         // Plant Sizing index for condenser loop
         Real64 rho;                // local fluid density [kg/m3]
@@ -10004,7 +10004,7 @@ namespace HVACVariableRefrigerantFlow {
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::RhoH2O;
 
-        static std::string const RoutineName("CalcVRFCondenser_FluidTCtrl");
+        static constexpr std::string_view RoutineName("CalcVRFCondenser_FluidTCtrl");
 
         int VRFCond;            // index to VRF condenser
         int TUListNum;          // index to TU List
@@ -12449,7 +12449,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 density_rate;    // density of refrigerant at rated conditions [kg/m3]
         Real64 density_real;    // density of refrigerant at rated conditions [kg/m3]
 
-        static std::string const RoutineName("VRFOU_CapModFactor");
+        static constexpr std::string_view RoutineName("VRFOU_CapModFactor");
 
         // variable initializations
         RefrigerantIndex = FindRefrigerant(this->RefrigerantName);
@@ -12535,7 +12535,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 Tfs;             // Temperature of the air at the coil surface [C]]
         Real64 Tsuction;        // VRF compressor suction refrigerant temperature [Pa]
 
-        static std::string const RoutineName("VRFOU_TeModification");
+        static constexpr std::string_view RoutineName("VRFOU_TeModification");
 
         // variable initializations
         TUListNum = this->ZoneTUListPtr;
@@ -12671,7 +12671,7 @@ namespace HVACVariableRefrigerantFlow {
         Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
         Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
-        static std::string const RoutineName("VRFOU_CompSpd");
+        static constexpr std::string_view RoutineName("VRFOU_CompSpd");
 
         // variable initializations: component index
         TUListNum = this->ZoneTUListPtr;
@@ -12819,7 +12819,7 @@ namespace HVACVariableRefrigerantFlow {
         Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
         Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
-        static std::string const RoutineName("VRFOU_CompCap");
+        static constexpr std::string_view RoutineName("VRFOU_CompCap");
 
         // variable initializations: component index
         TUListNum = this->ZoneTUListPtr;
@@ -12972,7 +12972,7 @@ namespace HVACVariableRefrigerantFlow {
         Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
         Array1D<Real64> Par(3);                // Array for the parameters [-]
 
-        static std::string const RoutineName("VRFOU_CalcCompC");
+        static constexpr std::string_view RoutineName("VRFOU_CalcCompC");
 
         // variable initializations
         NumOfCompSpdInput = this->CompressorSpeed.size();
@@ -13300,7 +13300,7 @@ namespace HVACVariableRefrigerantFlow {
         Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
         Array1D<Real64> Par(3);                // Array for the parameters [-]
 
-        static std::string const RoutineName("VRFOU_CalcCompH");
+        static constexpr std::string_view RoutineName("VRFOU_CalcCompH");
 
         // variable initializations
         NumOfCompSpdInput = this->CompressorSpeed.size();
@@ -13503,7 +13503,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 Tsuction_new;        // VRF compressor suction refrigerant temperature (new) [C]
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("VRFHR_OU_Mode");
+        static constexpr std::string_view RoutineName("VRFHR_OU_Mode");
 
         // Initialization: operational parameters
         RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, OutDryBulbTemp, OutHumRat);
@@ -13889,7 +13889,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 Ref_Coe_v3;            // Piping Loss Algorithm Parameter: coefficient to calculate Pipe_viscosity_ref [-]
         Real64 RefPipInsH;            // Heat transfer coefficient for calculating piping loss [W/m2K]
 
-        static std::string const RoutineName("VRFOU_PipeLossC");
+        static constexpr std::string_view RoutineName("VRFOU_PipeLossC");
 
         TUListNum = this->ZoneTUListPtr;
         NumTUInList = TerminalUnitList(TUListNum).NumTUInList;
@@ -14037,7 +14037,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 Ref_Coe_v3;            // Piping Loss Algorithm Parameter: coefficient to calculate Pipe_viscosity_ref [-]
         Real64 RefPipInsH;            // Heat transfer coefficient for calculating piping loss [W/m2K]
 
-        static std::string const RoutineName("VRFOU_PipeLossH");
+        static constexpr std::string_view RoutineName("VRFOU_PipeLossH");
 
         TUListNum = this->ZoneTUListPtr;
         NumTUInList = TerminalUnitList(TUListNum).NumTUInList;

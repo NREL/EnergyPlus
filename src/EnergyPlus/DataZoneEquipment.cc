@@ -288,7 +288,7 @@ namespace DataZoneEquipment {
         using namespace ScheduleManager;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneEquipmentData1: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetZoneEquipmentData1: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;

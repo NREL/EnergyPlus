@@ -584,7 +584,7 @@ namespace ZoneEquipmentManager {
         using General::RoundSigDigits;
 
         // Parameters
-        static std::string const RoutineName("SizeZoneEquipment");
+        static constexpr std::string_view RoutineName("SizeZoneEquipment");
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -862,7 +862,7 @@ namespace ZoneEquipmentManager {
         // Consult the "DOAS Effect On Zone Sizing" new feature proposal and design documents
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcDOASSupCondsForSizing");
+        static constexpr std::string_view RoutineName("CalcDOASSupCondsForSizing");
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
@@ -2215,7 +2215,7 @@ namespace ZoneEquipmentManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
-        static std::string const RoutineName("UpdateZoneSizing");
+        static constexpr std::string_view RoutineName("UpdateZoneSizing");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -5517,11 +5517,11 @@ namespace ZoneEquipmentManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const StdGravity(9.80665); // The acceleration of gravity at the sea level (m/s2)
-        static std::string const RoutineNameMixing("CalcAirFlowSimple:Mixing");
-        static std::string const RoutineNameCrossMixing("CalcAirFlowSimple:CrossMixing");
-        static std::string const RoutineNameRefrigerationDoorMixing("CalcAirFlowSimple:RefrigerationDoorMixing");
-        static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
-        static std::string const RoutineNameZoneAirBalance("CalcAirFlowSimple:ZoneAirBalance");
+        static constexpr std::string_view RoutineNameMixing("CalcAirFlowSimple:Mixing");
+        static constexpr std::string_view RoutineNameCrossMixing("CalcAirFlowSimple:CrossMixing");
+        static constexpr std::string_view RoutineNameRefrigerationDoorMixing("CalcAirFlowSimple:RefrigerationDoorMixing");
+        static constexpr std::string_view RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
+        static constexpr std::string_view RoutineNameZoneAirBalance("CalcAirFlowSimple:ZoneAirBalance");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MCP;

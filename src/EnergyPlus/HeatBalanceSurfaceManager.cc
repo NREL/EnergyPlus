@@ -5122,17 +5122,17 @@ namespace HeatBalanceSurfaceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcHeatBalanceOutsideSurf");
-        static std::string const RoutineNameGroundTemp("CalcHeatBalanceOutsideSurf:GroundTemp");
-        static std::string const RoutineNameGroundTempFC("CalcHeatBalanceOutsideSurf:GroundTempFC");
-        static std::string const RoutineNameOtherSideCoefNoCalcExt("CalcHeatBalanceOutsideSurf:OtherSideCoefNoCalcExt");
-        static std::string const RoutineNameOtherSideCoefCalcExt("CalcHeatBalanceOutsideSurf:OtherSideCoefCalcExt");
-        static std::string const RoutineNameOSCM("CalcHeatBalanceOutsideSurf:OSCM");
-        static std::string const RoutineNameExtEnvWetSurf("CalcHeatBalanceOutsideSurf:extEnvWetSurf");
-        static std::string const RoutineNameExtEnvDrySurf("CalcHeatBalanceOutsideSurf:extEnvDrySurf");
-        static std::string const RoutineNameNoWind("CalcHeatBalanceOutsideSurf:nowind");
-        static std::string const RoutineNameOther("CalcHeatBalanceOutsideSurf:interior/other");
-        static std::string const RoutineNameIZPart("CalcHeatBalanceOutsideSurf:IZPart");
+        static constexpr std::string_view RoutineName("CalcHeatBalanceOutsideSurf");
+        static constexpr std::string_view RoutineNameGroundTemp("CalcHeatBalanceOutsideSurf:GroundTemp");
+        static constexpr std::string_view RoutineNameGroundTempFC("CalcHeatBalanceOutsideSurf:GroundTempFC");
+        static constexpr std::string_view RoutineNameOtherSideCoefNoCalcExt("CalcHeatBalanceOutsideSurf:OtherSideCoefNoCalcExt");
+        static constexpr std::string_view RoutineNameOtherSideCoefCalcExt("CalcHeatBalanceOutsideSurf:OtherSideCoefCalcExt");
+        static constexpr std::string_view RoutineNameOSCM("CalcHeatBalanceOutsideSurf:OSCM");
+        static constexpr std::string_view RoutineNameExtEnvWetSurf("CalcHeatBalanceOutsideSurf:extEnvWetSurf");
+        static constexpr std::string_view RoutineNameExtEnvDrySurf("CalcHeatBalanceOutsideSurf:extEnvDrySurf");
+        static constexpr std::string_view RoutineNameNoWind("CalcHeatBalanceOutsideSurf:nowind");
+        static constexpr std::string_view RoutineNameOther("CalcHeatBalanceOutsideSurf:interior/other");
+        static constexpr std::string_view RoutineNameIZPart("CalcHeatBalanceOutsideSurf:IZPart");
         static std::string const HBSurfManGroundHAMT("HBSurfMan:Ground:HAMT");
         static std::string const HBSurfManRainHAMT("HBSurfMan:Rain:HAMT");
         static std::string const HBSurfManDrySurfCondFD("HBSurfMan:DrySurf:CondFD");

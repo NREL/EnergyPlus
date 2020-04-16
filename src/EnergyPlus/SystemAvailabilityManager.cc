@@ -510,7 +510,7 @@ namespace SystemAvailabilityManager {
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSysAvailManagerInputs: "); // include trailing blank
+        static constexpr std::string_view RoutineName("GetSysAvailManagerInputs: "); // include trailing blank
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphaFieldNames;
@@ -4137,7 +4137,7 @@ namespace SystemAvailabilityManager {
         using DataContaminantBalance::Contaminant;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetHybridVentilationInputs: "); // include trailing blank
+        static constexpr std::string_view RoutineName("GetHybridVentilationInputs: "); // include trailing blank
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call

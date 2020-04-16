@@ -554,7 +554,7 @@ namespace MicroCHPElectricGenerator {
 
     void MicroCHPDataStruct::onInitLoopEquip(const EnergyPlus::PlantLocation &)
     {
-        static std::string const RoutineName("MicroCHPDataStruct::onInitLoopEquip");
+        static constexpr std::string_view RoutineName("MicroCHPDataStruct::onInitLoopEquip");
 
         Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                        DataLoopNode::Node(this->PlantInletNodeID).Temp,
@@ -598,7 +598,7 @@ namespace MicroCHPElectricGenerator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("InitMicroCHPNoNormalizeGenerators");
+        static constexpr std::string_view RoutineName("InitMicroCHPNoNormalizeGenerators");
 
         bool errFlag;
 
@@ -741,7 +741,7 @@ namespace MicroCHPElectricGenerator {
         // IEA Annex 42 FC-COGEN-SIM "A Generic Model Specification for Combustion-based Residential CHP Devices"
         // Alex Ferguson, Nick Kelly, Version 3, June 26, 2006
 
-        static std::string const RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
+        static constexpr std::string_view RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
 
         int CurrentOpMode = 0;
         Real64 AllowedLoad = 0.0;
@@ -1298,7 +1298,7 @@ namespace MicroCHPElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update plant loop interactions, do any calcs needed
 
-        static std::string const RoutineName("CalcUpdateHeatRecovery");
+        static constexpr std::string_view RoutineName("CalcUpdateHeatRecovery");
 
         PlantUtilities::SafeCopyPlantNode(this->PlantInletNodeID, this->PlantOutletNodeID);
 
@@ -1329,7 +1329,7 @@ namespace MicroCHPElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update variables in structures linked to output reports
 
-        static std::string const RoutineName("UpdateMicroCHPGeneratorRecords");
+        static constexpr std::string_view RoutineName("UpdateMicroCHPGeneratorRecords");
 
         this->A42Model.ACPowerGen = this->A42Model.Pnet;                                                          // electrical power produced [W]
         this->A42Model.ACEnergyGen = this->A42Model.Pnet * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // energy produced (J)

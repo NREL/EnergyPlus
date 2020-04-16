@@ -4050,8 +4050,8 @@ namespace WaterThermalTanks {
 
         bool ErrorsFound = false;
 
-        static std::string const RoutineName("GetWaterThermalTankInput: ");
-        static std::string const RoutineNameNoColon("GetWaterThermalTankInput");
+        static constexpr std::string_view RoutineName("GetWaterThermalTankInput: ");
+        static constexpr std::string_view RoutineNameNoColon("GetWaterThermalTankInput");
 
         // Make sure refrigeration input is gotten before this input
         RefrigeratedCase::CheckRefrigerationInput();
@@ -5357,7 +5357,7 @@ namespace WaterThermalTanks {
         // the Newton-Raphson iterative method.  For vertical cylinders and other shapes, the node heights are calculated
         // using basic geometry.
 
-        static std::string const RoutineName("GetWaterThermalTankInput");
+        static constexpr std::string_view RoutineName("GetWaterThermalTankInput");
 
         const Real64 Tolerance(1.0e-8); // Tolerance for Newton-Raphson solution
         const Real64 FluidCond(0.6);    // Conductivity of water (W/m-K)
@@ -5575,7 +5575,7 @@ namespace WaterThermalTanks {
         // METHODOLOGY EMPLOYED:
         // Inlet and outlet nodes are initialized.  Scheduled values are retrieved for the current timestep.
 
-        static std::string const RoutineName("InitWaterThermalTank");
+        static constexpr std::string_view RoutineName("InitWaterThermalTank");
         static std::string const GetWaterThermalTankInput("GetWaterThermalTankInput");
         static std::string const SizeTankForDemand("SizeTankForDemandSide");
 
@@ -6361,7 +6361,7 @@ namespace WaterThermalTanks {
         // the timestep.  The final reported heat rates are averages based on the total energy transfer over the
         // timestep.
 
-        static std::string const RoutineName("CalcWaterThermalTankMixed");
+        static constexpr std::string_view RoutineName("CalcWaterThermalTankMixed");
 
         // FLOW:
         Real64 TimeElapsed_loc = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
@@ -7233,7 +7233,7 @@ namespace WaterThermalTanks {
         // Final node temperatures are reported as final instantaneous values as well as averages over the
         // time step.  Heat transfer rates are averages over the time step.
 
-        static std::string const RoutineName("CalcWaterThermalTankStratified");
+        static constexpr std::string_view RoutineName("CalcWaterThermalTankStratified");
         const Real64 TemperatureConvergenceCriteria = 0.0001;
         const Real64 SubTimestepMax = 60.0 * 10.0; // seconds
         const Real64 SubTimestepMin = 10.0;        // seconds
@@ -10295,7 +10295,7 @@ namespace WaterThermalTanks {
         // For water heaters sides on Supply LoopSide, obtains hot water flow rate from the plant sizing array
         //  (adapted approach from boiler sizing routines)
 
-        static std::string const RoutineName("SizeSupplySidePlantConnections");
+        static constexpr std::string_view RoutineName("SizeSupplySidePlantConnections");
 
         Real64 tmpUseDesignVolFlowRate = this->UseDesignVolFlowRate;
         Real64 tmpSourceDesignVolFlowRate = this->SourceDesignVolFlowRate;
@@ -10452,7 +10452,7 @@ namespace WaterThermalTanks {
         // BA benchmark report for residential design mode
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeTankForDemandSide");
+        static constexpr std::string_view RoutineName("SizeTankForDemandSide");
         Real64 const GalTocubicMeters(0.0037854);
         Real64 const kBtuPerHrToWatts(293.1);
 
@@ -10793,7 +10793,7 @@ namespace WaterThermalTanks {
         // REFERENCES:
         // BA benchmark report for residential design mode
 
-        static std::string const RoutineName("SizeTankForSupplySide");
+        static constexpr std::string_view RoutineName("SizeTankForSupplySide");
 
         Real64 Tstart = 14.44;
         Real64 Tfinish = 57.22;
@@ -10914,7 +10914,7 @@ namespace WaterThermalTanks {
         //  recovery rate that if continued would reheat tank in user specified amount of time.
         //  intial and final tank temperatures are 14.44 and reheat to 57.22 (values from CalcStandardRatings routine)
 
-        static std::string const RoutineName("SizeDemandSidePlantConnections");
+        static constexpr std::string_view RoutineName("SizeDemandSidePlantConnections");
 
         Real64 tankRecoverhours = this->SizingRecoveryTime;
         bool ErrorsFound = false;
@@ -11129,7 +11129,7 @@ namespace WaterThermalTanks {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const GalTocubicMeters(0.0037854);
         Real64 const kBtuPerHrToWatts(293.1);
-        static std::string const RoutineName("SizeStandAloneWaterHeater");
+        static constexpr std::string_view RoutineName("SizeStandAloneWaterHeater");
 
         Real64 Tstart = 14.44;
         Real64 Tfinish = 57.22;

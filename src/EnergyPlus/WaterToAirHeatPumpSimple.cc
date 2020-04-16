@@ -339,7 +339,7 @@ namespace WaterToAirHeatPumpSimple {
         using namespace OutputReportPredefined;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSimpleWatertoAirHPInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetSimpleWatertoAirHPInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HPNum;               // The Water to Air HP that you are currently loading input into
@@ -855,7 +855,7 @@ namespace WaterToAirHeatPumpSimple {
         // shut off after compressor cycle off  [s]
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitSimpleWatertoAirHP");
+        static constexpr std::string_view RoutineName("InitSimpleWatertoAirHP");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1167,8 +1167,8 @@ namespace WaterToAirHeatPumpSimple {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeWaterToAirCoil");
-        static std::string const RoutineNameAlt("SizeHVACWaterToAir");
+        static constexpr std::string_view RoutineName("SizeWaterToAirCoil");
+        static constexpr std::string_view RoutineNameAlt("SizeHVACWaterToAir");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2152,8 +2152,8 @@ namespace WaterToAirHeatPumpSimple {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Tref(283.15); // Reference Temperature for performance curves,10C [K]
-        static std::string const RoutineName("CalcHPCoolingSimple");
-        static std::string const RoutineNameSourceSideInletTemp("CalcHPCoolingSimple:SourceSideInletTemp");
+        static constexpr std::string_view RoutineName("CalcHPCoolingSimple");
+        static constexpr std::string_view RoutineNameSourceSideInletTemp("CalcHPCoolingSimple:SourceSideInletTemp");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2503,8 +2503,8 @@ namespace WaterToAirHeatPumpSimple {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Tref(283.15); // Reference Temperature for performance curves,10C [K]
-        static std::string const RoutineName("CalcHPHeatingSimple");
-        static std::string const RoutineNameSourceSideInletTemp("CalcHPHeatingSimple:SourceSideInletTemp");
+        static constexpr std::string_view RoutineName("CalcHPHeatingSimple");
+        static constexpr std::string_view RoutineNameSourceSideInletTemp("CalcHPHeatingSimple:SourceSideInletTemp");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

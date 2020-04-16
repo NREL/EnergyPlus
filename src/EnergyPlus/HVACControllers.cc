@@ -563,7 +563,7 @@ namespace HVACControllers {
         using WaterCoils::CheckForSensorAndSetPointNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("HVACControllers: GetControllerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("HVACControllers: GetControllerInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Num; // The Controller that you are currently loading input into
@@ -957,7 +957,7 @@ namespace HVACControllers {
         using SetPointManager::iCtrlVarType_MaxHumRat;
         using SetPointManager::iCtrlVarType_MinHumRat;
 
-        static std::string const RoutineName("InitController");
+        static constexpr std::string_view RoutineName("InitController");
 
         int ActuatedNode;
         int SensedNode;

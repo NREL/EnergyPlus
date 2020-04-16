@@ -267,7 +267,7 @@ namespace FluidProperties {
         int const DefaultNumSteamTemps(111);               // Temperature dimension of default steam data.
         int const DefaultNumSteamSuperheatedTemps(114);    // Temperature dimension of default steam data.
         int const DefaultNumSteamSuperheatedPressure(114); // Temperature dimension of default steam data.
-        static std::string const RoutineName("GetFluidPropertiesData: ");
+        static constexpr std::string_view RoutineName("GetFluidPropertiesData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -4856,7 +4856,7 @@ namespace FluidProperties {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ConcToler(0.0001); // Some reasonable value for comparisons
-        static std::string const RoutineName("InterpDefValuesForGlycolConc: ");
+        static constexpr std::string_view RoutineName("InterpDefValuesForGlycolConc: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HiIndex;       // index on the high side of the concentration
@@ -4960,7 +4960,7 @@ namespace FluidProperties {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ConcToler(0.0001); // Some reasonable value for comparisons
-        static std::string const RoutineName("InterpValuesForGlycolConc: ");
+        static constexpr std::string_view RoutineName("InterpValuesForGlycolConc: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HiIndex;       // index on the high side of the concentration
@@ -5338,7 +5338,7 @@ namespace FluidProperties {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
         Real64 const incr(10.0);
-        static std::string const RoutineName("ReportAndTestGlycols");
+        static constexpr std::string_view RoutineName("ReportAndTestGlycols");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -5836,7 +5836,7 @@ namespace FluidProperties {
         static ObjexxFCL::gio::Fmt fmtA("(A)");
         Real64 const incr(10.0);
         Real64 const Quality(1.0);
-        static std::string const RoutineName("ReportAndTestRefrigerants");
+        static constexpr std::string_view RoutineName("ReportAndTestRefrigerants");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6530,7 +6530,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSatPressureRefrig: ");
+        static constexpr std::string_view RoutineName("GetSatPressureRefrig: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6651,7 +6651,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSatTemperatureRefrig: ");
+        static constexpr std::string_view RoutineName("GetSatTemperatureRefrig: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6773,7 +6773,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSatEnthalpyRefrig");
+        static constexpr std::string_view RoutineName("GetSatEnthalpyRefrig");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6856,7 +6856,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSatDensityRefrig: ");
+        static constexpr std::string_view RoutineName("GetSatDensityRefrig: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -7011,7 +7011,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSatSpecificHeatRefrig: ");
+        static constexpr std::string_view RoutineName("GetSatSpecificHeatRefrig: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -7106,9 +7106,9 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSupHeatEnthalpyRefrig: ");
-        static std::string const RoutineNameNoSpace("GetSupHeatEnthalpyRefrig:");
-        static std::string const RoutineNameNoColon("GetSupHeatEnthalpyRefrig");
+        static constexpr std::string_view RoutineName("GetSupHeatEnthalpyRefrig: ");
+        static constexpr std::string_view RoutineNameNoSpace("GetSupHeatEnthalpyRefrig:");
+        static constexpr std::string_view RoutineNameNoColon("GetSupHeatEnthalpyRefrig");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -7360,8 +7360,8 @@ namespace FluidProperties {
 
         // FUNCTION PARAMETERS:
         // the enthalpy calculated from the pressure found
-        static std::string const RoutineName("GetSupHeatPressureRefrig: ");
-        static std::string const RoutineNameNoSpace("GetSupHeatPressureRefrig:");
+        static constexpr std::string_view RoutineName("GetSupHeatPressureRefrig: ");
+        static constexpr std::string_view RoutineNameNoSpace("GetSupHeatPressureRefrig:");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -7647,8 +7647,8 @@ namespace FluidProperties {
 
         // FUNCTION PARAMETERS:
         // the enthalpy calculated from the pressure found
-        static std::string const RoutineName("GetSupHeatTempRefrig: ");
-        static std::string const RoutineNameNoSpace("GetSupHeatTempRefrig:");
+        static constexpr std::string_view RoutineName("GetSupHeatTempRefrig: ");
+        static constexpr std::string_view RoutineNameNoSpace("GetSupHeatTempRefrig:");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RefrigNum;       // index for refrigerant under consideration
@@ -7780,7 +7780,7 @@ namespace FluidProperties {
         //  na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineNameNoSpace("GetSupHeatTempRefrigResidual");
+        static constexpr std::string_view RoutineNameNoSpace("GetSupHeatTempRefrigResidual");
         std::string Refrigerant; // carries in substance name
         int RefrigNum;           // index for refrigerant under consideration
         Real64 Pressure;         // pressure of the refrigerant
@@ -7846,7 +7846,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETERS:
-        static std::string const RoutineName("GetSupHeatDensityRefrig");
+        static constexpr std::string_view RoutineName("GetSupHeatDensityRefrig");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -8101,7 +8101,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETERS:
-        static std::string const RoutineName("GetSpecificHeatGlycol: ");
+        static constexpr std::string_view RoutineName("GetSpecificHeatGlycol: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -8241,7 +8241,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETERS:
-        static std::string const RoutineName("GetDensityGlycol: ");
+        static constexpr std::string_view RoutineName("GetDensityGlycol: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -8403,7 +8403,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETERS:
-        static std::string const RoutineName("GetConductivityGlycol: ");
+        static constexpr std::string_view RoutineName("GetConductivityGlycol: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -8566,7 +8566,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETERS:
-        static std::string const RoutineName("GetViscosityGlycol: ");
+        static constexpr std::string_view RoutineName("GetViscosityGlycol: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -9465,7 +9465,7 @@ namespace FluidProperties {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetFluidDensityTemperatureLimits: ");
+        static constexpr std::string_view RoutineName("GetFluidDensityTemperatureLimits: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -9512,7 +9512,7 @@ namespace FluidProperties {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetFluidSpecificHeatTemperatureLimits: ");
+        static constexpr std::string_view RoutineName("GetFluidSpecificHeatTemperatureLimits: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

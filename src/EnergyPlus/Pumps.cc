@@ -327,8 +327,8 @@ namespace Pumps {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
-        static std::string const RoutineName("GetPumpInput: ");
-        static std::string const RoutineNameNoColon("GetPumpInput");
+        static constexpr std::string_view RoutineName("GetPumpInput: ");
+        static constexpr std::string_view RoutineNameNoColon("GetPumpInput");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PumpNum;
@@ -1305,7 +1305,7 @@ namespace Pumps {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
         Real64 const ZeroPowerTol(0.0000001);
-        static std::string const RoutineName("PlantPumps::InitializePumps ");
+        static constexpr std::string_view RoutineName("PlantPumps::InitializePumps ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;  // pump inlet node number
@@ -1555,7 +1555,7 @@ namespace Pumps {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PlantPumps:SetupPumpMinMaxFlows: ");
+        static constexpr std::string_view RoutineName("PlantPumps:SetupPumpMinMaxFlows: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;  // pump inlet node number
@@ -1747,7 +1747,7 @@ namespace Pumps {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PlantPumps:CalcPumps: ");
+        static constexpr std::string_view RoutineName("PlantPumps:CalcPumps: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2021,8 +2021,8 @@ namespace Pumps {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
-        static std::string const RoutineName("PlantPumps::InitSimVars ");
-        static std::string const RoutineNameSizePumps("SizePumps");
+        static constexpr std::string_view RoutineName("PlantPumps::InitSimVars ");
+        static constexpr std::string_view RoutineNameSizePumps("SizePumps");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

@@ -7262,7 +7262,7 @@ namespace WindowManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIterations(100);  // Maximum allowed number of iterations
         Real64 const errtemptol(0.02); // Tolerance on errtemp for convergence
-        static std::string const RoutineName("WindowTempsForNominalCond");
+        static constexpr std::string_view RoutineName("WindowTempsForNominalCond");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

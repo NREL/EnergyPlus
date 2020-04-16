@@ -447,7 +447,7 @@ namespace VariableSpeedCoils {
         using WaterManager::SetupTankSupplyComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetVarSpeedCoilInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetVarSpeedCoilInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DXCoilNum;           // The Water to Air HP that you are currently loading input into
@@ -3219,7 +3219,7 @@ namespace VariableSpeedCoils {
         // shut off after compressor cycle off  [s]
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineNameSimpleWatertoAirHP("InitSimpleWatertoAirHP");
+        static constexpr std::string_view RoutineNameSimpleWatertoAirHP("InitSimpleWatertoAirHP");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -3245,7 +3245,7 @@ namespace VariableSpeedCoils {
         Real64 WaterFlowScale;             // water flow scaling factor match rated flow rate
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitVarSpeedCoil");
+        static constexpr std::string_view RoutineName("InitVarSpeedCoil");
 
         if (MyOneTimeFlag) {
             // initialize the environment and sizing flags
@@ -3822,8 +3822,8 @@ namespace VariableSpeedCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeVarSpeedCoil");
-        static std::string const RoutineNameAlt("SizeHVACWaterToAir");
+        static constexpr std::string_view RoutineName("SizeVarSpeedCoil");
+        static constexpr std::string_view RoutineNameAlt("SizeHVACWaterToAir");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -5054,8 +5054,8 @@ namespace VariableSpeedCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcVarSpeedCoilCooling");
-        static std::string const RoutineNameSourceSideInletTemp("CalcVarSpeedCoilCooling:SourceSideInletTemp");
+        static constexpr std::string_view RoutineName("CalcVarSpeedCoilCooling");
+        static constexpr std::string_view RoutineNameSourceSideInletTemp("CalcVarSpeedCoilCooling:SourceSideInletTemp");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -5697,7 +5697,7 @@ namespace VariableSpeedCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcVarSpeedHPWH");
+        static constexpr std::string_view RoutineName("CalcVarSpeedHPWH");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -6262,8 +6262,8 @@ namespace VariableSpeedCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcVarSpeedCoilHeating");
-        static std::string const RoutineNameSourceSideInletTemp("CalcVarSpeedCoilHeating:SourceSideInletTemp");
+        static constexpr std::string_view RoutineName("CalcVarSpeedCoilHeating");
+        static constexpr std::string_view RoutineNameSourceSideInletTemp("CalcVarSpeedCoilHeating:SourceSideInletTemp");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -7499,7 +7499,7 @@ namespace VariableSpeedCoils {
         using CurveManager::CurveValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcTotCapSHR_VSWSHP");
+        static constexpr std::string_view RoutineName("CalcTotCapSHR_VSWSHP");
         static int const MaxIter(30);        // Maximum number of iterations for dry evaporator calculations
         static Real64 const Tolerance(0.01); // Error tolerance for dry evaporator iterations
 
