@@ -432,6 +432,9 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
     std::string pythonStringForUsage()
     {
+        if (DataGlobals::eplusRunningViaAPI) {
+            return "Python Version not accessible during API calls";
+        }
         loadWrapperDLL();
         std::string sVersion = (*EP_Py_GetVersion)();
         return "Linked to Python Version: \"" + sVersion + "\"";
