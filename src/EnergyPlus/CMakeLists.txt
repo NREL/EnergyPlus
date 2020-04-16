@@ -726,8 +726,15 @@ endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )
 endif()
+
+# we will build the intermediate wrapper DLL that hard links to Python DLL here
 if(LINK_WITH_PYTHON)
-  target_link_libraries( energypluslib ${PYTHON_LIBRARIES} )
+  add_library( pythonwrapper SHARED
+    PythonLibWrapper.cc
+    PythonLibWrapper.hh
+  )
+  target_link_libraries( pythonwrapper ${PYTHON_LIBRARIES} )
+  target_link_libraries( energypluslib pythonwrapper)  # this is only temporary, may need to be INTERFACE or PRIVATE
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
