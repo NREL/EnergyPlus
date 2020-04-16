@@ -11,6 +11,7 @@ Enhance Outdoor Air Reporting
  move and rename the required airflow rate based on 62.1 computed each timestep to Voz-dyn and the associated times,
  added Time Above Zero When Unoccupied 
  - January 27, 2020 - changed "Dynamic Zone Outdoor Airflow - Voz-dyn" to "Dynamic Target Ventilation - Voz-dyn"
+ - April 16, 2020 - added Design Document portion
  
 
 ## Justification for New Feature ##
@@ -670,19 +671,17 @@ will appear as shown below.
 <i>Values shown at standard air density.</i>
 <br><br>
 
-
-
 ## Testing/Validation/Data Sources ##
 
-insert text
+Compare current outputs including the sum of timestep results to annual results shown in the new reports.
 
 ## Input Output Reference Documentation ##
 
-insert text
+Add a paragraph for each table describing the contents of the table as part of the section on Output:Table:SummaryReports.
 
 ## Input Description ##
 
-insert text
+No changes to input.
 
 ## Outputs Description ##
 
@@ -695,18 +694,39 @@ New output variables would include:
 
 Additional output varibles will be included that correspond to columns not already defined.
 
+The OutputDetailsAndExamples documentation includes a section on eplustbl.htm containing a 
+description and example of the Outdoor Air Summary which would be updated.
 
 ## Engineering Reference ##
 
-insert text
+No changes to the engineering reference are expected.
 
 ## Example File and Transition Changes ##
 
-insert text
+No changes to example files or transition files are expected.
 
 ## References ##
 
-insert text
+None.
 
+## Design Document ##
 
+To implement the updated outdoor air summary report the following will be done:
+
+- Update OutputReportPredefined::SetPredefinedTables() to remove unused portions of the old report, move the columns
+from the old report to the new report, and add subtables and new columns to support the new version of the report.
+
+- Update OutputReportTabular::FillRemainingPredefinedEntries() to support the new report columns and remove unused columns
+of results from the old report.
+
+- Update SystemReports::ReportMaxVentilationLoads() wqhich calculates the OA mass flow rate for each zone for both zone 
+equipment and air loops. 
+
+- Update DataZoneEquipment::CalcDesignSpecificationOutdoorAir() which is called by SingleDuct.cc::CalcOAMassFlow() 
+to support the new output columns. 
+
+- Update MixedAir::CalcOAController to support the new output columns.
+
+Additional changes may be required to create the data needed for all the columns for the revised outdoor air summary 
+report subtables.
 
