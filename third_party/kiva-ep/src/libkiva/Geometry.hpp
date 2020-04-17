@@ -4,6 +4,11 @@
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 
+// C++ language standard detection
+#if (defined(__cplusplus) && __cplusplus >= 201703L) || (defined(_HAS_CXX17) && _HAS_CXX17 == 1)
+#define BOOST_NO_AUTO_PTR
+#endif
+
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/multi/geometries/multi_point.hpp>

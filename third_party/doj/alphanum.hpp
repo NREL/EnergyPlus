@@ -36,11 +36,20 @@
 
 #include <cassert>
 #include <functional>
+#include <utility>
 #include <string>
 #include <sstream>
 
 #ifdef ALPHANUM_LOCALE
 #include <cctype>
+#endif
+
+// C++ language standard detection
+#if (defined(__cplusplus) && __cplusplus >= 201703L) || (defined(_HAS_CXX17) && _HAS_CXX17 == 1)
+    #define DOJ_HAS_CPP_17
+    #define DOJ_HAS_CPP_14
+#elif (defined(__cplusplus) && __cplusplus >= 201402L) || (defined(_HAS_CXX14) && _HAS_CXX14 == 1)
+    #define DOJ_HAS_CPP_14
 #endif
 
 // TODO: make comparison with hexadecimal numbers. Extend the alphanum_comp() function by traits to choose between decimal and hexadecimal.
@@ -281,7 +290,18 @@ namespace doj {
 
   ////////////////////////////////////////////////////////////////////////////
 
-  /**
+
+#if defined(DOJ_HAS_CPP_14)
+    template <class T = void> struct alphanum_less;
+    // Use transparent comparator if possible, combined with perfect forwarding
+    // on find() and count() calls prevents unnecessary string construction.
+    template <> struct alphanum_less<void> {
+      template <class T, class U> auto operator()(T&& t, U&& u) const
+        -> decltype(alphanum_comp( std::forward<T>(t), std::forward<U>(u) ) < 0)
+           { return alphanum_comp( std::forward<T>(t), std::forward<U>(u) ) < 0; }
+    };
+#else
+    /**
     Functor class to compare two objects with the "Alphanum
     Algorithm". If the objects are no std::string, they must
     implement "std::ostream operator<< (std::ostream&, const Ty&)".
@@ -292,7 +312,11 @@ namespace doj {
         return alphanum_comp( left, right ) < 0;
       }
     };
+#endif
 
 }
+
+#undef DOJ_HAS_CPP_14
+#undef DOJ_HAS_CPP_17
 
 #endif
