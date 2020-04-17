@@ -53,7 +53,12 @@
 int numWarnings = 0;
 int oneTimeHalfway = 0;
 
-void BeginNewEnvironmentHandler() { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void BeginNewEnvironmentHandler() {
+    printf("CALLBACK: %s\n", __PRETTY_FUNCTION__);
+    issueWarning("Fake Warning at new environment");
+    issueSevere("Fake Severe at new environment");
+    issueText("Just some text at the new environment");
+}
 void AfterNewEnvironmentWarmupCompleteHandler() { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
 void BeginZoneTimeStepBeforeInitHeatBalanceHandler() { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
 void BeginZoneTimeStepAfterInitHeatBalanceHandler() { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
@@ -69,6 +74,7 @@ void EndOfZoneSizingHandler() { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
 void EndOfSystemSizingHandler() { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
 void EndOfAfterComponentGetInputHandler() { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
 void UnitarySystemSizingHandler() { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void stdOutHandler(const char * message) { printf("CAPTURED STDOUT: %s\n", message); }
 
 void newEnvrnHandler() {
     printf("Starting a new environment\n");
@@ -115,6 +121,7 @@ int main(int argc, const char * argv[]) {
     oneTimeHalfway = 0;
     cClearAllStates(); // note previous callbacks are cleared here
     callbackAfterNewEnvironmentWarmupComplete(newEnvrnHandler);
+    registerStdOutCallback(stdOutHandler);
     energyplus(argc, argv);
     if (numWarnings > 0) {
         printf("There were %d warnings!\n", numWarnings);

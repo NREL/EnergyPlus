@@ -373,6 +373,24 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterValues)
     Real64 curFacilityElectricity = getMeterValue(hFacilityElectricity);
     EXPECT_NEAR(3.14, curFacilityElectricity, 0.001);
     // TODO: Figure out how to get accrued meter value and test that here
+
+    // now try to get bad meter values for invalid handles
+    // in API mode, the function will throw an exception (for now)
+    DataGlobals::eplusRunningViaAPI = true;
+    EXPECT_THROW(getMeterValue(-1), std::runtime_error);
+    EXPECT_THROW(getMeterValue(5), std::runtime_error);
+
+    // in Plugin mode, there is a flag that should be set to true
+    DataGlobals::eplusRunningViaAPI = false;
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    // first the thing should just pass
+    getMeterValue(-1);
+    // but the flag should be set
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    getMeterValue(5);
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetRealActuatorHandles)
@@ -605,4 +623,32 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestResetActuators)
     PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
     resetActuator(8);
     EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+}
+
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestMiscSimData)
+{
+    // there are a number of Data Exchange functions that return meaningful simulation parameters -- year, hour, etc.
+    // we don't really need to set up the simulation to make sure they are returning the exact right values, but we
+    // can certainly set up a unit test to call into them and make sure nothing goes wrong.  This will essentially be
+    // just stabilizing the API itself.
+
+    // so make calls into these functions, don't worry about testing the individual values, if something throws then this unit test will fail
+    year();
+    month();
+    dayOfMonth();
+    dayOfWeek();
+    dayOfYear();
+    daylightSavingsTimeIndicator();
+    hour();
+    currentTime();
+    minutes();
+    systemTimeStep();
+    holidayIndex();
+    sunIsUp();
+    isRaining();
+    warmupFlag();
+    kindOfSim();
+    currentEnvironmentNum();
+    // getConstructionHandle();
+
 }
