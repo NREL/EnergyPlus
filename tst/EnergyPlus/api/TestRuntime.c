@@ -50,6 +50,10 @@
 #include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/runtime.h>
 
+#ifdef _WIN32
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
 int numWarnings = 0;
 int oneTimeHalfway = 0;
 
