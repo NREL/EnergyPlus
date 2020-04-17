@@ -333,7 +333,7 @@ int getInternalVariableHandle(const char* type, const char* key) {
     handle = 0;
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
-    for (auto const & availVariable : EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable) {
+    for (auto const & availVariable : EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable) { // TODO: this should stop at numEMSInternalVarsAvailable
         handle++;
         std::string const variableTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availVariable.DataTypeName);
         std::string const variableIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availVariable.UniqueIDName);
@@ -345,7 +345,7 @@ int getInternalVariableHandle(const char* type, const char* key) {
 }
 
 Real64 getInternalVariableValue(int handle) {
-    if (handle >= 1 && handle <= (int)EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable.size()) {
+    if (handle >= 1 && handle <= (int)EnergyPlus::DataRuntimeLanguage::numEMSInternalVarsAvailable) {
         auto thisVar = EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable(handle);
         if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrReal) {
             return *thisVar.RealValue;
