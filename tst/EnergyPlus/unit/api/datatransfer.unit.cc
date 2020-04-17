@@ -80,7 +80,6 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
         {
         }
     };
-    std::vector<DummyRealVariable> realVariablePlaceholders;
     struct DummyIntVariable
     {
         std::string varName;
@@ -90,8 +89,6 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
             : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value)
         {}
     };
-    std::vector<DummyIntVariable> intVariablePlaceholders;
-
     struct DummyBaseActuator {
         std::string objType;
         std::string controlType;
@@ -122,11 +119,20 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
             : DummyBaseActuator(_objType, _controlType, _key)
         {}
     };
+    struct DummyInternalVariable {
+        std::string varName;
+        std::string varKey;
+        Real64 value = 0.0;
+        DummyInternalVariable(std::string _varName, std::string _varKey, Real64 _value) : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value)
+        {
+        }
+    };
+    std::vector<DummyRealVariable> realVariablePlaceholders;
+    std::vector<DummyIntVariable> intVariablePlaceholders;
     std::vector<DummyRealActuator> realActuatorPlaceholders;
     std::vector<DummyIntActuator> intActuatorPlaceholders;
     std::vector<DummyBoolActuator> boolActuatorPlaceholders;
-
-    std::vector<Real64> internalVarPlaceholders;
+    std::vector<DummyInternalVariable> internalVarPlaceholders;
 
     void SetUp() override
     {
@@ -205,11 +211,15 @@ public:
         }
     }
 
-    void addInternalVariable(std::string const &varType, std::string const &varKey)
+    void preRequestInternalVariable(std::string const &varType, std::string const &varKey, Real64 const value) {
+        this->internalVarPlaceholders.emplace_back(varType, varKey, value);
+    }
+
+    void setupInternalVariablesOnceAllAreRequested()
     {
-        this->internalVarPlaceholders.emplace_back();
-        SetupEMSInternalVariable(varType, varKey, "kg/s", this->internalVarPlaceholders.back());
-        this->internalVarPlaceholders.clear();
+        for (auto & iv : this->internalVarPlaceholders) {
+            SetupEMSInternalVariable(iv.varName, iv.varKey, "kg/s", iv.value);
+        }
     }
 
     void addPluginGlobal(std::string const &varName)
@@ -246,7 +256,8 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     this->setupVariablesOnceAllAreRequested();
     this->preRequestActuator("Chiller:Electric", "Max Flow Rate", "Chiller 1", ActuatorType::REAL);
     this->setupActuatorsOnceAllAreRequested();
-    this->addInternalVariable("Floor Area", "Zone 1");
+    this->preRequestInternalVariable("Floor Area", "Zone 1", 6.02e23);
+    this->setupInternalVariablesOnceAllAreRequested();
     this->addPluginGlobal("Plugin_Global_Var_Name");
     this->addTrendWithNewGlobal("NewGlobalVarHere", "Trend 1", 3);
     std::string csvData = listAllAPIDataCSV();
@@ -622,6 +633,39 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestResetActuators)
     EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
     PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
     resetActuator(8);
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+}
+
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestAccessingInternalVariables)
+{
+    // we can't really test that the actuator is being recalculated by E+ again, but we can make sure the call works anyway
+    this->preRequestInternalVariable("a", "b", 1.0);
+    this->preRequestInternalVariable("c", "d", 2.0);
+    this->setupInternalVariablesOnceAllAreRequested();
+    int hIntVar1 = getInternalVariableHandle("a", "b");
+    int hIntVar2 = getInternalVariableHandle("c", "d");
+    EXPECT_GT(hIntVar1, -1);
+    EXPECT_GT(hIntVar2, -1);
+    Real64 val1 = getInternalVariableValue(hIntVar1);
+    Real64 val2 = getInternalVariableValue(hIntVar2);
+    EXPECT_DOUBLE_EQ(1.0, val1);
+    EXPECT_DOUBLE_EQ(2.0, val2);
+
+    // now try to get internal variable values for invalid handles
+    // in API mode, the function will throw an exception (for now)
+    DataGlobals::eplusRunningViaAPI = true;
+    EXPECT_THROW(getInternalVariableValue(-1), std::runtime_error);
+    EXPECT_THROW(getInternalVariableValue(3), std::runtime_error);
+
+    // in Plugin mode, there is a flag that should be set to true
+    DataGlobals::eplusRunningViaAPI = false;
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    // first the thing should just pass
+    getInternalVariableValue(-1);
+    // but the flag should be set
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    getInternalVariableValue(3);
     EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
 }
 
