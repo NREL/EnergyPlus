@@ -3831,22 +3831,19 @@ namespace ConvectionCoefficients {
         //     NBSSIR 83-2655, National Bureau of Standards, "Surface Inside Heat Balances", pp 79.
         // 2.  ASHRAE Handbook of Fundamentals 1985, p. 23.2, Table 1.
 
-        // USE STATEMENTS:
-        // na
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
+        //      +----------------------------------------+-----------+-----------------------------------------+-----------------+-------------+
+        //      |               Situation                | DeltaTemp |                 CosTilt                 | Convection Type | Coefficient |
+        //      +----------------------------------------+-----------+-----------------------------------------+-----------------+-------------+
+        //      | Vertical Surface                       | N/A       | -0.3827 to 0.3827 (67.5° to 112.5°)     | Normal          |       3.076 |
+        //      | Horizontal Surface, exterior face up   | Positive  | 0.9238 to 1.0 (0° to 22.5°)             | enhanced        |       4.043 |
+        //      | Horizontal Surface, exterior face down | Positive  | -0.9238 to -1.0 (157.5° to 180°)        | reduced         |       0.948 |
+        //      | Horizontal Surface, exterior face up   | Negative  | 0.9239 to 1.0 (0° to 22.5°)             | reduced         |       0.948 |
+        //      | Horizontal Surface, exterior face down | Negative  | -0.9239 to -1.0 (157.5° to 180°)        | enhanced        |       4.040 |
+        //      | Tilted Surface                         | Positive  | 0.3827 to 0.9239 (22.5° to 67.5°)       | enhanced        |       3.870 |
+        //      | Tilted Surface                         | Negative  | -0.3827 to -0.9239 (157.5° to 157.5°)   | reduced         |       2.281 |
+        //      +----------------------------------------+-----------+-----------------------------------------+-----------------+-------------+
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DeltaTemp = Tamb - Tsurf;
 
         // Set HConvIn using the proper correlation based on DeltaTemp and Cosine of the Tilt of the Surface

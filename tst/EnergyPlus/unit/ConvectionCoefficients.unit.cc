@@ -1316,26 +1316,26 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 
 
-    //Scenario: horizontal surface, reduced convection
+    //Scenario: horizontal surface, enhanced convection
     // 180 degree surface, negative Delta_T
     // Hcov expected = 0.948
 
     Tsurf = 30.0;
     Tamb = 20.0;
     CosTilt = -1; // cos(180 degrees)
-    ExpectedCoefficient = 0.948;
+    ExpectedCoefficient = 4.040;
 
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 
-    //Scenario: horizontal surface, enhanced convection
+    //Scenario: horizontal surface, reduced convection
     // 180 degree surface, positive Delta_T
     // Hcov expected = 4.040
 
     Tsurf = 20.0;
     Tamb = 30.0;
     CosTilt = -1; // cos(180 degrees)
-    ExpectedCoefficient = 4.040;
+    ExpectedCoefficient = 0.948;
 
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
