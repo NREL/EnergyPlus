@@ -3847,29 +3847,21 @@ namespace ConvectionCoefficients {
         Real64 DeltaTemp = Tamb - Tsurf;
 
         // Set HConvIn using the proper correlation based on DeltaTemp and Cosine of the Tilt of the Surface
-        if (std::abs(cosTilt) < 0.3827) {  // Vertical Surface
-            return 3.076;
-        }
-        else if (std::abs(cosTilt) >= 0.9239) { // Horizontal Surface
-            if (DeltaTemp > 0){ // Enhanced Convection
+        if (std::abs(cosTilt) >= 0.9239) {   // Horizontal Surface
+            if (DeltaTemp * cosTilt < 0.0) { // Horizontal, Reduced Convection
+                return 0.948;
+            } else if (DeltaTemp * cosTilt == 0.0) { // Vertical Surface
+                return 3.076;
+            } else /*if (DeltaTemp * cosTilt > 0.0)*/ { // Horizontal, Enhanced Convection
                 return 4.040;
             }
-            else if (DeltaTemp < 0){ // Reduced Convection
-                return 0.948;
-            }
-            else { // Zero DeltaTemp
-                return 3.076;
-            }
-        }
-        else { // tilted surface
-            if (DeltaTemp > 0){ // Enhanced Convection
-                return 3.870;
-            }
-            else if (DeltaTemp < 0){ // Reduced Convection
+        } else {                             // Tilted Surface
+            if (DeltaTemp * cosTilt < 0.0) { // Tilted, Reduced Convection
                 return 2.281;
-            }
-            else { // Zero DeltaTemp
+            } else if (DeltaTemp * cosTilt == 0.0) { // Vertical Surface
                 return 3.076;
+            } else /*if (DeltaTemp * cosTilt > 0.0)*/ { // Tilted, Enhanced Convection
+                return 3.870;
             }
         }
     }
