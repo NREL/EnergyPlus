@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -144,11 +145,11 @@ void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity pe
                           Real64 &Power              // Basin heater power (W)
 );
 
-void TestAirPathIntegrity(bool &ErrFound);
+void TestAirPathIntegrity(OutputFiles &outputFiles, bool &ErrFound);
 
-void TestSupplyAirPathIntegrity(bool &ErrFound);
+void TestSupplyAirPathIntegrity(EnergyPlus::OutputFiles &outputFiles, bool &ErrFound);
 
-void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths);
+void TestReturnAirPathIntegrity(OutputFiles &outputFiles, bool &ErrFound, Array2S_int ValRetAPaths);
 
 void CalcTotalSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
                                    Real64 const TDB2,      // dry-bulb temperature at state 2 {C}

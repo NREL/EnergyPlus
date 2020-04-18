@@ -49,11 +49,24 @@
 #include <EnergyPlus/OutputFiles.hh>
 
 #include "DataStringGlobals.hh"
+#include "UtilityRoutines.hh"
+
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
 namespace EnergyPlus {
+
+OutputFile &OutputFile::ensure_open()
+{
+    if (!good()) {
+        open();
+    }
+    if (!good()) {
+        ShowFatalError("OpenOutputFiles: Could not open file " + fileName + " for output (write).");
+    }
+    return *this;
+}
 
 std::ostream &open_out_stream(int const fileID, const std::string &fileName)
 {
@@ -140,11 +153,6 @@ std::vector<std::string> OutputFile::getLines()
         return lines;
     }
     return std::vector<std::string>();
-}
-
-void OutputFile::open_at_end()
-{
-    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::ate));
 }
 
 OutputFiles::GIOOutputFile::GIOOutputFile(int const FileID, std::string FileName)
