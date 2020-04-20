@@ -9279,9 +9279,7 @@ namespace UnitarySystems {
         //  IF (.NOT. FirstHVACIteration .AND. AirLoopPass .EQ. 1 .AND. AirflowNetworkFanActivated) THEN
         if (!FirstHVACIteration && AirflowNetwork::AirflowNetworkFanActivated) {
             Real64 DeltaMassRate = 0.0;
-            Real64 SensibleOutput = 0.0;  // sensible output rate, {W}
-            Real64 LatentOutput = 0.0;    // latent output rate, {W}
-            Real64 TotalOutput = 0.0;     // total output rate, {W} 
+            Real64 TotalOutput = 0.0;          // total output rate, {W} 
             Real64 SensibleOutputDelta = 0.0;  // delta sensible output rate, {W}
             Real64 LatentOutputDelta = 0.0;    // delta latent output rate, {W}
             Real64 TotalOutputDelta = 0.0;     // delta total output rate, {W} 
@@ -9295,14 +9293,14 @@ namespace UnitarySystems {
                 MassFlowRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate;
                 DeltaMassRate = 0.0;
             }
-            CalcTotalSensibleLatentOutput(MassFlowRate, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, DataLoopNode::Node(ZoneInNode).Temp, DataLoopNode::Node(ZoneInNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
+            CalcTotalSensibleLatentOutput(MassFlowRate, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, DataLoopNode::Node(ZoneInNode).Temp, DataLoopNode::Node(ZoneInNode).HumRat, TotalOutput, this->m_SenLoadLoss, this->m_LatLoadLoss);
             CalcTotalSensibleLatentOutput(DeltaMassRate, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, DataLoopNode::Node(this->NodeNumOfControlledZone).Temp, DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
-            this->m_SenLoadLoss = SensibleOutput - SensibleOutputDelta;
+            this->m_SenLoadLoss = this->m_SenLoadLoss + SensibleOutputDelta;
             if (std::abs(this->m_SensibleLoadMet) > 0.0) {
                 if (std::abs(this->m_SenLoadLoss / this->m_SensibleLoadMet) < 0.001) this->m_SenLoadLoss = 0.0;
             }
             if (this->m_Humidistat) {
-                this->m_LatLoadLoss = LatentOutput - LatentOutputDelta;
+                this->m_LatLoadLoss = this->m_LatLoadLoss + LatentOutputDelta;
                 if (std::abs(this->m_LatentLoadMet) > 0.0) {
                     if (std::abs(this->m_LatLoadLoss / this->m_LatentLoadMet) < 0.001) this->m_LatLoadLoss = 0.0;
                 }

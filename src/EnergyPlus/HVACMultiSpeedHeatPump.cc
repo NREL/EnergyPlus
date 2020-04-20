@@ -2338,16 +2338,15 @@ namespace HVACMultiSpeedHeatPump {
             DeltaMassRate = Node(OutNode).MassFlowRate - Node(ZoneInNode).MassFlowRate / MSHeatPump(MSHeatPumpNum).FlowFraction;
             if (DeltaMassRate < 0.0) DeltaMassRate = 0.0;
             Real64 MassFlowRate( 0.0 );  // parent mass flow rate
-            Real64 SensibleOutput(0.0);  // sensible output rate
             Real64 LatentOutput(0.0);    // latent output rate
             Real64 TotalOutput(0.0);     // total output rate 
             Real64 SensibleOutputDelta(0.0);  // delta sensible output rate
             Real64 LatentOutputDelta(0.0);    // delta latent output rate
             Real64 TotalOutputDelta(0.0);     // delta total output rate 
             MassFlowRate = Node(ZoneInNode).MassFlowRate / MSHeatPump(MSHeatPumpNum).FlowFraction;
-            CalcTotalSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
+            CalcTotalSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, TotalOutput, MSHeatPump(MSHeatPumpNum).LoadLoss, LatentOutput);
             CalcTotalSensibleLatentOutput(DeltaMassRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
-            MSHeatPump(MSHeatPumpNum).LoadLoss = SensibleOutput - SensibleOutputDelta;
+            MSHeatPump(MSHeatPumpNum).LoadLoss = MSHeatPump(MSHeatPumpNum).LoadLoss + SensibleOutputDelta;
             if (std::abs(MSHeatPump(MSHeatPumpNum).LoadLoss) < 1.0e-6) MSHeatPump(MSHeatPumpNum).LoadLoss = 0.0;
         }
 

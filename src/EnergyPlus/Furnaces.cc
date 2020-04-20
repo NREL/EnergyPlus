@@ -5259,20 +5259,18 @@ namespace Furnaces {
                 MassFlowRate = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).MassFlowRate;
                 DeltaMassRate = 0.0;
             }
-            Real64 SensibleOutput(0.0);  // sensible output rate, {W}
-            Real64 LatentOutput(0.0);    // latent output rate, {W}
             Real64 TotalOutput(0.0);     // total output rate, {W} 
             Real64 SensibleOutputDelta(0.0);  // delta sensible output rate, {W}
             Real64 LatentOutputDelta(0.0);    // delta latent output rate, {W}
             Real64 TotalOutputDelta(0.0);     // delta total output rate, {W} 
-            CalcTotalSensibleLatentOutput(MassFlowRate, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
+            CalcTotalSensibleLatentOutput(MassFlowRate, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, TotalOutput, Furnace(FurnaceNum).SenLoadLoss, Furnace(FurnaceNum).LatLoadLoss);
             CalcTotalSensibleLatentOutput(DeltaMassRate, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
-            Furnace(FurnaceNum).SenLoadLoss = SensibleOutput - SensibleOutputDelta;
+            Furnace(FurnaceNum).SenLoadLoss = Furnace(FurnaceNum).SenLoadLoss + SensibleOutputDelta;
             if (std::abs(Furnace(FurnaceNum).SensibleLoadMet) > 0.0) {
                 if (std::abs(Furnace(FurnaceNum).SenLoadLoss / Furnace(FurnaceNum).SensibleLoadMet) < 0.001) Furnace(FurnaceNum).SenLoadLoss = 0.0;
             }
             if (Furnace(FurnaceNum).Humidistat) {
-                Furnace(FurnaceNum).LatLoadLoss = LatentOutput - LatentOutputDelta;
+                Furnace(FurnaceNum).LatLoadLoss = Furnace(FurnaceNum).LatLoadLoss + LatentOutputDelta;
                 if (std::abs(Furnace(FurnaceNum).LatentLoadMet) > 0.0) {
                     if (std::abs(Furnace(FurnaceNum).LatLoadLoss / Furnace(FurnaceNum).LatentLoadMet) < 0.001) Furnace(FurnaceNum).LatLoadLoss = 0.0;
                 }
