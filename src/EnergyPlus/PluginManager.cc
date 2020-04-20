@@ -73,7 +73,7 @@ namespace PluginManagement {
 
     // some flags
     bool fullyReady = false;
-    bool shouldIssueFatalAfterPluginCompletes = false;
+    bool apiErrorFlag = false;
 
     // function pointers into the PythonWrapper DLL
     void *wrapperDLLHandle = nullptr;
@@ -726,7 +726,7 @@ namespace PluginManagement {
         plugins.clear();
         pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
         PluginManagement::fullyReady = false;
-        PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+        PluginManagement::apiErrorFlag = false;
 #endif
     }
 
@@ -1262,7 +1262,7 @@ namespace PluginManagement {
                                        ", make sure it returns an integer exit code, either zero (success) or one (failure)");
         }
         (*EP_Py_DECREF)(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
-        if (EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes) {
+        if (EnergyPlus::PluginManagement::apiErrorFlag) {
             EnergyPlus::ShowFatalError("API problems encountered while running plugin cause program termination.");
         }
     }

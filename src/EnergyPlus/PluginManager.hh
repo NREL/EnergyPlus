@@ -194,7 +194,7 @@ namespace PluginManagement {
 
     // some flags
     extern bool fullyReady;
-    extern bool shouldIssueFatalAfterPluginCompletes;
+    extern bool apiErrorFlag;
 
     // lazy pointers into the Python DLL
     extern void *wrapperDLLHandle;

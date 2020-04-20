@@ -56,9 +56,8 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, TestTrendVariable)
 {
 
-// note this is a bit funny -- the unit test would also need to depend on the python library being brought in, much like e+
+// this file isn't included in the gtest source unless LINK_WITH_PYTHON is ON
 
-#if LINK_WITH_PYTHON == 1
     // create a plugin manager instance
     EnergyPlus::PluginManagement::PluginManager pluginManager;
 
@@ -91,7 +90,6 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_NEAR(fakeValues[1], pluginManager.getTrendVariableValue(trendVarIndex, 1), 0.001);
     EXPECT_NEAR(fakeValues[0], pluginManager.getTrendVariableValue(trendVarIndex, 2), 0.001);
     EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(trendVarIndex, 3));
-#endif
 
 }
 } // namespace EnergyPlus

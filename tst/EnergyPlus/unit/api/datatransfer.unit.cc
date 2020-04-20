@@ -299,9 +299,6 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableHandlesRealTy
     this->preRequestRealVariable("Chiller Heat Transfer", "Chiller 1");
     this->preRequestRealVariable("Zone Mean Temperature", "Zone 1");
     this->setupVariablesOnceAllAreRequested();
-    //if (EnergyPlus::OutputProcessor::RVariableTypes.allocated()) {
-    //    int i = 1;
-    //}
     int hChillerHT = getVariableHandle("Chiller Heat Transfer", "Chiller 1");
     int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
     EXPECT_GT(hChillerHT, -1);
@@ -356,23 +353,13 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableValuesRealTyp
     Real64 curZoneTemp = getVariableValue(hZoneTemp);
     EXPECT_NEAR(3.14, curHeatTransfer, 0.0001);
     EXPECT_NEAR(2.718, curZoneTemp, 0.0001);
-    // invalid handles will respond differently based on whether E+ is in API or Plugin mode
 
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(getVariableValue(-1), std::runtime_error);
-    EXPECT_THROW(getVariableValue(3), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // now test invalid handles
     getVariableValue(-1);
-    // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1,apiErrorFlag());
+    resetErrorFlag();
     getVariableValue(3);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1,apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterHandles)
@@ -400,22 +387,12 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterValues)
     EXPECT_NEAR(3.14, curFacilityElectricity, 0.001);
     // TODO: Figure out how to get accrued meter value and test that here
 
-    // now try to get bad meter values for invalid handles
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(getMeterValue(-1), std::runtime_error);
-    EXPECT_THROW(getMeterValue(5), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // test invalid handles
     getMeterValue(-1);
-    // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
     getMeterValue(5);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1, apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetRealActuatorHandles)
@@ -519,22 +496,12 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetRealActuators)
     EXPECT_DOUBLE_EQ(3.14, val1);
     EXPECT_DOUBLE_EQ(6.28, val2);
 
-    // now try to get and set actuator values for invalid handles
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(getActuatorValue(-1), std::runtime_error);
-    EXPECT_THROW(getActuatorValue(3), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // invalid handles
     getActuatorValue(-1);
-    // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
     getActuatorValue(3);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1, apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetIntActuators)
@@ -558,22 +525,13 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetIntActuators)
     EXPECT_DOUBLE_EQ(3, val1);
     EXPECT_DOUBLE_EQ(-6, val2);
 
-    // now try to get and set actuator values for invalid handles
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(getActuatorValue(-1), std::runtime_error);
-    EXPECT_THROW(getActuatorValue(3), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // invalid handles
     getActuatorValue(-1);
     // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
     getActuatorValue(3);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1, apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetBoolActuators)
@@ -597,22 +555,12 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetBoolActuators)
     EXPECT_DOUBLE_EQ(0, val1);
     EXPECT_DOUBLE_EQ(1, val2);
 
-    // now try to get and set actuator values for invalid handles
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(getActuatorValue(-1), std::runtime_error);
-    EXPECT_THROW(getActuatorValue(3), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // invalid handles
     getActuatorValue(-1);
-    // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
     getActuatorValue(3);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1, apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestResetActuators)
@@ -629,22 +577,12 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestResetActuators)
     resetActuator(hActuator2);
     resetActuator(hActuator3);
 
-    // now try to get and set actuator values for invalid handles
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(resetActuator(-1), std::runtime_error);
-    EXPECT_THROW(resetActuator(8), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // invalid handles
     resetActuator(-1);
-    // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
     resetActuator(8);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1, apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestAccessingInternalVariables)
@@ -662,22 +600,12 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestAccessingInternalVariabl
     EXPECT_DOUBLE_EQ(1.0, val1);
     EXPECT_DOUBLE_EQ(2.0, val2);
 
-    // now try to get internal variable values for invalid handles
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(getInternalVariableValue(-1), std::runtime_error);
-    EXPECT_THROW(getInternalVariableValue(3), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // invalid handles
     getInternalVariableValue(-1);
-    // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
     getInternalVariableValue(3);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1, apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestMiscSimData)
