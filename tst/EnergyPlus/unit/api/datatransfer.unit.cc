@@ -260,7 +260,9 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     ASSERT_TRUE(process_idf(idf_objects, false)); // this had to be here or I was getting a strange segfault during a JSON string dtor
 
     // first off, the function should return, even if there isn't anything meaningful in it (it will have headers)
-    std::string csvDataEmpty = listAllAPIDataCSV();
+    char * charCsvDataEmpty = listAllAPIDataCSV();
+    std::string strCsvDataEmpty = std::string(charCsvDataEmpty);
+    free(charCsvDataEmpty); // free the char*
 
     // then as we add stuff, and make sure it appears in the output
     this->preRequestRealVariable("Boiler Heat Transfer", "Boiler 1");                 // output variable
@@ -272,7 +274,9 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     this->setupInternalVariablesOnceAllAreRequested();
     this->addPluginGlobal("Plugin_Global_Var_Name");
     this->addTrendWithNewGlobal("NewGlobalVarHere", "Trend 1", 3);
-    std::string csvData = listAllAPIDataCSV();
+    char * charCsvDataFull = listAllAPIDataCSV();
+    std::string csvData = std::string(charCsvDataFull);
+    free(charCsvDataFull); // free the char*
     std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
     std::size_t foundAddedMeter = csvData.find("CHILLER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
     std::size_t foundAddedActuator = csvData.find("Chiller:Electric") != std::string::npos;

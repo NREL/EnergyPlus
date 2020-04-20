@@ -68,11 +68,11 @@ extern "C" {
 // ----- GENERIC QUERY FUNCTIONS
 
 /// \brief Gets available API data for the current simulation
-/// \details This function returns a string of API data in CSV form for the current simulation
+/// \details This function returns a char * which points to API data in CSV form for the current simulation
 ///          The data can be easily parsed and then used in subsequent API code.
 /// \remark A future version of this will more intelligently return available data in a structured format in memory.
-/// \return A const char * pointing to a CSV formatted string
-ENERGYPLUSLIB_API const char * listAllAPIDataCSV();
+/// \return A char * pointing to a CSV formatted string.  This allocates a new char *, and calling clients must free this when done with it!
+ENERGYPLUSLIB_API char * listAllAPIDataCSV();
 /// \brief Provides a user-facing check for whether API data is ready to be accessed
 /// \details Many parts of a simulation need to be set up to complete a run.
 ///          At the early stages of a simulation, most data has not been allocated and set up.

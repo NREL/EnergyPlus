@@ -57,7 +57,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
 
-const char * listAllAPIDataCSV() {
+char * listAllAPIDataCSV() {
     std::string output = "**ACTUATORS**\n";
     for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
         if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.ControlTypeName.empty()) {
@@ -106,8 +106,7 @@ const char * listAllAPIDataCSV() {
     }
     // note that we cannot just return a c_str to the local string, as the string will be destructed upon leaving
     // this function, and undefined behavior will occur.
-    // instead make a small copy -- I realize it could cause its own issues, but I would not expect users to be making
-    // many many calls to this.  And if they did, just free the memory and be done.
+    // instead make a deep copy, and the user must manage the new char * pointer
     char *p = new char[std::strlen(output.c_str())];
     std::strcpy(p, output.c_str());
     return p;
