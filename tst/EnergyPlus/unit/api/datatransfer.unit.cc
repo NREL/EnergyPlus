@@ -87,43 +87,51 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
         int value = 0;
         DummyIntVariable(std::string _varName, std::string _varKey, Real64 _value)
             : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value)
-        {}
+        {
+        }
     };
-    struct DummyBaseActuator {
+    struct DummyBaseActuator
+    {
         std::string objType;
         std::string controlType;
         std::string key;
         bool flag = false;
         DummyBaseActuator(std::string _objType, std::string _controlType, std::string _key)
             : objType(std::move(_objType)), controlType(std::move(_controlType)), key(std::move(_key))
-        {}
+        {
+        }
     };
     struct DummyRealActuator : DummyBaseActuator
     {
         Real64 val = 0.0;
-        DummyRealActuator(const std::string& _objType, const std::string& _controlType, const std::string& _key)
+        DummyRealActuator(const std::string &_objType, const std::string &_controlType, const std::string &_key)
             : DummyBaseActuator(_objType, _controlType, _key)
-        {}
+        {
+        }
     };
     struct DummyIntActuator : DummyBaseActuator
     {
         int val = 0;
-        DummyIntActuator(const std::string& _objType, const std::string& _controlType, const std::string& _key)
+        DummyIntActuator(const std::string &_objType, const std::string &_controlType, const std::string &_key)
             : DummyBaseActuator(_objType, _controlType, _key)
-        {}
+        {
+        }
     };
     struct DummyBoolActuator : DummyBaseActuator
     {
         bool val = true;
-        DummyBoolActuator(const std::string& _objType, const std::string& _controlType, const std::string& _key)
+        DummyBoolActuator(const std::string &_objType, const std::string &_controlType, const std::string &_key)
             : DummyBaseActuator(_objType, _controlType, _key)
-        {}
+        {
+        }
     };
-    struct DummyInternalVariable {
+    struct DummyInternalVariable
+    {
         std::string varName;
         std::string varKey;
         Real64 value = 0.0;
-        DummyInternalVariable(std::string _varName, std::string _varKey, Real64 _value) : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value)
+        DummyInternalVariable(std::string _varName, std::string _varKey, Real64 _value)
+            : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value)
         {
         }
     };
@@ -180,11 +188,13 @@ public:
         }
     }
 
-    enum class ActuatorType {REAL, INTEGER, BOOL};
-    void preRequestActuator(std::string const &objType,
-                            std::string const &controlType,
-                            std::string const &objKey,
-                            ActuatorType t)
+    enum class ActuatorType
+    {
+        REAL,
+        INTEGER,
+        BOOL
+    };
+    void preRequestActuator(std::string const &objType, std::string const &controlType, std::string const &objKey, ActuatorType t)
     {
         switch (t) {
         case ActuatorType::REAL:
@@ -199,25 +209,27 @@ public:
         }
     }
 
-    void setupActuatorsOnceAllAreRequested() {
-        for (auto & act : this->realActuatorPlaceholders) {
+    void setupActuatorsOnceAllAreRequested()
+    {
+        for (auto &act : this->realActuatorPlaceholders) {
             SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
-        for (auto & act : this->intActuatorPlaceholders) {
+        for (auto &act : this->intActuatorPlaceholders) {
             SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
-        for (auto & act : this->boolActuatorPlaceholders) {
+        for (auto &act : this->boolActuatorPlaceholders) {
             SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
     }
 
-    void preRequestInternalVariable(std::string const &varType, std::string const &varKey, Real64 const value) {
+    void preRequestInternalVariable(std::string const &varType, std::string const &varKey, Real64 const value)
+    {
         this->internalVarPlaceholders.emplace_back(varType, varKey, value);
     }
 
     void setupInternalVariablesOnceAllAreRequested()
     {
-        for (auto & iv : this->internalVarPlaceholders) {
+        for (auto &iv : this->internalVarPlaceholders) {
             SetupEMSInternalVariable(iv.varName, iv.varKey, "kg/s", iv.value);
         }
     }
@@ -251,8 +263,8 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     std::string csvDataEmpty = listAllAPIDataCSV();
 
     // then as we add stuff, and make sure it appears in the output
-    this->preRequestRealVariable("Boiler Heat Transfer", "Boiler 1");  // output variable
-    this->preRequestRealVariable("Chiller Electric Energy", "Chiller 1", 3.14, true);  // meter
+    this->preRequestRealVariable("Boiler Heat Transfer", "Boiler 1");                 // output variable
+    this->preRequestRealVariable("Chiller Electric Energy", "Chiller 1", 3.14, true); // meter
     this->setupVariablesOnceAllAreRequested();
     this->preRequestActuator("Chiller:Electric", "Max Flow Rate", "Chiller 1", ActuatorType::REAL);
     this->setupActuatorsOnceAllAreRequested();
@@ -287,6 +299,9 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableHandlesRealTy
     this->preRequestRealVariable("Chiller Heat Transfer", "Chiller 1");
     this->preRequestRealVariable("Zone Mean Temperature", "Zone 1");
     this->setupVariablesOnceAllAreRequested();
+    //if (EnergyPlus::OutputProcessor::RVariableTypes.allocated()) {
+    //    int i = 1;
+    //}
     int hChillerHT = getVariableHandle("Chiller Heat Transfer", "Chiller 1");
     int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
     EXPECT_GT(hChillerHT, -1);
@@ -401,7 +416,6 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterValues)
     PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
     getMeterValue(5);
     EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetRealActuatorHandles)
@@ -471,18 +485,15 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetBadActuatorHandles)
     EXPECT_GT(hActuator, -1);
     // now try to get handles to invalid actuators
     {
-        int hActuatorBad =
-            getActuatorHandle("Chiller:Electric", "Max Flow Rate", "InvalidInstance");
+        int hActuatorBad = getActuatorHandle("Chiller:Electric", "Max Flow Rate", "InvalidInstance");
         EXPECT_EQ(hActuatorBad, -1);
     }
     {
-        int hActuatorBad =
-            getActuatorHandle("Chiller:Electric", "InvalidVar", "Chiller 1");
+        int hActuatorBad = getActuatorHandle("Chiller:Electric", "InvalidVar", "Chiller 1");
         EXPECT_EQ(hActuatorBad, -1);
     }
     {
-        int hActuatorBad =
-            getActuatorHandle("InvalidType", "Max Flow Rate", "Chiller 1");
+        int hActuatorBad = getActuatorHandle("InvalidType", "Max Flow Rate", "Chiller 1");
         EXPECT_EQ(hActuatorBad, -1);
     }
 }
@@ -540,7 +551,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetIntActuators)
     EXPECT_GT(hActuator2, -1);
     // now let's set the values of the actuators
     setActuatorValue(hActuator1, 3);
-    setActuatorValue(hActuator2, -6.1);  // should get rounded
+    setActuatorValue(hActuator2, -6.1); // should get rounded
     // now make sure we don't get them mixed up
     Real64 val1 = getActuatorValue(hActuator1);
     Real64 val2 = getActuatorValue(hActuator2);
@@ -578,8 +589,8 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetBoolActuators)
     EXPECT_GT(hActuator1, -1);
     EXPECT_GT(hActuator2, -1);
     // now let's set the values of the actuators
-    setActuatorValue(hActuator1, 0);  // false
-    setActuatorValue(hActuator2, 1);  // true
+    setActuatorValue(hActuator1, 0); // false
+    setActuatorValue(hActuator2, 1); // true
     // now make sure we don't get them mixed up
     Real64 val1 = getActuatorValue(hActuator1);
     Real64 val2 = getActuatorValue(hActuator2);
@@ -694,5 +705,4 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestMiscSimData)
     kindOfSim();
     currentEnvironmentNum();
     // getConstructionHandle();
-
 }
