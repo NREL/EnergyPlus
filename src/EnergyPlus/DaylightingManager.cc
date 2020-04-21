@@ -5147,7 +5147,9 @@ namespace DaylightingManager {
 
         // Smallest deviation from unity for the sum of all fractions
         // Accept approx 4 to 8 ULP error (technically abs(1.0 + sumFracs) should be close to 2)
-        Real64 const FractionTolerance(4 * std::numeric_limits<Real64>::epsilon());
+        //   constexpr Real64 FractionTolerance(4 * std::numeric_limits<Real64>::epsilon());
+        // Instead, we use a 0.001 = 0.1% tolerance
+        constexpr Real64 FractionTolerance(0.001);
 
         cCurrentModuleObject = "Daylighting:Controls";
         for (int iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl) {
@@ -5330,11 +5332,11 @@ namespace DaylightingManager {
             if ( (1.0 - sumFracs) > FractionTolerance) {
                 ShowWarningError("GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is < 1.0.");
                 ShowContinueError("..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", only " +
-                        RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 2) + " of the zone is controlled.");
+                        RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 3) + " of the zone is controlled.");
             } else if ((sumFracs - 1.0) > FractionTolerance) {
                 ShowSevereError("GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.");
                 ShowContinueError("..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", trying to control " +
-                        RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 2) + " of the zone.");
+                        RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 3) + " of the zone.");
                 ErrorsFound = true;
             }
 
