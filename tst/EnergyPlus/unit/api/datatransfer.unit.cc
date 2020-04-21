@@ -67,9 +67,6 @@ using namespace EnergyPlus;
 class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
 {
     // create a plugin manager instance
-    // TODO: Note that this requires the Python package to be built next to the E+ unit test binary
-    //       Right now, this is built inside the E+ src/EnergyPlus/CMakeLists.txt file, it should probably be a separate project
-    //       so that both E+ and the unit test binary can depend on it.
     EnergyPlus::PluginManagement::PluginManager pluginManager;
 
     struct DummyRealVariable
@@ -83,7 +80,6 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
         {
         }
     };
-    std::vector<DummyRealVariable> realVariablePlaceholders;
     struct DummyIntVariable
     {
         std::string varName;
@@ -91,45 +87,60 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
         int value = 0;
         DummyIntVariable(std::string _varName, std::string _varKey, Real64 _value)
             : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value)
-        {}
+        {
+        }
     };
-    std::vector<DummyIntVariable> intVariablePlaceholders;
-
-    struct DummyBaseActuator {
+    struct DummyBaseActuator
+    {
         std::string objType;
         std::string controlType;
         std::string key;
         bool flag = false;
         DummyBaseActuator(std::string _objType, std::string _controlType, std::string _key)
             : objType(std::move(_objType)), controlType(std::move(_controlType)), key(std::move(_key))
-        {}
+        {
+        }
     };
     struct DummyRealActuator : DummyBaseActuator
     {
         Real64 val = 0.0;
-        DummyRealActuator(const std::string& _objType, const std::string& _controlType, const std::string& _key)
+        DummyRealActuator(const std::string &_objType, const std::string &_controlType, const std::string &_key)
             : DummyBaseActuator(_objType, _controlType, _key)
-        {}
+        {
+        }
     };
     struct DummyIntActuator : DummyBaseActuator
     {
         int val = 0;
-        DummyIntActuator(const std::string& _objType, const std::string& _controlType, const std::string& _key)
+        DummyIntActuator(const std::string &_objType, const std::string &_controlType, const std::string &_key)
             : DummyBaseActuator(_objType, _controlType, _key)
-        {}
+        {
+        }
     };
     struct DummyBoolActuator : DummyBaseActuator
     {
         bool val = true;
-        DummyBoolActuator(const std::string& _objType, const std::string& _controlType, const std::string& _key)
+        DummyBoolActuator(const std::string &_objType, const std::string &_controlType, const std::string &_key)
             : DummyBaseActuator(_objType, _controlType, _key)
-        {}
+        {
+        }
     };
+    struct DummyInternalVariable
+    {
+        std::string varName;
+        std::string varKey;
+        Real64 value = 0.0;
+        DummyInternalVariable(std::string _varName, std::string _varKey, Real64 _value)
+            : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value)
+        {
+        }
+    };
+    std::vector<DummyRealVariable> realVariablePlaceholders;
+    std::vector<DummyIntVariable> intVariablePlaceholders;
     std::vector<DummyRealActuator> realActuatorPlaceholders;
     std::vector<DummyIntActuator> intActuatorPlaceholders;
     std::vector<DummyBoolActuator> boolActuatorPlaceholders;
-
-    std::vector<Real64> internalVarPlaceholders;
+    std::vector<DummyInternalVariable> internalVarPlaceholders;
 
     void SetUp() override
     {
@@ -177,11 +188,13 @@ public:
         }
     }
 
-    enum class ActuatorType {REAL, INTEGER, BOOL};
-    void preRequestActuator(std::string const &objType,
-                            std::string const &controlType,
-                            std::string const &objKey,
-                            ActuatorType t)
+    enum class ActuatorType
+    {
+        REAL,
+        INTEGER,
+        BOOL
+    };
+    void preRequestActuator(std::string const &objType, std::string const &controlType, std::string const &objKey, ActuatorType t)
     {
         switch (t) {
         case ActuatorType::REAL:
@@ -196,23 +209,29 @@ public:
         }
     }
 
-    void setupActuatorsOnceAllAreRequested() {
-        for (auto & act : this->realActuatorPlaceholders) {
+    void setupActuatorsOnceAllAreRequested()
+    {
+        for (auto &act : this->realActuatorPlaceholders) {
             SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
-        for (auto & act : this->intActuatorPlaceholders) {
+        for (auto &act : this->intActuatorPlaceholders) {
             SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
-        for (auto & act : this->boolActuatorPlaceholders) {
+        for (auto &act : this->boolActuatorPlaceholders) {
             SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
     }
 
-    void addInternalVariable(std::string const &varType, std::string const &varKey)
+    void preRequestInternalVariable(std::string const &varType, std::string const &varKey, Real64 const value)
     {
-        this->internalVarPlaceholders.emplace_back();
-        SetupEMSInternalVariable(varType, varKey, "kg/s", this->internalVarPlaceholders.back());
-        this->internalVarPlaceholders.clear();
+        this->internalVarPlaceholders.emplace_back(varType, varKey, value);
+    }
+
+    void setupInternalVariablesOnceAllAreRequested()
+    {
+        for (auto &iv : this->internalVarPlaceholders) {
+            SetupEMSInternalVariable(iv.varName, iv.varKey, "kg/s", iv.value);
+        }
     }
 
     void addPluginGlobal(std::string const &varName)
@@ -241,24 +260,32 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     ASSERT_TRUE(process_idf(idf_objects, false)); // this had to be here or I was getting a strange segfault during a JSON string dtor
 
     // first off, the function should return, even if there isn't anything meaningful in it (it will have headers)
-    std::string csvDataEmpty = listAllAPIDataCSV();
+    char * charCsvDataEmpty = listAllAPIDataCSV();
+    std::string strCsvDataEmpty = std::string(charCsvDataEmpty);
+    free(charCsvDataEmpty); // free the char*
 
     // then as we add stuff, and make sure it appears in the output
-    this->preRequestRealVariable("Boiler Heat Transfer", "Boiler 1");
+    this->preRequestRealVariable("Boiler Heat Transfer", "Boiler 1");                 // output variable
+    this->preRequestRealVariable("Chiller Electric Energy", "Chiller 1", 3.14, true); // meter
     this->setupVariablesOnceAllAreRequested();
     this->preRequestActuator("Chiller:Electric", "Max Flow Rate", "Chiller 1", ActuatorType::REAL);
     this->setupActuatorsOnceAllAreRequested();
-    this->addInternalVariable("Floor Area", "Zone 1");
+    this->preRequestInternalVariable("Floor Area", "Zone 1", 6.02e23);
+    this->setupInternalVariablesOnceAllAreRequested();
     this->addPluginGlobal("Plugin_Global_Var_Name");
     this->addTrendWithNewGlobal("NewGlobalVarHere", "Trend 1", 3);
-    std::string csvData = listAllAPIDataCSV();
+    char * charCsvDataFull = listAllAPIDataCSV();
+    std::string csvData = std::string(charCsvDataFull);
+    free(charCsvDataFull); // free the char*
     std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
+    std::size_t foundAddedMeter = csvData.find("CHILLER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
     std::size_t foundAddedActuator = csvData.find("Chiller:Electric") != std::string::npos;
     std::size_t foundAddedIV = csvData.find("Zone 1") != std::string::npos;
     std::size_t foundAddedGlobal =
         csvData.find("PLUGIN_GLOBAL_VAR_NAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
     std::size_t foundAddedTrend = csvData.find("Trend 1") != std::string::npos;
     EXPECT_TRUE(foundAddedBoiler);
+    EXPECT_TRUE(foundAddedMeter);
     EXPECT_TRUE(foundAddedActuator);
     EXPECT_TRUE(foundAddedIV);
     EXPECT_TRUE(foundAddedGlobal);
@@ -330,23 +357,13 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableValuesRealTyp
     Real64 curZoneTemp = getVariableValue(hZoneTemp);
     EXPECT_NEAR(3.14, curHeatTransfer, 0.0001);
     EXPECT_NEAR(2.718, curZoneTemp, 0.0001);
-    // invalid handles will respond differently based on whether E+ is in API or Plugin mode
 
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(getVariableValue(-1), std::runtime_error);
-    EXPECT_THROW(getVariableValue(3), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // now test invalid handles
     getVariableValue(-1);
-    // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1,apiErrorFlag());
+    resetErrorFlag();
     getVariableValue(3);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1,apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterHandles)
@@ -373,6 +390,13 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterValues)
     Real64 curFacilityElectricity = getMeterValue(hFacilityElectricity);
     EXPECT_NEAR(3.14, curFacilityElectricity, 0.001);
     // TODO: Figure out how to get accrued meter value and test that here
+
+    // test invalid handles
+    getMeterValue(-1);
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
+    getMeterValue(5);
+    EXPECT_EQ(1, apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetRealActuatorHandles)
@@ -442,18 +466,15 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetBadActuatorHandles)
     EXPECT_GT(hActuator, -1);
     // now try to get handles to invalid actuators
     {
-        int hActuatorBad =
-            getActuatorHandle("Chiller:Electric", "Max Flow Rate", "InvalidInstance");
+        int hActuatorBad = getActuatorHandle("Chiller:Electric", "Max Flow Rate", "InvalidInstance");
         EXPECT_EQ(hActuatorBad, -1);
     }
     {
-        int hActuatorBad =
-            getActuatorHandle("Chiller:Electric", "InvalidVar", "Chiller 1");
+        int hActuatorBad = getActuatorHandle("Chiller:Electric", "InvalidVar", "Chiller 1");
         EXPECT_EQ(hActuatorBad, -1);
     }
     {
-        int hActuatorBad =
-            getActuatorHandle("InvalidType", "Max Flow Rate", "Chiller 1");
+        int hActuatorBad = getActuatorHandle("InvalidType", "Max Flow Rate", "Chiller 1");
         EXPECT_EQ(hActuatorBad, -1);
     }
 }
@@ -479,22 +500,12 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetRealActuators)
     EXPECT_DOUBLE_EQ(3.14, val1);
     EXPECT_DOUBLE_EQ(6.28, val2);
 
-    // now try to get and set actuator values for invalid handles
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(getActuatorValue(-1), std::runtime_error);
-    EXPECT_THROW(getActuatorValue(3), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // invalid handles
     getActuatorValue(-1);
-    // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
     getActuatorValue(3);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1, apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetIntActuators)
@@ -511,29 +522,20 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetIntActuators)
     EXPECT_GT(hActuator2, -1);
     // now let's set the values of the actuators
     setActuatorValue(hActuator1, 3);
-    setActuatorValue(hActuator2, -6.1);  // should get rounded
+    setActuatorValue(hActuator2, -6.1); // should get rounded
     // now make sure we don't get them mixed up
     Real64 val1 = getActuatorValue(hActuator1);
     Real64 val2 = getActuatorValue(hActuator2);
     EXPECT_DOUBLE_EQ(3, val1);
     EXPECT_DOUBLE_EQ(-6, val2);
 
-    // now try to get and set actuator values for invalid handles
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(getActuatorValue(-1), std::runtime_error);
-    EXPECT_THROW(getActuatorValue(3), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // invalid handles
     getActuatorValue(-1);
     // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
     getActuatorValue(3);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1, apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetBoolActuators)
@@ -549,30 +551,20 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetBoolActuators)
     EXPECT_GT(hActuator1, -1);
     EXPECT_GT(hActuator2, -1);
     // now let's set the values of the actuators
-    setActuatorValue(hActuator1, 0);  // false
-    setActuatorValue(hActuator2, 1);  // true
+    setActuatorValue(hActuator1, 0); // false
+    setActuatorValue(hActuator2, 1); // true
     // now make sure we don't get them mixed up
     Real64 val1 = getActuatorValue(hActuator1);
     Real64 val2 = getActuatorValue(hActuator2);
     EXPECT_DOUBLE_EQ(0, val1);
     EXPECT_DOUBLE_EQ(1, val2);
 
-    // now try to get and set actuator values for invalid handles
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(getActuatorValue(-1), std::runtime_error);
-    EXPECT_THROW(getActuatorValue(3), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // invalid handles
     getActuatorValue(-1);
-    // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
     getActuatorValue(3);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1, apiErrorFlag());
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestResetActuators)
@@ -589,20 +581,60 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestResetActuators)
     resetActuator(hActuator2);
     resetActuator(hActuator3);
 
-    // now try to get and set actuator values for invalid handles
-    // in API mode, the function will throw an exception (for now)
-    DataGlobals::eplusRunningViaAPI = true;
-    EXPECT_THROW(resetActuator(-1), std::runtime_error);
-    EXPECT_THROW(resetActuator(8), std::runtime_error);
-
-    // in Plugin mode, there is a flag that should be set to true
-    DataGlobals::eplusRunningViaAPI = false;
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-    // first the thing should just pass
+    // invalid handles
     resetActuator(-1);
-    // but the flag should be set
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
     resetActuator(8);
-    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    EXPECT_EQ(1, apiErrorFlag());
+}
+
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestAccessingInternalVariables)
+{
+    // we can't really test that the actuator is being recalculated by E+ again, but we can make sure the call works anyway
+    this->preRequestInternalVariable("a", "b", 1.0);
+    this->preRequestInternalVariable("c", "d", 2.0);
+    this->setupInternalVariablesOnceAllAreRequested();
+    int hIntVar1 = getInternalVariableHandle("a", "b");
+    int hIntVar2 = getInternalVariableHandle("c", "d");
+    EXPECT_GT(hIntVar1, -1);
+    EXPECT_GT(hIntVar2, -1);
+    Real64 val1 = getInternalVariableValue(hIntVar1);
+    Real64 val2 = getInternalVariableValue(hIntVar2);
+    EXPECT_DOUBLE_EQ(1.0, val1);
+    EXPECT_DOUBLE_EQ(2.0, val2);
+
+    // invalid handles
+    getInternalVariableValue(-1);
+    EXPECT_EQ(1, apiErrorFlag());
+    resetErrorFlag();
+    getInternalVariableValue(3);
+    EXPECT_EQ(1, apiErrorFlag());
+}
+
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestMiscSimData)
+{
+    // there are a number of Data Exchange functions that return meaningful simulation parameters -- year, hour, etc.
+    // we don't really need to set up the simulation to make sure they are returning the exact right values, but we
+    // can certainly set up a unit test to call into them and make sure nothing goes wrong.  This will essentially be
+    // just stabilizing the API itself.
+
+    // so make calls into these functions, don't worry about testing the individual values, if something throws then this unit test will fail
+    year();
+    month();
+    dayOfMonth();
+    dayOfWeek();
+    dayOfYear();
+    daylightSavingsTimeIndicator();
+    hour();
+    currentTime();
+    minutes();
+    systemTimeStep();
+    holidayIndex();
+    sunIsUp();
+    isRaining();
+    warmupFlag();
+    kindOfSim();
+    currentEnvironmentNum();
+    // getConstructionHandle();
 }

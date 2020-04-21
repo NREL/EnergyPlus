@@ -21,6 +21,11 @@ include(cmake/Version.cmake)
 
 set( OPENGL_REQUIRED ON CACHE BOOL "Require OpenGL in order to build" )
 if(OPENGL_REQUIRED)
+  # On Linux specifically, OpenGL is complaining about being able to find OpenGL using both the
+  # exported module target or the library variables.  If it has to choose, and doesn't have a user-preference,
+  # a warning is shown on every configure step.  This next line just sets the preference so the warning won't show up.
+  # See this for more info: https://cmake.org/cmake/help/v3.10/module/FindOpenGL.html#linux-specific
+  set(OpenGL_GL_PREFERENCE GLVND)
   find_package(OpenGL)
   if(NOT OPENGL_FOUND)
     set(CMAKE_VERSION_BUILD "${CMAKE_VERSION_BUILD} (No OpenGL)" CACHE STRING "Build number" FORCE) # git sha
@@ -286,3 +291,17 @@ mark_as_advanced(FMT_INSTALL)
 mark_as_advanced(FMT_PEDANTIC)
 mark_as_advanced(FMT_TEST)
 mark_as_advanced(FMT_WERROR)
+mark_as_advanced(GLFW_BUILD_DOCS)
+mark_as_advanced(GLFW_BUILD_EXAMPLES)
+mark_as_advanced(GLFW_BUILD_TESTS)
+mark_as_advanced(GLFW_INSTALL)
+mark_as_advanced(GLFW_USE_OSMESA)
+mark_as_advanced(GLFW_USE_WAYLAND)
+mark_as_advanced(GLFW_VULKAN_STATIC)
+mark_as_advanced(BUILD_PENUMBRA_TESTING)
+mark_as_advanced(PENUMBRA_COVERAGE)
+mark_as_advanced(PENUMBRA_STATIC_LIB)
+mark_as_advanced(BUILD_GMOCK)
+mark_as_advanced(BUILD_GTEST)
+mark_as_advanced(gmock_build_tests)
+mark_as_advanced(BUILD_WCE_TESTING)
