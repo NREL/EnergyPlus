@@ -417,12 +417,8 @@ namespace HVACControllers {
                 if (HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride) {
                     HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride = false;
                     // Put the controller tolerance (offset) back to it's original value
-                    RootFinder::SetupRootFinder(RootFinders(ControlNum),
-                        iSlopeDecreasing,
-                        iMethodBrent,
-                        constant_zero,
-                        1.0e-6,
-                        ControllerProps(ControlNum).Offset);
+                    RootFinder::SetupRootFinder(
+                        RootFinders(ControlNum), iSlopeDecreasing, iMethodBrent, constant_zero, 1.0e-6, ControllerProps(ControlNum).Offset);
                 }
 
                 // If a iControllerOpColdStart call, reset the actuator inlet flows
@@ -457,7 +453,6 @@ namespace HVACControllers {
                 UpdateController(ControlNum);
 
                 CheckTempAndHumRatCtrl(ControlNum, IsConvergedFlag);
-
 
             } else if (SELECT_CASE_var == iControllerOpEnd) {
                 // With the correct ControlNum Initialize all Controller related parameters
@@ -925,8 +920,7 @@ namespace HVACControllers {
         RootFinders(ControlNum).UpperPoint.DefinedFlag = false;
     }
 
-    void InitController(int const ControlNum,
-                        bool &IsConvergedFlag)
+    void InitController(int const ControlNum, bool &IsConvergedFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1154,10 +1148,12 @@ namespace HVACControllers {
 
             // Check to make sure that the Minimum Flow rate is less than the max.
             if (ControllerProps(ControlNum).MaxVolFlowActuated == 0.0) {
+                ShowWarningError(RoutineName + ": Controller:WaterCoil=\"" + ControllerProps(ControlNum).ControllerName +
+                                 "\", Maximum Actuated Flow is zero.");
                 ControllerProps(ControlNum).MinVolFlowActuated = 0.0;
             } else if (ControllerProps(ControlNum).MinVolFlowActuated >= ControllerProps(ControlNum).MaxVolFlowActuated) {
-                ShowFatalError("Controller:WaterCoil, Minimum control flow is > or = Maximum control flow; " +
-                               ControllerProps(ControlNum).ControllerName);
+                ShowFatalError(RoutineName + ": Controller:WaterCoil=\"" + ControllerProps(ControlNum).ControllerName +
+                               "\", Minimum control flow is > or = Maximum control flow.");
             }
 
             // Setup root finder after sizing calculation
@@ -2675,15 +2671,15 @@ namespace HVACControllers {
                 ObjexxFCL::gio::write(FileUnit, fmtAA) << ControllerModeTypes(iModeNum) << ',';
 
                 // Number of times this controller operated in this mode
-                ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumCalls" << ','
-                                             << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum));
+                ObjexxFCL::gio::write(FileUnit, fmtAAA)
+                    << "NumCalls" << ',' << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum));
 
                 // Aggregated number of iterations needed by this controller
-                ObjexxFCL::gio::write(FileUnit, fmtAAA) << "TotIterations" << ','
-                                             << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).TotIterations(iModeNum));
+                ObjexxFCL::gio::write(FileUnit, fmtAAA)
+                    << "TotIterations" << ',' << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).TotIterations(iModeNum));
                 // Aggregated number of iterations needed by this controller
-                ObjexxFCL::gio::write(FileUnit, fmtAAA) << "MaxIterations" << ','
-                                             << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).MaxIterations(iModeNum));
+                ObjexxFCL::gio::write(FileUnit, fmtAAA)
+                    << "MaxIterations" << ',' << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).MaxIterations(iModeNum));
 
                 // Average number of iterations needed by controllers to simulate the specified air loop
                 if (ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum) == 0) {
@@ -2764,8 +2760,8 @@ namespace HVACControllers {
         ObjexxFCL::gio::write(TraceFileUnit, fmtAAAA) << "Num" << ',' << "Name" << ',';
 
         for (ControllerNum = 1; ControllerNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++ControllerNum) {
-            ObjexxFCL::gio::write(TraceFileUnit, fmtAAAA) << TrimSigDigits(ControllerNum) << ',' << PrimaryAirSystem(AirLoopNum).ControllerName(ControllerNum)
-                                               << ',';
+            ObjexxFCL::gio::write(TraceFileUnit, fmtAAAA)
+                << TrimSigDigits(ControllerNum) << ',' << PrimaryAirSystem(AirLoopNum).ControllerName(ControllerNum) << ',';
             // SAME AS ControllerProps(ControllerIndex)%ControllerName BUT NOT YET AVAILABLE
         }
 
@@ -3055,24 +3051,24 @@ namespace HVACControllers {
             IOFlags flags;
             flags.ADVANCE("No");
             ObjexxFCL::gio::write(TraceFileUnit, "(19(A,A))", flags) << "EnvironmentNum"
-                                                          << "WarmupFlag"
-                                                          << "SysTimeStamp"
-                                                          << "SysTimeInterval"
-                                                          << "AirLoopPass"
-                                                          << "FirstHVACIteration"
-                                                          << "Operation"
-                                                          << "NumCalcCalls"
-                                                          << "SensedNode%MassFlowRate"
-                                                          << "ActuatedNode%MassFlowRateMinAvail"
-                                                          << "ActuatedNode%MassFlowRateMaxAvail"
-                                                          << "X"
-                                                          << "Y"
-                                                          << "Setpoint"
-                                                          << "DeltaSensed"
-                                                          << "Offset"
-                                                          << "Mode"
-                                                          << "IsConvergedFlag"
-                                                          << "NextActuatedValue";
+                                                                     << "WarmupFlag"
+                                                                     << "SysTimeStamp"
+                                                                     << "SysTimeInterval"
+                                                                     << "AirLoopPass"
+                                                                     << "FirstHVACIteration"
+                                                                     << "Operation"
+                                                                     << "NumCalcCalls"
+                                                                     << "SensedNode%MassFlowRate"
+                                                                     << "ActuatedNode%MassFlowRateMinAvail"
+                                                                     << "ActuatedNode%MassFlowRateMaxAvail"
+                                                                     << "X"
+                                                                     << "Y"
+                                                                     << "Setpoint"
+                                                                     << "DeltaSensed"
+                                                                     << "Offset"
+                                                                     << "Mode"
+                                                                     << "IsConvergedFlag"
+                                                                     << "NextActuatedValue";
         }
 
         WriteRootFinderTraceHeader(TraceFileUnit);

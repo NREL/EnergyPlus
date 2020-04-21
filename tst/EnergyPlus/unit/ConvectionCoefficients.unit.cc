@@ -434,11 +434,11 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(outputFiles(), errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -448,7 +448,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(outputFiles(), errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();

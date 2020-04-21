@@ -97,9 +97,9 @@ namespace SimulationManager {
 
     void SetupSimulation(OutputFiles &outputFiles, bool &ErrorsFound);
 
-    void ReportNodeConnections();
+    void ReportNodeConnections(OutputFiles &outputFiles);
 
-    void ReportLoopConnections();
+    void ReportLoopConnections(OutputFiles &outputFiles);
 
     void ReportParentChildren();
 

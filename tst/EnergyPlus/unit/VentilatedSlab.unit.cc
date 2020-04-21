@@ -2295,10 +2295,10 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedule data
+    ProcessScheduleInput(outputFiles());  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -2306,7 +2306,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read construction material data
+    GetMaterialData(outputFiles(), ErrorsFound); // read construction material data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -2314,7 +2314,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound); // read zone geometry data
+    SetupZoneGeometry(outputFiles(), ErrorsFound); // read zone geometry data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;

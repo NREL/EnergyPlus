@@ -19,7 +19,7 @@ set( CMAKE_POSITION_INDEPENDENT_CODE ON )
 
 include(cmake/Version.cmake)
 
-set( OPENGL_REQUIRED OFF CACHE BOOL "Require OpenGL in order to build" )
+set( OPENGL_REQUIRED ON CACHE BOOL "Require OpenGL in order to build" )
 if(OPENGL_REQUIRED)
   find_package(OpenGL)
   if(NOT OPENGL_FOUND)
