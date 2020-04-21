@@ -1350,4 +1350,15 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
 
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: Vertical Surface, CosTilt not exactly zero
+    // Hcov expected = 3.076
+
+    Tsurf = 19.0;
+    Tamb = 20.0;
+    CosTilt = 0.0001; // cos(90 degrees)
+    ExpectedCoefficient = 3.076;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 }
