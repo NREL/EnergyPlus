@@ -1462,7 +1462,12 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections_Implicit)
 
         "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
         "Default Algorithm,       !- Name",
-        "FohannoPolidoriVerticalWall;  !- Simple Buoyancy Vertical Wall Equation Source"
+        "FohannoPolidoriVerticalWall;  !- Simple Buoyancy Vertical Wall Equation Source",
+
+        "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,",
+        "Default algorithms,      !- Name",
+        "TARPWindward;            !- Wind Convection Windward Vertical Wall Equation Source",
+
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1559,6 +1564,20 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections_Implicit)
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedUnstableCeiling);
     algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWindow);
+
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_SparrowWindward);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_EmmelVertical);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_ClearRoof);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_NaturalASHRAEVerticalWall);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonStableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonUnstableHorizontalOrTilt);
+
 }
 
 
