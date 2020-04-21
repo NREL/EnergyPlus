@@ -5145,6 +5145,10 @@ namespace DaylightingManager {
         int NumAlpha;
         int NumNumber;
 
+        // Smallest deviation from unity for the sum of all fractions
+        // Accept approx 4 to 8 ULP error (technically abs(1.0 + sumFracs) should be close to 2)
+        Real64 const FractionTolerance(4 * std::numeric_limits<Real64>::epsilon());
+
         cCurrentModuleObject = "Daylighting:Controls";
         for (int iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl) {
             cAlphaArgs = "";
@@ -5322,17 +5326,18 @@ namespace DaylightingManager {
                 ErrorsFound = true;
             }
 
-            if (sum(zone_daylight.FracZoneDaylit) < 1.0) {
+            Real64 sumFracs = sum(zone_daylight.FracZoneDaylit);
+            if ( (1.0 - sumFracs) > FractionTolerance) {
                 ShowWarningError("GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is < 1.0.");
                 ShowContinueError("..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", only " +
-                                  RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 2) + " of the zone is controlled.");
-            }
-            if (sum(zone_daylight.FracZoneDaylit) > 1.0) {
+                        RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 2) + " of the zone is controlled.");
+            } else if ((sumFracs - 1.0) > FractionTolerance) {
                 ShowSevereError("GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.");
                 ShowContinueError("..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", trying to control " +
-                                  RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 2) + " of the zone.");
+                        RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 2) + " of the zone.");
                 ErrorsFound = true;
             }
+
             if (zone_daylight.LightControlType == Stepped && zone_daylight.LightControlSteps <= 0) {
                 ShowWarningError("GetDaylightingControls: For Stepped Control, the number of steps must be > 0");
                 ShowContinueError("..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", will use 1");
