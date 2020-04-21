@@ -1572,7 +1572,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
     EXPECT_FALSE(Node(2).IsLocalNode);
     EXPECT_TRUE(Node(3).IsLocalNode);
 }
-TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreen)
+TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOption2b)
 {
     // #7586
     DataSurfaces::Surface.allocate(2);
@@ -1604,11 +1604,6 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreen)
 
     SetupWindowShadingControlActuators();
 
-    std::string const error_string = delimited_string({
-        "   ** Severe  ** Missing shade or blind layer in window construction name = 'Construction1', surface name = 'Surface1'.",
-        "   **   ~~~   ** ...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade or a blind layer.",
-        "   **   ~~~   ** ...Add shade or blind layer to this construction in order to be able to apply EMS Actuator.",
-    });
-    // One surface has warnings and the other does not
-    EXPECT_TRUE(compare_err_stream(error_string, true));
+    EXPECT_FALSE(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn);
+    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue,0);
 }
