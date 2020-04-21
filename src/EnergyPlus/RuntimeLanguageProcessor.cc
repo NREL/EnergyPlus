@@ -1396,6 +1396,7 @@ namespace RuntimeLanguageProcessor {
                 if (parse("==", OperatorEqual, false) || parse("<>", OperatorNotEqual, false) || parse("<=", OperatorLessOrEqual, false) ||
                     parse(">=", OperatorGreaterOrEqual, false) || parse("||", OperatorLogicalOR, false) || parse("&&", OperatorLogicalAND, false)) {
                     // One of the comparision / logical operators
+                    OperatorProcessing = true;
 
                 } else if (String[Pos] == '@') { // next check for builtin functions signaled by "@"
 
