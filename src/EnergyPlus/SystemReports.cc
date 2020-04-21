@@ -235,8 +235,6 @@ namespace SystemReports {
     Array1D_bool NoLoadFlag;
     Array1D_bool UnmetLoadFlag;
 
-    static constexpr auto fmtLD("*");
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE SystemReports
 
     // Reporting Initialization

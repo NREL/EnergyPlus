@@ -1370,7 +1370,7 @@ namespace RuntimeLanguageProcessor {
 
                 // parse an operator if found,
                 // returns true and increments position, other wise returns false and leaves state untouched
-                const auto parse = [&](const char *string, int op, bool case_insensitive = false) {
+                const auto parse = [&](const char *string, int op, bool case_insensitive) {
                     const auto len = strlen(string);
                     const auto potential_match = String.substr(Pos, len);
 
@@ -1393,8 +1393,8 @@ namespace RuntimeLanguageProcessor {
 
                 // First check for two character operators:  == <> <= >= || &&
                 std::string const cc(String.substr(Pos, 2));
-                if (parse("==", OperatorEqual) || parse("<>", OperatorNotEqual) || parse("<=", OperatorLessOrEqual) ||
-                    parse(">=", OperatorGreaterOrEqual) || parse("||", OperatorLogicalOR) || parse("&&", OperatorLogicalAND)) {
+                if (parse("==", OperatorEqual, false) || parse("<>", OperatorNotEqual, false) || parse("<=", OperatorLessOrEqual, false) ||
+                    parse(">=", OperatorGreaterOrEqual, false) || parse("||", OperatorLogicalOR, false) || parse("&&", OperatorLogicalAND, false)) {
                     // One of the comparision / logical operators
 
                 } else if (String[Pos] == '@') { // next check for builtin functions signaled by "@"
