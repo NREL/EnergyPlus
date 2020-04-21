@@ -391,6 +391,13 @@ ENERGYPLUSLIB_API Real64 currentTime();
 /// \see apiDataFullyReady
 ENERGYPLUSLIB_API int minutes();
 
+/// \brief Returns the duration of the current zone simulation time step, in fractional hours
+/// \details The zone time step will vary throughout the simulation as needed to maintain convergence while being cautious about program runtime.
+///          This function returns the current value of the time step
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \see apiDataFullyReady
+ENERGYPLUSLIB_API Real64 zoneTimeStep();
+
 /// \brief Returns the duration of the current HVAC system simulation time step, in fractional hours
 /// \details The HVAC time step will vary throughout the simulation as needed to maintain convergence while being cautious about program runtime.
 ///          This function returns the current value of the time step
@@ -456,6 +463,20 @@ ENERGYPLUSLIB_API int currentEnvironmentNum();
 /// \see apiDataFullyReady
 /// \see kindOfSim
 ENERGYPLUSLIB_API int getConstructionHandle(const char* constructionName);
+
+/// \brief Returns a simple sum of the time part of the date/time function
+/// \details Could be used in random seeding.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \see apiDataFullyReady
+/// \see kindOfSim
+ENERGYPLUSLIB_API int actualTime();
+
+/// \brief Returns a simple sum of the date/time function
+/// \details Could be used in random seeding.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \see apiDataFullyReady
+/// \see kindOfSim
+ENERGYPLUSLIB_API int actualDateTime();
 
 #ifdef __cplusplus
 }
