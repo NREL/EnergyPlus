@@ -1452,6 +1452,19 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections)
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedUnstableCeiling);
     algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWindow);
+
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_SparrowWindward);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_SparrowLeeward);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_ClearRoof);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_NaturalASHRAEVerticalWall);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonStableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonUnstableHorizontalOrTilt);
 }
 
 TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections_Implicit)
@@ -1568,7 +1581,7 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections_Implicit)
     algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_SparrowWindward);
     algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
-    ASSERT_EQ(algorithm_identifier, HcExt_EmmelVertical);
+    ASSERT_EQ(algorithm_identifier, HcExt_SparrowLeeward);
     algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_ClearRoof);
     algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
