@@ -737,18 +737,18 @@ class DataExchange:
         """
         return self.api.currentEnvironmentNum()
 
-    def actual_time(self) -> RealEP:
+    def actual_time(self) -> int:
         """
         Gets a simple sum of the values of the time part of the date/time function. Could be used in random seeding.
 
         :return: Integer value of time portion of the date/time function.
         """
-        return self.api.currentEnvironmentNum()
+        return self.api.actualTime()
 
-    def actual_date_time(self) -> RealEP:
+    def actual_date_time(self) -> int:
         """
         Gets a simple sum of the values of the date/time function. Could be used in random seeding.
 
         :return: Integer value of the date/time function.
         """
-        return self.api.currentEnvironmentNum()
+        return self.api.actualDateTime()
