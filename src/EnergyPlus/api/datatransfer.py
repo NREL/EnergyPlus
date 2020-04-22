@@ -87,6 +87,8 @@ class DataExchange:
         self.api.sunIsUp.restype = c_int
         self.api.isRaining.argtypes = []
         self.api.isRaining.restype = c_int
+        self.api.zoneTimeStep.argtypes = []
+        self.api.zoneTimeStep.restype = RealEP
         self.api.systemTimeStep.argtypes = []
         self.api.systemTimeStep.restype = RealEP
         self.api.currentEnvironmentNum.argtypes = []
@@ -115,6 +117,10 @@ class DataExchange:
         self.api.getPluginTrendVariableDirection.restype = RealEP
         self.api.getConstructionHandle.argtypes = [c_char_p]
         self.api.getConstructionHandle.restype = c_int
+        self.api.actualTime.argtypes = []
+        self.api.actualTime.restype = c_int
+        self.api.actualDateTime.argtypes = []
+        self.api.actualDateTime.restype = c_int
 
     def list_available_api_data_csv(self) -> bytes:
         """
@@ -129,7 +135,7 @@ class DataExchange:
         Check whether the data exchange API is ready.
         Handles to variables, actuators, and other data are not reliably defined prior to this being true.
 
-        :return: Returns true if the data exchange data is fully initialized in the simulation.
+        :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.
         """
         success = self.api.apiDataFullyReady()
         if success == 0:
@@ -654,7 +660,7 @@ class DataExchange:
         """
         Get the current day of the year (1-366)
 
-        :return: AN integer day of the year (1-366)
+        :return: An integer day of the year (1-366)
         """
         return self.api.dayOfYear()
 
@@ -703,6 +709,15 @@ class DataExchange:
         """
         return self.api.warmupFlag() == 1
 
+    def zone_time_step(self) -> RealEP:
+        """
+        Gets the current zone time step value in EnergyPlus.  The zone time step is variable and fluctuates
+        during the simulation.
+
+        :return: The current zone time step in fractional hours.
+        """
+        return self.api.systemTimeStep()
+
     def system_time_step(self) -> RealEP:
         """
         Gets the current system time step value in EnergyPlus.  The system time step is variable and fluctuates
@@ -721,3 +736,19 @@ class DataExchange:
         :return: The current environment number.
         """
         return self.api.currentEnvironmentNum()
+
+    def actual_time(self) -> int:
+        """
+        Gets a simple sum of the values of the time part of the date/time function. Could be used in random seeding.
+
+        :return: Integer value of time portion of the date/time function.
+        """
+        return self.api.actualTime()
+
+    def actual_date_time(self) -> int:
+        """
+        Gets a simple sum of the values of the date/time function. Could be used in random seeding.
+
+        :return: Integer value of the date/time function.
+        """
+        return self.api.actualDateTime()

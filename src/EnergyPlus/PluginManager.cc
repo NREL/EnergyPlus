@@ -1280,7 +1280,7 @@ namespace PluginManagement {
             if (userDefinedPath) {
                 EnergyPlus::ShowMessage("Successfully added path \"" + path + "\" to the sys.path in Python");
             }
-            (*EP_PyRun_SimpleString)("print(' EPS : ' + str(sys.path))");
+            //(*EP_PyRun_SimpleString)("print(' EPS : ' + str(sys.path))");
         } else {
             EnergyPlus::ShowFatalError("ERROR adding \"" + path + "\" to the sys.path in Python");
         }
