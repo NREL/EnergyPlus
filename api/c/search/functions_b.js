@@ -11,5 +11,6 @@ var searchData=
   ['registerprogresscallback',['registerProgressCallback',['../runtime_8h.html#aeee74db35daf3420d850dc2d8ef17086',1,'runtime.h']]],
   ['registerstdoutcallback',['registerStdOutCallback',['../runtime_8h.html#aca6d3144c87a923754b749b4884ca5de',1,'runtime.h']]],
   ['requestvariable',['requestVariable',['../datatransfer_8h.html#affb05c4a3d189ce3ed4aac12e88884b7',1,'datatransfer.h']]],
-  ['resetactuator',['resetActuator',['../datatransfer_8h.html#aa8854ff2f59cce069af2211380d21532',1,'datatransfer.h']]]
+  ['resetactuator',['resetActuator',['../datatransfer_8h.html#aa8854ff2f59cce069af2211380d21532',1,'datatransfer.h']]],
+  ['reseterrorflag',['resetErrorFlag',['../datatransfer_8h.html#ab79073ab0c06bc142b06fc86deddb41d',1,'datatransfer.h']]]
 ];

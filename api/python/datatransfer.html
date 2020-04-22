@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Data Transfer API &#8212; EnergyPlus Python API Documentation 0.1 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -14,28 +14,29 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Runtime API" href="runtime.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="Runtime API" href="runtime.html" /> 
   </head><body>
-  
+      <div class="header" role="banner"><img class="rightlogo" src="_static/favicon.png" alt="Logo"/><h1 class="heading"><a href="index.html">
+          <span>EnergyPlus Python API Documentation 0.1 documentation</span></a></h1>
+        <h2 class="heading"><span>Data Transfer API</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="runtime.html">Runtime API</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-            
+      </div>
+      <div class="content" role="main">
+        
+        
   <div class="section" id="module-datatransfer">
 <span id="data-transfer-api"></span><h1>Data Transfer API<a class="headerlink" href="#module-datatransfer" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="datatransfer.DataExchange">
-<em class="property">class </em><code class="sig-prename descclassname">datatransfer.</code><code class="sig-name descname">DataExchange</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7f576348aa90&gt;</em>, <em class="sig-param">running_as_python_plugin: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/datatransfer.html#DataExchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">datatransfer.</code><code class="sig-name descname">DataExchange</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fbea5dffb00&gt;</em>, <em class="sig-param">running_as_python_plugin: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/datatransfer.html#DataExchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This API class enables data transfer between EnergyPlus and a client.  Output variables and meters are treated as
 “sensor” data.  A client should get a handle (integer) using one of the worker methods then make calls to get data
@@ -59,6 +60,28 @@ have a <cite>self.transfer</cite> instance of this class available, and should <
 but only in the Python Plugin cases.  For the outside tool API usage, plugin global variables are not available, and
 data should be shared in the outside calling code.</p>
 <dl class="method">
+<dt id="datatransfer.DataExchange.actual_date_time">
+<code class="sig-name descname">actual_date_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/datatransfer.html#DataExchange.actual_date_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.actual_date_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a simple sum of the values of the date/time function. Could be used in random seeding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Integer value of the date/time function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="datatransfer.DataExchange.actual_time">
+<code class="sig-name descname">actual_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/datatransfer.html#DataExchange.actual_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.actual_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a simple sum of the values of the time part of the date/time function. Could be used in random seeding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Integer value of time portion of the date/time function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="datatransfer.DataExchange.api_data_fully_ready">
 <code class="sig-name descname">api_data_fully_ready</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/datatransfer.html#DataExchange.api_data_fully_ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.api_data_fully_ready" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether the data exchange API is ready.
@@ -66,6 +89,19 @@ Handles to variables, actuators, and other data are not reliably defined prior t
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="datatransfer.DataExchange.api_error_flag">
+<code class="sig-name descname">api_error_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/datatransfer.html#DataExchange.api_error_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.api_error_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether the error flag has been activated.
+A number of functions will return 0 in erroneous situations, and this function allows for disambiguation
+between valid zero return values and the error condition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Returns true if the error flag was activated during prior calculations.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -85,7 +121,7 @@ carefully.</p>
 
 <dl class="method">
 <dt id="datatransfer.DataExchange.current_time">
-<code class="sig-name descname">current_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/datatransfer.html#DataExchange.current_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.current_time" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">current_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; ctypes.c_double<a class="reference internal" href="_modules/datatransfer.html#DataExchange.current_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.current_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the current time of day in hours, where current time represents the end time of the current time step.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -171,7 +207,26 @@ this allows getting the most recent value.</p>
 <dd class="field-odd"><p><strong>actuator_handle</strong> – An integer returned from the <cite>get_actuator_handle</cite> function.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A floating point of the actuator value.  For boolean actuators returns 1.0 for true and 0.0 for false.</p>
+<dd class="field-even"><p>A floating point of the actuator value.  For boolean actuators returns 1.0 for true and 0.0 for false.
+Returns zero if the handle is invalid.  Use the api_error_flag function to disambiguate between valid
+zero returns and error states.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="datatransfer.DataExchange.get_construction_handle">
+<code class="sig-name descname">get_construction_handle</code><span class="sig-paren">(</span><em class="sig-param">var_name: Union[str, bytes]</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/datatransfer.html#DataExchange.get_construction_handle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.get_construction_handle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a handle to a constructions in a running simulation.  This is only used for Python Plugin applications!</p>
+<p>Some actuators allow specifying different constructions to allow switchable construction control.
+This function returns an index that can be used in those functions.  The construction is specified by name.</p>
+<p>The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
+automatically converts values to upper-case when finding matches to internal variables in the simulation.</p>
+<p>Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
+as needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An integer ID for this construction, or -1 if one could not be found.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -202,7 +257,7 @@ as needed.</p>
 
 <dl class="method">
 <dt id="datatransfer.DataExchange.get_global_value">
-<code class="sig-name descname">get_global_value</code><span class="sig-paren">(</span><em class="sig-param">handle: int</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/datatransfer.html#DataExchange.get_global_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.get_global_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_global_value</code><span class="sig-paren">(</span><em class="sig-param">handle: int</em><span class="sig-paren">)</span> &#x2192; ctypes.c_double<a class="reference internal" href="_modules/datatransfer.html#DataExchange.get_global_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.get_global_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the current value of a plugin global variable in a running simulation.  This is only used for Python Plugin
 applications!</p>
 <p>Global variables are used as a way to share data between running Python Plugins.  First a global variable must
@@ -247,7 +302,7 @@ as needed.</p>
 
 <dl class="method">
 <dt id="datatransfer.DataExchange.get_internal_variable_value">
-<code class="sig-name descname">get_internal_variable_value</code><span class="sig-paren">(</span><em class="sig-param">variable_handle: int</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/datatransfer.html#DataExchange.get_internal_variable_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.get_internal_variable_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_internal_variable_value</code><span class="sig-paren">(</span><em class="sig-param">variable_handle: int</em><span class="sig-paren">)</span> &#x2192; ctypes.c_double<a class="reference internal" href="_modules/datatransfer.html#DataExchange.get_internal_variable_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.get_internal_variable_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the value of an internal variable in a running simulation.  The <cite>get_internal_variable_handle</cite> function is
 first used to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this
 function to then get the value of the variable.</p>
@@ -256,7 +311,8 @@ function to then get the value of the variable.</p>
 <dd class="field-odd"><p><strong>variable_handle</strong> – An integer returned from the <cite>get_internal_variable_handle</cite> function.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Floating point representation of the internal variable value</p>
+<dd class="field-even"><p>Floating point representation of the internal variable value.  Returns zero if the handle is invalid.
+Use the api_error_flag function to disambiguate between valid zero returns and error states.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -281,7 +337,7 @@ as needed.</p>
 
 <dl class="method">
 <dt id="datatransfer.DataExchange.get_meter_value">
-<code class="sig-name descname">get_meter_value</code><span class="sig-paren">(</span><em class="sig-param">meter_handle: int</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/datatransfer.html#DataExchange.get_meter_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.get_meter_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_meter_value</code><span class="sig-paren">(</span><em class="sig-param">meter_handle: int</em><span class="sig-paren">)</span> &#x2192; ctypes.c_double<a class="reference internal" href="_modules/datatransfer.html#DataExchange.get_meter_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.get_meter_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the current value of a meter in a running simulation.  The <cite>get_meter_handle</cite> function is first used
 to get a handle to the meter by name.  Then once the handle is retrieved, it is passed into this function to
 then get the value of the meter.</p>
@@ -292,7 +348,8 @@ This will change in a future version of the API.</p>
 <dd class="field-odd"><p><strong>meter_handle</strong> – An integer returned from the <cite>get_meter_handle</cite> function.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Floating point representation of the current meter value</p>
+<dd class="field-even"><p>Floating point representation of the current meter value.  Returns zero if the handle is invalid.
+Use the api_error_flag function to disambiguate between valid zero returns and error states.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -496,7 +553,7 @@ as needed.</p>
 
 <dl class="method">
 <dt id="datatransfer.DataExchange.get_variable_value">
-<code class="sig-name descname">get_variable_value</code><span class="sig-paren">(</span><em class="sig-param">variable_handle: int</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/datatransfer.html#DataExchange.get_variable_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.get_variable_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_variable_value</code><span class="sig-paren">(</span><em class="sig-param">variable_handle: int</em><span class="sig-paren">)</span> &#x2192; ctypes.c_double<a class="reference internal" href="_modules/datatransfer.html#DataExchange.get_variable_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.get_variable_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the current value of a variable in a running simulation.  The <cite>get_variable_handle</cite> function is first used
 to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this function to
 then get the value of the variable.</p>
@@ -505,7 +562,8 @@ then get the value of the variable.</p>
 <dd class="field-odd"><p><strong>variable_handle</strong> – An integer returned from the <cite>get_variable_handle</cite> function.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Floating point representation of the current variable value</p>
+<dd class="field-even"><p>Floating point representation of the current variable value.  Returns zero if the handle is invalid.
+Use the api_error_flag function to disambiguate between valid zero returns and error states.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -618,6 +676,14 @@ instead of the externally set actuator value.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="datatransfer.DataExchange.reset_api_error_flag">
+<code class="sig-name descname">reset_api_error_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/datatransfer.html#DataExchange.reset_api_error_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.reset_api_error_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the error flag for API calls.
+A number of functions will return 0 in erroneous situations, but activate an error flag.  In certain work flows,
+it may be useful to reset this error flag (unit testing, etc.).  This function allows resetting it to false.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="datatransfer.DataExchange.set_actuator_value">
 <code class="sig-name descname">set_actuator_value</code><span class="sig-paren">(</span><em class="sig-param">actuator_handle: int</em>, <em class="sig-param">actuator_value: ctypes.c_double</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/datatransfer.html#DataExchange.set_actuator_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.set_actuator_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the value of an actuator in a running simulation.  The <cite>get_actuator_handle</cite> function is first used
@@ -680,7 +746,7 @@ simply wraps that with a bool conversion.</p>
 
 <dl class="method">
 <dt id="datatransfer.DataExchange.system_time_step">
-<code class="sig-name descname">system_time_step</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/datatransfer.html#DataExchange.system_time_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.system_time_step" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">system_time_step</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; ctypes.c_double<a class="reference internal" href="_modules/datatransfer.html#DataExchange.system_time_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.system_time_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the current system time step value in EnergyPlus.  The system time step is variable and fluctuates
 during the simulation.</p>
 <dl class="field-list simple">
@@ -715,79 +781,44 @@ specified or automatically selected by EnergyPlus based on other data (start day
 </dl>
 </dd></dl>
 
+<dl class="method">
+<dt id="datatransfer.DataExchange.zone_time_step">
+<code class="sig-name descname">zone_time_step</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; ctypes.c_double<a class="reference internal" href="_modules/datatransfer.html#DataExchange.zone_time_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatransfer.DataExchange.zone_time_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the current zone time step value in EnergyPlus.  The zone time step is variable and fluctuates
+during the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The current zone time step in fractional hours.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
 
 
-          </div>
-          
-        </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">EnergyPlus Python API Documentation</a></h1>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="runtime.html">Runtime API</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="api.html">Root Api Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="func.html">Functional API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="runtime.html">Runtime API</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Transfer API</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="runtime.html" title="previous chapter">Runtime API</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, National Renewable Energy Laboratory for the United States Department of Energy.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/datatransfer.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
-
-    
+<div class="footer">
+    <div style="text-align:center;">
+        <font size="+2"> LINKS </font> <br>
+        <a href="https://energyplus.net">EnergyPlus Web Site</a> <br>
+        <a href="https://github.com/NREL/EnergyPlus">EnergyPlus Github Repo</a> <br>
+        <a href="https://nrel.github.io/EnergyPlus/api">API Documentation Home</a> <br>
+        <a href="https://nrel.github.io/EnergyPlus/api/c">C Documentation</a> <br>
+    </div>
+    <hr>
+    &copy; Copyright 2020, National Renewable Energy Laboratory for the United States Department of Energy.
+</div>
   </body>
 </html>

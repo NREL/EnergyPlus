@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Runtime API &#8212; EnergyPlus Python API Documentation 0.1 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -15,28 +15,31 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Data Transfer API" href="datatransfer.html" />
-    <link rel="prev" title="Functional API" href="func.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="Functional API" href="func.html" /> 
   </head><body>
-  
+      <div class="header" role="banner"><img class="rightlogo" src="_static/favicon.png" alt="Logo"/><h1 class="heading"><a href="index.html">
+          <span>EnergyPlus Python API Documentation 0.1 documentation</span></a></h1>
+        <h2 class="heading"><span>Runtime API</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="func.html">Functional API</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="datatransfer.html">Data Transfer API</a>&#160;&#160;»
+        </p>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-            
+      </div>
+      <div class="content" role="main">
+        
+        
   <div class="section" id="module-runtime">
 <span id="runtime-api"></span><h1>Runtime API<a class="headerlink" href="#module-runtime" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="runtime.Runtime">
-<em class="property">class </em><code class="sig-prename descclassname">runtime.</code><code class="sig-name descname">Runtime</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7f778a0a69e8&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runtime.html#Runtime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runtime.Runtime" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">runtime.</code><code class="sig-name descname">Runtime</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fbea5dffb00&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runtime.html#Runtime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runtime.Runtime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This API class enables a client to hook into EnergyPlus at runtime and sense/actuate data in a running simulation.
 The pattern is quite simple: create a callback function in Python, and register it with one of the registration
@@ -416,75 +419,29 @@ from the EnergyPlus executable.</p>
 </div>
 
 
-          </div>
-          
-        </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">EnergyPlus Python API Documentation</a></h1>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="func.html">Functional API</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="datatransfer.html">Data Transfer API</a>&#160;&#160;»
+        </p>
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="api.html">Root Api Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="func.html">Functional API</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Runtime API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datatransfer.html">Data Transfer API</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="func.html" title="previous chapter">Functional API</a></li>
-      <li>Next: <a href="datatransfer.html" title="next chapter">Data Transfer API</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, National Renewable Energy Laboratory for the United States Department of Energy.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/runtime.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
-
-    
+<div class="footer">
+    <div style="text-align:center;">
+        <font size="+2"> LINKS </font> <br>
+        <a href="https://energyplus.net">EnergyPlus Web Site</a> <br>
+        <a href="https://github.com/NREL/EnergyPlus">EnergyPlus Github Repo</a> <br>
+        <a href="https://nrel.github.io/EnergyPlus/api">API Documentation Home</a> <br>
+        <a href="https://nrel.github.io/EnergyPlus/api/c">C Documentation</a> <br>
+    </div>
+    <hr>
+    &copy; Copyright 2020, National Renewable Energy Laboratory for the United States Department of Energy.
+</div>
   </body>
 </html>

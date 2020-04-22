@@ -1,6 +1,9 @@
 var datatransfer_8h =
 [
+    [ "actualDateTime", "datatransfer_8h.html#ac75563a858f5ece1185c6139f2716b79", null ],
+    [ "actualTime", "datatransfer_8h.html#a0c795a6a4620861c87f28ffcd405f7a7", null ],
     [ "apiDataFullyReady", "datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b", null ],
+    [ "apiErrorFlag", "datatransfer_8h.html#a44906aa59d9d8251303d80027b95e2ee", null ],
     [ "currentEnvironmentNum", "datatransfer_8h.html#acdae46660de641f4db3d65316c6aaeea", null ],
     [ "currentTime", "datatransfer_8h.html#ab75ea19dab5f0e62f336f0d7b79bd92e", null ],
     [ "daylightSavingsTimeIndicator", "datatransfer_8h.html#a487697ea2acbfb7a72fe625202c2a029", null ],
@@ -29,15 +32,17 @@ var datatransfer_8h =
     [ "hour", "datatransfer_8h.html#a721ff0d06e8367ee5d2c5cf1a2c40ab5", null ],
     [ "isRaining", "datatransfer_8h.html#a59a81eaf25d770c25a6261f1ad9f0691", null ],
     [ "kindOfSim", "datatransfer_8h.html#aaefffbd72431dd41a06670d83d204b8e", null ],
-    [ "listAllAPIDataCSV", "datatransfer_8h.html#ae3ec61a5c1ba8a88b36326b1f2d56ab9", null ],
+    [ "listAllAPIDataCSV", "datatransfer_8h.html#a39b154c513acc7227f3af1838b7b7fe7", null ],
     [ "minutes", "datatransfer_8h.html#a587907c11746d4b7546dfc284f11a207", null ],
     [ "month", "datatransfer_8h.html#a3f3be7ce4301fc1896efac6f0952f772", null ],
     [ "requestVariable", "datatransfer_8h.html#affb05c4a3d189ce3ed4aac12e88884b7", null ],
     [ "resetActuator", "datatransfer_8h.html#aa8854ff2f59cce069af2211380d21532", null ],
+    [ "resetErrorFlag", "datatransfer_8h.html#ab79073ab0c06bc142b06fc86deddb41d", null ],
     [ "setActuatorValue", "datatransfer_8h.html#a206dfb792b3123bddc75e227ea7db414", null ],
     [ "setPluginGlobalVariableValue", "datatransfer_8h.html#a739b92059308f641ddad3a41bce72e5c", null ],
     [ "sunIsUp", "datatransfer_8h.html#a716478c7e864433c390c474803f776fa", null ],
     [ "systemTimeStep", "datatransfer_8h.html#a4377c8d21a48a35fcf257b1f4061ba5b", null ],
     [ "warmupFlag", "datatransfer_8h.html#ae2a3b0627c19a3272319f9720f494058", null ],
-    [ "year", "datatransfer_8h.html#a98bf680dbfa28f79514ba50d33fee63f", null ]
+    [ "year", "datatransfer_8h.html#a98bf680dbfa28f79514ba50d33fee63f", null ],
+    [ "zoneTimeStep", "datatransfer_8h.html#a15ee2aef7d79e89d7e722644036469ff", null ]
 ];

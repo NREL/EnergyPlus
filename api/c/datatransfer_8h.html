@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>EnergyPlus C API: /eplus/repos/1eplus/src/EnergyPlus/api/datatransfer.h File Reference</title>
+<title>EnergyPlus C API: /eplus/repos/7eplus/src/EnergyPlus/api/datatransfer.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -38,27 +38,12 @@
   <td id="masterlinks">
    <p>Links</p>
    <ul>
+    <li><a href="https://energyplus.net">EnergyPlus Web Site</a></li>
     <li><a href="https://github.com/NREL/EnergyPlus">EnergyPlus Github Repo</a></li>
     <li><a href="https://nrel.github.io/EnergyPlus/api/">API Documentation Home</a></li>
-    <li><a href="https://nrel.github.io/EnergyPlus/api/c/">This C Documentation</a></li>
-    <li><a href="https://nrel.github.io/EnergyPlus/api/python/">Python Documentation</a></li>
+    <li><a href="https://nrel.github.io/EnergyPlus/api/python/">Python API Documentation</a></li>
    </ul>
   </td>
-   <td>        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-</td>
  </tr>
  </tbody>
 </table>
@@ -110,7 +95,7 @@ $(document).ready(function(){initNavTree('datatransfer_8h.html','');});
   <div class="summary">
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">/eplus/repos/1eplus/src/EnergyPlus/api/datatransfer.h File Reference</div>  </div>
+<div class="title">/eplus/repos/7eplus/src/EnergyPlus/api/datatransfer.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -123,12 +108,18 @@ $(document).ready(function(){initNavTree('datatransfer_8h.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae3ec61a5c1ba8a88b36326b1f2d56ab9"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#ae3ec61a5c1ba8a88b36326b1f2d56ab9">listAllAPIDataCSV</a> ()</td></tr>
-<tr class="memdesc:ae3ec61a5c1ba8a88b36326b1f2d56ab9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets available API data for the current simulation.  <a href="#ae3ec61a5c1ba8a88b36326b1f2d56ab9">More...</a><br /></td></tr>
-<tr class="separator:ae3ec61a5c1ba8a88b36326b1f2d56ab9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39b154c513acc7227f3af1838b7b7fe7"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#a39b154c513acc7227f3af1838b7b7fe7">listAllAPIDataCSV</a> ()</td></tr>
+<tr class="memdesc:a39b154c513acc7227f3af1838b7b7fe7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets available API data for the current simulation.  <a href="#a39b154c513acc7227f3af1838b7b7fe7">More...</a><br /></td></tr>
+<tr class="separator:a39b154c513acc7227f3af1838b7b7fe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4919a834ba52cd44d4b164137120b07b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b">apiDataFullyReady</a> ()</td></tr>
 <tr class="memdesc:a4919a834ba52cd44d4b164137120b07b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides a user-facing check for whether API data is ready to be accessed.  <a href="#a4919a834ba52cd44d4b164137120b07b">More...</a><br /></td></tr>
 <tr class="separator:a4919a834ba52cd44d4b164137120b07b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44906aa59d9d8251303d80027b95e2ee"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#a44906aa59d9d8251303d80027b95e2ee">apiErrorFlag</a> ()</td></tr>
+<tr class="memdesc:a44906aa59d9d8251303d80027b95e2ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides a user-facing check on the API error flag.  <a href="#a44906aa59d9d8251303d80027b95e2ee">More...</a><br /></td></tr>
+<tr class="separator:a44906aa59d9d8251303d80027b95e2ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab79073ab0c06bc142b06fc86deddb41d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#ab79073ab0c06bc142b06fc86deddb41d">resetErrorFlag</a> ()</td></tr>
+<tr class="memdesc:ab79073ab0c06bc142b06fc86deddb41d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the API Error flag.  <a href="#ab79073ab0c06bc142b06fc86deddb41d">More...</a><br /></td></tr>
+<tr class="separator:ab79073ab0c06bc142b06fc86deddb41d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:affb05c4a3d189ce3ed4aac12e88884b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#affb05c4a3d189ce3ed4aac12e88884b7">requestVariable</a> (const char *type, const char *key)</td></tr>
 <tr class="memdesc:affb05c4a3d189ce3ed4aac12e88884b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Marks a variable as requested in a simulation.  <a href="#affb05c4a3d189ce3ed4aac12e88884b7">More...</a><br /></td></tr>
 <tr class="separator:affb05c4a3d189ce3ed4aac12e88884b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -219,6 +210,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a587907c11746d4b7546dfc284f11a207"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#a587907c11746d4b7546dfc284f11a207">minutes</a> ()</td></tr>
 <tr class="memdesc:a587907c11746d4b7546dfc284f11a207"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the minutes into the hour from 1 to 60.  <a href="#a587907c11746d4b7546dfc284f11a207">More...</a><br /></td></tr>
 <tr class="separator:a587907c11746d4b7546dfc284f11a207"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15ee2aef7d79e89d7e722644036469ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_type_defs_8h.html#ad7943e857089166860fb89c13dcb8dee">Real64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#a15ee2aef7d79e89d7e722644036469ff">zoneTimeStep</a> ()</td></tr>
+<tr class="memdesc:a15ee2aef7d79e89d7e722644036469ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the duration of the current zone simulation time step, in fractional hours.  <a href="#a15ee2aef7d79e89d7e722644036469ff">More...</a><br /></td></tr>
+<tr class="separator:a15ee2aef7d79e89d7e722644036469ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4377c8d21a48a35fcf257b1f4061ba5b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_type_defs_8h.html#ad7943e857089166860fb89c13dcb8dee">Real64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#a4377c8d21a48a35fcf257b1f4061ba5b">systemTimeStep</a> ()</td></tr>
 <tr class="memdesc:a4377c8d21a48a35fcf257b1f4061ba5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the duration of the current HVAC system simulation time step, in fractional hours.  <a href="#a4377c8d21a48a35fcf257b1f4061ba5b">More...</a><br /></td></tr>
 <tr class="separator:a4377c8d21a48a35fcf257b1f4061ba5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -243,11 +237,63 @@ Functions</h2></td></tr>
 <tr class="memitem:a89ef2a120ed8ccb2c82f0507cb14ad37"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#a89ef2a120ed8ccb2c82f0507cb14ad37">getConstructionHandle</a> (const char *constructionName)</td></tr>
 <tr class="memdesc:a89ef2a120ed8ccb2c82f0507cb14ad37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an index to a construction in the simulation.  <a href="#a89ef2a120ed8ccb2c82f0507cb14ad37">More...</a><br /></td></tr>
 <tr class="separator:a89ef2a120ed8ccb2c82f0507cb14ad37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c795a6a4620861c87f28ffcd405f7a7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#a0c795a6a4620861c87f28ffcd405f7a7">actualTime</a> ()</td></tr>
+<tr class="memdesc:a0c795a6a4620861c87f28ffcd405f7a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a simple sum of the time part of the date/time function.  <a href="#a0c795a6a4620861c87f28ffcd405f7a7">More...</a><br /></td></tr>
+<tr class="separator:a0c795a6a4620861c87f28ffcd405f7a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac75563a858f5ece1185c6139f2716b79"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="datatransfer_8h.html#ac75563a858f5ece1185c6139f2716b79">actualDateTime</a> ()</td></tr>
+<tr class="memdesc:ac75563a858f5ece1185c6139f2716b79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a simple sum of the date/time function.  <a href="#ac75563a858f5ece1185c6139f2716b79">More...</a><br /></td></tr>
+<tr class="separator:ac75563a858f5ece1185c6139f2716b79"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This "data exchange" API category provides access to read and write real-time data within a running simulation. </p>
 <p>While an EnergyPlus simulation is running, simulation state is constantly being calculated and updated. EMS was implemented in EnergyPlus to allow user scripts to read variable data and write actuator data in custom ways. This builds on top of that implementation by allowing the user to write C code that can read/write simulation data. This file includes methods that are specific to PythonPlugin workflows, including PythonPlugin "Trend" and "Global" variables. These mechanisms are only available in Plugin workflows and will cause a program error if they are accessed in an "EnergyPlus-as-a-library" workflow. However, there are many functions in this file that are available for all API usages, including getting access to variables and meters, writing actuator values, and accessing simulation state such as the day of week, hour of day, etc. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="ac75563a858f5ece1185c6139f2716b79"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac75563a858f5ece1185c6139f2716b79">&#9670;&nbsp;</a></span>actualDateTime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int actualDateTime </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns a simple sum of the date/time function. </p>
+<p>Could be used in random seeding. </p><dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
+<dd>
+<a class="el" href="datatransfer_8h.html#aaefffbd72431dd41a06670d83d204b8e" title="Returns an integer indicator for the current simulation environment type. ">kindOfSim</a> </dd></dl>
+
+</div>
+</div>
+<a id="a0c795a6a4620861c87f28ffcd405f7a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c795a6a4620861c87f28ffcd405f7a7">&#9670;&nbsp;</a></span>actualTime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int actualTime </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns a simple sum of the time part of the date/time function. </p>
+<p>Could be used in random seeding. </p><dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
+<dd>
+<a class="el" href="datatransfer_8h.html#aaefffbd72431dd41a06670d83d204b8e" title="Returns an integer indicator for the current simulation environment type. ">kindOfSim</a> </dd></dl>
+
+</div>
+</div>
 <a id="a4919a834ba52cd44d4b164137120b07b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4919a834ba52cd44d4b164137120b07b">&#9670;&nbsp;</a></span>apiDataFullyReady()</h2>
 
@@ -265,6 +311,26 @@ Functions</h2></td></tr>
 
 <p>Provides a user-facing check for whether API data is ready to be accessed. </p>
 <p>Many parts of a simulation need to be set up to complete a run. At the early stages of a simulation, most data has not been allocated and set up. Calling to retrieve variable, meter, or actuator values prior to this point can cause problems. This function allows a user to call the simulation to check whether data is ready for access. Do not call for variable, meter, actuator, or any other internal exchange data prior to this returning true. </p><dl class="section return"><dt>Returns</dt><dd>Returns 0 (success) once the data is ready, otherwise returns 1. </dd></dl>
+
+</div>
+</div>
+<a id="a44906aa59d9d8251303d80027b95e2ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44906aa59d9d8251303d80027b95e2ee">&#9670;&nbsp;</a></span>apiErrorFlag()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int apiErrorFlag </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Provides a user-facing check on the API error flag. </p>
+<p>Some API functions return a value of 0, which could potentially indicate an error, or an actual 0 value. This function provides a way to disambiguate the response value. </p><dl class="section return"><dt>Returns</dt><dd>Returns 0 (success) if the error flag is not activated, or 1 if the error flag is true. </dd></dl>
 
 </div>
 </div>
@@ -466,13 +532,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The floating point value last assigned to the actuator in the program. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">If</td><td>running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error. When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes </td></tr>
-  </table>
-  </dd>
-</dl>
+<dl class="section return"><dt>Returns</dt><dd>The floating point value last assigned to the actuator in the program, or zero if a handle problem is encountered. If a zero is returned, use the <code>apiErrorFlag</code> function to disambiguate the return value. </dd></dl>
 <dl class="section remark"><dt>Remarks</dt><dd>Note the behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
@@ -575,13 +635,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">If</td><td>running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error. When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The current value of the variable, in floating point form. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The current value of the variable, in floating point form, or zero if a handle problem is encountered. If a zero is returned, use the <code>apiErrorFlag</code> function to disambiguate the return value. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#ae65fc86c8aea54e2c6170b03facaa802" title="Gets a handle to an internal variable. ">getInternalVariableHandle</a> </dd></dl>
 
 </div>
@@ -638,13 +692,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The floating point value of a meter at the current time </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">If</td><td>running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error. When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes </td></tr>
-  </table>
-  </dd>
-</dl>
+<dl class="section return"><dt>Returns</dt><dd>The floating point value of a meter at the current time, or zero if a handle problem is encountered. If a zero is returned, use the <code>apiErrorFlag</code> function to disambiguate the return value. </dd></dl>
 <dl class="section remark"><dt>Remarks</dt><dd>Note the behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
@@ -709,12 +757,7 @@ This function only has meaning in the context of Python Plugin workflows, not in
 <dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd>
 <dd>
 This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">A</td><td>handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </td></tr>
-  </table>
-  </dd>
-</dl>
+<dl class="section return"><dt>Returns</dt><dd>The current value of the variable, in floating point form, or zero if a handle problem is encountered. If a zero is returned, use the <code>apiErrorFlag</code> function to disambiguate the return value. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
 <a class="el" href="datatransfer_8h.html#ac196675c7643c5a7d35d02a2e540f34b" title="Gets a handle to a Python Plugin &quot;Global&quot; variable. ">getPluginGlobalVariableHandle</a> </dd></dl>
@@ -757,13 +800,9 @@ This function only has meaning in the context of Python Plugin workflows, not in
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd>
 <dd>
-This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">A</td><td>handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </td></tr>
-  </table>
-  </dd>
-</dl>
+This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd>
+<dd>
+A handle index or other problem will return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
 <a class="el" href="datatransfer_8h.html#abec2aa8de29ff4ebe03c80d115e1c4b2" title="Gets a handle to a Python Plugin &quot;Trend&quot; variable. ">getPluginTrendVariableHandle</a> </dd></dl>
@@ -806,13 +845,9 @@ This function only has meaning in the context of Python Plugin workflows, not in
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd>
 <dd>
-This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">A</td><td>handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </td></tr>
-  </table>
-  </dd>
-</dl>
+This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd>
+<dd>
+A handle index or other problem will return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
 <a class="el" href="datatransfer_8h.html#abec2aa8de29ff4ebe03c80d115e1c4b2" title="Gets a handle to a Python Plugin &quot;Trend&quot; variable. ">getPluginTrendVariableHandle</a> </dd></dl>
@@ -886,13 +921,9 @@ This function only has meaning in the context of Python Plugin workflows, not in
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd>
 <dd>
-This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">A</td><td>handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </td></tr>
-  </table>
-  </dd>
-</dl>
+This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd>
+<dd>
+A handle index or other problem will return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
 <a class="el" href="datatransfer_8h.html#abec2aa8de29ff4ebe03c80d115e1c4b2" title="Gets a handle to a Python Plugin &quot;Trend&quot; variable. ">getPluginTrendVariableHandle</a> </dd></dl>
@@ -935,13 +966,9 @@ This function only has meaning in the context of Python Plugin workflows, not in
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd>
 <dd>
-This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">A</td><td>handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </td></tr>
-  </table>
-  </dd>
-</dl>
+This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd>
+<dd>
+A handle index or other problem will return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
 <a class="el" href="datatransfer_8h.html#abec2aa8de29ff4ebe03c80d115e1c4b2" title="Gets a handle to a Python Plugin &quot;Trend&quot; variable. ">getPluginTrendVariableHandle</a> </dd></dl>
@@ -984,13 +1011,9 @@ This function only has meaning in the context of Python Plugin workflows, not in
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd>
 <dd>
-This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">A</td><td>handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </td></tr>
-  </table>
-  </dd>
-</dl>
+This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd>
+<dd>
+A handle index or other problem will return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
 <a class="el" href="datatransfer_8h.html#abec2aa8de29ff4ebe03c80d115e1c4b2" title="Gets a handle to a Python Plugin &quot;Trend&quot; variable. ">getPluginTrendVariableHandle</a> </dd></dl>
@@ -1033,13 +1056,9 @@ This function only has meaning in the context of Python Plugin workflows, not in
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd>
 <dd>
-This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">A</td><td>handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </td></tr>
-  </table>
-  </dd>
-</dl>
+This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd>
+<dd>
+A handle index or other problem will return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
 <a class="el" href="datatransfer_8h.html#abec2aa8de29ff4ebe03c80d115e1c4b2" title="Gets a handle to a Python Plugin &quot;Trend&quot; variable. ">getPluginTrendVariableHandle</a> </dd></dl>
@@ -1111,13 +1130,7 @@ This function only has meaning in the context of Python Plugin workflows, not in
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The current value of the variable, in floating point form. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">If</td><td>running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error. When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes </td></tr>
-  </table>
-  </dd>
-</dl>
+<dl class="section return"><dt>Returns</dt><dd>The current value of the variable, in floating point form, or zero if a handle problem is encountered. If a zero is returned, use the <code>apiErrorFlag</code> function to disambiguate the return value. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a890084610394cff4609115b1813c4ae7" title="Gets a handle to a variable. ">getVariableHandle</a> </dd></dl>
 
 </div>
@@ -1214,14 +1227,14 @@ This function only has meaning in the context of Python Plugin workflows, not in
 
 </div>
 </div>
-<a id="ae3ec61a5c1ba8a88b36326b1f2d56ab9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3ec61a5c1ba8a88b36326b1f2d56ab9">&#9670;&nbsp;</a></span>listAllAPIDataCSV()</h2>
+<a id="a39b154c513acc7227f3af1838b7b7fe7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39b154c513acc7227f3af1838b7b7fe7">&#9670;&nbsp;</a></span>listAllAPIDataCSV()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char* listAllAPIDataCSV </td>
+          <td class="memname">char* listAllAPIDataCSV </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -1230,8 +1243,8 @@ This function only has meaning in the context of Python Plugin workflows, not in
 </div><div class="memdoc">
 
 <p>Gets available API data for the current simulation. </p>
-<p>This function returns a string of API data in CSV form for the current simulation The data can be easily parsed and then used in subsequent API code. </p><dl class="section remark"><dt>Remarks</dt><dd>A future version of this will more intelligently return available data in a structured format in memory. </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>A const char * pointing to a CSV formatted string </dd></dl>
+<p>This function returns a char * which points to API data in CSV form for the current simulation The data can be easily parsed and then used in subsequent API code. </p><dl class="section remark"><dt>Remarks</dt><dd>A future version of this will more intelligently return available data in a structured format in memory. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A char * pointing to a CSV formatted string. This allocates a new char *, and calling clients must free this when done with it! </dd></dl>
 
 </div>
 </div>
@@ -1338,18 +1351,34 @@ This function only has meaning in the context of Python Plugin workflows, not in
   </table>
   </dd>
 </dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">If</td><td>running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error. When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section remark"><dt>Remarks</dt><dd>Note the behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true </dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>When calling this function, a handle index or other problem will cause the function to return 0 but set an error flag. In Plugin work flows, EnergyPlus will abort after returning, in other applications use the <code>apiErrorFlag</code> function to check the error status. </dd>
+<dd>
+Note the behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
 <a class="el" href="datatransfer_8h.html#a4e231591e59c83ad2b59fa3362403630" title="Gets a handle to an actuator. ">getActuatorHandle</a> </dd>
 <dd>
 <a class="el" href="datatransfer_8h.html#a206dfb792b3123bddc75e227ea7db414" title="Sets the value of an actuator in EnergyPlus. ">setActuatorValue</a> </dd></dl>
+
+</div>
+</div>
+<a id="ab79073ab0c06bc142b06fc86deddb41d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab79073ab0c06bc142b06fc86deddb41d">&#9670;&nbsp;</a></span>resetErrorFlag()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void resetErrorFlag </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Reset the API Error flag. </p>
+<p>In most cases, upon an error, the client will want to just abort the calculation. However, in cases where an invalid condition allows a calculation to continue, this function can reset the flag. </p>
 
 </div>
 </div>
@@ -1387,13 +1416,9 @@ This function only has meaning in the context of Python Plugin workflows, not in
   </table>
   </dd>
 </dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">If</td><td>running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error. When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section remark"><dt>Remarks</dt><dd>Note the behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true </dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>When calling this function, a handle index or other problem will cause the function to return 0 but set an error flag. In Plugin work flows, EnergyPlus will abort after returning, in other applications use the <code>apiErrorFlag</code> function to check the error status. </dd>
+<dd>
+Note the behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
 <a class="el" href="datatransfer_8h.html#a4e231591e59c83ad2b59fa3362403630" title="Gets a handle to an actuator. ">getActuatorHandle</a> </dd>
@@ -1438,13 +1463,9 @@ This function only has meaning in the context of Python Plugin workflows, not in
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd>
 <dd>
-This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">A</td><td>handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </td></tr>
-  </table>
-  </dd>
-</dl>
+This function only has meaning in the context of Python Plugin workflows, not in regular API workflows. </dd>
+<dd>
+A handle index or other problem will return 0 and set a flag to cause EnergyPlus to terminate once Python completes. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd>
 <dd>
 <a class="el" href="datatransfer_8h.html#ac196675c7643c5a7d35d02a2e540f34b" title="Gets a handle to a Python Plugin &quot;Global&quot; variable. ">getPluginGlobalVariableHandle</a> </dd></dl>
@@ -1531,6 +1552,27 @@ This function only has meaning in the context of Python Plugin workflows, not in
 
 <p>Returns the current year of the simulation. </p>
 <p>A simulation can span multiple years and will always have a "meaningful" year that is either user-defined explicitly, determined based on other inputs in the input file, or chosen as the current year. </p><dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd></dl>
+
+</div>
+</div>
+<a id="a15ee2aef7d79e89d7e722644036469ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15ee2aef7d79e89d7e722644036469ff">&#9670;&nbsp;</a></span>zoneTimeStep()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_type_defs_8h.html#ad7943e857089166860fb89c13dcb8dee">Real64</a> zoneTimeStep </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the duration of the current zone simulation time step, in fractional hours. </p>
+<p>The zone time step will vary throughout the simulation as needed to maintain convergence while being cautious about program runtime. This function returns the current value of the time step </p><dl class="section remark"><dt>Remarks</dt><dd>The behavior of this function is not well-defined until the <code>apiDataFullyReady</code> function returns true. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="datatransfer_8h.html#a4919a834ba52cd44d4b164137120b07b" title="Provides a user-facing check for whether API data is ready to be accessed. ">apiDataFullyReady</a> </dd></dl>
 
 </div>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <title>datatransfer &#8212; EnergyPlus Python API Documentation 0.1 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -13,23 +13,22 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-   
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="search" title="Search" href="../search.html" /> 
   </head><body>
-  
+      <div class="header" role="banner"><img class="rightlogo" src="../_static/favicon.png" alt="Logo"/><h1 class="heading"><a href="../index.html">
+          <span>EnergyPlus Python API Documentation 0.1 documentation</span></a></h1>
+        <h2 class="heading"><span>datatransfer</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-            
+      </div>
+      <div class="content" role="main">
+        
+        
   <h1>Source code for datatransfer</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">ctypes</span> <span class="k">import</span> <span class="n">cdll</span><span class="p">,</span> <span class="n">c_int</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">,</span> <span class="n">c_void_p</span>
 <span class="kn">from</span> <span class="nn">pyenergyplus.common</span> <span class="k">import</span> <span class="n">RealEP</span><span class="p">,</span> <span class="n">EnergyPlusException</span>
@@ -69,6 +68,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">listAllAPIDataCSV</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_char_p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">apiDataFullyReady</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">apiDataFullyReady</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">apiErrorFlag</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">apiErrorFlag</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">resetErrorFlag</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">resetErrorFlag</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">requestVariable</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">requestVariable</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getVariableHandle</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">]</span>
@@ -116,6 +119,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">sunIsUp</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">isRaining</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">isRaining</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">zoneTimeStep</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">zoneTimeStep</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">systemTimeStep</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">systemTimeStep</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">currentEnvironmentNum</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
@@ -142,6 +147,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableSum</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableDirection</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">c_int</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginTrendVariableDirection</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">RealEP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getConstructionHandle</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getConstructionHandle</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">actualTime</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">actualTime</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">actualDateTime</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">actualDateTime</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
 
 <div class="viewcode-block" id="DataExchange.list_available_api_data_csv"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.list_available_api_data_csv">[docs]</a>    <span class="k">def</span> <span class="nf">list_available_api_data_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -162,6 +173,26 @@
         <span class="k">if</span> <span class="n">success</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="DataExchange.api_error_flag"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.api_error_flag">[docs]</a>    <span class="k">def</span> <span class="nf">api_error_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check whether the error flag has been activated.</span>
+<span class="sd">        A number of functions will return 0 in erroneous situations, and this function allows for disambiguation</span>
+<span class="sd">        between valid zero return values and the error condition.</span>
+
+<span class="sd">        :return: Returns true if the error flag was activated during prior calculations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">apiErrorFlag</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="DataExchange.reset_api_error_flag"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.reset_api_error_flag">[docs]</a>    <span class="k">def</span> <span class="nf">reset_api_error_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the error flag for API calls.</span>
+<span class="sd">        A number of functions will return 0 in erroneous situations, but activate an error flag.  In certain work flows,</span>
+<span class="sd">        it may be useful to reset this error flag (unit testing, etc.).  This function allows resetting it to false.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">resetErrorFlag</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="DataExchange.request_variable"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.request_variable">[docs]</a>    <span class="k">def</span> <span class="nf">request_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span> <span class="n">variable_key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -253,18 +284,19 @@
             <span class="n">actuator_key</span> <span class="o">=</span> <span class="n">actuator_key</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getActuatorHandle</span><span class="p">(</span><span class="n">component_type</span><span class="p">,</span> <span class="n">control_type</span><span class="p">,</span> <span class="n">actuator_key</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataExchange.get_variable_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_variable_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_variable_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="DataExchange.get_variable_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_variable_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_variable_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the current value of a variable in a running simulation.  The `get_variable_handle` function is first used</span>
 <span class="sd">        to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this function to</span>
 <span class="sd">        then get the value of the variable.</span>
 
 <span class="sd">        :param variable_handle: An integer returned from the `get_variable_handle` function.</span>
-<span class="sd">        :return: Floating point representation of the current variable value</span>
+<span class="sd">        :return: Floating point representation of the current variable value.  Returns zero if the handle is invalid.</span>
+<span class="sd">                 Use the api_error_flag function to disambiguate between valid zero returns and error states.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getVariableValue</span><span class="p">(</span><span class="n">variable_handle</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataExchange.get_meter_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_meter_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_meter_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meter_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="DataExchange.get_meter_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_meter_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_meter_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meter_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the current value of a meter in a running simulation.  The `get_meter_handle` function is first used</span>
 <span class="sd">        to get a handle to the meter by name.  Then once the handle is retrieved, it is passed into this function to</span>
@@ -274,7 +306,8 @@
 <span class="sd">        This will change in a future version of the API.</span>
 
 <span class="sd">        :param meter_handle: An integer returned from the `get_meter_handle` function.</span>
-<span class="sd">        :return: Floating point representation of the current meter value</span>
+<span class="sd">        :return: Floating point representation of the current meter value.  Returns zero if the handle is invalid.</span>
+<span class="sd">                 Use the api_error_flag function to disambiguate between valid zero returns and error states.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getMeterValue</span><span class="p">(</span><span class="n">meter_handle</span><span class="p">)</span></div>
 
@@ -313,6 +346,8 @@
 
 <span class="sd">        :param actuator_handle: An integer returned from the `get_actuator_handle` function.</span>
 <span class="sd">        :return: A floating point of the actuator value.  For boolean actuators returns 1.0 for true and 0.0 for false.</span>
+<span class="sd">                 Returns zero if the handle is invalid.  Use the api_error_flag function to disambiguate between valid</span>
+<span class="sd">                 zero returns and error states.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getActuatorValue</span><span class="p">(</span><span class="n">actuator_handle</span><span class="p">)</span></div>
 
@@ -336,16 +371,38 @@
             <span class="n">variable_key</span> <span class="o">=</span> <span class="n">variable_key</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getInternalVariableHandle</span><span class="p">(</span><span class="n">variable_type</span><span class="p">,</span> <span class="n">variable_key</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataExchange.get_internal_variable_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_internal_variable_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_internal_variable_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="DataExchange.get_internal_variable_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_internal_variable_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_internal_variable_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the value of an internal variable in a running simulation.  The `get_internal_variable_handle` function is</span>
 <span class="sd">        first used to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this</span>
 <span class="sd">        function to then get the value of the variable.</span>
 
 <span class="sd">        :param variable_handle: An integer returned from the `get_internal_variable_handle` function.</span>
-<span class="sd">        :return: Floating point representation of the internal variable value</span>
+<span class="sd">        :return: Floating point representation of the internal variable value.  Returns zero if the handle is invalid.</span>
+<span class="sd">                 Use the api_error_flag function to disambiguate between valid zero returns and error states.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getInternalVariableValue</span><span class="p">(</span><span class="n">variable_handle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataExchange.get_construction_handle"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_construction_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_construction_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a handle to a constructions in a running simulation.  This is only used for Python Plugin applications!</span>
+
+<span class="sd">        Some actuators allow specifying different constructions to allow switchable construction control.</span>
+<span class="sd">        This function returns an index that can be used in those functions.  The construction is specified by name.</span>
+
+<span class="sd">        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API</span>
+<span class="sd">        automatically converts values to upper-case when finding matches to internal variables in the simulation.</span>
+
+<span class="sd">        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion</span>
+<span class="sd">        as needed.</span>
+
+<span class="sd">        :return: An integer ID for this construction, or -1 if one could not be found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">running_as_python_plugin</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EnergyPlusException</span><span class="p">(</span><span class="s2">&quot;get_construction_handle is only available as part of a Python Plugin workflow&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">var_name</span> <span class="o">=</span> <span class="n">var_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getConstructionHandle</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DataExchange.get_global_handle"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_global_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -373,7 +430,7 @@
             <span class="n">var_name</span> <span class="o">=</span> <span class="n">var_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">getPluginGlobalVariableHandle</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataExchange.get_global_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_global_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="DataExchange.get_global_value"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.get_global_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the current value of a plugin global variable in a running simulation.  This is only used for Python Plugin</span>
 <span class="sd">        applications!</span>
@@ -607,7 +664,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">hour</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="DataExchange.current_time"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.current_time">[docs]</a>    <span class="k">def</span> <span class="nf">current_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="DataExchange.current_time"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.current_time">[docs]</a>    <span class="k">def</span> <span class="nf">current_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the current time of day in hours, where current time represents the end time of the current time step.</span>
 
@@ -684,7 +741,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">warmupFlag</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span></div>
 
-<div class="viewcode-block" id="DataExchange.system_time_step"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.system_time_step">[docs]</a>    <span class="k">def</span> <span class="nf">system_time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="DataExchange.zone_time_step"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.zone_time_step">[docs]</a>    <span class="k">def</span> <span class="nf">zone_time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the current zone time step value in EnergyPlus.  The zone time step is variable and fluctuates</span>
+<span class="sd">        during the simulation.</span>
+
+<span class="sd">        :return: The current zone time step in fractional hours.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">systemTimeStep</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.system_time_step"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.system_time_step">[docs]</a>    <span class="k">def</span> <span class="nf">system_time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealEP</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the current system time step value in EnergyPlus.  The system time step is variable and fluctuates</span>
 <span class="sd">        during the simulation.</span>
@@ -701,75 +767,44 @@
 
 <span class="sd">        :return: The current environment number.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">currentEnvironmentNum</span><span class="p">()</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">currentEnvironmentNum</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.actual_time"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.actual_time">[docs]</a>    <span class="k">def</span> <span class="nf">actual_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a simple sum of the values of the time part of the date/time function. Could be used in random seeding.</span>
+
+<span class="sd">        :return: Integer value of time portion of the date/time function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">actualTime</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataExchange.actual_date_time"><a class="viewcode-back" href="../datatransfer.html#datatransfer.DataExchange.actual_date_time">[docs]</a>    <span class="k">def</span> <span class="nf">actual_date_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a simple sum of the values of the date/time function. Could be used in random seeding.</span>
+
+<span class="sd">        :return: Integer value of the date/time function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">actualDateTime</span><span class="p">()</span></div></div>
 </pre></div>
 
-          </div>
-          
-        </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">EnergyPlus Python API Documentation</a></h1>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">Root Api Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../func.html">Functional API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../runtime.html">Runtime API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../datatransfer.html">Data Transfer API</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../index.html">Documentation overview</a><ul>
-  <li><a href="index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, National Renewable Energy Laboratory for the United States Department of Energy.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-    </div>
 
-    
-
-    
+<div class="footer">
+    <div style="text-align:center;">
+        <font size="+2"> LINKS </font> <br>
+        <a href="https://energyplus.net">EnergyPlus Web Site</a> <br>
+        <a href="https://github.com/NREL/EnergyPlus">EnergyPlus Github Repo</a> <br>
+        <a href="https://nrel.github.io/EnergyPlus/api">API Documentation Home</a> <br>
+        <a href="https://nrel.github.io/EnergyPlus/api/c">C Documentation</a> <br>
+    </div>
+    <hr>
+    &copy; Copyright 2020, National Renewable Energy Laboratory for the United States Department of Energy.
+</div>
   </body>
 </html>

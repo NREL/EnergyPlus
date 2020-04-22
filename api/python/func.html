@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Functional API &#8212; EnergyPlus Python API Documentation 0.1 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -15,23 +15,26 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Runtime API" href="runtime.html" />
-    <link rel="prev" title="Root Api Documentation" href="api.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="Root Api Documentation" href="api.html" /> 
   </head><body>
-  
+      <div class="header" role="banner"><img class="rightlogo" src="_static/favicon.png" alt="Logo"/><h1 class="heading"><a href="index.html">
+          <span>EnergyPlus Python API Documentation 0.1 documentation</span></a></h1>
+        <h2 class="heading"><span>Functional API</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="api.html">Root Api Documentation</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="runtime.html">Runtime API</a>&#160;&#160;»
+        </p>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-            
+      </div>
+      <div class="content" role="main">
+        
+        
   <div class="section" id="module-func">
 <span id="functional-api"></span><h1>Functional API<a class="headerlink" href="#module-func" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
@@ -43,7 +46,7 @@
 
 <dl class="class">
 <dt id="func.Functional">
-<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Functional</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7f6337fdc9e8&gt;</em>, <em class="sig-param">running_as_python_plugin: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Functional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Functional" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Functional</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fbea5dffb00&gt;</em>, <em class="sig-param">running_as_python_plugin: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Functional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Functional" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This API class enables accessing structures and functionality inside EnergyPlus from an outside client.
 This functional API will be extended over time, but initial targeted functionality includes fluid and refrigerant
@@ -130,7 +133,7 @@ one thread, each with many new and different error handler callbacks, and you ne
 
 <dl class="class">
 <dt id="func.Glycol">
-<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Glycol</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7f6337fdc9e8&gt;</em>, <em class="sig-param">glycol_name: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Glycol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Glycol" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Glycol</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fbea5dffb00&gt;</em>, <em class="sig-param">glycol_name: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Glycol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Glycol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class provides access to the glycol property calculations inside EnergyPlus.
 For now, the only glycol name allowed is plain water.  This is because other fluids are only
@@ -197,7 +200,7 @@ additional fluids, but water will suffice for now.</p>
 
 <dl class="class">
 <dt id="func.Psychrometrics">
-<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Psychrometrics</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7f6337fdc9e8&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Psychrometrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Psychrometrics</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fbea5dffb00&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Psychrometrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class provides access to the psychrometric functions within EnergyPlus.  Some property calculations are
 available as functions of different independent variables, and so there are functions with suffixes like
@@ -560,7 +563,7 @@ available as functions of different independent variables, and so there are func
 
 <dl class="class">
 <dt id="func.Refrigerant">
-<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Refrigerant</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7f6337fdc9e8&gt;</em>, <em class="sig-param">refrigerant_name: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Refrigerant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Refrigerant" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Refrigerant</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fbea5dffb00&gt;</em>, <em class="sig-param">refrigerant_name: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Refrigerant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Refrigerant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class provides access to the refrigerant property calculations inside EnergyPlus.
 For now, the only refrigerant  name allowed is steam.  This is because other refrigerants are only
@@ -651,75 +654,29 @@ but steam will provide a suitable use case for now.</p>
 </div>
 
 
-          </div>
-          
-        </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">EnergyPlus Python API Documentation</a></h1>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="api.html">Root Api Documentation</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="runtime.html">Runtime API</a>&#160;&#160;»
+        </p>
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="api.html">Root Api Documentation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Functional API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="runtime.html">Runtime API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datatransfer.html">Data Transfer API</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="api.html" title="previous chapter">Root Api Documentation</a></li>
-      <li>Next: <a href="runtime.html" title="next chapter">Runtime API</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, National Renewable Energy Laboratory for the United States Department of Energy.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/func.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
-
-    
+<div class="footer">
+    <div style="text-align:center;">
+        <font size="+2"> LINKS </font> <br>
+        <a href="https://energyplus.net">EnergyPlus Web Site</a> <br>
+        <a href="https://github.com/NREL/EnergyPlus">EnergyPlus Github Repo</a> <br>
+        <a href="https://nrel.github.io/EnergyPlus/api">API Documentation Home</a> <br>
+        <a href="https://nrel.github.io/EnergyPlus/api/c">C Documentation</a> <br>
+    </div>
+    <hr>
+    &copy; Copyright 2020, National Renewable Energy Laboratory for the United States Department of Energy.
+</div>
   </body>
 </html>
