@@ -316,7 +316,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
-    CalcChillerIPLV(OutputFiles::getSingleton(),
+    CalcChillerIPLV(outputFiles(),
                     ChillerElectricEIR::ElectricEIRChiller(1).Name,
                     TypeOf_Chiller_ElectricEIR,
                     ChillerElectricEIR::ElectricEIRChiller(1).RefCap,

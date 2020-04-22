@@ -10146,9 +10146,7 @@ namespace UnitarySystems {
                 this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
                 if (DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp > this->DesignMaxOutletTemp && !this->m_SimASHRAEModel) {
                     Real64 MDotAir = DataLoopNode::Node(this->HeatCoilInletNodeNum).MassFlowRate;
-                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat);
-                    Real64 CpAirOut = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat);
-                    Real64 CpAir = (CpAirIn + CpAirOut) / 2;
+                    Real64 CpAir = Psychrometrics::PsyCpAirFnW(0.5 * (DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat + DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat));
                     Real64 HCDeltaT = this->DesignMaxOutletTemp - DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp;
                     Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
                     this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, MaxHeatCoilLoad);
@@ -10171,9 +10169,7 @@ namespace UnitarySystems {
                     this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
                     if (DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp > this->DesignMaxOutletTemp && !this->m_SimASHRAEModel) {
                         Real64 MDotAir = DataLoopNode::Node(this->HeatCoilInletNodeNum).MassFlowRate;
-                        Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat);
-                        Real64 CpAirOut = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat);
-                        Real64 CpAir = (CpAirIn + CpAirOut) / 2;
+                        Real64 CpAir = Psychrometrics::PsyCpAirFnW(0.5 * (DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat + DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat));
                         Real64 HCDeltaT = this->DesignMaxOutletTemp - DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp;
                         Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
                         this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, MaxHeatCoilLoad);
@@ -10187,9 +10183,7 @@ namespace UnitarySystems {
                 this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
                 if (DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp > this->DesignMaxOutletTemp && !this->m_SimASHRAEModel) {
                     Real64 MDotAir = DataLoopNode::Node(this->HeatCoilInletNodeNum).MassFlowRate;
-                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat);
-                    Real64 CpAirOut = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat);
-                    Real64 CpAir = (CpAirIn + CpAirOut) / 2;
+                    Real64 CpAir = Psychrometrics::PsyCpAirFnW(0.5 * (DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat + DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat));
                     Real64 HCDeltaT = this->DesignMaxOutletTemp - DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp;
                     Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
                     this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, MaxHeatCoilLoad);
@@ -10210,9 +10204,7 @@ namespace UnitarySystems {
                     this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
                     if (DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp > this->DesignMaxOutletTemp && !this->m_SimASHRAEModel) {
                         Real64 MDotAir = DataLoopNode::Node(this->HeatCoilInletNodeNum).MassFlowRate;
-                        Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat);
-                        Real64 CpAirOut = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat);
-                        Real64 CpAir = (CpAirIn + CpAirOut) / 2;
+                        Real64 CpAir = Psychrometrics::PsyCpAirFnW(0.5 * (DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat + DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat));
                         Real64 HCDeltaT = this->DesignMaxOutletTemp - DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp;
                         Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
                         this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, MaxHeatCoilLoad);
@@ -10238,9 +10230,7 @@ namespace UnitarySystems {
             this->calcUnitarySuppHeatingSystem(FirstHVACIteration, SuppPLR, SuppCoilLoad);
             if ((DataLoopNode::Node(this->m_SuppCoilAirOutletNode).Temp > this->DesignMaxOutletTemp) && SuppPLR > 0.0 && !this->m_SimASHRAEModel) {
                 Real64 MDotAir = DataLoopNode::Node(this->m_SuppCoilAirInletNode).MassFlowRate;
-                Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->m_SuppCoilAirInletNode).HumRat);
-                Real64 CpAirOut = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->m_SuppCoilAirOutletNode).HumRat);
-                Real64 CpAir = (CpAirIn + CpAirOut) / 2;
+                Real64 CpAir = Psychrometrics::PsyCpAirFnW(0.5 * (DataLoopNode::Node(this->m_SuppCoilAirInletNode).HumRat + DataLoopNode::Node(this->m_SuppCoilAirOutletNode).HumRat));
                 Real64 HCDeltaT = max(0.0, this->DesignMaxOutletTemp - DataLoopNode::Node(this->m_SuppCoilAirInletNode).Temp);
                 Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
                 this->calcUnitarySuppHeatingSystem(FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);

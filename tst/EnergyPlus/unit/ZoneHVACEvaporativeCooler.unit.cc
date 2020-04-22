@@ -195,7 +195,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(outputFiles());
     ScheduleManager::ScheduleInputProcessed = true;
 
     Fans::GetFanInput();
@@ -319,7 +319,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(outputFiles());
     ScheduleManager::ScheduleInputProcessed = true;
 
     Fans::GetFanInput();
@@ -448,7 +448,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(outputFiles());
     ScheduleManager::ScheduleInputProcessed = true;
 
     Fans::GetFanInput();

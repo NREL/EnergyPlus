@@ -486,7 +486,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
     EXPECT_EQ(2, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
@@ -752,7 +752,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
     AirLoopFlow(1).OAMinFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
 
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
 
     EXPECT_EQ(7, VentilationMechanical(1).SystemOAMethod);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
@@ -958,7 +958,7 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
     GetZoneAirDistribution();
     GetZoneSizingInput();
     DataGlobals::DoZoneSizing = true;
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
 
     EXPECT_EQ(0.00944, VentilationMechanical(1).ZoneOAPeopleRate(1));
     EXPECT_EQ(0.00, VentilationMechanical(1).ZoneOAAreaRate(1));
@@ -1303,7 +1303,7 @@ TEST_F(EnergyPlusFixture, FreezingCheckTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
 
     AirLoopControlInfo.allocate(1); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
     AirLoopFlow.allocate(1);        // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
@@ -1736,7 +1736,7 @@ TEST_F(EnergyPlusFixture, OAControllerMixedAirSPTest)
     AirLoopControlInfo.allocate(1);
     AirLoopControlInfo(1).LoopFlowRateSet = true;
 
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
 
     StdRhoAir = 1.2;
     OAController(1).MixMassFlow = 1.7 * StdRhoAir;
@@ -1880,7 +1880,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart1)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
 
     EXPECT_EQ(1, GetNumOAMixers());
     EXPECT_EQ(1, GetNumOAControllers());
@@ -5208,7 +5208,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
 
     EXPECT_EQ(6, GetNumOAMixers());
     EXPECT_EQ(1, GetNumOAControllers());
@@ -5258,7 +5258,7 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     DataContaminantBalance::ZoneSysContDemand(1).OutputRequiredToGCSP = 1.0;
     DataContaminantBalance::ZoneSysContDemand(2).OutputRequiredToGCSP = 0.5;
 
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
 
     // Case 1 - System OA method = IndoorAirQualityProcedure, SOAM_IAQP, controls to OutputRequiredToCO2SP
     OAMassFlow = 0.0;
@@ -5466,7 +5466,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
     DataHeatBalance::ZoneIntGain(6).NOFOCC = 6;
 
     SizingManager::GetOARequirements();
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
     EXPECT_EQ(SOAM_ZoneSum, VentilationMechanical(1).SystemOAMethod);
 
     // Summary of inputs and expected OA flow rate for each zone, StdRho = 1, so mass flow = volume flow for these tests
@@ -5614,7 +5614,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
     AirLoopFlow(1).OAMinFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
 
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
 
     EXPECT_EQ(8, VentilationMechanical(1).SystemOAMethod);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
@@ -5905,7 +5905,7 @@ TEST_F(EnergyPlusFixture, MixedAir_OAControllerOrderInControllersListTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
 
     GetOutsideAirSysInputs();
 
@@ -5987,7 +5987,7 @@ TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
     EXPECT_EQ(2, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
@@ -6181,7 +6181,7 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
     EXPECT_EQ("OA HEAT RECOVERY", OutsideAirSys(1).ComponentName(1));
     EXPECT_EQ("OA MIXER", OutsideAirSys(1).ComponentName(2));
 
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
     EXPECT_EQ(5, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
@@ -6389,7 +6389,7 @@ TEST_F(EnergyPlusFixture, OAController_HighExhaustMassFlowTest)
     EXPECT_EQ("OA SYS HEATING COIL", OutsideAirSys(1).ComponentName(2));
     EXPECT_EQ("OA MIXER", OutsideAirSys(1).ComponentName(3));
 
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
     EXPECT_EQ(5, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
@@ -6640,7 +6640,7 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
     EXPECT_EQ("OA SYS HEATING COIL", OutsideAirSys(1).ComponentName(2));
     EXPECT_EQ("OA MIXER", OutsideAirSys(1).ComponentName(3));
 
-    GetOAControllerInputs(OutputFiles::getSingleton());
+    GetOAControllerInputs(outputFiles());
     EXPECT_EQ(5, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
