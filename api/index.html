@@ -1,15 +1,63 @@
 <DOCTYPE html>
 <html>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+		<link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/jumbotron/">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<title>EnergyPlus API Navigation</title>
+	</head>
 <body>
-
-<h1>C API</h1>
-
-EnergyPlus now includes a proper C API.  Documentation is built using Doxygen, and available <a href="https://nrel.github.io/EnergyPlus/api/c/index.html">here</a>.
-
-<h1>Python API</h1>
-
-The API also includes Python bindings that wrap the C API.  Documentation is built using Sphinx, and available <a href="https://nrel.github.io/EnergyPlus/api/python/index.html">here</a>.
-
+	<div class="jumbotron" style="padding-bottom: 32px; padding-top: 32px;">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-2"></div>
+				<div class="col-md-8 text-center">
+					<img src="logo.png" alt="EnergyPlus Logo"> <br>
+				</div>
+				<div class="col-md-2"></div>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<h1>API Documentation</h1>
+				<p>
+					Internal aspects of EnergyPlus are now accessible via API.
+					The API is written in C, but a Python wrapper is also included on top of this API for convenience.
+					More details about the API including usage details are provided in the input-output documentation which is included with the EnergyPlus install.
+					This website documents the low-level details of the API functions.
+				</p>
+			</div>
+			<hr>
+			<div class="col-md-6">
+				<div class="text-center">
+					<img src="c.svg" width=128 height=128>
+					<br>
+					<h1>EnergyPlus C API</h1>
+				</div>
+				<p>
+					EnergyPlus now includes a proper C API.  Documentation is built using Doxygen.
+				</p>
+				<div class="text-center">
+					<a href="https://nrel.github.io/EnergyPlus/api/c/index.html" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Go To C Documentation</a>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="text-center">
+					<img src="python.svg" width=128 height=128>
+					<br>
+					<h1>EnergyPlus Python API</h1>
+				</div>
+				<p>
+					The API also includes Python bindings that wrap the C API.  Documentation is built using Sphinx.
+				</p>
+				<div class="text-center">
+					<a href="https://nrel.github.io/EnergyPlus/api/python/index.html" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Go To Python Documentation</a>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
 
