@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath(os.path.join('..', '..', '..', '..', '..', 'b
 
 # -- Project information -----------------------------------------------------
 
-project = u'EnergyPlus Python API Documentation'
+project = u'EnergyPlus Python API'
 copyright = u'2020, National Renewable Energy Laboratory for the United States Department of Energy'
 author = u'National Renewable Energy Laboratory for the United States Department of Energy'
 

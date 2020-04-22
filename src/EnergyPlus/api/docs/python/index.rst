@@ -1,5 +1,5 @@
-Welcome to EnergyPlus Python API Documentation's documentation!
-===============================================================
+Welcome to EnergyPlus Python API documentation!
+===============================================
 
 EnergyPlus now includes Python bindings that wrap a C API.
 There are two primary use cases of the API:
