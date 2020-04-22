@@ -49,7 +49,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <limits>
 #include <string>
 
 // ObjexxFCL Headers
@@ -3841,37 +3840,42 @@ namespace ConvectionCoefficients {
         //      | Horizontal Surface, exterior face up   | Negative  | 0.9239 to 1.0 (0° to 22.5°)             | reduced         |       0.948 |
         //      | Horizontal Surface, exterior face down | Negative  | -0.9239 to -1.0 (157.5° to 180°)        | enhanced        |       4.040 |
         //      | Tilted Surface                         | Positive  | 0.3827 to 0.9239 (22.5° to 67.5°)       | enhanced        |       3.870 |
-        //      | Tilted Surface                         | Negative  | -0.3827 to -0.9239 (157.5° to 157.5°)   | reduced         |       2.281 |
+        //      | Tilted Surface                         | Negative  | -0.3827 to -0.9239 (157.5° to 157.5°)   | enhanced        |       3.870 |
+        //      | Tilted Surface                         | Negative  | 0.3827 to 0.9239 (22.5° to 67.5°)       | reduced         |       2.281 |
+        //      | Tilted Surface                         | Positive  | -0.3827 to -0.9239 (157.5° to 157.5°)   | reduced         |       2.281 |
         //      +----------------------------------------+-----------+-----------------------------------------+-----------------+-------------+
 
-        Real64 DeltaTemp = Tamb - Tsurf;
 
         // Set HConvIn using the proper correlation based on DeltaTemp and Cosine of the Tilt of the Surface
         if (std::abs(cosTilt) < 0.3827) {  // Vertical Surface
             return 3.076;
         }
-        else if (std::abs(cosTilt) >= 0.9239) { // Horizontal Surface
-            if ((DeltaTemp > 0 && cosTilt > 0.0) || (DeltaTemp < 0 && cosTilt < 0.0)){ //Enhanced Convection
-                return 4.040;
+        else {
+            Real64 DeltaTemp = Tamb - Tsurf;
+            if (std::abs(cosTilt) >= 0.9239) { // Horizontal Surface
+                if (DeltaTemp * cosTilt > 0.0){ //Enhanced Convection
+                    return 4.040;
+                }
+                else if (DeltaTemp * cosTilt < 0.0){ // Reduced Convection
+                    return 0.948;
+                }
+                else { // Zero DeltaTemp
+                    return 3.076;
+                }
             }
-            else if ((DeltaTemp < 0 && cosTilt > 0.0) || (DeltaTemp > 0 && cosTilt < 0.0)){ // Reduced Convection
-                return 0.948;
-            }
-            else { // Zero DeltaTemp
-                return 3.076;
+            else { // tilted surface
+                if (DeltaTemp * cosTilt > 0.0){ // Enhanced Convection
+                    return 3.870;
+                }
+                else if (DeltaTemp * cosTilt < 0.0){ // Reduced Convection
+                    return 2.281;
+                }
+                else { // Zero DeltaTemp
+                    return 3.076;
+                }
             }
         }
-        else { // tilted surface
-            if (DeltaTemp > 0){ // Enhanced Convection
-                return 3.870;
-            }
-            else if (DeltaTemp < 0){ // Reduced Convection
-                return 2.281;
-            }
-            else { // Zero DeltaTemp
-                return 3.076;
-            }
-        }
+
     }
 
     void CalcASHRAESimpleIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
