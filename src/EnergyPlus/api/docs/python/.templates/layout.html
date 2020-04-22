@@ -1,6 +1,14 @@
 {% extends "!layout.html" %}
 {%- block footer %}
 <div class="footer">
+    <div style="text-align:center;">
+        <font size="+2"> LINKS </font> <br>
+        <a href="https://energyplus.net">EnergyPlus Web Site</a> <br>
+        <a href="https://github.com/NREL/EnergyPlus">EnergyPlus Github Repo</a> <br>
+        <a href="https://nrel.github.io/EnergyPlus/api">API Documentation Home</a> <br>
+        <a href="https://nrel.github.io/EnergyPlus/api/c">C Documentation</a> <br>
+    </div>
+    <hr>
     {%- if show_copyright %}
     {%- if hasdoc('copyright') %}
     {% trans path=pathto('copyright'), copyright=copyright|e %}&copy; <a href="{{ path }}">Copyright</a> {{ copyright }}.{% endtrans %}
@@ -8,11 +16,5 @@
     {% trans copyright=copyright|e %}&copy; Copyright {{ copyright }}.{% endtrans %}
     {%- endif %}
     {%- endif %}
-    <br>
-    <div style="text-align:center;">
-        <a href="https://github.com/NREL/EnergyPlus">EnergyPlus Github Repo</a> <br>
-        <a href="https://nrel.github.io/EnergyPlus/api">API Documentation Home</a> <br>
-        <a href="https://nrel.github.io/EnergyPlus/api/c">C Documentation</a> <br>
-    </div>
 </div>
 {%- endblock %}
