@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Functional API &#8212; EnergyPlus Python API Documentation 0.1 documentation</title>
+    <title>Functional API &#8212; EnergyPlus Python API 0.1 documentation</title>
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -18,7 +18,7 @@
     <link rel="prev" title="Root Api Documentation" href="api.html" /> 
   </head><body>
       <div class="header" role="banner"><img class="rightlogo" src="_static/favicon.png" alt="Logo"/><h1 class="heading"><a href="index.html">
-          <span>EnergyPlus Python API Documentation 0.1 documentation</span></a></h1>
+          <span>EnergyPlus Python API 0.1 documentation</span></a></h1>
         <h2 class="heading"><span>Functional API</span></h2>
       </div>
       <div class="topnav" role="navigation" aria-label="top navigation">
@@ -46,7 +46,7 @@
 
 <dl class="class">
 <dt id="func.Functional">
-<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Functional</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fbea5dffb00&gt;</em>, <em class="sig-param">running_as_python_plugin: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Functional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Functional" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Functional</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fdff3d3bb70&gt;</em>, <em class="sig-param">running_as_python_plugin: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Functional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Functional" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This API class enables accessing structures and functionality inside EnergyPlus from an outside client.
 This functional API will be extended over time, but initial targeted functionality includes fluid and refrigerant
@@ -133,7 +133,7 @@ one thread, each with many new and different error handler callbacks, and you ne
 
 <dl class="class">
 <dt id="func.Glycol">
-<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Glycol</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fbea5dffb00&gt;</em>, <em class="sig-param">glycol_name: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Glycol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Glycol" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Glycol</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fdff3d3bb70&gt;</em>, <em class="sig-param">glycol_name: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Glycol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Glycol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class provides access to the glycol property calculations inside EnergyPlus.
 For now, the only glycol name allowed is plain water.  This is because other fluids are only
@@ -200,7 +200,7 @@ additional fluids, but water will suffice for now.</p>
 
 <dl class="class">
 <dt id="func.Psychrometrics">
-<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Psychrometrics</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fbea5dffb00&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Psychrometrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Psychrometrics</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fdff3d3bb70&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Psychrometrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Psychrometrics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class provides access to the psychrometric functions within EnergyPlus.  Some property calculations are
 available as functions of different independent variables, and so there are functions with suffixes like
@@ -563,7 +563,7 @@ available as functions of different independent variables, and so there are func
 
 <dl class="class">
 <dt id="func.Refrigerant">
-<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Refrigerant</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fbea5dffb00&gt;</em>, <em class="sig-param">refrigerant_name: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Refrigerant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Refrigerant" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">func.</code><code class="sig-name descname">Refrigerant</code><span class="sig-paren">(</span><em class="sig-param">api: &lt;ctypes.LibraryLoader object at 0x7fdff3d3bb70&gt;</em>, <em class="sig-param">refrigerant_name: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/func.html#Refrigerant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#func.Refrigerant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class provides access to the refrigerant property calculations inside EnergyPlus.
 For now, the only refrigerant  name allowed is steam.  This is because other refrigerants are only
