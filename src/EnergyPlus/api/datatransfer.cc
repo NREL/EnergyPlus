@@ -47,6 +47,9 @@
 
 #include <cmath>
 
+#include <ObjexxFCL/ArrayS.functions.hh>
+#include <ObjexxFCL/time.hh>
+
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -605,6 +608,10 @@ int warmupFlag() {
     }
 }
 
+Real64 zoneTimeStep() {
+    return EnergyPlus::DataGlobals::TimeStepZone;
+}
+
 Real64 systemTimeStep() {
     return EnergyPlus::DataHVACGlobals::TimeStepSys;
 }
@@ -629,4 +636,18 @@ int getConstructionHandle(const char* constructionName) {
         }
     }
     return 0;
+}
+
+int actualTime() {
+    std::string datestring;
+    Array1D_int datevalues(8);
+    ObjexxFCL::date_and_time(datestring, _, _, datevalues);
+    return double(sum(datevalues({5, 8})));
+}
+
+int actualDateTime() {
+    std::string datestring;
+    Array1D_int datevalues(8);
+    ObjexxFCL::date_and_time(datestring, _, _, datevalues);
+    return double(sum(datevalues));
 }

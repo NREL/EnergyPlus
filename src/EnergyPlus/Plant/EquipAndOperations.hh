@@ -141,6 +141,8 @@ namespace DataPlant {
         int ReferenceNodeNumber;        // DELTA CTRL ONLY--for calculation of delta Temp
         int ErlSimProgramMngr;          // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr;         // EMS:ProgramManager to run when this model is initialized and setup
+        int initPluginLocation;         // If Python Plugins are used to init this, this defines the location in the plugin structure
+        int simPluginLocation;          // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         Real64 EMSIntVarLoopDemandRate; // EMS internal variable for loop-level demand rate, neg cooling [W]
         bool MyEnvrnFlag;
 

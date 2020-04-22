@@ -2,8 +2,8 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 5SwimmingPool.idf
-! Basic file description:  Basic test of an indoor swimming pool.
+! 5SwimmingPoolZoneMultipliers.idf
+! Basic file description:  Basic test of an indoor swimming pool.  Also includes zone multipliers and some new output variables.
 !
 ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
 !                          outside air stream controlled to preheat and precool setpoints.
@@ -633,7 +633,7 @@
     0,                       !- Y Origin {m}
     0,                       !- Z Origin {m}
     1,                       !- Type
-    1,                       !- Multiplier
+    3,                       !- Multiplier
     0.609600067,             !- Ceiling Height {m}
     283.2;                   !- Volume {m3}
 
@@ -804,7 +804,7 @@
     0,                       !- Y Origin {m}
     0,                       !- Z Origin {m}
     1,                       !- Type
-    1,                       !- Multiplier
+    3,                       !- Multiplier
     2.438400269,             !- Ceiling Height {m}
     239.247360229;           !- Volume {m3}
 
@@ -1013,7 +1013,7 @@
     0,                       !- Y Origin {m}
     0,                       !- Z Origin {m}
     1,                       !- Type
-    1,                       !- Multiplier
+    3,                       !- Multiplier
     2.438400269,             !- Ceiling Height {m}
     103.311355591;           !- Volume {m3}
 
@@ -1187,7 +1187,7 @@
     0,                       !- Y Origin {m}
     0,                       !- Z Origin {m}
     1,                       !- Type
-    1,                       !- Multiplier
+    3,                       !- Multiplier
     2.438400269,             !- Ceiling Height {m}
     239.247360229;           !- Volume {m3}
 
@@ -1376,7 +1376,7 @@
     0,                       !- Y Origin {m}
     0,                       !- Z Origin {m}
     1,                       !- Type
-    1,                       !- Multiplier
+    3,                       !- Multiplier
     2.438400269,             !- Ceiling Height {m}
     103.311355591;           !- Volume {m3}
 
@@ -1550,7 +1550,7 @@
     0,                       !- Y Origin {m}
     0,                       !- Z Origin {m}
     1,                       !- Type
-    1,                       !- Multiplier
+    3,                       !- Multiplier
     2.438400269,             !- Ceiling Height {m}
     447.682556152;           !- Volume {m3}
 
@@ -3497,8 +3497,6 @@
 
   Output:Variable,*,Indoor Pool Makeup Water Rate,hourly;
 
-  Output:Variable,*,Indoor Pool Makeup Water Volume,hourly;
-
   Output:Variable,*,Indoor Pool Makeup Water Temperature,hourly;
 
   Output:Variable,*,Indoor Pool Water Temperature,hourly;
@@ -3507,109 +3505,33 @@
 
   Output:Variable,*,Indoor Pool Inlet Water Mass Flow Rate,hourly;
 
-  Output:Variable,*,Indoor Pool Miscellaneous Equipment Power,hourly;
-
-  Output:Variable,*,Indoor Pool Miscellaneous Equipment Energy,hourly;
-
   Output:Variable,*,Indoor Pool Water Heating Rate,hourly;
-
-  Output:Variable,*,Indoor Pool Water Heating Energy,hourly;
-
-  Output:Variable,*,Indoor Pool Radiant to Convection by Cover,hourly;
-
-  Output:Variable,*,Indoor Pool People Heat Gain,hourly;
-
-  Output:Variable,*,Indoor Pool Current Activity Factor,hourly;
-
-  Output:Variable,*,Indoor Pool Current Cover Factor,hourly;
-
-  Output:Variable,*,Indoor Pool Saturation Pressure at Pool Temperature,hourly;
-
-  Output:Variable,*,Indoor Pool Partial Pressure of Water Vapor in Air,hourly;
-
-  Output:Variable,*,Indoor Pool Current Cover Evaporation Factor,hourly;
-
-  Output:Variable,*,Indoor Pool Current Cover Convective Factor,hourly;
-
-  Output:Variable,*,Indoor Pool Current Cover SW Radiation Factor,hourly;
-
-  Output:Variable,*,Indoor Pool Current Cover LW Radiation Factor,hourly;
 
   Output:Variable,*,Indoor Pool Evaporative Heat Loss Rate,hourly;
 
-  Output:Variable,*,Indoor Pool Evaporative Heat Loss Energy,hourly;
+  Output:Variable,*,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate,hourly;
 
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Temperature,hourly;
+  Output:Variable,*,Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,hourly;
 
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,*,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,hourly;
 
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Setpoint Temperature,hourly;
+  Output:Variable,*,Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate,hourly;
 
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Humidity Ratio,hourly;
+  Output:Variable,*,Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,hourly;
 
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Temperature,hourly;
+  Output:Variable,*,Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,hourly;
 
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Mass Flow Rate,hourly;
+  Output:Variable,*,Zone Predicted Moisture Load Moisture Transfer Rate,hourly;
 
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Setpoint Temperature,hourly;
+  Output:Variable,*,Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate,hourly;
 
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Humidity Ratio,hourly;
+  Output:Variable,*,Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate,hourly;
 
-  Output:Variable,Mixed Air Node 1,System Node Temperature,hourly;
+  Output:Variable,*,Zone System Predicted Moisture Load Moisture Transfer Rate,hourly;
 
-  Output:Variable,Mixed Air Node 1,System Node Humidity Ratio,hourly;
+  Output:Variable,*,Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate,hourly;
 
-  Output:Variable,Mixed Air Node 1,System Node Dewpoint Temperature,hourly;
-
-  Output:Variable,VAV Sys 1 Outlet Node,System Node Temperature,hourly;
-
-  Output:Variable,VAV Sys 1 Outlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,VAV Sys 1 Outlet Node,System Node Humidity Ratio,hourly;
-
-  Output:Variable,VAV Sys 1 Outlet Node,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,OA Cooling Coil 1 Water Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Cooling Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Main Cooling Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,OA Heating Coil 1 Water Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Heating Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Main Heating Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,*,Heating Coil Heating Rate,hourly;
-
-  Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
-
-  Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
-
-  Output:Variable,*,Plant Supply Side Cooling Demand Rate,hourly;
-
-  Output:Variable,*,Plant Supply Side Heating Demand Rate,hourly;
-
-  Output:Variable,*,Boiler Gas Rate,hourly;
-
-  Output:Variable,*,Boiler Heating Rate,hourly;
-
-  Output:Variable,*,Chiller Electric Power,hourly;
-
-  Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
-
-  Output:Variable,*,Chiller Evaporator Inlet Temperature,hourly;
-
-  Output:Variable,*,Chiller Evaporator Outlet Temperature,hourly;
-
-  Output:Variable,*,Chiller Evaporator Mass Flow Rate,hourly;
-
-  Output:Variable,*,Chiller Condenser Heat Transfer Rate,hourly;
-
-  Output:Variable,*,Pump Mass Flow Rate,hourly;
-
-  Output:Variable,*,Pump Outlet Temperature,hourly;
+  Output:Variable,*,Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate,hourly;
 
   Output:VariableDictionary,Regular;
 
