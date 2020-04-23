@@ -91,6 +91,7 @@ void EnergyPlusFixture::SetUp()
     OutputFiles::getSingleton().eso.open_as_stringstream();
     OutputFiles::getSingleton().audit.open_as_stringstream();
     OutputFiles::getSingleton().bnd.open_as_stringstream();
+    OutputFiles::getSingleton().debug.open_as_stringstream();
 
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
@@ -122,7 +123,7 @@ void EnergyPlusFixture::TearDown()
         ObjexxFCL::gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputStandardError, flags);
         OutputFiles::getSingleton().eio.del();
-        ObjexxFCL::gio::close(DataGlobals::OutputFileDebug, flags);
+        OutputFiles::getSingleton().debug.del();
         OutputFiles::getSingleton().zsz.del();
         OutputFiles::getSingleton().ssz.del();
         OutputFiles::getSingleton().mtr.del();
