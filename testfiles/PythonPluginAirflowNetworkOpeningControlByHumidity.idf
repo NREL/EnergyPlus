@@ -1,8 +1,8 @@
-! EMSAirflowNetworkOpeningControlByHumidity.idf
+! PythonPluginAirflowNetworkOpeningControlByHumidity.idf
 !
 !
 !
-! Basic file description:  file based on HybridVentilationControl.idf but modified to use EMS to control opening based on relative humidity.
+! Basic file description:  file based on HybridVentilationControl.idf but modified to use python to control opening based on relative humidity.
 !                          1 story building divided into 3 interior conditioned zones and 1 unconditioned zone over the
 !                          conditioned zones. Roof with no plenum. No ground contact with floor.
 !                          Outdoor air is modulated based on occupancy and floor area.
@@ -3222,37 +3222,11 @@
 
   Output:Variable,Zone 1 Node,System Node Relative Humidity,timestep;
 
-!  EnergyManagementSystem:Sensor,
-!    ZoneRH,                  !- Name
-!    Zone 1 Node,             !- Output:Variable or Output:Meter Index Key Name
-!    System Node Relative Humidity;  !- Output:Variable or Output:Meter Name
-
-!  EnergyManagementSystem:Actuator,
-!    MyOpenFactor,            !- Name
-!    Zn001:Wall001:Win001,    !- Actuated Component Unique Name
-!    AirFlow Network Window/Door Opening,  !- Actuated Component Type
-!    Venting Opening Factor;  !- Actuated Component Control Type
-
-!  EnergyManagementSystem:ProgramCallingManager,
-!    RH Controlled Open Factor,  !- Name
-!    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
-!    RH_OpeningController;    !- Program Name 1
-
   PythonPlugin:Instance,
     RH Controlled Open Factor,  !- Name
     Yes,                     !- Run During Warmup Days
     PythonPluginAirflowNetworkOpeningControlByHumidity, !- Python Module Name
     RH_OpeningController;        !- Plugin Class Name
-
-!  EnergyManagementSystem:Program,
-!    RH_OpeningController,    !- Name
-!    IF ZoneRH < 25,          !- Program Line 1
-!    SET MyOpenFactor = 0.0,  !- Program Line 2
-!    ELSEIF ZoneRH > 60,      !- <none>
-!    SET MyOpenFactor = 1.0,  !- <none>
-!    ELSE,                    !- <none>
-!    SET MyOpenFactor = (ZoneRH - 25) / (60 - 25),  !- <none>
-!    ENDIF;                   !- <none>
 
   Output:EnergyManagementSystem,
     Verbose,                 !- Actuator Availability Dictionary Reporting

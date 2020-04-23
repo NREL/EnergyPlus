@@ -1,7 +1,7 @@
-! EMSUserDefined5ZoneAirCooled.idf
+! PythonPluginUserDefined5ZoneAirCooled.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              User Defined component models using Energy Management System
+! Highlights:              User Defined component models using Python Plugin System
 !                          PlantComponent:UserDefined example of a constant COP chiller
 !                          Coil:UserDefined examples with chilled water and hot water coil systems that meet setpoint on leaving air node
 !                          AirTerminal:SingleDuct:UserDefined with VAV reheat air terminals that operate at full stop during heating (for zone mixing).

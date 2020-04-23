@@ -2,7 +2,7 @@
 ! Basic file description:  1 story building divided into 3 conditioned zones. Roof with no plenum.
 !                          No ground contact with floor. Window air conditioners serve each zone.
 !
-! Highlights:              illustrates use of EMS and user defined components to model a window air conditioners
+! Highlights:              illustrates use of Python Plugin system and user defined components to model a window air conditioners
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
