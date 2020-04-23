@@ -455,10 +455,12 @@ namespace HVACManager {
 
                 UpdateInternalGainValues(true, true);
 
-                ManageZoneAirUpdates(iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                ManageZoneAirUpdates(iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                     PriorTimeStep);
 
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                    ManageZoneContaminanUpdates(iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                                PriorTimeStep);
                 SimHVAC();
 
                 if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !WarmupFlag) {
@@ -473,13 +475,17 @@ namespace HVACManager {
                 // Need to set the flag back since we do not need to shift the temps back again in the correct step.
                 ShortenTimeStepSys = false;
 
-                ManageZoneAirUpdates(iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                ManageZoneAirUpdates(iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                     PriorTimeStep);
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                    ManageZoneContaminanUpdates(iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
+                                                PriorTimeStep);
 
-                ManageZoneAirUpdates(iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                ManageZoneAirUpdates(iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys,
+                                     UseZoneTimeStepHistory, PriorTimeStep);
                 if (Contaminant.SimulateContaminants)
-                    ManageZoneContaminanUpdates(iPushSystemTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                    ManageZoneContaminanUpdates(iPushSystemTimestepHistories, ShortenTimeStepSys,
+                                                UseZoneTimeStepHistory, PriorTimeStep);
                 PreviousTimeStep = TimeStepSys;
             }
 
@@ -506,6 +512,10 @@ namespace HVACManager {
 
             // Update the plant and condenser loop capacitance model temperature history.
             UpdateNodeThermalHistory();
+
+            if (OutputReportTabular::displayHeatEmissionsSummary) {
+                OutputReportTabular::CalcHeatEmissionReport();
+            }
 
             ManageEMS(emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
 
@@ -810,6 +820,18 @@ namespace HVACManager {
         if (!SimHVACIterSetup) {
             SetupOutputVariable("HVAC System Solver Iteration Count", OutputProcessor::Unit::None, HVACManageIteration, "HVAC", "Sum", "SimHVAC");
             SetupOutputVariable("Air System Solver Iteration Count", OutputProcessor::Unit::None, RepIterAir, "HVAC", "Sum", "SimHVAC");
+            SetupOutputVariable("Air System Relief Air Total Heat Loss Energy",
+                                OutputProcessor::Unit::J,
+                                DataHeatBalance::SysTotalHVACReliefHeatLoss,
+                                "HVAC",
+                                "Sum",
+                                "SimHVAC");
+            SetupOutputVariable("HVAC System Total Heat Rejection Energy",
+                                OutputProcessor::Unit::J,
+                                DataHeatBalance::SysTotalHVACRejectHeatLoss,
+                                "HVAC",
+                                "Sum",
+                                "SimHVAC");
             ManageSetPoints(); // need to call this before getting plant loop data so setpoint checks can complete okay
             GetPlantLoopData();
             GetPlantInput();

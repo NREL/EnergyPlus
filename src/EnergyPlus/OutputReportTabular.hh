@@ -772,6 +772,8 @@ namespace OutputReportTabular {
 
     void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType);
 
+    void CalcHeatEmissionReport();
+
     //======================================================================================================================
     //======================================================================================================================
 

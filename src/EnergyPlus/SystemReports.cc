@@ -2283,18 +2283,6 @@ namespace SystemReports {
                                     PrimaryAirSystem(SysIndex).Name);
             }
         }
-        SetupOutputVariable("Air System Relief Air Total Heat Loss Energy",
-                            OutputProcessor::Unit::J,
-                            DataHeatBalance::SysTotalHVACReliefHeatLoss,
-                            "HVAC",
-                            "Sum",
-                            "SimHVAC");
-        SetupOutputVariable("HVAC System Total Heat Rejection Energy",
-                            OutputProcessor::Unit::J,
-                            DataHeatBalance::SysTotalHVACRejectHeatLoss,
-                            "HVAC",
-                            "Sum",
-                            "SimHVAC");
         for (ZoneIndex = 1; ZoneIndex <= NumOfZones; ++ZoneIndex) {
             if (!ZoneEquipConfig(ZoneIndex).IsControlled) continue;
             // CurrentModuleObject='Zones(Controlled)'

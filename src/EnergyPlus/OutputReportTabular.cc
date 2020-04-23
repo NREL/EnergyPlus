@@ -4790,6 +4790,45 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
+        using DataGlobals::convertJtoGJ;
+        using DataHeatBalance::BuildingPreDefRep;
+
+        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
+        using DataHeatBalance::ZoneTotalExhaustHeatLoss;
+        using DataHeatBalSurface::SumSurfaceHeatEmission;
+
+        using DataHVACGlobals::TimeStepSys;
+
+        SysTotalHVACReliefHeatLoss = 0;
+        SysTotalHVACRejectHeatLoss = 0;
+
+        if (!displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
+
+        // Only gather zone report at zone time steps
+        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
+            BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * convertJtoGJ;
+            return;
+        }
+
+        CalcHeatEmissionReport();
+        BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * convertJtoGJ;
+        BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * convertJtoGJ;
+        BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
+        BuildingPreDefRep.emiHVACReject += SysTotalHVACRejectHeatLoss * convertJtoGJ;
+
+        BuildingPreDefRep.emiTotHeat = BuildingPreDefRep.emiEnvelopConv + BuildingPreDefRep.emiZoneExfiltration + BuildingPreDefRep.emiZoneExhaust +
+                                       BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;
+    }
+
+
+    void CalcHeatEmissionReport()
+    {
+        // PURPOSE OF THIS SUBROUTINE:
+        // Gathers the data each zone timestep for the heat gain report.
+        // The routine generates an annual table with the following columns which correspond to
+        // the output variables and data structures shown.
+
+        // Using/Aliasing
         using Boilers::Boiler;
         using Boilers::NumBoilers;
         using ChillerElectricEIR::ElectricEIRChiller;
@@ -4807,7 +4846,6 @@ namespace OutputReportTabular {
         using DataHeatBalance::SysTotalHVACReliefHeatLoss;
         using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
         using DataHeatBalance::ZoneTotalExhaustHeatLoss;
-        using DataHeatBalSurface::SumSurfaceHeatEmission;
         using DataHVACGlobals::AirCooled;
         using DataHVACGlobals::EvapCooled;
         using DataHVACGlobals::TimeStepSys;
@@ -4855,23 +4893,10 @@ namespace OutputReportTabular {
         SysTotalHVACReliefHeatLoss = 0;
         SysTotalHVACRejectHeatLoss = 0;
 
-        if (!displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
-
-        // Only gather zone report at zone time steps
-        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
-            BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * convertJtoGJ;
-            return;
-        }
-
-        BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * convertJtoGJ;
-
-        BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * convertJtoGJ;
-
         // HVAC relief air
         for (iOACtrl = 1; iOACtrl <= NumOAControllers; ++iOACtrl) {
             SysTotalHVACReliefHeatLoss += OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
         }
-        BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
 
         // Condenser water loop
         for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
@@ -4893,17 +4918,17 @@ namespace OutputReportTabular {
         }
         for (iChiller = 1; iChiller <= NumEngineDrivenChillers; ++iChiller) {
             if (EngineDrivenChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
+                SysTotalHVACRejectHeatLoss += EngineDrivenChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumGTChillers; ++iChiller) {
             if (GTChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
+                SysTotalHVACRejectHeatLoss += GTChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumConstCOPChillers; ++iChiller) {
             if (ConstCOPChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
+                SysTotalHVACRejectHeatLoss += ConstCOPChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumElectricEIRChillers; ++iChiller) {
@@ -5022,11 +5047,6 @@ namespace OutputReportTabular {
         for (iCooler = 1; iCooler <= NumEvapCool; ++iCooler) {
             SysTotalHVACRejectHeatLoss += EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC + EvapCond(iCooler).EvapCoolerEnergy;
         }
-
-        BuildingPreDefRep.emiHVACReject += SysTotalHVACRejectHeatLoss * convertJtoGJ;
-
-        BuildingPreDefRep.emiTotHeat = BuildingPreDefRep.emiEnvelopConv + BuildingPreDefRep.emiZoneExfiltration + BuildingPreDefRep.emiZoneExhaust +
-                                       BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;
     }
 
     void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
