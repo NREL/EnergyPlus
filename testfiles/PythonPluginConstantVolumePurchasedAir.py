@@ -2,32 +2,14 @@ from pyenergyplus.plugin import EnergyPlusPlugin
 import math
 
 
-class Set_Purch_Air(EnergyPlusPlugin):
-
-    def __init__(self):
-        super().__init__()
-        self.need_to_get_handles = True
-
-    def on_after_predictor_after_hvac_managers(self) -> int:
-
-        # check if API ready
-        if self.api.exchange.api_data_fully_ready():
-            # get handles if needed
-            if self.need_to_get_handles:
-                self.need_to_get_handles = False
-            # calculations
-            return 0
-        else:
-            return 0
-
-
 class Set_Shade_Control_State(EnergyPlusPlugin):
 
     def __init__(self):
         super().__init__()
         self.need_to_get_handles = True
         self.Solar_Beam_Incident_Cos_handle = None
-        self.Zn001_Wall001_Win001_Shading_Deploy_Status_handle = None
+        self.Zn001_Wall001_Win001_Shading_Deploy_Status_actuator_handle = None
+        self.Zn001_Wall001_Win001_Shading_Deploy_Status_output_handle = None
         self.Zone_Sensible_Cool_Rate_handle = None
         self.Shade_Status_Off_handle = None
         self.Shade_Status_Interior_Blind_On_handle = None
@@ -48,11 +30,14 @@ class Set_Shade_Control_State(EnergyPlusPlugin):
                     "Zn001:Wall001:Win001"
                 )
 
-                self.Zn001_Wall001_Win001_Shading_Deploy_Status_handle = self.api.exchange.get_actuator_handle(
+                self.Zn001_Wall001_Win001_Shading_Deploy_Status_actuator_handle = self.api.exchange.get_actuator_handle(
                     "Window Shading Control",
                     "Control Status",
                     "Zn001:Wall001:Win001"
                 )
+
+                self.Zn001_Wall001_Win001_Shading_Deploy_Status_output_handle = self.api.exchange.get_global_handle(
+                    "Zn001_Wall001_Win001_Shading_Deploy_Status")
 
                 self.Zone_Sensible_Cool_Rate_handle = self.api.exchange.get_variable_handle(
                     "Zone Air System Sensible Cooling Rate",
@@ -81,15 +66,20 @@ class Set_Shade_Control_State(EnergyPlusPlugin):
                 self.Shade_Status_Interior_Blind_On_handle)
 
             if IncidentAngle < 45.0:
-                self.api.exchange.set_actuator_value(self.Zn001_Wall001_Win001_Shading_Deploy_Status_handle,
+                self.api.exchange.set_actuator_value(self.Zn001_Wall001_Win001_Shading_Deploy_Status_actuator_handle,
                                                      shade_status_interior_blind_on)
+                shade_status_rpt = shade_status_interior_blind_on
             elif Zone_Sensible_Cool_Rate > 20.0:
-                self.api.exchange.set_actuator_value(self.Zn001_Wall001_Win001_Shading_Deploy_Status_handle,
+                self.api.exchange.set_actuator_value(self.Zn001_Wall001_Win001_Shading_Deploy_Status_actuator_handle,
                                                      shade_status_interior_blind_on)
-
+                shade_status_rpt = shade_status_interior_blind_on
             else:
-                self.api.exchange.set_actuator_value(self.Zn001_Wall001_Win001_Shading_Deploy_Status_handle,
+                self.api.exchange.set_actuator_value(self.Zn001_Wall001_Win001_Shading_Deploy_Status_actuator_handle,
                                                      shade_status_off)
+                shade_status_rpt = shade_status_off
+
+            self.api.exchange.set_global_value(self.Zn001_Wall001_Win001_Shading_Deploy_Status_output_handle,
+                                               shade_status_rpt)
             return 0
         else:
             return 0
@@ -111,6 +101,22 @@ class InitializeShadeControlFlags(EnergyPlusPlugin):
         # self.Shade_Status_Between_Glass_Blind_On_handle = None
 
     def on_begin_new_environment(self) -> int:
+
+        # these are control flag values used inside EnergyPlus for window shades
+        # EMS control of window shading devices involves setting the control values for shading control actuators with
+        #  one of these values.  The variable names can be used or replaced, it is the whole number values that trigger
+        #  changes in the modeling.
+        #  Shades and Blinds are either fully on or fully off, partial positions require multiple windows.
+        # the window shading control flag values follow
+        #  -1: if window has no shading device
+        #   0: if shading device is off
+        #   1: if interior shade is on
+        #   2: if glazing is switched to darker state
+        #   3: if exterior shade is on
+        #   6: if interior blind is on
+        #   7: if exterior blind is on
+        #   8: if between-glass shade is on
+        #   9: if between-glass blind is on
 
         # check if API ready
         if self.api.exchange.api_data_fully_ready():
