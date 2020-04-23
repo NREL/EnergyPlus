@@ -124,7 +124,6 @@ namespace WindowAC {
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::OutputFileDebug;
     using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::BlowThru;

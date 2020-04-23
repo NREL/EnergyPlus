@@ -223,9 +223,9 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports();
+    void InitEnergyReports(OutputFiles &outputFiles);
 
-    void FindFirstLastPtr(int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
+    void FindFirstLastPtr(OutputFiles &outputFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
     void UpdateZoneCompPtrArray(int &Idx,
                                 int const ListNum,

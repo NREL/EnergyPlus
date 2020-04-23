@@ -732,39 +732,44 @@ namespace HeatBalanceIntRadExchange {
                     }
 
                     if (Option1 == "IDF") {
-                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!======== original input factors ===========================";
-                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + thisEnclosure.Name + ',';
+                        // TODO Both "original" and "final" print the same output. This is likely a bug
+                        // (discovered while updating output to {fmt}
+                        // see: https://github.com/NREL/EnergyPlusArchive/commit/1c08247853c297dce59f3f53cde47ccfa67720c0#diff-124964a7e9b73ce494c1952ab1acdeeb
+                        print(outputFiles.debug, "{}\n", "!======== original input factors ===========================");
+                        print(outputFiles.debug, "ZoneProperty:UserViewFactors:bySurfaceName,{},\n", thisEnclosure.Name);
                         for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
                             for (Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                                print(outputFiles.debug,
+                                      "  {},{},{:.6R}",
+                                      Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
+                                      Surface(thisEnclosure.SurfacePtr(Findex)).Name,
+                                      thisEnclosure.F(Findex, SurfNum));
                                 if (!(SurfNum == thisEnclosure.NumOfSurfaces && Findex == thisEnclosure.NumOfSurfaces)) {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
-                                        Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
-                                        RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ',';
+                                    print(outputFiles.debug, ",\n");
                                 } else {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
-                                        Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
-                                        RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ';';
+                                    print(outputFiles.debug, ";\n");
                                 }
                             }
                         }
-                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============= end of data ======================";
+                        print(outputFiles.debug, "{}\n", "!============= end of data ======================");
 
-                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============ final view factors =======================";
-                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + thisEnclosure.Name + ',';
+                        print(outputFiles.debug, "{}\n", "!============ final view factors =======================");
+                        print(outputFiles.debug, "ZoneProperty:UserViewFactors:bySurfaceName,{},\n", thisEnclosure.Name);
                         for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
                             for (Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                                print(outputFiles.debug,
+                                      "  {},{},{:.6R}",
+                                      Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
+                                      Surface(thisEnclosure.SurfacePtr(Findex)).Name,
+                                      thisEnclosure.F(Findex, SurfNum));
                                 if (!(SurfNum == thisEnclosure.NumOfSurfaces && Findex == thisEnclosure.NumOfSurfaces)) {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
-                                        Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
-                                        RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ',';
+                                    print(outputFiles.debug, ",\n");
                                 } else {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
-                                        Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
-                                        RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ';';
+                                    print(outputFiles.debug, ";\n");
                                 }
                             }
                         }
-                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============= end of data ======================";
+                        print(outputFiles.debug, "{}\n", "!============= end of data ======================");
                     }
                 }
 
@@ -1016,39 +1021,43 @@ namespace HeatBalanceIntRadExchange {
                 }
 
                 if (Option1 == "IDF") {
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!======== original input factors ===========================";
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + thisEnclosure.Name + ',';
+                    // TODO Both "original" and "final" print the same output. This is likely a bug
+                    // see: https://github.com/NREL/EnergyPlusArchive/commit/1c08247853c297dce59f3f53cde47ccfa67720c0#diff-124964a7e9b73ce494c1952ab1acdeeb
+                    print(outputFiles.debug, "{}\n", "!======== original input factors ===========================");
+                    print(outputFiles.debug, "ZoneProperty:UserViewFactors:bySurfaceName,{},\n", thisEnclosure.Name);
                     for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
                         for (int Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                            print(outputFiles.debug,
+                                  "  {},{},{:.6R}",
+                                  Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
+                                  Surface(thisEnclosure.SurfacePtr(Findex)).Name,
+                                  thisEnclosure.F(Findex, SurfNum));
                             if (!(SurfNum == thisEnclosure.NumOfSurfaces && Findex == thisEnclosure.NumOfSurfaces)) {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA)
-                                    << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' + Surface(thisEnclosure.SurfacePtr(Findex)).Name +
-                                           ',' + General::RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ',';
+                                print(outputFiles.debug, ",\n");
                             } else {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA)
-                                    << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' + Surface(thisEnclosure.SurfacePtr(Findex)).Name +
-                                           ',' + General::RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ';';
+                                print(outputFiles.debug, ";\n");
                             }
                         }
                     }
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============= end of data ======================";
+                    print(outputFiles.debug, "{}\n", "!============= end of data ======================");
 
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============ final view factors =======================";
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + thisEnclosure.Name + ',';
+                    print(outputFiles.debug, "{}\n", "!============ final view factors =======================");
+                    print(outputFiles.debug, "ZoneProperty:UserViewFactors:bySurfaceName,{},\n", thisEnclosure.Name);
                     for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
                         for (int Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                            print(outputFiles.debug,
+                                  "  {},{},{:.6R}",
+                                  Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
+                                  Surface(thisEnclosure.SurfacePtr(Findex)).Name,
+                                  thisEnclosure.F(Findex, SurfNum));
                             if (!(SurfNum == thisEnclosure.NumOfSurfaces && Findex == thisEnclosure.NumOfSurfaces)) {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA)
-                                    << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' + Surface(thisEnclosure.SurfacePtr(Findex)).Name +
-                                           ',' + General::RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ',';
+                                print(outputFiles.debug, ",\n");
                             } else {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA)
-                                    << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' + Surface(thisEnclosure.SurfacePtr(Findex)).Name +
-                                           ',' + General::RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ';';
+                                print(outputFiles.debug, ";\n");
                             }
                         }
                     }
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============= end of data ======================";
+                    print(outputFiles.debug, "{}\n", "!============= end of data ======================");
                 }
             }
 

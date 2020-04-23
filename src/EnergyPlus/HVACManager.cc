@@ -152,7 +152,6 @@ namespace HVACManager {
     using DataGlobals::KickOffSimulation;
     using DataGlobals::MetersHaveBeenInitialized;
     using DataGlobals::NumOfZones;
-    using DataGlobals::OutputFileDebug;
     using DataGlobals::RunOptCondEntTemp;
     using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
@@ -303,7 +302,6 @@ namespace HVACManager {
         static constexpr auto EndOfHeaderString("End of Data Dictionary");          // End of data dictionary marker
         static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
 
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -330,12 +328,6 @@ namespace HVACManager {
         bool DummyLogical;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_10(
-            "('node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       ','MassMax        MassSP    Press "
-            "       Enthal     HumRat Fluid Type')");
-        static ObjexxFCL::gio::Fmt Format_11("('node #   Name')");
-        static ObjexxFCL::gio::Fmt Format_20("(1x,I3,1x,F8.2,2(2x,F8.3),2x,F8.2,4(1x,F13.2),2x,F8.0,2x,F11.2,2x,F9.5,2x,A)");
-        static ObjexxFCL::gio::Fmt Format_30("(1x,I3,5x,A)");
 
         // SYSTEM INITIALIZATION
         if (TriggerGetAFN) {
@@ -522,7 +514,7 @@ namespace HVACManager {
                 if (DoOutputReporting) {
                     CalcMoreNodeInfo();
                     CalculatePollution();
-                    InitEnergyReports();
+                    InitEnergyReports(outputFiles);
                     ReportSystemEnergyUse();
                 }
                 if (DoOutputReporting || (ZoneSizingCalc && CompLoadReportIsReq)) {
@@ -641,25 +633,39 @@ namespace HVACManager {
             }
             if ((ReportDebug) && (DayOfSim > 0)) { // Report the node data
                 if (size(Node) > 0 && !DebugNamesReported) {
-                    ObjexxFCL::gio::write(OutputFileDebug, Format_11);
+                    print(outputFiles.debug, "{}\n", "node #   Name");
                     for (NodeNum = 1; NodeNum <= isize(Node); ++NodeNum) {
-                        ObjexxFCL::gio::write(OutputFileDebug, Format_30) << NodeNum << NodeID(NodeNum);
+                        print(outputFiles.debug, " {:3}     {}\n", NodeNum, NodeID(NodeNum));
                     }
                     DebugNamesReported = true;
                 }
                 if (size(Node) > 0) {
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD);
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD);
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "Day of Sim     Hour of Day    Time";
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << DayOfSim << HourOfDay << TimeStep * TimeStepZone;
-                    ObjexxFCL::gio::write(OutputFileDebug, Format_10);
+                    print(outputFiles.debug, "\n\n Day of Sim     Hour of Day    Time\n");
+                    print(outputFiles.debug, "{:12}{:12} {:22.15N} \n", DayOfSim, HourOfDay, TimeStep * TimeStepZone);
+                    print(outputFiles.debug,
+                          "{}\n",
+                          "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "
+                          "Enthal     HumRat Fluid Type");
                 }
                 for (NodeNum = 1; NodeNum <= isize(Node); ++NodeNum) {
-                    ObjexxFCL::gio::write(OutputFileDebug, Format_20)
-                        << NodeNum << Node(NodeNum).Temp << Node(NodeNum).MassFlowRateMinAvail << Node(NodeNum).MassFlowRateMaxAvail
-                        << Node(NodeNum).TempSetPoint << Node(NodeNum).MassFlowRate << Node(NodeNum).MassFlowRateMin << Node(NodeNum).MassFlowRateMax
-                        << Node(NodeNum).MassFlowRateSetPoint << Node(NodeNum).Press << Node(NodeNum).Enthalpy << Node(NodeNum).HumRat
-                        << ValidNodeFluidTypes(Node(NodeNum).FluidType);
+                    static constexpr auto Format_20{
+                        " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#8.0F}  {:11.2F}  {:9.5F}  {}\n"};
+
+                    print(outputFiles.debug,
+                          Format_20,
+                          NodeNum,
+                          Node(NodeNum).Temp,
+                          Node(NodeNum).MassFlowRateMinAvail,
+                          Node(NodeNum).MassFlowRateMaxAvail,
+                          Node(NodeNum).TempSetPoint,
+                          Node(NodeNum).MassFlowRate,
+                          Node(NodeNum).MassFlowRateMin,
+                          Node(NodeNum).MassFlowRateMax,
+                          Node(NodeNum).MassFlowRateSetPoint,
+                          Node(NodeNum).Press,
+                          Node(NodeNum).Enthalpy,
+                          Node(NodeNum).HumRat,
+                          ValidNodeFluidTypes(Node(NodeNum).FluidType));
                 }
             }
         }
