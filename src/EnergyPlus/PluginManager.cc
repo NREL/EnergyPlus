@@ -1267,7 +1267,7 @@ namespace PluginManagement {
         }
     }
 #else
-    void PluginInstance::run(int EP_UNUSED(iCalledFrom))
+    void PluginInstance::run(int EP_UNUSED(iCalledFrom)) const
     {
     }
 #endif
