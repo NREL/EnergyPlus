@@ -22,27 +22,18 @@ class CurveOverwriteMGR(EnergyPlusPlugin):
                 self.CoilInletDBT_handle = self.api.exchange.get_variable_handle("System Node Temperature",
                                                                                  "Zone1PTHPFanOutletNode")
 
-                attr = "CoilInletDBT_handle"
-                print(f"{attr}: {getattr(self, attr)}")
-
                 self.CoilInletW_handle = self.api.exchange.get_variable_handle("System Node Humidity Ratio",
                                                                                "Zone1PTHPFanOutletNode")
 
-                attr = "CoilInletW_handle"
-                print(f"{attr}: {getattr(self, attr)}")
-
                 self.Pressure_handle = self.api.exchange.get_variable_handle("System Node Pressure",
                                                                              "Zone1PTHPOAInNode")
-
-                attr = "Pressure_handle"
-                print(f"{attr}: {getattr(self, attr)}")
 
                 self.CurveOverwrite_handle = self.api.exchange.get_actuator_handle("Curve",
                                                                                    "Curve Result",
                                                                                    "HPACCOOLCAPFT")
 
-                attr = "CurveOverwrite_handle"
-                print(f"{attr}: {getattr(self, attr)}")
+                self.OAT_handle = self.api.exchange.get_variable_handle("System Node Temperature",
+                                                                        "Zone1PTHPOAInNode")
 
                 self.need_to_get_handles = False
 
@@ -66,7 +57,7 @@ class CurveOverwriteMGR(EnergyPlusPlugin):
                     C6 * IVThree)
             if OAT > 31.0:
                 CurveInput = C1 - (C2a * IVOnea) + (C3 * IVOnea * IVOnea) - (C4 * IVTwo) + (C5 * IVTwo * IVTwo) - (
-                        C6 * IVThree),
+                        C6 * IVThree)
 
             CurveOverwrite = CurveInput
             self.api.exchange.set_actuator_value(self.CurveOverwrite_handle, CurveOverwrite)

@@ -230,11 +230,11 @@
 ! ERLCurveValue may show slight differences from NewCurveValue and Performance Curve Output
 ! due to location of EMS Program call (i.e., AfterPredictorBeforeHVACManagers).
 
-  Output:Variable,*,ERLCurveValue,Hourly;
+!  Output:Variable,*,ERLCurveValue,Hourly;
 
-  Output:Variable,*,NewCurveValue,Hourly;
+!  Output:Variable,*,NewCurveValue,Hourly;
 
-  Output:Variable,*,OldCurveValue,Hourly;
+!  Output:Variable,*,OldCurveValue,Hourly;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Hourly;
 
@@ -2119,3 +2119,11 @@
     HTML;                    !- Column Separator
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
+
+  Output:Variable,Zone1PTHPFanOutletNode,System Node Temperature,timestep;
+  Output:Variable,Zone1PTHPFanOutletNode,System Node Humidity Ratio,timestep;
+  Output:Variable,Zone1PTHPOAInNode,System Node Pressure,timestep;
+  Output:Variable,Zone1PTHPOAInNode,System Node Temperature,timestep;
+  Output:Variable,Zone1PTHPDXCoolCoil,Cooling Coil Total Cooling Rate,timestep;
+  Output:Variable,Zone2PTHPDXCoolCoil,Cooling Coil Total Cooling Rate,timestep;
+  Output:Variable,Zone3PTHPDXCoolCoil,Cooling Coil Total Cooling Rate,timestep;
