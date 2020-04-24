@@ -108,9 +108,6 @@ namespace Pipes {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    //!$int NumLocalPipes(0);
-    //!$bool GetPipeInputFlag(true);
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
     // Object Data

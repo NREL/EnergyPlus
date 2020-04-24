@@ -85,8 +85,6 @@ namespace ExteriorEnergyUse {
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    //!$extern int NumExteriorLights; // Number of Exterior Light Inputs
-    //!$extern int NumExteriorEqs;    // Number of Exterior Equipment Inputs
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>
 
@@ -97,30 +95,6 @@ namespace ExteriorEnergyUse {
     // Name Public routines, optionally name Private routines within this module
 
     // Types
-
-    //!$struct ExteriorLightUsage
-    //!${
-    //!$    // Members
-    //!$    std::string Name;          // Descriptive name -- will show on reporting
-    //!$    int SchedPtr;              // Can be scheduled
-    //!$    Real64 DesignLevel;        // Consumption in Watts
-    //!$    Real64 Power;              // Power = DesignLevel * ScheduleValue
-    //!$    Real64 CurrentUse;         // Use for this time step
-    //!$    int ControlMode;           // Control mode Schedule Only or Astronomical Clock plus schedule
-    //!$    bool ManageDemand;         // Flag to indicate whether to use demand limiting
-    //!$    Real64 DemandLimit;        // Demand limit set by demand manager [W]
-    //!$    bool PowerActuatorOn;      // EMS flag
-    //!$    Real64 PowerActuatorValue; // EMS value
-    //!$    Real64 SumConsumption;     // sum of electric consumption [J] for reporting
-    //!$    Real64 SumTimeNotZeroCons; // sum of time of positive electric consumption [hr]
-    //!$
-    //!$    // Default Constructor
-    //!$    ExteriorLightUsage()
-    //!$        : SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ControlMode(1), ManageDemand(false), DemandLimit(0.0),
-    //!$          PowerActuatorOn(false), SumConsumption(0.0), SumTimeNotZeroCons(0.0)
-    //!$    {
-    //!$    }
-    //!$};
 
     struct ExteriorEquipmentUsage
     {
@@ -141,7 +115,6 @@ namespace ExteriorEnergyUse {
     };
 
     // Object Data
-    //!$extern Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
     extern Array1D<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
 
     // Functions

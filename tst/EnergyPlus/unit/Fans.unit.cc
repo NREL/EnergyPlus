@@ -103,7 +103,6 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
 TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
 {
 
-    //!$Fans::NumFans = 1;
     state.fans.NumFans = 1;
     Fans::Fan.allocate(state.fans.NumFans);
     Fans::FanNumericFields.allocate(state.fans.NumFans);
@@ -151,7 +150,6 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
 TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
 {
 
-    //!$Fans::NumFans = 1;
     state.fans.NumFans = 1;
     Fans::Fan.allocate(state.fans.NumFans);
     Fans::FanNumericFields.allocate(state.fans.NumFans);
@@ -199,7 +197,6 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
 TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
 {
 
-    //!$Fans::NumFans = 1;
     state.fans.NumFans = 1;
     Fans::Fan.allocate(state.fans.NumFans);
     Fans::FanNumericFields.allocate(state.fans.NumFans);

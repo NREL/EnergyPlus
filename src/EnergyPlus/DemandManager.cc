@@ -667,7 +667,6 @@ namespace DemandManager {
         using DataHeatBalance::ZoneElectricObjects;
         using DataZoneControls::TempControlledZone;
         using DataZoneControls::TStatObjects;
-        //!$using ExteriorEnergyUse::ExteriorLights;
         using General::RoundSigDigits;
         using MixedAir::GetOAController;
         using ScheduleManager::GetScheduleIndex;
@@ -1564,7 +1563,6 @@ namespace DemandManager {
         using DataHeatBalance::Lights;
         using DataHeatBalance::ZoneElectric;
         using DataZoneControls::TempControlledZone;
-        //!$using ExteriorEnergyUse::ExteriorLights;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -1790,7 +1788,6 @@ namespace DemandManager {
         using DataZoneControls::ComfortControlledZone;
         using DataZoneControls::NumComfortControlledZones;
         using DataZoneControls::TempControlledZone;
-        //!$using ExteriorEnergyUse::ExteriorLights;
         using MixedAir::OAGetFlowRate;
         using MixedAir::OAGetMinFlowRate;
         using MixedAir::OASetDemandManagerVentilationFlow;

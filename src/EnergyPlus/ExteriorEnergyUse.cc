@@ -119,15 +119,12 @@ namespace ExteriorEnergyUse {
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    //!$int NumExteriorLights; // Number of Exterior Light Inputs
-    //!$int NumExteriorEqs;    // Number of Exterior Equipment Inputs
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>
 
     // Name Public routines, optionally name Private routines within this module
 
     // Object Data
-    //!$Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
     Array1D<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
     std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
 
@@ -137,7 +134,6 @@ namespace ExteriorEnergyUse {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        //!$ExteriorLights.deallocate();
         ExteriorEquipment.deallocate();
         UniqueExteriorEquipNames.clear();
         GetExteriorEnergyInputFlag = true;

@@ -2205,7 +2205,6 @@ namespace ZoneEquipmentManager {
         using DataGlobals::DuringDay;
         using DataGlobals::emsCallFromZoneSizing;
         using DataGlobals::EndDay;
-        //!$using DataGlobals::EndZoneSizingCalc;
         using DataGlobals::HourOfDay;
         using DataGlobals::isPulseZoneSizing;
         using DataGlobals::MinutesPerTimeStep;

@@ -74,9 +74,6 @@ namespace Pipes {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    //!$extern int NumLocalPipes;
-    //!$extern bool GetPipeInputFlag;
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
     // Types

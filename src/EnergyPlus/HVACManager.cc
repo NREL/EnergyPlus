@@ -2426,7 +2426,6 @@ namespace HVACManager {
 
         using DataHVACGlobals::FanType_ZoneExhaust;
         using Fans::Fan;
-        //!$using Fans::NumFans;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

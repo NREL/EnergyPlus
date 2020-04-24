@@ -279,7 +279,6 @@ namespace EMSManager {
 
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        //!$using DataGlobals::emsCallFromBeginNewEvironment;
         using DataGlobals::emsCallFromExternalInterface;
         using DataGlobals::emsCallFromSetupSimulation;
         using DataGlobals::emsCallFromUserDefinedComponentModel;
@@ -564,7 +563,6 @@ namespace EMSManager {
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::emsCallFromAfterHVACManagers;
         using DataGlobals::emsCallFromBeforeHVACManagers;
-        //!$using DataGlobals::emsCallFromBeginNewEvironment;
         using DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp;
         using DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
         using DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance;
