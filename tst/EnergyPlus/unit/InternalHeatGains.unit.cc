@@ -969,7 +969,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     ASSERT_FALSE(ErrorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
 
-    InternalHeatGains::GetInternalHeatGainsInput(outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
 
     EXPECT_EQ(DataHeatBalance::TotPeople, 1);
     EXPECT_EQ(DataHeatBalance::TotLights, 1);
@@ -983,7 +983,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     EnergyPlus::createFacilityElectricPowerServiceObject(); // Needs to happen before InitInternalHeatGains
 
     // First time should be all good, because ZnRpt values intialize to zero
-    InternalHeatGains::InitInternalHeatGains();
+    InternalHeatGains::InitInternalHeatGains(state);
 
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
@@ -994,7 +994,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).CO2Rate, 0.0001125);
 
     // Second time should should give the same answers, because everything should reset before accumulating
-    InternalHeatGains::InitInternalHeatGains();
+    InternalHeatGains::InitInternalHeatGains(state);
 
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);

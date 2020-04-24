@@ -836,9 +836,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_BlankAutosized)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetSetPointManagerInputs();
+    GetSetPointManagerInputs(state);
 
-    GetControllerInput();
+    GetControllerInput(state);
 
     ASSERT_EQ(ControllerProps.size(), 1u);
     EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
@@ -911,9 +911,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetSetPointManagerInputs();
+    GetSetPointManagerInputs(state);
 
-    GetControllerInput();
+    GetControllerInput(state);
 
     ASSERT_EQ(ControllerProps.size(), 1u);
     EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
@@ -998,7 +998,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
 
     // This will call ManageController, which calls SizeController which should autosize the controller max actuated flow rate to zero
     // and issue a warning
-    SimAirServingZones::SimAirLoops(true, SimZoneEquipment);
+    SimAirServingZones::SimAirLoops(state, true, SimZoneEquipment);
 
     // after controllers are simulated, AirLoopControllerIndex = index to this controller on this air loop (e.g., n of num contollers on air loop)
     ASSERT_EQ(1, DataAirSystems::PrimaryAirSystem(1).NumControllers);
