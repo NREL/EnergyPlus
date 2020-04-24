@@ -3704,7 +3704,7 @@
     Central Chiller Outlet Node,  !- Plant Connection 1 Outlet Node Name
     MeetsLoadWithNominalCapacityLowOutLimit,  !- Plant Connection 1 Loading Mode
     NeedsFlowIfLoopOn,       !- Plant Connection 1 Loop Flow Request Mode
-    Chiller model init programs,  !- Plant Connection 1 Initialization Program Calling Manager Name
+    ,                        !- Plant Connection 1 Initialization Program Calling Manager Name
     Chiller model simulation programs,  !- Plant Connection 1 Simulation Program Calling Manager Name
     ,                        !- Plant Connection 2 Inlet Node Name
     ,                        !- Plant Connection 2 Outlet Node Name
@@ -3731,68 +3731,10 @@
     ;                        !- Ambient Zone Name
 
   PythonPlugin:Instance,
-    Chiller model init programs,            !- Name
-    Yes,                                    !- Run During Warmup Days
-    PythonPluginUserDefined5ZoneAirCooled,  !- Python Module Name
-    UserDefinedCoilInit;                    !- Plugin Class Name
-
-  PythonPlugin:Instance,
     Chiller model simulation programs,      !- Name
     Yes,                                    !- Run During Warmup Days
     PythonPluginUserDefined5ZoneAirCooled,  !- Python Module Name
     UserDefinedCoilSim;                    !- Plugin Class Name
-
-!  EnergyManagementSystem:ProgramCallingManager,
-!    Chiller model simulation programs,  !- Name
-!    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-!    ModelChillerModel;       !- Program Name 1
-
-!  EnergyManagementSystem:Program,
-!    ModelChillerModel,       !- Name
-!    Set dummy = CW_MyLoad,   !- Program Line 1
-!    Set dummy = CW_Tin,      !- Program Line 2
-!    Set dummy = CW_Mdot,     !- <none>
-!    If CW_MyLoad > (0 - 100),!- <none>
-!    Set CW_Tout             = CW_Tin,  !- <none>
-!    Set CW_Mdot_Request     = 0.0,  !- <none>
-!    Set Chiller_ElectEnergy = 0.0,  !- <none>
-!    RETURN,                  !- <none>
-!    ENDIF,                   !- <none>
-!    Set ABS_CW_MyLoad = @ABS CW_MyLoad,  !- <none>
-!    IF ABS_CW_MyLoad > Chiller_Cap_Max,  !- <none>
-!    Set Qdot = Chiller_Cap_Max,  !- <none>
-!    ELSE,                    !- <none>
-!    Set Qdot = ABS_CW_MyLoad,!- <none>
-!    ENDIF,                   !- <none>
-!    IF CW_Mdot == 0,         !- <none>
-!    Set Mdot = Chiller_Mdot_Max,  !- <none>
-!    SEt CW_Mdot_Request = Chiller_Mdot_Max,  !- <none>
-!    ELSE,                    !- <none>
-!    Set Mdot = CW_Mdot,      !- <none>
-!    ENDIF,                   !- <none>
-!    Set CW_Tout = CW_Tin - (Qdot / (Mdot * CW_Cp)),  !- <none>
-!    Set EIR     = 1 / 4.6,   !- <none>
-!    Set Chiller_power = Qdot * EIR,  !- <none>
-!    Set Chiller_ElectEnergy = Chiller_power * SystemTimestep * 3600;  !- <none>
-
-!  EnergyManagementSystem:ProgramCallingManager,
-!    Chiller model init programs,  !- Name
-!    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-!    InitEvapChillerModel;    !- Program Name 1
-
-!  EnergyManagementSystem:Program,
-!    InitEvapChillerModel,    !- Name
-!    Set CWLoopExitTemp = 7.0,!- Program Line 1
-!    Set CWLoopDeltaTemp = 4.0,  !- Program Line 2
-!    Set CW_CP = @CPCW CWLoopExitTemp,  !- <none>
-!    Set CW_rho = @RhoH2O CWLoopExitTemp,  !- <none>
-!    Set Chiller_Vdot_Design = CWplant_Vdot_Design,  !- <none>
-!    Set Chiller_Mdot_Min = 0.0,  !- <none>
-!    Set Chiller_Mdot_Max = Chiller_Vdot_Design * CW_rho,  !- <none>
-!    Set Chiller_Cap = CW_CP * CW_rho * CWLoopDeltaTemp * CWplant_Vdot_Design,  !- <none>
-!    Set Chiller_Cap_Min = 0.0,  !- <none>
-!    Set Chiller_Cap_Max = Chiller_Cap,  !- <none>
-!    Set Chiller_Cap_Opt = 0.9 * Chiller_Cap;  !- <none>
 
 PythonPlugin:Variables,
    ChillerGlobalVars,       !- Name
@@ -3808,17 +3750,6 @@ PythonPlugin:Variables,
     HVAC,                               !- Group Type
     Cooling,                            !- End-Use Category
     Custom air cooled chiller;         !- End-Use Subcategory
-
-!  EnergyManagementSystem:MeteredOutputVariable,
-!    Chiller Electricity Consumption,  !- Name
-!    Chiller_ElectEnergy,     !- EMS Variable Name
-!    SystemTimestep,          !- Update Frequency
-!    ModelChillerModel,       !- EMS Program or Subroutine Name
-!    Electricity,             !- Resource Type
-!    HVAC,                    !- Group Type
-!    Cooling,                 !- End-Use Category
-!    Custom air cooled chiller,  !- End-Use Subcategory
-!    J;                       !- Units
 
   EnergyManagementSystem:MeteredOutputVariable,
     CWcoil1 tot cool Energy, !- Name
@@ -3855,16 +3786,6 @@ PythonPlugin:Variables,
 
 ! input data
 
-!  EnergyManagementSystem:InternalVariable,
-!    CW_Tin,                  !- Name
-!    Central Chiller,         !- Internal Data Index Key Name
-!    Inlet Temperature for Plant Connection 1;  !- Internal Data Type
-
-!  EnergyManagementSystem:InternalVariable,
-!    CW_Mdot,                 !- Name
-!    Central Chiller,         !- Internal Data Index Key Name
-!    Inlet Mass Flow Rate for Plant Connection 1;  !- Internal Data Type
-
   EnergyManagementSystem:InternalVariable,
     CW_Cp,                   !- Name
     Central Chiller,         !- Internal Data Index Key Name
@@ -3875,67 +3796,9 @@ PythonPlugin:Variables,
     Central Chiller,         !- Internal Data Index Key Name
     Inlet Density for Plant Connection 1;  !- Internal Data Type
 
-!  EnergyManagementSystem:InternalVariable,
-!    CW_MyLoad,               !- Name
-!    Central Chiller,         !- Internal Data Index Key Name
-!    Load Request for Plant Connection 1;  !- Internal Data Type
-
 ! sizing and inits
 
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Mdot_Min,        !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Minimum Mass Flow Rate;  !- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Mdot_Max,        !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Maximum Mass Flow Rate;  !- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Vdot_Design,     !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Design Volume Flow Rate; !- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Cap_Min,         !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Minimum Loading Capacity;!- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Cap_Max,         !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Maximum Loading Capacity;!- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Cap_Opt,         !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    `Optimal Loading Capacity`;!- Actuated Component Control Type
-
-!  EnergyManagementSystem:InternalVariable,
-!    CWplant_Vdot_Design,     !- Name
-!    Chilled Water Loop,      !- Internal Data Index Key Name
-!    Plant Design Volume Flow Rate;  !- Internal Data Type
-
 ! model results
-
-!  EnergyManagementSystem:Actuator,
-!    CW_Tout,                 !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Outlet Temperature;      !- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    CW_Mdot_Request,         !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Mass Flow Rate;          !- Actuated Component Control Type
 
   SetpointManager:Scheduled,
     Central Chiller Setpoint Manager,  !- Name
