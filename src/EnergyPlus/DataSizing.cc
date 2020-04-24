@@ -46,8 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -630,6 +632,103 @@ namespace DataSizing {
         this->DesHeatLoad = this->DesHeatLoad * ratio;
         this->HeatFlowSeq = this->HeatFlowSeq * ratio;
         this->HeatLoadSeq = this->HeatLoadSeq * ratio;
+    }
+
+    void ZoneSizingData::zeroMemberData()
+    {
+        if (!allocated(this->DOASSupMassFlowSeq)) return;
+        for (int TimeStepIndex = 1; TimeStepIndex <= SimAirServingZones::NumOfTimeStepInDay; ++TimeStepIndex) {
+            this->DOASSupMassFlowSeq(TimeStepIndex) = 0.0;
+            this->DOASHeatLoadSeq(TimeStepIndex) = 0.0;
+            this->DOASCoolLoadSeq(TimeStepIndex) = 0.0;
+            this->DOASHeatAddSeq(TimeStepIndex) = 0.0;
+            this->DOASLatAddSeq(TimeStepIndex) = 0.0;
+            this->DOASSupTempSeq(TimeStepIndex) = 0.0;
+            this->DOASSupHumRatSeq(TimeStepIndex) = 0.0;
+            this->DOASTotCoolLoadSeq(TimeStepIndex) = 0.0;
+
+            this->HeatFlowSeq(TimeStepIndex) = 0.0;
+            this->HeatFlowSeqNoOA(TimeStepIndex) = 0.0;
+            this->HeatLoadSeq(TimeStepIndex) = 0.0;
+            // not used directly in output report
+            this->HeatZoneTempSeq(TimeStepIndex) = 0.0;
+            this->DesHeatSetPtSeq(TimeStepIndex) = 0.0;
+            this->HeatOutTempSeq(TimeStepIndex) = 0.0;
+            this->HeatZoneRetTempSeq(TimeStepIndex) = 0.0;
+            this->HeatTstatTempSeq(TimeStepIndex) = 0.0;
+            this->HeatZoneHumRatSeq(TimeStepIndex) = 0.0;
+            this->HeatOutHumRatSeq(TimeStepIndex) = 0.0;
+            this->CoolFlowSeq(TimeStepIndex) = 0.0;
+            this->CoolFlowSeqNoOA(TimeStepIndex) = 0.0;
+            this->CoolLoadSeq(TimeStepIndex) = 0.0;
+            // not used directly in output report
+            this->CoolZoneTempSeq(TimeStepIndex) = 0.0;
+            this->DesCoolSetPtSeq(TimeStepIndex) = 0.0;
+            this->CoolOutTempSeq(TimeStepIndex) = 0.0;
+            this->CoolZoneRetTempSeq(TimeStepIndex) = 0.0;
+            this->CoolTstatTempSeq(TimeStepIndex) = 0.0;
+            this->CoolZoneHumRatSeq(TimeStepIndex) = 0.0;
+            this->CoolOutHumRatSeq(TimeStepIndex) = 0.0;
+        }
+        this->CoolDesDay = ""; // name of a cooling design day
+        this->HeatDesDay = ""; // name of a heating design day
+
+        this->DesHeatMassFlow = 0.0;       // zone design heating air mass flow rate [kg/s]
+        this->DesCoolMassFlow = 0.0;       // zone design cooling air mass flow rate [kg/s]
+        this->DesHeatLoad = 0.0;           // zone design heating load [W]
+        this->DesCoolLoad = 0.0;           // zone design cooling load [W]
+        this->DesHeatDens = 0.0;           // zone design heating air density [kg/m3]
+        this->DesCoolDens = 0.0;           // zone design cooling air density [kg/m3]
+        this->DesHeatVolFlow = 0.0;        // zone design heating air volume flow rate [m3/s]
+        this->DesCoolVolFlow = 0.0;        // zone design cooling air volume flow rate [m3/s]
+        this->DesHeatVolFlowMax = 0.0;     // zone design heating maximum air volume flow rate [m3/s]
+        this->DesCoolVolFlowMin = 0.0;     // zone design cooling minimum air volume flow rate [m3/s]
+        this->DesHeatCoilInTemp = 0.0;     // zone heating coil design air inlet temperature [C]
+        this->DesCoolCoilInTemp = 0.0;     // zone cooling coil design air inlet temperature [C]
+        this->DesHeatCoilInHumRat = 0.0;   // zone heating coil design air inlet humidity ratio [kg/kg]
+        this->DesCoolCoilInHumRat = 0.0;   // zone cooling coil design air inlet humidity ratio [kg/kg]
+        this->DesHeatCoilInTempTU = 0.0;   // zone heating coil design air inlet temperature (supply air)([C]
+        this->DesCoolCoilInTempTU = 0.0;   // zone cooling coil design air inlet temperature (supply air)[C]
+        this->DesHeatCoilInHumRatTU = 0.0; // zone heating coil design air inlet humidity ratio
+        this->DesCoolCoilInHumRatTU = 0.0; // zone cooling coil design air inlet humidity ratio
+        this->HeatMassFlow = 0.0;          // current zone heating air mass flow rate (HVAC time step)
+        this->CoolMassFlow = 0.0;          // current zone cooling air mass flow rate (HVAC time step)
+        this->HeatLoad = 0.0;              // current zone heating load (HVAC time step)
+        this->CoolLoad = 0.0;              // current zone heating load (HVAC time step)
+        this->HeatZoneTemp = 0.0;          // current zone temperature (heating, time step)
+        this->HeatOutTemp = 0.0;           // current outdoor temperature (heating, time step)
+        this->HeatZoneRetTemp = 0.0;       // current zone return temperature (heating, time step)
+        this->HeatTstatTemp = 0.0;         // current zone thermostat temperature (heating, time step)
+        this->CoolZoneTemp = 0.0;          // current zone temperature (cooling, time step)
+        this->CoolOutTemp = 0.0;           // current Outdoor temperature (cooling, time step)
+        this->CoolZoneRetTemp = 0.0;       // current zone return temperature (cooling, time step)
+        this->CoolTstatTemp = 0.0;         // current zone thermostat temperature (cooling, time step)
+        this->HeatZoneHumRat = 0.0;        // current zone humidity ratio (heating, time step)
+        this->CoolZoneHumRat = 0.0;        // current zone humidity ratio (cooling, time step)
+        this->HeatOutHumRat = 0.0;         // current outdoor humidity ratio (heating, time step)
+        this->CoolOutHumRat = 0.0;         // current outdoor humidity ratio (cooling, time step)
+        this->ZoneTempAtHeatPeak = 0.0;    // zone temp at max heating [C]
+        this->ZoneRetTempAtHeatPeak = 0.0; // zone return temp at max heating [C]
+        this->OutTempAtHeatPeak = 0.0;     // outdoor temperature at max heating [C]
+        this->ZoneTempAtCoolPeak = 0.0;    // zone temp at max cooling [C]
+        this->ZoneRetTempAtCoolPeak = 0.0; // zone return temp at max cooling [C]
+        this->OutTempAtCoolPeak = 0.0;     // outdoor temperature at max cooling [C]
+        this->ZoneHumRatAtHeatPeak = 0.0;  // zone humidity ratio at max heating [kg/kg]
+        this->ZoneHumRatAtCoolPeak = 0.0;  // zone humidity ratio at max cooling [kg/kg]
+        this->OutHumRatAtHeatPeak = 0.0;   // outdoor humidity at max heating [kg/kg]
+        this->OutHumRatAtCoolPeak = 0.0;   // outdoor humidity at max cooling [kg/kg]
+        this->TimeStepNumAtHeatMax = 0;    // time step number (in day) at Heating peak
+        this->TimeStepNumAtCoolMax = 0;    // time step number (in day) at cooling peak
+        this->HeatDDNum = 0;               // design day index of design day causing heating peak
+        this->CoolDDNum = 0;               // design day index of design day causing heating peak
+        this->cHeatDDDate = "";            // date of design day causing heating peak
+        this->cCoolDDDate = "";            // date of design day causing cooling peak
+        this->DOASHeatLoad = 0.0;          // current heating load from DOAS supply air [W]
+        this->DOASCoolLoad = 0.0;          // current cooling load from DOAS supply air [W]
+        this->DOASSupMassFlow = 0.0;       // current mass flow rate of DOAS supply air [kg/s]
+        this->DOASSupTemp = 0.0;           // current DOAS supply air temperature [C]
+        this->DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kgWater/kgDryAir]
+        this->DOASTotCoolLoad = 0.0;       // current total cooling load imposed by DOAS supply air [W]
     }
 
     void resetHVACSizingGlobals(int const curZoneEqNum, int const curSysNum, bool &firstPassFlag) // called in zone equipment Report function

@@ -614,6 +614,7 @@ namespace DataSizing {
         );
         void scaleZoneHeating(Real64 const ratio // Scaling ratio
         );
+        void zeroMemberData();
     };
 
     struct TermUnitSizingData
