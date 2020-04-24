@@ -529,6 +529,12 @@ namespace HeatRecovery {
                                  "\" latent heating effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError("Latent heating effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
+            if ((ExchCond(ExchNum).HeatEffectLatent100 == 0.0 && ExchCond(ExchNum).HeatEffectLatent75 > 0.0) || (ExchCond(ExchNum).HeatEffectLatent100 > 0.0 && ExchCond(ExchNum).HeatEffectLatent75 == 0.0)) {
+                ShowWarningError( cCurrentModuleObject + " \"" + ExchCond( ExchNum ).Name + "\"" );
+                ShowContinueError("..." + cNumericFieldNames(3)  + " = " + RoundSigDigits(rNumericArgs(3), 2));
+                ShowContinueError("..." + cNumericFieldNames(5)  + " = " + RoundSigDigits(rNumericArgs(5), 2));
+                ShowContinueError("...Latent heating effectiveness at 75% and 100% rated flow can be 0.0 but not one of them only.");
+            }
             ExchCond(ExchNum).CoolEffectSensible100 = rNumericArgs(6);
             ExchCond(ExchNum).CoolEffectLatent100 = rNumericArgs(7);
             ExchCond(ExchNum).CoolEffectSensible75 = rNumericArgs(8);
@@ -543,6 +549,13 @@ namespace HeatRecovery {
                                  "\" latent cooling effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError("Latent cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
+            if ((ExchCond(ExchNum).CoolEffectLatent100 == 0.0 && ExchCond(ExchNum).CoolEffectLatent75 > 0.0) || (ExchCond(ExchNum).CoolEffectLatent100 > 0.0 && ExchCond(ExchNum).CoolEffectLatent75 == 0.0)) {
+                ShowWarningError( cCurrentModuleObject + " \"" + ExchCond( ExchNum ).Name + "\"" );
+                ShowContinueError("..." + cNumericFieldNames(7) + " = " + RoundSigDigits(rNumericArgs(7), 2));
+                ShowContinueError("..." + cNumericFieldNames(9) + " = " + RoundSigDigits(rNumericArgs(9), 2));
+                ShowContinueError("...Latent cooling effectiveness at 75% and 100% rated flow can be 0.0 but not one of them only.");
+            }
+
             ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(
