@@ -46,10 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -634,41 +632,40 @@ namespace DataSizing {
         this->HeatLoadSeq = this->HeatLoadSeq * ratio;
     }
 
-    void ZoneSizingData::zeroMemberData()
+    void ZoneSizingData::zeroMemberData(int const numOfTimeStepInDay)
     {
         if (!allocated(this->DOASSupMassFlowSeq)) return;
-        for (int TimeStepIndex = 1; TimeStepIndex <= SimAirServingZones::NumOfTimeStepInDay; ++TimeStepIndex) {
-            this->DOASSupMassFlowSeq(TimeStepIndex) = 0.0;
-            this->DOASHeatLoadSeq(TimeStepIndex) = 0.0;
-            this->DOASCoolLoadSeq(TimeStepIndex) = 0.0;
-            this->DOASHeatAddSeq(TimeStepIndex) = 0.0;
-            this->DOASLatAddSeq(TimeStepIndex) = 0.0;
-            this->DOASSupTempSeq(TimeStepIndex) = 0.0;
-            this->DOASSupHumRatSeq(TimeStepIndex) = 0.0;
-            this->DOASTotCoolLoadSeq(TimeStepIndex) = 0.0;
-
-            this->HeatFlowSeq(TimeStepIndex) = 0.0;
-            this->HeatFlowSeqNoOA(TimeStepIndex) = 0.0;
-            this->HeatLoadSeq(TimeStepIndex) = 0.0;
+        for (int timeStepIndex = 1; timeStepIndex <= numOfTimeStepInDay; ++timeStepIndex) {
+            this->DOASSupMassFlowSeq(timeStepIndex) = 0.0;
+            this->DOASHeatLoadSeq(timeStepIndex) = 0.0;
+            this->DOASCoolLoadSeq(timeStepIndex) = 0.0;
+            this->DOASHeatAddSeq(timeStepIndex) = 0.0;
+            this->DOASLatAddSeq(timeStepIndex) = 0.0;
+            this->DOASSupTempSeq(timeStepIndex) = 0.0;
+            this->DOASSupHumRatSeq(timeStepIndex) = 0.0;
+            this->DOASTotCoolLoadSeq(timeStepIndex) = 0.0;
+            this->HeatFlowSeq(timeStepIndex) = 0.0;
+            this->HeatFlowSeqNoOA(timeStepIndex) = 0.0;
+            this->HeatLoadSeq(timeStepIndex) = 0.0;
             // not used directly in output report
-            this->HeatZoneTempSeq(TimeStepIndex) = 0.0;
-            this->DesHeatSetPtSeq(TimeStepIndex) = 0.0;
-            this->HeatOutTempSeq(TimeStepIndex) = 0.0;
-            this->HeatZoneRetTempSeq(TimeStepIndex) = 0.0;
-            this->HeatTstatTempSeq(TimeStepIndex) = 0.0;
-            this->HeatZoneHumRatSeq(TimeStepIndex) = 0.0;
-            this->HeatOutHumRatSeq(TimeStepIndex) = 0.0;
-            this->CoolFlowSeq(TimeStepIndex) = 0.0;
-            this->CoolFlowSeqNoOA(TimeStepIndex) = 0.0;
-            this->CoolLoadSeq(TimeStepIndex) = 0.0;
+            this->HeatZoneTempSeq(timeStepIndex) = 0.0;
+            this->DesHeatSetPtSeq(timeStepIndex) = 0.0;
+            this->HeatOutTempSeq(timeStepIndex) = 0.0;
+            this->HeatZoneRetTempSeq(timeStepIndex) = 0.0;
+            this->HeatTstatTempSeq(timeStepIndex) = 0.0;
+            this->HeatZoneHumRatSeq(timeStepIndex) = 0.0;
+            this->HeatOutHumRatSeq(timeStepIndex) = 0.0;
+            this->CoolFlowSeq(timeStepIndex) = 0.0;
+            this->CoolFlowSeqNoOA(timeStepIndex) = 0.0;
+            this->CoolLoadSeq(timeStepIndex) = 0.0;
             // not used directly in output report
-            this->CoolZoneTempSeq(TimeStepIndex) = 0.0;
-            this->DesCoolSetPtSeq(TimeStepIndex) = 0.0;
-            this->CoolOutTempSeq(TimeStepIndex) = 0.0;
-            this->CoolZoneRetTempSeq(TimeStepIndex) = 0.0;
-            this->CoolTstatTempSeq(TimeStepIndex) = 0.0;
-            this->CoolZoneHumRatSeq(TimeStepIndex) = 0.0;
-            this->CoolOutHumRatSeq(TimeStepIndex) = 0.0;
+            this->CoolZoneTempSeq(timeStepIndex) = 0.0;
+            this->DesCoolSetPtSeq(timeStepIndex) = 0.0;
+            this->CoolOutTempSeq(timeStepIndex) = 0.0;
+            this->CoolZoneRetTempSeq(timeStepIndex) = 0.0;
+            this->CoolTstatTempSeq(timeStepIndex) = 0.0;
+            this->CoolZoneHumRatSeq(timeStepIndex) = 0.0;
+            this->CoolOutHumRatSeq(timeStepIndex) = 0.0;
         }
         this->CoolDesDay = ""; // name of a cooling design day
         this->HeatDesDay = ""; // name of a heating design day

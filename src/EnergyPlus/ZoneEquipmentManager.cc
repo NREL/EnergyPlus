@@ -1202,7 +1202,9 @@ namespace ZoneEquipmentManager {
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatLoadSeq.allocate(NumOfTimeStepInDay);
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolLoadSeq.allocate(NumOfTimeStepInDay);
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneTempSeq.allocate(NumOfTimeStepInDay);
+                CalcZoneSizing(DesDayNum, CtrlZoneNum).DesHeatSetPtSeq.allocate(NumOfTimeStepInDay);
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneTempSeq.allocate(NumOfTimeStepInDay);
+                CalcZoneSizing(DesDayNum, CtrlZoneNum).DesCoolSetPtSeq.allocate(NumOfTimeStepInDay);
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatOutTempSeq.allocate(NumOfTimeStepInDay);
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolOutTempSeq.allocate(NumOfTimeStepInDay);
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneRetTempSeq.allocate(NumOfTimeStepInDay);
@@ -1425,7 +1427,9 @@ namespace ZoneEquipmentManager {
             FinalZoneSizing(CtrlZoneNum).HeatLoadSeq.allocate(NumOfTimeStepInDay);
             FinalZoneSizing(CtrlZoneNum).CoolLoadSeq.allocate(NumOfTimeStepInDay);
             FinalZoneSizing(CtrlZoneNum).HeatZoneTempSeq.allocate(NumOfTimeStepInDay);
+            FinalZoneSizing(CtrlZoneNum).DesHeatSetPtSeq.allocate(NumOfTimeStepInDay);
             FinalZoneSizing(CtrlZoneNum).CoolZoneTempSeq.allocate(NumOfTimeStepInDay);
+            FinalZoneSizing(CtrlZoneNum).DesCoolSetPtSeq.allocate(NumOfTimeStepInDay);
             FinalZoneSizing(CtrlZoneNum).HeatOutTempSeq.allocate(NumOfTimeStepInDay);
             FinalZoneSizing(CtrlZoneNum).CoolOutTempSeq.allocate(NumOfTimeStepInDay);
             FinalZoneSizing(CtrlZoneNum).HeatZoneRetTempSeq.allocate(NumOfTimeStepInDay);
@@ -1451,7 +1455,9 @@ namespace ZoneEquipmentManager {
             CalcFinalZoneSizing(CtrlZoneNum).HeatLoadSeq.allocate(NumOfTimeStepInDay);
             CalcFinalZoneSizing(CtrlZoneNum).CoolLoadSeq.allocate(NumOfTimeStepInDay);
             CalcFinalZoneSizing(CtrlZoneNum).HeatZoneTempSeq.allocate(NumOfTimeStepInDay);
+            CalcFinalZoneSizing(CtrlZoneNum).DesHeatSetPtSeq.allocate(NumOfTimeStepInDay);
             CalcFinalZoneSizing(CtrlZoneNum).CoolZoneTempSeq.allocate(NumOfTimeStepInDay);
+            CalcFinalZoneSizing(CtrlZoneNum).DesCoolSetPtSeq.allocate(NumOfTimeStepInDay);
             CalcFinalZoneSizing(CtrlZoneNum).HeatOutTempSeq.allocate(NumOfTimeStepInDay);
             CalcFinalZoneSizing(CtrlZoneNum).CoolOutTempSeq.allocate(NumOfTimeStepInDay);
             CalcFinalZoneSizing(CtrlZoneNum).HeatZoneRetTempSeq.allocate(NumOfTimeStepInDay);
@@ -1759,18 +1765,19 @@ namespace ZoneEquipmentManager {
 
     void RezeroZoneSizingArrays()
     {
+        // Zero zone sizing arrays between the pulse and normal sizing.
         DisplayString("Re-zeroing zone sizing arrays");
 
         for (int DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum) {
             for (int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
-                ZoneSizing(DesDayNum, CtrlZoneNum).zeroMemberData();
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).zeroMemberData();
+                ZoneSizing(DesDayNum, CtrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
+                CalcZoneSizing(DesDayNum, CtrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
             }
         }
 
         for (int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
-            CalcFinalZoneSizing(CtrlZoneNum).zeroMemberData();
-            FinalZoneSizing(CtrlZoneNum).zeroMemberData();
+            CalcFinalZoneSizing(CtrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
+            FinalZoneSizing(CtrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
         }
     }
 
