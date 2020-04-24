@@ -639,7 +639,7 @@ namespace EnergyPlus {
 
             static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
-            void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+            void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                           bool RunFlag) override;
 
             bool operator==(std::string const & a) {
@@ -931,7 +931,7 @@ namespace EnergyPlus {
 
         void CheckIfAnySlabs();
 
-        void CheckIfAnyBasements(EnergyPlusData &state);
+        void CheckIfAnyBasements(EnergyPlusData &EP_UNUSED(state));
 
         void GetPipingSystemsAndGroundDomainsInput(EnergyPlusData &state);
 

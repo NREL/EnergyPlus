@@ -108,7 +108,7 @@ namespace Pipes {
         static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
     public:
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
     };
 
     // Object Data

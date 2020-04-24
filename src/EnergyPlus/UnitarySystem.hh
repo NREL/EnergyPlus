@@ -114,7 +114,7 @@ namespace UnitarySystems {
         bool m_SingleModeFlag;
 
         static void getDesignSpecMSHP(EnergyPlusData &state);
-        static void getDesignSpecMSHPdata(EnergyPlusData &state, bool errorsFound);
+        static void getDesignSpecMSHPdata(EnergyPlusData &EP_UNUSED(state), bool errorsFound);
     };
 
     struct UnitarySys : HVACSystemData

@@ -196,7 +196,7 @@ namespace UserDefinedComponents {
 
         static PlantComponent *factory(std::string const &objectName);
 
-        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
