@@ -1696,6 +1696,8 @@
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
+  Output:Variable,*,Site Outdoor Air Barometric Pressure,hourly;
+
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
@@ -1719,6 +1721,8 @@
   ! Output:Variable,*,Zone 1 WinAC Electricity Power,hourly;
 
   Output:Variable, Zone 1 WinAC Electricity Power, PythonPlugin:OutputVariable, hourly;
+
+  Output:Variable, Zone 1 WinAC Electricity Consumption, PythonPlugin:OutputVariable, hourly;
 
   Output:Variable,Zone1WindACAirOutletNode,System Node Mass Flow Rate,hourly;
 
@@ -1755,6 +1759,10 @@
   Output:Variable,Zone2WindACAirInletNode,System Node Humidity Ratio,hourly;
 
   Output:Variable,Zone3WindACAirInletNode,System Node Humidity Ratio,hourly;
+
+  Output:Variable,West Zone,Zone Thermostat Cooling Setpoint Temperature,hourly;
+
+  Output:Variable,COOLINGCOILAVAILSCHED,Schedule Value,hourly;
 
   Output:VariableDictionary,IDF;
 
@@ -1834,26 +1842,26 @@
 !    Set RatedEIR  = 1 / 3.0, !- <none>
 !    Set ZoneCoolTstat = Zone1Cooling_Tstat;  !- <none>
 
-!  EnergyManagementSystem:Program,
-!    Zone1_WinAC_ModelOuput,  !- Name
-!    Set Zone1WinAC_PrimAir_MdotOut = PrimAir_MdotOut,  !- Program Line 1
-!    Set Zone1WinAC_PrimAir_MdotIn  = PrimAir_MdotIn,  !- Program Line 2
-!    Set Zone1WinAC_PrimAir_Tout    = PrimAir_Tout,  !- <none>
-!    Set Zone1WinAC_PrimAir_Wout    = PrimAir_Wout,  !- <none>
-!    Set Zone1WinAC_ElectPower      = ElectPower,  !- <none>
-!    Set Zone1WinAC_tot_cool_Power  = tot_cool_Power,  !- <none>
-!    Set Zone1WinAC_ElectEnergy     = ElectEnergy,  !- <none>
-!    Set Zone1WinAC_OA_MdotIn       = OA_MdotIn;  !- <none>
+  EnergyManagementSystem:Program,
+    Zone1_WinAC_ModelOuput,  !- Name
+    Set Zone1WinAC_PrimAir_MdotOut = PrimAir_MdotOut,  !- Program Line 1
+    Set Zone1WinAC_PrimAir_MdotIn  = PrimAir_MdotIn,  !- Program Line 2
+    Set Zone1WinAC_PrimAir_Tout    = PrimAir_Tout,  !- <none>
+    Set Zone1WinAC_PrimAir_Wout    = PrimAir_Wout,  !- <none>
+    Set Zone1WinAC_ElectPower      = ElectPower,  !- <none>
+    Set Zone1WinAC_tot_cool_Power  = tot_cool_Power,  !- <none>
+    Set Zone1WinAC_ElectEnergy     = ElectEnergy,  !- <none>
+    Set Zone1WinAC_OA_MdotIn       = OA_MdotIn;  !- <none>
 
-!  EnergyManagementSystem:Sensor,
-!    COOLINGCOILAVAILSCHED,   !- Name
-!    COOLINGCOILAVAILSCHED,   !- Output:Variable or Output:Meter Index Key Name
-!    Schedule Value;          !- Output:Variable or Output:Meter Name
+  EnergyManagementSystem:Sensor,
+    COOLINGCOILAVAILSCHED,   !- Name
+    COOLINGCOILAVAILSCHED,   !- Output:Variable or Output:Meter Index Key Name
+    Schedule Value;          !- Output:Variable or Output:Meter Name
 
-!  EnergyManagementSystem:Sensor,
-!    Zone1Cooling_Tstat,      !- Name
-!    West Zone,               !- Output:Variable or Output:Meter Index Key Name
-!    Zone Thermostat Cooling Setpoint Temperature;  !- Output:Variable or Output:Meter Name
+  EnergyManagementSystem:Sensor,
+    Zone1Cooling_Tstat,      !- Name
+    West Zone,               !- Output:Variable or Output:Meter Index Key Name
+    Zone Thermostat Cooling Setpoint Temperature;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Actuator,
     Zone1WinAC_PrimAir_Tout, !- Name
@@ -1861,95 +1869,95 @@
     Primary Air Connection,  !- Actuated Component Type
     Outlet Temperature;      !- Actuated Component Control Type
 
-!  EnergyManagementSystem:Actuator,
-!    Zone1WinAC_PrimAir_Wout, !- Name
-!    Zone1WindAC,             !- Actuated Component Unique Name
-!    Primary Air Connection,  !- Actuated Component Type
-!    Outlet Humidity Ratio;   !- Actuated Component Control Type
+  EnergyManagementSystem:Actuator,
+    Zone1WinAC_PrimAir_Wout, !- Name
+    Zone1WindAC,             !- Actuated Component Unique Name
+    Primary Air Connection,  !- Actuated Component Type
+    Outlet Humidity Ratio;   !- Actuated Component Control Type
 
-!  EnergyManagementSystem:Actuator,
-!    Zone1WinAC_PrimAir_MdotOut,  !- Name
-!    Zone1WindAC,             !- Actuated Component Unique Name
-!    Primary Air Connection,  !- Actuated Component Type
-!    Outlet Mass Flow Rate;   !- Actuated Component Control Type
+  EnergyManagementSystem:Actuator,
+    Zone1WinAC_PrimAir_MdotOut,  !- Name
+    Zone1WindAC,             !- Actuated Component Unique Name
+    Primary Air Connection,  !- Actuated Component Type
+    Outlet Mass Flow Rate;   !- Actuated Component Control Type
 
-!  EnergyManagementSystem:Actuator,
-!    Zone1WinAC_PrimAir_MdotIn,  !- Name
-!    Zone1WindAC,             !- Actuated Component Unique Name
-!    Primary Air Connection,  !- Actuated Component Type
-!    Inlet Mass Flow Rate;    !- Actuated Component Control Type
+  EnergyManagementSystem:Actuator,
+    Zone1WinAC_PrimAir_MdotIn,  !- Name
+    Zone1WindAC,             !- Actuated Component Unique Name
+    Primary Air Connection,  !- Actuated Component Type
+    Inlet Mass Flow Rate;    !- Actuated Component Control Type
 
-!  EnergyManagementSystem:Actuator,
-!    Zone1WinAC_OA_MdotIn,    !- Name
-!    Zone1WindAC,             !- Actuated Component Unique Name
-!    Secondary Air Connection,!- Actuated Component Type
-!    Inlet Mass Flow Rate;    !- Actuated Component Control Type
+  EnergyManagementSystem:Actuator,
+    Zone1WinAC_OA_MdotIn,    !- Name
+    Zone1WindAC,             !- Actuated Component Unique Name
+    Secondary Air Connection,!- Actuated Component Type
+    Inlet Mass Flow Rate;    !- Actuated Component Control Type
 
-!  EnergyManagementSystem:InternalVariable,
-!    Zone1WinAC_PrimAir_Tinlet,  !- Name
-!    Zone1WindAC,             !- Internal Data Index Key Name
-!    Inlet Temperature for Primary Air Connection;  !- Internal Data Type
+  EnergyManagementSystem:InternalVariable,
+    Zone1WinAC_PrimAir_Tinlet,  !- Name
+    Zone1WindAC,             !- Internal Data Index Key Name
+    Inlet Temperature for Primary Air Connection;  !- Internal Data Type
 
-!  EnergyManagementSystem:InternalVariable,
-!    Zone1WinAC_PrimAir_Winlet,  !- Name
-!    Zone1WindAC,             !- Internal Data Index Key Name
-!    Inlet Humidity Ratio for Primary Air Connection;  !- Internal Data Type
+  EnergyManagementSystem:InternalVariable,
+    Zone1WinAC_PrimAir_Winlet,  !- Name
+    Zone1WindAC,             !- Internal Data Index Key Name
+    Inlet Humidity Ratio for Primary Air Connection;  !- Internal Data Type
 
-!  EnergyManagementSystem:InternalVariable,
-!    Zone1WinAC_PrimAir_Cp,   !- Name
-!    Zone1WindAC,             !- Internal Data Index Key Name
-!    Inlet Specific Heat for Primary Air Connection;  !- Internal Data Type
+  EnergyManagementSystem:InternalVariable,
+    Zone1WinAC_PrimAir_Cp,   !- Name
+    Zone1WindAC,             !- Internal Data Index Key Name
+    Inlet Specific Heat for Primary Air Connection;  !- Internal Data Type
 
-!  EnergyManagementSystem:InternalVariable,
-!    Zone1WinAC_Qdot_Request, !- Name
-!    Zone1WindAC,             !- Internal Data Index Key Name
-!    Remaining Sensible Load to Cooling Setpoint;  !- Internal Data Type
+  EnergyManagementSystem:InternalVariable,
+    Zone1WinAC_Qdot_Request, !- Name
+    Zone1WindAC,             !- Internal Data Index Key Name
+    Remaining Sensible Load to Cooling Setpoint;  !- Internal Data Type
 
 !EnergyManagementSystem:InternalVariable , Zone1WinAC_PrimAir_rho,    Zone1WindAC,Inlet Density for Primary Air Connection;
 !EnergyManagementSystem:InternalVariable , Zone1WinAC_PrimAir_cp,     Zone1WindAC,Inlet Specific Heat for Primary Air Connection;
 
-!  EnergyManagementSystem:InternalVariable,
-!    Zone1WinAC_OA_Tdb,       !- Name
-!    Zone1WindAC,             !- Internal Data Index Key Name
-!    Inlet Temperature for Secondary Air Connection;  !- Internal Data Type
+  EnergyManagementSystem:InternalVariable,
+    Zone1WinAC_OA_Tdb,       !- Name
+    Zone1WindAC,             !- Internal Data Index Key Name
+    Inlet Temperature for Secondary Air Connection;  !- Internal Data Type
 
-!  EnergyManagementSystem:InternalVariable,
-!    Zone1WinAC_OA_W,         !- Name
-!    Zone1WindAC,             !- Internal Data Index Key Name
-!    Inlet Humidity Ratio for Secondary Air Connection;  !- Internal Data Type
+  EnergyManagementSystem:InternalVariable,
+    Zone1WinAC_OA_W,         !- Name
+    Zone1WindAC,             !- Internal Data Index Key Name
+    Inlet Humidity Ratio for Secondary Air Connection;  !- Internal Data Type
 
-!  EnergyManagementSystem:InternalVariable,
-!    Zone1WinAC_OA_rho,       !- Name
-!    Zone1WindAC,             !- Internal Data Index Key Name
-!    Inlet Density for Secondary Air Connection;  !- Internal Data Type
+  EnergyManagementSystem:InternalVariable,
+    Zone1WinAC_OA_rho,       !- Name
+    Zone1WindAC,             !- Internal Data Index Key Name
+    Inlet Density for Secondary Air Connection;  !- Internal Data Type
 
-!  EnergyManagementSystem:InternalVariable,
-!    Zone1_CoolDesign_Cap,    !- Name
-!    West Zone,               !- Internal Data Index Key Name
-!    Final Zone Design Cooling Load;  !- Internal Data Type
+  EnergyManagementSystem:InternalVariable,
+    Zone1_CoolDesign_Cap,    !- Name
+    West Zone,               !- Internal Data Index Key Name
+    Final Zone Design Cooling Load;  !- Internal Data Type
 
-!  EnergyManagementSystem:InternalVariable,
-!    Zone1_CoolDesign_Mdot,   !- Name
-!    West Zone,               !- Internal Data Index Key Name
-!    Final Zone Design Cooling Air Mass Flow Rate;  !- Internal Data Type
+  EnergyManagementSystem:InternalVariable,
+    Zone1_CoolDesign_Mdot,   !- Name
+    West Zone,               !- Internal Data Index Key Name
+    Final Zone Design Cooling Air Mass Flow Rate;  !- Internal Data Type
 
-!  EnergyManagementSystem:InternalVariable,
-!    Zone1_OADesign_Vdot,     !- Name
-!    West Zone,               !- Internal Data Index Key Name
-!    Zone Outdoor Air Design Volume Flow Rate;  !- Internal Data Type
+  EnergyManagementSystem:InternalVariable,
+    Zone1_OADesign_Vdot,     !- Name
+    West Zone,               !- Internal Data Index Key Name
+    Zone Outdoor Air Design Volume Flow Rate;  !- Internal Data Type
 
-!  EnergyManagementSystem:Sensor,
-!    OA_Press,                !- Name
-!    Environment,             !- Output:Variable or Output:Meter Index Key Name
-!    Site Outdoor Air Barometric Pressure;  !- Output:Variable or Output:Meter Name
+  EnergyManagementSystem:Sensor,
+    OA_Press,                !- Name
+    Environment,             !- Output:Variable or Output:Meter Index Key Name
+    Site Outdoor Air Barometric Pressure;  !- Output:Variable or Output:Meter Name
 
-!  EnergyManagementSystem:OutputVariable,
-!    Zone 1 WinAC Total Cooling Rate,  !- Name
-!    Zone1WinAC_tot_cool_Power,  !- EMS Variable Name
-!    Averaged,                !- Type of Data in Variable
-!    SystemTimestep,          !- Update Frequency
-!    Zone1_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
-!    W;                       !- Units
+  EnergyManagementSystem:OutputVariable,
+    Zone 1 WinAC Total Cooling Rate,  !- Name
+    Zone1WinAC_tot_cool_Power,  !- EMS Variable Name
+    Averaged,                !- Type of Data in Variable
+    SystemTimestep,          !- Update Frequency
+    Zone1_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
+    W;                       !- Units
 
   PythonPlugin:Variables,
     MyGlobalVariables,       !- Name
@@ -2324,15 +2332,15 @@
     Zone3_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
     W;                       !- Units
 
-!  EnergyManagementSystem:MeteredOutputVariable,
-!    Zone 3 WinAC Electricity Consumption [J],  !- Name
-!    Zone3WinAC_ElectEnergy, !- EMS Variable Name
-!    SystemTimestep,         !- Update Frequency
-!    Zone3_WinAC_ModelOuput, !- EMS Program or Subroutine Name
-!    Electricity,            !- Resource Type
-!    HVAC,                   !- Group Type
-!    Cooling,                !- End Use Category
-!    Window Air Conditioners;!- End Use Subcategory
+  EnergyManagementSystem:MeteredOutputVariable,
+    Zone 3 WinAC Electricity Consumption [J],  !- Name
+    Zone3WinAC_ElectEnergy, !- EMS Variable Name
+    SystemTimestep,         !- Update Frequency
+    Zone3_WinAC_ModelOuput, !- EMS Program or Subroutine Name
+    Electricity,            !- Resource Type
+    HVAC,                   !- Group Type
+    Cooling,                !- End Use Category
+    Window Air Conditioners;!- End Use Subcategory
      ! turn it off and leave
    ! unit is on and doing some cooling
    ! determine mixed air conditions
