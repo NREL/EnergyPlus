@@ -728,6 +728,67 @@ namespace DataSizing {
         this->DOASTotCoolLoad = 0.0;       // current total cooling load imposed by DOAS supply air [W]
     }
 
+    void ZoneSizingData::allocateMemberArrays(int const numOfTimeStepInDay) {
+        this->HeatFlowSeq.allocate(numOfTimeStepInDay);
+        this->CoolFlowSeq.allocate(numOfTimeStepInDay);
+        this->HeatFlowSeqNoOA.allocate(numOfTimeStepInDay);
+        this->CoolFlowSeqNoOA.allocate(numOfTimeStepInDay);
+        this->HeatLoadSeq.allocate(numOfTimeStepInDay);
+        this->CoolLoadSeq.allocate(numOfTimeStepInDay);
+        this->HeatZoneTempSeq.allocate(numOfTimeStepInDay);
+        this->DesHeatSetPtSeq.allocate(numOfTimeStepInDay);
+        this->CoolZoneTempSeq.allocate(numOfTimeStepInDay);
+        this->DesCoolSetPtSeq.allocate(numOfTimeStepInDay);
+        this->HeatOutTempSeq.allocate(numOfTimeStepInDay);
+        this->CoolOutTempSeq.allocate(numOfTimeStepInDay);
+        this->HeatZoneRetTempSeq.allocate(numOfTimeStepInDay);
+        this->HeatTstatTempSeq.allocate(numOfTimeStepInDay);
+        this->CoolZoneRetTempSeq.allocate(numOfTimeStepInDay);
+        this->CoolTstatTempSeq.allocate(numOfTimeStepInDay);
+        this->HeatZoneHumRatSeq.allocate(numOfTimeStepInDay);
+        this->CoolZoneHumRatSeq.allocate(numOfTimeStepInDay);
+        this->HeatOutHumRatSeq.allocate(numOfTimeStepInDay);
+        this->CoolOutHumRatSeq.allocate(numOfTimeStepInDay);
+        this->DOASHeatLoadSeq.allocate(numOfTimeStepInDay);
+        this->DOASCoolLoadSeq.allocate(numOfTimeStepInDay);
+        this->DOASHeatAddSeq.allocate(numOfTimeStepInDay);
+        this->DOASLatAddSeq.allocate(numOfTimeStepInDay);
+        this->DOASSupMassFlowSeq.allocate(numOfTimeStepInDay);
+        this->DOASSupTempSeq.allocate(numOfTimeStepInDay);
+        this->DOASSupHumRatSeq.allocate(numOfTimeStepInDay);
+        this->DOASTotCoolLoadSeq.allocate(numOfTimeStepInDay);
+        for (int timeStepIndex = 1; timeStepIndex <= numOfTimeStepInDay; ++timeStepIndex) {
+            this->HeatFlowSeq(timeStepIndex) = 0.0;
+            this->CoolFlowSeq(timeStepIndex) = 0.0;
+            this->HeatFlowSeqNoOA(timeStepIndex) = 0.0;
+            this->CoolFlowSeqNoOA(timeStepIndex) = 0.0;
+            this->HeatLoadSeq(timeStepIndex) = 0.0;
+            this->CoolLoadSeq(timeStepIndex) = 0.0;
+            this->HeatZoneTempSeq(timeStepIndex) = 0.0;
+            this->DesHeatSetPtSeq(timeStepIndex) = 0.0;
+            this->CoolZoneTempSeq(timeStepIndex) = 0.0;
+            this->DesCoolSetPtSeq(timeStepIndex) = 0.0;
+            this->HeatOutTempSeq(timeStepIndex) = 0.0;
+            this->CoolOutTempSeq(timeStepIndex) = 0.0;
+            this->HeatZoneRetTempSeq(timeStepIndex) = 0.0;
+            this->HeatTstatTempSeq(timeStepIndex) = 0.0;
+            this->CoolZoneRetTempSeq(timeStepIndex) = 0.0;
+            this->CoolTstatTempSeq(timeStepIndex) = 0.0;
+            this->HeatZoneHumRatSeq(timeStepIndex) = 0.0;
+            this->CoolZoneHumRatSeq(timeStepIndex) = 0.0;
+            this->HeatOutHumRatSeq(timeStepIndex) = 0.0;
+            this->CoolOutHumRatSeq(timeStepIndex) = 0.0;
+            this->DOASHeatLoadSeq(timeStepIndex) = 0.0;
+            this->DOASCoolLoadSeq(timeStepIndex) = 0.0;
+            this->DOASHeatAddSeq(timeStepIndex) = 0.0;
+            this->DOASLatAddSeq(timeStepIndex) = 0.0;
+            this->DOASSupMassFlowSeq(timeStepIndex) = 0.0;
+            this->DOASSupTempSeq(timeStepIndex) = 0.0;
+            this->DOASSupHumRatSeq(timeStepIndex) = 0.0;
+            this->DOASTotCoolLoadSeq(timeStepIndex) = 0.0;
+        }
+    }
+
     void resetHVACSizingGlobals(int const curZoneEqNum, int const curSysNum, bool &firstPassFlag) // called in zone equipment Report function
     {
         // reset Data globals so that prevoiusly set variables are not used in other equipment models

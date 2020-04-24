@@ -1167,118 +1167,8 @@ namespace ZoneEquipmentManager {
                     CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASLowSetpoint = ZoneSizingInput(1).DOASLowSetpoint;
                     CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASHighSetpoint = ZoneSizingInput(1).DOASHighSetpoint;
                 }
-                ZoneSizing(DesDayNum, CtrlZoneNum).HeatFlowSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).CoolFlowSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).HeatFlowSeqNoOA.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).CoolFlowSeqNoOA.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).HeatLoadSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).CoolLoadSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneTempSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).DesHeatSetPtSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneTempSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).DesCoolSetPtSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).HeatOutTempSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).CoolOutTempSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneRetTempSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).HeatTstatTempSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneRetTempSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).CoolTstatTempSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneHumRatSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneHumRatSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).HeatOutHumRatSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).CoolOutHumRatSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).DOASHeatLoadSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).DOASCoolLoadSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).DOASHeatAddSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).DOASLatAddSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupMassFlowSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupTempSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRatSeq.allocate(NumOfTimeStepInDay);
-                ZoneSizing(DesDayNum, CtrlZoneNum).DOASTotCoolLoadSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatFlowSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolFlowSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatFlowSeqNoOA.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolFlowSeqNoOA.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatLoadSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolLoadSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneTempSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DesHeatSetPtSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneTempSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DesCoolSetPtSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatOutTempSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolOutTempSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneRetTempSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatTstatTempSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneRetTempSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolTstatTempSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneHumRatSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneHumRatSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatOutHumRatSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolOutHumRatSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASHeatLoadSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASCoolLoadSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASHeatAddSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASLatAddSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupMassFlowSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupTempSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRatSeq.allocate(NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASTotCoolLoadSeq.allocate(NumOfTimeStepInDay);
-                for (TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex) {
-                    ZoneSizing(DesDayNum, CtrlZoneNum).HeatFlowSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).CoolFlowSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).HeatFlowSeqNoOA(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).CoolFlowSeqNoOA(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).HeatLoadSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).CoolLoadSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneTempSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).DesHeatSetPtSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).DesCoolSetPtSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).HeatOutTempSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).CoolOutTempSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneRetTempSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).HeatTstatTempSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneRetTempSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).CoolTstatTempSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneHumRatSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).HeatOutHumRatSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).CoolOutHumRatSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).DOASHeatLoadSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).DOASCoolLoadSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).DOASHeatAddSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).DOASLatAddSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupMassFlowSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupTempSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRatSeq(TimeStepIndex) = 0.0;
-                    ZoneSizing(DesDayNum, CtrlZoneNum).DOASTotCoolLoadSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatFlowSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolFlowSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatFlowSeqNoOA(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolFlowSeqNoOA(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatLoadSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolLoadSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneTempSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatOutTempSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolOutTempSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneRetTempSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatTstatTempSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneRetTempSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolTstatTempSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolZoneHumRatSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatOutHumRatSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolOutHumRatSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASHeatLoadSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASCoolLoadSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASHeatAddSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASLatAddSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupMassFlowSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupTempSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRatSeq(TimeStepIndex) = 0.0;
-                    CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASTotCoolLoadSeq(TimeStepIndex) = 0.0;
-                }
+                ZoneSizing(DesDayNum, CtrlZoneNum).allocateMemberArrays(NumOfTimeStepInDay);
+                CalcZoneSizing(DesDayNum, CtrlZoneNum).allocateMemberArrays(NumOfTimeStepInDay);
             }
         }
 
@@ -1420,116 +1310,8 @@ namespace ZoneEquipmentManager {
                 CalcFinalZoneSizing(CtrlZoneNum).ZoneADEffCooling = ZoneSizingInput(1).ZoneADEffCooling;
                 CalcFinalZoneSizing(CtrlZoneNum).ZoneADEffHeating = ZoneSizingInput(1).ZoneADEffHeating;
             }
-            FinalZoneSizing(CtrlZoneNum).HeatFlowSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).HeatFlowSeqNoOA.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).CoolFlowSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).CoolFlowSeqNoOA.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).HeatLoadSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).CoolLoadSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).HeatZoneTempSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).DesHeatSetPtSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).CoolZoneTempSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).DesCoolSetPtSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).HeatOutTempSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).CoolOutTempSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).HeatZoneRetTempSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).HeatTstatTempSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).CoolZoneRetTempSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).CoolTstatTempSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).HeatZoneHumRatSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).CoolZoneHumRatSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).HeatOutHumRatSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).CoolOutHumRatSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).DOASHeatLoadSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).DOASCoolLoadSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).DOASHeatAddSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).DOASLatAddSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).DOASSupMassFlowSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).DOASSupTempSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).DOASSupHumRatSeq.allocate(NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).DOASTotCoolLoadSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).HeatFlowSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).CoolFlowSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).HeatFlowSeqNoOA.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).CoolFlowSeqNoOA.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).HeatLoadSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).CoolLoadSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).HeatZoneTempSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).DesHeatSetPtSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).CoolZoneTempSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).DesCoolSetPtSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).HeatOutTempSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).CoolOutTempSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).HeatZoneRetTempSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTempSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).CoolZoneRetTempSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).CoolTstatTempSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).HeatZoneHumRatSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).CoolZoneHumRatSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).HeatOutHumRatSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).CoolOutHumRatSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).DOASHeatLoadSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).DOASCoolLoadSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).DOASHeatAddSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).DOASLatAddSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).DOASSupMassFlowSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).DOASSupTempSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).DOASSupHumRatSeq.allocate(NumOfTimeStepInDay);
-            CalcFinalZoneSizing(CtrlZoneNum).DOASTotCoolLoadSeq.allocate(NumOfTimeStepInDay);
-            for (TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex) {
-                FinalZoneSizing(CtrlZoneNum).HeatFlowSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).CoolFlowSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).HeatFlowSeqNoOA(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).CoolFlowSeqNoOA(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).HeatLoadSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).CoolLoadSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).HeatZoneTempSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).HeatOutTempSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).CoolOutTempSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).HeatZoneRetTempSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).HeatTstatTempSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).CoolZoneRetTempSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).CoolTstatTempSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).HeatZoneHumRatSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).CoolZoneHumRatSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).HeatOutHumRatSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).CoolOutHumRatSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).DOASHeatLoadSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).DOASCoolLoadSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).DOASHeatAddSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).DOASLatAddSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).DOASSupMassFlowSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).DOASSupTempSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).DOASSupHumRatSeq(TimeStepIndex) = 0.0;
-                FinalZoneSizing(CtrlZoneNum).DOASTotCoolLoadSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).HeatFlowSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).CoolFlowSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).HeatFlowSeqNoOA(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).CoolFlowSeqNoOA(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).HeatLoadSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).CoolLoadSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).HeatZoneTempSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).HeatOutTempSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).CoolOutTempSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).HeatZoneRetTempSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTempSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).CoolZoneRetTempSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).CoolTstatTempSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).HeatZoneHumRatSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).CoolZoneHumRatSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).HeatOutHumRatSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).CoolOutHumRatSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).DOASHeatLoadSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).DOASCoolLoadSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).DOASHeatAddSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).DOASLatAddSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).DOASSupMassFlowSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).DOASSupTempSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).DOASSupHumRatSeq(TimeStepIndex) = 0.0;
-                CalcFinalZoneSizing(CtrlZoneNum).DOASTotCoolLoadSeq(TimeStepIndex) = 0.0;
-            }
+            FinalZoneSizing(CtrlZoneNum).allocateMemberArrays(NumOfTimeStepInDay);
+            CalcFinalZoneSizing(CtrlZoneNum).allocateMemberArrays(NumOfTimeStepInDay);
 
             // setup CalcFinalZoneSizing structure for use with EMS, some as sensors, some as actuators
             if (AnyEnergyManagementSystemInModel) {
@@ -1768,16 +1550,13 @@ namespace ZoneEquipmentManager {
         // Zero zone sizing arrays between the pulse and normal sizing.
         DisplayString("Re-zeroing zone sizing arrays");
 
-        for (int DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum) {
-            for (int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
-                ZoneSizing(DesDayNum, CtrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
+        for (int ctrlZoneNum = 1; ctrlZoneNum <= NumOfZones; ++ctrlZoneNum) {
+            for (int desDayNum = 1; desDayNum <= TotDesDays + TotRunDesPersDays; ++desDayNum) {
+                ZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
+                CalcZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
             }
-        }
-
-        for (int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
-            CalcFinalZoneSizing(CtrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
-            FinalZoneSizing(CtrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
+            CalcFinalZoneSizing(ctrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
+            FinalZoneSizing(ctrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
         }
     }
 
