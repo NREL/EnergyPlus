@@ -738,7 +738,8 @@ namespace WeatherManager {
                            bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     );
 
-    void ReadEPlusWeatherForDay(int const DayToRead,          // =1 when starting out, otherwise signifies next day
+    void ReadEPlusWeatherForDay(OutputFiles &outputFiles,
+                                int const DayToRead,          // =1 when starting out, otherwise signifies next day
                                 int const Environ,            // Environment being simulated
                                 bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     );
@@ -829,7 +830,8 @@ namespace WeatherManager {
 
     void OpenWeatherFile(bool &ErrorsFound);
 
-    void OpenEPlusWeatherFile(bool &ErrorsFound,       // Will be set to true if errors found
+    void OpenEPlusWeatherFile(OutputFiles &outputFiles,
+                              bool &ErrorsFound,       // Will be set to true if errors found
                               bool const ProcessHeader // Set to true when headers should be processed (rather than just read)
     );
 

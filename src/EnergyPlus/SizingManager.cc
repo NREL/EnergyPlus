@@ -293,10 +293,7 @@ namespace SizingManager {
                 outputFiles.zsz.fileName = outputFiles.outputZszTxtFileName;
             }
 
-            outputFiles.zsz.open();
-            if (!outputFiles.zsz.good() != 0) {
-                ShowFatalError(RoutineName + "Could not open file " + outputFiles.zsz.fileName + " for output (write).");
-            }
+            outputFiles.zsz.ensure_open();
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
@@ -496,10 +493,7 @@ namespace SizingManager {
             } else {
                 outputFiles.ssz.fileName = outputFiles.outputSszTxtFileName;
             }
-            outputFiles.ssz.open();
-            if (!outputFiles.ssz.good()) {
-                ShowFatalError(RoutineName + "Could not open file " + outputFiles.ssz.fileName + " for output (write).");
-            }
+            outputFiles.ssz.ensure_open();
 
             SimAir = true;
             SimZoneEquip = true;

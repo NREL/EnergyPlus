@@ -2909,8 +2909,10 @@ namespace ZoneTempPredictorCorrector {
                     "Zone Air Humidity Ratio", OutputProcessor::Unit::None, ZoneAirHumRat(Loop), "System", "Average", Zone(Loop).Name);
                 SetupOutputVariable(
                     "Zone Air Relative Humidity", OutputProcessor::Unit::Perc, ZoneAirRelHum(Loop), "System", "Average", Zone(Loop).Name);
-                // This output variable is for the predicted Heating/Cooling load for the zone which can be compared to actual load
-                // These report variables are not multiplied by zone and group multipliers
+                
+                // The following output variables are for the predicted Heating/Cooling load for the zone which can be compared to actual load.
+                // There are two sets of data available: one where zone and group multipliers have been applied and another where the multipliers have not.
+                // First, these report variables are NOT multiplied by zone and group multipliers
                 SetupOutputVariable("Zone Predicted Sensible Load to Setpoint Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     SNLoadPredictedRate(Loop),
@@ -2929,7 +2931,29 @@ namespace ZoneTempPredictorCorrector {
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
-                // This output variable is for the predicted moisture load for the zone with humidity controlled specified.
+                //Second, these report variable ARE multiplied by zone and group multipliers
+                SetupOutputVariable("Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    ZoneSysEnergyDemand(Loop).TotalOutputRequired,
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+                SetupOutputVariable("Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    ZoneSysEnergyDemand(Loop).OutputRequiredToHeatingSP,
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+                SetupOutputVariable("Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    ZoneSysEnergyDemand(Loop).OutputRequiredToCoolingSP,
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+                
+                // The following output variables are for the predicted moisture load for the zone with humidity controlled specified.
+                // There are two sets of data available: one where zone and group multipliers have been applied and another where the multipliers have not.
+                // First, these report variables are NOT multiplied by zone and group multipliers
                 SetupOutputVariable("Zone Predicted Moisture Load Moisture Transfer Rate",
                                     OutputProcessor::Unit::kgWater_s,
                                     MoisturePredictedRate(Loop),
@@ -2948,6 +2972,26 @@ namespace ZoneTempPredictorCorrector {
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
+                //Second, these report variable ARE multiplied by zone and group multipliers
+                SetupOutputVariable("Zone System Predicted Moisture Load Moisture Transfer Rate",
+                                    OutputProcessor::Unit::kgWater_s,
+                                    ZoneSysMoistureDemand(Loop).TotalOutputRequired,
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+                SetupOutputVariable("Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
+                                    OutputProcessor::Unit::kgWater_s,
+                                    ZoneSysMoistureDemand(Loop).OutputRequiredToHumidifyingSP,
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+                SetupOutputVariable("Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
+                                    OutputProcessor::Unit::kgWater_s,
+                                    ZoneSysMoistureDemand(Loop).OutputRequiredToDehumidifyingSP,
+                                    "System",
+                                    "Average",
+                                    Zone(Loop).Name);
+
                 SetupOutputVariable(
                     "Zone Thermostat Control Type", OutputProcessor::Unit::None, TempControlType(Loop), "Zone", "Average", Zone(Loop).Name);
                 SetupOutputVariable("Zone Thermostat Heating Setpoint Temperature",
@@ -4403,19 +4447,15 @@ namespace ZoneTempPredictorCorrector {
 
         ZoneSetPointLast(ZoneNum) = ZoneSetPoint;
         TempZoneThermostatSetPoint(ZoneNum) = ZoneSetPoint; // needed to fix Issue # 5048
-
-        // Save the unmultiplied zone load to a report variable
-        SNLoadPredictedRate(ZoneNum) = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired * LoadCorrectionFactor(ZoneNum);
-        SNLoadPredictedHSPRate(ZoneNum) = LoadToHeatingSetPoint * LoadCorrectionFactor(ZoneNum);
-        SNLoadPredictedCSPRate(ZoneNum) = LoadToCoolingSetPoint * LoadCorrectionFactor(ZoneNum);
         CurDeadBandOrSetback(ZoneNum) = DeadBandOrSetback(ZoneNum);
 
-        // Apply the Zone Multiplier and Load Correction factor to the total zone load
-        ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired *= Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier * LoadCorrectionFactor(ZoneNum);
-        ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP =
-            LoadToHeatingSetPoint * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier * LoadCorrectionFactor(ZoneNum);
-        ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP =
-            LoadToCoolingSetPoint * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier * LoadCorrectionFactor(ZoneNum);
+        // Apply the Zone Multiplier and Load Correction factor as needed
+        ReportSensibleLoadsZoneMultiplier(ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired,
+                                          ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP,
+                                          ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP,
+                                          SNLoadPredictedRate(ZoneNum),SNLoadPredictedHSPRate(ZoneNum),SNLoadPredictedCSPRate(ZoneNum),
+                                          LoadToHeatingSetPoint,LoadToCoolingSetPoint,
+                                          LoadCorrectionFactor(ZoneNum),Zone(ZoneNum).Multiplier,Zone(ZoneNum).ListMultiplier);
 
         // init each sequenced demand to the full output
         if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired))
@@ -4427,6 +4467,31 @@ namespace ZoneTempPredictorCorrector {
             ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP =
                 ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP; // array assignment
     }
+
+    void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
+                                    Real64 &TotalHeatLoad,
+                                    Real64 &TotalCoolLoad,
+                                    Real64 &SensLoadSingleZone,
+                                    Real64 &SensLoadHeatSingleZone,
+                                    Real64 &SensLoadCoolSingleZone,
+                                    Real64 const OutputHeatSP,
+                                    Real64 const OutputCoolSP,
+                                    Real64 const LoadCorrFactor,
+                                    Real64 const ZoneMultiplier,
+                                    Real64 const ZoneMultiplierList
+    )
+    {
+        SensLoadSingleZone = TotalLoad * LoadCorrFactor;
+        SensLoadHeatSingleZone = OutputHeatSP * LoadCorrFactor;
+        SensLoadCoolSingleZone = OutputCoolSP * LoadCorrFactor;
+    
+        Real64 ZoneMultFac = ZoneMultiplier * ZoneMultiplierList;
+    
+        TotalLoad = SensLoadSingleZone * ZoneMultFac;
+        TotalHeatLoad = SensLoadHeatSingleZone * ZoneMultFac;
+        TotalCoolLoad = SensLoadCoolSingleZone * ZoneMultFac;
+    }
+
 
     void CalcPredictedHumidityRatio(int const ZoneNum, Real64 RAFNFrac)
     {
@@ -4761,7 +4826,7 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        // Save the unmultiplied zone moisture load to a report variable
+        // Apply zone multipliers as needed
         ReportMoistLoadsZoneMultiplier(ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired,
                                        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP,
                                        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP,
@@ -4799,7 +4864,6 @@ namespace ZoneTempPredictorCorrector {
         TotalHumidLoad *= ZoneMultFac;
         TotalDehumidLoad *= ZoneMultFac;
     }
-
 
     void CorrectZoneAirTemp(EnergyPlusData &state, Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
                             bool const ShortenTimeStepSys,

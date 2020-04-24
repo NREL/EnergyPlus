@@ -98,13 +98,13 @@ namespace SimulationManager {
 
     void SetupSimulation(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound);
 
-    void ReportNodeConnections();
+    void ReportNodeConnections(OutputFiles &outputFiles);
 
-    void ReportLoopConnections();
+    void ReportLoopConnections(OutputFiles &outputFiles);
 
-    void ReportParentChildren();
+    void ReportParentChildren(OutputFiles &outputFiles);
 
-    void ReportCompSetMeterVariables();
+    void ReportCompSetMeterVariables(OutputFiles &outputFiles);
 
     void PostIPProcessing();
 

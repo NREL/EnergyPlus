@@ -64,7 +64,6 @@ namespace DataPlant {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::DoingSizing;
-    using DataGlobals::OutputFileDebug;
     using DataLoopNode::NodeID;
     using DataLoopNode::SensedNodeFlagValue;
 

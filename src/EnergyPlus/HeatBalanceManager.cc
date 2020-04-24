@@ -5941,10 +5941,7 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
-        static constexpr auto EndOfHeaderString("End of Data Dictionary");                   // End of data dictionary marker
-        static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
-        static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -5977,14 +5974,22 @@ namespace HeatBalanceManager {
             if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
             if (PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && DoOutputReporting) {
-                    ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
+                    static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
+                    print(outputFiles.eso, "{}\n", EndOfHeaderString);
                     print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
-                    ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
-                        << "1"
-                        << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
+                    static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+                    print(outputFiles.eso,
+                          EnvironmentStampFormatStr,
+                          "1",
+                          "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                          Latitude,
+                          Longitude,
+                          TimeZoneNumber,
+                          Elevation);
+
                     print(outputFiles.mtr,
                           EnvironmentStampFormatStr,
                           "1",

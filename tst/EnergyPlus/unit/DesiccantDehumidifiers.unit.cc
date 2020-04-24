@@ -2815,7 +2815,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -2824,7 +2824,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
-    SizingManager::ManageSizing(state, OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, outputFiles());
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 1;
@@ -3995,7 +3995,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -4004,7 +4004,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
-    SizingManager::ManageSizing(state, OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, outputFiles());
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 0;
@@ -5413,7 +5413,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -5422,7 +5422,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
-    SizingManager::ManageSizing(state, OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, outputFiles());
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 0;
@@ -6658,7 +6658,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -6667,7 +6667,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
-    SizingManager::ManageSizing(state, OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, outputFiles());
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 0;

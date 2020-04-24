@@ -235,17 +235,13 @@ namespace DataGlobals {
     extern int TimeStep;                             // Counter for time steps (fractional hours)
     extern Real64 TimeStepZone;                      // Zone time step in fractional hours
     extern bool WarmupFlag;                          // True during the warmup portion of a simulation
-    extern int OutputFileStandard;                   // Unit number for the standard output file (hourly data only)
-    extern std::ostream *eso_stream;                 // Internal stream used for eso output (used for performance)
     extern JsonOutputStreams jsonOutputStreams;      // Internal streams used for json outputs
     extern int OutputStandardError;                  // Unit number for the standard error output file
     extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern int OutputFileDebug;                      // Unit number for debug outputs
     extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int OutputFileShadingFrac;                // Unit number for shading output
     extern int StdMeterRecordCount;                  // Count of Meter output records
-    extern int OutputFileBNDetails;                  // Unit number for Branch-Node Details
     extern int OutputDElightIn;                      // Unit number for the DElight In file
     extern std::ostream *delightin_stream;           // Internal stream used for DElight In file
     extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation

@@ -282,14 +282,14 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
 
     // Read the project data, such as Timestep
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     EXPECT_EQ(DataGlobals::NumOfTimeStepInHour, 4);
 
     // Needed to avoid crash in SetupSimulation (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject();
 
     bool ErrorsFound(false);
-    SimulationManager::SetupSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     EXPECT_EQ(WeatherManager::NumOfEnvrn, 3);

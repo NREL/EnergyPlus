@@ -414,7 +414,7 @@ namespace HeatBalanceSurfaceManager {
                     Surface(SurfNum).WindDir = Node(Surface(SurfNum).LinkedOutAirNode).OutAirWindDir;
                 }
 
-                if (Surface(SurfNum).HasSurroundingSurfProperties) {
+                if (InitSurfaceHeatBalancefirstTime && Surface(SurfNum).HasSurroundingSurfProperties) {
                     SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
                     SrdSurfsViewFactor = 0;
                     if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0) {
