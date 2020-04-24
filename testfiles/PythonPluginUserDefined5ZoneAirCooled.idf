@@ -5177,4 +5177,3 @@ PythonPlugin:Variables,
     Set HW_tempFall = ActualQdot/(Water_MdotRequest * Water_cp),  !- <none>
     Set Water_Tout = Water_Tinlet - HW_tempFall,  !- <none>
     Set tot_heat_Power = ActualQdot;  !- <none>
-

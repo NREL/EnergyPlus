@@ -32,8 +32,6 @@ class UserDefinedCoilSim(EnergyPlusPlugin):
         self.CW_Tout_handle = None
         self.CW_Mdot_Request_handle = None
         self.Chiller_ElectEnergy_handle = None
-        # self.chiller_cap_max_handle = None
-        # self.chiller_mdot_max_handle = None
 
     def get_handles(self):
         self.CWplant_Vdot_Design_handle = self.api.exchange.get_internal_variable_handle(
@@ -136,7 +134,7 @@ class UserDefinedCoilSim(EnergyPlusPlugin):
         # set chiller mdot
         if CW_Mdot == 0.0:
             Mdot = self.api.exchange.get_actuator_value(self.Chiller_Mdot_Max_handle)
-            CW_Mdot_Request = self.api.exchange.get_actuator_value(self.Chiller_Mdot_Max_handle)
+            self.api.exchange.set_actuator_value(self.CW_Mdot_Request_handle, Mdot)
         else:
             Mdot = CW_Mdot
 
