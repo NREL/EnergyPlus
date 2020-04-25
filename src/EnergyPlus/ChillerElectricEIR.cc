@@ -231,7 +231,7 @@ namespace ChillerElectricEIR {
         sizFac = this->SizFac;
     }
 
-    void ElectricEIRChillerSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
+    void ElectricEIRChillerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;

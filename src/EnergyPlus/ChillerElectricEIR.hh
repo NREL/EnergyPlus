@@ -245,7 +245,7 @@ namespace ChillerElectricEIR {
 
         void getSizingFactor(Real64 &sizFac) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void initialize(bool RunFlag, Real64 MyLoad);
 
