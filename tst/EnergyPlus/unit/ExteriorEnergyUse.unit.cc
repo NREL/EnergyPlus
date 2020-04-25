@@ -68,7 +68,7 @@ using namespace EnergyPlus::ScheduleManager;
 TEST_F(EnergyPlusFixture, ExteriorEquipmentTest_Test1)
 {
 
-	state.exteriorEnergyUse.NumExteriorLights = 0;
+    state.exteriorEnergyUse.NumExteriorLights = 0;
     state.exteriorEnergyUse.NumExteriorEqs = 2;
     TimeStepZone = 0.25;
     TimeStepZoneSec = TimeStepZone * SecInHour;
