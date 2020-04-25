@@ -2597,7 +2597,7 @@ namespace MixedAir {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitOutsideAirSys(EnergyPlusData &state, int const(OASysNum), bool const FirstHVACIteration, int const AirLoopNum)
+    void InitOutsideAirSys(EnergyPlusData &EP_UNUSED(state), int const(OASysNum), bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:

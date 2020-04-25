@@ -532,7 +532,7 @@ namespace MicroCHPElectricGenerator {
         }
     }
 
-    void MicroCHPDataStruct::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+    void MicroCHPDataStruct::simulate(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
                                       bool FirstHVACIteration,
                                       Real64 &EP_UNUSED(CurLoad),
                                       bool EP_UNUSED(RunFlag))
@@ -553,7 +553,7 @@ namespace MicroCHPElectricGenerator {
                                                         FirstHVACIteration);
     }
 
-    void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus::PlantLocation &)
+    void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &)
     {
         static std::string const RoutineName("MicroCHPDataStruct::onInitLoopEquip");
 

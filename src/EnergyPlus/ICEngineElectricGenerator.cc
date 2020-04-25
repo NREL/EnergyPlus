@@ -442,7 +442,7 @@ namespace ICEngineElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void ICEngineGeneratorSpecs::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+    void ICEngineGeneratorSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
                                           bool FirstHVACIteration,
                                           Real64 &EP_UNUSED(CurLoad),
                                           bool EP_UNUSED(RunFlag))

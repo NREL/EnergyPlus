@@ -134,7 +134,7 @@ namespace ChillerGasAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GasAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void GasAbsorberSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
@@ -207,7 +207,7 @@ namespace ChillerGasAbsorption {
         _SizFac = this->SizFac;
     }
 
-    void GasAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    void GasAbsorberSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
     {
         this->initialize();
 

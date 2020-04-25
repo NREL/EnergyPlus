@@ -136,7 +136,7 @@ namespace ChillerExhaustAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void ExhaustAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ExhaustAbsorberSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
@@ -208,7 +208,7 @@ namespace ChillerExhaustAbsorption {
         _SizFac = this->SizFac;
     }
 
-    void ExhaustAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    void ExhaustAbsorberSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
     {
         this->initialize();
 

@@ -124,7 +124,7 @@ namespace BoilerSteam {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void BoilerSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void BoilerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         this->initialize();
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
@@ -144,7 +144,7 @@ namespace BoilerSteam {
         _SizFac = this->SizFac;
     }
 
-    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
+    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &)
     {
         this->initialize();
         this->autosize();

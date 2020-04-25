@@ -152,7 +152,7 @@ namespace PlantHeatExchangerFluidToFluid {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void HeatExchangerStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void HeatExchangerStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initialize();
     }
@@ -171,7 +171,7 @@ namespace PlantHeatExchangerFluidToFluid {
         }
     }
 
-    void HeatExchangerStruct::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation,
+    void HeatExchangerStruct::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation,
                                        bool const FirstHVACIteration,
                                        Real64 &CurLoad,
                                        bool const EP_UNUSED(RunFlag))

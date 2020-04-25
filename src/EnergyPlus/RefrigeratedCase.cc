@@ -10134,13 +10134,13 @@ namespace RefrigeratedCase {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void RefrigCondenserData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void RefrigCondenserData::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         InitRefrigeration();
         InitRefrigerationPlantConnections();
     }
 
-    void RefrigCondenserData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void RefrigCondenserData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                        bool const FirstHVACIteration,
                                        Real64 &EP_UNUSED(CurLoad),
                                        bool const EP_UNUSED(RunFlag))
@@ -10291,13 +10291,13 @@ namespace RefrigeratedCase {
         return nullptr; // LCOV_EXCL_LINE
         }
 
-    void RefrigRackData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void RefrigRackData::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
             InitRefrigeration();
             InitRefrigerationPlantConnections();
         }
 
-    void RefrigRackData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void RefrigRackData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                   bool const FirstHVACIteration,
                                   Real64 &EP_UNUSED(CurLoad),
                                   bool const EP_UNUSED(RunFlag))

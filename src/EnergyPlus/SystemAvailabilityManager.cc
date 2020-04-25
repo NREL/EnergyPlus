@@ -5305,7 +5305,7 @@ namespace SystemAvailabilityManager {
         }
     }
 
-    bool GetHybridVentilationControlStatus(EnergyPlusData &state, int const ZoneNum) // Index of zone
+    bool GetHybridVentilationControlStatus(EnergyPlusData &EP_UNUSED(state), int const ZoneNum) // Index of zone
     {
 
         // SUBROUTINE INFORMATION:

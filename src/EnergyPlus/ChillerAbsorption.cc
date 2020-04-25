@@ -149,7 +149,7 @@ namespace ChillerAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void BLASTAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void BLASTAbsorberSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
 
         this->EquipFlowCtrl = DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum).FlowCtrl;
@@ -195,7 +195,7 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    void BLASTAbsorberSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;

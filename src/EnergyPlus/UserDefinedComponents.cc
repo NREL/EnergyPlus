@@ -149,7 +149,7 @@ namespace UserDefinedComponents {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void UserPlantComponentStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    void UserPlantComponentStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
     {
         bool anyEMSRan;
         Real64 myLoad = 0.0;

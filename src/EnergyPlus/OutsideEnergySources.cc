@@ -135,13 +135,13 @@ namespace OutsideEnergySources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void OutsideEnergySourceSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
+    void OutsideEnergySourceSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
                                             Real64 &CurLoad, bool RunFlag) {
         this->initialize(CurLoad);
         this->calculate(RunFlag, CurLoad);
     }
 
-    void OutsideEnergySourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &) {
+    void OutsideEnergySourceSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &) {
         this->initialize(0.0);
         this->size();
     }

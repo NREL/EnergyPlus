@@ -154,7 +154,7 @@ namespace SwimmingPool {
         ReportSwimmingPool();
     }
 
-    void SwimmingPoolData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SwimmingPoolData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool FirstHVACIteration,
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool EP_UNUSED(RunFlag))

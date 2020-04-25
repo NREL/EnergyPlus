@@ -193,7 +193,7 @@ namespace PipeHeatTransfer {
         PipeHTUniqueNames.clear();
     }
 
-    void PipeHTData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PipeHTData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                               bool const FirstHVACIteration,
                               Real64 &EP_UNUSED(CurLoad),
                               bool const EP_UNUSED(RunFlag))

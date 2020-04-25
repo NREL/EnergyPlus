@@ -406,7 +406,7 @@ namespace UnitarySystems {
         }
     }
 
-    void DesignSpecMSHP::getDesignSpecMSHPdata(EnergyPlusData &state, bool errorsFound)
+    void DesignSpecMSHP::getDesignSpecMSHPdata(EnergyPlusData &EP_UNUSED(state), bool errorsFound)
     {
         std::string cCurrentModuleObject = "UnitarySystemPerformance:Multispeed";
 

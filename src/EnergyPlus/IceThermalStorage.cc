@@ -180,7 +180,7 @@ namespace IceThermalStorage {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void SimpleIceStorageData::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation,
+    void SimpleIceStorageData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation,
                                         bool EP_UNUSED(FirstHVACIteration),
                                         Real64 &EP_UNUSED(CurLoad),
                                         bool RunFlag)
@@ -288,7 +288,7 @@ namespace IceThermalStorage {
         this->RecordOutput(MyLoad2, RunFlag);
     }
 
-    void DetailedIceStorageData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void DetailedIceStorageData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                           bool EP_UNUSED(FirstHVACIteration),
                                           Real64 &EP_UNUSED(CurLoad),
                                           bool EP_UNUSED(RunFlag))

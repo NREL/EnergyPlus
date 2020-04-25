@@ -192,7 +192,7 @@ namespace ChillerReformulatedEIR {
         sizFac = this->SizFac;
     }
 
-    void ReformulatedEIRChillerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    void ReformulatedEIRChillerSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;
@@ -203,7 +203,7 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ReformulatedEIRChillerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu

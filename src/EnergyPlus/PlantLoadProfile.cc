@@ -122,12 +122,12 @@ namespace PlantLoadProfile {
         return nullptr;
     }
 
-    void PlantProfileData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void PlantProfileData::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->InitPlantProfile();
     }
 
-    void PlantProfileData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PlantProfileData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool const EP_UNUSED(FirstHVACIteration),
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool const EP_UNUSED(RunFlag))

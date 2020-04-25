@@ -139,13 +139,13 @@ namespace PhotovoltaicThermalCollectors {
         return nullptr;
     }
 
-    void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initialize(true);
         this->size();
     }
 
-    void PVTCollectorStruct::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PVTCollectorStruct::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                       bool const FirstHVACIteration,
                                       Real64 &EP_UNUSED(CurLoad),
                                       bool const EP_UNUSED(RunFlag))

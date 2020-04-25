@@ -140,7 +140,7 @@ namespace Pipes {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void LocalPipeData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void LocalPipeData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                  bool const EP_UNUSED(FirstHVACIteration),
                                  Real64 &EP_UNUSED(CurLoad),
                                  bool const EP_UNUSED(RunFlag))

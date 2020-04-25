@@ -157,7 +157,7 @@ namespace HeatPumpWaterToWaterSimple {
         return nullptr;
     }
 
-    void GshpSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const EP_UNUSED(RunFlag))
+    void GshpSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const EP_UNUSED(RunFlag))
     {
         if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop

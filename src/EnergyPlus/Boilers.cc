@@ -149,7 +149,7 @@ namespace Boilers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void BoilerSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void BoilerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                bool const EP_UNUSED(FirstHVACIteration),
                                Real64 &CurLoad,
                                bool const RunFlag)
@@ -172,7 +172,7 @@ namespace Boilers {
         SizFactor = this->SizFac;
     }
 
-    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->InitBoiler();
         this->SizeBoiler();

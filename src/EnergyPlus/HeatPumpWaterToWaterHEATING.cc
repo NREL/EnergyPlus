@@ -142,7 +142,7 @@ namespace HeatPumpWaterToWaterHEATING {
     }
 
 
-    void GshpPeHeatingSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+    void GshpPeHeatingSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                                       bool EP_UNUSED(RunFlag)) {
 
         // Simulate the model for the Demand "MyLoad"
@@ -175,7 +175,7 @@ namespace HeatPumpWaterToWaterHEATING {
         OptLoad = this->NomCap * this->OptPartLoadRat;
     }
 
-    void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) {
+    void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;

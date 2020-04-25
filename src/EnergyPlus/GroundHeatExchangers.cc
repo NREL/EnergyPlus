@@ -408,14 +408,14 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEBase::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void GLHEBase::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initGLHESimVars();
     }
 
     //******************************************************************************
 
-    void GLHEBase::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void GLHEBase::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                             bool const EP_UNUSED(FirstHVACIteration),
                             Real64 &EP_UNUSED(CurLoad),
                             bool const EP_UNUSED(RunFlag))

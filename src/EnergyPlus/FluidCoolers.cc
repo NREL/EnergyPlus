@@ -131,7 +131,7 @@ namespace FluidCoolers {
         return nullptr;
     }
 
-    void FluidCoolerspecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void FluidCoolerspecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool const EP_UNUSED(FirstHVACIteration),
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool const RunFlag)
@@ -146,7 +146,7 @@ namespace FluidCoolers {
         this->report(RunFlag);
     }
 
-    void FluidCoolerspecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void FluidCoolerspecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initialize();
         this->size();

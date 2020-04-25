@@ -169,7 +169,7 @@ namespace CondenserLoopTowers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CoolingTower::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void CoolingTower::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                 bool const EP_UNUSED(FirstHVACIteration),
                                 Real64 &CurLoad,
                                 bool const RunFlag)
@@ -201,7 +201,7 @@ namespace CondenserLoopTowers {
         SizFactor = this->SizFac;
     }
 
-    void CoolingTower::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void CoolingTower::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initialize();
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {

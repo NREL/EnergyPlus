@@ -211,7 +211,7 @@ namespace SurfaceGroundHeatExchanger {
         return nullptr;
     }
 
-    void SurfaceGroundHeatExchangerData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SurfaceGroundHeatExchangerData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                                   bool const FirstHVACIteration,
                                                   Real64 &EP_UNUSED(CurLoad),
                                                   bool const EP_UNUSED(RunFlag))

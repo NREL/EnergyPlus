@@ -3104,7 +3104,7 @@ namespace FuelCellElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void FCDataStruct::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void FCDataStruct::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                 bool FirstHVACIteration,
                                 Real64 &EP_UNUSED(CurLoad),
                                 bool EP_UNUSED(RunFlag))

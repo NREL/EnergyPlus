@@ -196,7 +196,7 @@ namespace PlantCentralGSHP {
         SizFac = 1.0;
     }
 
-    void WrapperSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+    void WrapperSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
     {
         if (calledFromLocation.loopNum != this->GLHELoopNum) {
 

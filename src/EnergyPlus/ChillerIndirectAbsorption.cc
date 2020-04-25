@@ -149,7 +149,7 @@ namespace ChillerIndirectAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void IndirectAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void IndirectAbsorberSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
 
@@ -208,7 +208,7 @@ namespace ChillerIndirectAbsorption {
         sizFac = this->SizFac;
     }
 
-    void IndirectAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    void IndirectAbsorberSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;

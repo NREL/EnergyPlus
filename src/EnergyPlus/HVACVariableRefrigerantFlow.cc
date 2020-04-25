@@ -416,7 +416,7 @@ namespace HVACVariableRefrigerantFlow {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void VRFCondenserEquipment::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void VRFCondenserEquipment::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->SizeVRFCondenser();
     }
@@ -429,7 +429,7 @@ namespace HVACVariableRefrigerantFlow {
                       this->HeatingCapacity); // connects to single loop, need to switch between cooling/heating capacity?
     }
 
-    void VRFCondenserEquipment::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    void VRFCondenserEquipment::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
     {
         if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
             PlantUtilities::UpdateChillerComponentCondenserSide(this->SourceLoopNum,
@@ -9962,7 +9962,7 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
+    void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &EP_UNUSED(state))
     {
 
         // SUBROUTINE INFORMATION:

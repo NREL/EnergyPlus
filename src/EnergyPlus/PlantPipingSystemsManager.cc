@@ -150,7 +150,7 @@ namespace EnergyPlus {
             DataGlobals::AnySlabsInModel = (numSlabsCheck > 0);
         }
 
-        void CheckIfAnyBasements(EnergyPlusData &state) {
+        void CheckIfAnyBasements(EnergyPlusData &EP_UNUSED(state)) {
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Matt Mitchell
             //       DATE WRITTEN   May 2014
@@ -179,7 +179,7 @@ namespace EnergyPlus {
             return nullptr; // LCOV_EXCL_LINE
         }
 
-        void Circuit::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+        void Circuit::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                bool const EP_UNUSED(FirstHVACIteration),
                                Real64 &EP_UNUSED(CurLoad),
                                bool const EP_UNUSED(RunFlag)) {

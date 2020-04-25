@@ -396,7 +396,7 @@ namespace PlantComponentTemperatureSources {
         DataLoopNode::Node(this->OutletNodeNum).Temp = this->OutletTemp;
     }
 
-    void WaterSourceSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void WaterSourceSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool EP_UNUSED(FirstHVACIteration),
                                     Real64 &CurLoad,
                                     bool EP_UNUSED(RunFlag))
@@ -419,7 +419,7 @@ namespace PlantComponentTemperatureSources {
         _SizFac = this->SizFac;
     }
 
-    void WaterSourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
+    void WaterSourceSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &)
     {
         Real64 myLoad = 0.0;
         this->initialize(myLoad);

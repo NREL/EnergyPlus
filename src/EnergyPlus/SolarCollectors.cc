@@ -756,7 +756,7 @@ namespace SolarCollectors {
         }
     }
 
-    void CollectorData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void CollectorData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                  bool const EP_UNUSED(FirstHVACIteration),
                                  Real64 &EP_UNUSED(CurLoad),
                                  bool const EP_UNUSED(RunFlag))
