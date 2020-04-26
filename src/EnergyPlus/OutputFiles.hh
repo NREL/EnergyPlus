@@ -68,6 +68,7 @@ public:
 
     std::string fileName;
     void open();
+    std::fstream::pos_type position() const noexcept;
     std::vector<std::string> getLines();
     void open_as_stringstream();
     std::string get_output();
@@ -115,6 +116,7 @@ public:
     OutputFile mtr{"eplusout.mtr"};
     OutputFile bnd{"eplusout.bnd"};
 
+    OutputFile debug{"eplusout.dbg"};
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 

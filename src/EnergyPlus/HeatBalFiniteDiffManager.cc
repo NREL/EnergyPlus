@@ -104,7 +104,6 @@ namespace HeatBalFiniteDiffManager {
     using DataGlobals::HourOfDay;
     using DataGlobals::KelvinConv;
     using DataGlobals::NumOfTimeStepInHour;
-    using DataGlobals::OutputFileDebug;
     using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZoneSec;

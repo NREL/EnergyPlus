@@ -238,7 +238,6 @@ namespace DataGlobals {
     extern int OutputStandardError;                  // Unit number for the standard error output file
     extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern int OutputFileDebug;                      // Unit number for debug outputs
     extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int OutputFileShadingFrac;                // Unit number for shading output
     extern int StdMeterRecordCount;                  // Count of Meter output records
