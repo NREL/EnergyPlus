@@ -77,7 +77,7 @@ TEST_F(EnergyPlusFixture, ExteriorEquipmentTest_Test1)
     ExteriorEquipment(2).DesignLevel = 0.0;
     ExteriorEquipment(1).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
     ExteriorEquipment(2).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-    ReportExteriorEnergyUse(state);
+    ReportExteriorEnergyUse(state.exteriorEnergyUse);
 
     EXPECT_EQ(1000.0, ExteriorEquipment(1).Power);
     EXPECT_EQ(0.0, ExteriorEquipment(2).Power);

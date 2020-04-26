@@ -632,7 +632,7 @@ namespace SimulationManager {
 
                         ManageWeather();
 
-                        ManageExteriorEnergyUse(state);
+                        ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
                         ManageHeatBalance(state, outputFiles);
 
@@ -2094,7 +2094,7 @@ namespace SimulationManager {
 
             ManageWeather();
 
-            ManageExteriorEnergyUse(state);
+            ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
             ManageHeatBalance(state, outputFiles);
 
@@ -2109,7 +2109,7 @@ namespace SimulationManager {
 
             ManageWeather();
 
-            ManageExteriorEnergyUse(state);
+            ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
             ManageHeatBalance(state, outputFiles);
 
@@ -2122,7 +2122,7 @@ namespace SimulationManager {
             if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
             ManageWeather();
 
-            ManageExteriorEnergyUse(state);
+            ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
             ManageHeatBalance(state, outputFiles);
 
@@ -3123,7 +3123,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
 
     // FLOW:
     if (ResimExt) {
-        ManageExteriorEnergyUse(state);
+        ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
         ++DemandManagerExtIterations;
     }

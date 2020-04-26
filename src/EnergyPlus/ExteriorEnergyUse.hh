@@ -119,9 +119,9 @@ namespace ExteriorEnergyUse {
 
     // Functions
 
-    void ManageExteriorEnergyUse(EnergyPlusData &state);
+    void ManageExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
 
-    void GetExteriorEnergyUseInput(EnergyPlusData &state);
+    void GetExteriorEnergyUseInput(ExteriorEnergyUseData &exteriorEnergyUse);
 
     void ValidateFuelType(int &FuelTypeNumber,                    // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,       // Fuel Type String
@@ -131,7 +131,7 @@ namespace ExteriorEnergyUse {
                           std::string const &CurrentName          // current object name being parsed
     );
 
-    void ReportExteriorEnergyUse(EnergyPlusData &state);
+    void ReportExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
 
 } // namespace ExteriorEnergyUse
 
