@@ -250,9 +250,9 @@ namespace Fans {
             SimSimpleFan(state.fans, FanNum);
         } else if (Fan(FanNum).FanType_Num == FanType_SimpleVAV) {
             if (present(PressureRise)) {
-                SimVariableVolumeFan(state, FanNum, PressureRise);
+                SimVariableVolumeFan(state.fans, FanNum, PressureRise);
             } else {
-                SimVariableVolumeFan(state, FanNum);
+                SimVariableVolumeFan(state.fans, FanNum);
             }
         } else if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
             SimOnOffFan(state, FanNum, SpeedRatio);
@@ -1645,7 +1645,7 @@ namespace Fans {
         }
     }
 
-    void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> PressureRise)
+    void SimVariableVolumeFan(FansData &fans, int const FanNum, Optional<Real64 const> PressureRise)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1776,7 +1776,7 @@ namespace Fans {
         MassFlow = min(MassFlow, MaxAirMassFlowRate);
 
         // Determine the Fan Schedule for the Time step
-        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || state.fans.LocalTurnFansOn) && !state.fans.LocalTurnFansOff && MassFlow > 0.0) {
+        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || fans.LocalTurnFansOn) && !fans.LocalTurnFansOff && MassFlow > 0.0) {
             // Fan is operating - calculate power loss and enthalpy rise
             //  Fan(FanNum)%FanPower = PartLoadFrac*FullMassFlow*DeltaPress/(FanEff*RhoAir) ! total fan power
             // Calculate and check limits on fraction of system flow

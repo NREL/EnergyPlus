@@ -274,7 +274,7 @@ namespace Fans {
 
     void SimSimpleFan(FansData &fans, int const FanNum);
 
-    void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> PressureRise = _);
+    void SimVariableVolumeFan(FansData &fans, int const FanNum, Optional<Real64 const> PressureRise = _);
 
     void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> SpeedRatio = _);
 
