@@ -105,10 +105,10 @@ namespace Pipes {
         }
 
     public:
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
+        static PlantComponent *factory(PipesData &pipes, int objectType, std::string objectName);
 
     public:
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(states), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
     };
 
     // Object Data
@@ -117,7 +117,7 @@ namespace Pipes {
     // Functions
     void clear_state();
 
-    void GetPipeInput(EnergyPlusData &state);
+    void GetPipeInput(PipesData &pipes);
 
 } // namespace Pipes
 

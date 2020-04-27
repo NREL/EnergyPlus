@@ -121,12 +121,12 @@ namespace Pipes {
         LocalPipeUniqueNames.clear();
     }
 
-    PlantComponent *LocalPipeData::factory(EnergyPlusData &state, int objectType, std::string objectName)
+    PlantComponent *LocalPipeData::factory(PipesData &pipes, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
-        if (state.pipes.GetPipeInputFlag) {
-            GetPipeInput(state);
-            state.pipes.GetPipeInputFlag = false;
+        if (pipes.GetPipeInputFlag) {
+            GetPipeInput(pipes);
+            pipes.GetPipeInputFlag = false;
         }
         // Now look for this particular pipe in the list
         for (auto &pipe : LocalPipe) {
@@ -176,7 +176,7 @@ namespace Pipes {
         PlantUtilities::SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
     }
 
-    void GetPipeInput(EnergyPlusData &state)
+    void GetPipeInput(PipesData &pipes)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -209,9 +209,9 @@ namespace Pipes {
         // GET NUMBER OF ALL EQUIPMENT TYPES
         NumWaterPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic");
         NumSteamPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic:Steam");
-        state.pipes.NumLocalPipes = NumWaterPipes + NumSteamPipes;
-        LocalPipe.allocate(state.pipes.NumLocalPipes);
-        LocalPipeUniqueNames.reserve(static_cast<unsigned>(state.pipes.NumLocalPipes));
+        pipes.NumLocalPipes = NumWaterPipes + NumSteamPipes;
+        LocalPipe.allocate(pipes.NumLocalPipes);
+        LocalPipeUniqueNames.reserve(static_cast<unsigned>(pipes.NumLocalPipes));
 
         cCurrentModuleObject = "Pipe:Adiabatic";
         for (PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum) {
