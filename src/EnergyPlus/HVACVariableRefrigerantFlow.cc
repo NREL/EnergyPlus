@@ -3378,7 +3378,7 @@ namespace HVACVariableRefrigerantFlow {
 
                         // Set the Design Fan Volume Flow Rate
                         errFlag = false;
-                        FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
+                        FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, FanType, FanName, errFlag);
                         VRFTU(VRFTUNum).ActualFanVolFlowRate = FanVolFlowRate;
 
                         if (errFlag) {

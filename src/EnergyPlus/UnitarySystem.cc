@@ -646,7 +646,7 @@ namespace UnitarySystems {
                     if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         this->m_ActualFanVolFlowRate = HVACFan::fanObjs[this->m_FanIndex]->designAirVolFlowRate;
                     } else {
-                        this->m_ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, blankString, blankString, errorsFound, this->m_FanIndex);
+                        this->m_ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state.fans, blankString, blankString, errorsFound, this->m_FanIndex);
                     }
                 }
             }
@@ -2392,7 +2392,7 @@ namespace UnitarySystems {
                     if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         BranchFanFlow = HVACFan::fanObjs[this->m_FanIndex]->designAirVolFlowRate;
                     } else {
-                        BranchFanFlow = Fans::GetFanDesignVolumeFlowRate(state, FanType, m_FanName, ErrFound);
+                        BranchFanFlow = Fans::GetFanDesignVolumeFlowRate(state.fans, FanType, m_FanName, ErrFound);
                     }
                 }
                 if (BranchFanFlow > 0.0) {
@@ -3521,7 +3521,7 @@ namespace UnitarySystems {
 
                                 // Get the Design Fan Volume Flow Rate
                                 errFlag = false;
-                                FanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, loc_fanType, loc_m_FanName, errFlag);
+                                FanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state.fans, loc_fanType, loc_m_FanName, errFlag);
                                 if (FanVolFlowRate == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                                 thisSys.m_ActualFanVolFlowRate = FanVolFlowRate;
                                 thisSys.m_DesignFanVolFlowRate = FanVolFlowRate;

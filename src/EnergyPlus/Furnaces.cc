@@ -1191,7 +1191,7 @@ namespace Furnaces {
 
                     // Set the Design Fan Volume Flow Rate
                     errFlag = false;
-                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
+                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, FanType, FanName, errFlag);
                     Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
 
                     if (errFlag) {
@@ -1728,7 +1728,7 @@ namespace Furnaces {
 
                     // Get the Design Fan Volume Flow Rate
                     errFlag = false;
-                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
+                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, FanType, FanName, errFlag);
                     Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -2932,7 +2932,7 @@ namespace Furnaces {
 
                     // Get the Design Fan Volume Flow Rate
                     errFlag = false;
-                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
+                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, FanType, FanName, errFlag);
                     Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
@@ -4306,7 +4306,7 @@ namespace Furnaces {
 
             // Set the Design Fan Volume Flow Rate
             errFlag = false;
-            FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
+            FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, FanType, FanName, errFlag);
             Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
             if (errFlag) {
                 ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
@@ -4890,7 +4890,7 @@ namespace Furnaces {
         if (!DoingSizing && MySecondOneTimeFlag(FurnaceNum)) {
             // sizing all done.  check fan air flow rates
             errFlag = false;
-            FanVolFlowRate = GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
+            FanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
             Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
             if (errFlag) {
                 ShowContinueError("...occurs in " + cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " =" + Furnace(FurnaceNum).Name);
@@ -5178,7 +5178,7 @@ namespace Furnaces {
                 MyFanFlag(FurnaceNum) = false;
             } else {
                 Furnace(FurnaceNum).ActualFanVolFlowRate =
-                    GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
+                    GetFanDesignVolumeFlowRate(state.fans, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
             }
         }
 

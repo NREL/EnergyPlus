@@ -447,7 +447,7 @@ namespace HVACStandAloneERV {
                 // Set the SA Design Fan Volume Flow Rate
                 // get from fan module
                 errFlag = false;
-                SAFanVolFlowRate = GetFanDesignVolumeFlowRate(state, cFanTypes(SAFanTypeNum), StandAloneERV(StandAloneERVNum).SupplyAirFanName, errFlag);
+                SAFanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, cFanTypes(SAFanTypeNum), StandAloneERV(StandAloneERVNum).SupplyAirFanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("... occurs in " + CurrentModuleObject + " =" + StandAloneERV(StandAloneERVNum).Name);
                     ErrorsFound = true;
@@ -497,7 +497,7 @@ namespace HVACStandAloneERV {
                 // Set the EA Design Fan Volume Flow Rate
                 // get from fan module
                 errFlag = false;
-                EAFanVolFlowRate = GetFanDesignVolumeFlowRate(state, cFanTypes(EAFanTypeNum), StandAloneERV(StandAloneERVNum).ExhaustAirFanName, errFlag);
+                EAFanVolFlowRate = GetFanDesignVolumeFlowRate(state.fans, cFanTypes(EAFanTypeNum), StandAloneERV(StandAloneERVNum).ExhaustAirFanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("... occurs in " + CurrentModuleObject + " =" + StandAloneERV(StandAloneERVNum).Name);
                     ErrorsFound = true;

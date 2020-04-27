@@ -672,7 +672,7 @@ namespace FanCoilUnits {
                             (SELECT_CASE_var == FanType_SimpleOnOff)) {
                             // Get fan air volume flow rate
                             FanCoil(FanCoilNum).FanAirVolFlow =
-                                GetFanDesignVolumeFlowRate(state, FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName, IsNotOK);
+                                GetFanDesignVolumeFlowRate(state.fans, FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName, IsNotOK);
                             // Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
                             if (FanCoil(FanCoilNum).MaxAirVolFlow > FanCoil(FanCoilNum).FanAirVolFlow &&
                                 FanCoil(FanCoilNum).FanAirVolFlow != AutoSize) {
@@ -1616,7 +1616,7 @@ namespace FanCoilUnits {
                     if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                         Fans::SimulateFanComponents(state, FanCoil(FanCoilNum).FanName, true, FanCoil(FanCoilNum).FanIndex);
                         FanCoil(FanCoilNum).FanAirVolFlow =
-                            GetFanDesignVolumeFlowRate(state, cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
+                            GetFanDesignVolumeFlowRate(state.fans, cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
                     } else {
                         HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, _, _, _, _);
                         FanCoil(FanCoilNum).FanAirVolFlow = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->designAirVolFlowRate;
@@ -1657,7 +1657,7 @@ namespace FanCoilUnits {
             if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(state, FanCoil(FanCoilNum).FanName, true, FanCoil(FanCoilNum).FanIndex);
                 FanCoil(FanCoilNum).FanAirVolFlow =
-                    GetFanDesignVolumeFlowRate(state, cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
+                    GetFanDesignVolumeFlowRate(state.fans, cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
             } else {
                 HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(state, _, _, _, _);
                 FanCoil(FanCoilNum).FanAirVolFlow = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->designAirVolFlowRate;

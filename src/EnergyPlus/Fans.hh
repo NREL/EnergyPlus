@@ -319,7 +319,7 @@ namespace Fans {
                     Optional_string_const ThisObjectName = _  // parent object name (for error message)
     );
 
-    Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state, std::string const &FanType,     // must match fan types in this module
+    Real64 GetFanDesignVolumeFlowRate(FansData &fans, std::string const &FanType,     // must match fan types in this module
                                       std::string const &FanName,     // must match fan names for the fan type
                                       bool &ErrorsFound,              // set to true if problem
                                       Optional_int_const FanIndex = _ // index to fan
