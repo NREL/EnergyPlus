@@ -992,7 +992,7 @@ namespace AirLoopHVACDOAS {
         }
         bool errorsFound = false;
         if (this->m_FanIndex > 0 && this->m_FanTypeNum == SimAirServingZones::Fan_ComponentModel) {
-            Fans::SetFanData(state, this->m_FanIndex, errorsFound, Name, SizingMassFlow / DataEnvironment::StdRhoAir, 0);
+            Fans::SetFanData(state.fans, this->m_FanIndex, errorsFound, Name, SizingMassFlow / DataEnvironment::StdRhoAir, 0);
             Fans::Fan(this->m_FanIndex).MaxAirMassFlowRate = SizingMassFlow;
             DataLoopNode::Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = SizingMassFlow;
             DataLoopNode::Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = SizingMassFlow;

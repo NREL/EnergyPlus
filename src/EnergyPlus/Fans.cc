@@ -3013,7 +3013,7 @@ namespace Fans {
         return FanSpeedRatioCurveIndex;
     }
 
-    void SetFanData(EnergyPlusData &state, int const FanNum,                     // Index of fan
+    void SetFanData(FansData &fans, int const FanNum,                     // Index of fan
                     bool &ErrorsFound,                    // Set to true if certain errors found
                     std::string const &FanName,           // Name of fan
                     Optional<Real64 const> MaxAirVolFlow, // Fan air volumetric flow rate    [m3/s]
@@ -3057,9 +3057,9 @@ namespace Fans {
         int WhichFan; // index to generic HX
 
         // Obtains and Allocates fan related parameters from input file
-        if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state.fans);
-            state.fans.GetFanInputFlag = false;
+        if (fans.GetFanInputFlag) { // First time subroutine has been entered
+            GetFanInput(fans);
+            fans.GetFanInputFlag = false;
         }
 
         if (FanNum == 0) {
@@ -3068,7 +3068,7 @@ namespace Fans {
             WhichFan = FanNum;
         }
 
-        if (WhichFan <= 0 || WhichFan > state.fans.NumFans) {
+        if (WhichFan <= 0 || WhichFan > fans.NumFans) {
             ShowSevereError("SetFanData: Could not find fan = \"" + FanName + "\"");
             ErrorsFound = true;
             return;

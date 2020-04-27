@@ -349,7 +349,7 @@ namespace Fans {
                                    Optional_int IndexIn = _ // optional fan index if fan type and name are unknown or index needs setting
     );
 
-    void SetFanData(EnergyPlusData &state, int const FanNum,                         // Index of fan
+    void SetFanData(FansData &fans, int const FanNum,                         // Index of fan
                     bool &ErrorsFound,                        // Set to true if certain errors found
                     std::string const &FanName,               // Name of fan
                     Optional<Real64 const> MaxAirVolFlow = _, // Fan air volumetric flow rate    [m3/s]
