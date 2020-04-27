@@ -439,7 +439,7 @@ namespace HVACStandAloneERV {
                     ErrorsFound = true;
                 }
 
-                GetFanIndex(state, StandAloneERV(StandAloneERVNum).SupplyAirFanName,
+                GetFanIndex(state.fans, StandAloneERV(StandAloneERVNum).SupplyAirFanName,
                             StandAloneERV(StandAloneERVNum).SupplyAirFanIndex,
                             errFlag,
                             CurrentModuleObject + " \"" + StandAloneERV(StandAloneERVNum).Name + "\"");
@@ -486,7 +486,7 @@ namespace HVACStandAloneERV {
                     // error for fan availability schedule?
                     StandAloneERV(StandAloneERVNum).ExhaustAirFanSchPtr =
                         GetFanAvailSchPtr(state, cFanTypes(EAFanTypeNum), StandAloneERV(StandAloneERVNum).ExhaustAirFanName, errFlag);
-                    GetFanIndex(state, StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
+                    GetFanIndex(state.fans, StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
                                 StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex,
                                 errFlag,
                                 CurrentModuleObject + " \"" + StandAloneERV(StandAloneERVNum).Name + "\"");

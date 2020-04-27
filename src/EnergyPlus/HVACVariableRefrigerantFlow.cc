@@ -3367,7 +3367,7 @@ namespace HVACVariableRefrigerantFlow {
 
                         // Get the fan index
                         errFlag = false;
-                        GetFanIndex(state, FanName, VRFTU(VRFTUNum).FanIndex, errFlag);
+                        GetFanIndex(state.fans, FanName, VRFTU(VRFTUNum).FanIndex, errFlag);
                         if (errFlag) {
                             ShowContinueError("...occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;

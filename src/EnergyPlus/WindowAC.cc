@@ -492,7 +492,7 @@ namespace WindowAC {
                     {
                         auto const SELECT_CASE_var(WindAC(WindACNum).FanType_Num);
                         if ((SELECT_CASE_var == FanType_SimpleOnOff) || (SELECT_CASE_var == FanType_SimpleConstVolume)) {
-                            GetFanIndex(state, WindAC(WindACNum).FanName, WindAC(WindACNum).FanIndex, FanErrFlag, CurrentModuleObject);
+                            GetFanIndex(state.fans, WindAC(WindACNum).FanName, WindAC(WindACNum).FanIndex, FanErrFlag, CurrentModuleObject);
                             if (FanErrFlag) {
                                 ShowContinueError(" specified in " + CurrentModuleObject + " = \"" + WindAC(WindACNum).Name + "\".");
                                 ErrorsFound = true;

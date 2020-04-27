@@ -846,7 +846,7 @@ namespace PackagedTerminalHeatPump {
                     ShowContinueError("specified in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                     ErrorsFound = true;
                 } else {
-                    GetFanIndex(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
+                    GetFanIndex(state.fans, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
                     FanInletNodeNum = GetFanInletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                     FanOutletNodeNum = GetFanOutletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                     GetFanVolFlow(PTUnit(PTUnitNum).FanIndex, FanVolFlow);
@@ -1737,7 +1737,7 @@ namespace PackagedTerminalHeatPump {
                     ShowContinueError("...specified in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                     ErrorsFound = true;
                 } else {
-                    GetFanIndex(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
+                    GetFanIndex(state.fans, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
                     FanInletNodeNum = GetFanInletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                     FanOutletNodeNum = GetFanOutletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                     GetFanVolFlow(PTUnit(PTUnitNum).FanIndex, FanVolFlow);
@@ -2467,7 +2467,7 @@ namespace PackagedTerminalHeatPump {
                     if (PTUnit(PTUnitNum).FanType_Num == FanType_SimpleOnOff) {
 
                         errFlag = false;
-                        GetFanIndex(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag);
+                        GetFanIndex(state.fans, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag);
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                             ErrorsFound = true;
