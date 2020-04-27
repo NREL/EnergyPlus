@@ -58,6 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace NodeInputManager {
 
@@ -127,7 +128,7 @@ namespace NodeInputManager {
                      Optional_string_const InputFieldName = _      // Input Field Name
     );
 
-    void SetupNodeVarsForReporting();
+    void SetupNodeVarsForReporting(OutputFiles &outputFiles);
 
     void GetNodeListsInput(bool &ErrorsFound);                // Set to true when requested Node List not found, unchanged otherwise
 

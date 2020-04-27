@@ -481,9 +481,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
+    ProcessScheduleInput(outputFiles());  // read schedules
 
-    GetZoneAirSetPoints(OutputFiles::getSingleton());
+    GetZoneAirSetPoints(outputFiles());
 
     DeadBandOrSetback.allocate(NumTempControlledZones);
     CurDeadBandOrSetback.allocate(NumTempControlledZones);
@@ -1520,7 +1520,7 @@ TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
     ExpectedResult = 21000.0;
     EXPECT_NEAR(OutReqToDehumSP,ExpectedResult,AcceptableTolerance);
 
-    // Test 2a: list Zone Multiplier is greater than 1, non-list Zone Multiplier is one
+    // Test 2b: list Zone Multiplier is greater than 1, non-list Zone Multiplier is one
     TotOutReq = 1000.0;
     OutReqToHumSP = 2000.0;
     OutReqToDehumSP = 3000.0;
@@ -1563,4 +1563,137 @@ TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
     EXPECT_NEAR(OutReqToHumSP,ExpectedResult,AcceptableTolerance);
     ExpectedResult = 600.0;
     EXPECT_NEAR(OutReqToDehumSP,ExpectedResult,AcceptableTolerance);
+}
+
+TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
+{
+    Real64 TotOutReq;
+    Real64 OutReqToHeatSP;
+    Real64 OutReqToCoolSP;
+    Real64 SingleZoneTotRate;
+    Real64 SingleZoneHeatRate;
+    Real64 SingleZoneCoolRate;
+    Real64 HeatToSP;
+    Real64 CoolToSP;
+    Real64 CorrectionFactor;
+    Real64 ZoneMultiplier;
+    Real64 ZoneMultiplierList;
+    Real64 ExpectedResult;
+    Real64 AcceptableTolerance = 0.00001;
+
+    // Test 1: Zone Multipliers and Load Correction Factor are all unity (1.0).  So, single zone loads should be the same as total loads
+    TotOutReq = 1000.0;
+    OutReqToHeatSP = 0.0;
+    OutReqToCoolSP = 0.0;
+    HeatToSP = 2000.0;
+    CoolToSP = 3000.0;
+    CorrectionFactor = 1.0;
+    ZoneMultiplier = 1.0;
+    ZoneMultiplierList = 1.0;
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,OutReqToHeatSP,OutReqToCoolSP,
+                                   SingleZoneTotRate,SingleZoneHeatRate,SingleZoneCoolRate,
+                                   HeatToSP,CoolToSP,CorrectionFactor,ZoneMultiplier,ZoneMultiplierList);
+    EXPECT_NEAR(TotOutReq,SingleZoneTotRate,AcceptableTolerance);
+    EXPECT_NEAR(OutReqToHeatSP,SingleZoneHeatRate,AcceptableTolerance);
+    EXPECT_NEAR(OutReqToCoolSP,SingleZoneCoolRate,AcceptableTolerance);
+
+    // Test 2a: Zone Multiplier (non-list) is greater than 1, list Zone Multiplier and Load Correction are still one
+    TotOutReq = 1000.0;
+    OutReqToHeatSP = 0.0;
+    OutReqToCoolSP = 0.0;
+    HeatToSP = 2000.0;
+    CoolToSP = 3000.0;
+    CorrectionFactor = 1.0;
+    ZoneMultiplier = 4.0;
+    ZoneMultiplierList = 1.0;
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,OutReqToHeatSP,OutReqToCoolSP,
+                                   SingleZoneTotRate,SingleZoneHeatRate,SingleZoneCoolRate,
+                                   HeatToSP,CoolToSP,CorrectionFactor,ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHeatRate,AcceptableTolerance);
+    ExpectedResult = 3000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneCoolRate,AcceptableTolerance);
+    ExpectedResult = 4000.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 8000.0;
+    EXPECT_NEAR(OutReqToHeatSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 12000.0;
+    EXPECT_NEAR(OutReqToCoolSP,ExpectedResult,AcceptableTolerance);
+
+    // Test 2b: list Zone Multiplier is greater than 1, non-list Zone Multiplier and Load Correction are still one
+    TotOutReq = 1000.0;
+    OutReqToHeatSP = 0.0;
+    OutReqToCoolSP = 0.0;
+    HeatToSP = 2000.0;
+    CoolToSP = 3000.0;
+    CorrectionFactor = 1.0;
+    ZoneMultiplier = 1.0;
+    ZoneMultiplierList = 5.0;
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,OutReqToHeatSP,OutReqToCoolSP,
+                                   SingleZoneTotRate,SingleZoneHeatRate,SingleZoneCoolRate,
+                                   HeatToSP,CoolToSP,CorrectionFactor,ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHeatRate,AcceptableTolerance);
+    ExpectedResult = 3000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneCoolRate,AcceptableTolerance);
+    ExpectedResult = 5000.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 10000.0;
+    EXPECT_NEAR(OutReqToHeatSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 15000.0;
+    EXPECT_NEAR(OutReqToCoolSP,ExpectedResult,AcceptableTolerance);
+
+    // Test 2c: list Zone Multiplier and Zone Multiplier are unity, Load Correction is not equal to 1.0
+    TotOutReq = 1000.0;
+    OutReqToHeatSP = 0.0;
+    OutReqToCoolSP = 0.0;
+    HeatToSP = 2000.0;
+    CoolToSP = 3000.0;
+    CorrectionFactor = 1.1;
+    ZoneMultiplier = 1.0;
+    ZoneMultiplierList = 1.0;
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,OutReqToHeatSP,OutReqToCoolSP,
+                                   SingleZoneTotRate,SingleZoneHeatRate,SingleZoneCoolRate,
+                                   HeatToSP,CoolToSP,CorrectionFactor,ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1100.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2200.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHeatRate,AcceptableTolerance);
+    ExpectedResult = 3300.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneCoolRate,AcceptableTolerance);
+    ExpectedResult = 1100.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 2200.0;
+    EXPECT_NEAR(OutReqToHeatSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 3300.0;
+    EXPECT_NEAR(OutReqToCoolSP,ExpectedResult,AcceptableTolerance);
+
+    // Test 3: none of the multipliers are unity
+    TotOutReq = 1000.0;
+    OutReqToHeatSP = 0.0;
+    OutReqToCoolSP = 0.0;
+    HeatToSP = 2000.0;
+    CoolToSP = 3000.0;
+    CorrectionFactor = 1.2;
+    ZoneMultiplier = 2.0;
+    ZoneMultiplierList = 1.5;
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,OutReqToHeatSP,OutReqToCoolSP,
+                                   SingleZoneTotRate,SingleZoneHeatRate,SingleZoneCoolRate,
+                                   HeatToSP,CoolToSP,CorrectionFactor,ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1200.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2400.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHeatRate,AcceptableTolerance);
+    ExpectedResult = 3600.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneCoolRate,AcceptableTolerance);
+    ExpectedResult = 3600.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 7200.0;
+    EXPECT_NEAR(OutReqToHeatSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 10800.0;
+    EXPECT_NEAR(OutReqToCoolSP,ExpectedResult,AcceptableTolerance);
 }
