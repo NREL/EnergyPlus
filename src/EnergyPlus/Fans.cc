@@ -2815,7 +2815,7 @@ namespace Fans {
         return DesignVolumeFlowRate;
     }
 
-    int GetFanInletNode(EnergyPlusData &state, std::string const &FanType, // must match fan types in this module
+    int GetFanInletNode(FansData &fans, std::string const &FanType, // must match fan types in this module
                         std::string const &FanName, // must match fan names for the fan type
                         bool &ErrorsFound           // set to true if problem
     )
@@ -2839,9 +2839,9 @@ namespace Fans {
         int WhichFan;
 
         // Obtains and Allocates fan related parameters from input file
-        if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state.fans);
-            state.fans.GetFanInputFlag = false;
+        if (fans.GetFanInputFlag) { // First time subroutine has been entered
+            GetFanInput(fans);
+            fans.GetFanInputFlag = false;
         }
 
         WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
@@ -2856,7 +2856,7 @@ namespace Fans {
         return NodeNumber;
     }
 
-    int getFanInNodeIndex(EnergyPlusData &state, int const &FanIndex, // fan index
+    int getFanInNodeIndex(FansData &fans, int const &FanIndex, // fan index
                           bool &ErrorsFound    // set to true if problem
     )
     {
@@ -2864,9 +2864,9 @@ namespace Fans {
         int NodeNumber = 0; // returned outlet node of matched fan
 
         // Obtains and Allocates fan related parameters from input file
-        if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state.fans);
-            state.fans.GetFanInputFlag = false;
+        if (fans.GetFanInputFlag) { // First time subroutine has been entered
+            GetFanInput(fans);
+            fans.GetFanInputFlag = false;
         }
 
         if (FanIndex != 0) {
@@ -2879,7 +2879,7 @@ namespace Fans {
         return NodeNumber;
     }
 
-    int GetFanOutletNode(EnergyPlusData &state, std::string const &FanType, // must match fan types in this module
+    int GetFanOutletNode(FansData &fans, std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem
     )
@@ -2903,9 +2903,9 @@ namespace Fans {
         int WhichFan;
 
         // Obtains and Allocates fan related parameters from input file
-        if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state.fans);
-            state.fans.GetFanInputFlag = false;
+        if (fans.GetFanInputFlag) { // First time subroutine has been entered
+            GetFanInput(fans);
+            fans.GetFanInputFlag = false;
         }
 
         WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
