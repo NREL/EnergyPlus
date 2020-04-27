@@ -276,13 +276,13 @@ namespace Fans {
 
     void SimVariableVolumeFan(FansData &fans, int const FanNum, Optional<Real64 const> PressureRise = _);
 
-    void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> SpeedRatio = _);
+    void SimOnOffFan(FansData &fans, int const FanNum, Optional<Real64 const> SpeedRatio = _);
 
-    void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum);
+    void SimZoneExhaustFan(FansData &fans, int const FanNum);
 
     // cpw22Aug2010 Added Component Model fan algorithm
 
-    void SimComponentModelFan(EnergyPlusData &state, int const FanNum);
+    void SimComponentModelFan(FansData &fans, int const FanNum);
 
     // End Algorithm Section of the Module
     // *****************************************************************************
