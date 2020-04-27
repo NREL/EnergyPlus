@@ -694,7 +694,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     bool Available{false};
     bool ErrorsFound{false};
-    ASSERT_THROW(WeatherManager::GetNextEnvironment(state, outputFiles(), Available, ErrorsFound), std::runtime_error);
+    ASSERT_THROW(WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound), std::runtime_error);
     ASSERT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({

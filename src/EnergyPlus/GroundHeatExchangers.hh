@@ -290,7 +290,7 @@ namespace EnergyPlus {
             void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad,
                           bool const RunFlag) override;
 
-            static PlantComponent *factory(EnergyPlusData &state, int const objectType, std::string objectName);
+            static PlantComponent *factory(DataGlobal &dataGlobals, int const objectType, std::string objectName);
 
             virtual Real64 getGFunc(Real64) = 0;
 
@@ -439,7 +439,7 @@ namespace EnergyPlus {
 
         void clear_state();
 
-        void GetGroundHeatExchangerInput(EnergyPlusData &state);
+        void GetGroundHeatExchangerInput(DataGlobal &dataGlobals);
 
         std::shared_ptr<GLHEResponseFactorsStruct>
         BuildAndGetResponseFactorObjectFromArray(std::shared_ptr<GLHEVertArrayStruct> const &arrayObjectPtr);

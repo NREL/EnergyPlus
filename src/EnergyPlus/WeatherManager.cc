@@ -787,7 +787,7 @@ namespace WeatherManager {
         }
     }
 
-    bool GetNextEnvironment(EnergyPlusData &state, OutputFiles &outputFiles,
+    bool GetNextEnvironment(DataGlobal &dataGlobals, OutputFiles &outputFiles,
                             bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     )
@@ -950,7 +950,7 @@ namespace WeatherManager {
             rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW(StdPressureSeaLevel, constant_twenty, constant_zero);
             OpenWeatherFile(ErrorsFound); // moved here because of possibility of special days on EPW file
             CloseWeatherFile();
-            ReadUserWeatherInput(state, outputFiles);
+            ReadUserWeatherInput(dataGlobals, outputFiles);
             AllocateWeatherData();
             if (NumIntervalsPerHour != 1) {
                 if (NumIntervalsPerHour != NumOfTimeStepInHour) {
@@ -5881,7 +5881,7 @@ namespace WeatherManager {
         } // ... end of .NOT.WarmupFlag IF-THEN block.
     }
 
-    void ReadUserWeatherInput(EnergyPlusData &state, OutputFiles &outputFiles)
+    void ReadUserWeatherInput(DataGlobal &dataGlobals, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5975,7 +5975,7 @@ namespace WeatherManager {
 
         GetLocationInfo(ErrorsFound);
 
-        GetGroundTemps(state, ErrorsFound);
+        GetGroundTemps(dataGlobals, ErrorsFound);
 
         GetGroundReflectances(outputFiles, ErrorsFound);
 
@@ -8077,7 +8077,7 @@ namespace WeatherManager {
         }
     }
 
-    void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound)
+    void GetGroundTemps(DataGlobal &dataGlobals, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8099,25 +8099,25 @@ namespace WeatherManager {
 
         // FLOW:
         // Initialize Site:GroundTemperature:BuildingSurface object
-        siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
+        siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit(dataGlobals, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
         if (siteBuildingSurfaceGroundTempsPtr) {
             ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:FCFactorMethod object
-        siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
+        siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit(dataGlobals, "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
         if (siteFCFactorMethodGroundTempsPtr) {
             ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Shallow object
-        siteShallowGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:SHALLOW", "");
+        siteShallowGroundTempsPtr = GetGroundTempModelAndInit(dataGlobals, "SITE:GROUNDTEMPERATURE:SHALLOW", "");
         if (siteShallowGroundTempsPtr) {
             ErrorsFound = siteShallowGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Deep object
-        siteDeepGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:DEEP", "");
+        siteDeepGroundTempsPtr = GetGroundTempModelAndInit(dataGlobals, "SITE:GROUNDTEMPERATURE:DEEP", "");
         if (siteDeepGroundTempsPtr) {
             ErrorsFound = siteDeepGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }

@@ -736,7 +736,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(state, outputFiles(), Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;

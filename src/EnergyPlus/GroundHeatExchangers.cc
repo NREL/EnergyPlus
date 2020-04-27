@@ -432,10 +432,10 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    PlantComponent *GLHEBase::factory(EnergyPlusData &state, int const objectType, std::string objectName)
+    PlantComponent *GLHEBase::factory(DataGlobal &dataGlobals, int const objectType, std::string objectName)
     {
         if (GetInput) {
-            GetGroundHeatExchangerInput(state);
+            GetGroundHeatExchangerInput(dataGlobals);
             GetInput = false;
         }
         if (objectType == DataPlant::TypeOf_GrndHtExchgSystem) {
@@ -2137,7 +2137,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GetGroundHeatExchangerInput(EnergyPlusData &state)
+    void GetGroundHeatExchangerInput(DataGlobal &dataGlobals)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -2601,7 +2601,7 @@ namespace GroundHeatExchangers {
                 prevTimeSteps = 0.0;
 
                 // Initialize ground temperature model and get pointer reference
-                thisGLHE.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5));
+                thisGLHE.groundTempModel = GetGroundTempModelAndInit(dataGlobals, DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5));
                 if (thisGLHE.groundTempModel) {
                     errorsFound = thisGLHE.groundTempModel->errorsFound;
                 }
@@ -2797,7 +2797,7 @@ namespace GroundHeatExchangers {
                 }
 
                 // Initialize ground temperature model and get pointer reference
-                thisGLHE.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(5), DataIPShortCuts::cAlphaArgs(6));
+                thisGLHE.groundTempModel = GetGroundTempModelAndInit(dataGlobals, DataIPShortCuts::cAlphaArgs(5), DataIPShortCuts::cAlphaArgs(6));
                 if (thisGLHE.groundTempModel) {
                     errorsFound = thisGLHE.groundTempModel->errorsFound;
                 }

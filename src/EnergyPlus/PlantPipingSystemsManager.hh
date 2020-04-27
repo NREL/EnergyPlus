@@ -637,7 +637,7 @@ namespace EnergyPlus {
 
             void initInOutCells(CartesianCell const &in, CartesianCell const &out);
 
-            static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
+            static PlantComponent *factory(DataGlobal &dataGlobals, int objectType, std::string objectName);
 
             void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                           bool RunFlag) override;
@@ -927,19 +927,19 @@ namespace EnergyPlus {
 
         void clear_state();
 
-        void SimulateGroundDomains(EnergyPlusData &state, OutputFiles &outputFiles, bool initOnly);
+        void SimulateGroundDomains(DataGlobal &dataGlobals, OutputFiles &outputFiles, bool initOnly);
 
         void CheckIfAnySlabs();
 
         void CheckIfAnyBasements(EnergyPlusData &EP_UNUSED(state));
 
-        void GetPipingSystemsAndGroundDomainsInput(EnergyPlusData &state);
+        void GetPipingSystemsAndGroundDomainsInput(DataGlobal &dataGlobals);
 
-        void ReadGeneralDomainInputs(EnergyPlusData &state, int IndexStart, int NumGeneralizedDomains, bool &ErrorsFound);
+        void ReadGeneralDomainInputs(DataGlobal &dataGlobals, int IndexStart, int NumGeneralizedDomains, bool &ErrorsFound);
 
-        void ReadZoneCoupledDomainInputs(EnergyPlusData &state, int StartingDomainNumForZone, int NumZoneCoupledDomains, bool &ErrorsFound);
+        void ReadZoneCoupledDomainInputs(DataGlobal &dataGlobals, int StartingDomainNumForZone, int NumZoneCoupledDomains, bool &ErrorsFound);
 
-        void ReadBasementInputs(EnergyPlusData &state, int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
+        void ReadBasementInputs(DataGlobal &dataGlobals, int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
         
         bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
                                             int const MaterialNum);
@@ -952,7 +952,7 @@ namespace EnergyPlus {
 
         void ReadPipeSegmentInputs(bool &ErrorsFound);
 
-        void ReadHorizontalTrenchInputs(EnergyPlusData &state, int StartingDomainNumForHorizontal,
+        void ReadHorizontalTrenchInputs(DataGlobal &dataGlobals, int StartingDomainNumForHorizontal,
                                         int StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound);
 

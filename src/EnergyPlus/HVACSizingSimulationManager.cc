@@ -264,7 +264,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, OutputFiles &outputFiles,
         Available = true;
         for (int i = 1; i <= NumOfEnvrn; ++i) { // loop over environments
 
-            GetNextEnvironment(state, OutputFiles::getSingleton(), Available, ErrorsFound);
+            GetNextEnvironment(state.dataGlobals, OutputFiles::getSingleton(), Available, ErrorsFound);
             if (ErrorsFound) break;
             if (!Available) continue;
 
@@ -345,7 +345,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, OutputFiles &outputFiles,
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(state, OutputFiles::getSingleton(), false);
+                            SimulateGroundDomains(state.dataGlobals, OutputFiles::getSingleton(), false);
                         }
 
                         BeginTimeStepFlag = true;

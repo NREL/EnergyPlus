@@ -264,7 +264,7 @@ int initializeEnergyPlus(EnergyPlusData &state, std::string const & filepath) {
 
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
-    DataSystemVariables::processEnvironmentVariables(state);
+    DataSystemVariables::processEnvironmentVariables(state.dataGlobals);
 
     if (!filepath.empty()) {
         // if filepath is not empty, then we are using E+ as a library API call
@@ -350,7 +350,7 @@ int initializeAsLibrary(EnergyPlusData &state) {
 
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
-    DataSystemVariables::processEnvironmentVariables(state);
+    DataSystemVariables::processEnvironmentVariables(state.dataGlobals);
 
     int errStatus = initErrorFile();
     if (errStatus) {

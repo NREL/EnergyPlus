@@ -496,7 +496,7 @@ namespace SimulationManager {
 
         while (Available) {
 
-            GetNextEnvironment(state, outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state.dataGlobals, outputFiles, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -598,7 +598,7 @@ namespace SimulationManager {
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(state, OutputFiles::getSingleton(), false);
+                            SimulateGroundDomains(state.dataGlobals, OutputFiles::getSingleton(), false);
                         }
 
                         if (AnyUnderwaterBoundaries) {
@@ -2066,7 +2066,7 @@ namespace SimulationManager {
 
         while (Available) { // do for each environment
 
-            GetNextEnvironment(state, outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state.dataGlobals, outputFiles, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -2129,7 +2129,7 @@ namespace SimulationManager {
         } // ... End environment loop.
 
         if (AnySlabsInModel || AnyBasementsInModel) {
-            SimulateGroundDomains(state, outputFiles, true);
+            SimulateGroundDomains(state.dataGlobals, outputFiles, true);
         }
 
         if (!ErrorsFound) SimCostEstimate(); // basically will get and check input
