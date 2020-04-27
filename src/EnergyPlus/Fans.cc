@@ -247,7 +247,7 @@ namespace Fans {
 
         // Calculate the Correct Fan Model with the current FanNum
         if (Fan(FanNum).FanType_Num == FanType_SimpleConstVolume) {
-            SimSimpleFan(state, FanNum);
+            SimSimpleFan(state.fans, FanNum);
         } else if (Fan(FanNum).FanType_Num == FanType_SimpleVAV) {
             if (present(PressureRise)) {
                 SimVariableVolumeFan(state, FanNum, PressureRise);
@@ -1516,7 +1516,7 @@ namespace Fans {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimSimpleFan(EnergyPlusData &state, int const FanNum)
+    void SimSimpleFan(FansData &fans, int const FanNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1619,7 +1619,7 @@ namespace Fans {
         MassFlow = max(MassFlow, Fan(FanNum).MinAirMassFlowRate);
 
         // Determine the Fan Schedule for the Time step
-        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || state.fans.LocalTurnFansOn) && !state.fans.LocalTurnFansOff && MassFlow > 0.0) {
+        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || fans.LocalTurnFansOn) && !fans.LocalTurnFansOff && MassFlow > 0.0) {
             // Fan is operating
             Fan(FanNum).FanPower = max(0.0, MassFlow * DeltaPress / (FanEff * RhoAir)); // total fan power
             FanShaftPower = MotEff * Fan(FanNum).FanPower;                              // power delivered to shaft

@@ -272,7 +272,7 @@ namespace Fans {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimSimpleFan(EnergyPlusData &state, int const FanNum);
+    void SimSimpleFan(FansData &fans, int const FanNum);
 
     void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> PressureRise = _);
 
