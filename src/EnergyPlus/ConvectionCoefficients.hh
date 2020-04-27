@@ -370,8 +370,8 @@ namespace ConvectionCoefficients {
 
         // Default Constructor
         OutsideFaceAdpativeConvAlgoStruct()
-            : EnteredByUser(false), SuppressRainChange(false), HWindWallWindwardEqNum(HcExt_BlockenWindward), HWindWallWindwardUserCurveNum(0),
-              HWindWallLeewardEqNum(HcExt_EmmelVertical), HWindWallLeewardUserCurveNum(0), HWindHorizRoofEqNum(HcExt_ClearRoof),
+            : EnteredByUser(false), SuppressRainChange(false), HWindWallWindwardEqNum(HcExt_SparrowWindward), HWindWallWindwardUserCurveNum(0),
+              HWindWallLeewardEqNum(HcExt_SparrowLeeward), HWindWallLeewardUserCurveNum(0), HWindHorizRoofEqNum(HcExt_ClearRoof),
               HWindHorizRoofUserCurveNum(0), HNatVertWallEqNum(HcExt_NaturalASHRAEVerticalWall), HNatVertWallUserCurveNum(0),
               HNatStableHorizEqNum(HcExt_NaturalWaltonStableHorizontalOrTilt), HNatStableHorizUserCurveNum(0),
               HNatUnstableHorizEqNum(HcExt_NaturalWaltonUnstableHorizontalOrTilt), HNatUstableHorizUserCurveNum(0)
