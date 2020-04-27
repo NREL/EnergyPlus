@@ -214,7 +214,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(outputFiles());  // read schedules
 
-    GetFanInput(state);
+    GetFanInput(state.fans);
 
     EnergyPlus::DataSizing::CurZoneEqNum = 1;
 

@@ -252,7 +252,7 @@ namespace Fans {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFanInput(EnergyPlusData &state);
+    void GetFanInput(FansData &fans);
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************

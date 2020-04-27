@@ -203,7 +203,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state);
+            GetFanInput(state.fans);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -273,7 +273,7 @@ namespace Fans {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFanInput(EnergyPlusData &state)
+    void GetFanInput(FansData &fans)
     {
 
         // SUBROUTINE INFORMATION:
@@ -326,7 +326,7 @@ namespace Fans {
         int MaxAlphas;
         int MaxNumbers;
 
-        state.fans.GetFanInputFlag = false;
+        fans.GetFanInputFlag = false;
         // Flow
         MaxAlphas = 0;
         MaxNumbers = 0;
@@ -354,8 +354,8 @@ namespace Fans {
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
         }
-        state.fans.NumNightVentPerf = inputProcessor->getNumObjectsFound("FanPerformance:NightVentilation");
-        if (state.fans.NumNightVentPerf > 0) {
+        fans.NumNightVentPerf = inputProcessor->getNumObjectsFound("FanPerformance:NightVentilation");
+        if (fans.NumNightVentPerf > 0) {
             inputProcessor->getObjectDefMaxArgs("FanPerformance:NightVentilation", NumParams, NumAlphas, NumNums);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNums);
@@ -376,13 +376,13 @@ namespace Fans {
         lNumericFieldBlanks.dimension(MaxNumbers, false);
         rNumericArgs.dimension(MaxNumbers, 0.0);
 
-        state.fans.NumFans = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + NumCompModelFan; // cpw1Mar2010 Add NumCompModelFan
-        if (state.fans.NumFans > 0) {
-            Fan.allocate(state.fans.NumFans);
-            FanNumericFields.allocate(state.fans.NumFans);
-            UniqueFanNames.reserve(state.fans.NumFans);
+        fans.NumFans = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + NumCompModelFan; // cpw1Mar2010 Add NumCompModelFan
+        if (fans.NumFans > 0) {
+            Fan.allocate(fans.NumFans);
+            FanNumericFields.allocate(fans.NumFans);
+            UniqueFanNames.reserve(fans.NumFans);
         }
-        CheckEquipName.dimension(state.fans.NumFans, true);
+        CheckEquipName.dimension(fans.NumFans, true);
 
         for (SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum) {
             FanNum = SimpFanNum;
@@ -617,9 +617,9 @@ namespace Fans {
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(7));
                     if (SELECT_CASE_var == "COUPLED") {
-                        Fan(FanNum).AvailManagerMode = state.fans.ExhaustFanCoupledToAvailManagers;
+                        Fan(FanNum).AvailManagerMode = fans.ExhaustFanCoupledToAvailManagers;
                     } else if (SELECT_CASE_var == "DECOUPLED") {
-                        Fan(FanNum).AvailManagerMode = state.fans.ExhaustFanDecoupledFromAvailManagers;
+                        Fan(FanNum).AvailManagerMode = fans.ExhaustFanDecoupledFromAvailManagers;
                     } else {
                         ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7) + " entered =" + cAlphaArgs(7) +
                                         " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -627,7 +627,7 @@ namespace Fans {
                     }
                 }
             } else {
-                Fan(FanNum).AvailManagerMode = state.fans.ExhaustFanCoupledToAvailManagers;
+                Fan(FanNum).AvailManagerMode = fans.ExhaustFanCoupledToAvailManagers;
             }
 
             if (NumAlphas > 7 && !lAlphaFieldBlanks(8)) {
@@ -741,10 +741,10 @@ namespace Fans {
         } // end Number of Simple  ON-OFF FAN Loop
 
         cCurrentModuleObject = "FanPerformance:NightVentilation";
-        state.fans.NumNightVentPerf = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        fans.NumNightVentPerf = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-        if (state.fans.NumNightVentPerf > 0) {
-            NightVentPerf.allocate(state.fans.NumNightVentPerf);
+        if (fans.NumNightVentPerf > 0) {
+            NightVentPerf.allocate(fans.NumNightVentPerf);
             for (auto &e : NightVentPerf) {
                 e.FanName.clear();
                 e.FanEff = 0.0;
@@ -756,7 +756,7 @@ namespace Fans {
             }
         }
         // input the night ventilation performance objects
-        for (NVPerfNum = 1; NVPerfNum <= state.fans.NumNightVentPerf; ++NVPerfNum) {
+        for (NVPerfNum = 1; NVPerfNum <= fans.NumNightVentPerf; ++NVPerfNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           NVPerfNum,
                                           cAlphaArgs,
@@ -777,7 +777,7 @@ namespace Fans {
             NightVentPerf(NVPerfNum).MotInAirFrac = rNumericArgs(5);
             // find the corresponding fan
             NVPerfFanFound = false;
-            for (FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
+            for (FanNum = 1; FanNum <= fans.NumFans; ++FanNum) {
                 if (NightVentPerf(NVPerfNum).FanName == Fan(FanNum).FanName) {
                     NVPerfFanFound = true;
                     Fan(FanNum).NVPerfNum = NVPerfNum;
@@ -903,8 +903,8 @@ namespace Fans {
         rNumericArgs.deallocate();
 
         // Check Fans
-        for (FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
-            for (checkNum = FanNum + 1; checkNum <= state.fans.NumFans; ++checkNum) {
+        for (FanNum = 1; FanNum <= fans.NumFans; ++FanNum) {
+            for (checkNum = FanNum + 1; checkNum <= fans.NumFans; ++checkNum) {
                 if (Fan(FanNum).InletNodeNum == Fan(checkNum).InletNodeNum) {
                     ErrorsFound = true;
                     ShowSevereError("GetFanInput, duplicate fan inlet node names, must be unique for fans.");
@@ -926,7 +926,7 @@ namespace Fans {
             ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
         }
 
-        for (FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
+        for (FanNum = 1; FanNum <= fans.NumFans; ++FanNum) {
             // Setup Report variables for the Fans  CurrentModuleObject='Fans'
             SetupOutputVariable("Fan Electric Power", OutputProcessor::Unit::W, Fan(FanNum).FanPower, "System", "Average", Fan(FanNum).FanName);
             SetupOutputVariable(
@@ -994,7 +994,7 @@ namespace Fans {
 
         bool anyRan;
         ManageEMS(emsCallFromComponentGetInput, anyRan);
-        MySizeFlag.dimension(state.fans.NumFans, true);
+        MySizeFlag.dimension(fans.NumFans, true);
     }
 
     // End of Get Input subroutines for the HB Module
@@ -2624,7 +2624,7 @@ namespace Fans {
         // is not legal fan.
 
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state);
+            GetFanInput(state.fans);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2748,7 +2748,7 @@ namespace Fans {
         int FanIndex;
 
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state);
+            GetFanInput(state.fans);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2794,7 +2794,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state);
+            GetFanInput(state.fans);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2840,7 +2840,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state);
+            GetFanInput(state.fans);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2865,7 +2865,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state);
+            GetFanInput(state.fans);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2904,7 +2904,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state);
+            GetFanInput(state.fans);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2945,7 +2945,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state);
+            GetFanInput(state.fans);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2986,7 +2986,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state);
+            GetFanInput(state.fans);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -3058,7 +3058,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state);
+            GetFanInput(state.fans);
             state.fans.GetFanInputFlag = false;
         }
 

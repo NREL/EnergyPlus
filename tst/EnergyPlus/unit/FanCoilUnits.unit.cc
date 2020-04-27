@@ -265,7 +265,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetFanInput(state);
+    GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
     GetFanCoilUnits(state);
@@ -578,7 +578,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetFanInput(state);
+    GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
     GetFanCoilUnits(state);
@@ -889,7 +889,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetFanInput(state);
+    GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
     GetFanCoilUnits(state);
@@ -1267,7 +1267,7 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetFanInput(state);
+    GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
     GetFanCoilUnits(state);
@@ -1586,7 +1586,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetFanInput(state);
+    GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
     GetFanCoilUnits(state);
@@ -1942,7 +1942,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetFanInput(state);
+    GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
     GetFanCoilUnits(state);
@@ -2277,7 +2277,7 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
     SetPredefinedTables();
-    GetFanInput(state);
+    GetFanInput(state.fans);
     GetFanCoilUnits(state);
 
     PlantLoop.allocate(TotNumLoops);
@@ -2650,7 +2650,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetFanInput(state);
+    GetFanInput(state.fans);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
     GetFanCoilUnits(state);
