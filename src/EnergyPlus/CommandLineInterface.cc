@@ -433,7 +433,7 @@ namespace CommandLineInterface {
         outputSciFileName = outputFilePrefix + normalSuffix + ".sci";
         outputWrlFileName = outputFilePrefix + normalSuffix + ".wrl";
         outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
-        outputDbgFileName = outputFilePrefix + normalSuffix + ".dbg";
+        OutputFiles::getSingleton().debug.fileName = outputFilePrefix + normalSuffix + ".dbg";
         outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
         outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
         outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
@@ -587,17 +587,7 @@ namespace CommandLineInterface {
             }
         }
 
-        OutputFileDebug = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(OutputFileDebug, outputDbgFileName, flags);
-            iostatus = flags.ios();
-        }
-        if (iostatus != 0) {
-            DisplayString("ERROR: Could not open output debug file: " + outputDbgFileName + ".");
-            exit(EXIT_FAILURE);
-        }
+        OutputFiles::getSingleton().debug.ensure_open();
 
         // TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 

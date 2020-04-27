@@ -2579,7 +2579,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     Surface(6).Vertex(3) = Vector(10., 0., 3.);
     Surface(6).Vertex(4) = Vector(10., 8., 3.);
 
-    CalculateZoneVolume(enteredCeilingHeight);
+    CalculateZoneVolume(outputFiles(), enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2645,7 +2645,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
     Zone(1).FloorArea = 80.;
     Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(enteredCeilingHeight);
+    CalculateZoneVolume(outputFiles(), enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2711,7 +2711,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     Zone(1).FloorArea = 80.;
     Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(enteredCeilingHeight);
+    CalculateZoneVolume(outputFiles(), enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2777,7 +2777,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     Zone(1).CeilingArea = 80.;
     Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(enteredCeilingHeight);
+    CalculateZoneVolume(outputFiles(), enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2838,7 +2838,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     Surface(4).Vertex(3) = Vector(10., 8., 0.);
     Surface(4).Vertex(4) = Vector(10., 8., 3.);
 
-    CalculateZoneVolume(enteredCeilingHeight);
+    CalculateZoneVolume(outputFiles(), enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 

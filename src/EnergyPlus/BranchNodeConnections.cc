@@ -54,7 +54,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -74,7 +73,6 @@ namespace BranchNodeConnections {
     // needed in the branch-node data
 
     // Using/Aliasing
-    using DataGlobals::OutputFileDebug;
     using namespace DataLoopNode;
     using namespace DataBranchNodeConnections;
 
