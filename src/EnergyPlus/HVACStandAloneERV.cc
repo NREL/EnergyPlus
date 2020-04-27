@@ -433,7 +433,7 @@ namespace HVACStandAloneERV {
 
                 errFlag = false;
                 StandAloneERV(StandAloneERVNum).SupplyAirFanSchPtr =
-                    GetFanAvailSchPtr(state, cFanTypes(SAFanTypeNum), StandAloneERV(StandAloneERVNum).SupplyAirFanName, errFlag);
+                    GetFanAvailSchPtr(state.fans, cFanTypes(SAFanTypeNum), StandAloneERV(StandAloneERVNum).SupplyAirFanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("... occurs in " + CurrentModuleObject + " \"" + StandAloneERV(StandAloneERVNum).Name + "\"");
                     ErrorsFound = true;
@@ -485,7 +485,7 @@ namespace HVACStandAloneERV {
                     StandAloneERV(StandAloneERVNum).ExhaustAirFanType_Num = EAFanTypeNum;
                     // error for fan availability schedule?
                     StandAloneERV(StandAloneERVNum).ExhaustAirFanSchPtr =
-                        GetFanAvailSchPtr(state, cFanTypes(EAFanTypeNum), StandAloneERV(StandAloneERVNum).ExhaustAirFanName, errFlag);
+                        GetFanAvailSchPtr(state.fans, cFanTypes(EAFanTypeNum), StandAloneERV(StandAloneERVNum).ExhaustAirFanName, errFlag);
                     GetFanIndex(state.fans, StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
                                 StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex,
                                 errFlag,

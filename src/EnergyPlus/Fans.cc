@@ -2920,7 +2920,7 @@ namespace Fans {
         return NodeNumber;
     }
 
-    int GetFanAvailSchPtr(EnergyPlusData &state, std::string const &FanType, // must match fan types in this module
+    int GetFanAvailSchPtr(FansData &fans, std::string const &FanType, // must match fan types in this module
                           std::string const &FanName, // must match fan names for the fan type
                           bool &ErrorsFound           // set to true if problem
     )
@@ -2944,9 +2944,9 @@ namespace Fans {
         int WhichFan;
 
         // Obtains and Allocates fan related parameters from input file
-        if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state.fans);
-            state.fans.GetFanInputFlag = false;
+        if (fans.GetFanInputFlag) { // First time subroutine has been entered
+            GetFanInput(fans);
+            fans.GetFanInputFlag = false;
         }
 
         WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
@@ -2961,7 +2961,7 @@ namespace Fans {
         return FanAvailSchPtr;
     }
 
-    int GetFanSpeedRatioCurveIndex(EnergyPlusData &state, std::string &FanType, // must match fan types in this module (set if nonzero index passed)
+    int GetFanSpeedRatioCurveIndex(FansData &fans, std::string &FanType, // must match fan types in this module (set if nonzero index passed)
                                    std::string &FanName, // must match fan names for the fan type (set if nonzero index passed)
                                    Optional_int IndexIn  // optional fan index if fan type and name are unknown or index needs setting
     )
@@ -2985,9 +2985,9 @@ namespace Fans {
         int WhichFan;
 
         // Obtains and Allocates fan related parameters from input file
-        if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state.fans);
-            state.fans.GetFanInputFlag = false;
+        if (fans.GetFanInputFlag) { // First time subroutine has been entered
+            GetFanInput(fans);
+            fans.GetFanInputFlag = false;
         }
 
         if (present(IndexIn)) {

@@ -549,7 +549,7 @@ namespace UnitVentilator {
                                 // Get the fan's availability schedule
                                 errFlag = false;
                                 UnitVent(UnitVentNum).FanAvailSchedPtr =
-                                    GetFanAvailSchPtr(state, UnitVent(UnitVentNum).FanType, UnitVent(UnitVentNum).FanName, errFlag);
+                                    GetFanAvailSchPtr(state.fans, UnitVent(UnitVentNum).FanType, UnitVent(UnitVentNum).FanName, errFlag);
                                 if (errFlag) {
                                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
                                     ErrorsFound = true;

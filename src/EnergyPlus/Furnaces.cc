@@ -1217,7 +1217,7 @@ namespace Furnaces {
 
                     // Get the fan's availabitlity schedule
                     errFlag = false;
-                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
+                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1753,7 +1753,7 @@ namespace Furnaces {
 
                     // Get the fan's availability schedule
                     errFlag = false;
-                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
+                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -2924,7 +2924,7 @@ namespace Furnaces {
 
                     // Get the fan availability schedule
                     errFlag = false;
-                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
+                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -3813,7 +3813,7 @@ namespace Furnaces {
                         ErrorsFound = true;
                     }
                     errFlag = false;
-                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
+                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -5161,7 +5161,7 @@ namespace Furnaces {
                     Furnace(FurnaceNum).CoolingSpeedRatio = Furnace(FurnaceNum).MaxCoolAirVolFlow / Furnace(FurnaceNum).ActualFanVolFlowRate;
                     Furnace(FurnaceNum).NoHeatCoolSpeedRatio = Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow / Furnace(FurnaceNum).ActualFanVolFlowRate;
                 }
-                if (GetFanSpeedRatioCurveIndex(state, FanType, FanName, Furnace(FurnaceNum).FanIndex) > 0) {
+                if (GetFanSpeedRatioCurveIndex(state.fans, FanType, FanName, Furnace(FurnaceNum).FanIndex) > 0) {
                     if (Furnace(FurnaceNum).ActualFanVolFlowRate == Furnace(FurnaceNum).MaxHeatAirVolFlow &&
                         Furnace(FurnaceNum).ActualFanVolFlowRate == Furnace(FurnaceNum).MaxCoolAirVolFlow &&
                         Furnace(FurnaceNum).ActualFanVolFlowRate == Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow) {

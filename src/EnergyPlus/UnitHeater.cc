@@ -436,7 +436,7 @@ namespace UnitHeater {
                             ShowContinueError("...this can lead to unexpected results where the fan flow rate is less than required.");
                         }
                         UnitHeat(UnitHeatNum).FanAvailSchedPtr =
-                            GetFanAvailSchPtr(state, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag);
+                            GetFanAvailSchPtr(state.fans, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag);
                     }
                 } else if (UtilityRoutines::SameString(UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
                     UnitHeat(UnitHeatNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;

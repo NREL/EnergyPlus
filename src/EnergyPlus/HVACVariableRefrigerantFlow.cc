@@ -3404,7 +3404,7 @@ namespace HVACVariableRefrigerantFlow {
 
                         // Get the fan's availability schedule
                         errFlag = false;
-                        VRFTU(VRFTUNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
+                        VRFTU(VRFTUNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, FanType, FanName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;

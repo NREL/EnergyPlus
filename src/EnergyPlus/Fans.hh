@@ -339,12 +339,12 @@ namespace Fans {
                          bool &ErrorsFound           // set to true if problem
     );
 
-    int GetFanAvailSchPtr(EnergyPlusData &state, std::string const &FanType, // must match fan types in this module
+    int GetFanAvailSchPtr(FansData &fans, std::string const &FanType, // must match fan types in this module
                           std::string const &FanName, // must match fan names for the fan type
                           bool &ErrorsFound           // set to true if problem
     );
 
-    int GetFanSpeedRatioCurveIndex(EnergyPlusData &state, std::string &FanType,    // must match fan types in this module (set if nonzero index passed)
+    int GetFanSpeedRatioCurveIndex(FansData &fans, std::string &FanType,    // must match fan types in this module (set if nonzero index passed)
                                    std::string &FanName,    // must match fan names for the fan type (set if nonzero index passed)
                                    Optional_int IndexIn = _ // optional fan index if fan type and name are unknown or index needs setting
     );

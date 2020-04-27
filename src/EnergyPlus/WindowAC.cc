@@ -518,7 +518,7 @@ namespace WindowAC {
                         }
                     }
                     // Get the fan's availability schedule
-                    WindAC(WindACNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, WindAC(WindACNum).FanType, WindAC(WindACNum).FanName, FanErrFlag);
+                    WindAC(WindACNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, WindAC(WindACNum).FanType, WindAC(WindACNum).FanName, FanErrFlag);
                 }
                 if (FanErrFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + WindAC(WindACNum).Name);

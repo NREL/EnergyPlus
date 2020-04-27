@@ -604,7 +604,7 @@ namespace UnitarySystems {
                             FanType = "Fan:SystemModel";
                             FanName = this->m_FanName;
                         } else {
-                            if (Fans::GetFanSpeedRatioCurveIndex(state, FanType, FanName, this->m_FanIndex) > 0) fanHasPowerSpeedRatioCurve = true;
+                            if (Fans::GetFanSpeedRatioCurveIndex(state.fans, FanType, FanName, this->m_FanIndex) > 0) fanHasPowerSpeedRatioCurve = true;
                         }
                         if (fanHasPowerSpeedRatioCurve) {
 
@@ -3548,7 +3548,7 @@ namespace UnitarySystems {
 
                                 // Get the fan's availability schedule
                                 errFlag = false;
-                                thisSys.m_FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, loc_fanType, loc_m_FanName, errFlag);
+                                thisSys.m_FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state.fans, loc_fanType, loc_m_FanName, errFlag);
                                 if (errFlag) {
                                     ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                     errorsFound = true;

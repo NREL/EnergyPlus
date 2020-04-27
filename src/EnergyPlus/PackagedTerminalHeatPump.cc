@@ -852,7 +852,7 @@ namespace PackagedTerminalHeatPump {
                     GetFanVolFlow(PTUnit(PTUnitNum).FanIndex, FanVolFlow);
                     PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                     // Get the fan's availability schedule
-                    PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                    PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...specified in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                         ErrorsFound = true;
@@ -1724,7 +1724,7 @@ namespace PackagedTerminalHeatPump {
 
                 // Get the fan's availability schedule
                 errFlag = false;
-                PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...specified in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                     ErrorsFound = true;
@@ -2488,7 +2488,7 @@ namespace PackagedTerminalHeatPump {
                             PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                         }
                         errFlag = false;
-                        PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                        PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                             ErrorsFound = true;
