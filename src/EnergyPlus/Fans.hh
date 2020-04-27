@@ -312,7 +312,7 @@ namespace Fans {
 
     Real64 GetFanPower(int const FanIndex);
 
-    void GetFanType(EnergyPlusData &state, std::string const &FanName,               // Fan name
+    void GetFanType(FansData &fans, std::string const &FanName,               // Fan name
                     int &FanType,                             // returned fantype number
                     bool &ErrorsFound,                        // error indicator
                     Optional_string_const ThisObjectType = _, // parent object type (for error message)

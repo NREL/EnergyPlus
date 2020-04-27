@@ -769,7 +769,7 @@ namespace HVACMultiSpeedHeatPump {
                     MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state.fans, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
                 }
                 GetFanIndex(state.fans, Alphas(7), MSHeatPump(MSHPNum).FanNum, ErrorsFound, CurrentModuleObject);
-                GetFanType(state, Alphas(7), FanType, ErrorsFound);
+                GetFanType(state.fans, Alphas(7), FanType, ErrorsFound);
                 if (FanType != MSHeatPump(MSHPNum).FanType) {
                     ShowSevereError(CurrentModuleObject + ", \"" + MSHeatPump(MSHPNum).Name + "\", " + cAlphaFields(6) + " and " + cAlphaFields(7) +
                                     " do not match in Fan objects.");

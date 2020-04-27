@@ -678,7 +678,7 @@ namespace AirflowNetworkBalanceManager {
                     success = false;
                 }
                 int fanType_Num;
-                GetFanType(state, thisObjectName, fanType_Num, fanErrorFound);
+                GetFanType(state.fans, thisObjectName, fanType_Num, fanErrorFound);
                 if (fanType_Num != FanType_ZoneExhaust) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " = " + thisObjectName + ". The specified " + "Name" +
                                     " is not found as a valid Fan:ZoneExhaust object.");
@@ -1393,7 +1393,7 @@ namespace AirflowNetworkBalanceManager {
                     GetFanVolFlow(fanIndex, flowRate);
                     flowRate *= StdRhoAir;
 
-                    GetFanType(state, fan_name, fanType_Num, FanErrorFound);
+                    GetFanType(state.fans, fan_name, fanType_Num, FanErrorFound);
                     SupplyFanType = fanType_Num;
                 }
 

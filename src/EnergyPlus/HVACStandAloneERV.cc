@@ -421,7 +421,7 @@ namespace HVACStandAloneERV {
                 StandAloneERV(StandAloneERVNum).SupplyAirOutletNode =
                     HVACFan::fanObjs[StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->outletNodeNum;
             } else {
-                GetFanType(state, StandAloneERV(StandAloneERVNum).SupplyAirFanName,
+                GetFanType(state.fans, StandAloneERV(StandAloneERVNum).SupplyAirFanName,
                            SAFanTypeNum,
                            errFlag,
                            CurrentModuleObject,
@@ -476,7 +476,7 @@ namespace HVACStandAloneERV {
                     HVACFan::fanObjs[StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->outletNodeNum;
 
             } else {
-                GetFanType(state, StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
+                GetFanType(state.fans, StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
                            EAFanTypeNum,
                            errFlag,
                            CurrentModuleObject,

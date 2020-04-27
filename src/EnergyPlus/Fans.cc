@@ -2726,7 +2726,7 @@ namespace Fans {
         }
     }
 
-    void GetFanType(EnergyPlusData &state, std::string const &FanName,           // Fan name
+    void GetFanType(FansData &fans, std::string const &FanName,           // Fan name
                     int &FanType,                         // returned fantype number
                     bool &ErrorsFound,                    // error indicator
                     Optional_string_const ThisObjectType, // parent object type (for error message)
@@ -2747,9 +2747,9 @@ namespace Fans {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanIndex;
 
-        if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput(state.fans);
-            state.fans.GetFanInputFlag = false;
+        if (fans.GetFanInputFlag) { // First time subroutine has been entered
+            GetFanInput(fans);
+            fans.GetFanInputFlag = false;
         }
 
         FanIndex = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);

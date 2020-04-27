@@ -488,7 +488,7 @@ namespace WindowAC {
                     WindAC(WindACNum).FanAvailSchedPtr = HVACFan::fanObjs[WindAC(WindACNum).FanIndex]->availSchedIndex;
                 } else {
 
-                    GetFanType(state, WindAC(WindACNum).FanName, WindAC(WindACNum).FanType_Num, FanErrFlag, CurrentModuleObject, WindAC(WindACNum).Name);
+                    GetFanType(state.fans, WindAC(WindACNum).FanName, WindAC(WindACNum).FanType_Num, FanErrFlag, CurrentModuleObject, WindAC(WindACNum).Name);
                     {
                         auto const SELECT_CASE_var(WindAC(WindACNum).FanType_Num);
                         if ((SELECT_CASE_var == FanType_SimpleOnOff) || (SELECT_CASE_var == FanType_SimpleConstVolume)) {
