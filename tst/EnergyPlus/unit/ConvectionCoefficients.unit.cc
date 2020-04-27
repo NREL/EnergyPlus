@@ -1251,7 +1251,7 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections)
 
         "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
         "Default Algorithm,       !- Name",
-        "FohannoPolidoriVerticalWall,  !- Simple Buoyancy Vertical Wall Equation Source",
+        "ASHRAEVerticalWall,      !- Simple Buoyancy Vertical Wall Equation Source",
         ",                        !- Simple Buoyancy Vertical Wall User Curve Name",
         "AlamdariHammondStableHorizontal,  !- Simple Buoyancy Stable Horizontal Equation Source",
         ",                        !- Simple Buoyancy Stable Horizontal Equation User Curve Name",
@@ -1363,7 +1363,7 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections)
     int algorithm_identifier;
 
     algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
-    ASSERT_EQ(algorithm_identifier, HcInt_FohannoPolidoriVerticalWall);
+    ASSERT_EQ(algorithm_identifier, HcExt_NaturalASHRAEVerticalWall);
     algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
     algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;

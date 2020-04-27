@@ -282,7 +282,6 @@ namespace ConvectionCoefficients {
     std::unordered_map<std::string, int> HcExt_ConvectionTypesMap = {
         {"VALUE", -999},
         {"SCHEDULE", -999},
-        {"SIMPLECOMBINED", ASHRAESimple},
         {"TARP", TarpHcOutside},
         {"MOWITT", MoWiTTHcOutside},
         {"DOE-2", DOE2HcOutside},
@@ -301,10 +300,7 @@ namespace ConvectionCoefficients {
         {"FOHANNOPOLIDORIVERTICALWALL", HcExt_FohannoPolidoriVerticalWall},
         {"ISO15099WINDOWS", HcExt_ISO15099Windows},
         {"ALAMDARIHAMMONDSTABLEHORIZONTAL", HcExt_AlamdariHammondStableHorizontal},
-        {"ALAMDARIHAMMONDUNSTABLEHORIZONTAL", HcExt_AlamdariHammondUnstableHorizontal}
-    };
-
-    std::unordered_map<std::string, int> ValidSpecificExtWindConvMap = {
+        {"ALAMDARIHAMMONDUNSTABLEHORIZONTAL", HcExt_AlamdariHammondUnstableHorizontal},
         {"SIMPLECOMBINED", HcExt_ASHRAESimpleCombined},
         {"TARPWINDWARD", HcExt_SparrowWindward},
         {"TARPLEEWARD", HcExt_SparrowLeeward},
@@ -312,14 +308,7 @@ namespace ConvectionCoefficients {
         {"MOWITTLEEWARD", HcExt_MoWiTTLeeward},
         {"DOE2WINDWARD", HcExt_DOE2Windward},
         {"DOE2LEEWARD", HcExt_DOE2Leeward},
-        {"NUSSELTJURGES", HcExt_NusseltJurges},
-        {"MCADAMS", HcExt_McAdams},
-        {"MITCHELL", HcExt_Mitchell},
-        {"EMMELVERTICAL", HcExt_EmmelVertical},
-        {"EMMELROOF", HcExt_EmmelRoof},
         {"BLOCKENWINDWARD", HcExt_BlockenWindward},
-        {"CLEARROOF", HcExt_ClearRoof},
-        {"USERCURVE", HcExt_UserCurve},
     };
 
 
@@ -968,7 +957,7 @@ namespace ConvectionCoefficients {
     bool SetAdaptiveConvectionAlgoOutsideCoefficient(int* const OutsideFaceAdaptiveConvectionAlgoParam, const std::string equationName, const std::string curveName, const std::string sourceFieldName, const std::string curveFieldName){
 
         static std::string const RoutineName("GetUserConvectionCoefficients");
-        static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
+        static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
         bool ErrorsFound = false;
         bool IsValidType = true;
 
@@ -2195,7 +2184,7 @@ namespace ConvectionCoefficients {
                     &InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum,
                 };
 
-            for (int i = 2; i < NumAlphas-1; i+=2){
+            for (int i = 2; i <= NumAlphas-1; i+=2){
                 std::string eqname = cAlphaArgs(i);
                 std::string curvename = cAlphaArgs(i+1);
                 std::string sourcefield = cAlphaFieldNames(i);
@@ -2233,13 +2222,7 @@ namespace ConvectionCoefficients {
                     &OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum,
                 };
 
-            for (int i = 2; i < NumAlphas-1; i+=2){
-                std::string eqname = cAlphaArgs(i);
-                std::string curvename = cAlphaArgs(i+1);
-                std::string sourcefield = cAlphaFieldNames(i);
-                std::string curvefield = cAlphaFieldNames(i+1);
-                std::string modulename = cAlphaArgs(1);
-
+            for (int i = 2; i <= NumAlphas-1; i+=2){
                 ErrorsFound = SetAdaptiveConvectionAlgoOutsideCoefficient( AdaptiveConvectionAlgoOutsideDefaults[(i/2)-1], cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1));
             }
         } // end of 'SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections'
