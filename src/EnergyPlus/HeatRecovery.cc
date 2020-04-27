@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -66,7 +67,9 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -1690,6 +1693,7 @@ namespace HeatRecovery {
             }
         }
         TempSize = ExchCond(ExchNum).NomSupAirVolFlow;
+        SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
         RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
         ExchCond(ExchNum).NomSupAirVolFlow = TempSize;
         DataConstantUsedForSizing = 0.0;
@@ -1719,7 +1723,7 @@ namespace HeatRecovery {
             DataFractionUsedForSizing = 0.0;
         }
         HRFlowSizingFlag = false;
-
+        SizeHRHXtoMinFlow = false;
         if (ExchCond(ExchNum).ExchTypeNum == HX_DESICCANT_BALANCED && ExchCond(ExchNum).HeatExchPerfTypeNum == BALANCEDHX_PERFDATATYPE1) {
 
             BalDesDehumPerfIndex = ExchCond(ExchNum).PerfDataIndex;
@@ -5399,6 +5403,27 @@ namespace HeatRecovery {
         }
     }
 
+    bool GetHeatRecoveryHXNominalFlowSizingFlag(int const OASysNum) 
+    {
+        bool HXNominalFlowSizingFlag;
+        HXNominalFlowSizingFlag = false;
+        if (OASysNum == 0) {
+            return HXNominalFlowSizingFlag;
+        }
+        auto &thisOASys = DataAirLoop::OutsideAirSys(OASysNum);
+        if (thisOASys.OAControllerIndex > 0) {
+            auto &thisOAController(MixedAir::OAController(thisOASys.OAControllerIndex));
+            if (thisOAController.ControllerType_Num == MixedAir::ControllerOutsideAir) {
+                if (thisOAController.Econo == MixedAir::NoEconomizer || thisOAController.EconBypass ||
+                    thisOAController.Lockout != MixedAir::NoLockoutPossible ||
+                    (thisOAController.Lockout == MixedAir::NoLockoutPossible &&
+                     thisOAController.HeatRecoveryBypassControlType == DataHVACGlobals::BypassWhenWithinEconomizerLimits)) {
+                    HXNominalFlowSizingFlag = true;
+                }
+            }
+        }
+        return HXNominalFlowSizingFlag;
+    }
 } // namespace HeatRecovery
 
 } // namespace EnergyPlus

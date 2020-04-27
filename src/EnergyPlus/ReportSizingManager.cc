@@ -2645,9 +2645,10 @@ namespace ReportSizingManager {
                                     AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
                                 }
                             }
-                            // incase DesOutAirVolFlow is larger
-                            if (FinalSysSizing(CurSysNum).DesOutAirVolFlow > 0.0) {
-                                AutosizeDes = max(FinalSysSizing(CurSysNum).DesMainVolFlow, AutosizeDes);
+                            if (SizeHRHXtoMinFlow) {
+                                if (FinalSysSizing(CurSysNum).DesOutAirVolFlow > 0.0) {
+                                    AutosizeDes = FinalSysSizing(CurSysNum).DesOutAirVolFlow;
+                                }
                             }
                         } else {
                             {
