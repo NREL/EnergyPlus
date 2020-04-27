@@ -3050,7 +3050,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportTSMeters(EnergyPlusData &state, Real64 const StartMinute, // Start Minute for TimeStep
+    void ReportTSMeters(DataGlobal &dataGlobals, Real64 const StartMinute, // Start Minute for TimeStep
                         Real64 const EndMinute,   // End Minute for TimeStep
                         bool &PrintESOTimeStamp,  // True if the ESO Time Stamp also needs to be printed
                         bool PrintTimeStampToSQL  // Print Time Stamp to SQL file
@@ -3116,7 +3116,7 @@ namespace OutputProcessor {
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3139,7 +3139,7 @@ namespace OutputProcessor {
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintESOTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3177,7 +3177,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportHRMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportHRMeters(DataGlobal &dataGlobals, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3240,7 +3240,7 @@ namespace OutputProcessor {
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3280,7 +3280,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportDYMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportDYMeters(DataGlobal &dataGlobals, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3339,7 +3339,7 @@ namespace OutputProcessor {
                                          DailyStampReportNbr,
                                          DailyStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3378,7 +3378,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportMNMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportMNMeters(DataGlobal &dataGlobals, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3433,7 +3433,7 @@ namespace OutputProcessor {
                                          MonthlyStampReportNbr,
                                          MonthlyStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month);
                 PrintTimeStamp = false;
@@ -3538,7 +3538,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportSMMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportSMMeters(DataGlobal &dataGlobals, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3582,7 +3582,7 @@ namespace OutputProcessor {
             ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Simulation);
         }
         if (ResultsFramework::OutputSchema->SMMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->SMMeters.newRow(state.dataGlobals.DayOfSimChr);
+            ResultsFramework::OutputSchema->SMMeters.newRow(dataGlobals.DayOfSimChr);
         }
 
         PrintTimeStamp = true;
@@ -3599,7 +3599,7 @@ namespace OutputProcessor {
                                          RunPeriodStampReportNbr,
                                          RunPeriodStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         dataGlobals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL);
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -5983,7 +5983,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                         indexGroupKey);
 }
 
-void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
+void UpdateDataandReport(DataGlobal &dataGlobals, OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
 {
 
     // SUBROUTINE INFORMATION:
@@ -6159,7 +6159,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              TimeStepStampReportNbr,
                                              TimeStepStampReportChr,
                                              DayOfSim,
-                                             state.dataGlobals.DayOfSimChr,
+                                             dataGlobals.DayOfSimChr,
                                              true,
                                              Month,
                                              DayOfMonth,
@@ -6243,7 +6243,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              TimeStepStampReportNbr,
                                              TimeStepStampReportChr,
                                              DayOfSim,
-                                             state.dataGlobals.DayOfSimChr,
+                                             dataGlobals.DayOfSimChr,
                                              true,
                                              Month,
                                              DayOfMonth,
@@ -6332,7 +6332,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      TimeStepStampReportNbr,
                                                      TimeStepStampReportChr,
                                                      DayOfSim,
-                                                     state.dataGlobals.DayOfSimChr,
+                                                     dataGlobals.DayOfSimChr,
                                                      true,
                                                      Month,
                                                      DayOfMonth,
@@ -6388,7 +6388,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      TimeStepStampReportNbr,
                                                      TimeStepStampReportChr,
                                                      DayOfSim,
-                                                     state.dataGlobals.DayOfSimChr,
+                                                     dataGlobals.DayOfSimChr,
                                                      true,
                                                      Month,
                                                      DayOfMonth,
@@ -6418,7 +6418,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         UpdateMeters(MDHM);
 
-        ReportTSMeters(state, StartMinute, TimeValue.at(TimeStepType::TimeStepZone).CurMinute, TimePrint, TimePrint);
+        ReportTSMeters(dataGlobals, StartMinute, TimeValue.at(TimeStepType::TimeStepZone).CurMinute, TimePrint, TimePrint);
 
     } // TimeStep Block
 
@@ -6434,7 +6434,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      TimeStepStampReportNbr,
                                      TimeStepStampReportChr,
                                      DayOfSim,
-                                     state.dataGlobals.DayOfSimChr,
+                                     dataGlobals.DayOfSimChr,
                                      true,
                                      Month,
                                      DayOfMonth,
@@ -6517,7 +6517,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             } // Number of I Variables
         }     // thisTimeStepType (Zone or HVAC)
 
-        ReportHRMeters(state, TimePrint);
+        ReportHRMeters(dataGlobals, TimePrint);
 
     } // Hour Block
 
@@ -6535,7 +6535,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      DailyStampReportNbr,
                                      DailyStampReportChr,
                                      DayOfSim,
-                                     state.dataGlobals.DayOfSimChr,
+                                     dataGlobals.DayOfSimChr,
                                      true,
                                      Month,
                                      DayOfMonth,
@@ -6571,7 +6571,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             } // Number of I Variables
         }     // thisTimeStepType (Zone or HVAC)
 
-        ReportDYMeters(state, TimePrint);
+        ReportDYMeters(dataGlobals, TimePrint);
 
     } // Day Block
 
@@ -6582,7 +6582,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     if (EndMonthFlag || EndEnvrnFlag) {
         if (TrackingMonthlyVariables) {
             WriteTimeStampFormatData(
-                OutputFiles::getSingleton().eso, ReportingFrequency::Monthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, state.dataGlobals.DayOfSimChr, true, Month);
+                OutputFiles::getSingleton().eso, ReportingFrequency::Monthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, dataGlobals.DayOfSimChr, true, Month);
             TimePrint = false;
         }
 
@@ -6612,7 +6612,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             } // Number of I Variables
         }     // thisTimeStepType (Zone, HVAC)
 
-        ReportMNMeters(state, TimePrint);
+        ReportMNMeters(dataGlobals, TimePrint);
 
         NumHoursInMonth = 0;
     } // Month Block
@@ -6621,7 +6621,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     if (EndEnvrnFlag) {
         if (TrackingRunPeriodVariables) {
             WriteTimeStampFormatData(
-                OutputFiles::getSingleton().eso, ReportingFrequency::Simulation, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, state.dataGlobals.DayOfSimChr, true);
+                OutputFiles::getSingleton().eso, ReportingFrequency::Simulation, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, dataGlobals.DayOfSimChr, true);
             TimePrint = false;
         }
 
@@ -6648,7 +6648,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             } // Number of I Variables
         }     // thisTimeStepType (Zone, HVAC)
 
-        ReportSMMeters(state, TimePrint);
+        ReportSMMeters(dataGlobals, TimePrint);
 
         NumHoursInSim = 0;
     }

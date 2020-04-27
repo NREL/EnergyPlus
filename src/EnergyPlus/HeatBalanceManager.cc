@@ -5959,7 +5959,7 @@ namespace HeatBalanceManager {
 
         if (!WarmupFlag && DoOutputReporting) {
             CalcMoreNodeInfo();
-            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
@@ -6002,13 +6002,13 @@ namespace HeatBalanceManager {
                 }
             }
             CalcMoreNodeInfo();
-            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
-            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }

@@ -534,7 +534,7 @@ namespace HVACManager {
                 }
                 if (DoOutputReporting) {
                     ReportMaxVentilationLoads(state);
-                    UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
+                    UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
                     if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                         if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                     }
@@ -580,7 +580,7 @@ namespace HVACManager {
                     PrintedWarmup = true;
                 }
                 CalcMoreNodeInfo();
-                UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
+                UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
                 if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                     if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                 }
@@ -617,7 +617,7 @@ namespace HVACManager {
                     }
                     PrintedWarmup = true;
                 }
-                UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
+                UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
             }
             ManageEMS(emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan); // EMS calling point
             // UPDATE SYSTEM CLOCKS
