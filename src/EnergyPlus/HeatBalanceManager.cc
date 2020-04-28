@@ -5891,7 +5891,7 @@ namespace HeatBalanceManager {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
                 auto &thisConstruct(thisSurface.Construction);
-                if (!Construct(thisConstruct).WindowTypeBSDF) {
+                if (!Construct(thisConstruct).WindowTypeBSDF && !Construct(thisConstruct).TypeIsAirBoundaryInteriorWindow) {
                     FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
                     FenLaySurfTempBack(Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
                 }
@@ -5940,10 +5940,7 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
-        static constexpr auto EndOfHeaderString("End of Data Dictionary");                   // End of data dictionary marker
-        static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
-        static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -5976,14 +5973,22 @@ namespace HeatBalanceManager {
             if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
             if (PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && DoOutputReporting) {
-                    ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
+                    static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
+                    print(outputFiles.eso, "{}\n", EndOfHeaderString);
                     print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
-                    ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
-                        << "1"
-                        << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
+                    static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+                    print(outputFiles.eso,
+                          EnvironmentStampFormatStr,
+                          "1",
+                          "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                          Latitude,
+                          Longitude,
+                          TimeZoneNumber,
+                          Elevation);
+
                     print(outputFiles.mtr,
                           EnvironmentStampFormatStr,
                           "1",
@@ -7560,15 +7565,26 @@ namespace HeatBalanceManager {
                 if (UtilityRoutines::SameString(solarMethod, "GroupedZones")) {
                     thisConstruct.TypeIsAirBoundarySolar = true;
                 } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
-                    ShowWarningError(RoutineName + ": Construction:AirBoundary Solar and Daylighting Method=InteriorWindow is not functional.");
-                    ShowContinueError("Using GroupedZones method instead for Construction:AirBoundary = " + thisConstruct.Name + ".");
-                    thisConstruct.TypeIsAirBoundarySolar = true;
-                    // thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
-                    // thisConstruct.TransDiff = 1.0;
-                    // thisConstruct.TransDiffVis = 1.0;
-                    // thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
-                    // thisConstruct.TransSolBeamCoef = 1.0;
-                    // thisConstruct.ReflectSolDiffBack = 0.0;
+                    thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
+                    thisConstruct.TransDiff = 1.0;
+                    thisConstruct.TransDiffVis = 1.0;
+                    thisConstruct.AbsDiffBackShade = 0.0;
+                    thisConstruct.ShadeAbsorpThermal = 0.0;
+                    thisConstruct.ReflectSolDiffBack = 0.0;
+                    thisConstruct.ReflectSolDiffFront = 0.0;
+                    thisConstruct.ReflectVisDiffFront = 0.0;
+                    thisConstruct.AbsBeamShadeCoef = 0.0;
+                    thisConstruct.TransSolBeamCoef = 0.0;
+                    thisConstruct.TransSolBeamCoef(1) = 1.0;
+                    thisConstruct.ReflSolBeamFrontCoef = 0.0;
+                    thisConstruct.ReflSolBeamBackCoef = 0.0;
+                    thisConstruct.TransVisBeamCoef = 0.0;
+                    thisConstruct.TransVisBeamCoef(1) = 1.0;
+                    thisConstruct.AbsBeamCoef = 0.0;
+                    thisConstruct.AbsBeamBackCoef = 0.0;
+                    thisConstruct.AbsDiff = 0.0;
+                    thisConstruct.AbsDiffBack = 0.0;
                 }
 
                 // Radiant Exchange Method

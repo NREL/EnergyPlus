@@ -413,7 +413,7 @@ namespace HeatBalanceSurfaceManager {
                     Surface(SurfNum).WindDir = Node(Surface(SurfNum).LinkedOutAirNode).OutAirWindDir;
                 }
 
-                if (Surface(SurfNum).HasSurroundingSurfProperties) {
+                if (InitSurfaceHeatBalancefirstTime && Surface(SurfNum).HasSurroundingSurfProperties) {
                     SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
                     SrdSurfsViewFactor = 0;
                     if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0) {
@@ -1157,7 +1157,7 @@ namespace HeatBalanceSurfaceManager {
             } else {
                 isExterior = false;
                 // interior window report
-                if (Surface(iSurf).Class == SurfaceClass_Window) {
+                if (Surface(iSurf).Class == SurfaceClass_Window && !Construct(Surface(iSurf).Construction).TypeIsAirBoundaryInteriorWindow) {
                     if (!has_prefix(Surface(iSurf).Name, "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
                         surfName = Surface(iSurf).Name;
                         curCons = Surface(iSurf).Construction;

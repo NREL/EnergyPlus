@@ -491,14 +491,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
+    OutputProcessor::GetReportVariableInput(outputFiles());
     PlantManager::CheckIfAnyPlant();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
 
@@ -506,7 +506,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(outputFiles(), ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
     CondenserLoopTowers::towers(1).initialize();
@@ -883,14 +883,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
+    OutputProcessor::GetReportVariableInput(outputFiles());
     PlantManager::CheckIfAnyPlant();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
 
@@ -898,7 +898,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(outputFiles(), ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
     CondenserLoopTowers::towers(1).initialize();
@@ -1314,14 +1314,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
+    OutputProcessor::GetReportVariableInput(outputFiles());
     PlantManager::CheckIfAnyPlant();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
 
@@ -1329,7 +1329,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(outputFiles(), ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
     // sized using user inputs in cooling tower instead of plant sizing object
@@ -1729,14 +1729,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
+    OutputProcessor::GetReportVariableInput(outputFiles());
     PlantManager::CheckIfAnyPlant();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
 
@@ -1744,7 +1744,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(outputFiles(), ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
     // sized using user inputs in cooling tower instead of plant sizing object
@@ -2213,14 +2213,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
+    OutputProcessor::GetReportVariableInput(outputFiles());
     PlantManager::CheckIfAnyPlant();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
 
@@ -2228,7 +2228,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(outputFiles(), ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
     // sized using user inputs in cooling tower instead of plant sizing object
@@ -2640,14 +2640,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
+    OutputProcessor::GetReportVariableInput(outputFiles());
     PlantManager::CheckIfAnyPlant();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
 
@@ -2655,7 +2655,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(outputFiles(), ErrorsFound);
 
     // get inputs of cooling tower object
     CondenserLoopTowers::GetTowerInput();
@@ -3029,14 +3029,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     SimulationManager::PostIPProcessing();
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
+    OutputProcessor::GetReportVariableInput(outputFiles());
     PlantManager::CheckIfAnyPlant();
 
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
@@ -3423,14 +3423,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     SimulationManager::PostIPProcessing();
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
+    OutputProcessor::GetReportVariableInput(outputFiles());
     PlantManager::CheckIfAnyPlant();
 
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
@@ -3898,13 +3898,13 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     SimulationManager::PostIPProcessing();
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
 
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone);
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
+    OutputProcessor::GetReportVariableInput(outputFiles());
     PlantManager::CheckIfAnyPlant();
     BranchInputManager::ManageBranchInput();
 

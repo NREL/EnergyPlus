@@ -11,18 +11,22 @@ def time_step_handler():
     global one_time, outdoor_temp_sensor, outdoor_dew_point_sensor, outdoor_dew_point_actuator
     sys.stdout.flush()
     if one_time:
-        outdoor_temp_sensor = api.exchange.get_variable_handle(
-            u"SITE OUTDOOR AIR DRYBULB TEMPERATURE", u"ENVIRONMENT"
-        )
-        outdoor_dew_point_sensor = api.exchange.get_variable_handle(
-            u"SITE OUTDOOR AIR DEWPOINT TEMPERATURE", u"ENVIRONMENT"
-        )
-        outdoor_dew_point_actuator = api.exchange.get_actuator_handle(
-            "Environment", "Weather Data", "Outdoor Dew Point"
-        )
-        if outdoor_temp_sensor == -1 or outdoor_dew_point_sensor == -1 or outdoor_dew_point_actuator == -1:
-            sys.exit(1)
-        one_time = False
+        if api.exchange.api_data_fully_ready():
+            # val = api.exchange.list_available_api_data_csv()
+            # with open('/tmp/data.csv', 'w') as f:
+            #     f.write(val.decode(encoding='utf-8'))
+            outdoor_temp_sensor = api.exchange.get_variable_handle(
+                u"SITE OUTDOOR AIR DRYBULB TEMPERATURE", u"ENVIRONMENT"
+            )
+            outdoor_dew_point_sensor = api.exchange.get_variable_handle(
+                u"SITE OUTDOOR AIR DEWPOINT TEMPERATURE", u"ENVIRONMENT"
+            )
+            outdoor_dew_point_actuator = api.exchange.get_actuator_handle(
+                "Weather Data", "Outdoor Dew Point", "Environment"
+            )
+            if outdoor_temp_sensor == -1 or outdoor_dew_point_sensor == -1 or outdoor_dew_point_actuator == -1:
+                sys.exit(1)
+            one_time = False
     api.exchange.set_actuator_value(outdoor_dew_point_actuator, -25)
     oa_temp = api.exchange.get_variable_value(outdoor_temp_sensor)
     print("Reading outdoor temp via getVariable, value is: %s" % oa_temp)

@@ -230,17 +230,23 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
     OutputSchema->RITimestepTSData.addVariable(var0);
-    OutputSchema->RITimestepTSData.newRow(2, 25, 14, 40); // month,day,hour,minute
-    OutputSchema->RITimestepTSData.newRow(2, 25, 14, 45); // month,day,hour,minute
+    OutputSchema->RITimestepTSData.newRow(2, 25, 1, 45); // month,day,hour,minute
+    OutputSchema->RITimestepTSData.newRow(2, 25, 1, 60); // month,day,hour,minute
+    OutputSchema->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
+    OutputSchema->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
 
     OutputSchema->RITimestepTSData.pushVariableValue(reportId, 1.0);
     OutputSchema->RITimestepTSData.pushVariableValue(reportId, 2.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 3.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 4.0);
 
     reportId++;
     Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
     OutputSchema->RITimestepTSData.addVariable(var1);
-    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 3.0);
-    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 4.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 5.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 6.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 7.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 8.0);
 
     OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
 
@@ -248,59 +254,63 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
             "Timestep": {
                 "Cols":[
                     {
-                        "Units" : "kgWater/kgDryAir",
-                        "Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
-                    },
-                    {
                         "Units" : "C",
                         "Variable":"SALESFLOOR INLET NODE:System Node Temperature"
+                    },
+                    {
+                        "Units" : "kgWater/kgDryAir",
+                        "Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
                     }
                 ],
                 "ReportFrequency" : "Timestep",
                 "Rows":[
-                    { "2/25 14:40:00" : [3.0,1.0] },
-                    { "2/25 14:45:00" : [4.0,2.0] }
+                    { "02/25 00:45:00" : [1.0,5.0] },
+                    { "02/25 01:00:00" : [2.0,6.0] },
+                    { "02/25 23:45:00" : [3.0,7.0] },
+                    { "02/25 24:00:00" : [4.0,8.0] }
                 ]
             }
         } )"_json;
 
-    // There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
-    // EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+    EXPECT_EQ( expectedObject.dump(), OutputData.dump());
 
     // If add one more, it also should go to the top of json cols array
     reportId++;
     Variable var2("SALESFLOOR OUTLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
     OutputSchema->RITimestepTSData.addVariable(var2);
-    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 5.0);
-    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 6.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 9.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 10.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 11.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 12.0);
     OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
 
     expectedObject = R"( {
             "Timestep": {
                 "Cols":[
                     {
-                        "Units": "C",
-                        "Variable" : "SALESFLOOR OUTLET NODE:System Node Temperature"
+                        "Units" : "C",
+                        "Variable":"SALESFLOOR INLET NODE:System Node Temperature"
                     },
                     {
                         "Units" : "kgWater/kgDryAir",
                         "Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
                     },
                     {
-                        "Units" : "C",
-                        "Variable":"SALESFLOOR INLET NODE:System Node Temperature"
+                        "Units": "C",
+                        "Variable" : "SALESFLOOR OUTLET NODE:System Node Temperature"
                     }
                 ],
                 "ReportFrequency" : "Timestep",
                 "Rows":[
-                    { "2/25 14:40:00" : [5.0,3.0,1.0] },
-                    { "2/25 14:45:00" : [6.0,4.0,2.0] }
+                    { "02/25 00:45:00" : [1.0,5.0,9.0] },
+                    { "02/25 01:00:00" : [2.0,6.0,10.0] },
+                    { "02/25 23:45:00" : [3.0,7.0,11.0] },
+                    { "02/25 24:00:00" : [4.0,8.0,12.0] }
                 ]
             }
         } )"_json;
 
-    // There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
-    // EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+    EXPECT_EQ( expectedObject.dump(), OutputData.dump());
 }
 
 TEST_F(EnergyPlusFixture, JsonOutput_TableInfo)
