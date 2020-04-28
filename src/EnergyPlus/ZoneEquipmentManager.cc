@@ -2176,7 +2176,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void UpdateZoneSizing(EnergyPlusData &state, OutputFiles &outputFiles, int const CallIndicator)
+    void UpdateZoneSizing(DataGlobal const &dataGlobals, OutputFiles &outputFiles, int const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2572,7 +2572,7 @@ namespace ZoneEquipmentManager {
                     }
                 }
 
-            } else if (SELECT_CASE_var == state.dataGlobals.EndZoneSizingCalc) {
+            } else if (SELECT_CASE_var == dataGlobals.EndZoneSizingCalc) {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;

@@ -371,8 +371,8 @@ namespace SizingManager {
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
-                            UpdateZoneSizing(state, outputFiles, BeginDay);
-                            UpdateFacilitySizing(state, BeginDay);
+                            UpdateZoneSizing(state.dataGlobals, outputFiles, BeginDay);
+                            UpdateFacilitySizing(state.dataGlobals, BeginDay);
                         }
 
                         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -430,8 +430,8 @@ namespace SizingManager {
                         } // ... End hour loop.
 
                         if (EndDayFlag) {
-                            UpdateZoneSizing(state, outputFiles, EndDay);
-                            UpdateFacilitySizing(state, EndDay);
+                            UpdateZoneSizing(state.dataGlobals, outputFiles, EndDay);
+                            UpdateFacilitySizing(state.dataGlobals, EndDay);
                         }
 
                         if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
@@ -446,8 +446,8 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(state, outputFiles, state.dataGlobals.EndZoneSizingCalc);
-                    UpdateFacilitySizing(state, state.dataGlobals.EndZoneSizingCalc);
+                    UpdateZoneSizing(state.dataGlobals, outputFiles, state.dataGlobals.EndZoneSizingCalc);
+                    UpdateFacilitySizing(state.dataGlobals, state.dataGlobals.EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
@@ -4782,7 +4782,7 @@ namespace SizingManager {
     }
 
     // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-    void UpdateFacilitySizing(EnergyPlusData &state, int const CallIndicator)
+    void UpdateFacilitySizing(DataGlobal const &dataGlobals, int const CallIndicator)
     {
         int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
@@ -4894,7 +4894,7 @@ namespace SizingManager {
                 }
             }
 
-        } else if (CallIndicator == state.dataGlobals.EndZoneSizingCalc) {
+        } else if (CallIndicator == dataGlobals.EndZoneSizingCalc) {
             for (int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum) {
                 if (CalcFacilitySizing(DDNum).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad) {
                     CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing(DDNum).DesCoolLoad;

@@ -419,7 +419,7 @@ namespace DataSystemVariables {
         Threading = false;
     }
 
-    void processEnvironmentVariables(DataGlobal &dataGlobals) {
+    void processEnvironmentVariables(DataGlobal const &dataGlobals) {
 
         static std::string cEnvValue;
 

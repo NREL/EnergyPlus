@@ -541,8 +541,8 @@ namespace HVACManager {
                     UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
                 }
                 if (ZoneSizingCalc) {
-                    UpdateZoneSizing(state, OutputFiles::getSingleton(), DuringDay);
-                    UpdateFacilitySizing(state, DuringDay);
+                    UpdateZoneSizing(state.dataGlobals, OutputFiles::getSingleton(), DuringDay);
+                    UpdateFacilitySizing(state.dataGlobals, DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {

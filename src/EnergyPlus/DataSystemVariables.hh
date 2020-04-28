@@ -176,7 +176,7 @@ namespace DataSystemVariables {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void processEnvironmentVariables(DataGlobal &dataGlobals);
+    void processEnvironmentVariables(DataGlobal const &dataGlobals);
 
 } // namespace DataSystemVariables
 
