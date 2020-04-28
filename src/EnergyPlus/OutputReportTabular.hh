@@ -772,6 +772,8 @@ namespace OutputReportTabular {
 
     void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType);
 
+    void CalcHeatEmissionReport();
+
     //======================================================================================================================
     //======================================================================================================================
 
@@ -808,7 +810,7 @@ namespace OutputReportTabular {
 
     void WriteCompCostTable();
 
-    void WriteVeriSumTable();
+    void WriteVeriSumTable(OutputFiles &outputFiles);
 
     void WriteAdaptiveComfortTable();
 

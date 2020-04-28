@@ -184,7 +184,6 @@ namespace SimulationManager {
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
     static constexpr auto fmtLD("*");
-    static constexpr auto fmtA("(A)");
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -2784,7 +2783,7 @@ namespace SimulationManager {
         AskForConnectionsReport = false;
     }
 
-    void ReportParentChildren()
+    void ReportParentChildren(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2805,7 +2804,6 @@ namespace SimulationManager {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using DataGlobals::OutputFileDebug;
         using General::TrimSigDigits;
         using namespace DataBranchNodeConnections;
         using namespace BranchNodeConnections;
@@ -2836,7 +2834,7 @@ namespace SimulationManager {
         bool ErrorsFound;
 
         ErrorsFound = false;
-        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "Node Type,CompSet Name,Inlet Node,OutletNode";
+        print(outputFiles.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
         for (Loop = 1; Loop <= NumOfActualParents; ++Loop) {
             NumChildren = GetNumChildren(ParentNodeList(Loop).CType, ParentNodeList(Loop).CName);
             if (NumChildren > 0) {
@@ -2862,13 +2860,21 @@ namespace SimulationManager {
                                 ChildOutNodeName,
                                 ChildOutNodeNum,
                                 ErrorsFound);
-                if (Loop > 1) ObjexxFCL::gio::write(OutputFileDebug, "(1X,60('='))");
-                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << " Parent Node," + ParentNodeList(Loop).CType + ':' + ParentNodeList(Loop).CName +
-                                                                    ',' + ParentNodeList(Loop).InletNodeName + ',' +
-                                                                    ParentNodeList(Loop).OutletNodeName;
+                if (Loop > 1) print(outputFiles.debug, "{}\n", std::string(60, '='));
+
+                print(outputFiles.debug,
+                      " Parent Node,{}:{},{},{}\n",
+                      ParentNodeList(Loop).CType,
+                      ParentNodeList(Loop).CName,
+                      ParentNodeList(Loop).InletNodeName,
+                      ParentNodeList(Loop).OutletNodeName);
                 for (Loop1 = 1; Loop1 <= NumChildren; ++Loop1) {
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "..ChildNode," + ChildCType(Loop1) + ':' + ChildCName(Loop1) + ',' +
-                                                                        ChildInNodeName(Loop1) + ',' + ChildOutNodeName(Loop1);
+                    print(outputFiles.debug,
+                          "..ChildNode,{}:{},{},{}\n",
+                          ChildCType(Loop1),
+                          ChildCName(Loop1),
+                          ChildInNodeName(Loop1),
+                          ChildOutNodeName(Loop1));
                 }
                 ChildCType.deallocate();
                 ChildCName.deallocate();
@@ -2877,15 +2883,18 @@ namespace SimulationManager {
                 ChildInNodeNum.deallocate();
                 ChildOutNodeNum.deallocate();
             } else {
-                if (Loop > 1) ObjexxFCL::gio::write(OutputFileDebug, "(1X,60('='))");
-                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << " Parent Node (no children)," + ParentNodeList(Loop).CType + ':' +
-                                                                    ParentNodeList(Loop).CName + ',' + ParentNodeList(Loop).InletNodeName + ',' +
-                                                                    ParentNodeList(Loop).OutletNodeName;
+                if (Loop > 1) print(outputFiles.debug, "{}\n", std::string(60, '='));
+                print(outputFiles.debug,
+                      " Parent Node (no children),{}:{},{},{}\n",
+                      ParentNodeList(Loop).CType,
+                      ParentNodeList(Loop).CName,
+                      ParentNodeList(Loop).InletNodeName,
+                      ParentNodeList(Loop).OutletNodeName);
             }
         }
     }
 
-    void ReportCompSetMeterVariables()
+    void ReportCompSetMeterVariables(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2904,7 +2913,6 @@ namespace SimulationManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::OutputFileDebug;
         using namespace DataBranchNodeConnections;
         using namespace BranchNodeConnections;
         using namespace DataGlobalConstants;
@@ -2935,12 +2943,12 @@ namespace SimulationManager {
         Array1D_string EndUses;
         Array1D_string Groups;
 
-        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << " CompSet,ComponentType,ComponentName,NumMeteredVariables";
-        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType";
+        print(outputFiles.debug, "{}\n", " CompSet,ComponentType,ComponentName,NumMeteredVariables");
+        print(outputFiles.debug, "{}\n", " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType");
 
         for (Loop = 1; Loop <= NumCompSets; ++Loop) {
             NumVariables = GetNumMeteredVariables(CompSets(Loop).CType, CompSets(Loop).CName);
-            ObjexxFCL::gio::write(OutputFileDebug, "(1X,'CompSet,',A,',',A,',',I5)") << CompSets(Loop).CType << CompSets(Loop).CName << NumVariables;
+            print(outputFiles.debug, "CompSet, {}, {}, {:5}\n", CompSets(Loop).CType, CompSets(Loop).CName, NumVariables);
             if (NumVariables <= 0) continue;
             VarIndexes.dimension(NumVariables, 0);
             VarIDs.dimension(NumVariables, 0);
@@ -2963,12 +2971,18 @@ namespace SimulationManager {
                                 VarNames,
                                 VarIDs);
             for (Loop1 = 1; Loop1 <= NumVariables; ++Loop1) {
-                ObjexxFCL::gio::write(OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)")
-                    << VarIndexes(Loop1) << VarIDs(Loop1) << VarNames(Loop1) << unitEnumToString(unitsForVar(Loop1))
-                    << GetResourceTypeChar(ResourceTypes(Loop1)) << EndUses(Loop1)
-                    << Groups(Loop1)
-                    // TODO: Should call OutputProcessor::StandardTimeStepTypeKey(IndexTypes(Loop1)) to return "Zone" or "HVAC"
-                    << static_cast<int>(IndexTypes(Loop1));
+                print(outputFiles.debug,
+                      "RepVar,{:5},{:5},{},[{}],{},{},{},{:5}\n",
+                      VarIndexes(Loop1),
+                      VarIDs(Loop1),
+                      VarNames(Loop1),
+                      unitEnumToString(unitsForVar(Loop1)),
+                      GetResourceTypeChar(ResourceTypes(Loop1)),
+                      EndUses(Loop1),
+                      Groups(Loop1)
+                      // TODO: Should call OutputProcessor::StandardTimeStepTypeKey(IndexTypes(Loop1)) to return "Zone" or "HVAC"
+                      ,
+                      static_cast<int>(IndexTypes(Loop1)));
             }
             VarIndexes.deallocate();
             IndexTypes.deallocate();

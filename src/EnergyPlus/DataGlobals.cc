@@ -202,7 +202,6 @@ namespace DataGlobals {
     int OutputStandardError(0);                      // Unit number for the standard error output file
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
-    int OutputFileDebug(0);                          // Unit number for debug outputs
     int OutputFilePerfLog(0);                        // Unit number for performance log outputs
     int OutputFileShadingFrac(0);                    // Unit number for shading output
     int StdMeterRecordCount(0);                      // Count of Meter output records
@@ -307,7 +306,7 @@ namespace DataGlobals {
         OutputFiles::getSingleton().eso.close();
         OutputStandardError = 0;
         StdOutputRecordCount = 0;
-        OutputFileDebug = 0;
+        OutputFiles::getSingleton().debug.close();
         OutputFiles::getSingleton().zsz.close();
         OutputFiles::getSingleton().ssz.close();
         OutputFiles::getSingleton().mtr.close();

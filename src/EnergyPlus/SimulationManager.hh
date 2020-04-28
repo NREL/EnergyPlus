@@ -101,9 +101,9 @@ namespace SimulationManager {
 
     void ReportLoopConnections(OutputFiles &outputFiles);
 
-    void ReportParentChildren();
+    void ReportParentChildren(OutputFiles &outputFiles);
 
-    void ReportCompSetMeterVariables();
+    void ReportCompSetMeterVariables(OutputFiles &outputFiles);
 
     void PostIPProcessing();
 
