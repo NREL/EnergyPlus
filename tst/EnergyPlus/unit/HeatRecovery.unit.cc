@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include "EnergyPlus/DataAirLoop.hh"
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -60,10 +61,12 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -3939,3 +3942,268 @@ TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
     EXPECT_EQ(ExchCond(ExchNum).Name, "HEATRECOVERY HX IN ERV");
     EXPECT_EQ(ExchCond(ExchNum).NomSupAirVolFlow, 1.0);
 }
+
+TEST_F(EnergyPlusFixture, HeatRecovery_NominalFlowSizingOptionsTest)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "    AirLoopHVAC:OutdoorAirSystem,",
+        "      VAV WITH REHEAT_OA,      !- Name",
+        "      VAV WITH REHEAT_OA_Controllers,  !- Controller List Name",
+        "      VAV WITH REHEAT_OA_Equipment;  !- Outdoor Air Equipment List Name",
+
+        "    AirLoopHVAC:ControllerList,",
+        "      VAV WITH REHEAT_OA_Controllers,  !- Name",
+        "      Controller:OutdoorAir,   !- Controller 1 Object Type",
+        "      VAV WITH REHEAT_OA_CONTROLLER;  !- Controller 1 Name",
+
+        "    Controller:OutdoorAir,",
+        "      VAV WITH REHEAT_OA_CONTROLLER,  !- Name",
+        "      VAV WITH REHEAT_OARelief Node,  !- Relief Air Outlet Node Name",
+        "      VAV WITH REHEAT Supply Equipment Inlet Node,  !- Return Air Node Name",
+        "      VAV WITH REHEAT_OA-VAV WITH REHEAT_CoolCNode,  !- Mixed Air Node Name",
+        "      VAV WITH REHEAT_OAInlet Node,  !- Actuator Node Name",
+        "      AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+        "      AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "      NoEconomizer,            !- Economizer Control Type",
+        "      ModulateFlow,            !- Economizer Control Action Type",
+        "      ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+        "      64000.0,                 !- Economizer Maximum Limit Enthalpy {J/kg}",
+        "      ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+        "      ,                        !- Electronic Enthalpy Limit Curve Name",
+        "      ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+        "      NoLockout,               !- Lockout Type",
+        "      FixedMinimum,            !- Minimum Limit Type",
+        "      MinOA_Sched,             !- Minimum Outdoor Air Schedule Name",
+        "      ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+        "      ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+        "      ,                        !- Mechanical Ventilation Controller Name",
+        "      ,                        !- Time of Day Economizer Control Schedule Name",
+        "      ,                        !- High Humidity Control",
+        "      ,                        !- Humidistat Control Zone Name",
+        "      ,                        !- High Humidity Outdoor Air Flow Ratio",
+        "      ,                        !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+        "      BypassWhenOAFlowGreaterThanMinimum;  !- Heat Recovery Bypass Control Type",
+
+        "    Schedule:Compact,",
+        "      MinOA_Sched,             !- Name",
+        "      Fraction,                !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,1.0;        !- Field 3",
+
+        "    ScheduleTypeLimits,",
+        "      Fraction,                !- Name",
+        "      0.0,                     !- Lower Limit Value",
+        "      1.0,                     !- Upper Limit Value",
+        "      CONTINUOUS;              !- Numeric Type",
+
+        "    AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
+        "      VAV WITH REHEAT_OA_Equipment,  !- Name",
+        "      HeatExchanger:AirToAir:SensibleAndLatent,  !- Component 1 Object Type",
+        "      HEATRECOVERY HX GENERIC, !- Component 1 Name",
+        "      OutdoorAir:Mixer,        !- Component 2 Object Type",
+        "      VAV WITH REHEAT_OAMixing Box;  !- Component 2 Name",
+
+        "    HeatExchanger:AirToAir:SensibleAndLatent,",
+        "      HEATRECOVERY HX GENERIC, !- Name",
+        "      ,                        !- Availability Schedule Name",
+        "      AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}",
+        "      0.70,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
+        "      0.60,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
+        "      0.70,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
+        "      0.60,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
+        "      0.75,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
+        "      0.60,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
+        "      0.75,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
+        "      0.60,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
+        "      VAV WITH REHEAT_OAInlet Node,  !- Supply Air Inlet Node Name",
+        "      VAV WITH REHEAT Heat Recovery Outlet Node,  !- Supply Air Outlet Node Name",
+        "      VAV WITH REHEAT_OARelief Node,  !- Exhaust Air Inlet Node Name",
+        "      VAV WITH REHEAT Heat Recovery Secondary Outlet Node,  !- Exhaust Air Outlet Node Name",
+        "      800.0,                   !- Nominal Electric Power {W}",
+        "      No,                      !- Supply Air Outlet Temperature Control",
+        "      Rotary,                  !- Heat Exchanger Type",
+        "      None,                    !- Frost Control Type",
+        "      1.7;                     !- Threshold Temperature {C}",
+                                                                      
+        "    OutdoorAir:Mixer,",
+        "      VAV WITH REHEAT_OAMixing Box,  !- Name",
+        "      VAV WITH REHEAT_OA-VAV WITH REHEAT_CoolCNode,  !- Mixed Air Node Name",
+        "      VAV WITH REHEAT Heat Recovery Outlet Node,  !- Outdoor Air Stream Node Name",
+        "      VAV WITH REHEAT_OARelief Node,  !- Relief Air Stream Node Name",
+        "      VAV WITH REHEAT Supply Equipment Inlet Node;  !- Return Air Stream Node Name",
+
+        "OutdoorAir:NodeList,",
+        "    VAV WITH REHEAT_OAInlet Node;  !- Node or NodeList Name 1",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ScheduleManager::ProcessScheduleInput(outputFiles());
+    // get OA Controller
+    MixedAir::GetOAControllerInputs(outputFiles());
+    int OAContrllerNum = 1;
+    auto &thisOAController(MixedAir::OAController(OAContrllerNum));
+    EXPECT_EQ(1, MixedAir::NumOAControllers);
+    EXPECT_EQ("VAV WITH REHEAT_OA_CONTROLLER", thisOAController.Name);
+    // get OA System
+    MixedAir::GetOutsideAirSysInputs();
+    int OASysNum = 1;
+    auto &thisOASys = DataAirLoop::OutsideAirSys(OASysNum);
+    thisOASys.OAControllerIndex = MixedAir::GetOAController(thisOAController.Name);
+    EXPECT_EQ(1, DataAirLoop::NumOASystems);
+    EXPECT_EQ("VAV WITH REHEAT_OA", thisOASys.Name);
+    // get HR HX generic
+    GetHeatRecoveryInput();
+    int ExchNum = 1;
+    auto &thisHX = HeatRecovery::ExchCond(ExchNum);
+    EXPECT_EQ(1, HeatRecovery::NumAirToAirGenericExchs);
+    EXPECT_EQ(thisHX.Name, "HEATRECOVERY HX GENERIC");
+    // initialize
+    DataSizing::CurSysNum = 1;
+    DataSizing::CurOASysNum = 1;
+    // check user-inputs
+    EXPECT_EQ(thisOAController.Econo, MixedAir::NoEconomizer);
+    EXPECT_EQ(thisOAController.Lockout, MixedAir::NoLockoutPossible); // no lockout
+    EXPECT_EQ(thisOAController.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
+    EXPECT_FALSE(thisOAController.EconBypass); // no bypass
+    EXPECT_FALSE(SizeHRHXtoMinFlow); // initialied to false
+    // test 1: Economizer Type = NoEconomizer 
+    SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
+    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum
+
+    // test 2: Economizer Type = DifferentialDryBulb but no bypass
+    thisOAController.Econo = MixedAir::DifferentialDryBulb;
+    SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
+    EXPECT_FALSE(SizeHRHXtoMinFlow); // sized to maximum OA 
+
+    // test 3: Economizer Type = DifferentialDryBulb and allow bypass
+    thisOAController.EconBypass = true; // allow bypass
+    SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
+    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum
+    ;
+    // test 4: Economizer Type = DifferentialDryBulb and no bypass
+    thisOAController.EconBypass = false; // no bypass
+    thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenWithinEconomizerLimits;
+    SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
+    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum
+}
+
+TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "  HeatExchanger:AirToAir:SensibleAndLatent,",
+        "    HeatRecovery HX Generic, !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
+        "    0.76,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
+        "    0.0,                     !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
+        "    0.81,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
+        "    0.0,                     !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
+        "    0.76,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
+        "    0.0,                     !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
+        "    0.81,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
+        "    0.0,                     !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
+        "    OA Inlet Node,           !- Supply Air Inlet Node Name",
+        "    HX Pri Air Outlet Node,  !- Supply Air Outlet Node Name",
+        "    Return Air Node,         !- Exhaust Air Inlet Node Name",
+        "    HX Sec Air Outlet Node,  !- Exhaust Air Outlet Node Name",
+        "    50.0,                    !- Nominal Electric Power {W}",
+        "    No,                      !- Supply Air Outlet Temperature Control",
+        "    Rotary,                  !- Heat Exchanger Type",
+        "    None,                    !- Frost Control Type",
+        "    1.7;                     !- Threshold Temperature {C}",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // get HR HX generic
+    GetHeatRecoveryInput();
+    int ExchNum = 1;
+    auto &thisHX = HeatRecovery::ExchCond(ExchNum);
+    // check inputs
+    EXPECT_EQ(thisHX.Name, "HEATRECOVERY HX GENERIC");
+    EXPECT_EQ(thisHX.NomSupAirVolFlow, DataSizing::AutoSize);
+
+    // set up sizing parameters
+    DataSizing::SysSizingRunDone = true;
+    DataSizing::ZoneSizingRunDone = true;
+    FinalSysSizing.allocate(1);
+
+    int OAContrllerNum = 1;
+    MixedAir::OAController.allocate(OAContrllerNum);
+    auto &thisOAController(MixedAir::OAController(OAContrllerNum));
+    // initialize OA controller
+    thisOAController.ControllerType_Num = MixedAir::ControllerOutsideAir;
+
+    int OASysNum = 1;
+    DataAirLoop::OutsideAirSys.allocate(OASysNum);
+    auto &thisOASys = DataAirLoop::OutsideAirSys(OASysNum);
+    thisOASys.OAControllerIndex = 1;
+
+    DataSizing::CurSysNum = 1;
+    DataSizing::CurOASysNum = 1;
+    FinalSysSizing(CurSysNum).DesMainVolFlow = 1.0;
+    FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.20;
+    DataSizing::CurDuctType = Main;
+
+    // test 1: the HX is in OA System, no economizer, no-bypass
+    thisOAController.Econo = MixedAir::NoEconomizer;
+    thisOAController.Lockout = MixedAir::NoLockoutPossible; // no lockout
+    thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum;
+    thisOAController.EconBypass = false; // economizer control action type, no bypass
+    // run HX sizing calculation
+    SizeHeatRecovery(ExchNum);
+    // check autosized nominal supply flow
+    EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
+
+    // test 2: the HX is on OA system but with economizer, and no-bypass
+    thisOAController.Econo = MixedAir::DifferentialDryBulb; // with economizer
+    thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
+    // run HX sizing calculation
+    SizeHeatRecovery(ExchNum);
+    // check autosized nominal supply flow
+    EXPECT_EQ(thisHX.NomSupAirVolFlow, 1.0); // maximum flow 
+
+    // test 3: the HX is on OA system, with economizer and lockout
+    thisOAController.Econo = MixedAir::DifferentialDryBulb;
+    thisOAController.Lockout = MixedAir::LockoutWithHeatingPossible; // lockout
+    thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
+    // run HX sizing calculation
+    SizeHeatRecovery(ExchNum);
+    // check autosized nominal supply flow
+    EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
+
+    // test 4: the HX is on OA system, with economizer and lockout
+    thisOAController.Econo = MixedAir::DifferentialDryBulb;
+    thisOAController.Lockout = MixedAir::LockoutWithCompressorPossible; // lockout
+    thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
+    // run HX sizing calculation
+    SizeHeatRecovery(ExchNum);
+    // check autosized nominal supply flow
+    EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
+    
+    // test 5: the HX is on OA system but with economizer and bypass
+    thisOAController.Econo = MixedAir::DifferentialDryBulb;
+    thisOAController.EconBypass = true; // with bypass
+    thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
+    // run HX sizing calculation
+    SizeHeatRecovery(ExchNum);
+    // check autosized nominal supply flow
+    EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
+
+    // test 6: the HX is on main air loop
+    thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
+    DataSizing::CurSysNum = 1;
+    DataSizing::CurOASysNum = 0;
+    // run HX sizing calculation
+    SizeHeatRecovery(ExchNum);
+    // check autosized nominal supply flow
+    EXPECT_EQ(thisHX.NomSupAirVolFlow, 1.0);
+}
+

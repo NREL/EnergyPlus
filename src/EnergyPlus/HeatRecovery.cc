@@ -5415,7 +5415,8 @@ namespace HeatRecovery {
             auto &thisOAController(MixedAir::OAController(thisOASys.OAControllerIndex));
             if (thisOAController.ControllerType_Num == MixedAir::ControllerOutsideAir) {
                 if (thisOAController.Econo == MixedAir::NoEconomizer || thisOAController.EconBypass ||
-                    thisOAController.Lockout != MixedAir::NoLockoutPossible ||
+                    thisOAController.Lockout == MixedAir::LockoutWithHeatingPossible ||
+                    thisOAController.Lockout == MixedAir::LockoutWithCompressorPossible ||
                     (thisOAController.Lockout == MixedAir::NoLockoutPossible &&
                      thisOAController.HeatRecoveryBypassControlType == DataHVACGlobals::BypassWhenWithinEconomizerLimits)) {
                     HXNominalFlowSizingFlag = true;

@@ -484,6 +484,7 @@ namespace DataSizing {
         DataCoilSizingFanCoolLoad = 0.0;
         DataCoilSizingCapFT = 1.0;
         DataDesAccountForFanHeat = true;
+        SizeHRHXtoMinFlow = false;
 
         NumZoneHVACSizing = 0;
         NumAirTerminalSizingSpec = 0;
