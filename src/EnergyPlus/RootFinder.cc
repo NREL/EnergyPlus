@@ -647,11 +647,10 @@ namespace RootFinder {
         //   tolerance for the X variables.
         // - the distance between the lower and upper bounds is smaller than the user-specified
         //   tolerance for the X variables. (USING brackets from previous iteration)
-        // BUG: Relaxed check to avoid detecting round-off in case 2 successive iterates are the same!
-        // IF ( CheckIncrementRoundOff( RootFinderData, X ) ) THEN
-        //  RootFinderData%StatusFlag = iStatusOKRoundOff
-        //  RETURN
-        // END IF
+        if (CheckIncrementRoundOff(RootFinderData, X)) {
+            RootFinderData.StatusFlag = iStatusOKRoundOff;
+            return;
+        }
         if (CheckBracketRoundOff(RootFinderData)) {
             RootFinderData.StatusFlag = iStatusOKRoundOff;
             RootFinderData.XCandidate = X;
@@ -1382,38 +1381,13 @@ namespace RootFinder {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
         //       DATE WRITTEN   February 2006
-        //       MODIFIED
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function checks whether the current iterate X satisfies the
         // round-off criterion or not.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         bool CheckIncrementRoundOff;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 DeltaX; // Increment in X since last iterate
         Real64 TolX;   // Tolerance to satisfy for X increment
         // FLOW:
@@ -1423,7 +1397,7 @@ namespace RootFinder {
         if (RootFinderData.CurrentPoint.DefinedFlag) {
             // TODO: Use typical value for X averaged over successive iterations
             TolX = RootFinderData.Controls.TolX * std::abs(X) + RootFinderData.Controls.ATolX;
-            DeltaX = X - RootFinderData.CurrentPoint.Y;
+            DeltaX = X - RootFinderData.CurrentPoint.X;
 
             if (std::abs(DeltaX) <= std::abs(TolX)) {
                 CheckIncrementRoundOff = true;
