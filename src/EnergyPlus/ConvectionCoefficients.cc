@@ -3831,19 +3831,19 @@ namespace ConvectionCoefficients {
         // 2.  ASHRAE Handbook of Fundamentals 1985, p. 23.2, Table 1.
 
 
-        //      +----------------------------------------+-----------+-----------------------------------------+-----------------+-------------+
-        //      |               Situation                | DeltaTemp |                 CosTilt                 | Convection Type | Coefficient |
-        //      +----------------------------------------+-----------+-----------------------------------------+-----------------+-------------+
-        //      | Vertical Surface                       | N/A       | -0.3827 to 0.3827 (67.5° to 112.5°)     | Normal          |       3.076 |
-        //      | Horizontal Surface, exterior face up   | Positive  | 0.9238 to 1.0 (0° to 22.5°)             | enhanced        |       4.043 |
-        //      | Horizontal Surface, exterior face down | Positive  | -0.9238 to -1.0 (157.5° to 180°)        | reduced         |       0.948 |
-        //      | Horizontal Surface, exterior face up   | Negative  | 0.9239 to 1.0 (0° to 22.5°)             | reduced         |       0.948 |
-        //      | Horizontal Surface, exterior face down | Negative  | -0.9239 to -1.0 (157.5° to 180°)        | enhanced        |       4.040 |
-        //      | Tilted Surface                         | Positive  | 0.3827 to 0.9239 (22.5° to 67.5°)       | enhanced        |       3.870 |
-        //      | Tilted Surface                         | Negative  | -0.3827 to -0.9239 (157.5° to 157.5°)   | enhanced        |       3.870 |
-        //      | Tilted Surface                         | Negative  | 0.3827 to 0.9239 (22.5° to 67.5°)       | reduced         |       2.281 |
-        //      | Tilted Surface                         | Positive  | -0.3827 to -0.9239 (157.5° to 157.5°)   | reduced         |       2.281 |
-        //      +----------------------------------------+-----------+-----------------------------------------+-----------------+-------------+
+        //      +---------------------+-----------+---------------------------------------------+------------------+-----------------+-------------+
+        //      |      Situation      | DeltaTemp |                   CosTilt                   | cos(tilt)*deltaT | Convection Type | Coefficient |
+        //      +---------------------+-----------+---------------------------------------------+------------------+-----------------+-------------+
+        //      | Vertical Surface    | N/A       | -0.3827 to 0.3827 (67.5 to 112.5 degrees)   | N/A              | Normal          |       3.076 |
+        //      | Horizontal Surface  | Positive  | 0.9238 to 1.0 (0 to 22.5 degrees)           | Positive         | Enhanced        |       4.043 |
+        //      | Horizontal Surface  | Positive  | -0.9238 to -1.0 (157.5 to 180 degrees)      | Negative         | Reduced         |       0.948 |
+        //      | Horizontal Surface  | Negative  | 0.9239 to 1.0 (0 to 22.5 degrees)           | Negative         | Reduced         |       0.948 |
+        //      | Horizontal Surface  | Negative  | -0.9239 to -1.0 (157.5 to 180 degrees)      | Positive         | Enhanced        |       4.040 |
+        //      | Tilted Surface      | Positive  | 0.3827 to 0.9239 (22.5 to 67.5 degrees)     | Positive         | Enhanced        |       3.870 |
+        //      | Tilted Surface      | Negative  | -0.3827 to -0.9239 (157.5 to 157.5 degrees) | Positive         | Enhanced        |       3.870 |
+        //      | Tilted Surface      | Negative  | 0.3827 to 0.9239 (22.5 to 67.5 degrees)     | Negative         | Reduced         |       2.281 |
+        //      | Tilted Surface      | Positive  | -0.3827 to -0.9239 (157.5 to 157.5 degrees) | Negative         | Reduced         |       2.281 |
+        //      +---------------------+-----------+---------------------------------------------+------------------+-----------------+-------------+
 
 
         // Set HConvIn using the proper correlation based on DeltaTemp and Cosine of the Tilt of the Surface
@@ -3851,12 +3851,12 @@ namespace ConvectionCoefficients {
             return 3.076;
         }
         else {
-            Real64 DeltaTemp = Tamb - Tsurf;
+            Real64 DeltaTempCosTilt = (Tamb - Tsurf)*cosTilt;
             if (std::abs(cosTilt) >= 0.9239) { // Horizontal Surface
-                if (DeltaTemp * cosTilt > 0.0){ //Enhanced Convection
+                if (DeltaTempCosTilt > 0.0){ //Enhanced Convection
                     return 4.040;
                 }
-                else if (DeltaTemp * cosTilt < 0.0){ // Reduced Convection
+                else if (DeltaTempCosTilt < 0.0){ // Reduced Convection
                     return 0.948;
                 }
                 else { // Zero DeltaTemp
@@ -3864,10 +3864,10 @@ namespace ConvectionCoefficients {
                 }
             }
             else { // tilted surface
-                if (DeltaTemp * cosTilt > 0.0){ // Enhanced Convection
+                if (DeltaTempCosTilt > 0.0){ // Enhanced Convection
                     return 3.870;
                 }
-                else if (DeltaTemp * cosTilt < 0.0){ // Reduced Convection
+                else if (DeltaTempCosTilt < 0.0){ // Reduced Convection
                     return 2.281;
                 }
                 else { // Zero DeltaTemp
