@@ -5418,7 +5418,7 @@ namespace HeatRecovery {
                     thisOAController.Lockout == MixedAir::LockoutWithHeatingPossible ||
                     thisOAController.Lockout == MixedAir::LockoutWithCompressorPossible ||
                     (thisOAController.Lockout == MixedAir::NoLockoutPossible &&
-                     thisOAController.HeatRecoveryBypassControlType == DataHVACGlobals::BypassWhenWithinEconomizerLimits)) {
+                     thisOAController.HeatRecoveryBypassControlType == DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum)) {
                     HXNominalFlowSizingFlag = true;
                 }
             }

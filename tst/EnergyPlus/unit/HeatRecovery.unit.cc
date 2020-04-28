@@ -4070,26 +4070,26 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalFlowSizingOptionsTest)
     EXPECT_EQ(thisOAController.Lockout, MixedAir::NoLockoutPossible); // no lockout
     EXPECT_EQ(thisOAController.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
     EXPECT_FALSE(thisOAController.EconBypass); // no bypass
-    EXPECT_FALSE(SizeHRHXtoMinFlow); // initialied to false
+    EXPECT_FALSE(SizeHRHXtoMinFlow); // initialized to false
     // test 1: Economizer Type = NoEconomizer 
     SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
-    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum
-
+    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum OA
+    ;
     // test 2: Economizer Type = DifferentialDryBulb but no bypass
     thisOAController.Econo = MixedAir::DifferentialDryBulb;
     SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
-    EXPECT_FALSE(SizeHRHXtoMinFlow); // sized to maximum OA 
-
+    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum OA 
+    ;
     // test 3: Economizer Type = DifferentialDryBulb and allow bypass
     thisOAController.EconBypass = true; // allow bypass
     SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
-    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum
+    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum OA
     ;
     // test 4: Economizer Type = DifferentialDryBulb and no bypass
     thisOAController.EconBypass = false; // no bypass
     thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenWithinEconomizerLimits;
     SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
-    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum
+    EXPECT_FALSE(SizeHRHXtoMinFlow); // sized to maximum OA
 }
 
 TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
@@ -4168,9 +4168,18 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     // run HX sizing calculation
     SizeHeatRecovery(ExchNum);
     // check autosized nominal supply flow
-    EXPECT_EQ(thisHX.NomSupAirVolFlow, 1.0); // maximum flow 
+    EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20); // minimum flow
+    ;
+    // test 3: the HX is on OA system but with economizer, and no-bypass
+    thisOAController.Econo = MixedAir::DifferentialDryBulb; // with economizer
+    thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenWithinEconomizerLimits;
+    thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
+    // run HX sizing calculation
+    SizeHeatRecovery(ExchNum);
+    // check autosized nominal supply flow
+    EXPECT_EQ(thisHX.NomSupAirVolFlow, 1.0); // maximum flow
 
-    // test 3: the HX is on OA system, with economizer and lockout
+    // test 4: the HX is on OA system, with economizer and lockout
     thisOAController.Econo = MixedAir::DifferentialDryBulb;
     thisOAController.Lockout = MixedAir::LockoutWithHeatingPossible; // lockout
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
@@ -4179,7 +4188,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     // check autosized nominal supply flow
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
 
-    // test 4: the HX is on OA system, with economizer and lockout
+    // test 5: the HX is on OA system, with economizer and lockout
     thisOAController.Econo = MixedAir::DifferentialDryBulb;
     thisOAController.Lockout = MixedAir::LockoutWithCompressorPossible; // lockout
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
@@ -4188,7 +4197,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     // check autosized nominal supply flow
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
     
-    // test 5: the HX is on OA system but with economizer and bypass
+    // test 6: the HX is on OA system but with economizer and bypass
     thisOAController.Econo = MixedAir::DifferentialDryBulb;
     thisOAController.EconBypass = true; // with bypass
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
@@ -4197,7 +4206,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     // check autosized nominal supply flow
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
 
-    // test 6: the HX is on main air loop
+    // test 7: the HX is on main air loop
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 0;
