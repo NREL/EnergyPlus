@@ -10699,7 +10699,7 @@ namespace SurfaceGeometry {
         return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
     }
 
-    void ProcessSurfaceVertices(OutputFiles &outputFiles
+    void ProcessSurfaceVertices(OutputFiles &outputFiles,
                                 int const ThisSurf, // Surface Number
                                 Real64  &thisXShift, // Base surface shift of X to Lower Left Corner
                                 Real64  &thisYShift, // Base surface shift of Y to Lower Left Corner
