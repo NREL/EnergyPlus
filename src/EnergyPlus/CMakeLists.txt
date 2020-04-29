@@ -772,6 +772,11 @@ if(LINK_WITH_PYTHON)
           )
   target_link_libraries( pythonwrapper ${PYTHON_LIBRARIES} )
   add_dependencies( energyplusapi pythonwrapper)
+  install( TARGETS pythonwrapper
+          RUNTIME DESTINATION ./
+          LIBRARY DESTINATION ./
+          ARCHIVE DESTINATION ./
+          )
 endif()
 
 # now the actual E+ executable

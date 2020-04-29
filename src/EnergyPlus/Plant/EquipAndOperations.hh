@@ -148,8 +148,8 @@ namespace DataPlant {
 
         // Default Constructor
         OperationData()
-            : OpSchemeType(0), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0), ErlSimProgramMngr(0),
-              ErlInitProgramMngr(0), EMSIntVarLoopDemandRate(0.0), MyEnvrnFlag(true)
+            : OpSchemeType(0), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0), ReferenceNodeNumber(0),
+              ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1), EMSIntVarLoopDemandRate(0.0), MyEnvrnFlag(true)
         {
         }
     };
