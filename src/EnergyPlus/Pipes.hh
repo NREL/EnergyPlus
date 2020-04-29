@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -72,9 +73,6 @@ namespace Pipes {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumLocalPipes;
-    extern bool GetPipeInputFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
@@ -107,10 +105,10 @@ namespace Pipes {
         }
 
     public:
-        static PlantComponent *factory(int objectType, std::string objectName);
+        static PlantComponent *factory(PipesData &pipes, int objectType, std::string objectName);
 
     public:
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(states), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
     };
 
     // Object Data
@@ -119,7 +117,7 @@ namespace Pipes {
     // Functions
     void clear_state();
 
-    void GetPipeInput();
+    void GetPipeInput(PipesData &pipes);
 
 } // namespace Pipes
 

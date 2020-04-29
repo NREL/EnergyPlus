@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -205,15 +206,15 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ProcessScheduleInput(outputFiles());
 
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // read project control data
+    GetProjectControlData(outputFiles(), ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneData(ErrorsFound);
-    GetZoneEquipmentData();
+    GetZoneEquipmentData(state);
 
-    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
+    GetMaterialData(outputFiles(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
@@ -230,7 +231,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(outputFiles(), ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     DataEnvironment::OutDryBulbTemp = 20.0;
