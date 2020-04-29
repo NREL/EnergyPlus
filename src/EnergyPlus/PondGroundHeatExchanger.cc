@@ -389,9 +389,9 @@ namespace PondGroundHeatExchanger {
         // repeated warm up days tend to drive the initial pond temperature toward the drybulb temperature
         // For each environment start the pond midway between drybulb and ground temp.
 
-        if (setupOutputVarsFlag) {
+        if (this->setupOutputVarsFlag) {
             this->setupOutputVars();
-            setupOutputVarsFlag = false;
+            this->setupOutputVarsFlag = false;
         }
 
         if (this->OneTimeFlag || DataGlobals::WarmupFlag) {
@@ -443,16 +443,16 @@ namespace PondGroundHeatExchanger {
             this->MyFlag = false;
         }
 
-        // check if we are in very first call for this zone time step
-        if (DataGlobals::BeginTimeStepFlag && FirstHVACIteration &&
-            DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 1) { // DSU
+        Real64 currentSimTime = (DataGlobals::DayOfSim - 1) * 24 + DataGlobals::HourOfDay - 1 + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        if (FirstHVACIteration && (currentSimTime > (this->prevSimTime + DataHVACGlobals::TimeStepSys))) {
             // update past temperature
+            this->prevSimTime = currentSimTime;
             this->PastBulkTemperature = this->BulkTemperature;
         }
 
         this->InletTemp = DataLoopNode::Node(InletNodeNum).Temp;
-        OutletTemp = DataLoopNode::Node(OutletNodeNum).Temp;
-        PondTemp = this->BulkTemperature;
+        this->OutletTemp = DataLoopNode::Node(OutletNodeNum).Temp;
+        this->PondTemp = this->BulkTemperature;
 
         // Hypothetical design flow rate
         Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(
@@ -503,7 +503,7 @@ namespace PondGroundHeatExchanger {
         Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater,
                                                                      max(this->PondTemp, DataPrecisionGlobals::constant_zero),
                                                                      this->WaterIndex,
-                                                                     RoutineName); // DSU bug fix here, was using working fluid index
+                                                                     RoutineName);
 
         Real64 Flux = this->CalcTotalFLux(this->PondTemp);
         Real64 PondTempStar =
@@ -627,7 +627,7 @@ namespace PondGroundHeatExchanger {
         Real64 Perimeter = 4.0 * std::sqrt(this->Area); // pond perimeter -- square assumption
 
         // ground heat transfer coefficient
-        Real64 UvalueGround = 0.999 * (GrndConductivity / this->Depth) + 1.37 * (GrndConductivity * Perimeter / this->Area);
+        Real64 UvalueGround = 0.999 * (this->GrndConductivity / this->Depth) + 1.37 * (this->GrndConductivity * Perimeter / this->Area);
 
         // ground heat transfer flux
         Real64 FluxGround = UvalueGround * (PondBulkTemp - DataEnvironment::GroundTemp_Deep);
@@ -749,7 +749,7 @@ namespace PondGroundHeatExchanger {
             DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobals::Pi * Viscosity * TubeInDiameter * NumCircuits);
+        Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobals::Pi * Viscosity * this->TubeInDiameter * this->NumCircuits);
 
         Real64 PrantlNum = Viscosity * SpecificHeat / Conductivity;
 
@@ -763,7 +763,7 @@ namespace PondGroundHeatExchanger {
         }
 
         // inside convection resistance, from Nu
-        Real64 ConvCoefIn = Conductivity * NusseltNum / TubeInDiameter;
+        Real64 ConvCoefIn = Conductivity * NusseltNum / this->TubeInDiameter;
 
         // now find properties of pond water - always assume pond fluid is water
         Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
@@ -776,7 +776,7 @@ namespace PondGroundHeatExchanger {
         // The following code includes some slight modifications from Simon's original code.
         // It guarantees that the delta T is 10C and also avoids the problems associated with
         // water hitting a maximum density at around 4C. (RKS)
-        Real64 ExpansionCoef = -(FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) + 5.0, WaterIndex, CalledFrom) -
+        Real64 ExpansionCoef = -(FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) + 5.0, this->WaterIndex, CalledFrom) -
                                  FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) - 5.0, this->WaterIndex, CalledFrom)) /
                                (10.0 * WaterDensity);
 
@@ -790,13 +790,13 @@ namespace PondGroundHeatExchanger {
         NusseltNum = pow_2(0.6 + (0.387 * std::pow(RayleighNum, 1.0 / 6.0) / (std::pow(1.0 + 0.559 / std::pow(PrantlNum, 9.0 / 16.0), 8.0 / 27.0))));
 
         // outside convection resistance, from Nu
-        Real64 ConvCoefOut = WaterConductivity * NusseltNum / TubeOutDiameter;
+        Real64 ConvCoefOut = WaterConductivity * NusseltNum / this->TubeOutDiameter;
 
         // conduction resistance of pipe
-        Real64 PipeResistance = TubeInDiameter / TubeConductivity * std::log(TubeOutDiameter / TubeInDiameter);
+        Real64 PipeResistance = this->TubeInDiameter / this->TubeConductivity * std::log(this->TubeOutDiameter / this->TubeInDiameter);
 
         // total pipe thermal resistance - conduction and convection
-        Real64 TotalResistance = PipeResistance + 1.0 / ConvCoefIn + TubeInDiameter / (TubeOutDiameter * ConvCoefOut);
+        Real64 TotalResistance = PipeResistance + 1.0 / ConvCoefIn + this->TubeInDiameter / (this->TubeOutDiameter * ConvCoefOut);
 
         // Calculate the NTU parameter
         // NTU = UA/[(Mdot*Cp)min] = A/[Rtot*(Mdot*Cp)min]
@@ -808,7 +808,7 @@ namespace PondGroundHeatExchanger {
         if (massFlowRate == 0.0) {
             CalcEffectiveness = 1.0;
         } else {
-            NTU = DataGlobals::Pi * TubeInDiameter * this->CircuitLength * NumCircuits / (TotalResistance * massFlowRate * SpecificHeat);
+            NTU = DataGlobals::Pi * TubeInDiameter * this->CircuitLength * this->NumCircuits / (TotalResistance * massFlowRate * SpecificHeat);
             // Calculate effectiveness - formula for static fluid
             CalcEffectiveness = (1.0 - std::exp(-NTU));
         }
@@ -869,7 +869,7 @@ namespace PondGroundHeatExchanger {
         }
 
         // keep track of the bulk temperature
-        this->BulkTemperature = PondTemp;
+        this->BulkTemperature = this->PondTemp;
     }
 
     //==============================================================================
