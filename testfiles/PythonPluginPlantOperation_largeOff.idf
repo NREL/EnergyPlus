@@ -7819,7 +7819,7 @@
     Tower_dispatch,             !- Name
     Yes,                                    !- Run During Warmup Days
     PythonPluginPlantOperation_largeOff,    !- Python Module Name
-    DispatchAlgs;                           !- Plugin Class Name
+    Tower_dispatch_Values;                  !- Plugin Class Name
 
 !  EnergyManagementSystem:Program,
 !    Tower_dispatch_Values,   !- Name

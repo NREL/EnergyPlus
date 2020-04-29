@@ -1,7 +1,7 @@
 from pyenergyplus.plugin import EnergyPlusPlugin
 
 
-class DispatchAlgs(EnergyPlusPlugin):
+class Tower_dispatch_Values(EnergyPlusPlugin):
 
     def __init__(self):
         # init parent class
