@@ -53,6 +53,7 @@
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -91,7 +92,7 @@ struct CoilCoolingDX
                             std::vector<Real64> &normalModeFlowRates,
                             std::vector<Real64> &normalModeRatedCapacities);
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
-    void size();
+    void size(EnergyPlusData &state);
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;

@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -175,7 +176,7 @@ namespace DataSystemVariables {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void processEnvironmentVariables();
+    void processEnvironmentVariables(DataGlobal const &dataGlobals);
 
 } // namespace DataSystemVariables
 

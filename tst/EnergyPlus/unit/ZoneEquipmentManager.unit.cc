@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -125,9 +126,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     bool ErrorsFound = false;
     GetZoneData(ErrorsFound);
     AllocateHeatBalArrays();
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -381,7 +382,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     GetZoneData(ErrorsFound);
     DataHeatBalFanSys::ZoneReOrder.allocate(NumOfZones);
 
-    GetSimpleAirModelInputs(outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -419,7 +420,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
 
     InitSimpleMixingConvectiveHeatGains();
 
-    CalcAirFlowSimple(2);
+    CalcAirFlowSimple(state, 2);
 
     EXPECT_NEAR(720.738493, DataHeatBalFanSys::MCPM(1), 0.00001);
     EXPECT_NEAR(119.818784, DataHeatBalFanSys::MCPM(2), 0.00001);
@@ -511,9 +512,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     bool ErrorsFound = false;
     GetZoneData(ErrorsFound);
     AllocateHeatBalArrays();
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
 
     int ZoneNum = 1;
     for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -647,9 +648,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     bool ErrorsFound = false;
     GetZoneData(ErrorsFound);
     AllocateHeatBalArrays();
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -749,9 +750,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     bool ErrorsFound = false;
     GetZoneData(ErrorsFound);
     AllocateHeatBalArrays();
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
 
     int ZoneNum = 1;
     for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -944,7 +945,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     bool ErrorsFound = false;
     GetZoneData(ErrorsFound);
     AllocateHeatBalArrays();
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1121,7 +1122,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     bool ErrorsFound = false;
     GetZoneData(ErrorsFound);
     AllocateHeatBalArrays();
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1309,7 +1310,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     bool ErrorsFound = false;
     GetZoneData(ErrorsFound);
     AllocateHeatBalArrays();
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1529,7 +1530,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     bool ErrorsFound = false;
     GetZoneData(ErrorsFound);
     AllocateHeatBalArrays();
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1857,7 +1858,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     bool ErrorsFound = false;
     GetZoneData(ErrorsFound);
     AllocateHeatBalArrays();
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -2085,7 +2086,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     bool ErrorsFound = false;
     GetZoneData(ErrorsFound);
     AllocateHeatBalArrays();
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);

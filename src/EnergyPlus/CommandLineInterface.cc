@@ -59,6 +59,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -82,7 +83,7 @@ namespace CommandLineInterface {
     using namespace SolarShading;
     using namespace ez;
 
-    int ProcessArgs(int argc, const char *argv[])
+    int ProcessArgs(EnergyPlusData &state, int argc, const char *argv[])
     {
         typedef std::string::size_type size_type;
 
@@ -199,7 +200,7 @@ namespace CommandLineInterface {
 
         DDOnlySimulation = opt.isSet("-D");
 
-        AnnualSimulation = opt.isSet("-a");
+        state.dataGlobals.AnnualSimulation = opt.isSet("-a");
 
         outputEpJSONConversion = opt.isSet("-c");
 
@@ -511,7 +512,7 @@ namespace CommandLineInterface {
         }
 
         // Error for cases where both design-day and annual simulation switches are set
-        if (DDOnlySimulation && AnnualSimulation) {
+        if (DDOnlySimulation && state.dataGlobals.AnnualSimulation) {
             DisplayString("ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
             DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);

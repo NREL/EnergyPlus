@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -1075,7 +1076,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(outputFiles(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -1084,7 +1085,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(outputFiles(), Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -1096,7 +1097,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        DataGlobals::DayOfSimChr = "0";
+        state.dataGlobals.DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
@@ -1136,7 +1137,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance(outputFiles());
+                    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -2166,7 +2167,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(outputFiles(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -2175,7 +2176,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(outputFiles(), Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -2187,7 +2188,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        DataGlobals::DayOfSimChr = "0";
+        state.dataGlobals.DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
@@ -2227,7 +2228,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance(outputFiles());
+                    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
