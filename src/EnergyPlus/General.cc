@@ -2302,9 +2302,6 @@ namespace General {
             ActualTimeMinS = 0;
         }
         const auto TimeStmpS = format("{:02}:{:02}", ActualTimeHrS, ActualTimeMinS);
-//        auto minutes = std::nextafter((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin, std::numeric_limits<Real64>::infinity());
-       // auto minutes = std::round(((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin) * 10000000) / 10000000;
-//        auto minutes = std::nextafter((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin, std::numeric_limits<Real64>::infinity());
         auto minutes = ((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin);
 
         auto TimeStmpE = format(

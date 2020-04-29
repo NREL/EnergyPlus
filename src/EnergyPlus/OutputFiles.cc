@@ -305,10 +305,16 @@ public:
                 return write_string(str);
             } else if (specs()->type == 'N') {
                 // matches Fortran's 'G' format
-
+                if (specs()->precision == -1) {
+                    specs()->precision = 14;
+                }
                 if (should_be_fixed_output(value) && specs()->width == 0) {
+                    specs()->width = 16;
+//                    specs()->precision = 14;
                     specs()->type = 'F';
-                    return (*this)(value);
+                    auto str = write_to_string(value, *specs());
+                    strip(str);
+                    return write_string(str);
                 } else if (should_be_fixed_output(value) && fixed_will_fit(value, specs()->width - 5)) {
                     specs()->type = 'F';
 
