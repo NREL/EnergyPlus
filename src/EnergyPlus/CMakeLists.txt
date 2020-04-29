@@ -83,6 +83,7 @@ SET( SRC
   DXCoils.hh
   DXFEarClipping.cc
   DXFEarClipping.hh
+  Data/EnergyPlusData.hh
   DataAirLoop.cc
   DataAirLoop.hh
   DataAirSystems.cc
@@ -568,6 +569,8 @@ SET( SRC
   TARCOGParams.hh
   TarcogShading.cc
   TarcogShading.hh
+  TempSolveRoot.cc
+  TempSolveRoot.hh
   ThermalChimney.cc
   ThermalChimney.hh
   ThermalComfort.cc

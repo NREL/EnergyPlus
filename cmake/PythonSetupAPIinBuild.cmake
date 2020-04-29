@@ -1,6 +1,8 @@
 # Sets up the pyenergyplus Python package, which is the EnergyPlus Python API wrapper, in the build tree, next to E+
 # set REPO_ROOT, EXECUTABLE_PATH (path to energyplus.exe), and E+ and API major/minor/etc version variables when calling
 
+message("Full executable path is: ${EXECUTABLE_PATH}")
+
 # get the parent path of the current EXE and drop the pyenergyplus stuff in there
 get_filename_component(EPLUS_EXE_DIR ${EXECUTABLE_PATH} DIRECTORY)
 

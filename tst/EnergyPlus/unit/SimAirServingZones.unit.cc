@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -466,7 +467,7 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimAirServingZones::GetAirPathData();
+    SimAirServingZones::GetAirPathData(state);
 
     // 2 controllers on this AHU for 2 water coils on the branch
     // CanBeLockedOutByEcono should be false for both controller in this test
@@ -626,7 +627,7 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimAirServingZones::GetAirPathData();
+    SimAirServingZones::GetAirPathData(state);
 
     // 2 controllers on this AHU for 2 water coils in the OA system
     // CanBeLockedOutByEcono should be false for the heating coil controller #1 in this test
@@ -781,21 +782,21 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SingleDuct::GetSysInput();
+    SingleDuct::GetSysInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SplitterComponent::GetSplitterInput();
     EXPECT_TRUE(compare_err_stream(""));
-    SimAirServingZones::GetAirPathData();
+    SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(true);
+    SimAirServingZones::InitAirLoops(state, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
@@ -1013,21 +1014,21 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SingleDuct::GetSysInput();
+    SingleDuct::GetSysInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SplitterComponent::GetSplitterInput();
     EXPECT_TRUE(compare_err_stream(""));
-    SimAirServingZones::GetAirPathData();
+    SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(true);
+    SimAirServingZones::InitAirLoops(state, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
@@ -1278,21 +1279,21 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SingleDuct::GetSysInput();
+    SingleDuct::GetSysInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SplitterComponent::GetSplitterInput();
     EXPECT_TRUE(compare_err_stream(""));
-    SimAirServingZones::GetAirPathData();
+    SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(true);
+    SimAirServingZones::InitAirLoops(state, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
@@ -1544,21 +1545,21 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SingleDuct::GetSysInput();
+    SingleDuct::GetSysInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SplitterComponent::GetSplitterInput();
     EXPECT_TRUE(compare_err_stream(""));
-    SimAirServingZones::GetAirPathData();
+    SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(true);
+    SimAirServingZones::InitAirLoops(state, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
