@@ -7741,17 +7741,23 @@
     Chiller:Electric:ReformulatedEIR,  !- Equipment 2 Object Type
     CoolSys1 Chiller 2;      !- Equipment 2 Name
 
-  EnergyManagementSystem:ProgramCallingManager,
-    Init_Chiller_Capacity,   !- Name
-    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-    Init_Chiller_Capacity_Values;  !- Program Name 1
+ ! EnergyManagementSystem:ProgramCallingManager,
+ !   Init_Chiller_Capacity,         !- Name
+ !   UserDefinedComponentModel,     !- EnergyPlus Model Calling Point
+ !   Init_Chiller_Capacity_Values;  !- Program Name 1
 
-  EnergyManagementSystem:Program,
-    Init_Chiller_Capacity_Values,  !- Name
-    Set totChilCap = Chil1_Cap + Chil2_Cap;  !- Program Line 1
+  PythonPlugin:Instance,
+    Init_Chiller_Capacity,                  !- Name
+    Yes,                                    !- Run During Warmup Days
+    PythonPluginPlantOperation_largeOff,    !- Python Module Name
+    Init_Chiller_Capacity_Values;           !- Plugin Class Name
 
-  EnergyManagementSystem:GlobalVariable,
-    totChilCap;              !- Erl Variable 1 Name
+!  EnergyManagementSystem:Program,
+!    Init_Chiller_Capacity_Values,  !- Name
+!    Set totChilCap = Chil1_Cap + Chil2_Cap;  !- Program Line 1
+
+!  EnergyManagementSystem:GlobalVariable,
+!    totChilCap;              !- Erl Variable 1 Name
 
 !  EnergyManagementSystem:ProgramCallingManager,
 !    Cooling_dispatch,        !- Name
@@ -7776,20 +7782,20 @@
     SET Chil2_Disptch = 0.0, !- <none>
     ENDIF;                   !- <none>
 
-  EnergyManagementSystem:InternalVariable,
-    CoolSys1_LoopDmnd,       !- Name
+!  EnergyManagementSystem:InternalVariable,
+!    CoolSys1_LoopDmnd,       !- Name
     CoolSys1 Operation Scheme,  !- Internal Data Index Key Name
     Supply Side Current Demand Rate;  !- Internal Data Type
 
-  EnergyManagementSystem:InternalVariable,
-    Chil1_Cap,               !- Name
-    CoolSys1 Chiller 1,      !- Internal Data Index Key Name
-    Chiller Nominal Capacity;!- Internal Data Type
+!  EnergyManagementSystem:InternalVariable,
+!    Chil1_Cap,               !- Name
+!    CoolSys1 Chiller 1,      !- Internal Data Index Key Name
+!    Chiller Nominal Capacity;!- Internal Data Type
 
-  EnergyManagementSystem:InternalVariable,
-    Chil2_Cap,               !- Name
-    CoolSys1 Chiller 2,      !- Internal Data Index Key Name
-    Chiller Nominal Capacity;!- Internal Data Type
+!  EnergyManagementSystem:InternalVariable,
+!    Chil2_Cap,               !- Name
+!    CoolSys1 Chiller 2,      !- Internal Data Index Key Name
+!    Chiller Nominal Capacity;!- Internal Data Type
 
   EnergyManagementSystem:Actuator,
     Chil1_Disptch,           !- Name
