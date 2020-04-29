@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -693,7 +694,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     bool Available{false};
     bool ErrorsFound{false};
-    ASSERT_THROW(WeatherManager::GetNextEnvironment(outputFiles(), Available, ErrorsFound), std::runtime_error);
+    ASSERT_THROW(WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound), std::runtime_error);
     ASSERT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({

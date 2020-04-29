@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
@@ -233,9 +234,9 @@ public: // methods
                   Real64 const controlSOCMaxFracLimit,
                   Real64 const controlSOCMinFracLimit);
 
-    void calcAndReportSimpleBucketModel();
+    //void calcAndReportSimpleBucketModel();
 
-    void calcAndReportKineticBatteryModel();
+    //void calcAndReportKineticBatteryModel();
 
     void reinitAtBeginEnvironment();
 
@@ -480,7 +481,7 @@ public: // Method
                         std::string const &availSchedName,
                         Real64 const thermalToElectRatio);
 
-    void simGeneratorGetPowerOutput(bool const runFlag,             // true if generator is on
+    void simGeneratorGetPowerOutput(EnergyPlusData &state, bool const runFlag,             // true if generator is on
                                     Real64 const myElecLoadRequest, // target electric power production request
                                     bool const FirstHVACIteration,  //
                                     Real64 &electricPowerOutput,    // Actual generator electric power output
@@ -543,7 +544,7 @@ public: // Methods
     // Constructor
     ElectPowerLoadCenter(int const objectNum);
 
-    void manageElecLoadCenter(bool const firstHVACIteration, Real64 &remainingPowerDemand);
+    void manageElecLoadCenter(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
     void setupLoadCenterMeterIndices();
 
@@ -558,7 +559,7 @@ public: // Methods
     void updateLoadCenterGeneratorRecords();
 
 private: // Methods
-    void dispatchGenerators(bool const firstHVACIteration, Real64 &remainingPowerDemand);
+    void dispatchGenerators(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
     void dispatchStorage(Real64 const remainingPowerDemand);
 
@@ -689,7 +690,7 @@ public: // Methods
     {
     }
 
-    void manageElectricPowerService(bool const FirstHVACIteration,
+    void manageElectricPowerService(EnergyPlusData &state, bool const FirstHVACIteration,
                                     bool &SimElecCircuits,      // simulation convergence flag
                                     bool const UpdateMetersOnly // if true then don't resimulate generators, just update meters.
     );

@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -226,7 +227,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     NumOfGlycols = 1;
 
     createCoilSelectionReportObj();
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
 
     EXPECT_DOUBLE_EQ(0.00159, WaterCoil(CoilNum).DesAirVolFlowRate);
     // Check that all Data* variables have been reset
@@ -257,7 +258,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     WaterCoil(CoilNum).DesOutletAirHumRat = AutoSize;
     WaterCoil(CoilNum).MaxWaterVolFlowRate = AutoSize;
 
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
 
     EXPECT_DOUBLE_EQ(0.00259, WaterCoil(CoilNum).DesAirVolFlowRate);
     EXPECT_EQ(0, DataPltSizCoolNum);
@@ -292,7 +293,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     WaterCoil(CoilNum).DesOutletAirHumRat = AutoSize;
     WaterCoil(CoilNum).MaxWaterVolFlowRate = AutoSize;
 
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
 
     EXPECT_DOUBLE_EQ(0.00359, WaterCoil(CoilNum).DesAirVolFlowRate);
     EXPECT_EQ(0, DataPltSizCoolNum);
@@ -323,7 +324,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     WaterCoil(CoilNum).DesOutletAirHumRat = AutoSize;
     WaterCoil(CoilNum).MaxWaterVolFlowRate = AutoSize;
 
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
 
     EXPECT_DOUBLE_EQ(0.00459, WaterCoil(CoilNum).DesAirVolFlowRate);
     EXPECT_EQ(0, DataPltSizCoolNum);
@@ -374,7 +375,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     WaterCoil(CoilNum).DesOutletAirHumRat = AutoSize;
     WaterCoil(CoilNum).MaxWaterVolFlowRate = AutoSize;
 
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
     EXPECT_NEAR(WaterCoil(CoilNum).InletAirTemp, 16.0, 0.0001); // a mixture of zone air (20 C) and 10% OA (-20 C) = 16 C
     EXPECT_NEAR(WaterCoil(CoilNum).DesTotWaterCoilLoad, 1709.8638, 0.0001);
     EXPECT_NEAR(WaterCoil(CoilNum).UACoil, 51.2456, 0.0001);
@@ -469,7 +470,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
 
     // run water coil sizing
     createCoilSelectionReportObj();
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
     EXPECT_DOUBLE_EQ(1.0, WaterCoil(CoilNum).DesAirVolFlowRate);
 
     Real64 CpAirStd = 0.0;
@@ -539,7 +540,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
 
     MySizeFlag(1) = true;
     // run water coil sizing
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
 
     // check coil UA-value sizing
     EXPECT_NEAR(577.686, WaterCoil(CoilNum).UACoil, 0.01); // smaller UA than result above at 1435.00
@@ -621,7 +622,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
 
     // run water coil sizing
     createCoilSelectionReportObj();
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
     EXPECT_DOUBLE_EQ(1.0, WaterCoil(CoilNum).DesAirVolFlowRate);
 
     Real64 CpAirStd = 0.0;
@@ -692,7 +693,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
 
     MySizeFlag(1) = true;
     // run water coil sizing
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
 
     // water flow rate should be non-zero, and air flow rate being so small will get set to 0 during sizing
     EXPECT_GT(WaterCoil(CoilNum).InletWaterMassFlowRate, 0.0);
@@ -778,7 +779,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
 
     // run water coil sizing
     createCoilSelectionReportObj();
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
     EXPECT_DOUBLE_EQ(1.0, WaterCoil(CoilNum).DesAirVolFlowRate);
 
     Real64 CpAirStd = 0.0;
@@ -891,7 +892,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
 
     // run water coil sizing
     createCoilSelectionReportObj();
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
     EXPECT_DOUBLE_EQ(1.0, WaterCoil(CoilNum).DesAirVolFlowRate);
 
     Real64 DesCoilCoolingLoad = 0.0;
@@ -1007,7 +1008,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
 
     // run water coil sizing
     createCoilSelectionReportObj();
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
     EXPECT_DOUBLE_EQ(1.0, WaterCoil(CoilNum).DesAirVolFlowRate);
 
     Real64 DesCoilCoolingLoad = 0.0;
@@ -1103,7 +1104,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
 
     // run water coil sizing
     createCoilSelectionReportObj();
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
     EXPECT_DOUBLE_EQ(1.0, WaterCoil(CoilNum).DesAirVolFlowRate);
 
     Real64 CpAirStd = 0.0;
@@ -1204,7 +1205,7 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
     MySizeFlag(1) = true;
 
     // run water coil sizing
-    SizeWaterCoil(CoilNum);
+    SizeWaterCoil(state, CoilNum);
     EXPECT_DOUBLE_EQ(1.0, WaterCoil(CoilNum).DesAirVolFlowRate);
 
     Real64 CpAirStd(0.0);

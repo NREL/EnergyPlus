@@ -69,6 +69,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
@@ -202,7 +203,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
 
-    HeatBalanceManager::ManageHeatBalance(outputFiles());
+    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
 
     // This test will emulate NFRC 100 U-factor test
     int winNum;
@@ -436,7 +437,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
     HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
-    HeatBalanceManager::GetBuildingData(ErrorsFound);
+    HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
     Psychrometrics::InitializePsychRoutines();
 
@@ -2660,7 +2661,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
     HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
-    HeatBalanceManager::GetBuildingData(ErrorsFound);
+    HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
 

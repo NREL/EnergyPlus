@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -171,7 +172,7 @@ namespace SteamBaseboardRadiator {
 
     // Functions
 
-    void SimSteamBaseboard(std::string const &EquipName,
+    void SimSteamBaseboard(EnergyPlusData &state, std::string const &EquipName,
                            int const ActualZoneNum,
                            int const ControlledZoneNum,
                            bool const FirstHVACIteration,
@@ -180,9 +181,9 @@ namespace SteamBaseboardRadiator {
 
     void GetSteamBaseboardInput();
 
-    void InitSteamBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
-    void SizeSteamBaseboard(int const BaseboardNum);
+    void SizeSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
     void CalcSteamBaseboard(int &BaseboardNum, Real64 &LoadMet);
 
