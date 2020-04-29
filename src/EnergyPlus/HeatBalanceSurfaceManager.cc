@@ -5796,11 +5796,11 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneIZSurfList(Zone(ZoneToResimulate).ZoneIZSurfaceList);
             auto const &zoneHTNonWindowSurfList(Zone(ZoneToResimulate).ZoneHTNonWindowSurfaceList);
             auto const &zoneHTWindowSurfList(Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
-            if (AllCTF) {
-                CalcHeatBalanceInsideSurf2CTFOnly(ZoneToResimulate, ZoneToResimulate, zoneIZSurfList, ZoneToResimulate);
-            } else {
+            //if (AllCTF) {
+            //    CalcHeatBalanceInsideSurf2CTFOnly(ZoneToResimulate, ZoneToResimulate, zoneIZSurfList, ZoneToResimulate);
+            //} else {
                 CalcHeatBalanceInsideSurf2(zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
-            }
+            //}
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
                 ZoneWinHeatGainRep(ZoneToResimulate) = ZoneWinHeatGain(ZoneToResimulate);
