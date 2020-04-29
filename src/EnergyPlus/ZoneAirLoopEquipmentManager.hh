@@ -53,26 +53,16 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
 namespace ZoneAirLoopEquipmentManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ZoneAirLoopEquipmentManager
-
     // Functions
     void clear_state();
 
-    void ManageZoneAirLoopEquipment(std::string const &ZoneAirLoopEquipName,
+    void ManageZoneAirLoopEquipment(EnergyPlusData &state, std::string const &ZoneAirLoopEquipName,
                                     bool const FirstHVACIteration,
                                     Real64 &SysOutputProvided,
                                     Real64 &NonAirSysOutput,
@@ -87,20 +77,13 @@ namespace ZoneAirLoopEquipmentManager {
 
     void InitZoneAirLoopEquipmentTimeStep(int const AirDistUnitNum);
 
-    void SimZoneAirLoopEquipment(int const AirDistUnitNum,
+    void SimZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum,
                                  Real64 &SysOutputProvided,
                                  Real64 &NonAirSysOutput,
                                  Real64 &LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative
                                  bool const FirstHVACIteration,
                                  int const ControlledZoneNum,
                                  int const ActualZoneNum);
-
-    void UpdateZoneAirLoopEquipment();
-
-    // void
-    // ReportZoneAirLoopEquipment(
-    // 	int const AirDistUnitNum
-    // );
 
 } // namespace ZoneAirLoopEquipmentManager
 

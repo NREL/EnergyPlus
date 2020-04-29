@@ -62,11 +62,12 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -195,7 +196,7 @@ namespace PlantCentralGSHP {
         SizFac = 1.0;
     }
 
-    void WrapperSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+    void WrapperSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
     {
         if (calledFromLocation.loopNum != this->GLHELoopNum) {
 
@@ -2037,9 +2038,20 @@ namespace PlantCentralGSHP {
                 ChillerEIRFT =
                     max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
                 ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
-                CHPower = (AvailChillerCap / ReferenceCOP) * ChillerEIRFPLR * ChillerEIRFT * FRAC;
+
+                if (ReferenceCOP <= 0.0) {
+                    CHPower = 0.0;
+                } else {
+                    CHPower = (AvailChillerCap / ReferenceCOP) * ChillerEIRFPLR * ChillerEIRFT * FRAC;
+                }
+
                 QCondenser = CHPower * this->ChillerHeater(ChillerHeaterNum).OpenMotorEff + QEvaporator + ChillerFalseLoadRate;
-                ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+
+                if (CHPower == 0.0) {
+                    ActualCOP = 0.0;
+                } else {
+                    ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+                }
 
                 if (CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                     Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
@@ -2487,7 +2499,13 @@ namespace PlantCentralGSHP {
                         max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
                     ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
                     CHPower = (AvailChillerCap / ReferenceCOP) * ChillerEIRFPLR * ChillerEIRFT * FRAC;
-                    ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+
+                    if (CHPower <= 0.0) {
+                        ActualCOP = 0.0;
+                    } else {
+                        ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+                    }
+
                     QCondenser = CHPower * this->ChillerHeater(ChillerHeaterNum).OpenMotorEff + QEvaporator + ChillerFalseLoadRate;
 
                     // Determine heating load for this heater and pass the remaining load to the next chiller heater

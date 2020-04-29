@@ -1,17 +1,17 @@
 
 # to get the list of input files, go to the root of the document folder, and:
-# grep -r '\\input{' * | cut -d ':' -f 2 | cut -c 8- | rev | cut -c 2- | rev | sed 's|^|  ${CMAKE_SOURCE_DIR}/doc/acknowledgments/|g' | sed 's/$/.tex/g'
+# grep -r '\\input{' * | cut -d ':' -f 2 | cut -c 8- | rev | cut -c 2- | rev | sed 's|^|  ${PROJECT_SOURCE_DIR}/acknowledgments/|g' | sed 's/$/.tex/g'
 SET( INCLUDED_TEX
-  ${CMAKE_SOURCE_DIR}/doc/title.tex
-  ${CMAKE_SOURCE_DIR}/doc/using-energyplus-for-compliance/using-energyplus-for-compliance.tex
-  ${CMAKE_SOURCE_DIR}/doc/header.tex
-  ${CMAKE_SOURCE_DIR}/doc/using-energyplus-for-compliance/src/using-energyplus-for-compliance.tex
-  ${CMAKE_SOURCE_DIR}/doc/using-energyplus-for-compliance/src/introduction.tex
-  ${CMAKE_SOURCE_DIR}/doc/using-energyplus-for-compliance/src/introduction/background.tex
-  ${CMAKE_SOURCE_DIR}/doc/using-energyplus-for-compliance/src/introduction/compliance-objects.tex
-  ${CMAKE_SOURCE_DIR}/doc/using-energyplus-for-compliance/src/introduction/tabular-summary-reports.tex
-  ${CMAKE_SOURCE_DIR}/doc/using-energyplus-for-compliance/src/introduction/features-related-to-appendix-g-and-leed.tex
-  ${CMAKE_SOURCE_DIR}/doc/using-energyplus-for-compliance/src/introduction/features-related-to-california-title-24.tex
+  ${PROJECT_SOURCE_DIR}/title.tex
+  ${PROJECT_SOURCE_DIR}/using-energyplus-for-compliance/using-energyplus-for-compliance.tex
+  ${PROJECT_SOURCE_DIR}/header.tex
+  ${PROJECT_SOURCE_DIR}/using-energyplus-for-compliance/src/using-energyplus-for-compliance.tex
+  ${PROJECT_SOURCE_DIR}/using-energyplus-for-compliance/src/introduction.tex
+  ${PROJECT_SOURCE_DIR}/using-energyplus-for-compliance/src/introduction/background.tex
+  ${PROJECT_SOURCE_DIR}/using-energyplus-for-compliance/src/introduction/compliance-objects.tex
+  ${PROJECT_SOURCE_DIR}/using-energyplus-for-compliance/src/introduction/tabular-summary-reports.tex
+  ${PROJECT_SOURCE_DIR}/using-energyplus-for-compliance/src/introduction/features-related-to-appendix-g-and-leed.tex
+  ${PROJECT_SOURCE_DIR}/using-energyplus-for-compliance/src/introduction/features-related-to-california-title-24.tex
 )
 
 # to get the list of included images, go to the root of the document folder and:
@@ -19,17 +19,4 @@ SET( INCLUDED_TEX
 SET( INCLUDED_IMAGES
 )
 
-SET( SOURCE_FILENAME "using-energyplus-for-compliance" )
-SET( OUTPUT_FILENAME "UsingEnergyPlusForCompliance" )
-
-add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
-	COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -DTEX_INTERACTION=${TEX_INTERACTION} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
-		    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc/${SOURCE_FILENAME}
-		    DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
-                 )
-add_custom_target( zPDF_${OUTPUT_FILENAME}
-                   DEPENDS ${CMAKE_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
-                 )
-
-# Make top-level 'documentation' target depend on this one
-add_dependencies(documentation zPDF_${OUTPUT_FILENAME})
+CREATE_DOC_TARGET("using-energyplus-for-compliance" "UsingEnergyPlusForCompliance")

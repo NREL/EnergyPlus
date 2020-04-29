@@ -358,6 +358,7 @@ namespace DataHeatBalance {
     extern Real64 CondFDRelaxFactorInput; // Relaxation factor, for looping across all the surfaces, user input value
 
     extern int ZoneAirSolutionAlgo;              // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    extern bool OverrideZoneAirSolutionAlgo;
     extern Real64 BuildingRotationAppendixG;     // Building Rotation for Appendix G
     extern bool ZoneAirMassBalanceSimulation;    // if true, then enforces zone mass flow conservation
     extern Real64 ZoneTotalExfiltrationHeatLoss; // Building total heat emission through zone exfiltration
@@ -451,6 +452,8 @@ namespace DataHeatBalance {
     extern Array1D<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
     extern Array1D<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
     extern Array1D<Real64> MoisturePredictedRate;
+    extern Array1D<Real64> MoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
+    extern Array1D<Real64> MoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
 
     extern Array1D<Real64> ListSNLoadHeatEnergy;
     extern Array1D<Real64> ListSNLoadCoolEnergy;
@@ -612,8 +615,7 @@ namespace DataHeatBalance {
 
     extern Array1D<Real64> const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
 
-    extern Real64 ZeroPointerVal;
-
+    extern Real64 zeroPointerVal;
     extern int NumAirBoundaryMixing;                 // Number of air boundary simple mixing objects needed
     extern std::vector<int> AirBoundaryMixingZone1;  // Air boundary simple mixing zone 1
     extern std::vector<int> AirBoundaryMixingZone2;  // Air boundary simple mixing zone 2
@@ -1493,6 +1495,7 @@ namespace DataHeatBalance {
         Real64 DesignFanPowerFrac;         // Fraction (0.0-1.0) of design power level that is fans
         int OperSchedPtr;                  // Schedule pointer for design power input or operating schedule
         int CPULoadSchedPtr;               // Schedule pointer for CPU loading schedule
+        Real64 SizingTAirIn;               // Entering air dry-bulb temperature at maximum value during sizing[C]
         Real64 DesignTAirIn;               // Design entering air dry-bulb temperature [C]
         Real64 DesignFanPower;             // Design fan power input [W]
         Real64 DesignCPUPower;             // Design CPU power input [W]
@@ -1566,7 +1569,7 @@ namespace DataHeatBalance {
         // Default Constructor
         ITEquipData()
             : ZonePtr(0), FlowControlWithApproachTemps(false), DesignTotalPower(0.0), NomMinDesignLevel(0.0), NomMaxDesignLevel(0.0),
-              DesignFanPowerFrac(0.0), OperSchedPtr(0), CPULoadSchedPtr(0), DesignTAirIn(0.0), DesignFanPower(0.0), DesignCPUPower(0.0),
+              DesignFanPowerFrac(0.0), OperSchedPtr(0), CPULoadSchedPtr(0), SizingTAirIn(0.0), DesignTAirIn(0.0), DesignFanPower(0.0), DesignCPUPower(0.0),
               DesignAirVolFlowRate(0.0), Class(0), AirFlowFLTCurve(0), CPUPowerFLTCurve(0), FanPowerFFCurve(0), AirConnectionType(0),
               InletRoomAirNodeNum(0), OutletRoomAirNodeNum(0), SupplyAirNodeNum(0), DesignRecircFrac(0.0), RecircFLTCurve(0),
               DesignUPSEfficiency(0.0), UPSEfficFPLRCurve(0), UPSLossToZoneFrac(0.0), EMSCPUPowerOverrideOn(false), EMSCPUPower(0.0),
@@ -1853,27 +1856,28 @@ namespace DataHeatBalance {
         std::string CompObjectType;                   // device object class name
         std::string CompObjectName;                   // device user unique name
         int CompTypeOfNum;                            // type of internal gain device identifier
-        Reference<Real64> PtrConvectGainRate;         // fortan POINTER to value of convection heat gain rate for device, watts
+        Real64 * PtrConvectGainRate;         // POINTER to value of convection heat gain rate for device, watts
         Real64 ConvectGainRate;                       // current timestep value of convection heat gain rate for device, watts
-        Reference<Real64> PtrReturnAirConvGainRate;   // fortan POINTER to value of return air convection heat gain rate for device, W
+        Real64 * PtrReturnAirConvGainRate;   // POINTER to value of return air convection heat gain rate for device, W
         Real64 ReturnAirConvGainRate;                 // current timestep value of return air convection heat gain rate for device, W
-        Reference<Real64> PtrRadiantGainRate;         // fortan POINTER to value of thermal radiation heat gain rate for device, watts
+        Real64 * PtrRadiantGainRate;         // POINTER to value of thermal radiation heat gain rate for device, watts
         Real64 RadiantGainRate;                       // current timestep value of thermal radiation heat gain rate for device, watts
-        Reference<Real64> PtrLatentGainRate;          // fortan POINTER to value of moisture gain rate for device, Watts
+        Real64 * PtrLatentGainRate;          // POINTER to value of moisture gain rate for device, Watts
         Real64 LatentGainRate;                        // current timestep value of moisture gain rate for device, Watts
-        Reference<Real64> PtrReturnAirLatentGainRate; // fortan POINTER to value of return air moisture gain rate for device, Watts
+        Real64 * PtrReturnAirLatentGainRate; // POINTER to value of return air moisture gain rate for device, Watts
         Real64 ReturnAirLatentGainRate;               // current timestep value of return air moisture gain rate for device, Watts
-        Reference<Real64> PtrCarbonDioxideGainRate;   // fortan POINTER to value of carbon dioxide gain rate for device
+        Real64 * PtrCarbonDioxideGainRate;   // POINTER to value of carbon dioxide gain rate for device
         Real64 CarbonDioxideGainRate;                 // current timestep value of carbon dioxide gain rate for device
-        Reference<Real64> PtrGenericContamGainRate;   // fortan POINTER to value of generic contaminant gain rate for device
+        Real64 * PtrGenericContamGainRate;   // POINTER to value of generic contaminant gain rate for device
         Real64 GenericContamGainRate;                 // current timestep value of generic contaminant gain rate for device
         int ReturnAirNodeNum;                         // return air node number for retrun air convection heat gain
 
         // Default Constructor
         GenericComponentZoneIntGainStruct()
-            : CompTypeOfNum(0), ConvectGainRate(0.0), // Autodesk:Init Zero initializations for Real64 members added to fix use uninitialized: Such
-                                                      // use probably is a logic bug that still needs fixing
-              ReturnAirConvGainRate(0.0), RadiantGainRate(0.0), LatentGainRate(0.0), ReturnAirLatentGainRate(0.0), CarbonDioxideGainRate(0.0),
+            : CompTypeOfNum(0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr),
+              ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0), PtrLatentGainRate(nullptr),
+              LatentGainRate(0.0), PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0),
+              PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0), PtrGenericContamGainRate(nullptr),
               GenericContamGainRate(0.0), ReturnAirNodeNum(0)
         {
         }
@@ -2164,24 +2168,17 @@ namespace DataHeatBalance {
     struct HeatReclaimDataBase
     {
         // Members
-        std::string Name;       // Name of DX Coil
-        std::string SourceType; // SourceType for DX Coil
+        std::string Name;       // Name of Coil
+        std::string SourceType; // SourceType for Coil
         Real64 AvailCapacity;   // Total available heat reclaim capacity
+        Real64 ReclaimEfficiencyTotal;   // Total reclaimed portion
+        Real64 WaterHeatingDesuperheaterReclaimedHeatTotal;    // total reclaimed heat by water heating desuperheater coils
+        Real64 HVACDesuperheaterReclaimedHeatTotal;    // total reclaimed heat by water heating desuperheater coils
+        Array1D<Real64> WaterHeatingDesuperheaterReclaimedHeat; // heat reclaimed by water heating desuperheater coils
+        Array1D<Real64> HVACDesuperheaterReclaimedHeat; // heat reclaimed by water heating desuperheater coils
 
         // Default Constructor
-        HeatReclaimDataBase() : AvailCapacity(0.0)
-        {
-        }
-    };
-
-    struct HeatReclaimRefrigeratedRackData : HeatReclaimDataBase // inherited from base struct
-    {
-        // Customized Members
-        Real64 UsedWaterHeater; // amount of avail used at plant water heater
-        Real64 UsedHVACCoil;    // amount of avail used at hvac coil
-
-        // Default Constructor
-        HeatReclaimRefrigeratedRackData() : UsedWaterHeater(0.0), UsedHVACCoil(0.0)
+        HeatReclaimDataBase() : AvailCapacity(0.0), ReclaimEfficiencyTotal(0.0), WaterHeatingDesuperheaterReclaimedHeatTotal(0.0), HVACDesuperheaterReclaimedHeatTotal(0.0)
         {
         }
     };
@@ -2190,27 +2187,9 @@ namespace DataHeatBalance {
     {
         // Customized Members
         Real64 AvailTemperature; // Temperature of heat reclaim source
-        Real64 UsedWaterHeater;  // amount of avail used at plant water heater
-        Real64 UsedHVACCoil;     // amount of avail used at hvac coil
 
         // Default Constructor
-        HeatReclaimRefrigCondenserData() : AvailTemperature(0.0), UsedWaterHeater(0.0), UsedHVACCoil(0.0)
-        {
-        }
-    };
-
-    struct HeatReclaimDXCoilData : HeatReclaimDataBase // inherited from base struct
-    {
-    };
-
-    struct HeatReclaimHPCoilData : HeatReclaimDataBase // inherited from base struct
-    {
-        // Customized Members
-        Real64 WaterHeatingDesuperheaterReclaimedHeatTotal;    // total reclaimed heat by water heating desuperheater coils
-        Array1D<Real64> WaterHeatingDesuperheaterReclaimedHeat; // heat reclaimed by water heating desuperheater coils
-
-        // Default Constructor
-        HeatReclaimHPCoilData() : WaterHeatingDesuperheaterReclaimedHeatTotal(0.0)
+        HeatReclaimRefrigCondenserData() : AvailTemperature(0.0)
         {
         }
     };
@@ -2648,11 +2627,11 @@ namespace DataHeatBalance {
     extern Array1D<ScreenTransData> ScreenTrans;
     extern Array1D<ZoneCatEUseData> ZoneIntEEuse;
     extern Array1D<RefrigCaseCreditData> RefrigCaseCredit;
-    extern Array1D<HeatReclaimRefrigeratedRackData> HeatReclaimRefrigeratedRack;
+    extern Array1D<HeatReclaimDataBase> HeatReclaimRefrigeratedRack;
     extern Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
-    extern Array1D<HeatReclaimDXCoilData> HeatReclaimDXCoil;
-    extern Array1D<HeatReclaimDXCoilData> HeatReclaimVS_DXCoil;
-    extern Array1D<HeatReclaimHPCoilData> HeatReclaimSimple_WAHPCoil;
+    extern Array1D<HeatReclaimDataBase> HeatReclaimDXCoil;
+    extern Array1D<HeatReclaimDataBase> HeatReclaimVS_DXCoil;
+    extern Array1D<HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
     extern Array1D<AirReportVars> ZnAirRpt;
     extern Array1D<TCGlazingsType> TCGlazings;
     extern Array1D<ZoneEquipData> ZoneCO2Gen;

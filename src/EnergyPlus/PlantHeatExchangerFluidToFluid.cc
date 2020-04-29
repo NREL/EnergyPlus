@@ -58,12 +58,13 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -151,7 +152,7 @@ namespace PlantHeatExchangerFluidToFluid {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void HeatExchangerStruct::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void HeatExchangerStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initialize();
     }
@@ -170,7 +171,7 @@ namespace PlantHeatExchangerFluidToFluid {
         }
     }
 
-    void HeatExchangerStruct::simulate(const PlantLocation &calledFromLocation,
+    void HeatExchangerStruct::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation,
                                        bool const FirstHVACIteration,
                                        Real64 &CurLoad,
                                        bool const EP_UNUSED(RunFlag))
@@ -2275,7 +2276,7 @@ namespace PlantHeatExchangerFluidToFluid {
     }
 
     Real64 HeatExchangerStruct::demandSideFlowResidual(Real64 const DmdSideMassFlowRate,
-                                                       Array1<Real64> const &Par // Par(1) = HX index number
+                                                       Array1D<Real64> const &Par // Par(1) = HX index number
     )
     {
 

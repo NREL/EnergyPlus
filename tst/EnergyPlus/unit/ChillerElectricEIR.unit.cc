@@ -54,8 +54,9 @@
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -64,11 +65,7 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::ChillerElectricEIR;
 using namespace EnergyPlus::DataLoopNode;
 
-class ChillerElecEIRFixture : public EnergyPlusFixture
-{
-};
-
-TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_TestOutletNodeConditions)
+TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
 {
     ElectricEIRChiller.allocate(1);
     auto &thisEIR = ChillerElectricEIR::ElectricEIRChiller(1);
@@ -93,7 +90,7 @@ TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_TestOutletNodeConditions)
     ElectricEIRChiller.deallocate();
 }
 
-TEST_F(ChillerElecEIRFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
+TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
 {
     // unit test for autosizing heat recovery in Chiller:Electric:EIR
     ChillerElectricEIR::ElectricEIRChiller.allocate(1);
@@ -129,7 +126,7 @@ TEST_F(ChillerElecEIRFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    thisEIR.size();
+    thisEIR.size(state);
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(thisEIR.DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
@@ -138,7 +135,7 @@ TEST_F(ChillerElecEIRFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantLoop.deallocate();
 }
 
-TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_AirCooledChiller)
+TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
 {
 
     bool RunFlag(true);
@@ -232,7 +229,7 @@ TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_AirCooledChiller)
     DataPlant::PlantFinalSizesOkayToReport = true;
 
     thisEIR.initialize(RunFlag, MyLoad);
-    thisEIR.size();
+    thisEIR.size(state);
 
     // run through init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;

@@ -63,7 +63,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -3231,7 +3231,7 @@ namespace PlantCondLoopOperation {
                 for (MachineOnBranch = 1; MachineOnBranch <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents;
                      ++MachineOnBranch) {
                     // Sankar Non Integrated Economizer
-                    if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).GeneralEquipType != GenEquipTypes_Pump) {
+                    if (!PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).isPump()) {
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).ON = false;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
                     }
@@ -3272,7 +3272,7 @@ namespace PlantCondLoopOperation {
         for (Num = 1; Num <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++Num) {
             for (MachineOnBranch = 1; MachineOnBranch <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents; ++MachineOnBranch) {
                 // Sankar Non Integrated Economizer
-                if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).GeneralEquipType != GenEquipTypes_Pump) {
+                if (!PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).isPump()) {
                     PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).ON = false;
                     PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
                 }
@@ -3369,7 +3369,7 @@ namespace PlantCondLoopOperation {
                         SetupEMSActuator(ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
-                                         "[W]",
+                                         "[fraction]",
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideOn,
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideValue);
                     }

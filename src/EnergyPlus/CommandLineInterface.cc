@@ -59,6 +59,9 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReports.hh>
@@ -80,7 +83,7 @@ namespace CommandLineInterface {
     using namespace SolarShading;
     using namespace ez;
 
-    int ProcessArgs(int argc, const char *argv[])
+    int ProcessArgs(EnergyPlusData &state, int argc, const char *argv[])
     {
         typedef std::string::size_type size_type;
 
@@ -128,7 +131,7 @@ namespace CommandLineInterface {
         // Define options
         ezOptionParser opt;
 
-        opt.overview = VerString;
+        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage();
 
         opt.syntax = "energyplus [options] [input-file]";
 
@@ -197,7 +200,7 @@ namespace CommandLineInterface {
 
         DDOnlySimulation = opt.isSet("-D");
 
-        AnnualSimulation = opt.isSet("-a");
+        state.dataGlobals.AnnualSimulation = opt.isSet("-a");
 
         outputEpJSONConversion = opt.isSet("-c");
 
@@ -382,13 +385,13 @@ namespace CommandLineInterface {
         }
 
         // EnergyPlus files
-        outputAuditFileName = outputFilePrefix + normalSuffix + ".audit";
+        OutputFiles::getSingleton().audit.fileName = outputFilePrefix + normalSuffix + ".audit";
         outputBndFileName = outputFilePrefix + normalSuffix + ".bnd";
         outputDxfFileName = outputFilePrefix + normalSuffix + ".dxf";
-        outputEioFileName = outputFilePrefix + normalSuffix + ".eio";
+        OutputFiles::getSingleton().eio.fileName = outputFilePrefix + normalSuffix + ".eio";
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
-        outputEsoFileName = outputFilePrefix + normalSuffix + ".eso";
+        OutputFiles::getSingleton().eso.fileName = outputFilePrefix + normalSuffix + ".eso";
 
         outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
         outputTSZoneJsonFileName = outputFilePrefix + normalSuffix + "_detailed_zone.json";
@@ -420,7 +423,7 @@ namespace CommandLineInterface {
 
         outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
         outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
-        outputMtrFileName = outputFilePrefix + normalSuffix + ".mtr";
+        OutputFiles::getSingleton().mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
         outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         outputDfsFileName = outputFilePrefix + normalSuffix + ".dfs";
@@ -431,7 +434,8 @@ namespace CommandLineInterface {
         outputSciFileName = outputFilePrefix + normalSuffix + ".sci";
         outputWrlFileName = outputFilePrefix + normalSuffix + ".wrl";
         outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
-        outputDbgFileName = outputFilePrefix + normalSuffix + ".dbg";
+        OutputFiles::getSingleton().debug.fileName = outputFilePrefix + normalSuffix + ".dbg";
+        outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
         outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
         outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
         outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
@@ -440,12 +444,12 @@ namespace CommandLineInterface {
         outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
         outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
         outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
-        outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
-        outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
-        outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
-        outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
-        outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
-        outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
+        OutputFiles::getSingleton().outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
+        OutputFiles::getSingleton().outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
+        OutputFiles::getSingleton().outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
+        OutputFiles::getSingleton().outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
+        OutputFiles::getSingleton().outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
+        OutputFiles::getSingleton().outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
         outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
         outputExtShdFracFileName = outputFilePrefix + shdSuffix + ".csv";
         if (suffixType == "L" || suffixType == "l") {
@@ -508,7 +512,7 @@ namespace CommandLineInterface {
         }
 
         // Error for cases where both design-day and annual simulation switches are set
-        if (DDOnlySimulation && AnnualSimulation) {
+        if (DDOnlySimulation && state.dataGlobals.AnnualSimulation) {
             DisplayString("ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
             DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
@@ -584,17 +588,7 @@ namespace CommandLineInterface {
             }
         }
 
-        OutputFileDebug = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(OutputFileDebug, outputDbgFileName, flags);
-            iostatus = flags.ios();
-        }
-        if (iostatus != 0) {
-            DisplayString("ERROR: Could not open output debug file: " + outputDbgFileName + ".");
-            exit(EXIT_FAILURE);
-        }
+        OutputFiles::getSingleton().debug.ensure_open();
 
         // TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 
@@ -824,6 +818,96 @@ namespace CommandLineInterface {
                 }
             }
         }
+    }
+
+    int runReadVarsESO() {
+        std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
+        bool FileExists;
+        {
+            IOFlags flags;
+            ObjexxFCL::gio::inquire(readVarsPath, flags);
+            FileExists = flags.exists();
+        }
+        if (!FileExists) {
+            readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
+            {
+                IOFlags flags;
+                ObjexxFCL::gio::inquire(readVarsPath, flags);
+                FileExists = flags.exists();
+            }
+            if (!FileExists) {
+                DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + ".");
+                return EXIT_FAILURE;
+            }
+        }
+
+        std::string const RVIfile = inputDirPathName + inputFileNameOnly + ".rvi";
+        std::string const MVIfile = inputDirPathName + inputFileNameOnly + ".mvi";
+
+        int fileUnitNumber;
+        int iostatus;
+        bool rviFileExists;
+        bool mviFileExists;
+
+        ObjexxFCL::gio::Fmt readvarsFmt("(A)");
+
+        {
+            IOFlags flags;
+            ObjexxFCL::gio::inquire(RVIfile, flags);
+            rviFileExists = flags.exists();
+        }
+        if (!rviFileExists) {
+            fileUnitNumber = GetNewUnitNumber();
+            {
+                IOFlags flags;
+                flags.ACTION("write");
+                ObjexxFCL::gio::open(fileUnitNumber, RVIfile, flags);
+                iostatus = flags.ios();
+            }
+            if (iostatus != 0) {
+                ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
+            }
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << OutputFiles::getSingleton().eso.fileName;
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputCsvFileName;
+            ObjexxFCL::gio::close(fileUnitNumber);
+        }
+
+        {
+            IOFlags flags;
+            ObjexxFCL::gio::inquire(MVIfile, flags);
+            mviFileExists = flags.exists();
+        }
+        if (!mviFileExists) {
+            fileUnitNumber = GetNewUnitNumber();
+            {
+                IOFlags flags;
+                flags.ACTION("write");
+                ObjexxFCL::gio::open(fileUnitNumber, MVIfile, flags);
+                iostatus = flags.ios();
+            }
+            if (iostatus != 0) {
+                ShowFatalError("EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write).");
+            }
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << OutputFiles::getSingleton().mtr.fileName;
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrCsvFileName;
+            ObjexxFCL::gio::close(fileUnitNumber);
+        }
+
+        // We quote the paths in case we have spaces
+        // "/Path/to/ReadVarEso" "/Path/to/folder with spaces/file.rvi" unlimited
+        std::string const readVarsRviCommand = "\"" + readVarsPath + "\" \"" + RVIfile + "\" unlimited";
+        std::string const readVarsMviCommand = "\"" + readVarsPath + "\" \"" + MVIfile + "\" unlimited";
+
+        // systemCall will be responsible to handle to above command on Windows versus Unix
+        systemCall(readVarsRviCommand);
+        systemCall(readVarsMviCommand);
+
+        if (!rviFileExists) removeFile(RVIfile.c_str());
+
+        if (!mviFileExists) removeFile(MVIfile.c_str());
+
+        moveFile("readvars.audit", outputRvauditFileName);
+        return EXIT_SUCCESS;
     }
 
 } // namespace CommandLineInterface

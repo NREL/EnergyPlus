@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -190,9 +191,9 @@ namespace PhotovoltaicThermalCollectors {
 
         static PlantComponent *factory(std::string const &objectName);
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupReportVars();
 
@@ -221,6 +222,7 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetPVTcollectorsInput();
 
+
     void GetPVTSimpleCollectorsInput(int NumSimplePVTPerform, Array1D<SimplePVTModelStruct> &tmpSimplePVTperf);
 
     void GetBIPVTCollectorsInput(int NumBIPVTPerform, Array1D<BIPVTModelStruct> &tmpBIPVTperf);
@@ -228,6 +230,7 @@ namespace PhotovoltaicThermalCollectors {
     void GetMainPVTInput(int NumPVT, Array1D<PVTCollectorStruct> &PVT, Array1D<SimplePVTModelStruct> tmpSimplePVTperf, Array1D<BIPVTModelStruct> tmpBIPVTperf);
 
     void simPVTfromOASys(int index, bool FirstHVACIteration);
+
 
     int getPVTindexFromName(std::string const &name);
 
