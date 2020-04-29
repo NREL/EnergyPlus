@@ -229,7 +229,7 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetMainPVTInput(int NumPVT, Array1D<PVTCollectorStruct> &PVT, Array1D<SimplePVTModelStruct> tmpSimplePVTperf, Array1D<BIPVTModelStruct> tmpBIPVTperf);
 
-    void simPVTfromOASys(int index, bool FirstHVACIteration);
+    void simPVTfromOASys(EnergyPlusData &state, int index, bool FirstHVACIteration);
 
 
     int getPVTindexFromName(std::string const &name);
