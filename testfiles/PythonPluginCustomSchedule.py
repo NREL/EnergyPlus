@@ -8,13 +8,14 @@ class HeatingSetPoint(EnergyPlusPlugin):
 
     def on_begin_timestep_before_predictor(self) -> int:
         if 'handles_done' not in self.data:
-            if self.api.exchange.api_data_fully_ready():
-                self.data['actuator_heating'] = self.api.exchange.get_actuator_handle(
-                    "Schedule:Constant", "Schedule Value", "HTGSETP_SCH"
-                )
-                self.data['handles_done'] = True
-            else:
-                return 0
+            self.data['actuator_heating'] = self.api.exchange.get_actuator_handle(
+                "Schedule:Constant", "Schedule Value", "HTGSETP_SCH"
+            )
+            if self.data['actuator_heating'] == -1:
+                self.api.runtime.issue_severe("Could not get handle to heating setpoint schedule")
+                return 1
+            self.data['handles_done'] = True
+
         hour = self.api.exchange.hour()
         day_of_week = self.api.exchange.day_of_week()
         day_of_year = self.api.exchange.day_of_year()
@@ -45,13 +46,13 @@ class CoolingSetPoint(EnergyPlusPlugin):
 
     def on_begin_timestep_before_predictor(self) -> int:
         if 'handles_done' not in self.data:
-            if self.api.exchange.api_data_fully_ready():
-                self.data['actuator_cooling'] = self.api.exchange.get_actuator_handle(
-                    "Schedule:Constant", "Schedule Value", "CLGSETP_SCH"
-                )
-                self.data['handles_done'] = True
-            else:
-                return 0
+            self.data['actuator_cooling'] = self.api.exchange.get_actuator_handle(
+                "Schedule:Constant", "Schedule Value", "CLGSETP_SCH"
+            )
+            if self.data['actuator_cooling'] == -1:
+                self.api.runtime.issue_severe("Could not get handle to cooling setpoint schedule")
+                return 1
+            self.data['handles_done'] = True
         hour = self.api.exchange.hour()
         day_of_week = self.api.exchange.day_of_week()
         day_of_month = self.api.exchange.day_of_month()
