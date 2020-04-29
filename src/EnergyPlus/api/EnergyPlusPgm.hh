@@ -56,7 +56,7 @@
 
 // Functions
 
-void CreateCurrentDateTimeString(std::string &CurrentDateTimeString);
+std::string CreateCurrentDateTimeString();
 
 int initializeEnergyPlus(EnergyPlusData &state, std::string const & filepath);
 

@@ -139,6 +139,9 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
 // Defines a custom formatting type 'N' that behaves like Fortran's G type.
 // 'N' was chosen for "Number"
 //
+// Defines a custom formatting type 'Z' that behaves like Fortran's E type.
+// 'Z' was chosen because Fortran's 'E' format always starts with a Zero
+//
 // Defines a custom formatting type 'T' that that truncates the value
 // to match the behavior of TrimSigDigits utility function
 //

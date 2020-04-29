@@ -397,7 +397,7 @@ json IdfParser::parse_object(
             auto const &legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
             auto const size = legacy_idd_extensibles_array.size();
             std::string const &field_name = legacy_idd_extensibles_array[extensible_index % size];
-            auto const val = parse_value(idf, index, success, schema_obj_extensions->at(field_name));
+            auto val = parse_value(idf, index, success, schema_obj_extensions->at(field_name));
             if (!success) return root;
             extensible[field_name] = std::move(val);
             was_value_parsed = true;

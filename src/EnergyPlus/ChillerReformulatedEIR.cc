@@ -52,7 +52,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -1457,19 +1456,8 @@ namespace ChillerReformulatedEIR {
                     ShowContinueError(
                         "EIR as a function of PLR curve output at various part-load ratios and condenser water temperatures shown below:");
                     ShowContinueError("PLR           =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-                    std::string StringVar; // Used for EIRFPLR warning messages
-                    ObjexxFCL::gio::write(StringVar, "'Cond Temp(C) = '");
-                    for (int CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        ObjexxFCL::gio::write(StringVar, "(F7.2,$)") << CondTempArray(CurveValPtr);
-                    }
-                    ObjexxFCL::gio::write(StringVar);
-                    ShowContinueError(StringVar);
-                    ObjexxFCL::gio::write(StringVar, "'Curve Output = '");
-                    for (int CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        ObjexxFCL::gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
-                    }
-                    ObjexxFCL::gio::write(StringVar);
-                    ShowContinueError(StringVar);
+                    ShowContinueError(format("'Cond Temp(C) = ' {:7.2F}\n", fmt::join(CondTempArray, " ")));
+                    ShowContinueError(format("'Curve Temp(C) = ' {:7.2F}\n", fmt::join(CurveValArray, " ")));
                     ErrorsFound = true;
                 }
             }
