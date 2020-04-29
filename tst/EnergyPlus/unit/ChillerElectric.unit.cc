@@ -322,4 +322,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     EnergyPlusData state;
 
     thisChiller.simulate(state, loc, firstHVAC, curLoad, runFlag);
+
+    Real64 TestCOP = thisChiller.QEvaporator / thisChiller.Power;
+    EXPECT_NEAR(TestCOP, thisChiller.ActualCOP, 1E-3);
 }

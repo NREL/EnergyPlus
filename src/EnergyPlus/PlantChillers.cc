@@ -163,9 +163,9 @@ namespace PlantChillers {
         }
     }
 
-    void BaseChillerSpecs::getSizingFactor(Real64 &_SizFac)
+    void BaseChillerSpecs::getSizingFactor(Real64 &sizFac)
     {
-        _SizFac = this->SizFac;
+        sizFac = this->SizFac;
     }
 
     void BaseChillerSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
@@ -176,10 +176,10 @@ namespace PlantChillers {
         }
     }
 
-    void BaseChillerSpecs::getDesignTemperatures(Real64 &_TempDesCondIn, Real64 &_TempDesEvapOut)
+    void BaseChillerSpecs::getDesignTemperatures(Real64 &tempDesCondIn, Real64 &tempDesEvapOut)
     {
-        _TempDesEvapOut = this->TempDesEvapOut;
-        _TempDesCondIn = this->TempDesCondIn;
+        tempDesEvapOut = this->TempDesEvapOut;
+        tempDesCondIn = this->TempDesCondIn;
     }
 
     ElectricChillerSpecs *ElectricChillerSpecs::factory(std::string const &chillerName)
@@ -1353,7 +1353,6 @@ namespace PlantChillers {
         Real64 PartLoadRat = this->MinPartLoadRat;
         Real64 ChillerNomCap = this->NomCap;
         Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
-        EvapMassFlowRateMax = this->EvapMassFlowRateMax;
 
         // If there is a fault of chiller fouling
         if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
@@ -1406,7 +1405,7 @@ namespace PlantChillers {
             }
         } // End of the Air Cooled/Evap Cooled Logic block
 
-        Real64 _CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+        Real64 condInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
 
         // correct inlet temperature if using heat recovery
         if (this->HeatRecActive) {
@@ -1414,10 +1413,10 @@ namespace PlantChillers {
                 this->AvgCondSinkTemp = (this->QHeatRecovery * this->HeatRecInletTemp + this->QCondenser * this->CondInletTemp) /
                                         (this->QHeatRecovery + this->QCondenser);
             } else {
-                this->AvgCondSinkTemp = _CondInletTemp;
+                this->AvgCondSinkTemp = condInletTemp;
             }
         } else {
-            this->AvgCondSinkTemp = _CondInletTemp;
+            this->AvgCondSinkTemp = condInletTemp;
         }
 
         // If there is a fault of Chiller SWT Sensor
@@ -1482,7 +1481,7 @@ namespace PlantChillers {
             }
             this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / this->COP * FRAC;
 
-            // Either set the flow to the Constant value or caluclate the flow for the variable volume
+            // Either set the flow to the Constant value or calculate the flow for the variable volume
             if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
 
                 // Start by assuming max (design) flow
@@ -1715,10 +1714,10 @@ namespace PlantChillers {
         if (this->CondenserType == CondType::WaterCooled) {
             if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
-                if (this->HeatRecActive) this->calcHeatRecovery(this->QCondenser, this->CondMassFlowRate, _CondInletTemp, this->QHeatRecovered);
+                if (this->HeatRecActive) this->calcHeatRecovery(this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
                 Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(
-                    DataPlant::PlantLoop(this->CDLoopNum).FluidName, _CondInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
-                this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + _CondInletTemp;
+                    DataPlant::PlantLoop(this->CDLoopNum).FluidName, condInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
+                this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + condInletTemp;
             } else {
                 ShowSevereError("CalcElectricChillerModel: Condenser flow = 0, for ElectricChiller=" + this->Name);
                 ShowContinueErrorTimeStamp("");
@@ -1732,12 +1731,12 @@ namespace PlantChillers {
             }
 
             // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
-            if (this->HeatRecActive) this->calcHeatRecovery(this->QCondenser, this->CondMassFlowRate, _CondInletTemp, this->QHeatRecovered);
+            if (this->HeatRecActive) this->calcHeatRecovery(this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
             if (this->CondMassFlowRate > 0.0) {
                 Real64 CpCond = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->CondInletNodeNum).HumRat);
-                this->CondOutletTemp = _CondInletTemp + this->QCondenser / this->CondMassFlowRate / CpCond;
+                this->CondOutletTemp = condInletTemp + this->QCondenser / this->CondMassFlowRate / CpCond;
             } else {
-                this->CondOutletTemp = _CondInletTemp;
+                this->CondOutletTemp = condInletTemp;
             }
         }
 
@@ -1751,10 +1750,10 @@ namespace PlantChillers {
 
             if (this->CondenserType == CondType::WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
-                if (_CondInletTemp > 70.0) {
+                if (condInletTemp > 70.0) {
                     ShowSevereError("CalcElectricChillerModel: Condenser loop inlet temperatures over 70.0 C for ElectricChiller=" + this->Name);
                     ShowContinueErrorTimeStamp("");
-                    ShowContinueError("Condenser loop water temperatures are too high at" + General::RoundSigDigits(_CondInletTemp, 2));
+                    ShowContinueError("Condenser loop water temperatures are too high at" + General::RoundSigDigits(condInletTemp, 2));
                     ShowContinueError("Check input for condenser plant loop, especially cooling tower");
                     ShowContinueError("Evaporator inlet temperature: " + General::RoundSigDigits(DataLoopNode::Node(this->EvapInletNodeNum).Temp, 2));
 
@@ -1766,7 +1765,7 @@ namespace PlantChillers {
                     ShowSevereError("CalcElectricChillerModel: Capacity ratio below zero for ElectricChiller=" + this->Name);
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Check input for Capacity Ratio Curve");
-                    ShowContinueError("Condenser inlet temperature: " + General::RoundSigDigits(_CondInletTemp, 2));
+                    ShowContinueError("Condenser inlet temperature: " + General::RoundSigDigits(condInletTemp, 2));
                     ShowContinueError("Evaporator inlet temperature: " + General::RoundSigDigits(DataLoopNode::Node(this->EvapInletNodeNum).Temp, 2));
                     ShowFatalError("Program Terminates due to previous error condition");
                 }
@@ -1780,7 +1779,7 @@ namespace PlantChillers {
 
     void ElectricChillerSpecs::calcHeatRecovery(Real64 &QCond,               // current condenser load
                                                 Real64 const CondMassFlow,   // current condenser Mass Flow
-                                                Real64 const _CondInletTemp, // current condenser Inlet Temp
+                                                Real64 const condInletTemp, // current condenser Inlet Temp
                                                 Real64 &QHeatRec             // amount of heat recovered
     )
     {
@@ -1808,7 +1807,7 @@ namespace PlantChillers {
         Real64 CpCond;
         if (this->CondenserType == CondType::WaterCooled) {
             CpCond = FluidProperties::GetSpecificHeatGlycol(
-                DataPlant::PlantLoop(this->CDLoopNum).FluidName, _CondInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
+                DataPlant::PlantLoop(this->CDLoopNum).FluidName, condInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
         } else {
             CpCond = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->CondInletNodeNum).HumRat);
         }
@@ -1817,7 +1816,7 @@ namespace PlantChillers {
         Real64 QTotal = QCond;
 
         if (this->HeatRecSetPointNodeNum == 0) { // use original algorithm that blends temps
-            Real64 TAvgIn = (HeatRecMassFlowRate * CpHeatRec * this->HeatRecInletTemp + CondMassFlow * CpCond * _CondInletTemp) /
+            Real64 TAvgIn = (HeatRecMassFlowRate * CpHeatRec * this->HeatRecInletTemp + CondMassFlow * CpCond * condInletTemp) /
                      (HeatRecMassFlowRate * CpHeatRec + CondMassFlow * CpCond);
 
             Real64 TAvgOut = QTotal / (HeatRecMassFlowRate * CpHeatRec + CondMassFlow * CpCond) + TAvgIn;
@@ -3204,7 +3203,7 @@ namespace PlantChillers {
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
         Real64 ChillerNomCap = this->NomCap;
-        Real64 _COP = this->COP;
+        Real64 COPLocal = this->COP;
         Real64 TempCondIn = DataLoopNode::Node(this->CondInletNodeNum).Temp;
         Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
 
@@ -3212,14 +3211,14 @@ namespace PlantChillers {
         if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerNomCap;
-            Real64 COP_ff = _COP;
+            Real64 COP_ff = COPLocal;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
             this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor();
 
             // update the Chiller nominal capacity and COP at faulty cases
             ChillerNomCap = NomCap_ff * this->FaultyChillerFoulingFactor;
-            _COP = COP_ff * this->FaultyChillerFoulingFactor;
+            COPLocal = COP_ff * this->FaultyChillerFoulingFactor;
         }
 
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
@@ -3277,7 +3276,7 @@ namespace PlantChillers {
             } else {
                 FRAC = 1.0;
             }
-            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / _COP * FRAC;
+            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COPLocal * FRAC;
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
@@ -3492,7 +3491,7 @@ namespace PlantChillers {
             }
 
             // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / _COP * FRAC;
+            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COPLocal * FRAC;
 
             if (this->EvapMassFlowRate == 0.0) {
                 this->QEvaporator = 0.0;
@@ -3567,18 +3566,18 @@ namespace PlantChillers {
         // Use Curve fit to determine Exhaust Temperature in C.  The temperature is simply a curve fit
         // of the exhaust temperature in C to the part load ratio.
         if (PartLoadRat != 0) {
-            Real64 _ExhaustTemp = CurveManager::CurveValue(this->ExhaustTempCurve, PartLoadRat);
-            Real64 ExhaustGasFlow = TotalExhaustEnergy / (ExhaustCP * (_ExhaustTemp - ReferenceTemp));
+            Real64 exhaustTemp = CurveManager::CurveValue(this->ExhaustTempCurve, PartLoadRat);
+            Real64 ExhaustGasFlow = TotalExhaustEnergy / (ExhaustCP * (exhaustTemp - ReferenceTemp));
 
             // Use Curve fit to determine stack temp after heat recovery
-            Real64 _UA = this->UACoef(1) * std::pow(ChillerNomCap, this->UACoef(2));
-            Real64 _DesignMinExitGasTemp = this->DesignMinExitGasTemp;
+            Real64 UALocal = this->UACoef(1) * std::pow(ChillerNomCap, this->UACoef(2));
+            Real64 designMinExitGasTemp = this->DesignMinExitGasTemp;
 
             this->ExhaustStackTemp =
-                _DesignMinExitGasTemp +
-                (_ExhaustTemp - _DesignMinExitGasTemp) / std::exp(_UA / (max(ExhaustGasFlow, this->MaxExhaustperPowerOutput * ChillerNomCap) * ExhaustCP));
+                designMinExitGasTemp +
+                (exhaustTemp - designMinExitGasTemp) / std::exp(UALocal / (max(ExhaustGasFlow, this->MaxExhaustperPowerOutput * ChillerNomCap) * ExhaustCP));
 
-            this->QExhaustRecovered = max(ExhaustGasFlow * ExhaustCP * (_ExhaustTemp - this->ExhaustStackTemp), 0.0);
+            this->QExhaustRecovered = max(ExhaustGasFlow * ExhaustCP * (exhaustTemp - this->ExhaustStackTemp), 0.0);
         } else {
             this->QExhaustRecovered = 0.0;
         }
@@ -4870,11 +4869,11 @@ namespace PlantChillers {
         Real64 TempEvapOutSetPoint(0.0); // C - evaporator outlet temperature setpoint
         Real64 EvapDeltaTemp(0.0);       // C - evaporator temperature difference, water side
         Real64 PartLoadRat(0.0);         // part load ratio for efficiency calculations
-        Real64 _FuelEnergyIn(0.0);  // (EFUEL) Amount of Fuel Energy Required to run gas turbine
-        Real64 _ExhaustFlow(0.0);   // (FEX) Exhaust Gas Flow Rate cubic meters per second
-        Real64 _ExhaustTemp(0.0);   // (TEX) Exhaust Gas Temperature in C
+        Real64 fuelEnergyIn(0.0);  // (EFUEL) Amount of Fuel Energy Required to run gas turbine
+        Real64 exhaustFlow(0.0);   // (FEX) Exhaust Gas Flow Rate cubic meters per second
+        Real64 exhaustTemp(0.0);   // (TEX) Exhaust Gas Temperature in C
         Real64 HeatRecOutTemp(0.0); // Heat Recovery Fluid Outlet Temperature
-        Real64 _HeatRecMdot(0.0);   // Heat Recovery Fluid Mass FlowRate
+        Real64 heatRecMdot(0.0);   // Heat Recovery Fluid Mass FlowRate
         Real64 MinHeatRecMdot(0.0); // Mass Flow rate that keeps from exceeding max temp
 
         // set module level inlet and outlet nodes
@@ -4984,7 +4983,7 @@ namespace PlantChillers {
         } // End of the Air Cooled/Evap Cooled Logic block
 
         // If not air or evap cooled then set to the condenser node that is attached to a cooling tower
-        Real64 _CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+        Real64 condInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
 
         // Set mass flow rates
         if (this->CondenserType == CondType::WaterCooled) {
@@ -5294,8 +5293,8 @@ namespace PlantChillers {
 
             if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(
-                    DataPlant::PlantLoop(this->CDLoopNum).FluidName, _CondInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
-                this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + _CondInletTemp;
+                    DataPlant::PlantLoop(this->CDLoopNum).FluidName, condInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
+                this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + condInletTemp;
             } else {
                 ShowSevereError("CalcGasTurbineChillerModel: Condenser flow = 0, for GasTurbineChiller=" + this->Name);
                 ShowContinueErrorTimeStamp("");
@@ -5304,7 +5303,7 @@ namespace PlantChillers {
         } else { // Air Cooled or Evap Cooled
 
             // don't care about outlet temp for Air-Cooled or Evap Cooled and there is no CondMassFlowRate and would divide by zero
-            this->CondOutletTemp = _CondInletTemp;
+            this->CondOutletTemp = condInletTemp;
         }
 
        // Gas Turbine Driven Portion of the Chiller:
@@ -5330,22 +5329,22 @@ namespace PlantChillers {
                 AmbientDeltaT = DataLoopNode::Node(this->CondInletNodeNum).OutAirDryBulb - 25.0;
             }
 
-            _FuelEnergyIn = PLoad * (this->PLBasedFuelInputCoef(1) + this->PLBasedFuelInputCoef(2) * RL + this->PLBasedFuelInputCoef(3) * RL2) *
+            fuelEnergyIn = PLoad * (this->PLBasedFuelInputCoef(1) + this->PLBasedFuelInputCoef(2) * RL + this->PLBasedFuelInputCoef(3) * RL2) *
                             (this->TempBasedFuelInputCoef(1) + this->TempBasedFuelInputCoef(2) * AmbientDeltaT +
                              this->TempBasedFuelInputCoef(3) * pow_2(AmbientDeltaT));
 
-            _ExhaustFlow = this->GTEngineCapacity *
+            exhaustFlow = this->GTEngineCapacity *
                            (this->ExhaustFlowCoef(1) + this->ExhaustFlowCoef(2) * AmbientDeltaT + this->ExhaustFlowCoef(3) * pow_2(AmbientDeltaT));
 
-            _ExhaustTemp = (this->PLBasedExhaustTempCoef(1) + this->PLBasedExhaustTempCoef(2) * RL + this->PLBasedExhaustTempCoef(3) * RL2) *
+            exhaustTemp = (this->PLBasedExhaustTempCoef(1) + this->PLBasedExhaustTempCoef(2) * RL + this->PLBasedExhaustTempCoef(3) * RL2) *
                                (this->TempBasedExhaustTempCoef(1) + this->TempBasedExhaustTempCoef(2) * AmbientDeltaT +
                                 this->TempBasedExhaustTempCoef(3) * pow_2(AmbientDeltaT)) -
                            273;
 
             if (PLoad != 0.0) {
-                Real64 _UAtoCapRat = this->UAtoCapCoef(1) * std::pow(this->GTEngineCapacity, this->UAtoCapCoef(2));
-                this->ExhaustStackTemp = this->DesignSteamSatTemp + (_ExhaustTemp - this->DesignSteamSatTemp) /
-                                              std::exp(_UAtoCapRat / (max(_ExhaustFlow, this->MaxExhaustperGTPower * this->GTEngineCapacity) * ExhaustCP));
+                Real64 UAtoCapRatLocal = this->UAtoCapCoef(1) * std::pow(this->GTEngineCapacity, this->UAtoCapCoef(2));
+                this->ExhaustStackTemp = this->DesignSteamSatTemp + (exhaustTemp - this->DesignSteamSatTemp) /
+                                              std::exp(UAtoCapRatLocal / (max(exhaustFlow, this->MaxExhaustperGTPower * this->GTEngineCapacity) * ExhaustCP));
             }
 
             if (this->HeatRecActive) {
@@ -5364,7 +5363,7 @@ namespace PlantChillers {
 
             if (this->HeatRecActive) {
                 // This mdot is input specified mdot "Desired Flowrate", already set at node in init routine
-                _HeatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
+                heatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
                 this->HeatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
                 Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
                                                                    this->HeatRecInletTemp,
@@ -5372,8 +5371,8 @@ namespace PlantChillers {
                                                                    RoutineNameHeatRecovery);
 
                 // Don't divide by zero
-                if ((_HeatRecMdot > 0.0) && (HeatRecCp > 0.0)) {
-                    HeatRecOutTemp = (this->HeatRecLubeRate) / (_HeatRecMdot * HeatRecCp) + this->HeatRecInletTemp;
+                if ((heatRecMdot > 0.0) && (HeatRecCp > 0.0)) {
+                    HeatRecOutTemp = (this->HeatRecLubeRate) / (heatRecMdot * HeatRecCp) + this->HeatRecInletTemp;
                 } else {
                     HeatRecOutTemp = this->HeatRecInletTemp;
                 }
@@ -5388,7 +5387,7 @@ namespace PlantChillers {
                     // Recalculate Outlet Temperature, with adjusted flowrate
                     if ((MinHeatRecMdot > 0.0) && (HeatRecCp > 0.0)) {
                         HeatRecOutTemp = (this->HeatRecLubeRate) / (MinHeatRecMdot * HeatRecCp) + this->HeatRecInletTemp;
-                        HeatRecRatio = _HeatRecMdot / MinHeatRecMdot;
+                        HeatRecRatio = heatRecMdot / MinHeatRecMdot;
                     } else {
                         HeatRecOutTemp = this->HeatRecInletTemp;
                         HeatRecRatio = 0.0;
@@ -5398,16 +5397,16 @@ namespace PlantChillers {
                 this->HeatRecLubeRate *= HeatRecRatio;
             } else {
                 this->HeatRecInletTemp = 0.0;
-                _HeatRecMdot = 0.0;
+                heatRecMdot = 0.0;
                 HeatRecOutTemp = 0.0;
             }
         }
 
         this->HeatRecOutletTemp = HeatRecOutTemp;
-        this->HeatRecMdot = _HeatRecMdot;
+        this->HeatRecMdot = heatRecMdot;
         this->HeatRecLubeEnergy = this->HeatRecLubeRate * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        this->FuelEnergyIn = std::abs(_FuelEnergyIn);
-        this->FuelMassUsedRate = std::abs(_FuelEnergyIn) / (this->FuelHeatingValue * KJtoJ);
+        this->FuelEnergyIn = std::abs(fuelEnergyIn);
+        this->FuelMassUsedRate = std::abs(fuelEnergyIn) / (this->FuelHeatingValue * KJtoJ);
 
         // Calculate Energy
         this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -5419,10 +5418,10 @@ namespace PlantChillers {
 
             if (this->CondenserType == CondType::WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
-                if (_CondInletTemp > 70.0) {
+                if (condInletTemp > 70.0) {
                     ShowSevereError("CalcGTChillerModel: Condenser loop inlet temperatures over 70.0 C for GTChiller=" + this->Name);
                     ShowContinueErrorTimeStamp("");
-                    ShowContinueError("Condenser loop water temperatures are too high at" + General::RoundSigDigits(_CondInletTemp, 2));
+                    ShowContinueError("Condenser loop water temperatures are too high at" + General::RoundSigDigits(condInletTemp, 2));
                     ShowContinueError("Check input for condenser plant loop, especially cooling tower");
                     ShowContinueError("Evaporator inlet temperature: " + General::RoundSigDigits(DataLoopNode::Node(this->EvapInletNodeNum).Temp, 2));
 
@@ -5434,7 +5433,7 @@ namespace PlantChillers {
                     ShowSevereError("CalcGTChillerModel: Capacity ratio below zero for GTChiller=" + this->Name);
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Check input for Capacity Ratio Curve");
-                    ShowContinueError("Condenser inlet temperature: " + General::RoundSigDigits(_CondInletTemp, 2));
+                    ShowContinueError("Condenser inlet temperature: " + General::RoundSigDigits(condInletTemp, 2));
                     ShowContinueError("Evaporator inlet temperature: " + General::RoundSigDigits(DataLoopNode::Node(this->EvapInletNodeNum).Temp, 2));
                     ShowFatalError("Program Terminates due to previous error condition");
                 }

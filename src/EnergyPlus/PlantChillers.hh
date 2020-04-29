@@ -267,7 +267,7 @@ namespace PlantChillers {
 
         void calcHeatRecovery(Real64 &QCond,         // current condenser load
                               Real64 CondMassFlow,   // current condenser Mass Flow
-                              Real64 _CondInletTemp, // current condenser Inlet Temp
+                              Real64 condInletTemp, // current condenser Inlet Temp
                               Real64 &QHeatRec       // amount of heat recovered
         );
     };
