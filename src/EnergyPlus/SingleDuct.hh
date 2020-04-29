@@ -285,6 +285,8 @@ namespace SingleDuct {
 
         void SimConstVolNoReheat(int const ZoneNodeNum);
 
+        void CalcOutdoorAirVolumeFlowRate();
+
         void UpdateSys();
 
         void ReportSys();
