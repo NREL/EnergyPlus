@@ -7753,10 +7753,16 @@
   EnergyManagementSystem:GlobalVariable,
     totChilCap;              !- Erl Variable 1 Name
 
-  EnergyManagementSystem:ProgramCallingManager,
-    Cooling_dispatch,        !- Name
-    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-    Cooling_dispatch_Values; !- Program Name 1
+!  EnergyManagementSystem:ProgramCallingManager,
+!    Cooling_dispatch,        !- Name
+!    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
+!    Cooling_dispatch_Values; !- Program Name 1
+
+  PythonPlugin:Instance,
+    Cooling_dispatch,             !- Name
+    Yes,                                    !- Run During Warmup Days
+    PythonPluginPlantOperation_largeOff,    !- Python Module Name
+    Cooling_dispatch_Values;                !- Plugin Class Name
 
   EnergyManagementSystem:Program,
     Cooling_dispatch_Values, !- Name
@@ -7812,7 +7818,7 @@
   PythonPlugin:Instance,
     Tower_dispatch,             !- Name
     Yes,                                    !- Run During Warmup Days
-    PythonPluginPlantOperation_largeOff,   !- Python Module Name
+    PythonPluginPlantOperation_largeOff,    !- Python Module Name
     DispatchAlgs;                           !- Plugin Class Name
 
 !  EnergyManagementSystem:Program,

@@ -422,6 +422,8 @@ ADD_SIMULATION_TEST(IDF_FILE PythonPluginCustomOutputVariable.idf EPW_FILE USA_I
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginCustomSchedule.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginDiscreteAirSystemSizes.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginPlantLoopOverrideControl.idf EPW_FILE USA_FL_Orlando.Intl.AP.722050_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE PythonPluginPlantOperation_largeOff.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE PythonPluginThermochromicWindow.idf EPW_FILE USA_NV_Las.Vegas-McCarran.Intl.AP.723860_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginTestMathAndKill.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw EXPECT_FATAL)  # Expected to Fatal
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginUserDefined5ZoneAirCooled.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginUserDefinedWindACAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
