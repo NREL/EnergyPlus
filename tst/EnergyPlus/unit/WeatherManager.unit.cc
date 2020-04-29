@@ -1039,9 +1039,8 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
     Environment(1).SkyTempModel = WP_ClarkAllenModel;
 
     AllocateWeatherData();
-    OpenEPlusWeatherFile(ErrorsFound, true);
-
-    ReadEPlusWeatherForDay(0, 1, false);
+    OpenWeatherFile(ErrorsFound);
+    ReadWeatherForDay(0, 1, false);
 
     EXPECT_EQ(TomorrowHorizIRSky(1, 1), 345.73838855245953);
 
