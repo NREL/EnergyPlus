@@ -59,6 +59,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -466,7 +467,7 @@ TEST_F(EnergyPlusFixture, Initialization)
 
     // call for initialization, oneTimeInit only first
     DataGlobals::BeginEnvrnFlag = false;
-    thisCoolingPLHP->onInitLoopEquip(myLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
     // validate that location work got done correctly
     EXPECT_EQ(1, thisCoolingPLHP->loadSideLocation.loopNum);
@@ -481,7 +482,7 @@ TEST_F(EnergyPlusFixture, Initialization)
     // now call for initialization again, for begin environment
     DataGlobals::BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisCoolingPLHP->onInitLoopEquip(myLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
     // validate that plant sizing went ok
     Real64 const flowTol = 0.001;
@@ -616,8 +617,8 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     DataGlobals::BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
-    thisCoolingPLHP->onInitLoopEquip(myCoolingLoadLocation);
-    thisHeatingPLHP->onInitLoopEquip(myHeatingLoadLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(state, myHeatingLoadLocation);
 
     DataPlant::PlantFinalSizesOkayToReport = true;
     DataPlant::PlantFirstSizesOkayToReport = true;
@@ -801,7 +802,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     DataGlobals::DisplayExtraWarnings = true;
 
     // initialize so the components can find themselves on the plant
-    thisHeatingPLHP->onInitLoopEquip(myLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
 
     DataPlant::PlantFinalSizesOkayToReport = true;
     DataPlant::PlantFirstSizesOkayToReport = true;
@@ -930,8 +931,8 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     DataGlobals::BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
-    thisCoolingPLHP->onInitLoopEquip(myCoolingLoadLocation);
-    thisHeatingPLHP->onInitLoopEquip(myHeatingLoadLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(state, myHeatingLoadLocation);
 
     DataPlant::PlantFinalSizesOkayToReport = true;
     DataPlant::PlantFirstSizesOkayToReport = true;
@@ -1032,7 +1033,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     DataGlobals::BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
-    thisHeatingPLHP->onInitLoopEquip(myHeatingLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(state, myHeatingLoadLocation);
 
     DataPlant::PlantFinalSizesOkayToReport = true;
     DataPlant::PlantFirstSizesOkayToReport = true;
@@ -1121,7 +1122,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     DataGlobals::BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
-    thisHeatingPLHP->onInitLoopEquip(myHeatingLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(state, myHeatingLoadLocation);
 
     DataPlant::PlantFinalSizesOkayToReport = true;
     DataPlant::PlantFirstSizesOkayToReport = true;
@@ -1281,7 +1282,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     // call for all initialization
     DataGlobals::BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisCoolingPLHP->onInitLoopEquip(myLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
     // call with run flag off, loose limits on node min/max
     thisCoolingPLHP->running = false;
@@ -1427,7 +1428,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     extraPLHPPlantSupplySideComp.NodeNumIn = -1;
     extraPLHPPlantDemandSideComp.NodeNumIn = -1;
     // call for all initialization, it should abort because the coil load and supply sides were on the same loop
-    EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(myLoadLocation), std::runtime_error);
+    EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation), std::runtime_error);
 
     // test the case where the heat pump source side cannot be found
     PLHPPlantSupplySideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
@@ -1435,7 +1436,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     extraPLHPPlantSupplySideComp.NodeNumIn = -1;
     extraPLHPPlantDemandSideComp.NodeNumIn = -1;
     // call for all initialization, it should abort because the coil source side inlet node is not found on plant
-    EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(myLoadLocation), std::runtime_error);
+    EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation), std::runtime_error);
 
     // test the case where the heat pump load side cannot be found
     PLHPPlantSupplySideComp.NodeNumIn = -1;
@@ -1443,7 +1444,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     extraPLHPPlantSupplySideComp.NodeNumIn = -1;
     extraPLHPPlantDemandSideComp.NodeNumIn = -1;
     // call for all initialization, it should abort because the coil load side inlet node is not found on plant
-    EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(myLoadLocation), std::runtime_error);
+    EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation), std::runtime_error);
 
     // test the case where the heat pump source side is found, but it's on the supply side of a loop
     // still need to drop the load side onto a (extra) plant supply to trigger this condition
@@ -1452,7 +1453,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     extraPLHPPlantSupplySideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
     extraPLHPPlantDemandSideComp.NodeNumIn = -1;
     // call for all initialization, it should abort because the coil source was found on a supply side
-    EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(myLoadLocation), std::runtime_error);
+    EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation), std::runtime_error);
 
     // test the case where the heat pump load side is found, but it's on the demand side of a loop
     // still need to drop the source side onto a (extra) plant demand to trigger this condition
@@ -1461,7 +1462,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     extraPLHPPlantSupplySideComp.NodeNumIn = -1;
     extraPLHPPlantDemandSideComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
     // call for all initialization, it should abort because the coil load was found on a demand side
-    EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(myLoadLocation), std::runtime_error);
+    EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
@@ -1534,7 +1535,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     // call for all initialization
     DataGlobals::BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisCoolingPLHP->onInitLoopEquip(myLoadLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation);
 
     // call from load side location, firsthvac, no load, not running, verify the unit doesn't have any values lingering
     thisCoolingPLHP->loadSideHeatTransfer = 1000;
@@ -1547,7 +1548,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     bool firstHVAC = true;
     Real64 curLoad = 0.0;
     bool runFlag = false;
-    thisCoolingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+    thisCoolingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideHeatTransfer, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->powerUsage, 0.001);
@@ -1557,7 +1558,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     // call from source side location, firsthvac, no load, not running, connected loop should be triggered to resimulate
     DataPlant::PlantLoop(1).LoopSide(2).SimLoopSideNeeded = false;
     DataPlant::PlantLoop(2).LoopSide(1).SimLoopSideNeeded = false;
-    thisCoolingPLHP->simulate(mySourceLocation, firstHVAC, curLoad, runFlag);
+    thisCoolingPLHP->simulate(state, mySourceLocation, firstHVAC, curLoad, runFlag);
     EXPECT_TRUE(DataPlant::PlantLoop(2).LoopSide(1).SimLoopSideNeeded);
 
     // now we can call it again from the load side, but this time there is load (still firsthvac, unit can meet load)
@@ -1572,7 +1573,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
-        thisCoolingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        thisCoolingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(specifiedLoadSetpoint, thisCoolingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(-curLoad, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
@@ -1591,7 +1592,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
-        thisCoolingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        thisCoolingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to miss setpoint and be at max capacity
         EXPECT_NEAR(15.597, thisCoolingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(availableCapacity, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
@@ -1667,7 +1668,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     // call for all initialization
     DataGlobals::BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisHeatingPLHP->onInitLoopEquip(myLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
 
     // call it from the load side, but this time there is a negative (cooling) load - shouldn't try to run
     {
@@ -1679,7 +1680,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = loadInletTemp;
         DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
-        thisHeatingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        thisHeatingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(loadInletTemp, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(0.0, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
@@ -1697,7 +1698,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
-        thisHeatingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        thisHeatingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(specifiedLoadSetpoint, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(curLoad, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
@@ -1716,7 +1717,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
-        thisHeatingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        thisHeatingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to miss setpoint and be at max capacity
         EXPECT_NEAR(44.402, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(availableCapacity, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
@@ -1886,7 +1887,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
     // call for all initialization
     DataGlobals::BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisCoolingPLHP->onInitLoopEquip(myLoadLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation);
 
     // call from load side location, firsthvac, no load, not running, verify the unit doesn't have any values lingering
     thisCoolingPLHP->loadSideHeatTransfer = 1000;
@@ -1899,7 +1900,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
     bool firstHVAC = true;
     Real64 curLoad = 0.0;
     bool runFlag = false;
-    thisCoolingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+    thisCoolingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideHeatTransfer, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->powerUsage, 0.001);
@@ -1918,7 +1919,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
-        thisCoolingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        thisCoolingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(specifiedLoadSetpoint, thisCoolingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(-curLoad, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
@@ -1937,7 +1938,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
-        thisCoolingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        thisCoolingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to miss setpoint and be at max capacity
         EXPECT_NEAR(15.597, thisCoolingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(availableCapacity, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
@@ -2003,7 +2004,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
     // call for all initialization
     DataGlobals::BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisHeatingPLHP->onInitLoopEquip(myLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
 
     // call it from the load side, but this time there is a negative (cooling) load - shouldn't try to run
     {
@@ -2015,7 +2016,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = loadInletTemp;
         DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
-        thisHeatingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        thisHeatingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(loadInletTemp, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(0.0, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
@@ -2033,7 +2034,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
-        thisHeatingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        thisHeatingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to meet setpoint and have some pre-evaluated conditions
         EXPECT_NEAR(specifiedLoadSetpoint, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(curLoad, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
@@ -2052,7 +2053,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
-        thisHeatingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        thisHeatingPLHP->simulate(state, myLoadLocation, firstHVAC, curLoad, runFlag);
         // expect it to miss setpoint and be at max capacity
         EXPECT_NEAR(44.402, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(availableCapacity, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
@@ -2199,7 +2200,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     // call for all initialization
     DataGlobals::BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisCoolingPLHP->onInitLoopEquip(myLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myLocation);
 
     // call with run flag off, loose limits on node min/max
     thisCoolingPLHP->running = false;
@@ -2357,8 +2358,8 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     DataGlobals::BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
-    thisCoolingPLHP->onInitLoopEquip(myCoolingLoadLocation);
-    thisHeatingPLHP->onInitLoopEquip(myHeatingLoadLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(state, myHeatingLoadLocation);
 
     DataPlant::PlantFinalSizesOkayToReport = true;
     DataPlant::PlantFirstSizesOkayToReport = true;
@@ -2517,8 +2518,8 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     DataGlobals::BeginEnvrnFlag = true;
 
     // initialize so the components can find themselves on the plant
-    thisCoolingPLHP->onInitLoopEquip(myCoolingLoadLocation);
-    thisHeatingPLHP->onInitLoopEquip(myHeatingLoadLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myCoolingLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(state, myHeatingLoadLocation);
 
     DataPlant::PlantFinalSizesOkayToReport = true;
     DataPlant::PlantFirstSizesOkayToReport = true;
@@ -2767,7 +2768,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     // call for all initialization
     DataGlobals::BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisCoolingPLHP->onInitLoopEquip(myLoadLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation);
 
     int NumFound;
 
@@ -2863,7 +2864,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     // call for all initialization
     DataGlobals::BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisHeatingPLHP->onInitLoopEquip(myLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
 
     int NumFound;
 

@@ -54,6 +54,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/DXFEarClipping.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
@@ -90,7 +91,6 @@ namespace DXFEarClipping {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
-    using DataGlobals::OutputFileDebug;
     using DataGlobals::Pi;
     using DataGlobals::RadToDeg;
     using DataGlobals::TwoPi;
@@ -678,7 +678,7 @@ namespace DXFEarClipping {
                     earvert(3) = evert;
                 }
                 if (trackit) {
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "ear=" << nears << " triangle=" << svert << mvert << evert;
+                    print(OutputFiles::getSingleton().debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
                 }
             }
         }

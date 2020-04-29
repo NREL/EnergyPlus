@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -318,5 +319,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     Real64 curLoad = -10000.0;
     bool runFlag = true;
 
-    thisChiller.simulate(loc, firstHVAC, curLoad, runFlag);
+    EnergyPlusData state;
+
+    thisChiller.simulate(state, loc, firstHVAC, curLoad, runFlag);
 }

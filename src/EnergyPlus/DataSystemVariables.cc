@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -418,7 +419,7 @@ namespace DataSystemVariables {
         Threading = false;
     }
 
-    void processEnvironmentVariables() {
+    void processEnvironmentVariables(DataGlobal const &dataGlobals) {
 
         static std::string cEnvValue;
 
@@ -434,7 +435,7 @@ namespace DataSystemVariables {
 
         get_environment_variable(FullAnnualSimulation, cEnvValue);
         FullAnnualRun = env_var_on(cEnvValue); // Yes or True
-        if (DataGlobals::AnnualSimulation) FullAnnualRun = true;
+        if (dataGlobals.AnnualSimulation) FullAnnualRun = true;
 
         get_environment_variable(cDisplayAllWarnings, cEnvValue);
         DataGlobals::DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True

@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -192,7 +193,7 @@ namespace PlantChillers {
 
         void getSizingFactor(Real64 &EP_UNUSED(SizFac)) override;
 
-        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut)) override;
 
@@ -249,7 +250,7 @@ namespace PlantChillers {
 
         static ElectricChillerSpecs *factory(std::string const &chillerName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void initialize(bool RunFlag, Real64 MyLoad) override;
 
@@ -344,7 +345,7 @@ namespace PlantChillers {
 
         static void getInput();
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 
@@ -436,7 +437,7 @@ namespace PlantChillers {
 
         static void getInput();
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 
@@ -468,7 +469,7 @@ namespace PlantChillers {
 
         static void getInput();
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 

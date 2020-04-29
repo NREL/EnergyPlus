@@ -60,6 +60,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -156,7 +157,7 @@ namespace HeatPumpWaterToWaterSimple {
         return nullptr;
     }
 
-    void GshpSpecs::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const EP_UNUSED(RunFlag))
+    void GshpSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const EP_UNUSED(RunFlag))
     {
         if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
