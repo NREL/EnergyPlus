@@ -3515,7 +3515,7 @@ namespace WeatherManager {
                             // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
                             SkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
                         } else {
-                            // Valid IR from Sky
+                            // Valid IR from weather files
                             SkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
                         }
                     } else {
