@@ -63,6 +63,17 @@ The coil is controlled by knowing the zone demand determined by the zone thermos
 
 This is the upper limit on the temperature in degrees C of the air leaving the terminal unit -- reheat coil (and being delivered to the zone). If the user leaves this field blank, no maximum reheat air temperature is enforced.
 
+\subsubsection{Outputs}
+
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
+
 An IDF example:
 
 \begin{lstlisting}
@@ -79,10 +90,6 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
       0.0,  !- Min Reheat Water Flow {m3/s}
       0.001;  !- Convergence Tolerance
 \end{lstlisting}
-
-\subsubsection{Outputs}
-
-There are no outputs for the constant volume reheat air terminal.
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:NoReheat}\label{airterminalsingleductconstantvolumenoreheat}
 The AirTerminal:SingleDuct:ConstantVolume:NoReheat object creates the capability of supplying central system air directly to a zone without any zone level thermostat control. The supply air temperature is controlled by the central system controller. It is typically used with a unitary system and furnaces which controls the system supply temperature and flow rate with continuous or cycling fan. When used without the Design Specification Outdoor Air Object Name, the terminal unit is passive and accepts any flow rate supplied by the central system, but will never exceed the maximum air flow rate.
@@ -121,7 +128,14 @@ This field specifies the occupancy level to use when calculating the ventilation
 
 \subsubsection{Outputs}
 
-There are no outputs for the constant volume NoReheat air terminal.
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 An IDF example:
 

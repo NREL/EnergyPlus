@@ -1154,6 +1154,14 @@ namespace SingleDuct {
             //  CALL SetupOutputVariable('Damper Position', Sys(SysNum)%DamperPosition, &
             //                        'System','Average',Sys(SysNum)%SysName)
 
+            // Setup output for the air terminal single duct constant volume no reheat.
+            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
+                OutputProcessor::Unit::m3_s,
+                sd_airterminal(SysNum).OutdoorAirFlowRate,
+                "System",
+                "Average",
+                sd_airterminal(SysNum).SysName);
+
         } // End Number of Sys Loop
 
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:NoReheat";
