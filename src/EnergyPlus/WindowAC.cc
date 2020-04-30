@@ -69,6 +69,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -124,7 +125,6 @@ namespace WindowAC {
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::OutputFileDebug;
     using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::BlowThru;
@@ -192,7 +192,7 @@ namespace WindowAC {
         WindACNumericFields.deallocate();
     }
 
-    void SimWindowAC(std::string const &CompName,   // name of the window AC unit
+    void SimWindowAC(EnergyPlusData &state, std::string const &CompName,   // name of the window AC unit
                      int const ZoneNum,             // number of zone being served
                      bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                      Real64 &PowerMet,              // Sensible power supplied by window AC (W)
@@ -242,7 +242,7 @@ namespace WindowAC {
 
         // First time SimWindowAC is called, get the input for all the window AC units
         if (GetWindowACInputFlag) {
-            GetWindowAC();
+            GetWindowAC(state);
             GetWindowACInputFlag = false;
         }
 
@@ -280,9 +280,9 @@ namespace WindowAC {
         ZoneCoolingOnlyFan = true;
 
         // Initialize the window AC unit
-        InitWindowAC(WindACNum, QZnReq, ZoneNum, FirstHVACIteration);
+        InitWindowAC(state, WindACNum, QZnReq, ZoneNum, FirstHVACIteration);
 
-        SimCyclingWindowAC(WindACNum, ZoneNum, FirstHVACIteration, PowerMet, QZnReq, LatOutputProvided);
+        SimCyclingWindowAC(state, WindACNum, ZoneNum, FirstHVACIteration, PowerMet, QZnReq, LatOutputProvided);
 
         // Report the result of the simulation
         ReportWindowAC(WindACNum);
@@ -291,7 +291,7 @@ namespace WindowAC {
         ZoneCoolingOnlyFan = false;
     }
 
-    void GetWindowAC()
+    void GetWindowAC(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -488,11 +488,11 @@ namespace WindowAC {
                     WindAC(WindACNum).FanAvailSchedPtr = HVACFan::fanObjs[WindAC(WindACNum).FanIndex]->availSchedIndex;
                 } else {
 
-                    GetFanType(WindAC(WindACNum).FanName, WindAC(WindACNum).FanType_Num, FanErrFlag, CurrentModuleObject, WindAC(WindACNum).Name);
+                    GetFanType(state.fans, WindAC(WindACNum).FanName, WindAC(WindACNum).FanType_Num, FanErrFlag, CurrentModuleObject, WindAC(WindACNum).Name);
                     {
                         auto const SELECT_CASE_var(WindAC(WindACNum).FanType_Num);
                         if ((SELECT_CASE_var == FanType_SimpleOnOff) || (SELECT_CASE_var == FanType_SimpleConstVolume)) {
-                            GetFanIndex(WindAC(WindACNum).FanName, WindAC(WindACNum).FanIndex, FanErrFlag, CurrentModuleObject);
+                            GetFanIndex(state.fans, WindAC(WindACNum).FanName, WindAC(WindACNum).FanIndex, FanErrFlag, CurrentModuleObject);
                             if (FanErrFlag) {
                                 ShowContinueError(" specified in " + CurrentModuleObject + " = \"" + WindAC(WindACNum).Name + "\".");
                                 ErrorsFound = true;
@@ -518,7 +518,7 @@ namespace WindowAC {
                         }
                     }
                     // Get the fan's availability schedule
-                    WindAC(WindACNum).FanAvailSchedPtr = GetFanAvailSchPtr(WindAC(WindACNum).FanType, WindAC(WindACNum).FanName, FanErrFlag);
+                    WindAC(WindACNum).FanAvailSchedPtr = GetFanAvailSchPtr(state.fans, WindAC(WindACNum).FanType, WindAC(WindACNum).FanName, FanErrFlag);
                 }
                 if (FanErrFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + WindAC(WindACNum).Name);
@@ -536,11 +536,11 @@ namespace WindowAC {
                 if (UtilityRoutines::SameString(Alphas(9), "Coil:Cooling:DX:SingleSpeed")) {
                     WindAC(WindACNum).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
                     WindAC(WindACNum).CoilOutletNodeNum =
-                        GetDXCoilOutletNode(WindAC(WindACNum).DXCoilType, WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
+                        GetDXCoilOutletNode(state, WindAC(WindACNum).DXCoilType, WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
                 } else if (UtilityRoutines::SameString(Alphas(9), "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
                     WindAC(WindACNum).DXCoilType_Num = CoilDX_CoolingHXAssisted;
                     WindAC(WindACNum).CoilOutletNodeNum =
-                        GetDXHXAsstdCoilOutletNode(WindAC(WindACNum).DXCoilType, WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
+                        GetDXHXAsstdCoilOutletNode(state, WindAC(WindACNum).DXCoilType, WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
                 } else if (UtilityRoutines::SameString(Alphas(9), "Coil:Cooling:DX:VariableSpeed")) {
                     WindAC(WindACNum).DXCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
                     WindAC(WindACNum).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
@@ -795,13 +795,13 @@ namespace WindowAC {
         }
         for (WindACNum = 1; WindACNum <= NumWindAC; ++WindACNum) {
             if (WindAC(WindACNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(WindAC(WindACNum).DXCoilName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(state, WindAC(WindACNum).DXCoilName,
                                                              WindAC(WindACNum).DXCoilType,
                                                              WindAC(WindACNum).FanName,
                                                              DataAirSystems::objectVectorOOFanSystemModel,
                                                              WindAC(WindACNum).FanIndex);
             } else {
-                coilSelectionReportObj->setCoilSupplyFanInfo(WindAC(WindACNum).DXCoilName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(state, WindAC(WindACNum).DXCoilName,
                                                              WindAC(WindACNum).DXCoilType,
                                                              WindAC(WindACNum).FanName,
                                                              DataAirSystems::structArrayLegacyFanModels,
@@ -810,7 +810,7 @@ namespace WindowAC {
         }
     }
 
-    void InitWindowAC(int const WindACNum,          // number of the current window AC unit being simulated
+    void InitWindowAC(EnergyPlusData &state, int const WindACNum,          // number of the current window AC unit being simulated
                       Real64 &QZnReq,               // zone load (modified as needed) (W)
                       int const ZoneNum,            // index to zone
                       bool const FirstHVACIteration // TRUE when first HVAC iteration
@@ -905,7 +905,7 @@ namespace WindowAC {
 
         if (!SysSizingCalc && MySizeFlag(WindACNum)) {
 
-            SizeWindowAC(WindACNum);
+            SizeWindowAC(state, WindACNum);
 
             MySizeFlag(WindACNum) = false;
         }
@@ -982,7 +982,7 @@ namespace WindowAC {
         if (WindAC(WindACNum).OpMode == ContFanCycCoil && WindAC(WindACNum).PartLoadFrac > 0.0 &&
             (GetCurrentScheduleValue(WindAC(WindACNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOn) {
 
-            CalcWindowACOutput(WindACNum, FirstHVACIteration, WindAC(WindACNum).OpMode, 0.0, false, NoCompOutput);
+            CalcWindowACOutput(state, WindACNum, FirstHVACIteration, WindAC(WindACNum).OpMode, 0.0, false, NoCompOutput);
 
             QToCoolSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
@@ -996,7 +996,7 @@ namespace WindowAC {
         }
     }
 
-    void SizeWindowAC(int const WindACNum)
+    void SizeWindowAC(EnergyPlusData &state, int const WindACNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1104,7 +1104,7 @@ namespace WindowAC {
                     } else {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     }
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     WindAC(WindACNum).MaxAirVolFlow = TempSize;
 
                 } else if (SAFMethod == FlowPerCoolingCapacity) {
@@ -1116,13 +1116,13 @@ namespace WindowAC {
                     if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
                         DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                     }
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DataCapacityUsedForSizing = TempSize;
                     DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     SizingMethod = CoolingAirflowSizing;
                     PrintFlag = true;
                     TempSize = AutoSize;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     WindAC(WindACNum).MaxAirVolFlow = TempSize;
                 }
                 // DataScalableSizingON = false;
@@ -1156,7 +1156,7 @@ namespace WindowAC {
                 PrintFlag = true;
                 SizingString = WindACNumericFields(WindACNum).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = WindAC(WindACNum).MaxAirVolFlow;
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 WindAC(WindACNum).MaxAirVolFlow = TempSize;
             }
         }
@@ -1185,7 +1185,7 @@ namespace WindowAC {
         DataScalableCapSizingON = false;
     }
 
-    void SimCyclingWindowAC(int const WindACNum,           // number of the current window AC unit being simulated
+    void SimCyclingWindowAC(EnergyPlusData &state, int const WindACNum,           // number of the current window AC unit being simulated
                             int const EP_UNUSED(ZoneNum),  // number of zone being served !unused1208
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // Sensible power supplied (W)
@@ -1280,7 +1280,7 @@ namespace WindowAC {
 
         if (UnitOn && CoilOn) {
             HXUnitOn = false;
-            ControlCycWindACOutput(WindACNum, FirstHVACIteration, OpMode, QZnReq, PartLoadFrac, HXUnitOn);
+            ControlCycWindACOutput(state, WindACNum, FirstHVACIteration, OpMode, QZnReq, PartLoadFrac, HXUnitOn);
         } else {
             PartLoadFrac = 0.0;
             HXUnitOn = false;
@@ -1288,7 +1288,7 @@ namespace WindowAC {
 
         WindAC(WindACNum).PartLoadFrac = PartLoadFrac;
 
-        CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, QUnitOut);
+        CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, QUnitOut);
 
         // Reseting AirMassFlow to inlet node mass flow rate since inlet mass flow rate may be getting
         // manipulated in subroutine CalcWindowACOutput
@@ -1385,7 +1385,7 @@ namespace WindowAC {
         }
     }
 
-    void CalcWindowACOutput(int const WindACNum,           // Unit index in fan coil array
+    void CalcWindowACOutput(EnergyPlusData &state, int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                             int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                             Real64 const PartLoadFrac,     // unit part load fraction
@@ -1455,15 +1455,15 @@ namespace WindowAC {
         // if blow through, simulate fan then coil. For draw through, simulate coil then fan.
         if (WindAC(WindACNum).FanPlace == BlowThru) {
             if (WindAC(WindACNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
+                Fans::SimulateFanComponents(state,
                     WindAC(WindACNum).FanName, FirstHVACIteration, WindAC(WindACNum).FanIndex, PartLoadFrac, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[WindAC(WindACNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[WindAC(WindACNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
         }
 
         if (WindAC(WindACNum).DXCoilType_Num == CoilDX_CoolingHXAssisted) {
-            SimHXAssistedCoolingCoil(WindAC(WindACNum).DXCoilName,
+            SimHXAssistedCoolingCoil(state, WindAC(WindACNum).DXCoilName,
                                      FirstHVACIteration,
                                      On,
                                      PartLoadFrac,
@@ -1478,7 +1478,7 @@ namespace WindowAC {
             Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
             Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
 
-            VariableSpeedCoils::SimVariableSpeedCoils(WindAC(WindACNum).DXCoilName,
+            VariableSpeedCoils::SimVariableSpeedCoils(state, WindAC(WindACNum).DXCoilName,
                                                       WindAC(WindACNum).DXCoilIndex,
                                                       WindAC(WindACNum).OpMode,
                                                       MaxONOFFCyclesperHour,
@@ -1493,15 +1493,15 @@ namespace WindowAC {
                                                       OnOffAirFlowRatio);
 
         } else {
-            SimDXCoil(WindAC(WindACNum).DXCoilName, On, FirstHVACIteration, WindAC(WindACNum).DXCoilIndex, WindAC(WindACNum).OpMode, PartLoadFrac);
+            SimDXCoil(state, WindAC(WindACNum).DXCoilName, On, FirstHVACIteration, WindAC(WindACNum).DXCoilIndex, WindAC(WindACNum).OpMode, PartLoadFrac);
         }
 
         if (WindAC(WindACNum).FanPlace == DrawThru) {
             if (WindAC(WindACNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
+                Fans::SimulateFanComponents(state,
                     WindAC(WindACNum).FanName, FirstHVACIteration, WindAC(WindACNum).FanIndex, PartLoadFrac, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[WindAC(WindACNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[WindAC(WindACNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
         }
 
@@ -1509,7 +1509,7 @@ namespace WindowAC {
         LoadMet = AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRat) - PsyHFnTdbW(Node(InletNode).Temp, MinHumRat));
     }
 
-    void ControlCycWindACOutput(int const WindACNum,           // Unit index in fan coil array
+    void ControlCycWindACOutput(EnergyPlusData &state, int const WindACNum,           // Unit index in fan coil array
                                 bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                 int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                                 Real64 const QZnReq,           // cooling output needed by zone [W]
@@ -1579,7 +1579,7 @@ namespace WindowAC {
         }
 
         // Get result when DX coil is off
-        CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, 0.0, HXUnitOn, NoCoolOutput);
+        CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, 0.0, HXUnitOn, NoCoolOutput);
 
         // If NoCoolOutput < QZnReq, the coil needs to be off
         if (NoCoolOutput < QZnReq) {
@@ -1588,7 +1588,7 @@ namespace WindowAC {
         }
 
         // Get full load result
-        CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, 1.0, HXUnitOn, FullOutput);
+        CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, 1.0, HXUnitOn, FullOutput);
 
         // Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput
         // Check that this is the case; if not set PartLoadFrac = 0.0 (off) and return
@@ -1623,7 +1623,7 @@ namespace WindowAC {
 
         while ((std::abs(Error) > ErrorToler) && (Iter <= MaxIter) && PartLoadFrac > MinPLF) {
             // Get result when DX coil is operating at partloadfrac
-            CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, ActualOutput);
+            CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, ActualOutput);
             Error = (QZnReq - ActualOutput) / QZnReq;
             DelPLF = (QZnReq - ActualOutput) / FullOutput;
             PartLoadFrac += Relax * DelPLF;
@@ -1654,7 +1654,7 @@ namespace WindowAC {
             HXUnitOn = true;
 
             //   Get full load result
-            CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, 1.0, HXUnitOn, FullOutput);
+            CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, 1.0, HXUnitOn, FullOutput);
 
             if (Node(WindAC(WindACNum).CoilOutletNodeNum).HumRatMax < Node(WindAC(WindACNum).CoilOutletNodeNum).HumRat || QZnReq <= FullOutput) {
                 PartLoadFrac = 1.0;
@@ -1667,7 +1667,7 @@ namespace WindowAC {
 
             while ((std::abs(Error) > ErrorToler) && (Iter <= MaxIter) && PartLoadFrac > MinPLF) {
                 // Get result when DX coil is operating at partloadfrac
-                CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, ActualOutput);
+                CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, ActualOutput);
                 Error = (QZnReq - ActualOutput) / QZnReq;
                 DelPLF = (QZnReq - ActualOutput) / FullOutput;
                 PartLoadFrac += Relax * DelPLF;
@@ -1692,7 +1692,7 @@ namespace WindowAC {
         } // WindAC(WindACNum)%DXCoilType_Num == CoilDX_CoolingHXAssisted && *
     }
 
-    int GetWindowACZoneInletAirNode(int const WindACNum)
+    int GetWindowACZoneInletAirNode(EnergyPlusData &state, int const WindACNum)
     {
 
         // FUNCTION INFORMATION:
@@ -1731,7 +1731,7 @@ namespace WindowAC {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
         if (GetWindowACInputFlag) {
-            GetWindowAC();
+            GetWindowAC(state);
             GetWindowACInputFlag = false;
         }
 
@@ -1740,7 +1740,7 @@ namespace WindowAC {
         return GetWindowACZoneInletAirNode;
     }
 
-    int GetWindowACOutAirNode(int const WindACNum)
+    int GetWindowACOutAirNode(EnergyPlusData &state, int const WindACNum)
     {
 
         // FUNCTION INFORMATION:
@@ -1779,7 +1779,7 @@ namespace WindowAC {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
         if (GetWindowACInputFlag) {
-            GetWindowAC();
+            GetWindowAC(state);
             GetWindowACInputFlag = false;
         }
 
@@ -1788,7 +1788,7 @@ namespace WindowAC {
         return GetWindowACOutAirNode;
     }
 
-    int GetWindowACReturnAirNode(int const WindACNum)
+    int GetWindowACReturnAirNode(EnergyPlusData &state, int const WindACNum)
     {
 
         // FUNCTION INFORMATION:
@@ -1827,7 +1827,7 @@ namespace WindowAC {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
         if (GetWindowACInputFlag) {
-            GetWindowAC();
+            GetWindowAC(state);
             GetWindowACInputFlag = false;
         }
 
@@ -1844,7 +1844,7 @@ namespace WindowAC {
         return GetWindowACReturnAirNode;
     }
 
-    int GetWindowACMixedAirNode(int const WindACNum)
+    int GetWindowACMixedAirNode(EnergyPlusData &state, int const WindACNum)
     {
 
         // FUNCTION INFORMATION:
@@ -1883,7 +1883,7 @@ namespace WindowAC {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
         if (GetWindowACInputFlag) {
-            GetWindowAC();
+            GetWindowAC(state);
             GetWindowACInputFlag = false;
         }
 

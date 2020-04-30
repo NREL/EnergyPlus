@@ -69,6 +69,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -163,7 +164,7 @@ namespace CoolingPanelSimple {
         MySizeFlagCoolPanel.deallocate();
     }
 
-    void SimCoolingPanel(std::string const &EquipName,
+    void SimCoolingPanel(EnergyPlusData &state, std::string const &EquipName,
                          int const ActualZoneNum,
                          int const ControlledZoneNum,
                          bool const FirstHVACIteration,
@@ -225,7 +226,7 @@ namespace CoolingPanelSimple {
 
             auto &ThisCP(CoolingPanel(CoolingPanelNum));
 
-            InitCoolingPanel(CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
+            InitCoolingPanel(state, CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
 
             QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
 
@@ -748,7 +749,7 @@ namespace CoolingPanelSimple {
         }
     }
 
-    void InitCoolingPanel(int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -844,7 +845,7 @@ namespace CoolingPanelSimple {
         if (!SysSizingCalc) {
             if (MySizeFlagCoolPanel(CoolingPanelNum) && !SetLoopIndexFlag(CoolingPanelNum)) {
                 // for each cooling panel do the sizing once.
-                SizeCoolingPanel(CoolingPanelNum);
+                SizeCoolingPanel(state, CoolingPanelNum);
                 MySizeFlagCoolPanel(CoolingPanelNum) = false;
 
                 // set design mass flow rates
@@ -928,7 +929,7 @@ namespace CoolingPanelSimple {
         ThisCP.RadEnergy = 0.0;
     }
 
-    void SizeCoolingPanel(int const CoolingPanelNum)
+    void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -1013,12 +1014,12 @@ namespace CoolingPanelSimple {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (CapSizingMethod == CoolingDesignCapacity && ThisCP.ScaledCoolingCapacity > 0.0) {
                     TempSize = ThisCP.ScaledCoolingCapacity;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DesCoilLoad = TempSize;
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     DataScalableCapSizingON = true;
                     TempSize = ThisCP.ScaledCoolingCapacity * Zone(ThisCP.ZonePtr).FloorArea;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DesCoilLoad = TempSize;
                     DataScalableCapSizingON = false;
                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
@@ -1062,7 +1063,7 @@ namespace CoolingPanelSimple {
                     } else {
                         TempSize = ThisCP.ScaledCoolingCapacity;
                     }
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DesCoilLoad = TempSize;
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;

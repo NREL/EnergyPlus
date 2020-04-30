@@ -62,13 +62,10 @@ namespace DataStringGlobals {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    extern std::string outputAuditFileName;
     extern std::string outputBndFileName;
     extern std::string outputDxfFileName;
-    extern std::string outputEioFileName;
     extern std::string outputEndFileName;
     extern std::string outputErrFileName;
-    extern std::string outputEsoFileName;
 
     extern std::string outputJsonFileName;
     extern std::string outputTSHvacJsonFileName;
@@ -124,7 +121,6 @@ namespace DataStringGlobals {
     extern std::string outputMapTxtFileName;
     extern std::string outputEddFileName;
     extern std::string outputIperrFileName;
-    extern std::string outputDbgFileName;
     extern std::string outputPerfLogFileName;
     extern std::string outputSlnFileName;
     extern std::string outputSciFileName;

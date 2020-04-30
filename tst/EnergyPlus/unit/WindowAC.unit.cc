@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -433,15 +434,15 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
 
     DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedule data
+    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedule data
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -450,15 +451,15 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     DataGlobals::ZoneSizingCalc = true;
     EnergyPlus::createFacilityElectricPowerServiceObject();
 
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, outputFiles());
 
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), errorsFound);
+    SimulationManager::SetupSimulation(state, outputFiles(), errorsFound);
     //
 
     Real64 qDotMet(0.0);    // Watts total cap
     Real64 lDotProvid(0.0); // latent removal kg/s
     int compIndex(0);
-    WindowAC::SimWindowAC("ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
+    WindowAC::SimWindowAC(state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check input processing
     EXPECT_EQ(compIndex, 1);
 
@@ -469,7 +470,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -295.0;
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
 
-    WindowAC::SimWindowAC("ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
+    WindowAC::SimWindowAC(state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check output
     EXPECT_NEAR(qDotMet, -295.0, 0.1);
 }

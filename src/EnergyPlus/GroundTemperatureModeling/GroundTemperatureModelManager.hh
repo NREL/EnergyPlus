@@ -75,7 +75,7 @@ namespace GroundTemperatureManager {
 
     extern std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
 
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(std::string const &type, std::string const &name);
+    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(DataGlobal &dataGlobals, std::string const &type, std::string const &name);
 
     void clear_state();
 

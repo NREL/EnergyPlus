@@ -69,6 +69,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -450,7 +451,7 @@ namespace SetPointManager {
         SchTESSetPtMgr.deallocate();              // TES Scheduled setpoint Managers
     }
 
-    void ManageSetPoints()
+    void ManageSetPoints(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor, Rick Strand
@@ -483,7 +484,7 @@ namespace SetPointManager {
 
         // First time ManageSetPoints is called, get the input for all the setpoint managers
         if (GetInputFlag) {
-            GetSetPointManagerInputs();
+            GetSetPointManagerInputs(state);
             GetInputFlag = false;
         }
 
@@ -507,20 +508,20 @@ namespace SetPointManager {
         }
     }
 
-    void GetSetPointManagerInputs()
+    void GetSetPointManagerInputs(EnergyPlusData &state)
     {
         // wrapper for GetInput to allow unit testing when fatal inputs are detected
         static bool ErrorsFound(false);
         static std::string const RoutineName("GetSetPointManagerInputs: "); // include trailing blank space
 
-        GetSetPointManagerInputData(ErrorsFound);
+        GetSetPointManagerInputData(state, ErrorsFound);
 
         if (ErrorsFound) {
             ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
         }
     }
 
-    void GetSetPointManagerInputData(bool &ErrorsFound)
+    void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3278,7 +3279,7 @@ namespace SetPointManager {
             }
 
             SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneName = cAlphaArgs(2);
-            SZOneStageCoolingSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetSystemNodeNumberForZone(cAlphaArgs(2));
+            SZOneStageCoolingSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetSystemNodeNumberForZone(state, cAlphaArgs(2));
             // get the actual zone number of the control zone
             SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
@@ -3371,7 +3372,7 @@ namespace SetPointManager {
             }
 
             SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneName = cAlphaArgs(2);
-            SZOneStageHeatingSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetSystemNodeNumberForZone(cAlphaArgs(2));
+            SZOneStageHeatingSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetSystemNodeNumberForZone(state, cAlphaArgs(2));
             // get the actual zone number of the control zone
             SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
@@ -8463,11 +8464,11 @@ namespace SetPointManager {
         }
     }
 
-    int getSPMBasedOnNode(int const NodeNum, int const SetPtType, int const SPMType, CtrlNodeType ctrlOrRefNode)
+    int getSPMBasedOnNode(EnergyPlusData &state, int const NodeNum, int const SetPtType, int const SPMType, CtrlNodeType ctrlOrRefNode)
     {
 
         if (GetInputFlag) {
-            GetSetPointManagerInputs();
+            GetSetPointManagerInputs(state);
             GetInputFlag = false;
         }
 
@@ -8501,7 +8502,7 @@ namespace SetPointManager {
         return getSPMBasedOnNode;
     }
 
-    bool IsNodeOnSetPtManager(int const NodeNum, int const SetPtType)
+    bool IsNodeOnSetPtManager(EnergyPlusData &state, int const NodeNum, int const SetPtType)
     {
 
         // FUNCTION INFORMATION:
@@ -8531,7 +8532,7 @@ namespace SetPointManager {
 
         // First time called, get the input for all the setpoint managers
         if (GetInputFlag) {
-            GetSetPointManagerInputs();
+            GetSetPointManagerInputs(state);
             GetInputFlag = false;
         }
 
@@ -8551,7 +8552,7 @@ namespace SetPointManager {
         return IsNodeOnSetPtManager;
     }
 
-    bool NodeHasSPMCtrlVarType(int const NodeNum, int const iCtrlVarType)
+    bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int const NodeNum, int const iCtrlVarType)
     {
 
         // FUNCTION INFORMATION:
@@ -8595,7 +8596,7 @@ namespace SetPointManager {
 
         // First time called, get the input for all the setpoint managers
         if (GetInputFlag) {
-            GetSetPointManagerInputs();
+            GetSetPointManagerInputs(state);
             GetInputFlag = false;
         }
 
@@ -8618,7 +8619,7 @@ namespace SetPointManager {
         return NodeHasSPMCtrlVarType;
     }
 
-    void ResetHumidityRatioCtrlVarType(int const NodeNum)
+    void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int const NodeNum)
     {
 
         // FUNCTION INFORMATION:
@@ -8663,7 +8664,7 @@ namespace SetPointManager {
 
         // First time called, get the input for all the setpoint managers
         if (GetInputFlag) {
-            GetSetPointManagerInputs();
+            GetSetPointManagerInputs(state);
             GetInputFlag = false;
         }
 
@@ -8722,7 +8723,7 @@ namespace SetPointManager {
         }
     }
 
-    int GetHumidityRatioVariableType(int const CntrlNodeNum)
+    int GetHumidityRatioVariableType(EnergyPlusData &state, int const CntrlNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8760,7 +8761,7 @@ namespace SetPointManager {
         int NodeNum;
 
         if (GetInputFlag) {
-            GetSetPointManagerInputs();
+            GetSetPointManagerInputs(state);
             GetInputFlag = false;
         }
 
@@ -8924,7 +8925,7 @@ namespace SetPointManager {
 
     } // end of SetUpNewScheduledTESSetPtMgr
 
-    bool GetCoilFreezingCheckFlag(int const MixedAirSPMNum)
+    bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int const MixedAirSPMNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8959,7 +8960,7 @@ namespace SetPointManager {
         int CtrldNodeNum;
 
         if (GetInputFlag) {
-            GetSetPointManagerInputs();
+            GetSetPointManagerInputs(state);
             GetInputFlag = false;
         }
 
@@ -8975,7 +8976,7 @@ namespace SetPointManager {
         return FeezigCheckFlag;
     } // End of GetCoilFreezingCheckFlag
 
-    int GetMixedAirNumWithCoilFreezingCheck(int const MixedAirNode)
+    int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int const MixedAirNode)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9011,7 +9012,7 @@ namespace SetPointManager {
         int CtrldNodeNum;
 
         if (GetInputFlag) {
-            GetSetPointManagerInputs();
+            GetSetPointManagerInputs(state);
             GetInputFlag = false;
         }
 
