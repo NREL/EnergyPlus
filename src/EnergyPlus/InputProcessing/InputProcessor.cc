@@ -52,7 +52,6 @@
 #include <istream>
 #include <unordered_set>
 
-// ObjexxFCL Headers
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
@@ -69,6 +68,7 @@
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <milo/dtoa.h>
@@ -624,7 +624,7 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
                                         bool within_max_fields,
                                         Array1S_string Alphas,
                                         int &NumAlphas,
-                                        Array1S<Real64> Numbers,
+                                        Array1D<Real64> &Numbers,
                                         int &NumNumbers,
                                         Optional<Array1D_bool> NumBlank,
                                         Optional<Array1D_bool> AlphaBlank,
@@ -711,7 +711,7 @@ void InputProcessor::getObjectItem(std::string const &Object,
                                    int const Number,
                                    Array1S_string Alphas,
                                    int &NumAlphas,
-                                   Array1S<Real64> Numbers,
+                                   Array1D<Real64> &Numbers,
                                    int &NumNumbers,
                                    int &Status,
                                    Optional<Array1D_bool> NumBlank,
@@ -769,7 +769,7 @@ void InputProcessor::getObjectItem(std::string const &Object,
     auto key = legacy_idd.find("extension");
     std::string extension_key;
     if (key != legacy_idd.end()) {
-        extension_key = key.value();
+        extension_key = key.value().get<std::string>();
     }
 
     auto const &obj = epJSON_it;
@@ -1142,7 +1142,7 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
         const json &legacy_idd = schema_properties.at(object.key()).at("legacy_idd");
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
 
         size_t max_size = 0;
@@ -1225,7 +1225,7 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
     std::string extension_key;
     auto key = legacy_idd.find("extension");
     if (key != legacy_idd.end()) {
-        extension_key = key.value();
+        extension_key = key.value().get<std::string>();
     }
 
     for (auto const obj : *objects) {
@@ -1453,6 +1453,9 @@ void InputProcessor::preScanReportingVariables()
     // consider those variables for output.  (At this time, all metered variables are
     // allowed to pass through).
 
+    // This routine also scans any variables requested by API call for library usage.
+    // These variables are stored in a vector in output processor, and the values are added before E+ begins.
+
     // METHODOLOGY EMPLOYED:
     // Uses internal records and structures.
     // Looks at:
@@ -1504,7 +1507,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][MeterCustom]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1525,7 +1528,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][MeterCustomDecrement]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1562,6 +1565,10 @@ void InputProcessor::preScanReportingVariables()
         }
     }
 
+    for (auto const & requestedVar : OutputProcessor::apiVarRequests) {
+        addRecordToOutputVariableStructure(requestedVar.varKey, requestedVar.varName);
+    }
+
     epJSON_objects = epJSON.find(OutputTableTimeBins);
     if (epJSON_objects != epJSON.end()) {
         auto const &epJSON_object = epJSON_objects.value();
@@ -1581,7 +1588,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableMonthly]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1601,7 +1608,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableAnnual]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1621,7 +1628,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableSummaries]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();

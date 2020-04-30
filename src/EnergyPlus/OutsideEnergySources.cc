@@ -60,12 +60,13 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -134,13 +135,13 @@ namespace OutsideEnergySources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void OutsideEnergySourceSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
+    void OutsideEnergySourceSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
                                             Real64 &CurLoad, bool RunFlag) {
         this->initialize(CurLoad);
         this->calculate(RunFlag, CurLoad);
     }
 
-    void OutsideEnergySourceSpecs::onInitLoopEquip(const PlantLocation &) {
+    void OutsideEnergySourceSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &) {
         this->initialize(0.0);
         this->size();
     }

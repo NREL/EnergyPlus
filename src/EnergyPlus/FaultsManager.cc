@@ -58,6 +58,7 @@
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -245,7 +246,7 @@ namespace FaultsManager {
 
     // Functions
 
-    void CheckAndReadFaults()
+    void CheckAndReadFaults(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -903,7 +904,7 @@ namespace FaultsManager {
                     UtilityRoutines::SameString(SELECT_CASE_VAR, "Coil:Heating:Desuperheater")) {
                     // Read in coil input if not done yet
                     if (HeatingCoils::GetCoilsInputFlag) {
-                        HeatingCoils::GetHeatingCoilInput();
+                        HeatingCoils::GetHeatingCoilInput(state);
                         HeatingCoils::GetCoilsInputFlag = false;
                     }
                     // Check the coil name and coil type
@@ -971,7 +972,7 @@ namespace FaultsManager {
                     }
                     // Read in controller input if not done yet
                     if (HVACControllers::GetControllerInputFlag) {
-                        HVACControllers::GetControllerInput();
+                        HVACControllers::GetControllerInput(state);
                         HVACControllers::GetControllerInputFlag = false;
                     }
                     // Check the controller name
@@ -997,7 +998,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Cooling:DX")) {
                     // Read in DXCoolingSystem input if not done yet
                     if (HVACDXSystem::GetInputFlag) {
-                        HVACDXSystem::GetDXCoolingSystemInput();
+                        HVACDXSystem::GetDXCoolingSystemInput(state);
                         HVACDXSystem::GetInputFlag = false;
                     }
 
@@ -1015,7 +1016,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Heating:DX")) {
                     // Read in DXCoolingSystem input if not done yet
                     if (HVACDXHeatPumpSystem::GetInputFlag) {
-                        HVACDXHeatPumpSystem::GetDXHeatPumpSystemInput();
+                        HVACDXHeatPumpSystem::GetDXHeatPumpSystemInput(state);
                         HVACDXHeatPumpSystem::GetInputFlag = false;
                     }
 
@@ -1515,7 +1516,7 @@ namespace FaultsManager {
             }
 
             // Assign fault index to the fan object
-            for (int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum) {
+            for (int FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
                 if (UtilityRoutines::SameString(Fans::Fan(FanNum).FanName, cAlphaArgs(3))) {
                     Fans::Fan(FanNum).FaultyFilterFlag = true;
                     Fans::Fan(FanNum).FaultyFilterIndex = jFault_AirFilter;
@@ -1559,7 +1560,7 @@ namespace FaultsManager {
             }
 
             // Check whether the specified fan curve covers the design operational point of the fan
-            if (!FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve()) {
+            if (!FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
                 ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + cAlphaFieldNames(6) + " = \"" + cAlphaArgs(6) + "\" does not cover ");
                 ShowContinueError("the operational point of Fan " + FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanName);
@@ -1764,6 +1765,102 @@ namespace FaultsManager {
             FouledCoils(jFault_FoulingCoil).Rfa = rNumericArgs(3);
             FouledCoils(jFault_FoulingCoil).Aout = rNumericArgs(4);
             FouledCoils(jFault_FoulingCoil).Aratio = rNumericArgs(5);
+
+
+            // Coil check and link
+            {
+                // Obtains and Allocates WaterCoil related parameters from input file
+                if (WaterCoils::GetWaterCoilsInputFlag) {
+                    WaterCoils::GetWaterCoilInput();
+                    WaterCoils::GetWaterCoilsInputFlag = false;
+                }
+
+                // Check the coil name and type
+                int CoilNum = UtilityRoutines::FindItemInList(FouledCoils(jFault_FoulingCoil).FouledCoilName, WaterCoils::WaterCoil);
+                if (CoilNum <= 0) {
+                    ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\". Referenced Coil named \"" +
+                                    FouledCoils(jFault_FoulingCoil).FouledCoilName + "\" was not found.");
+                    ErrorsFound = true;
+                } else {
+                    // Coil is found: check if the right type
+                    if ( (WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_SimpleHeating) ||
+                         (WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_Cooling) )
+                    {
+                        // Link the Coil with the fault model
+                        WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag = true;
+                        WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex = jFault_FoulingCoil;
+
+                        FouledCoils(jFault_FoulingCoil).FouledCoiledType = WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num;
+                        FouledCoils(jFault_FoulingCoil).FouledCoilNum = CoilNum;
+
+                        SetupOutputVariable("Coil Fouling Factor",
+                                    OutputProcessor::Unit::K_W,
+                                    WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFactor,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                        // Coil:Cooling:Water doesn't report UA because it's not variable,
+                        // but here, it's useful since we do change it via fouling, so report it
+                        if (WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_Cooling) {
+                            SetupOutputVariable("Cooling Coil Total U Factor Times Area Value",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).UACoilTotal,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                            SetupOutputVariable("Cooling Coil External U Factor Times Area Value",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).UACoilExternal,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                            SetupOutputVariable("Cooling Coil Internal U Factor Times Area Value",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).UACoilInternal,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                            SetupOutputVariable("Cooling Coil Total U Factor Times Area Value Before Fouling",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).OriginalUACoilVariable,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                            SetupOutputVariable("Cooling Coil External U Factor Times Area Value Before Fouling",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).OriginalUACoilExternal,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                            SetupOutputVariable("Cooling Coil Internal U Factor Times Area Value Before Fouling",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).OriginalUACoilInternal,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                        } else {
+                            SetupOutputVariable("Heating Coil U Factor Times Area Value Before Fouling",
+                                OutputProcessor::Unit::W_K,
+                                WaterCoils::WaterCoil(CoilNum).OriginalUACoilVariable,
+                                "System",
+                                "Average",
+                                WaterCoils::WaterCoil(CoilNum).Name);
+                        }
+                    } else {
+                        ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid "
+                                       + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) + "\".");
+                        ShowContinueError("Coil was found but it is not one of the supported types (\"Coil:Cooling:Water\" or \"Coil:Heating:Water\").");
+                        ErrorsFound = true;
+                    }
+                }
+            }
         }
 
         // read faults input: Fault_type 101-105, which are related with economizer sensors
@@ -1850,7 +1947,7 @@ namespace FaultsManager {
         RunFaultMgrOnceFlag = true;
 
         if (ErrorsFound) {
-            ShowFatalError("Errors getting FaultModel input data.  Preceding condition(s) cause termination.");
+            ShowFatalError("CheckAndReadFaults: Errors found in getting FaultModel input data. Preceding condition(s) cause termination.");
         }
     }
 
@@ -1965,6 +2062,28 @@ namespace FaultsManager {
         return UAReductionFactorAct;
     }
 
+    Real64 FaultPropertiesFoulingCoil::FaultFraction()
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Julien Marrec, EffiBEM
+        //       DATE WRITTEN   Feb. 2020
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculate the Fault Fraction based on Availability and Severity Schedules
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 FaultFrac(0.0); // Fault Fraction
+
+        // Check fault availability schedules
+        if (ScheduleManager::GetCurrentScheduleValue(this->AvaiSchedPtr) > 0.0) {
+
+            // Check fault severity schedules (Ptr initialized to -1, so would return a FaultFrac of 1 if not set)
+            FaultFrac = ScheduleManager::GetCurrentScheduleValue(this->SeveritySchedPtr);
+        }
+
+        return FaultFrac;
+    }
+
     void FaultPropertiesChillerSWT::CalFaultChillerSWT(bool FlagVariableFlow, // True if chiller is variable flow and false if it is constant flow
                                                        Real64 FaultyChillerSWTOffset, // Faulty chiller SWT sensor offset
                                                        Real64 Cp,                     // Local fluid specific heat
@@ -2024,7 +2143,7 @@ namespace FaultsManager {
         QEvaporator = QEvaporator_f;
     }
 
-    bool FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve()
+    bool FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2053,7 +2172,7 @@ namespace FaultsManager {
 
         FanFound = false;
 
-        for (int FanNum = 1; FanNum <= NumFans; ++FanNum) {
+        for (int FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
             if (UtilityRoutines::SameString(Fan(FanNum).FanName, FanName)) {
                 FanMaxAirFlowRate = Fan(FanNum).MaxAirFlowRate;
                 FanDeltaPress = Fan(FanNum).DeltaPress;

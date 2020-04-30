@@ -50,13 +50,11 @@
 #include <string>
 #include <vector>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -384,7 +382,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
         locDayOfSim,
         DataGlobals::HourOfDay,
         DataGlobals::TimeStep,
-        OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
+        *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
         DataGlobals::NumOfTimeStepInHour);
 
     return tmpztStepStamp;
@@ -414,8 +412,8 @@ void SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
     if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
         tmpSysStepStamp.CurMinuteEnd = MinutesPerHour;
     }
-    tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * MinutesPerHour;
-    tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
+    tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * MinutesPerHour;
+    tmpSysStepStamp.TimeStepDuration = *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
 
     for (auto &l : logObjs) {
         l.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
@@ -441,9 +439,8 @@ PlantCoinicidentAnalysis::PlantCoinicidentAnalysis(
     plantSizingIndex = sizingIndex;
 }
 
-void PlantCoinicidentAnalysis::ResolveDesignFlowRate(int const HVACSizingIterCount)
+void PlantCoinicidentAnalysis::ResolveDesignFlowRate(OutputFiles &outputFiles, int const HVACSizingIterCount)
 {
-    using DataGlobals::OutputFileInits;
     using DataSizing::GlobalCoolingSizingFactorMode;
     using DataSizing::GlobalCoolSizingFactor;
     using DataSizing::GlobalHeatingSizingFactorMode;
@@ -465,7 +462,6 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(int const HVACSizingIterCou
     std::string chIteration;
     std::string chSetSizes;
     std::string chDemandTrapUsed;
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
     bool changedByDemand(false);
     static bool eioHeaderDoneOnce(false);
     bool nullStampProblem;
@@ -551,10 +547,10 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(int const HVACSizingIterCou
 
     // add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
     if (!eioHeaderDoneOnce) {
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
+        print(outputFiles.eio,"{}", "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
                                              "Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous "
                                              "Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor "
-                                             "{},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}";
+                                             "{},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}\n");
         eioHeaderDoneOnce = true;
     }
     chIteration = TrimSigDigits(HVACSizingIterCount);
@@ -569,13 +565,21 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(int const HVACSizingIterCou
         chDemandTrapUsed = "No";
     }
 
-    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Plant Coincident Sizing Algorithm," + name + "," + chIteration + "," +
-                                             RoundSigDigits(newFoundMassFlowRateTimeStamp.runningAvgDataValue, 7) + "," +
-                                             RoundSigDigits(NewFoundMaxDemandTimeStamp.runningAvgDataValue, 2) + "," +
-                                             RoundSigDigits(peakLoadCalculatedMassFlow, 7) + "," + chSetSizes + "," +
-                                             RoundSigDigits(previousVolDesignFlowRate, 6) + "," + RoundSigDigits(newVolDesignFlowRate, 6) + "," +
-                                             chDemandTrapUsed + "," + RoundSigDigits(sizingFac, 4) + "," + RoundSigDigits(normalizedChange, 6) + "," +
-                                             RoundSigDigits(specificHeatForSizing, 4) + "," + RoundSigDigits(densityForSizing, 4);
+    print(outputFiles.eio,
+          "Plant Coincident Sizing Algorithm,{},{},{:.7R},{:.2R},{:.7R},{},{:.6R},{:.6R},{},{:.4R},{:.6R},{:.4R},{:.4R}\n",
+          name,
+          chIteration,
+          newFoundMassFlowRateTimeStamp.runningAvgDataValue,
+          NewFoundMaxDemandTimeStamp.runningAvgDataValue,
+          peakLoadCalculatedMassFlow,
+          chSetSizes,
+          previousVolDesignFlowRate,
+          newVolDesignFlowRate,
+          chDemandTrapUsed,
+          sizingFac,
+          normalizedChange,
+          specificHeatForSizing,
+          densityForSizing);
 
     // report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
 

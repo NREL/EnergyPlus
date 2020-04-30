@@ -62,13 +62,14 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -140,13 +141,13 @@ namespace PhotovoltaicThermalCollectors {
         return nullptr;
     }
 
-    void PVTCollectorStruct::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initialize(true);
         this->size();
     }
 
-    void PVTCollectorStruct::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PVTCollectorStruct::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                       bool const FirstHVACIteration,
                                       Real64 &EP_UNUSED(CurLoad),
                                       bool const EP_UNUSED(RunFlag))
@@ -1043,7 +1044,7 @@ namespace PhotovoltaicThermalCollectors {
 
             if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
                 Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
-                Real64 CpInlet = Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet);
+                Real64 CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
                 if (mdot * CpInlet > 0.0) {
                     PotentialOutletTemp = Tinlet + PotentialHeatGain / (mdot * CpInlet);
                 } else {
@@ -1059,7 +1060,7 @@ namespace PhotovoltaicThermalCollectors {
                     }
                     BypassFraction = max(0.0, BypassFraction);
                     PotentialOutletTemp = DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint;
-                    PotentialHeatGain = mdot * Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet) * (PotentialOutletTemp - Tinlet);
+                    PotentialHeatGain = mdot * Psychrometrics::PsyCpAirFnW(Winlet) * (PotentialOutletTemp - Tinlet);
 
                 } else {
                     BypassFraction = 0.0;
@@ -1108,7 +1109,7 @@ namespace PhotovoltaicThermalCollectors {
 
             if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
                 Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
-                CpInlet = Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet);
+                CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
                 WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(Tinlet, Winlet, DataEnvironment::OutBaroPress, RoutineName);
                 DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(Tinlet, WetBulbInlet, DataEnvironment::OutBaroPress, RoutineName);
             } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
@@ -1194,7 +1195,7 @@ namespace PhotovoltaicThermalCollectors {
 
             if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
                 Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
-                Real64 CpInlet = Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet);
+                Real64 CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
                 if (mdot * CpInlet > 0.0) {
                     PotentialOutletTemp = Tinlet + PotentialHeatGain / (mdot * CpInlet);
                 } else {
@@ -1210,7 +1211,7 @@ namespace PhotovoltaicThermalCollectors {
                     }
                     BypassFraction = max(0.0, BypassFraction);
                     PotentialOutletTemp = DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint;
-                    PotentialHeatGain = mdot * Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet) * (PotentialOutletTemp - Tinlet);
+                    PotentialHeatGain = mdot * Psychrometrics::PsyCpAirFnW(Winlet) * (PotentialOutletTemp - Tinlet);
 
                 } else {
                     BypassFraction = 0.0;
@@ -1244,7 +1245,7 @@ namespace PhotovoltaicThermalCollectors {
 
             if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
                 Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
-                CpInlet = Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet);
+                CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
                 WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(Tinlet, Winlet, DataEnvironment::OutBaroPress, RoutineName);
                 DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(Tinlet, WetBulbInlet, DataEnvironment::OutBaroPress, RoutineName);
             }
@@ -1354,7 +1355,7 @@ namespace PhotovoltaicThermalCollectors {
         int InletNode = this->HVACInletNodeNum;
         Real64 tfin = DataLoopNode::Node(InletNode).Temp;                     // inlet fluid temperature
         Real64 w_in = DataLoopNode::Node(InletNode).HumRat;                   // inlet air humidity ratio
-        Real64 cp_in = Psychrometrics::PsyCpAirFnWTdb(w_in, tfin);            // inlet air specific heat
+        Real64 cp_in = Psychrometrics::PsyCpAirFnW(w_in);                     // inlet air specific heat
         Real64 tamb = DataEnvironment::OutDryBulbTemp;                        // ambient temperature
         Real64 tsky = DataEnvironment::SkyTemp;                               // sky temperature
         Real64 t2 = DataSurfaces::Surface(this->SurfNum).OutDryBulbTemp, t2K; // temperature of bldg surface
@@ -1663,13 +1664,13 @@ namespace PhotovoltaicThermalCollectors {
         return 0; // Shutup compiler
     }
 
-    void simPVTfromOASys(int const index, bool const FirstHVACIteration)
+    void simPVTfromOASys(EnergyPlusData &state, int const index, bool const FirstHVACIteration)
     {
         PlantLocation dummyLoc(0, 0, 0, 0);
         Real64 dummyCurLoad(0.0);
         bool dummyRunFlag(true);
 
-        PVT(index).simulate(dummyLoc, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
+        PVT(index).simulate(state, dummyLoc, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
     }
 
 } // namespace PhotovoltaicThermalCollectors

@@ -65,8 +65,10 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -127,7 +129,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
     auto numZones = inputProcessor->getNumObjectsFound("Zone");
     ZoneReOrder.allocate(numZones);
     GetZoneData(ErrorsFound);
-    GetAirFlowFlag(ErrorsFound);
+    GetAirFlowFlag(state, outputFiles(), ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 }
 
@@ -163,7 +165,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 
     bool ErrorsFound(false);
 
-    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    GetMaterialData(outputFiles(), ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -200,7 +202,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_
 
     bool ErrorsFound(false);
 
-    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    GetMaterialData(outputFiles(), ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -392,7 +394,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(outputFiles(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(ZoneAirMassFlow.BalanceMixing);
@@ -452,9 +454,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     bool ErrorsFound(false); // If errors detected in input
 
     // call to process input
-    ProcessScheduleInput();
+    ProcessScheduleInput(outputFiles());
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(outputFiles(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -469,7 +471,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_FALSE(ErrorsFound);
     AllocateHeatBalArrays();
     ErrorsFound = false;
-    GetSimpleAirModelInputs(ErrorsFound);
+    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     SetZoneMassConservationFlag();
     // setup zone equipment configuration
@@ -600,7 +602,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(outputFiles(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -660,7 +662,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(outputFiles(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     NumOfZones = 2;
     ZoneReOrder.allocate(NumOfZones);
@@ -668,7 +670,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     ErrorsFound = false;
-    GetSimpleAirModelInputs(ErrorsFound);
+    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // first 2 have indexes swapped now since they are in lexicigraphical order now according to the new input processor
@@ -706,7 +708,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    GetMaterialData(outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
@@ -1204,13 +1206,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(outputFiles());
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1327,7 +1329,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(outputFiles(), ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION");
 }
@@ -1358,7 +1360,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(outputFiles(), ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi");
 }
@@ -1536,8 +1538,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
         "    2.5,                     !- Y-Coordinate of Reference Point {m}",
         "    0.8;                     !- Z-Coordinate of Reference Point {m}",
         "  ShadowCalculation,",
-        "    TimestepFrequency,       !- Calculation Method",
-        "    30,                      !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Timestep,                !- Shading Calculation Update Frequency Method",
+        "    30,                       !- Shading Calculation Update Frequency",
         "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
         "EnergyManagementSystem:ConstructionIndexVariable, Win_1, WINDOWCONSTRUCTION1;",
         "EnergyManagementSystem:ConstructionIndexVariable, Win_2, WINDOWCONSTRUCTION2;",
@@ -1565,7 +1568,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation();
+    SimulationManager::ManageSimulation(state, outputFiles());
     DataGlobals::DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
     WeatherManager::Envrn = 1;
 
@@ -1574,9 +1577,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataGlobals::HourOfDay = 11;
     DataGlobals::CurrentTime = 11.0;
     WeatherManager::SetCurrentWeather();
-    HeatBalanceManager::ManageHeatBalance();
+    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance();
+    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
     // Find the fenestration surface
     int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
     int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", DataHeatBalance::Construct);
@@ -1591,9 +1594,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataGlobals::HourOfDay = 14;
     DataGlobals::CurrentTime = 14.0;
     WeatherManager::SetCurrentWeather();
-    HeatBalanceManager::ManageHeatBalance();
+    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance();
+    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
     int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", DataHeatBalance::Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
     transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
@@ -1616,7 +1619,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1643,7 +1646,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1669,7 +1672,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_TRUE(DataHeatBalance::AnyEMPD);
@@ -1692,7 +1695,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1715,7 +1718,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1764,7 +1767,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
     
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsfound);
+    HeatBalanceManager::GetMaterialData(outputFiles(), errorsfound);
 
     EXPECT_FALSE(errorsfound);
     EXPECT_NEAR(DataHeatBalance::Material(1).Resistance,0.158,0.0001);
@@ -1805,11 +1808,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    ProcessScheduleInput();
+    ProcessScheduleInput(outputFiles());
 
     // call get material data to auto-generate IRTSurface material
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHeatBalance::TotMaterials, 1);
     int MaterNum = 1;
@@ -1836,11 +1839,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Non-Grouped Air Boundary"));
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    // InteriorWindow option currently disabled
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    //EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    //EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
@@ -1868,11 +1868,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    // InteriorWindow option currently disabled
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    //EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    //EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
@@ -1904,7 +1901,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    ProcessScheduleInput();
+    ProcessScheduleInput(outputFiles());
 
     // skip call to get material data since this doesn't use IRT
     ErrorsFound = false;
@@ -1952,7 +1949,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
     
     bool ErrorsFound(false); // If errors detected in input
 
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
     
     ASSERT_FALSE(ErrorsFound);
     
@@ -2048,7 +2045,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisec
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(outputFiles(), ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "BISECTION");
 }

@@ -54,6 +54,7 @@ extern "C" {
 #include <cstdlib>
 #include <exception>
 #include <iostream>
+#include <sys/stat.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -65,6 +66,7 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -81,14 +83,15 @@ extern "C" {
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SystemReports.hh>
-#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/Timer.h>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -98,6 +101,14 @@ namespace UtilityRoutines {
     bool outputErrorHeader(true);
     ObjexxFCL::gio::Fmt fmtLD("*");
     ObjexxFCL::gio::Fmt fmtA("(A)");
+    std::string appendPerfLog_headerRow("");
+    std::string appendPerfLog_valuesRow("");
+
+    void clear_state()
+    {
+        appendPerfLog_headerRow = "";
+        appendPerfLog_valuesRow = "";
+    }
 
     Real64 ProcessNumber(std::string const &String, bool &ErrorFlag)
     {
@@ -437,9 +448,50 @@ namespace UtilityRoutines {
     bool case_insensitive_comparator::operator()(const std::string& a, const std::string& b) const noexcept {
         return SameString(a, b);
     }
+
+    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn) 
+    // Add column to the performance log file (comma separated) which is appended to existing log.
+    // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
+    // J.Glazer February 2020
+    {
+        // the following was added for unit testing to clear the static strings
+        if (colHeader == "RESET" && colValue == "RESET") {
+            appendPerfLog_headerRow = "";
+            appendPerfLog_valuesRow = "";
+            return;
+        }
+
+        //accumuate the row until ready to be written to the file.
+        appendPerfLog_headerRow = appendPerfLog_headerRow + colHeader + ",";
+        appendPerfLog_valuesRow = appendPerfLog_valuesRow + colValue + ",";
+
+        if (finalColumn) {
+            std::fstream fsPerfLog;
+            if (!exists(DataStringGlobals::outputPerfLogFileName)) {
+                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                if (!fsPerfLog.fail()) {
+                    fsPerfLog << appendPerfLog_headerRow << std::endl;
+                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
+                }
+            } else {
+                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                if (!fsPerfLog.fail()) {
+                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
+                }
+            }
+            fsPerfLog.close();
+        }
+    }
+
+    inline bool exists (const std::string& filename) {
+    // https://stackoverflow.com/questions/25225948/how-to-check-if-a-file-exists-in-c-with-fstreamopen/51300933
+      struct stat buffer;   
+      return (stat (filename.c_str(), &buffer) == 0); 
+    }
+
 } // namespace UtilityRoutines
 
-int AbortEnergyPlus()
+int AbortEnergyPlus(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -512,16 +564,17 @@ int AbortEnergyPlus()
 
     AbortProcessing = true;
     if (AskForConnectionsReport) {
+        OutputFiles &outputFiles = OutputFiles::getSingleton();
         AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
 
         ShowMessage("Fatal error -- final processing.  More error messages may appear.");
-        SetupNodeVarsForReporting();
+        SetupNodeVarsForReporting(outputFiles);
 
         ErrFound = false;
         TerminalError = false;
-        TestBranchIntegrity(ErrFound);
+        TestBranchIntegrity(outputFiles, ErrFound);
         if (ErrFound) TerminalError = true;
-        TestAirPathIntegrity(ErrFound);
+        TestAirPathIntegrity(state, outputFiles, ErrFound);
         if (ErrFound) TerminalError = true;
         CheckMarkedNodes(ErrFound);
         if (ErrFound) TerminalError = true;
@@ -531,8 +584,8 @@ int AbortEnergyPlus()
         if (ErrFound) TerminalError = true;
 
         if (!TerminalError) {
-            ReportAirLoopConnections();
-            ReportLoopConnections();
+            ReportAirLoopConnections(outputFiles);
+            ReportLoopConnections(outputFiles);
         }
 
     } else if (!ExitDuringSimulations) {
@@ -647,7 +700,6 @@ void CloseMiscOpenFiles()
     // na
 
     // Using/Aliasing
-    using DataGlobals::OutputFileDebug;
     using DataReportingFlags::DebugOutput;
     using DaylightingManager::CloseDFSFile;
     using DaylightingManager::CloseReportIllumMaps;
@@ -664,9 +716,6 @@ void CloseMiscOpenFiles()
     // DERIVED TYPE DEFINITIONS
     // na
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string DebugPosition;
-
     //      LOGICAL :: exists, opened
     //      INTEGER :: UnitNumber
     //      INTEGER :: ios
@@ -674,26 +723,10 @@ void CloseMiscOpenFiles()
     CloseReportIllumMaps();
     CloseDFSFile();
 
-    //  In case some debug output was produced, it appears that the
-    //  position on the INQUIRE will not be 'ASIS' (3 compilers tested)
-    //  So, will want to keep....
-
-    {
-        IOFlags flags;
-        ObjexxFCL::gio::inquire(OutputFileDebug, flags);
-        DebugPosition = flags.POSITION();
-    }
-    if (DebugPosition != "ASIS") {
-        DebugOutput = true;
-    }
-    if (DebugOutput) {
-        ObjexxFCL::gio::close(OutputFileDebug);
+    if (DebugOutput || OutputFiles::getSingleton().debug.position() > 0) {
+        OutputFiles::getSingleton().debug.close();
     } else {
-        {
-            IOFlags flags;
-            flags.DISPOSE("DELETE");
-            ObjexxFCL::gio::close(OutputFileDebug, flags);
-        }
+        OutputFiles::getSingleton().debug.del();
     }
 }
 
@@ -844,6 +877,9 @@ int EndEnergyPlus()
     Time_Finish = epElapsedTime();
     if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
     Elapsed_Time = Time_Finish - Time_Start;
+    if (DataGlobals::createPerfLog) {
+        UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
+    }
 #ifdef EP_Detailed_Timings
     epStopTime("EntireRun=");
 #endif
@@ -860,6 +896,11 @@ int EndEnergyPlus()
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
+    if (DataGlobals::createPerfLog) {
+        UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
+        UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
+        UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); //last item so write the perfLog file
+    }
     ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                 " Severe Errors.");
     ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
@@ -1230,7 +1271,7 @@ bool env_var_on(std::string const &env_var_str)
     return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
 }
 
-void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1282,7 +1323,7 @@ void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1, Opti
     throw FatalError(ErrorMessage);
 }
 
-void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowSevereError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1339,7 +1380,7 @@ void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1, Opt
     }
 }
 
-void ShowSevereMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1392,7 +1433,7 @@ void ShowSevereMessage(std::string const &ErrorMessage, Optional_int OutUnit1, O
     }
 }
 
-void ShowContinueError(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1432,7 +1473,7 @@ void ShowContinueError(std::string const &Message, Optional_int OutUnit1, Option
     }
 }
 
-void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowContinueErrorTimeStamp(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1506,7 +1547,7 @@ void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit
     }
 }
 
-void ShowMessage(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowMessage(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1550,7 +1591,7 @@ void ShowMessage(std::string const &Message, Optional_int OutUnit1, Optional_int
     }
 }
 
-void ShowWarningError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowWarningError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1604,7 +1645,7 @@ void ShowWarningError(std::string const &ErrorMessage, Optional_int OutUnit1, Op
     }
 }
 
-void ShowWarningMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1882,7 +1923,7 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Mess
     }
 }
 
-void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowErrorMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1914,7 +1955,6 @@ void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Op
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static ObjexxFCL::gio::Fmt ErrorFormat("(2X,A)");
     static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     // INTERFACE BLOCK SPECIFICATIONS
@@ -1936,11 +1976,13 @@ void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Op
         ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
     }
     if (present(OutUnit1)) {
-        ObjexxFCL::gio::write(OutUnit1, ErrorFormat) << ErrorMessage;
+        print(OutUnit1(), "  {}", ErrorMessage);
     }
     if (present(OutUnit2)) {
-        ObjexxFCL::gio::write(OutUnit2, ErrorFormat) << ErrorMessage;
+        print(OutUnit2(), "  {}", ErrorMessage);
     }
+    std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
+    if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
 }
 
 void SummarizeErrors()

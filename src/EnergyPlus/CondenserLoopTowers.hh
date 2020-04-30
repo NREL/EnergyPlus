@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -349,13 +350,13 @@ namespace CondenserLoopTowers {
         {
         }
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
-        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void initialize();
 
@@ -402,20 +403,20 @@ namespace CondenserLoopTowers {
 
         void report(bool RunFlag);
 
-        Real64 residualUA(Real64 UA,                // UA of cooling tower
-                          Array1<Real64> const &Par // par(1) = design tower load [W]
+        Real64 residualUA(Real64 UA,                 // UA of cooling tower
+                          Array1D<Real64> const &Par // par(1) = design tower load [W]
         );
 
-        Real64 residualTa(Real64 FlowRatio,         // water or air flow ratio of cooling tower
-                          Array1<Real64> const &Par // par(1) = tower number
+        Real64 residualTa(Real64 FlowRatio,          // water or air flow ratio of cooling tower
+                          Array1D<Real64> const &Par // par(1) = tower number
         );
 
-        Real64 residualTr(Real64 Trange,            // cooling tower range temperature [C]
-                          Array1<Real64> const &Par // par(1) = tower number
+        Real64 residualTr(Real64 Trange,             // cooling tower range temperature [C]
+                          Array1D<Real64> const &Par // par(1) = tower number
         );
 
-        Real64 residualMerkelLoad(Real64 _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                  Array1<Real64> const &Par // par(1) = Tower number
+        Real64 residualMerkelLoad(Real64 _AirFlowRateRatio,  // fan speed ratio (1.0 is continuous, 0.0 is off)
+                                  Array1D<Real64> const &Par // par(1) = Tower number
         );
 
         static PlantComponent *factory(std::string const &objectName);

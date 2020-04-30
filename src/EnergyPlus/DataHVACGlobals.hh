@@ -217,7 +217,7 @@ namespace DataHVACGlobals {
     extern int const Coil_HeatingWaterToAirHPSimple;
     extern int const CoilVRF_Cooling;
     extern int const CoilVRF_Heating;
-
+    extern int const CoilDX_Cooling;
     extern int const Coil_UserDefined;
     extern int const CoilDX_PackagedThermalStorageCooling;
 
@@ -229,6 +229,7 @@ namespace DataHVACGlobals {
 
     extern int const CoilVRF_FluidTCtrl_Cooling;
     extern int const CoilVRF_FluidTCtrl_Heating;
+    extern int const CoilDX_SubcoolReheat;
 
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
@@ -412,9 +413,9 @@ namespace DataHVACGlobals {
     extern int const ZoneEquipTypeOf_DehumidifierDX;
     extern int const ZoneEquipTypeOf_IdealLoadsAirSystem;
     extern int const ZoneEquipTypeOf_RefrigerationChillerSet;
+    extern int const ZoneEquipTypeOf_HybridUnitaryAirConditioners;
     extern int const ZoneEquipTypeOf_FanZoneExhaust;
     extern int const ZoneEquipTypeOf_WaterHeaterHeatPump;
-    extern int const ZoneEquipTypeOf_AirTerminalSingleDuctUncontrolled;
     extern int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume;
     extern int const ZoneEquipTypeOf_AirTerminalDualDuctVAV;
     extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat;

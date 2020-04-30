@@ -60,9 +60,7 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::ChillerExhaustAbsorption;
 
-class ExhAbsorptionFixture : public EnergyPlusFixture {};
-
-TEST_F(ExhAbsorptionFixture, ExhAbsorption_GetInput_Test)
+TEST_F(EnergyPlusFixture, ExhAbsorption_GetInput_Test)
 {
     std::string const idf_objects = delimited_string({
         "  ChillerHeater:Absorption:DoubleEffect,                                                                     ",
@@ -303,7 +301,7 @@ TEST_F(ExhAbsorptionFixture, ExhAbsorption_GetInput_Test)
 
     compare_err_stream("");
 
-    EXPECT_EQ(1, NumExhaustAbsorbers);
+    EXPECT_EQ(1u, ExhaustAbsorber.size());
     EXPECT_EQ("EXH CHILLER", ExhaustAbsorber(1).Name);
 
     EXPECT_EQ(100000., ExhaustAbsorber(1).NomCoolingCap);

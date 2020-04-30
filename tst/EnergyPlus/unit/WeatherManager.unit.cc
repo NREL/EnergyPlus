@@ -59,6 +59,8 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -148,6 +150,34 @@ TEST_F(EnergyPlusFixture, SkyTempTest)
     // March 2
     ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 62, 6);
     EXPECT_NEAR(3.02, TomorrowSkyTemp(1, 1), .001);
+}
+
+TEST_F(EnergyPlusFixture, SkyEmissivityTest)
+{
+    // setup environment state
+    Environment.allocate(4);
+    Environment(1).SkyTempModel = WP_ClarkAllenModel;
+    Environment(2).SkyTempModel = WP_BruntModel;
+    Environment(3).SkyTempModel = WP_IdsoModel;
+    Environment(4).SkyTempModel = WP_BerdahlMartinModel;
+
+    // init local variables
+    Real64 OpagueSkyCover(0.0);
+    Real64 DryBulb(25.0);
+    Real64 DewPoint(16.7);
+    Real64 RelHum(0.6);
+
+    EXPECT_NEAR(0.832, CalcSkyEmissivity(Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.867, CalcSkyEmissivity(Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+
+    DryBulb = 5.0;
+    DewPoint = -2.13;
+    EXPECT_NEAR(0.781, CalcSkyEmissivity(Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.746, CalcSkyEmissivity(Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.760, CalcSkyEmissivity(Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.747, CalcSkyEmissivity(Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 }
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
@@ -301,7 +331,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(errorsFound);
+    SurfaceGeometry::GetOSCMData(outputFiles(), errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -325,7 +355,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(errorsFound);
+    SurfaceGeometry::GetOSCMData(outputFiles(), errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -475,7 +505,6 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
 
-    DataGlobals::OutputFileInits = GetNewUnitNumber();
     // set water mains temp parameters for CorrelationFromWeatherFile method
     OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
     OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
@@ -490,7 +519,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
                                                     "Annual Average Outdoor Air Temperature{C},"
                                                     "Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC},"
                                                     "Fixed Default Water Mains Temperature{C}",
-                                                    "Site Water Mains Temperature Information,CorrelationFromWeatherFile,NA,9.99,28.78,NA"});
+                                                    "Site Water Mains Temperature Information,CorrelationFromWeatherFile,NA,9.99,28.78,NA"}, "\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
@@ -665,7 +694,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     bool Available{false};
     bool ErrorsFound{false};
-    ASSERT_THROW(WeatherManager::GetNextEnvironment(Available, ErrorsFound), std::runtime_error);
+    ASSERT_THROW(WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound), std::runtime_error);
     ASSERT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
@@ -734,7 +763,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     SimulationManager::OpenOutputFiles();
     // reset eio stream
-    compare_eio_stream("", true);
+    has_eio_output(true);
 
     bool ErrorsFound(false);
     DataEnvironment::TotDesDays = 1;
@@ -743,6 +772,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     DesignDay.allocate(DataEnvironment::TotDesDays);
 
     Environment(1).DesignDayNum = 1;
+    Environment(1).WP_Type1 = 0;
     DataGlobals::MinutesPerTimeStep = 60;
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::BeginSimFlag = true;
@@ -754,8 +784,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     WeatherManager::GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-
-    WeatherManager::SetUpDesignDay(1);
+    WeatherManager::SetUpDesignDay(outputFiles(), 1);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType_Enthalpy);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndValue, 90500.0);
 
@@ -771,20 +800,23 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     }
     EXPECT_TRUE(n_RH_not100 > 0) << "Expected at least one hour with RH below 100%";
 
-    SimulationManager::CloseOutputFiles();
-
     // This actually doesn't end up in the EIO stream yet, it's written to a gio::out_stream
     // That's why I used SQLiteFixture instead
-    //std::string const eiooutput = delimited_string({
-        //"! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, Hum Ind Type, Hum Ind Value at Max Temp, Pressure {Pa}, Wind Direction {deg CW from N}, Wind Speed {m/s}, Clearness, Rain, Snow",
-        //"! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model",
-        //"Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00 {J/kg},100511,220,3.2,0.00,No,No",
-        //"Environment:Design Day Misc,202,1084.4,0.2082,0.1365,1.0,-6.23,20.6,ASHRAETau",
-    //});
+    std::string const eiooutput = delimited_string({
+        "! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, Wind Direction {deg CW from N}, Wind Speed {m/s}, Clearness, Rain, Snow",
+        "! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model",
+        "Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00,{J/kgDryAir},100511,220,3.2,0.00,No,No",
+        "Environment:Design Day Misc,202,1084.4,0.2082,0.1365,1.0,-6.23,20.6,ASHRAETau",
+    }, "\n");
 
-    //EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+    EXPECT_TRUE(compare_eio_stream(eiooutput, false));
 
-    OutputReportTabular::WriteEioTables();
+    OutputReportTabular::WriteEioTables(outputFiles());
+
+
+    // Close output files *after* the EIO has been written to
+    SimulationManager::CloseOutputFiles(outputFiles());
+
     EnergyPlus::sqlite->sqliteCommit();
 
     std::vector<std::tuple<std::string, std::string>> results_strings({
@@ -810,5 +842,6 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
         // Add informative message if failed
         EXPECT_EQ(value, expectedValue) << "Failed for ColumnName=" << columnName;
     }
+
 
 }

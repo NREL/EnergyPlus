@@ -119,13 +119,10 @@ namespace DataStringGlobals {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    std::string outputAuditFileName("eplusout.audit");
     std::string outputBndFileName("eplusout.bnd");
     std::string outputDxfFileName("eplusout.dxf");
-    std::string outputEioFileName("eplusout.eio");
     std::string outputEndFileName("eplusout.end");
     std::string outputErrFileName("eplusout.err");
-    std::string outputEsoFileName("eplusout.eso");
     std::string outputJsonFileName("eplusout.json");
     std::string outputTSHvacJsonFileName("eplusout_detailed_HVAC.json");
     std::string outputTSZoneJsonFileName("eplusout_detailed_zone.json");
@@ -155,7 +152,6 @@ namespace DataStringGlobals {
     std::string outputSMMsgPackFileName("eplusout_runperiod.msgpack");
     std::string outputMtdFileName("eplusout.mtd");
     std::string outputMddFileName("eplusout.mdd");
-    std::string outputMtrFileName("eplusout.mtr");
     std::string outputRddFileName("eplusout.rdd");
     std::string outputShdFileName("eplusout.shd");
     std::string outputTblCsvFileName("eplustbl.csv");
@@ -175,16 +171,10 @@ namespace DataStringGlobals {
     std::string outputMapTxtFileName("eplusmap.txt");
     std::string outputEddFileName("eplusout.edd");
     std::string outputIperrFileName("eplusout.iperr");
-    std::string outputDbgFileName("eplusout.dbg");
+    std::string outputPerfLogFileName("eplusout_perflog.csv");
     std::string outputSlnFileName("eplusout.sln");
     std::string outputSciFileName("eplusout.sci");
     std::string outputWrlFileName("eplusout.wrl");
-    std::string outputZszCsvFileName("epluszsz.csv");
-    std::string outputZszTabFileName("epluszsz.tab");
-    std::string outputZszTxtFileName("epluszsz.txt");
-    std::string outputSszCsvFileName("eplusssz.csv");
-    std::string outputSszTabFileName("eplusssz.tab");
-    std::string outputSszTxtFileName("eplusssz.txt");
     std::string outputScreenCsvFileName("eplusscreen.csv");
     std::string outputSqlFileName("eplusout.sql");
     std::string outputSqliteErrFileName("eplussqlite.err");
@@ -221,6 +211,7 @@ namespace DataStringGlobals {
                                                                                                                                       // version
                                                                                                                                       // information
     std::string MatchVersion("${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"); // String to be matched by Version object
+    std::string PythonAPIVersion("${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"); // API version string to be matched when using the Python API
 
 
     void clear_state()

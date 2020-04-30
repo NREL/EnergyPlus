@@ -87,6 +87,7 @@ class EPlusRunManager(object):
         suffixes.append("_bsmt.csv")
         suffixes.append(".edd")
         suffixes.append("Table.xml")
+        suffixes.append("_perflog.csv")
 
         # the following were not included in EP-Launch 2
         suffixes.append(".end")

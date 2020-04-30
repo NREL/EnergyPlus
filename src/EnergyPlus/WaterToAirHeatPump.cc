@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -1114,7 +1114,7 @@ namespace WaterToAirHeatPump {
         using DataPlant::PlantLoop;
         using General::RoundSigDigits;
         using General::SolveRoot;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -1287,7 +1287,7 @@ namespace WaterToAirHeatPump {
         // Set indoor air conditions to the actual condition
         LoadSideInletDBTemp_Unit = WatertoAirHP(HPNum).InletAirDBTemp;
         LoadSideInletHumRat_Unit = WatertoAirHP(HPNum).InletAirHumRat;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat_Unit, LoadSideInletDBTemp_Unit);
+        CpAir = PsyCpAirFnW(LoadSideInletHumRat_Unit);
         LoadSideAirInletEnth_Unit = PsyHFnTdbW(LoadSideInletDBTemp_Unit, LoadSideInletHumRat_Unit);
 
         SourceSideInletTemp = WatertoAirHP(HPNum).InletWaterTemp;
@@ -1698,7 +1698,7 @@ namespace WaterToAirHeatPump {
     }
 
     Real64 CalcCompSuctionTempResidual(Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-                                       Array1<Real64> const &Par     // Function parameters
+                                       Array1D<Real64> const &Par    // Function parameters
     )
     {
 
@@ -1783,7 +1783,7 @@ namespace WaterToAirHeatPump {
 
         // Using/Aliasing
         using namespace FluidProperties;
-        using Psychrometrics::PsyCpAirFnWTdb; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
+        using Psychrometrics::PsyCpAirFnW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyWFnTdbH;
         //  USE DataZoneEnergyDemands
@@ -1920,7 +1920,7 @@ namespace WaterToAirHeatPump {
         LoadSideMassFlowRate = WatertoAirHP(HPNum).InletAirMassFlowRate;
         LoadSideInletDBTemp = WatertoAirHP(HPNum).InletAirDBTemp;
         LoadSideInletHumRat = WatertoAirHP(HPNum).InletAirHumRat;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat, LoadSideInletDBTemp);
+        CpAir = PsyCpAirFnW(LoadSideInletHumRat);
 
         SourceSideInletTemp = WatertoAirHP(HPNum).InletWaterTemp;
         SourceSideWaterInletEnth = WatertoAirHP(HPNum).InletWaterEnthalpy;
@@ -2611,7 +2611,7 @@ namespace WaterToAirHeatPump {
         return IndexNum;
     }
 
-    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )
@@ -2667,7 +2667,7 @@ namespace WaterToAirHeatPump {
         return CoilCapacity;
     }
 
-    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -2732,7 +2732,7 @@ namespace WaterToAirHeatPump {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )

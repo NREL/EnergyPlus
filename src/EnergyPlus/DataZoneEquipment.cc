@@ -60,14 +60,15 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -117,23 +118,22 @@ namespace DataZoneEquipment {
     int const ZoneEvaporativeCoolerUnit_Num(13);
     int const ZoneHybridEvaporativeCooler_Num(14);
     int const AirDistUnit_Num(15);
-    int const DirectAir_Num(16);
-    int const BBWaterConvective_Num(17);
-    int const BBElectricConvective_Num(18);
-    int const HiTempRadiant_Num(19);
-    int const LoTempRadiant_Num(20);
-    int const ZoneExhaustFan_Num(21);
-    int const HeatXchngr_Num(22);
-    int const HPWaterHeater_Num(23);
-    int const BBWater_Num(24);
-    int const ZoneDXDehumidifier_Num(25);
-    int const BBSteam_Num(26);
-    int const BBElectric_Num(27);
-    int const RefrigerationAirChillerSet_Num(28);
-    int const UserDefinedZoneHVACForcedAir_Num(29);
-    int const CoolingPanel_Num(30);
-    int const ZoneUnitarySys_Num(31);
-    int const TotalNumZoneEquipType(31);
+    int const BBWaterConvective_Num(16);
+    int const BBElectricConvective_Num(17);
+    int const HiTempRadiant_Num(18);
+    int const LoTempRadiant_Num(19);
+    int const ZoneExhaustFan_Num(20);
+    int const HeatXchngr_Num(21);
+    int const HPWaterHeater_Num(22);
+    int const BBWater_Num(23);
+    int const ZoneDXDehumidifier_Num(24);
+    int const BBSteam_Num(25);
+    int const BBElectric_Num(26);
+    int const RefrigerationAirChillerSet_Num(27);
+    int const UserDefinedZoneHVACForcedAir_Num(28);
+    int const CoolingPanel_Num(29);
+    int const ZoneUnitarySys_Num(30);
+    int const TotalNumZoneEquipType(30);
     // **NOTE**... if you add another zone equipment object, then increment
     // TotalNumZoneEquipType above to match the total number of zone equipment types
     // End zone equip objects
@@ -219,7 +219,7 @@ namespace DataZoneEquipment {
         UniqueZoneEquipListNames.clear();
     }
 
-    void GetZoneEquipmentData()
+    void GetZoneEquipmentData(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -256,10 +256,10 @@ namespace DataZoneEquipment {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        GetZoneEquipmentData1();
+        GetZoneEquipmentData1(state);
     }
 
-    void GetZoneEquipmentData1()
+    void GetZoneEquipmentData1(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -659,9 +659,6 @@ namespace DataZoneEquipment {
                         if (SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT") {
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = AirDistUnit_Num;
 
-                        } else if (SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED") {
-                            thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = DirectAir_Num;
-
                         } else if (SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER") { // Window Air Conditioner
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = WindowAC_Num;
 
@@ -674,7 +671,7 @@ namespace DataZoneEquipment {
                         } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") { // Unitary System
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySys_Num;
                             UnitarySystems::UnitarySys thisSys;
-                            thisZoneEquipList.compPointer[ZoneEquipTypeNum] = thisSys.factory(
+                            thisZoneEquipList.compPointer[ZoneEquipTypeNum] = thisSys.factory(state, 
                                 DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
 
                         } else if (SELECT_CASE_var == "ZONEHVAC:DEHUMIDIFIER:DX") { // Zone dehumidifier
@@ -821,7 +818,6 @@ namespace DataZoneEquipment {
                 ZoneEquipConfig(ControlledZoneNum).InletNode.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).InletNodeADUNum.allocate(NumNodes);
-                ZoneEquipConfig(ControlledZoneNum).InletNodeSDUNum.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat.allocate(NumNodes);
 
@@ -835,7 +831,6 @@ namespace DataZoneEquipment {
                     }
                     ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(NodeNum) = 0;
                     ZoneEquipConfig(ControlledZoneNum).InletNodeADUNum(NodeNum) = 0;
-                    ZoneEquipConfig(ControlledZoneNum).InletNodeSDUNum(NodeNum) = 0;
                     ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool(NodeNum).InNode = 0;
                     ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat(NodeNum).InNode = 0;
                     ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool(NodeNum).OutNode = 0;
@@ -1240,7 +1235,7 @@ namespace DataZoneEquipment {
         return IsOnList;
     }
 
-    int GetControlledZoneIndex(std::string const &ZoneName) // Zone name to match into Controlled Zone structure
+    int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName) // Zone name to match into Controlled Zone structure
     {
 
         // FUNCTION INFORMATION:
@@ -1257,7 +1252,7 @@ namespace DataZoneEquipment {
         int ControlledZoneIndex; // Index into Controlled Zone structure
 
         if (!ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1();
+            GetZoneEquipmentData1(state);
             ZoneEquipInputsFilled = true;
         }
 
@@ -1266,7 +1261,7 @@ namespace DataZoneEquipment {
         return ControlledZoneIndex;
     }
 
-    int FindControlledZoneIndexFromSystemNodeNumberForZone(int const TrialZoneNodeNum) // Node number to match into Controlled Zone structure
+    int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state, int const TrialZoneNodeNum) // Node number to match into Controlled Zone structure
     {
 
         // FUNCTION INFORMATION:
@@ -1289,7 +1284,7 @@ namespace DataZoneEquipment {
         FoundIt = false;
 
         if (!ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1();
+            GetZoneEquipmentData1(state);
             ZoneEquipInputsFilled = true;
         }
         ControlledZoneIndex = 0;
@@ -1306,7 +1301,7 @@ namespace DataZoneEquipment {
         return ControlledZoneIndex;
     }
 
-    int GetSystemNodeNumberForZone(std::string const &ZoneName) // Zone name to match into Controlled Zone structure
+    int GetSystemNodeNumberForZone(EnergyPlusData &state, std::string const &ZoneName) // Zone name to match into Controlled Zone structure
     {
 
         // FUNCTION INFORMATION:
@@ -1326,7 +1321,7 @@ namespace DataZoneEquipment {
         int ControlledZoneIndex;
 
         if (!ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1();
+            GetZoneEquipmentData1(state);
             ZoneEquipInputsFilled = true;
         }
 
@@ -1341,7 +1336,7 @@ namespace DataZoneEquipment {
         return SystemZoneNodeNumber;
     }
 
-    int GetReturnAirNodeForZone(std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
+    int GetReturnAirNodeForZone(EnergyPlusData &state, std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
                                 std::string const &NodeName,             // Return air node name to match (may be blank)
                                 std::string const &calledFromDescription // String identifying the calling function and object
     )
@@ -1363,7 +1358,7 @@ namespace DataZoneEquipment {
         int ControlledZoneIndex;
 
         if (!ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1();
+            GetZoneEquipmentData1(state);
             ZoneEquipInputsFilled = true;
         }
 
@@ -1396,7 +1391,7 @@ namespace DataZoneEquipment {
         return ReturnAirNodeNumber;
     }
 
-    int GetReturnNumForZone(std::string const &ZoneName, // Zone name to match into Controlled Zone structure
+    int GetReturnNumForZone(EnergyPlusData &state, std::string const &ZoneName, // Zone name to match into Controlled Zone structure
                             std::string const &NodeName  // Return air node name to match (may be blank)
     )
     {
@@ -1413,7 +1408,7 @@ namespace DataZoneEquipment {
         int ControlledZoneIndex;
 
         if (!ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1();
+            GetZoneEquipmentData1(state);
             ZoneEquipInputsFilled = true;
         }
 
@@ -1844,10 +1839,6 @@ namespace DataZoneEquipment {
         for (int equipNum = 1; equipNum <= this->NumOfEquipTypes; ++equipNum) {
             if (this->EquipType_Num(equipNum) == AirDistUnit_Num) {
                 if (inletNodeNum == DataDefineEquip::AirDistUnit(this->EquipIndex(equipNum)).OutletNodeNum) {
-                    equipFound = true;
-                }
-            } else if (this->EquipType_Num(equipNum) == DirectAir_Num) {
-                if (inletNodeNum == DirectAirManager::DirectAir(this->EquipIndex(equipNum)).ZoneSupplyAirNode) {
                     equipFound = true;
                 }
             }

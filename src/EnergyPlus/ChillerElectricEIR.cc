@@ -64,7 +64,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
@@ -72,9 +72,11 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -161,7 +163,7 @@ namespace ChillerElectricEIR {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void ElectricEIRChillerSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ElectricEIRChillerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -229,7 +231,7 @@ namespace ChillerElectricEIR {
         sizFac = this->SizFac;
     }
 
-    void ElectricEIRChillerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    void ElectricEIRChillerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;
@@ -237,7 +239,7 @@ namespace ChillerElectricEIR {
         this->initialize(runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->size();
+            this->size(state);
         }
     }
 
@@ -1238,7 +1240,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::size()
+    void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1470,7 +1472,7 @@ namespace ChillerElectricEIR {
                     DataSizing::DataFractionUsedForSizing = 0.000114;
                     Real64 TempSize = this->CondVolFlowRate;
                     bool bPRINT = true; // TRUE if sizing is reported to output (eio)
-                    ReportSizingManager::RequestSizing(CompType, this->Name, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                    ReportSizingManager::RequestSizing(state, CompType, this->Name, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                     this->CondVolFlowRate = TempSize;
                     DataSizing::DataConstantUsedForSizing = 0.0;
                     DataSizing::DataFractionUsedForSizing = 0.0;
@@ -1536,7 +1538,8 @@ namespace ChillerElectricEIR {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             if (this->IPLVFlag) {
                 Real64 IPLV;
-                StandardRatings::CalcChillerIPLV(this->Name,
+                StandardRatings::CalcChillerIPLV(OutputFiles::getSingleton(),
+                                                 this->Name,
                                                  DataPlant::TypeOf_Chiller_ElectricEIR,
                                                  this->RefCap,
                                                  this->RefCOP,
@@ -1545,7 +1548,10 @@ namespace ChillerElectricEIR {
                                                  this->ChillerEIRFTIndex,
                                                  this->ChillerEIRFPLRIndex,
                                                  this->MinUnloadRat,
-                                                 IPLV);
+                                                 IPLV,
+                                                 Optional<const Real64>(),
+                                                 ObjexxFCL::Optional_int_const(),
+                                                 Optional<const Real64>());
                 this->IPLVFlag = false;
             }
             // create predefined report
@@ -2169,9 +2175,9 @@ namespace ChillerElectricEIR {
             // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
             if (this->HeatRecActive) this->calcHeatRecovery(this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
 
-            if (this->CondMassFlowRate > 0.0) {
-                Cp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->CondInletNodeNum).HumRat, condInletTemp);
-                this->CondOutletTemp = condInletTemp + this->QCondenser / this->CondMassFlowRate / Cp;
+            if (CondMassFlowRate > 0.0) {
+                Cp = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->CondInletNodeNum).HumRat);
+                CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / Cp;
             } else {
                 this->CondOutletTemp = condInletTemp;
             }

@@ -124,7 +124,7 @@ namespace BaseboardElectric {
         BaseboardNumericFields.deallocate();
     }
 
-    void SimElectricBaseboard(std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
+    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -191,7 +191,7 @@ namespace BaseboardElectric {
             }
         }
 
-        InitBaseboard(BaseboardNum, ControlledZoneNum);
+        InitBaseboard(state, BaseboardNum, ControlledZoneNum);
 
         QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
@@ -439,7 +439,7 @@ namespace BaseboardElectric {
         }
     }
 
-    void InitBaseboard(int const BaseboardNum, int const ControlledZoneNum)
+    void InitBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -505,7 +505,7 @@ namespace BaseboardElectric {
 
         if (!SysSizingCalc && MySizeFlag(BaseboardNum)) {
             // for each coil, do the sizing once.
-            SizeElectricBaseboard(BaseboardNum);
+            SizeElectricBaseboard(state, BaseboardNum);
 
             MySizeFlag(BaseboardNum) = false;
         }
@@ -522,7 +522,7 @@ namespace BaseboardElectric {
         Baseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
     }
 
-    void SizeElectricBaseboard(int const BaseboardNum)
+    void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -620,7 +620,7 @@ namespace BaseboardElectric {
                 } else {
                     TempSize = Baseboard(BaseboardNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 Baseboard(BaseboardNum).NominalCapacity = TempSize;
                 DataScalableCapSizingON = false;
             }
@@ -650,7 +650,7 @@ namespace BaseboardElectric {
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -675,7 +675,7 @@ namespace BaseboardElectric {
 
         AirInletTemp = Baseboard(BaseboardNum).AirInletTemp;
         AirOutletTemp = AirInletTemp;
-        CpAir = PsyCpAirFnWTdb(Baseboard(BaseboardNum).AirInletHumRat, AirInletTemp);
+        CpAir = PsyCpAirFnW(Baseboard(BaseboardNum).AirInletHumRat);
         AirMassFlowRate = SimpConvAirFlowSpeed;
         CapacitanceAir = CpAir * AirMassFlowRate;
         // currently only the efficiency is used to calculate the electric consumption.  There could be some

@@ -340,8 +340,6 @@ namespace Psychrometrics {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -584,7 +582,6 @@ namespace Psychrometrics {
         int const itmax(100); // Maximum No of Iterations
         static Real64 convTol(0.0001);
         static std::string const RoutineName("PsyTwbFnTdbWPb");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -689,7 +686,11 @@ namespace Psychrometrics {
 
             // Calculate new humidity ratio and determine difference from known
             // humidity ratio which is wStar calculated earlier
-            newW = ((2501.0 - 2.381 * WBT) * Wstar - (TDB - WBT)) / (2501.0 + 1.805 * TDB - 4.186 * WBT);
+            if (WBT >= 0.0) {
+                newW = ((2501.0 - 2.326 * WBT) * Wstar - 1.006 * (TDB - WBT)) / (2501.0 + 1.86 * TDB - 4.186 * WBT);
+            } else {
+                newW = ((2830.0 - 0.24 * WBT) * Wstar - 1.006 * (TDB - WBT)) / (2830.0 + 1.86 * TDB - 2.1 * WBT);
+            }
 
             // Check error, if not satisfied, calculate new guess and iterate
             error = W - newW;
@@ -747,7 +748,7 @@ namespace Psychrometrics {
         }
 
 #ifdef generatetestdata
-        ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << TDB << dW << Patm << Twb;
+        print(OutputFiles::getSingleton().debug, "{}{}{}{}", TDB, dW, Patm, Twb);
 #endif
 
         return TWB;

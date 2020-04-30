@@ -58,10 +58,11 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -86,7 +87,7 @@ namespace EIRPlantLoopHeatPumps {
         heatPumps.clear();
     }
 
-    void EIRPlantLoopHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
+    void EIRPlantLoopHeatPump::simulate(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &calledFromLocation,
                                         bool const FirstHVACIteration,
                                         Real64 &CurLoad,
                                         bool const RunFlag)
@@ -344,13 +345,13 @@ namespace EIRPlantLoopHeatPumps {
             CpSrc = FluidProperties::GetSpecificHeatGlycol(
                 thisLoadPlantLoop.FluidName, DataLoopNode::Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
         } else if (this->airSource) {
-            CpSrc = Psychrometrics::PsyCpAirFnWTdb(DataEnvironment::OutHumRat, DataEnvironment::OutDryBulbTemp);
+            CpSrc = Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat);
         }
         Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
         this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
     }
 
-    void EIRPlantLoopHeatPump::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         // This function does all one-time and begin-environment initialization
         std::string const routineName = EIRPlantLoopHeatPumps::__EQUIP__ + ':' + __FUNCTION__;
@@ -360,8 +361,17 @@ namespace EIRPlantLoopHeatPumps {
             // setup output variables
             SetupOutputVariable(
                 "Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, this->loadSideHeatTransfer, "System", "Average", this->name);
-            SetupOutputVariable(
-                "Heat Pump Load Side Heat Transfer Energy", OutputProcessor::Unit::J, this->loadSideEnergy, "System", "Sum", this->name);
+            SetupOutputVariable("Heat Pump Load Side Heat Transfer Energy",
+                                OutputProcessor::Unit::J,
+                                this->loadSideEnergy,
+                                "System",
+                                "Sum",
+                                this->name,
+                                _,
+                                "ENERGYTRANSFER",
+                                _,
+                                _,
+                                "Plant");
             SetupOutputVariable(
                 "Heat Pump Source Side Heat Transfer Rate", OutputProcessor::Unit::W, this->sourceSideHeatTransfer, "System", "Average", this->name);
             SetupOutputVariable(
@@ -375,7 +385,31 @@ namespace EIRPlantLoopHeatPumps {
             SetupOutputVariable(
                 "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, "System", "Average", this->name);
             SetupOutputVariable("Heat Pump Electric Power", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
-            SetupOutputVariable("Heat Pump Electric Energy", OutputProcessor::Unit::J, this->powerEnergy, "System", "Sum", this->name);
+            if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
+                SetupOutputVariable("Heat Pump Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    this->powerEnergy,
+                                    "System",
+                                    "Sum",
+                                    this->name,
+                                    _,
+                                    "Electric",
+                                    "Cooling",
+                                    "Heat Pump",
+                                    "Plant");
+            } else if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
+                SetupOutputVariable("Heat Pump Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    this->powerEnergy,
+                                    "System",
+                                    "Sum",
+                                    this->name,
+                                    _,
+                                    "Electric",
+                                    "Heating",
+                                    "Heat Pump",
+                                    "Plant");
+            }
             SetupOutputVariable(
                 "Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->loadSideMassFlowRate, "System", "Average", this->name);
             SetupOutputVariable(
@@ -836,7 +870,7 @@ namespace EIRPlantLoopHeatPumps {
         }
 
         Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
-        Real64 const CpSrc = Psychrometrics::PsyCpAirFnWTdb(sourceSideHumRat, sourceSideInitTemp);
+        Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(sourceSideHumRat);
 
         // set the source-side flow rate
         if (this->sourceSideDesignVolFlowRateWasAutoSized) {
@@ -1057,18 +1091,18 @@ namespace EIRPlantLoopHeatPumps {
                                         "; entered curve name: " + capFtName.get<std::string>());
                         errorsFound = true;
                     }
-                    auto &capEIRtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
-                    thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(capEIRtName));
+                    auto &eirFtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
+                    thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(eirFtName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
                         ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
-                                        "; entered curve name: " + capEIRtName.get<std::string>());
+                                        "; entered curve name: " + eirFtName.get<std::string>());
                         errorsFound = true;
                     }
-                    auto &capEIRplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
-                    thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(capEIRplrName));
+                    auto &eirFplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
+                    thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(eirFplrName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
                         ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
-                                        "; entered curve name: " + capEIRplrName.get<std::string>());
+                                        "; entered curve name: " + eirFplrName.get<std::string>());
                         errorsFound = true;
                     }
 

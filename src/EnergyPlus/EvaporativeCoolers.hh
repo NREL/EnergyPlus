@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -393,7 +394,7 @@ namespace EvaporativeCoolers {
                                              Real64 const EHumRatSec);
 
     Real64 CalcEvapCoolRDDSecFlowResidual(Real64 const AirMassFlowSec,
-                                          Array1<Real64> const &Par // Par( 6 ) is desired temperature C
+                                          Array1D<Real64> const &Par // Par( 6 ) is desired temperature C
     );
 
     Real64 IndEvapCoolerPower(int const EvapCoolIndex, // Unit index
@@ -426,48 +427,48 @@ namespace EvaporativeCoolers {
     //_______________________________________________________________________________________________________________________
     //***************
 
-    void SimZoneEvaporativeCoolerUnit(std::string const &CompName,    // name of the packaged terminal heat pump
+    void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state, std::string const &CompName,    // name of the packaged terminal heat pump
                                       int const ZoneNum,              // number of zone being served
                                       Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                       Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
                                       int &CompIndex                  // index to zone hvac unit
     );
 
-    void GetInputZoneEvaporativeCoolerUnit();
+    void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state);
 
-    void InitZoneEvaporativeCoolerUnit(int const UnitNum, // unit number
+    void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum, // unit number
                                        int const ZoneNum  // number of zone being served
     );
 
-    void SizeZoneEvaporativeCoolerUnit(int const UnitNum); // unit number
+    void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum); // unit number
 
-    void CalcZoneEvaporativeCoolerUnit(int const UnitNum,              // unit number
+    void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum,              // unit number
                                        int const ZoneNum,              // number of zone being served
                                        Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                        Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
     );
 
-    void CalcZoneEvapUnitOutput(int const UnitNum,              // unit number
+    void CalcZoneEvapUnitOutput(EnergyPlusData &state, int const UnitNum,              // unit number
                                 Real64 const PartLoadRatio,     // zone evap unit part load ratiod
                                 Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                 Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
     );
 
-    void ControlZoneEvapUnitOutput(int const UnitNum,           // unit number
+    void ControlZoneEvapUnitOutput(EnergyPlusData &state, int const UnitNum,           // unit number
                                    Real64 const ZoneCoolingLoad // target cooling load
     );
 
-    Real64 ZoneEvapUnitLoadResidual(Real64 const PartLoadRatio, // zone evap unit part load ratiod
-                                    Array1<Real64> const &Par   // parameters
+    Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio,  // zone evap unit part load ratiod
+                                    Array1D<Real64> const &Par   // parameters
     );
 
-    void ControlVSEvapUnitToMeetLoad(int const UnitNum,           // unit number
+    void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state, int const UnitNum,           // unit number
                                      int const ZoneNum,           // number of zone being served
                                      Real64 const ZoneCoolingLoad // target cooling load
     );
 
-    Real64 VSEvapUnitLoadResidual(Real64 const FanSpeedRatio,
-                                  Array1<Real64> const &Par // parameters
+    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 const FanSpeedRatio,
+                                  Array1D<Real64> const &Par // parameters
     );
 
     void ReportZoneEvaporativeCoolerUnit(int const UnitNum); // unit number

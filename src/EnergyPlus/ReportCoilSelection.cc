@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
@@ -141,9 +141,9 @@ CoilSelectionData::CoilSelectionData( // constructor
     fanTypeName = "unknown";
 }
 
-void ReportCoilSelection::finishCoilSummaryReportTable()
+void ReportCoilSelection::finishCoilSummaryReportTable(EnergyPlusData &state)
 {
-    doFinalProcessingOfCoilData();
+    doFinalProcessingOfCoilData(state);
     writeCoilSelectionOutput();
     writeCoilSelectionOutput2();
 }
@@ -495,7 +495,7 @@ void ReportCoilSelection::doAirLoopSetup(int const coilVecIndex)
     }
 }
 
-void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
+void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVecIndex)
 {
     auto &c(coilSelectionDataObjs[coilVecIndex]);
     c->coilLocation = "Zone";
@@ -526,7 +526,7 @@ void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
         switch (DataAirSystems::PrimaryAirSystem(c->airloopNum).supFanModelTypeEnum) {
         case DataAirSystems::structArrayLegacyFanModels: {
 
-            coilSelectionReportObj->setCoilSupplyFanInfo(c->coilName_,
+            coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
                                                          c->coilObjName,
                                                          Fans::Fan(DataAirSystems::PrimaryAirSystem(c->airloopNum).SupFanNum).FanName,
                                                          DataAirSystems::structArrayLegacyFanModels,
@@ -535,7 +535,7 @@ void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {
 
-            coilSelectionReportObj->setCoilSupplyFanInfo(c->coilName_,
+            coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
                                                          c->coilObjName,
                                                          HVACFan::fanObjs[DataAirSystems::PrimaryAirSystem(c->airloopNum).supFanVecIndex]->name,
                                                          DataAirSystems::objectVectorOOFanSystemModel,
@@ -599,7 +599,7 @@ void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
     }
 }
 
-void ReportCoilSelection::doFinalProcessingOfCoilData()
+void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
 {
     // this routine does some final processing in preparation for writing out results
     for (auto &c : coilSelectionDataObjs) {
@@ -771,7 +771,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData()
         case DataAirSystems::structArrayLegacyFanModels: {
             int locFanTypeNum(0);
             bool errorsFound(false);
-            Fans::GetFanType(c->fanAssociatedWithCoilName, locFanTypeNum, errorsFound);
+            Fans::GetFanType(state.fans, c->fanAssociatedWithCoilName, locFanTypeNum, errorsFound);
             if (locFanTypeNum == DataHVACGlobals::FanType_SimpleConstVolume) {
                 c->fanTypeName = "Fan:ConstantVolume";
             } else if (locFanTypeNum == DataHVACGlobals::FanType_SimpleVAV) {
@@ -784,9 +784,9 @@ void ReportCoilSelection::doFinalProcessingOfCoilData()
                 c->fanTypeName = "Fan:ComponentModel";
             }
             if (c->supFanNum <= 0) {
-                Fans::GetFanIndex(c->fanAssociatedWithCoilName, c->supFanNum, errorsFound, c->fanTypeName);
+                Fans::GetFanIndex(state.fans, c->fanAssociatedWithCoilName, c->supFanNum, errorsFound, c->fanTypeName);
             }
-            c->fanSizeMaxAirVolumeFlow = Fans::GetFanDesignVolumeFlowRate(c->fanTypeName, c->fanAssociatedWithCoilName, errorsFound, c->supFanNum);
+            c->fanSizeMaxAirVolumeFlow = Fans::GetFanDesignVolumeFlowRate(state.fans, c->fanTypeName, c->fanAssociatedWithCoilName, errorsFound, c->supFanNum);
             c->fanSizeMaxAirMassFlow = Fans::Fan(c->supFanNum).MaxAirMassFlowRate;
             break;
         }
@@ -856,7 +856,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData()
             c->coilFlowPrcntPlantFlow = -999.0;
         }
 
-        c->cpDryAir = Psychrometrics::PsyCpAirFnWTdb(0.0, 20.0);
+        c->cpDryAir = Psychrometrics::PsyCpAirFnW(0.0);
         c->rhoStandAir = DataEnvironment::StdRhoAir;
 
         // apply ADP method to find an SHR for Ideal loads peak, calculate sensible capacity for cooling coils
@@ -1399,7 +1399,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
     }
 
     // calc sensible capacity from inlet outlet
-    c->cpMoistAir = Psychrometrics::PsyCpAirFnWTdb(c->coilDesEntHumRat, 0.5 * (c->coilDesEntTemp + c->coilDesLvgTemp));
+    c->cpMoistAir = Psychrometrics::PsyCpAirFnW(c->coilDesEntHumRat);
 }
 
 void ReportCoilSelection::setCoilHeatingCapacity(
@@ -1714,7 +1714,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     }
 
     // calc sensible capacity from inlet outlet
-    c->cpMoistAir = Psychrometrics::PsyCpAirFnWTdb(c->coilDesLvgHumRat, 0.5 * (c->coilDesEntTemp + c->coilDesLvgTemp));
+    c->cpMoistAir = Psychrometrics::PsyCpAirFnW(c->coilDesLvgHumRat);
     // this is not generally correct but okay for heating coils
     c->coilSensCapAtPeak = std::abs(c->cpMoistAir * c->coilDesMassFlow * (c->coilDesLvgTemp - c->coilDesEntTemp));
     c->coilSensCapAtPeak = min(c->coilSensCapAtPeak, c->coilTotCapAtPeak);
@@ -1808,7 +1808,7 @@ void ReportCoilSelection::setCoilReheatMultiplier(std::string const &coilName, /
     c->reheatLoadMult = multiplierReheatLoad;
 }
 
-void ReportCoilSelection::setCoilSupplyFanInfo(std::string const &coilName, // user-defined name of the coil
+void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state, std::string const &coilName, // user-defined name of the coil
                                                std::string const &coilType, // idf input object class name of coil
                                                std::string const &fanName,
                                                DataAirSystems::fanModelTypeEnum const &fanEnumType,
@@ -1825,7 +1825,7 @@ void ReportCoilSelection::setCoilSupplyFanInfo(std::string const &coilName, // u
     if (fanEnumType == DataAirSystems::structArrayLegacyFanModels) {
         if (fanIndex <= 0) {
             bool errorsFound(false);
-            Fans::GetFanIndex(fanName, locFanIndex, errorsFound);
+            Fans::GetFanIndex(state.fans, fanName, locFanIndex, errorsFound);
         } else {
             locFanIndex = fanIndex;
         }
