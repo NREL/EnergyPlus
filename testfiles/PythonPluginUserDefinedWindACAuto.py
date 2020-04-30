@@ -384,9 +384,8 @@ class Zone1WinACModel(EnergyPlusPlugin):
 
         if self.need_to_get_handles:
             self.get_handles()
-
-        if not self.handles_gotten_properly():
-            return 1
+            if not self.handles_gotten_properly():
+                return 1
         self.initialize()
         self.simulate()
         self.report()
