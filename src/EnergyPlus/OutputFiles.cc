@@ -305,16 +305,9 @@ public:
                 return write_string(str);
             } else if (specs()->type == 'N') {
                 // matches Fortran's 'G' format
-                if (specs()->precision == -1) {
-                    specs()->precision = 14;
-                }
-                if (should_be_fixed_output(value) && specs()->width == 0) {
-                    specs()->width = 16;
-//                    specs()->precision = 14;
-                    specs()->type = 'F';
-                    auto str = write_to_string(value, *specs());
-                    strip(str);
-                    return write_string(str);
+
+                if (specs()->width == 0 && specs()->precision == -1) {
+                    return write_string(format("{:20N}", value));
                 } else if (should_be_fixed_output(value) && fixed_will_fit(value, specs()->width - 5)) {
                     specs()->type = 'F';
 
@@ -324,6 +317,9 @@ public:
                         --specs()->precision;
                     } else if (value < 1.0 && value > -1.0) {
                         // No adjustment necessary
+                    } else if (specs()->precision == -1) {
+                        const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(value)));
+                        specs()->precision = specs()->width - (order_of_magnitude + 2);
                     } else {
                         const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(value)));
                         specs()->precision -= (order_of_magnitude + 1);

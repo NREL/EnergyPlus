@@ -4943,7 +4943,7 @@ namespace OutputProcessor {
             NumberOut = "0.0";
         } else {
             NumberOut = format("{:N}", repVal);
-            strip_trailing_zeros(NumberOut);
+            strip_trailing_zeros(trim(NumberOut));
         }
 
         // Append the min and max strings with date information
