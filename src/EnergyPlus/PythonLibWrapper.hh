@@ -45,51 +45,59 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// Google Test Headers
-#include <gtest/gtest.h>
+#ifndef EPLUS_PYTHON_LIB_WRAPPER_HH
+#define EPLUS_PYTHON_LIB_WRAPPER_HH
 
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/PluginManager.hh>
+#ifdef _DEBUG
+// We don't want to try to import a debug build of Python here
+// so if we are building a Debug build of the C++ code, we need
+// to undefine _DEBUG during the #include command for Python.h.
+// Otherwise it will fail
+#undef _DEBUG
+  #include <Python.h>
+  #define _DEBUG
+#else
+#include <Python.h>
+#endif
 
-namespace EnergyPlus {
+#if _WIN32 || _MSC_VER
+#define PYTHONWRAP_API __declspec(dllexport)
+#else
+#define PYTHONWRAP_API
+#endif
 
-TEST_F(EnergyPlusFixture, TestTrendVariable)
-{
+extern "C" {
+    PYTHONWRAP_API const char * EP_Wrap_Py_GetVersion();
+    PYTHONWRAP_API wchar_t * EP_Wrap_Py_DecodeLocale(const char * s, unsigned long * size);
+    PYTHONWRAP_API void EP_Wrap_Py_InitializeEx(int i);
+    PYTHONWRAP_API int EP_Wrap_PyRun_SimpleString(const char * c);
+    PYTHONWRAP_API int EP_Wrap_Py_FinalizeEx();
+    PYTHONWRAP_API void EP_Wrap_PyErr_Fetch(PyObject **pType, PyObject **pValue, PyObject **pTrace);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_Repr(PyObject * o);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyUnicode_AsEncodedString(PyObject *unicode, const char *encoding, const char *errors);
+    PYTHONWRAP_API char * EP_Wrap_PyBytes_AsString(PyObject *o);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyUnicode_DecodeFSDefault(const char *s);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyImport_Import(PyObject *name);
+    PYTHONWRAP_API void EP_Wrap_Py_DECREF(PyObject *o);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyErr_Occurred();
+    PYTHONWRAP_API PyObject * EP_Wrap_PyModule_GetDict(PyObject *module);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyDict_GetItemString(PyObject *p, const char *key);
+    PYTHONWRAP_API const char * EP_Wrap_PyUnicode_AsUTF8(PyObject *unicode);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyUnicode_AsUTF8String(PyObject *unicode);
+    PYTHONWRAP_API int EP_Wrap_PyCallable_Check(PyObject *o);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallObject(PyObject *callable, PyObject *args);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_GetAttrString(PyObject *o, const char *attr_name);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallFunction(PyObject *callable, const char *format);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallMethod(PyObject *obj, const char *name, const char *format);
+    PYTHONWRAP_API int EP_Wrap_PyList_Check(PyObject *p);
+    PYTHONWRAP_API unsigned long EP_Wrap_PyList_Size(PyObject *list);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyList_GetItem(PyObject *list, Py_ssize_t index);
+    PYTHONWRAP_API int EP_Wrap_PyUnicode_Check(PyObject *o);
+    PYTHONWRAP_API int EP_Wrap_PyLong_Check(PyObject *p);
+    PYTHONWRAP_API long EP_Wrap_PyLong_AsLong(PyObject *obj);
+    PYTHONWRAP_API void EP_Wrap_Py_SetPath(const wchar_t *);
+    PYTHONWRAP_API void EP_Wrap_Py_SetPythonHome(const wchar_t *home);
+};
 
-// this file isn't included in the gtest source unless LINK_WITH_PYTHON is ON
 
-    // create a plugin manager instance
-    EnergyPlus::PluginManagement::PluginManager pluginManager;
-
-    // first create a plugin variable
-    pluginManager.addGlobalVariable("my_var");
-    int globalVarIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle("my_var", true);
-    EXPECT_EQ(0, globalVarIndex);
-
-    // now create a trend variable to track it
-    size_t const numValues = 4;
-    PluginManagement::trends.emplace_back("TREND_VAR", numValues, globalVarIndex);
-    int trendVarIndex = pluginManager.getTrendVariableHandle("trend_var");
-    EXPECT_EQ(0, trendVarIndex);
-
-    // initially it should be filled with zeroes
-    EXPECT_EQ(numValues, pluginManager.getTrendVariableHistorySize(trendVarIndex));
-    for (size_t i = 0; i < numValues; i++) {
-        EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(trendVarIndex, i));
-    }
-
-    // now pretend to run through a few simulation time steps, setting the value a few times and updating the trend
-    std::vector<Real64> fakeValues = {3.14, 2.78, 12.0};
-    for (int i = 0; i < 3; i++) {
-        EnergyPlus::PluginManagement::PluginManager::setGlobalVariableValue(globalVarIndex, fakeValues[i]);
-        pluginManager.updatePluginValues();
-    }
-
-    // now check the values at the end, it should still be zero at the oldest (fourth) item, and 12.0 at the recent
-    EXPECT_NEAR(fakeValues[2], pluginManager.getTrendVariableValue(trendVarIndex, 0), 0.001);
-    EXPECT_NEAR(fakeValues[1], pluginManager.getTrendVariableValue(trendVarIndex, 1), 0.001);
-    EXPECT_NEAR(fakeValues[0], pluginManager.getTrendVariableValue(trendVarIndex, 2), 0.001);
-    EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(trendVarIndex, 3));
-
-}
-} // namespace EnergyPlus
+#endif // EPLUS_PYTHON_LIB_WRAPPER_HH
