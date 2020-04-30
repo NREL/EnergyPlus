@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -648,7 +649,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     //	compare_err_stream( "" ); // just for debugging
 
-    SurfaceGeometry::SetupZoneGeometry(outputFiles(), FoundError); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays();
@@ -1042,7 +1043,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
     compare_err_stream("");                         // just for debugging
-    SurfaceGeometry::SetupZoneGeometry(outputFiles(), FoundError); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays();
@@ -1454,7 +1455,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
     compare_err_stream("");                         // just for debugging
-    SurfaceGeometry::SetupZoneGeometry(outputFiles(), FoundError); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
     compare_err_stream(""); // just for debugging
@@ -1824,7 +1825,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     //	compare_err_stream( "" ); // just for debugging
 
-    SurfaceGeometry::SetupZoneGeometry(outputFiles(), FoundError); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays();

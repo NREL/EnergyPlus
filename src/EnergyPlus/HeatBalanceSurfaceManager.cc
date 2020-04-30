@@ -93,6 +93,7 @@
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -212,7 +213,7 @@ namespace HeatBalanceSurfaceManager {
         calcHeatBalanceInsideSurfCTFOnlyFirstTime = true;
     }
 
-    void ManageSurfaceHeatBalance()
+    void ManageSurfaceHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -236,7 +237,7 @@ namespace HeatBalanceSurfaceManager {
         int ConstrNum;
 
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Initializing Surfaces");
-        InitSurfaceHeatBalance(); // Initialize all heat balance related parameters
+        InitSurfaceHeatBalance(state); // Initialize all heat balance related parameters
 
         // Solve the zone heat balance 'Detailed' solution
         // Call the outside and inside surface heat balances
@@ -248,7 +249,7 @@ namespace HeatBalanceSurfaceManager {
         // The air heat balance must be called before the temperature history
         // updates because there may be a radiant system in the building
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Air Heat Balance");
-        ManageAirHeatBalance();
+        ManageAirHeatBalance(state);
 
         // IF NECESSARY, do one final "average" heat balance pass.  This is only
         // necessary if a radiant system is present and it was actually on for
@@ -281,7 +282,7 @@ namespace HeatBalanceSurfaceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSurfaceHeatBalance()
+    void InitSurfaceHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -732,7 +733,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Internal Heat Gains");
-        ManageInternalHeatGains(false);
+        ManageInternalHeatGains(state, false);
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Solar Distribution");
         InitIntSolarDistribution();
 

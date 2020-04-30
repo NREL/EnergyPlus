@@ -51,6 +51,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/IntegratedHeatPump.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 using namespace EnergyPlus;
@@ -71,9 +72,9 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCurWorkMode)
 
     IntegratedHeatPumps.push_back(IHP);
 
-    EXPECT_ANY_THROW(GetCurWorkMode(0););
+    EXPECT_ANY_THROW(GetCurWorkMode(state, 0););
 
-    EXPECT_EQ(IHPOperationMode::DWHMode, GetCurWorkMode(1));
+    EXPECT_EQ(IHPOperationMode::DWHMode, GetCurWorkMode(state, 1));
 }
 
 TEST_F(EnergyPlusFixture, ASIHP_GetCoilIndexIHP)

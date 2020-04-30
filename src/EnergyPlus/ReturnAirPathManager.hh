@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -71,13 +72,13 @@ namespace ReturnAirPathManager {
 
     void clear_state();
 
-    void SimReturnAirPath();
+    void SimReturnAirPath(EnergyPlusData &state);
 
     void GetReturnAirPathInput();
 
     void InitReturnAirPath(int &ReturnAirPathNum); // unused1208
 
-    void CalcReturnAirPath(int &ReturnAirPathNum);
+    void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum);
 
     void ReportReturnAirPath(int &ReturnAirPathNum); // unused1208
 

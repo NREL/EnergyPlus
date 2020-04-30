@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -187,7 +188,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
     PurchAir(PurchAirNum).Name = "Ideal Loads 1";
 
-    SizePurchasedAir(PurchAirNum);
+    SizePurchasedAir(state, PurchAirNum);
     EXPECT_DOUBLE_EQ(1.0, PurchAir(PurchAirNum).MaxHeatVolFlowRate);
     EXPECT_NEAR(50985.58, PurchAir(PurchAirNum).MaxHeatSensCap, 0.1);
     EXPECT_DOUBLE_EQ(2.0, PurchAir(PurchAirNum).MaxCoolVolFlowRate);
@@ -241,7 +242,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
     PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
     PurchAir(PurchAirNum).Name = "Ideal Loads 1";
 
-    SizePurchasedAir(PurchAirNum);
+    SizePurchasedAir(state, PurchAirNum);
     EXPECT_DOUBLE_EQ(1.0, PurchAir(PurchAirNum).MaxHeatVolFlowRate);
     EXPECT_NEAR(63731.97, PurchAir(PurchAirNum).MaxHeatSensCap, 0.1); // larger than test 1 above
     EXPECT_DOUBLE_EQ(2.0, PurchAir(PurchAirNum).MaxCoolVolFlowRate);
@@ -396,7 +397,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-    ManageZoneEquipment(FirstHVACIteration, SimZone,
+    ManageZoneEquipment(state, FirstHVACIteration, SimZone,
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
 
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
@@ -504,7 +505,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-    ManageZoneEquipment(FirstHVACIteration, SimZone,
+    ManageZoneEquipment(state, FirstHVACIteration, SimZone,
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
 
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
