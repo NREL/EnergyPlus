@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
@@ -81,8 +82,8 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone)
 
     ZoneEquipInputsFilled = true;
 
-    EXPECT_EQ(0, GetSystemNodeNumberForZone("NonExistingZone"));
-    EXPECT_EQ(1, GetSystemNodeNumberForZone("Zone1"));
+    EXPECT_EQ(0, GetSystemNodeNumberForZone(state, "NonExistingZone"));
+    EXPECT_EQ(1, GetSystemNodeNumberForZone(state, "Zone1"));
 
     ZoneEquipConfig.deallocate();
 }
