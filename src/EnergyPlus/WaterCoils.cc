@@ -2113,7 +2113,6 @@ namespace WaterCoils {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataAirSystems::PrimaryAirSystem;
         using DataEnvironment::StdBaroPress;
         using General::RoundSigDigits;
         using General::SolveRoot;
