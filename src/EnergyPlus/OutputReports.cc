@@ -1788,7 +1788,6 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int surf;    // Loop variable for surfaces
     int vert;    // Loop counter
     int ZoneNum; // Loop counter
     std::string BaseSurfName;
@@ -1869,13 +1868,15 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     }
 
     // Do just "detached" shading first
-    for (surf = 1; surf <= TotSurfaces; ++surf) {
+    int surf2 = 0;
+    for (int surf = 1; surf <= TotSurfaces; ++surf) {
+        surf2 = surf;
         if (Surface(surf).Zone != 0) break;
     }
-    if ((surf - 1) > 0) {
+    if ((surf2 - 1) > 0) {
         *eiostream << "Shading Surfaces,"
-                   << "Number of Shading Surfaces," << surf - 1 << '\n';
-        for (surf = 1; surf <= TotSurfaces; ++surf) {
+                   << "Number of Shading Surfaces," << surf2 - 1 << '\n';
+        for (int surf = 1; surf <= TotSurfaces; ++surf) {
             if (Surface(surf).Zone != 0) break;
             AlgoName = "None";
             *eiostream << "Shading Surface," << Surface(surf).Name << "," << cSurfaceClass(Surface(surf).Class) << "," << Surface(surf).BaseSurfName
@@ -1931,7 +1932,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
         *eiostream << "Zone Surfaces," << Zone(ZoneNum).Name << "," << (Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1)
                    << '\n';
-        for (surf = 1; surf <= TotSurfaces; ++surf) {
+        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != ZoneNum) continue;
             SolarDiffusing = "";
             if (RptType == 10 || RptType == 11) { // Details and Details with Vertices

@@ -1304,6 +1304,8 @@ namespace SurfaceGeometry {
             ++MovedSurfs;
             Surface(MovedSurfs) = SurfaceTmp(SurfNum);
             SurfaceTmp(SurfNum).Class = SurfaceClass_Moved; //'Moved'
+            // Store list of moved surface numbers in order for reporting
+            DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
         }
 
         //  For each zone
@@ -1327,6 +1329,8 @@ namespace SurfaceGeometry {
                     SurfaceTmp(SurfNum).BaseSurf = -1;              // Default has base surface = base surface
                     BaseSurfNum = MovedSurfs;
                     Surface(MovedSurfs).BaseSurf = BaseSurfNum;
+                    // Store list of moved surface numbers in order for reporting (subsurfaces follow their base surface)
+                    DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
 
                     //  Find all subsurfaces to this surface - just to update the base surface number - don't move these yet
                     for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
@@ -1335,6 +1339,8 @@ namespace SurfaceGeometry {
                         if (SurfaceTmp(SubSurfNum).BaseSurf != SurfNum) continue;
                         // Set BaseSurf to negative of new BaseSurfNum (to avoid confusion with other base surfaces)
                         SurfaceTmp(SubSurfNum).BaseSurf = -BaseSurfNum;
+                        // Add original sub-surface numbers as placeholders in surface list for reporting
+                        DataSurfaces::AllSurfaceListReportOrder.push_back(-SubSurfNum);
                     }
                 }
             }
@@ -1349,6 +1355,8 @@ namespace SurfaceGeometry {
                 Surface(MovedSurfs) = SurfaceTmp(SurfNum);
                 Surface(MovedSurfs).BaseSurf = MovedSurfs;
                 SurfaceTmp(SurfNum).Class = SurfaceClass_Moved; // 'Moved'
+                // Store list of moved surface numbers in order for reporting (subsurfaces follow their base surface)
+                DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
             }
 
             // Opaque subsurfaces are next (anything left in this zone that's not a window or a glass door)
@@ -1366,6 +1374,8 @@ namespace SurfaceGeometry {
                 // Reset BaseSurf to it's positive value (set to negative earlier)
                 Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 SurfaceTmp(SubSurfNum).BaseSurf = -1;
+                // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
+                std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
             }
 
             // Last but not least, then window subsurfaces
@@ -1381,6 +1391,8 @@ namespace SurfaceGeometry {
                 // Reset BaseSurf to it's positive value (set to negative earlier)
                 Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 SurfaceTmp(SubSurfNum).BaseSurf = -1;
+                // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
+                std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
             }
         }
 
