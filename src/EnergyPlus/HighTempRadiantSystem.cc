@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
@@ -178,7 +179,7 @@ namespace HighTempRadiantSystem {
         HighTempRadSysNumericFields.deallocate();
     }
 
-    void SimHighTempRadiantSystem(std::string const &CompName,   // name of the low temperature radiant system
+    void SimHighTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   Real64 &LoadMet,               // load met by the radiant system, in Watts
                                   int &CompIndex)
@@ -236,7 +237,7 @@ namespace HighTempRadiantSystem {
             }
         }
 
-        InitHighTempRadiantSystem(FirstHVACIteration, RadSysNum);
+        InitHighTempRadiantSystem(state, FirstHVACIteration, RadSysNum);
 
         {
             auto const SELECT_CASE_var(HighTempRadSys(RadSysNum).ControlType);
@@ -672,7 +673,7 @@ namespace HighTempRadiantSystem {
         }
     }
 
-    void InitHighTempRadiantSystem(bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+    void InitHighTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                    int const RadSysNum // Index for the low temperature radiant system under consideration within the derived types
     )
     {
@@ -742,7 +743,7 @@ namespace HighTempRadiantSystem {
 
         if (!SysSizingCalc && MySizeFlag(RadSysNum)) {
             // for each radiant systen do the sizing once.
-            SizeHighTempRadiantSystem(RadSysNum);
+            SizeHighTempRadiantSystem(state, RadSysNum);
             MySizeFlag(RadSysNum) = false;
         }
 
@@ -769,7 +770,7 @@ namespace HighTempRadiantSystem {
         }
     }
 
-    void SizeHighTempRadiantSystem(int const RadSysNum)
+    void SizeHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -871,7 +872,7 @@ namespace HighTempRadiantSystem {
                 } else {
                     TempSize = HighTempRadSys(RadSysNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 HighTempRadSys(RadSysNum).MaxPowerCapac = TempSize;
                 DataScalableCapSizingON = false;
             }

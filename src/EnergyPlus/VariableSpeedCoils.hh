@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -372,7 +373,7 @@ namespace VariableSpeedCoils {
     // Functions
     void clear_state();
 
-    void SimVariableSpeedCoils(std::string const &CompName,   // Coil Name
+    void SimVariableSpeedCoils(EnergyPlusData &state, std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                int const CyclingScheme,       // Continuous fan OR cycling compressor
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -392,7 +393,7 @@ namespace VariableSpeedCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitVarSpeedCoil(int const DXCoilNum,                // Current DXCoilNum under simulation
+    void InitVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum,                // Current DXCoilNum under simulation
                           Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                           Real64 const HPTimeConstant,        // Heat pump time constant [s]
                           Real64 const FanDelayTime,          // Fan delay time, time delay for the HP's fan to
@@ -404,7 +405,7 @@ namespace VariableSpeedCoils {
                           int const SpeedNum                  // compressor speed number
     );
 
-    void SizeVarSpeedCoil(int const DXCoilNum);
+    void SizeVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum);
 
     void CalcVarSpeedCoilCooling(int const DXCoilNum,            // Heat Pump Number
                                  int const CyclingScheme,        // Fan/Compressor cycling scheme indicator

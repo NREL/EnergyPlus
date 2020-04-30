@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include "../Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 class CoilCoolingDXTest : public EnergyPlus::EnergyPlusFixture {
 public:
