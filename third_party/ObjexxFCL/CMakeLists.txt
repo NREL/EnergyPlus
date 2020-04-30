@@ -1,7 +1,7 @@
 set( target_name objexx )
 
 if (UNIX)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-sign-compare")
 endif()
 
 set(src
