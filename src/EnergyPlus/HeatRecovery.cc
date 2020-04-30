@@ -65,6 +65,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -216,7 +217,7 @@ namespace HeatRecovery {
         HeatExchangerUniqueNames.clear();
     }
 
-    void SimHeatRecovery(std::string const &CompName,             // name of the heat exchanger unit
+    void SimHeatRecovery(EnergyPlusData &state, std::string const &CompName,             // name of the heat exchanger unit
                          bool const FirstHVACIteration,           // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                          // Pointer to Component
                          int const FanOpMode,                     // Supply air fan operating mode
@@ -303,7 +304,7 @@ namespace HeatRecovery {
             CalledFromParentObject = false;
         }
 
-        InitHeatRecovery(HeatExchNum, CompanionCoilNum, companionCoilType);
+        InitHeatRecovery(state, HeatExchNum, CompanionCoilNum, companionCoilType);
 
         // call the correct heat exchanger calculation routine
         {
@@ -1246,7 +1247,7 @@ namespace HeatRecovery {
         }
     }
 
-    void InitHeatRecovery(int const ExchNum, // number of the current heat exchanger being simulated
+    void InitHeatRecovery(EnergyPlusData &state, int const ExchNum, // number of the current heat exchanger being simulated
                           int const CompanionCoilIndex,
                           int const CompanionCoilType_Num)
     {
@@ -1321,7 +1322,7 @@ namespace HeatRecovery {
 
         if (!SysSizingCalc && MySizeFlag(ExchNum)) {
 
-            SizeHeatRecovery(ExchNum);
+            SizeHeatRecovery(state, ExchNum);
             MySizeFlag(ExchNum) = false;
         }
 
@@ -1596,7 +1597,7 @@ namespace HeatRecovery {
         }
     }
 
-    void SizeHeatRecovery(int const ExchNum)
+    void SizeHeatRecovery(EnergyPlusData &state, int const ExchNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1677,7 +1678,7 @@ namespace HeatRecovery {
             }
         }
         TempSize = ExchCond(ExchNum).NomSupAirVolFlow;
-        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
         ExchCond(ExchNum).NomSupAirVolFlow = TempSize;
         DataConstantUsedForSizing = 0.0;
         DataFractionUsedForSizing = 0.0;
@@ -1700,7 +1701,7 @@ namespace HeatRecovery {
                 }
             }
             TempSize = ExchCond(ExchNum).NomSecAirVolFlow;
-            RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
             ExchCond(ExchNum).NomSecAirVolFlow = TempSize;
             DataConstantUsedForSizing = 0.0;
             DataFractionUsedForSizing = 0.0;
@@ -1718,7 +1719,7 @@ namespace HeatRecovery {
             SizingString = BalDesDehumPerfNumericFields(BalDesDehumPerfIndex).NumericFieldNames(FieldNum) + " [m3/s]";
             SizingMethod = SystemAirflowSizing;
             TempSize = BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
-            RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
             BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow = TempSize;
 
             FieldNum = 2;
@@ -1726,7 +1727,7 @@ namespace HeatRecovery {
             DataAirFlowUsedForSizing = BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
             TempSize = BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel;
             SizingMethod = DesiccantDehumidifierBFPerfDataFaceVelocitySizing;
-            RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
             BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel = TempSize;
             DataAirFlowUsedForSizing = 0.0;
         }

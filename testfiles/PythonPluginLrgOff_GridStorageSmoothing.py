@@ -1,27 +1,61 @@
 from pyenergyplus.plugin import EnergyPlusPlugin
 
 
-class TestOutTrends(EnergyPlusPlugin):
+class BatteryControlDemandDemo(EnergyPlusPlugin):
+
+    def __init__(self):
+        super().__init__()
+
+        # handles
+        self.need_to_get_handles = True
+        self.handles = {}
+
+    def get_handles(self):
+        self.need_to_get_handles = False
+        self.handles["CurntFacilityElectDemand"] = self.api.exchange.get_variable_handle(
+            "Facility Total Electric Demand Power",
+            "Whole Building"
+        )
+        self.handles["CurntFacilityElectDemandTrend"] = self.api.exchange.get_trend_handle(
+            "CurntFacilityElectDemandTrend"
+        )
+        self.handles["dischargeRate"] = self.api.exchange.get_actuator_handle(
+            "Electrical Storage",
+            "Power Draw Rate",
+            "Grid Battery Load Center"
+        )
+        self.handles["chargeRate"] = self.api.exchange.get_actuator_handle(
+            "Electrical Storage",
+            "Power Charge Rate",
+            "Grid Battery Load Center"
+        )
+
+    def handles_are_valid(self):
+        handles_are_valid = True
+        for (k, v) in self.handles.items():
+            if v == -1:
+                handles_are_valid = False
+                self.api.runtime.issue_severe(f"Handle not found '{k}'")
+        return handles_are_valid
+
+    def simulate(self):
+        avgFacilDemand = self.api.exchange.get_trend_average(self.handles["CurntFacilityElectDemandTrend"], 1008)
+        self.api.exchange.set_actuator_value(self.handles["dischargeRate"], 0.0)
+        self.api.exchange.set_actuator_value(self.handles["chargeRate"], 0.0)
+        dampenFactor = 0.8
+        CurntFacilityElectDemand = self.api.exchange.get_variable_value(self.handles["CurntFacilityElectDemand"])
+        if (CurntFacilityElectDemand > (avgFacilDemand * 1.05)):
+            dischargeRate = (CurntFacilityElectDemand - avgFacilDemand) * dampenFactor
+            self.api.exchange.set_actuator_value(self.handles["dischargeRate"], dischargeRate)
+        elif (CurntFacilityElectDemand < (avgFacilDemand * 0.95)):
+            chargeRate = (avgFacilDemand - CurntFacilityElectDemand) * dampenFactor
+            self.api.exchange.set_actuator_value(self.handles["chargeRate"], chargeRate)
 
     def on_begin_zone_timestep_before_init_heat_balance(self) -> int:
-        if 'handles_set' not in self.data:
-            self.data['outdoor_temp'] = self.api.exchange.get_variable_handle(
-                "Site Outdoor Air Drybulb Temperature", "Environment"
-            )
-            self.data['global_var'] = self.api.exchange.get_global_handle('OutdoorTempCopy')
-            self.data['trend_var'] = self.api.exchange.get_trend_handle('ThisTrendVariable')
-            self.data['handles_set'] = True
-            print("%s, %s, %s" % (
-                self.data['outdoor_temp'], self.data['global_var'], self.data['trend_var']
-            ))
-        cur_temp = self.api.exchange.get_variable_value(self.data['outdoor_temp'])
-        self.api.exchange.set_global_value(self.data['global_var'], cur_temp)
-        # val_1 = self.api.exchange.get_trend_value(self.data['trend_var'], 0)
-        # val_2 = self.api.exchange.get_trend_value(self.data['trend_var'], 1)
-        # val_3 = self.api.exchange.get_trend_value(self.data['trend_var'], 2)
-        # val_4 = self.api.exchange.get_trend_value(self.data['trend_var'], 3)
-        # val_5 = self.api.exchange.get_trend_value(self.data['trend_var'], 4)
-        # print("TRENDING: %s, %s, %s, %s, %s" % (
-        #     round(val_1, 2), round(val_2, 2), round(val_3, 2), round(val_4, 2), round(val_5, 2)
-        # ))
+
+        if self.need_to_get_handles:
+            self.get_handles()
+            if not self.handles_are_valid():
+                return 1
+        self.simulate()
         return 0

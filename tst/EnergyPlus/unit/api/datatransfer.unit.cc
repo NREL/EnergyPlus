@@ -246,10 +246,10 @@ public:
         EnergyPlus::PluginManagement::trends.emplace_back(trendName, numTrendValues, i);
     }
 
-    static void simulateTimeStepAndReport()
+    void simulateTimeStepAndReport()
     {
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
     }
 };
 
@@ -350,7 +350,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableValuesRealTyp
     int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
 
     // pretend like E+ ran a time step
-    DataExchangeAPIUnitTestFixture::simulateTimeStepAndReport();
+    this->simulateTimeStepAndReport();
 
     // get the values for valid handles
     Real64 curHeatTransfer = getVariableValue(hChillerHT);
@@ -385,7 +385,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterValues)
     int hFacilityElectricity = getMeterHandle("Electricity:Facility");
     EXPECT_GT(hFacilityElectricity, -1);
     // pretend like E+ ran a time step
-    DataExchangeAPIUnitTestFixture::simulateTimeStepAndReport();
+    this->simulateTimeStepAndReport();
     // get the value for a valid meter
     Real64 curFacilityElectricity = getMeterValue(hFacilityElectricity);
     EXPECT_NEAR(3.14, curFacilityElectricity, 0.001);

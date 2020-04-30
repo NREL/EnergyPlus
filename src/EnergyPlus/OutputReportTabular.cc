@@ -101,6 +101,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HybridModel.hh>
@@ -4790,6 +4791,45 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
+        using DataGlobals::convertJtoGJ;
+        using DataHeatBalance::BuildingPreDefRep;
+
+        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
+        using DataHeatBalance::ZoneTotalExhaustHeatLoss;
+        using DataHeatBalSurface::SumSurfaceHeatEmission;
+
+        using DataHVACGlobals::TimeStepSys;
+
+        SysTotalHVACReliefHeatLoss = 0;
+        SysTotalHVACRejectHeatLoss = 0;
+
+        if (!displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
+
+        // Only gather zone report at zone time steps
+        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
+            BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * convertJtoGJ;
+            return;
+        }
+
+        CalcHeatEmissionReport();
+        BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * convertJtoGJ;
+        BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * convertJtoGJ;
+        BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
+        BuildingPreDefRep.emiHVACReject += SysTotalHVACRejectHeatLoss * convertJtoGJ;
+
+        BuildingPreDefRep.emiTotHeat = BuildingPreDefRep.emiEnvelopConv + BuildingPreDefRep.emiZoneExfiltration + BuildingPreDefRep.emiZoneExhaust +
+                                       BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;
+    }
+
+
+    void CalcHeatEmissionReport()
+    {
+        // PURPOSE OF THIS SUBROUTINE:
+        // Gathers the data each zone timestep for the heat gain report.
+        // The routine generates an annual table with the following columns which correspond to
+        // the output variables and data structures shown.
+
+        // Using/Aliasing
         using Boilers::Boiler;
         using Boilers::NumBoilers;
         using ChillerElectricEIR::ElectricEIRChiller;
@@ -4807,7 +4847,6 @@ namespace OutputReportTabular {
         using DataHeatBalance::SysTotalHVACReliefHeatLoss;
         using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
         using DataHeatBalance::ZoneTotalExhaustHeatLoss;
-        using DataHeatBalSurface::SumSurfaceHeatEmission;
         using DataHVACGlobals::AirCooled;
         using DataHVACGlobals::EvapCooled;
         using DataHVACGlobals::TimeStepSys;
@@ -4855,23 +4894,10 @@ namespace OutputReportTabular {
         SysTotalHVACReliefHeatLoss = 0;
         SysTotalHVACRejectHeatLoss = 0;
 
-        if (!displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
-
-        // Only gather zone report at zone time steps
-        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
-            BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * convertJtoGJ;
-            return;
-        }
-
-        BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * convertJtoGJ;
-
-        BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * convertJtoGJ;
-
         // HVAC relief air
         for (iOACtrl = 1; iOACtrl <= NumOAControllers; ++iOACtrl) {
             SysTotalHVACReliefHeatLoss += OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
         }
-        BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
 
         // Condenser water loop
         for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
@@ -4893,17 +4919,17 @@ namespace OutputReportTabular {
         }
         for (iChiller = 1; iChiller <= NumEngineDrivenChillers; ++iChiller) {
             if (EngineDrivenChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
+                SysTotalHVACRejectHeatLoss += EngineDrivenChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumGTChillers; ++iChiller) {
             if (GTChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
+                SysTotalHVACRejectHeatLoss += GTChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumConstCOPChillers; ++iChiller) {
             if (ConstCOPChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
+                SysTotalHVACRejectHeatLoss += ConstCOPChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumElectricEIRChillers; ++iChiller) {
@@ -5022,11 +5048,6 @@ namespace OutputReportTabular {
         for (iCooler = 1; iCooler <= NumEvapCool; ++iCooler) {
             SysTotalHVACRejectHeatLoss += EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC + EvapCond(iCooler).EvapCoolerEnergy;
         }
-
-        BuildingPreDefRep.emiHVACReject += SysTotalHVACRejectHeatLoss * convertJtoGJ;
-
-        BuildingPreDefRep.emiTotHeat = BuildingPreDefRep.emiEnvelopConv + BuildingPreDefRep.emiZoneExfiltration + BuildingPreDefRep.emiZoneExhaust +
-                                       BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;
     }
 
     void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
@@ -5653,7 +5674,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports(OutputFiles &outputFiles)
+    void WriteTabularReports(EnergyPlusData &state, OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -5668,7 +5689,7 @@ namespace OutputReportTabular {
 
 
         FillWeatherPredefinedEntries();
-        FillRemainingPredefinedEntries();
+        FillRemainingPredefinedEntries(state);
 
         if (WriteTabularFiles) {
             // call each type of report in turn
@@ -5685,7 +5706,7 @@ namespace OutputReportTabular {
             WriteLoadComponentSummaryTables();
             WriteHeatEmissionTable();
 
-            coilSelectionReportObj->finishCoilSummaryReportTable(); // call to write out the coil selection summary table data
+            coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables();                                // moved to come after zone load components is finished
 
             if (DoWeathSim) {
@@ -6405,7 +6426,7 @@ namespace OutputReportTabular {
         return inString.substr(startPos, endPos - startPos);
     }
 
-    void FillRemainingPredefinedEntries()
+    void FillRemainingPredefinedEntries(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -6439,8 +6460,6 @@ namespace OutputReportTabular {
         using DataOutputs::iTotalAutoCalculatableFields;
         using DataOutputs::iTotalAutoSizableFields;
         using DataOutputs::iTotalFieldsWithDefaults;
-        using ExteriorEnergyUse::ExteriorLights;
-        using ExteriorEnergyUse::NumExteriorLights;
         using General::RoundSigDigits;
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;
@@ -6522,28 +6541,28 @@ namespace OutputReportTabular {
             consumptionTotal += Lights(iLight).SumConsumption / 1000000000.0;
         }
         PreDefTableEntry(pdchInLtConsump, "Interior Lighting Total", consumptionTotal);
-
+        
         // Exterior Lighting
         consumptionTotal = 0.0;
-        for (iLight = 1; iLight <= NumExteriorLights; ++iLight) {
-            if (ExteriorLights(iLight).ControlMode == 1) { // photocell/schedule
+        for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
+            if (state.exteriorEnergyUse.ExteriorLights(iLight).ControlMode == 1) { // photocell/schedule
                 PreDefTableEntry(pdchExLtAvgHrSchd,
-                                 ExteriorLights(iLight).Name,
-                                 ScheduleAverageHoursPerWeek(ExteriorLights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
+                                 state.exteriorEnergyUse.ExteriorLights(iLight).Name,
+                                 ScheduleAverageHoursPerWeek(state.exteriorEnergyUse.ExteriorLights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
             }
             // average operating hours per week
             if (gatherElapsedTimeBEPS > 0) {
-                HrsPerWeek = 24 * 7 * ExteriorLights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
-                PreDefTableEntry(pdchExLtAvgHrOper, ExteriorLights(iLight).Name, HrsPerWeek);
+                HrsPerWeek = 24 * 7 * state.exteriorEnergyUse.ExteriorLights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
+                PreDefTableEntry(pdchExLtAvgHrOper, state.exteriorEnergyUse.ExteriorLights(iLight).Name, HrsPerWeek);
             }
             // full load hours per week
-            if ((ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS) > 0) {
+            if ((state.exteriorEnergyUse.ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS) > 0) {
                 HrsPerWeek =
-                    24 * 7 * ExteriorLights(iLight).SumConsumption / (ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS * SecInHour);
-                PreDefTableEntry(pdchExLtFullLoadHrs, ExteriorLights(iLight).Name, HrsPerWeek);
+                    24 * 7 * state.exteriorEnergyUse.ExteriorLights(iLight).SumConsumption / (state.exteriorEnergyUse.ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS * SecInHour);
+                PreDefTableEntry(pdchExLtFullLoadHrs, state.exteriorEnergyUse.ExteriorLights(iLight).Name, HrsPerWeek);
             }
-            PreDefTableEntry(pdchExLtConsump, ExteriorLights(iLight).Name, ExteriorLights(iLight).SumConsumption / 1000000000.0);
-            consumptionTotal += ExteriorLights(iLight).SumConsumption / 1000000000.0;
+            PreDefTableEntry(pdchExLtConsump, state.exteriorEnergyUse.ExteriorLights(iLight).Name, state.exteriorEnergyUse.ExteriorLights(iLight).SumConsumption / 1000000000.0);
+            consumptionTotal += state.exteriorEnergyUse.ExteriorLights(iLight).SumConsumption / 1000000000.0;
         }
         PreDefTableEntry(pdchExLtConsump, "Exterior Lighting Total", consumptionTotal);
 
@@ -10342,8 +10361,6 @@ namespace OutputReportTabular {
         using DataSurfaces::SurfaceClass_Wall;
         using DataSurfaces::SurfaceClass_Window;
         using DataSurfaces::TotSurfaces;
-        using ExteriorEnergyUse::ExteriorLights;
-        using ExteriorEnergyUse::NumExteriorLights;
         using General::RoundSigDigits;
         using General::SafeDivide;
         using ScheduleManager::GetScheduleName;
@@ -15459,8 +15476,6 @@ namespace OutputReportTabular {
         using DataHeatBalance::TotLights;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZonePreDefRep;
-        using ExteriorEnergyUse::ExteriorLights;
-        using ExteriorEnergyUse::NumExteriorLights;
 
         Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
         int iLight;
@@ -15470,10 +15485,7 @@ namespace OutputReportTabular {
             Lights(iLight).SumTimeNotZeroCons = 0.;
             Lights(iLight).SumConsumption = 0.;
         }
-        for (iLight = 1; iLight <= NumExteriorLights; ++iLight) {
-            ExteriorLights(iLight).SumTimeNotZeroCons = 0.;
-            ExteriorLights(iLight).SumConsumption = 0.;
-        }
+
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
                 if (Zone(iZone).isNominalOccupied) {

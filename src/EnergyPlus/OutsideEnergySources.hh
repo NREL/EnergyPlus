@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -94,10 +95,10 @@ namespace OutsideEnergySources {
 
         static PlantComponent *factory(int objectType, std::string objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation,
                                  Real64 &MaxLoad,

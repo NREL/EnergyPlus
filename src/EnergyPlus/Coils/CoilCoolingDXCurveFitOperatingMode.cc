@@ -52,6 +52,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -148,7 +149,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(const std
     }
 }
 
-void CoilCoolingDXCurveFitOperatingMode::size()
+void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
 {
 
     std::string RoutineName = "sizeOperatingMode";
@@ -159,7 +160,7 @@ void CoilCoolingDXCurveFitOperatingMode::size()
     int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
     std::string SizingString = "Rated Evaporator Air Flow Rate";
     Real64 TempSize = this->original_input_specs.rated_evaporator_air_flow_rate;
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedEvapAirFlowRate = TempSize;
     Real64 const ratedInletAirTemp(26.6667);        // 26.6667C or 80F
     Real64 const ratedInletAirHumRat(0.01125);      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
@@ -170,7 +171,7 @@ void CoilCoolingDXCurveFitOperatingMode::size()
     SizingString = "Rated Gross Total Cooling Capacity";
     DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate; // TODO: This is volume flow, right?
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedGrossTotalCap = TempSize;
 
     SizingMethod = DataHVACGlobals::AutoCalculateSizing;
@@ -179,14 +180,14 @@ void CoilCoolingDXCurveFitOperatingMode::size()
     DataSizing::DataFractionUsedForSizing = 0.000114;
     SizingString = "Rated Condenser Air Flow Rate";
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedCondAirFlowRate = TempSize;
 
     for (auto &curSpeed : this->speeds) {
         curSpeed.parentModeRatedGrossTotalCap = this->ratedGrossTotalCap;
         curSpeed.parentModeRatedEvapAirFlowRate = this->ratedEvapAirFlowRate;
         curSpeed.parentModeRatedCondAirFlowRate = this->ratedCondAirFlowRate;
-        curSpeed.size();
+        curSpeed.size(state);
     }
 }
 

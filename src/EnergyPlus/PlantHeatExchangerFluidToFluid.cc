@@ -64,6 +64,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -151,7 +152,7 @@ namespace PlantHeatExchangerFluidToFluid {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void HeatExchangerStruct::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void HeatExchangerStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initialize();
     }
@@ -170,7 +171,7 @@ namespace PlantHeatExchangerFluidToFluid {
         }
     }
 
-    void HeatExchangerStruct::simulate(const PlantLocation &calledFromLocation,
+    void HeatExchangerStruct::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation,
                                        bool const FirstHVACIteration,
                                        Real64 &CurLoad,
                                        bool const EP_UNUSED(RunFlag))

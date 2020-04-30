@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -149,7 +150,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -160,7 +161,7 @@ namespace OutputProcessor {
         int StartMinute = 0;
         bool PrintESOTimeStamp = true;
 
-        ReportTSMeters(StartMinute, EndMinute, PrintESOTimeStamp, true);
+        ReportTSMeters(state.dataGlobals, StartMinute, EndMinute, PrintESOTimeStamp, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -215,7 +216,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -226,7 +227,7 @@ namespace OutputProcessor {
         int StartMinute = 0;
         bool PrintESOTimeStamp = false;
 
-        ReportTSMeters(StartMinute, EndMinute, PrintESOTimeStamp, true);
+        ReportTSMeters(state.dataGlobals, StartMinute, EndMinute, PrintESOTimeStamp, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -279,7 +280,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -287,7 +288,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportHRMeters(true);
+        ReportHRMeters(state.dataGlobals, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -347,7 +348,7 @@ namespace OutputProcessor {
         DailyStampReportNbr = 1;
         DailyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -355,7 +356,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportDYMeters(true);
+        ReportDYMeters(state.dataGlobals, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -419,7 +420,7 @@ namespace OutputProcessor {
         MonthlyStampReportNbr = 1;
         MonthlyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -427,7 +428,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportMNMeters(true);
+        ReportMNMeters(state.dataGlobals, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -491,7 +492,7 @@ namespace OutputProcessor {
         RunPeriodStampReportNbr = 1;
         RunPeriodStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -499,7 +500,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportSMMeters(true);
+        ReportSMMeters(state.dataGlobals, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -563,7 +564,7 @@ namespace OutputProcessor {
         YearlyStampReportNbr = 1;
         YearlyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataGlobals::CalendarYear = 2017;
         DataGlobals::CalendarYearChr = "2017";
@@ -4107,7 +4108,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4224,7 +4225,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting(outputFiles());
 
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4351,7 +4352,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4472,7 +4473,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting(outputFiles());
 
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4608,7 +4609,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4729,7 +4730,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting(outputFiles());
 
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4813,7 +4814,7 @@ namespace OutputProcessor {
 
         // Setup so that UpdateDataandReport can be called.
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4865,33 +4866,33 @@ namespace OutputProcessor {
 
         PurchAir(1).TotHeatEnergy = 1.1;
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.3;
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.5;
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.7;
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.9;
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 2.2;
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
 
         DataGlobals::WarmupFlag = false;
 
         PurchAir(1).TotHeatEnergy = 2.4;
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
 
         compare_eso_stream(delimited_string({
             "1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]",
@@ -4922,15 +4923,15 @@ namespace OutputProcessor {
 
         PurchAir(1).TotHeatEnergy = 100.0;
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 200.0;
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 300.0;
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
 
         compare_eso_stream(delimited_string({
             "2,365,12,31, 0,24, 0.00,10.00,Tuesday",
@@ -4953,7 +4954,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -5006,7 +5007,7 @@ namespace OutputProcessor {
                             1,
                             1);
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
 
         GenOutputVariablesAuditReport();
 
@@ -5031,7 +5032,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -5087,7 +5088,7 @@ namespace OutputProcessor {
                             1,
                             1);
         UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
 
         NumExtraVars = 0;
         BuildKeyVarList("Air Loop 1|AirSupply InletNode", "SYSTEM NODE SETPOINT TEMPERATURE", 1, 2);
