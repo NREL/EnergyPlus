@@ -980,7 +980,6 @@ namespace WaterCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataSizing::CurSysNum;
         using General::Iterate;
         using General::RoundSigDigits;
         using General::SafeDivide;
@@ -990,7 +989,6 @@ namespace WaterCoils {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using PlantUtilities::ScanPlantLoopsForObject;
         using namespace FaultsManager;
-        using DataAirSystems::PrimaryAirSystem;
         using HVACControllers::GetControllerNameAndIndex;
         using SimAirServingZones::CheckWaterCoilIsOnAirLoop;
 
