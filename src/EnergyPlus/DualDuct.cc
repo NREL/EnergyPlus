@@ -1529,7 +1529,6 @@ namespace DualDuct {
         this->dd_airterminalOutlet.AirMassFlowRateMaxAvail = MassFlow;
         this->dd_airterminalOutlet.AirMassFlowRateMinAvail = this->ZoneMinAirFrac * this->dd_airterminalHotAirInlet.AirMassFlowRateMax;
         this->dd_airterminalOutlet.AirEnthalpy = Enthalpy;
-        this->OutdoorAirFlowRate = MassFlow * AirLoopOAFrac;
 
         // Calculate the hot and cold damper position in %
         if ((this->dd_airterminalHotAirInlet.AirMassFlowRateMax == 0.0) || (this->dd_airterminalColdAirInlet.AirMassFlowRateMax == 0.0)) {
