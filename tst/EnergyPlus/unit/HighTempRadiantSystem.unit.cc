@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -152,7 +153,7 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemSca
     if (SizingTypesNum < 1) SizingTypesNum = 1;
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
 
-    SizeHighTempRadiantSystem(RadSysNum);
+    SizeHighTempRadiantSystem(state, RadSysNum);
     EXPECT_FALSE(DataSizing::DataScalableSizingON);
 }
 

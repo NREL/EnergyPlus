@@ -61,6 +61,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -636,9 +637,9 @@ namespace EnergyPlus {
 
             void initInOutCells(CartesianCell const &in, CartesianCell const &out);
 
-            static PlantComponent *factory(int objectType, std::string objectName);
+            static PlantComponent *factory(DataGlobal &dataGlobals, int objectType, std::string objectName);
 
-            void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+            void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                           bool RunFlag) override;
 
             bool operator==(std::string const & a) {
@@ -926,19 +927,19 @@ namespace EnergyPlus {
 
         void clear_state();
 
-        void SimulateGroundDomains(OutputFiles &outputFiles, bool initOnly);
+        void SimulateGroundDomains(DataGlobal &dataGlobals, OutputFiles &outputFiles, bool initOnly);
 
         void CheckIfAnySlabs();
 
-        void CheckIfAnyBasements();
+        void CheckIfAnyBasements(EnergyPlusData &EP_UNUSED(state));
 
-        void GetPipingSystemsAndGroundDomainsInput();
+        void GetPipingSystemsAndGroundDomainsInput(DataGlobal &dataGlobals);
 
-        void ReadGeneralDomainInputs(int IndexStart, int NumGeneralizedDomains, bool &ErrorsFound);
+        void ReadGeneralDomainInputs(DataGlobal &dataGlobals, int IndexStart, int NumGeneralizedDomains, bool &ErrorsFound);
 
-        void ReadZoneCoupledDomainInputs(int StartingDomainNumForZone, int NumZoneCoupledDomains, bool &ErrorsFound);
+        void ReadZoneCoupledDomainInputs(DataGlobal &dataGlobals, int StartingDomainNumForZone, int NumZoneCoupledDomains, bool &ErrorsFound);
 
-        void ReadBasementInputs(int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
+        void ReadBasementInputs(DataGlobal &dataGlobals, int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
         
         bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
                                             int const MaterialNum);
@@ -951,7 +952,7 @@ namespace EnergyPlus {
 
         void ReadPipeSegmentInputs(bool &ErrorsFound);
 
-        void ReadHorizontalTrenchInputs(int StartingDomainNumForHorizontal,
+        void ReadHorizontalTrenchInputs(DataGlobal &dataGlobals, int StartingDomainNumForHorizontal,
                                         int StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound);
 

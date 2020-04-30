@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -342,30 +343,30 @@ namespace VentilatedSlab {
 
     void clear_state();
 
-    void SimVentilatedSlab(std::string const &CompName,   // name of the fan coil unit
+    void SimVentilatedSlab(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
                            Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                            int &CompIndex);
 
-    void GetVentilatedSlabInput();
+    void GetVentilatedSlabInput(EnergyPlusData &state);
 
-    void InitVentilatedSlab(int const Item,               // index for the current ventilated slab
+    void InitVentilatedSlab(EnergyPlusData &state, int const Item,               // index for the current ventilated slab
                             int const VentSlabZoneNum,    // number of zone being served
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void SizeVentilatedSlab(int const Item);
+    void SizeVentilatedSlab(EnergyPlusData &state, int const Item);
 
-    void CalcVentilatedSlab(int &Item,                     // number of the current ventilated slab being simulated
+    void CalcVentilatedSlab(EnergyPlusData &state, int &Item,                     // number of the current ventilated slab being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // power supplied (W)
                             Real64 &LatOutputProvided      // latent capacity supplied (kg/s)
     );
 
-    void CalcVentilatedSlabComps(int const Item,                // system index in ventilated slab array
+    void CalcVentilatedSlabComps(EnergyPlusData &state, int const Item,                // system index in ventilated slab array
                                  bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                  Real64 &LoadMet                // load met by the system (watts)
     );

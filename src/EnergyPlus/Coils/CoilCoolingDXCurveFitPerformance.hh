@@ -54,6 +54,7 @@
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 class OutputFiles;
@@ -99,13 +100,13 @@ struct CoilCoolingDXCurveFitPerformance
                    int &fanOpMode,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode);
-    void calcStandardRatings(
+    void calcStandardRatings(EnergyPlusData &state,
         int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, EnergyPlus::OutputFiles &outputFiles);
-    Real64 calcIEERResidual(Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
+    Real64 calcIEERResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
     explicit CoilCoolingDXCurveFitPerformance(const std::string &name);
-    void size();
+    void size(EnergyPlusData &state);
     void setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 
     std::string name;
