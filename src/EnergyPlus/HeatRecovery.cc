@@ -1693,7 +1693,7 @@ namespace HeatRecovery {
             }
         }
         TempSize = ExchCond(ExchNum).NomSupAirVolFlow;
-        SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
+        SizeHRHXtoMinFlow = GetHeatRecoveryHXMinFlowSizingFlag(DataSizing::CurOASysNum);
         RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
         ExchCond(ExchNum).NomSupAirVolFlow = TempSize;
         DataConstantUsedForSizing = 0.0;
@@ -5403,7 +5403,7 @@ namespace HeatRecovery {
         }
     }
 
-    bool GetHeatRecoveryHXNominalFlowSizingFlag(int const OASysNum) 
+    bool GetHeatRecoveryHXMinFlowSizingFlag(int const OASysNum) 
     {
         bool HXNominalFlowSizingFlag;
         HXNominalFlowSizingFlag = false;

@@ -4072,23 +4072,23 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalFlowSizingOptionsTest)
     EXPECT_FALSE(thisOAController.EconBypass); // no bypass
     EXPECT_FALSE(SizeHRHXtoMinFlow); // initialized to false
     // test 1: Economizer Type = NoEconomizer 
-    SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
+    SizeHRHXtoMinFlow = GetHeatRecoveryHXMinFlowSizingFlag(DataSizing::CurOASysNum);
     EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum OA
     ;
     // test 2: Economizer Type = DifferentialDryBulb but no bypass
     thisOAController.Econo = MixedAir::DifferentialDryBulb;
-    SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
+    SizeHRHXtoMinFlow = GetHeatRecoveryHXMinFlowSizingFlag(DataSizing::CurOASysNum);
     EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum OA 
     ;
     // test 3: Economizer Type = DifferentialDryBulb and allow bypass
     thisOAController.EconBypass = true; // allow bypass
-    SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
+    SizeHRHXtoMinFlow = GetHeatRecoveryHXMinFlowSizingFlag(DataSizing::CurOASysNum);
     EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum OA
     ;
     // test 4: Economizer Type = DifferentialDryBulb and no bypass
     thisOAController.EconBypass = false; // no bypass
     thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenWithinEconomizerLimits;
-    SizeHRHXtoMinFlow = GetHeatRecoveryHXNominalFlowSizingFlag(DataSizing::CurOASysNum);
+    SizeHRHXtoMinFlow = GetHeatRecoveryHXMinFlowSizingFlag(DataSizing::CurOASysNum);
     EXPECT_FALSE(SizeHRHXtoMinFlow); // sized to maximum OA
 }
 

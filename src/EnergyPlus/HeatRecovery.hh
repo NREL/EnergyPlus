@@ -678,7 +678,7 @@ namespace HeatRecovery {
                               Optional<Real64> SecondaryAirVolFlow = _ // HX secondary air flow rate [m3/s]
     );
 
-    bool GetHeatRecoveryHXNominalFlowSizingFlag( int const OASysNum // index of outside air system 
+    bool GetHeatRecoveryHXMinFlowSizingFlag( int const OASysNum // index of outside air system 
     );
 
 } // namespace HeatRecovery
