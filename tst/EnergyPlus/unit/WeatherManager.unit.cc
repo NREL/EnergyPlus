@@ -54,14 +54,11 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/OutputFiles.hh>
-#include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -959,8 +956,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherZeroIRHoriz) {
 
 TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
-
-    DataStringGlobals::inputWeatherFileName = "/Users/tony-scimone/Projects/EnergyPlus/tst/EnergyPlus/unit/WeatherManagerIROutputTest.epw";
+    DataStringGlobals::inputWeatherFileName = configured_source_directory() + "/tst/EnergyPlus/unit/WeatherManagerIROutputTest.epw";
 
     std::string const idf_objects = delimited_string({
                                                          "  Version,9.3;",
@@ -1024,6 +1020,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
     bool ErrorsFound(false);
     DataEnvironment::TotDesDays = 2;
+
     // setup environment state
     Environment.allocate(DataEnvironment::TotDesDays);
     DesignDay.allocate(DataEnvironment::TotDesDays);
@@ -1043,5 +1040,4 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
     ReadWeatherForDay(0, 1, false);
 
     EXPECT_EQ(TomorrowHorizIRSky(1, 1), 345.73838855245953);
-
 }
