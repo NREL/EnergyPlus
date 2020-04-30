@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -259,6 +260,9 @@ protected:
     OutputFiles &outputFiles() {
         return m_outputFiles.get();
     }
+
+public:
+    EnergyPlusData state;
 
 private:
     friend class InputProcessorFixture;

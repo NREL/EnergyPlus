@@ -55,6 +55,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -255,7 +256,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Properties_IDF_Check)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput();
+    GetGroundHeatExchangerInput(state.dataGlobals);
 
     EXPECT_EQ(1u, vertPropsVector.size());
 
@@ -449,7 +450,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput();
+    GetGroundHeatExchangerInput(state.dataGlobals);
 
     EXPECT_EQ(1u, responseFactorsVector.size());
 
@@ -492,7 +493,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Chec
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput();
+    GetGroundHeatExchangerInput(state.dataGlobals);
 
     EXPECT_EQ(1u, vertArraysVector.size());
 
@@ -701,7 +702,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors_
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput();
+    GetGroundHeatExchangerInput(state.dataGlobals);
 
     EXPECT_EQ(1u, vertPropsVector.size());
     EXPECT_EQ(1u, responseFactorsVector.size());
@@ -771,7 +772,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput();
+    GetGroundHeatExchangerInput(state.dataGlobals);
 
     EXPECT_EQ(1u, vertPropsVector.size());
     EXPECT_EQ(1u, vertArraysVector.size());
@@ -862,7 +863,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_Ch
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput();
+    GetGroundHeatExchangerInput(state.dataGlobals);
 
     EXPECT_EQ(2u, vertPropsVector.size());
     EXPECT_EQ(4u, singleBoreholesVector.size());
@@ -1182,8 +1183,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
-    GetPlantInput();
+    GetPlantLoopData(state);
+    GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 
@@ -1287,7 +1288,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_re
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput();
+    GetGroundHeatExchangerInput(state.dataGlobals);
 
     auto &thisGLHE(verticalGLHE[0]);
 
@@ -1348,7 +1349,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_friction_factor)
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput();
+    GetGroundHeatExchangerInput(state.dataGlobals);
 
     auto &thisGLHE(verticalGLHE[0]);
 
@@ -1664,8 +1665,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
-    GetPlantInput();
+    GetPlantLoopData(state);
+    GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 
@@ -1968,8 +1969,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
-    GetPlantInput();
+    GetPlantLoopData(state);
+    GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 
@@ -2264,8 +2265,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
-    GetPlantInput();
+    GetPlantLoopData(state);
+    GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 
@@ -2562,8 +2563,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
-    GetPlantInput();
+    GetPlantLoopData(state);
+    GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 
@@ -2860,8 +2861,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
-    GetPlantInput();
+    GetPlantLoopData(state);
+    GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 
@@ -3158,8 +3159,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
-    GetPlantInput();
+    GetPlantLoopData(state);
+    GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 
@@ -3456,8 +3457,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
-    GetPlantInput();
+    GetPlantLoopData(state);
+    GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 
@@ -3754,8 +3755,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
-    GetPlantInput();
+    GetPlantLoopData(state);
+    GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 

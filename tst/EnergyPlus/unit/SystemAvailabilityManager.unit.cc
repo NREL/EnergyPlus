@@ -433,23 +433,23 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     DataHeatBalFanSys::MAT(1) = 23.0;
     DataHeatBalance::MRT(1) = 27.0;
 
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(1, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
     DataHeatBalFanSys::MAT(1) = 26.0;
     DataHeatBalance::MRT(1) = 30.0;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(2, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
 
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).ControlMode = 6; // 90% acceptance
     DataHeatBalFanSys::MAT(1) = 23.0;
     DataHeatBalance::MRT(1) = 27.0;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(1, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
     DataHeatBalFanSys::MAT(1) = 26.0;
     DataHeatBalance::MRT(1) = 30.0;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(2, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
 
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).ControlMode = 7; // CO2 control with an AirLoop
@@ -466,15 +466,15 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     DataAirLoop::PriAirSysAvailMgr(1).AvailManagerNum(1) = 1;
     SystemAvailabilityManager::SchedSysAvailMgrData(1).SchedPtr = 1;
     ScheduleManager::Schedule(1).CurrentValue = 1;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(2, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
     ScheduleManager::Schedule(1).CurrentValue = 0;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(1, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
     DataContaminantBalance::ZoneAirCO2(1) = 500.0;
     DataContaminantBalance::ZoneCO2SetPoint(1) = 800.0;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(0, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // No action
 
     DataHVACGlobals::ZoneComp(1).TotalNumComp = 1; //  CO2 control with zone equipment
@@ -483,10 +483,10 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     DataContaminantBalance::ZoneAirCO2(1) = 900.0;
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).HybridVentMgrConnectedToAirLoop = false;
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).SimHybridVentSysAvailMgr = true;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(2, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).AvailStatus = 1;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(1, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
     // time duration test
@@ -494,22 +494,22 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).ControlMode = 1;     // Temperature control
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl = 1; // Open
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).TimeOperDuration = 5.0;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(1, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // No change
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).TimeOperDuration = 11.0;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(2, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // Can change
 
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl = 2; // close
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).TimeOperDuration = 0.0;
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).TimeVentDuration = 5.0;
     DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(2, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // No change
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).TimeVentDuration = 11.0;
     DataHeatBalFanSys::TempControlType(1) = 1;
     DataHeatBalFanSys::TempZoneThermostatSetPoint(1) = 25.0;
-    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(1, 1);
+    SystemAvailabilityManager::CalcHybridVentSysAvailMgr(state, 1, 1);
     EXPECT_EQ(1, SystemAvailabilityManager::HybridVentSysAvailMgrData(1).VentilationCtrl); // Can change
 
     SystemAvailabilityManager::HybridVentSysAvailMgrData.deallocate();

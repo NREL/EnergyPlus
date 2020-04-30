@@ -76,6 +76,7 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -116,7 +117,7 @@ enum GeneralRoutinesEquipNums
     VentilatedSlabNum = 11
 };
 
-void ControlCompOutput(std::string const &CompName,           // the component Name
+void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,           // the component Name
                        std::string const &CompType,           // Type of component
                        int &CompNum,                          // Index of component in component array
                        bool const FirstHVACIteration,         // flag for 1st HVAV iteration in the time step
@@ -500,7 +501,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
         switch (SimCompNum) {      // Tuned If block changed to switch
         case ParallelPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
             // simulate series piu reheat coil
-            SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
+            SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
             CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * Node(TempOutNode).MassFlowRate *
@@ -510,7 +511,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
 
         case SeriesPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
             // simulate series piu reheat coil
-            SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
+            SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
             CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * Node(TempOutNode).MassFlowRate *
@@ -520,7 +521,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
 
         case HeatingCoilWaterNum: // 'COIL:HEATING:WATER'
             // Simulate reheat coil for the VAV system
-            SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
+            SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
             CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat);
             if (present(AirMassFlow)) {
@@ -557,35 +558,35 @@ void ControlCompOutput(std::string const &CompName,           // the component N
 
         case FourPipeFanCoilNum: // 'ZONEHVAC:FOURPIPEFANCOIL'
             // Simulate fancoil unit
-            Calc4PipeFanCoil(CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet);
+            Calc4PipeFanCoil(state, CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case OutdoorAirUnitNum: //'ZONEHVAC:OUTDOORAIRUNIT'
             // Simulate outdoor air unit components
-            CalcOAUnitCoilComps(CompNum, FirstHVACIteration, EquipIndex, LoadMet); // Autodesk:OPTIONAL EquipIndex used without PRESENT check
+            CalcOAUnitCoilComps(state, CompNum, FirstHVACIteration, EquipIndex, LoadMet); // Autodesk:OPTIONAL EquipIndex used without PRESENT check
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case UnitHeaterNum: // 'ZONEHVAC:UNITHEATER'
             // Simulate unit heater components
-            CalcUnitHeaterComponents(CompNum, FirstHVACIteration, LoadMet);
+            CalcUnitHeaterComponents(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case UnitVentilatorNum: // 'ZONEHVAC:UNITVENTILATOR'
             // Simulate unit ventilator components
-            CalcUnitVentilatorComponents(CompNum, FirstHVACIteration, LoadMet);
+            CalcUnitVentilatorComponents(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case VentilatedSlabNum: // 'ZONEHVAC:VENTILATEDSLAB'
             // Simulate unit ventilator components
-            CalcVentilatedSlabComps(CompNum, FirstHVACIteration, LoadMet);
+            CalcVentilatedSlabComps(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
@@ -1432,7 +1433,7 @@ void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity pe
     }
 }
 
-void TestAirPathIntegrity(OutputFiles &outputFiles, bool &ErrFound)
+void TestAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrFound)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1490,9 +1491,9 @@ void TestAirPathIntegrity(OutputFiles &outputFiles, bool &ErrFound)
     ValRetAPaths = 0;
     ValSupAPaths = 0;
 
-    TestSupplyAirPathIntegrity(outputFiles, errFlag);
+    TestSupplyAirPathIntegrity(state, outputFiles, errFlag);
     if (errFlag) ErrFound = true;
-    TestReturnAirPathIntegrity(outputFiles, errFlag, ValRetAPaths);
+    TestReturnAirPathIntegrity(state, outputFiles, errFlag, ValRetAPaths);
     if (errFlag) ErrFound = true;
 
     // Final tests, look for duplicate nodes
@@ -1528,7 +1529,7 @@ void TestAirPathIntegrity(OutputFiles &outputFiles, bool &ErrFound)
     ValSupAPaths.deallocate();
 }
 
-void TestSupplyAirPathIntegrity(OutputFiles &outputFiles, bool &ErrFound)
+void TestSupplyAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrFound)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1711,7 +1712,7 @@ void TestSupplyAirPathIntegrity(OutputFiles &outputFiles, bool &ErrFound)
     }
     if (NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0) {
         if (inputProcessor->getNumObjectsFound("AirLoopHVAC:SupplyPlenum") > 0) {
-            GetZonePlenumInput();
+            GetZonePlenumInput(state);
         }
     }
 
@@ -1785,7 +1786,7 @@ void TestSupplyAirPathIntegrity(OutputFiles &outputFiles, bool &ErrFound)
     }
 }
 
-void TestReturnAirPathIntegrity(OutputFiles &outputFiles, bool &ErrFound, Array2S_int ValRetAPaths)
+void TestReturnAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrFound, Array2S_int ValRetAPaths)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2069,7 +2070,7 @@ void TestReturnAirPathIntegrity(OutputFiles &outputFiles, bool &ErrFound, Array2
     }
     if (NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0) {
         if (inputProcessor->getNumObjectsFound("AirLoopHVAC:ReturnPlenum") > 0) {
-            GetZonePlenumInput();
+            GetZonePlenumInput(state);
         }
     }
 
@@ -2117,7 +2118,7 @@ void TestReturnAirPathIntegrity(OutputFiles &outputFiles, bool &ErrFound, Array2
         }
         if (!FoundZoneMixer(Count1)) { // could be as child on other items
             // PIU Units
-            if (PIUnitHasMixer(MixerCond(Count1).MixerName)) FoundZoneMixer(Count1) = true;
+            if (PIUnitHasMixer(state, MixerCond(Count1).MixerName)) FoundZoneMixer(Count1) = true;
         }
         if (!FoundZoneMixer(Count1)) { // could be as child on other items
             // fourPipeInduction units
