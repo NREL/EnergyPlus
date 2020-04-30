@@ -136,6 +136,9 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
 // on the value being printed.
 // This is necessary for parity with the old "RoundSigDigits" utility function
 //
+// Defines a custom formatting type 'S' that behaves like Fortran's G type, but stripped of whitespace
+// 'S' was chosen for "Stripped". It is implemented in terms of 'N'
+//
 // Defines a custom formatting type 'N' that behaves like Fortran's G type.
 // 'N' was chosen for "Number"
 //

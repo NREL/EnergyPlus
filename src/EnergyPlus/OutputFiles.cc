@@ -303,6 +303,10 @@ public:
                 std::swap(*std::next(begin), *std::next(begin, 2));
                 *begin = '0';
                 return write_string(str);
+            } else if (specs()->type == 'S') {
+                // matches Fortran's 'G', but stripped of whitespace
+                specs()->type = 'N';
+                return write_string(stripped(write_to_string(value, *specs())));
             } else if (specs()->type == 'N') {
                 // matches Fortran's 'G' format
 
