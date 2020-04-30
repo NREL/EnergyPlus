@@ -5405,25 +5405,36 @@ namespace HeatRecovery {
 
     bool GetHeatRecoveryHXMinFlowSizingFlag(int const OASysNum) 
     {
-        bool HXNominalFlowSizingFlag;
-        HXNominalFlowSizingFlag = false;
+        // returns true, if the HX is to be sized to minimum flow based on user-inputs 
+        // in OA controller object. The different user-inputs that lead the HX to be sized 
+        // to minimum OA flow include:
+        // (1) Economizer Control Type = NoEconomizer
+        // (2) Economizer Control Action Type = MinimumFlowWithBypass
+        // (3) 
+
+        bool HXMinFlowSizingFlag;
+        HXMinFlowSizingFlag = false;
         if (OASysNum == 0) {
-            return HXNominalFlowSizingFlag;
+            return HXMinFlowSizingFlag;
         }
         auto &thisOASys = DataAirLoop::OutsideAirSys(OASysNum);
         if (thisOASys.OAControllerIndex > 0) {
             auto &thisOAController(MixedAir::OAController(thisOASys.OAControllerIndex));
             if (thisOAController.ControllerType_Num == MixedAir::ControllerOutsideAir) {
-                if (thisOAController.Econo == MixedAir::NoEconomizer || thisOAController.EconBypass ||
-                    thisOAController.Lockout == MixedAir::LockoutWithHeatingPossible ||
-                    thisOAController.Lockout == MixedAir::LockoutWithCompressorPossible ||
-                    (thisOAController.Lockout == MixedAir::NoLockoutPossible &&
-                     thisOAController.HeatRecoveryBypassControlType == DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum)) {
-                    HXNominalFlowSizingFlag = true;
+                if (thisOAController.Econo == MixedAir::NoEconomizer) {
+                    HXMinFlowSizingFlag = true;
+                } else if (thisOAController.EconBypass) {
+                    HXMinFlowSizingFlag = true;
+                } else if (thisOAController.Lockout == MixedAir::LockoutWithHeatingPossible ||
+                           thisOAController.Lockout == MixedAir::LockoutWithCompressorPossible) {
+                    HXMinFlowSizingFlag = true;
+                } else if (thisOAController.Lockout == MixedAir::NoLockoutPossible &&
+                           thisOAController.HeatRecoveryBypassControlType == DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum) {
+                    HXMinFlowSizingFlag = true;
                 }
             }
         }
-        return HXNominalFlowSizingFlag;
+        return HXMinFlowSizingFlag;
     }
 } // namespace HeatRecovery
 
