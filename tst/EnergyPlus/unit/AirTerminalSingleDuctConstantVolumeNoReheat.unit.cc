@@ -889,11 +889,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     SimulateSingleDuct(state, thisAirDisUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDisUnit.EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminal.AirMassFlowRateMax); // design maximum mass flow rate
-    EXPECT_EQ(0.0, thisAirTerminal.sd_airterminalInlet.AirMassFlowRateMaxAvail); // maximum available mass flow rate
-    EXPECT_EQ(0.0, thisAirTerminal.sd_airterminalInlet.AirMassFlowRate);         // outlet mass flow rate is zero
-    EXPECT_EQ(0.0, thisAirTerminal.sd_airterminalOutlet.AirMassFlowRate);        // outlet mass flow rate is zero
-    EXPECT_EQ(0.0, thisAirTerminal.HeatRate);                                    // delivered heat rate is zero
-    EXPECT_EQ(0.0, thisAirTerminal.OutdoorAirFlowRate);                          // OA volume flow rate is zero
+    EXPECT_EQ(0.0, thisAirTerminalInlet.AirMassFlowRateMaxAvail);  // maximum available mass flow rate
+    EXPECT_EQ(0.0, thisAirTerminalOutlet.AirMassFlowRate);         // outlet mass flow rate is zero
+    EXPECT_EQ(0.0, thisAirTerminalOutlet.AirMassFlowRate);         // outlet mass flow rate is zero
+    EXPECT_EQ(0.0, thisAirTerminal.HeatRate);                      // delivered heat rate is zero
+    EXPECT_EQ(0.0, thisAirTerminal.OutdoorAirFlowRate);            // OA volume flow rate is zero
 
     DataGlobals::BeginEnvrnFlag = false;
     FirstHVACIteration = false;
@@ -917,10 +917,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     // run SimulateSingleDuct(state, ) function
     SimulateSingleDuct(state, thisAirDisUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDisUnit.EquipIndex(1));
-    Real64 expected_OAVolFlowRate = thisAirTerminal.sd_airterminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / DataEnvironment::StdRhoAir;
+    Real64 expected_OAVolFlowRate = thisAirTerminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / DataEnvironment::StdRhoAir;
     // check AT air mass flow rates
-    EXPECT_EQ(expectedMassFlow, thisAirTerminal.sd_airterminalInlet.AirMassFlowRate);
-    EXPECT_EQ(expectedMassFlow, thisAirTerminal.sd_airterminalOutlet.AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, thisAirTerminalInlet.AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, thisAirTerminalOutlet.AirMassFlowRate);
     EXPECT_EQ(expected_OAVolFlowRate, thisAirTerminal.OutdoorAirFlowRate);  // OA volume flow rate
 
     // 50% occupancy 1.5 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
@@ -930,10 +930,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 1.0 * ((1.5 * 0.1) + 0.5);
     SimulateSingleDuct(state, thisAirDisUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDisUnit.EquipIndex(1));
-    expected_OAVolFlowRate = thisAirTerminal.sd_airterminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / DataEnvironment::StdRhoAir;
+    expected_OAVolFlowRate = thisAirTerminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / DataEnvironment::StdRhoAir;
     // check AT air mass flow rates
-    EXPECT_EQ(expectedMassFlow, thisAirTerminal.sd_airterminalInlet.AirMassFlowRate);
-    EXPECT_EQ(expectedMassFlow, thisAirTerminal.sd_airterminalOutlet.AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, thisAirTerminalInlet.AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, thisAirTerminalOutlet.AirMassFlowRate);
     EXPECT_EQ(expected_OAVolFlowRate, thisAirTerminal.OutdoorAirFlowRate);  // OA volume flow rate
 
     // Nighttime OA Sched = 0.0
@@ -943,10 +943,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 0.0 * ((1.5 * 0.1) + 0.5);
     SimulateSingleDuct(state, thisAirDisUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDisUnit.EquipIndex(1));
-    expected_OAVolFlowRate = thisAirTerminal.sd_airterminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / DataEnvironment::StdRhoAir;
+    expected_OAVolFlowRate = thisAirTerminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / DataEnvironment::StdRhoAir;
     // check AT air mass flow rates
-    EXPECT_EQ(expectedMassFlow, thisAirTerminal.sd_airterminalInlet.AirMassFlowRate);
-    EXPECT_EQ(expectedMassFlow, thisAirTerminal.sd_airterminalOutlet.AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, thisAirTerminalInlet.AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, thisAirTerminalOutlet.AirMassFlowRate);
     EXPECT_EQ(expected_OAVolFlowRate, thisAirTerminal.OutdoorAirFlowRate);  // OA volume flow rate is zero
 }
 } // namespace EnergyPlus
