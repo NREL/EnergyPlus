@@ -533,12 +533,6 @@ namespace HeatRecovery {
                                  "\" latent heating effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError("Latent heating effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
-            if ((ExchCond(ExchNum).HeatEffectLatent100 == 0.0 && ExchCond(ExchNum).HeatEffectLatent75 > 0.0) || (ExchCond(ExchNum).HeatEffectLatent100 > 0.0 && ExchCond(ExchNum).HeatEffectLatent75 == 0.0)) {
-                ShowWarningError( cCurrentModuleObject + " \"" + ExchCond( ExchNum ).Name + "\"" );
-                ShowContinueError("..." + cNumericFieldNames(3)  + " = " + RoundSigDigits(rNumericArgs(3), 2));
-                ShowContinueError("..." + cNumericFieldNames(5)  + " = " + RoundSigDigits(rNumericArgs(5), 2));
-                ShowContinueError("...Latent heating effectiveness at 75% and 100% rated flow can be 0.0 but not one of them only.");
-            }
             ExchCond(ExchNum).CoolEffectSensible100 = rNumericArgs(6);
             ExchCond(ExchNum).CoolEffectLatent100 = rNumericArgs(7);
             ExchCond(ExchNum).CoolEffectSensible75 = rNumericArgs(8);
@@ -553,13 +547,6 @@ namespace HeatRecovery {
                                  "\" latent cooling effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError("Latent cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
-            if ((ExchCond(ExchNum).CoolEffectLatent100 == 0.0 && ExchCond(ExchNum).CoolEffectLatent75 > 0.0) || (ExchCond(ExchNum).CoolEffectLatent100 > 0.0 && ExchCond(ExchNum).CoolEffectLatent75 == 0.0)) {
-                ShowWarningError( cCurrentModuleObject + " \"" + ExchCond( ExchNum ).Name + "\"" );
-                ShowContinueError("..." + cNumericFieldNames(7) + " = " + RoundSigDigits(rNumericArgs(7), 2));
-                ShowContinueError("..." + cNumericFieldNames(9) + " = " + RoundSigDigits(rNumericArgs(9), 2));
-                ShowContinueError("...Latent cooling effectiveness at 75% and 100% rated flow can be 0.0 but not one of them only.");
-            }
-
             ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(
@@ -1694,7 +1681,7 @@ namespace HeatRecovery {
             }
         }
         TempSize = ExchCond(ExchNum).NomSupAirVolFlow;
-        SizeHRHXtoMinFlow = GetHeatRecoveryHXMinFlowSizingFlag(DataSizing::CurOASysNum);
+        SizeHRHXtoMinFlow = GetHeatRecoveryHXMinFlowSizingFlag(ExchCond(ExchNum).EconoLockOut, DataSizing::CurOASysNum);
         RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
         ExchCond(ExchNum).NomSupAirVolFlow = TempSize;
         DataConstantUsedForSizing = 0.0;
@@ -2207,11 +2194,52 @@ namespace HeatRecovery {
             //     Keep effectiveness between 0 and 1.0 ??
             //     HXOpSensEffect = MAX(MIN(HXOpSensEffect,1.0),0.0)
             //     HXOpLatEffect =  MAX(MIN(HXOpLatEffect,1.0),0.0)
-
-            //   The model should at least guard against negative numbers
-            ExchCond(ExNum).SensEffectiveness = max(0.0, ExchCond(ExNum).SensEffectiveness);
-            ExchCond(ExNum).LatEffectiveness = max(0.0, ExchCond(ExNum).LatEffectiveness);
-
+            bool static onetimewarningsensibleEff = false;
+            if (ExchCond(ExNum).SensEffectiveness < 0.0) {
+                //   The model should at least guard against negative numbers
+                ExchCond(ExNum).SensEffectiveness = 0.0;
+                if (!onetimewarningsensibleEff) {
+                    ShowWarningError("HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
+                                     " sensible effectiveness is less than zero. Check the following inputs.");
+                    if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
+                        ShowContinueError("...Sensible Effectiveness at 100% Heating Air Flow = " +
+                                          RoundSigDigits(ExchCond(ExNum).HeatEffectSensible100, 2));
+                        ShowContinueError("...Sensible Effectiveness at 75% Heating Air Flow = " +
+                                          RoundSigDigits(ExchCond(ExNum).HeatEffectSensible75, 2));
+                        ShowContinueError("...Sensible effectiveness reset to zero and the simulation continues.");
+                    } else {
+                        ShowContinueError("...Sensible Effectiveness at 100% Cooling Air Flow = " +
+                                          RoundSigDigits(ExchCond(ExNum).CoolEffectSensible100, 2));
+                        ShowContinueError("...Sensible Effectiveness at 75% Cooling Air Flow = " +
+                                          RoundSigDigits(ExchCond(ExNum).CoolEffectSensible75, 2));
+                        ShowContinueError("...Sensible effectiveness reset to zero and the simulation continues.");
+                    }
+                    onetimewarningsensibleEff = true;
+                }
+            }
+            bool static onetimewarninglatentEff = false;
+            if (ExchCond(ExNum).LatEffectiveness < 0.0) {
+                // The model should at least guard against negative numbers
+                ExchCond(ExNum).LatEffectiveness = 0.0;
+                if (!onetimewarninglatentEff) {
+                    ShowWarningError("HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
+                                     " latent effectiveness is less than zero. Check the following inputs.");
+                    if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
+                        ShowContinueError("...Latent Effectiveness at 100% Heating Air Flow = " +
+                                          RoundSigDigits(ExchCond(ExNum).HeatEffectLatent100, 2));
+                        ShowContinueError("...Latent Effectiveness at 75% Heating Air Flow = " +
+                                          RoundSigDigits(ExchCond(ExNum).HeatEffectLatent75, 2));
+                        ShowContinueError("...Latent effectiveness reset to zero and the simulation continues.");
+                    } else {
+                        ShowContinueError("...Latent Effectiveness at 100% Cooling Air Flow = " +
+                                          RoundSigDigits(ExchCond(ExNum).CoolEffectLatent100, 2));
+                        ShowContinueError("...Latent Effectiveness at 75% Cooling Air Flow = " +
+                                          RoundSigDigits(ExchCond(ExNum).CoolEffectLatent75, 2));
+                        ShowContinueError("...Latent effectiveness reset to zero and the simulation continues.");
+                    }
+                    onetimewarninglatentEff = true;
+                }
+            }
             // Use the effectiveness to calculate the air conditions exiting the heat exchanger (all air flow through the HX)
             // Include EATR and OACF in the following calculations at some point
 
@@ -5404,18 +5432,19 @@ namespace HeatRecovery {
         }
     }
 
-    bool GetHeatRecoveryHXMinFlowSizingFlag(int const OASysNum) 
+    bool GetHeatRecoveryHXMinFlowSizingFlag(int const HXEconoLockout, int const OASysNum) 
     {
         // returns true, if the HX is to be sized to minimum flow based on user-inputs 
-        // in OA controller object. The different user-inputs that lead the HX to be sized 
-        // to minimum OA flow include:
-        // (1) Economizer Control Type = NoEconomizer
-        // (2) Economizer Control Action Type = MinimumFlowWithBypass
-        // (3) 
+        // heat exchanger econmizer lockout and other inputs in OA controller object. The
+        // different user-inputs that lead the HX to be sized to minimum OA flow include:
+        // (1) Heat Exchanger Economizer Lockout = No
+        // (2) Economizer Control Type = NoEconomizer
+        // (3) Economizer Control Action Type = MinimumFlowWithBypass
+        // (4) 
 
         bool HXMinFlowSizingFlag;
         HXMinFlowSizingFlag = false;
-        if (OASysNum == 0) {
+        if (OASysNum == 0 || HXEconoLockout == EconoLockOut_No) {
             return HXMinFlowSizingFlag;
         }
         auto &thisOASys = DataAirLoop::OutsideAirSys(OASysNum);
