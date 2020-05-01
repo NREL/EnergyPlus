@@ -294,13 +294,24 @@ public:
                 // multiply by 10 to get the exponent we want
                 auto str = write_to_string(value * 10, *specs());
 
-                // swap around the first few characters and add in the leading
-                // 0 that we need to get the same formatting behavior on the rounded
-                // value that was acquired from the reduction in precision
-                auto begin = std::next(std::begin(str), specs()->width - (specs()->precision + 8));
-                std::swap(*begin, *std::next(begin));
-                std::advance(begin, 1);
-                std::swap(*std::next(begin), *std::next(begin, 2));
+                auto begin = std::find(std::begin(str), std::end(str), '.');
+                // ' -1.2345E15'
+                //     ^
+                std::swap(*begin, *std::prev(begin));
+                // ' -.12345E15'
+                //     ^
+                std::advance(begin, -2);
+                // ' -.12345E15'
+                //   ^
+                if (*begin != ' ') {
+                    // found a sign
+                    assert(begin != str.begin()); // we cannot fit the 0 if this happens
+                    std::swap(*begin, *std::prev(begin));
+                    // '- .12345E15'
+                    //   ^
+                }
+                // '-0.12345E15'
+                //   ^
                 *begin = '0';
                 return write_string(str);
             } else if (specs()->type == 'S') {

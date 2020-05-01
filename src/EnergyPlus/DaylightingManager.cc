@@ -63,7 +63,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataDaylighting.hh>
@@ -93,7 +92,6 @@
 #include <EnergyPlus/SolarReflectionManager.hh>
 #include <EnergyPlus/SurfaceOctree.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
 
 namespace EnergyPlus {
@@ -932,7 +930,6 @@ namespace DaylightingManager {
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
         using General::SafeDivide;
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1019,7 +1016,6 @@ namespace DaylightingManager {
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
         using General::SafeDivide;
-        using namespace Vectors;
         using DataEnvironment::SunIsUp;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
@@ -1414,7 +1410,6 @@ namespace DaylightingManager {
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
         using General::SafeDivide;
-        using namespace Vectors;
         using DataEnvironment::SunIsUp;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
@@ -1840,7 +1835,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
         using General::BlindBeamBeamTrans;
         using General::POLYF;
@@ -2295,7 +2289,6 @@ namespace DaylightingManager {
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
         using General::POLYF;
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2583,7 +2576,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2795,7 +2787,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3021,7 +3012,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3127,7 +3117,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3173,7 +3162,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3230,7 +3218,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
         using WindowComplexManager::DaylghtAltAndAzimuth;
 
         // Locals
@@ -10039,7 +10026,7 @@ namespace DaylightingManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt FmtA("(A)");
-        static ObjexxFCL::gio::Fmt HrFmt("(I2.2)");
+
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -10061,9 +10048,7 @@ namespace DaylightingManager {
         static Array1D_string SavedMnDy;
         static Array2D_string RefPts;
         std::string MapNoString;
-        std::string HrString;
         int linelen;
-        std::string AddXorYString;
         // BSLLC Start
         static Array1D<Real64> XValue;
         static Array1D<Real64> YValue;
@@ -10153,13 +10138,14 @@ namespace DaylightingManager {
             if (TimeStep == NumOfTimeStepInHour) { // Report only hourly
 
                 // Write X scale column header
-                ObjexxFCL::gio::write(HrString, HrFmt) << HourOfDay;
-                mapLine = ' ' + SavedMnDy(MapNum) + ' ' + HrString + ":00";
+                mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), HourOfDay);
                 if (IllumMap(MapNum).HeaderXLineLengthNeeded) linelen = int(len(mapLine));
                 RefPt = 1;
                 for (X = 1; X <= IllumMap(MapNum).Xnum; ++X) {
-                    AddXorYString = std::string(1, MapColSep) + '(' + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt), 2) + ';' +
-                                    RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt), 2) + ")=";
+                    const auto AddXorYString = format("{}({:.2R};{:.2R})=",
+                                                      MapColSep,
+                                                      IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt),
+                                                      IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt));
                     if (IllumMap(MapNum).HeaderXLineLengthNeeded) linelen += int(len(AddXorYString));
                     mapLine += AddXorYString;
                     ++RefPt;
@@ -10898,7 +10884,6 @@ namespace DaylightingManager {
         // METHODOLOGY EMPLOYED:na
         // REFERENCES:na
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS: na

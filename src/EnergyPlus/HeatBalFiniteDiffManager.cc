@@ -64,7 +64,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
@@ -97,7 +96,6 @@ namespace HeatBalFiniteDiffManager {
     //    involving latent heat, Simulation, Vol 18, No. 2, February 1972
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DayOfSim;
     using DataGlobals::DisplayExtraWarnings;
@@ -1221,7 +1219,6 @@ namespace HeatBalFiniteDiffManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool DoReport;
-        std::string InodesChar;
         int ThisNum;
         int Layer;
         int OutwardMatLayerNum;
@@ -1294,11 +1291,10 @@ namespace HeatBalFiniteDiffManager {
                     OutwardMatLayerNum = Layer - 1;
                     for (LayerNode = 1; LayerNode <= ConstructFD(ThisNum).NodeNumPoint(Layer); ++LayerNode) {
                         ++Inodes;
-                        ObjexxFCL::gio::write(InodesChar, fmtLD) << Inodes;
                         if (Inodes == 1) {
                             print(outputFiles.eio,
                                   Format_702,
-                                  "Node #" + stripped(InodesChar),
+                                  format("Node #{}", Inodes),
                                   ConstructFD(ThisNum).NodeXlocation(Inodes),
                                   Construct(ThisNum).Name,
                                   "Surface Outside Face",
@@ -1309,7 +1305,7 @@ namespace HeatBalFiniteDiffManager {
                             if (OutwardMatLayerNum > 0 && OutwardMatLayerNum <= Construct(ThisNum).TotLayers) {
                                 print(outputFiles.eio,
                                       Format_702,
-                                      "Node #" + stripped(InodesChar),
+                                      format("Node #{}", Inodes),
                                       ConstructFD(ThisNum).NodeXlocation(Inodes),
                                       Construct(ThisNum).Name,
                                       ConstructFD(ThisNum).Name(OutwardMatLayerNum),
@@ -1319,7 +1315,7 @@ namespace HeatBalFiniteDiffManager {
                             OutwardMatLayerNum = Layer;
                             print(outputFiles.eio,
                                   Format_702,
-                                  "Node #" + stripped(InodesChar),
+                                  format("Node #{}", Inodes),
                                   ConstructFD(ThisNum).NodeXlocation(Inodes),
                                   Construct(ThisNum).Name,
                                   ConstructFD(ThisNum).Name(OutwardMatLayerNum),
@@ -1330,10 +1326,9 @@ namespace HeatBalFiniteDiffManager {
 
                 Layer = Construct(ThisNum).TotLayers;
                 ++Inodes;
-                ObjexxFCL::gio::write(InodesChar, fmtLD) << Inodes;
                 print(outputFiles.eio,
                       Format_702,
-                      "Node #" + stripped(InodesChar),
+                      format("Node #{}", Inodes),
                       ConstructFD(ThisNum).NodeXlocation(Inodes),
                       Construct(ThisNum).Name,
                       ConstructFD(ThisNum).Name(Layer),

@@ -2449,20 +2449,11 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
 
     ObjexxFCL::gio::write(unit, Format_710) << "# Zone Names";
     for (zones = 1; zones <= NumOfZones; ++zones) {
-        ObjexxFCL::gio::write(ZoneNum, fmtLD) << zones;
-        strip(ZoneNum);
         TempZoneName = Zone(zones).Name;
-        pos = index(TempZoneName, ' ');
-        while (pos != std::string::npos) {
-            TempZoneName[pos] = '_';
-            pos = index(TempZoneName, ' ');
-        }
-        pos = index(TempZoneName, ':');
-        while (pos != std::string::npos) {
-            TempZoneName[pos] = '_';
-            pos = index(TempZoneName, ':');
-        }
-        ObjexxFCL::gio::write(unit, Format_710) << "# Zone=" + ZoneNum + ':' + TempZoneName;
+        std::replace(begin(TempZoneName), end(TempZoneName), ' ', '_');
+        std::replace(begin(TempZoneName), end(TempZoneName), ':', '_');
+
+        ObjexxFCL::gio::write(unit, Format_710) << "# Zone=" + fmt::to_string(zones) + ':' + TempZoneName;
     }
 
     // Define the colors:
@@ -2505,8 +2496,7 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
             ShadeType = "Building Shading";
             ObjexxFCL::gio::write(unit, Format_710) << "# Building Shading:" + Surface(surf).Name;
         }
-        ObjexxFCL::gio::write(csurfnumber, fmtLD) << surf;
-        strip(csurfnumber);
+        csurfnumber = fmt::to_string(surf);
         ObjexxFCL::gio::write(unit, Format_801) << colorstring(colorindex) << "Surf" + csurfnumber;
         for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
             ObjexxFCL::gio::write(unit, Format_802) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z;

@@ -51,7 +51,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -2589,7 +2588,6 @@ namespace DesiccantDehumidifiers {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const MinVolFlowPerRatedTotQ(0.00002684); // m3/s per W = 200 cfm/ton,
         // min vol flow per rated evaporator capacity
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2614,7 +2612,6 @@ namespace DesiccantDehumidifiers {
         int RegenCoilIndex;              // index to regeneration heating coil, 0 when not used
         int CompanionCoilIndexNum;       // index for companion DX cooling coil, 0 when DX coil is not used
         std::string MinVol;              // character string used for error messages
-        std::string VolFlowChar;         // character string used for error messages
         static bool MyOneTimeFlag(true); // one time flag
         static Real64 RhoAirStdInit;     // standard air density (kg/m3)
         bool UnitOn;                     // unit on flag
@@ -3044,15 +3041,11 @@ namespace DesiccantDehumidifiers {
             VolFlowPerRatedTotQ = (Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate + ExhaustFanMassFlowRate) /
                                   max(0.00001, (DesicDehum(DesicDehumNum).CompanionCoilCapacity * DDPartLoadRatio * RhoAirStdInit));
             if (!WarmupFlag && (VolFlowPerRatedTotQ < MinVolFlowPerRatedTotQ)) {
-                ObjexxFCL::gio::write(VolFlowChar, fmtLD) << VolFlowPerRatedTotQ;
                 ++DesicDehum(DesicDehumNum).ErrCount;
                 if (DesicDehum(DesicDehumNum).ErrCount < 2) {
-                    ShowWarningError(DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name +
-                                     "\" - Air volume flow rate per watt of total condenser waste heat is below the minimum recommended at " +
-                                     VolFlowChar + " m3/s/W.");
+                    ShowWarningError(format("{} \"{}\" - Air volume flow rate per watt of total condenser waste heat is below the minimum recommended at {:N} m3/s/W.",  DesicDehum(DesicDehumNum).DehumType, DesicDehum(DesicDehumNum).Name, VolFlowPerRatedTotQ));
                     ShowContinueErrorTimeStamp("");
-                    ObjexxFCL::gio::write(MinVol, fmtLD) << MinVolFlowPerRatedTotQ;
-                    ShowContinueError("Expected minimum for VolumeFlowperRatedTotalCondenserWasteHeat = [" + MinVol + ']');
+                    ShowContinueError(format("Expected minimum for VolumeFlowperRatedTotalCondenserWasteHeat = [{:N}]", MinVolFlowPerRatedTotQ));
                     ShowContinueError("Possible causes include inconsistent air flow rates in system components ");
                     ShowContinueError("on the regeneration side of the desiccant dehumidifier.");
                 } else {

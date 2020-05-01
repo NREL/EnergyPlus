@@ -52,8 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -65,11 +63,9 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -136,7 +132,6 @@ namespace LowTempRadiantSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
@@ -1676,11 +1671,10 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ZeroTol(0.0000001); // Smallest non-zero value allowed
         static std::string const RoutineName("InitLowTempRadiantSystem");
-        static ObjexxFCL::gio::Fmt fmtF102("(F10.2)");
+
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CurrentFlowSchedule; // Schedule value for flow fraction in a constant flow radiant system
-        std::string Errout;         // Message for errors
         int RadNum;                 // Number of the radiant system (DO loop counter)
         int RadSurfNum;             // Number of the radiant system surface (DO loop counter)
         int SurfNum;                // Intermediate variable for keeping track of the surface number
@@ -1757,18 +1751,13 @@ namespace LowTempRadiantSystem {
                     (CFloRadSys(RadNum).WaterVolFlowMax != AutoSize)) {
                     TotalEffic = CFloRadSys(RadNum).WaterVolFlowMax * CFloRadSys(RadNum).NomPumpHead / CFloRadSys(RadNum).NomPowerUse;
                     CFloRadSys(RadNum).PumpEffic = TotalEffic / CFloRadSys(RadNum).MotorEffic;
+                    static constexpr auto fmt = "Check input.  Calc Pump Efficiency={:.5R}% {}, for pump in radiant system {}";
                     if (CFloRadSys(RadNum).PumpEffic < 0.50) {
-                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
-                        ShowWarningError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
-                                         "% which is less than 50%, for pump in radiant system " + CFloRadSys(RadNum).Name);
+                        ShowWarningError(format(fmt, CFloRadSys(RadNum).PumpEffic, "which is less than 50%", CFloRadSys(RadNum).Name));
                     } else if ((CFloRadSys(RadNum).PumpEffic > 0.95) && (CFloRadSys(RadNum).PumpEffic <= 1.0)) {
-                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
-                        ShowWarningError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
-                                         "% is approaching 100%, for pump in radiant system " + CFloRadSys(RadNum).Name);
+                        ShowWarningError(format(fmt, CFloRadSys(RadNum).PumpEffic, "is approaching 100%", CFloRadSys(RadNum).Name));
                     } else if (CFloRadSys(RadNum).PumpEffic > 1.0) {
-                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
-                        ShowSevereError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
-                                        "% which is bigger than 100%, for pump in radiant system " + CFloRadSys(RadNum).Name);
+                        ShowSevereError(format(fmt, CFloRadSys(RadNum).PumpEffic, "which is bigger than 100%", CFloRadSys(RadNum).Name));
                         InitErrorsFound = true;
                     }
                 } else {
@@ -3062,7 +3051,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using namespace DataZoneEnergyDemands;
         using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataHeatBalance::MRT;
         using DataHeatBalance::Zone;
@@ -3758,7 +3746,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using namespace DataZoneEnergyDemands;
         using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
@@ -4829,7 +4816,6 @@ namespace LowTempRadiantSystem {
         using DataHeatBalance::ZoneData;
         using DataHeatBalFanSys::MAT;
         using DataHVACGlobals::SmallLoad;
-        using namespace DataZoneEnergyDemands;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

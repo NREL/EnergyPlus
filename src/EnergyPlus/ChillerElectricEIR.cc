@@ -52,7 +52,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -255,9 +254,6 @@ namespace ChillerElectricEIR {
         static std::string const RoutineName("GetElectricEIRChillerInput: "); // include trailing blank space
 
         bool ErrorsFound(false); // True when input errors are found
-
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric:EIR";
         NumElectricEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
@@ -714,12 +710,8 @@ namespace ChillerElectricEIR {
                     ShowContinueError("Energy input ratio as a function of part-load ratio curve shows negative values.");
                     ShowContinueError("EIR as a function of PLR curve output at various part-load ratios shown below:");
                     ShowContinueError("PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-                    ObjexxFCL::gio::write(StringVar, "'Curve Output = '");
-                    static ObjexxFCL::gio::Fmt fmtF72("((F7.2),$)");
-                    for (int CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        ObjexxFCL::gio::write(StringVar, fmtF72) << CurveValArray(CurveValPtr);
-                    }
-                    ObjexxFCL::gio::write(StringVar);
+                    StringVar = format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ","));
+                    puts(StringVar.c_str());
                     ShowContinueError(StringVar);
                     ErrorsFound = true;
                 }
@@ -1584,7 +1576,7 @@ namespace ChillerElectricEIR {
         // REFERENCES:
         // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
+
         static std::string const RoutineName("CalcElectricEIRChillerModel");
 
         Real64 EvapOutletTempSetPoint(0.0); // Evaporator outlet temperature setpoint [C]
@@ -1662,11 +1654,15 @@ namespace ChillerElectricEIR {
             // Warn user if entering condenser dry-bulb temperature falls below 0 C
             if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && std::abs(MyLoad) > 0 && RunFlag && !DataGlobals::WarmupFlag) {
                 this->PrintMessage = true;
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
+
                 this->MsgBuffer1 =
                     "ElectricEIRChillerModel - CHILLER:ELECTRIC:EIR \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
-                this->MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar + " C. Occurrence info = " + DataEnvironment::EnvironmentName +
-                                   ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
+                this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
+                                          DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                          DataEnvironment::EnvironmentName,
+                                          DataEnvironment::CurMnDy,
+                                          General::CreateSysTimeIntervalString());
+
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -1681,11 +1677,13 @@ namespace ChillerElectricEIR {
             // Warn user if evap condenser wet-bulb temperature falls below 10 C
             if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && std::abs(MyLoad) > 0 && RunFlag && !DataGlobals::WarmupFlag) {
                 this->PrintMessage = true;
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
                 this->MsgBuffer1 =
                     "ElectricEIRChillerModel - CHILLER:ELECTRIC:EIR \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 10C";
-                this->MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar + " C. Occurrence info = " + DataEnvironment::EnvironmentName +
-                                   ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
+                this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
+                                          DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                          DataEnvironment::EnvironmentName,
+                                          DataEnvironment::CurMnDy,
+                                          General::CreateSysTimeIntervalString());
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
