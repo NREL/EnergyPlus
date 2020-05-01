@@ -7758,6 +7758,10 @@
     PythonPluginPlantOperation_largeOff,                !- Python Module Name
     Init_Chiller_Capacity_and_Cooling_dispatch_Values;  !- Plugin Class Name
 
+  PythonPlugin:Variables,
+    PythonGlobalVars,           !- Name
+    totChilCap;     !- Variable Name 1
+
 !  EnergyManagementSystem:Program,
 !    Init_Chiller_Capacity_Values,  !- Name
 !    Set totChilCap = Chil1_Cap + Chil2_Cap;  !- Program Line 1

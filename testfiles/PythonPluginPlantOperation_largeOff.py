@@ -23,8 +23,6 @@ class Heating_dispatch_Values(EnergyPlusPlugin):
                     "HeatSys1 Operation Scheme"
                 )
 
-                print(f"\tHeatSys1_LoopDmnd_handle: {self.HeatSys1_LoopDmnd_handle}")
-
                 self.Boiler_Disptch_handle = self.api.exchange.get_actuator_handle(
                     "Plant Equipment Operation",
                     "Distributed Load Rate",
@@ -84,8 +82,8 @@ class Init_Chiller_Capacity_and_Cooling_dispatch_Values(EnergyPlusPlugin):
                 )
 
                 self.Chil1_Disptch_handle = self.api.exchange.get_actuator_handle(
-                    "Plant Equipment Operation"
-                    "Distributed Load Rate"
+                    "Plant Equipment Operation",
+                    "Distributed Load Rate",
                     "CoolSys1 Operation Scheme:CoolSys1 Chiller 1"
                 )
 
