@@ -85,6 +85,25 @@ struct DataGlobal : BaseGlobalStruct
 
 struct ExteriorEnergyUseData : BaseGlobalStruct
 {
+    // MODULE PARAMETER DEFINITIONS:
+    int const ElecUse = 1;         // Electricity
+    int const GasUse = 2;          // Gas (Natural)
+    int const WaterUse = 3;        // Water
+    int const CoalUse = 4;         // Coal
+    int const FuelOil1Use = 5;     // FuelOil#1
+    int const FuelOil2Use = 6;     // FuelOil#2
+    int const PropaneUse = 7;      // Propane
+    int const GasolineUse = 8;     // Gasoline
+    int const DieselUse = 9;       // Diesel
+    int const SteamUse = 10;        // Steam
+    int const DistrictCoolUse = 11; // Purchased Cooling
+    int const DistrictHeatUse = 12; // Purchased Heating
+    int const OtherFuel1Use = 13;   // OtherFuel1
+    int const OtherFuel2Use = 14;   // OtherFuel2
+
+    int const ScheduleOnly = 1;       // exterior lights only on schedule
+    int const AstroClockOverride = 2; // exterior lights controlled to turn off during day.
+
     struct ExteriorLightUsage
     {
         // Members
@@ -109,16 +128,36 @@ struct ExteriorEnergyUseData : BaseGlobalStruct
         }
     };
 
+    struct ExteriorEquipmentUsage
+    {
+        // Members
+        std::string Name; // Descriptive name -- will show on reporting
+        int FuelType;
+        int SchedPtr;       // Can be scheduled
+        Real64 DesignLevel; // Design Consumption (Watts, except for Water Equipment)
+        Real64 Power;       // Power = DesignLevel * ScheduleValue
+        Real64 CurrentUse;  // Use for this time step
+        bool ManageDemand;  // Flag to indicate whether to use demand limiting
+        Real64 DemandLimit; // Demand limit set by demand manager [W]
+
+                            // Default Constructor
+        ExteriorEquipmentUsage() : FuelType(0), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
+        {
+        }
+    };
+
     int NumExteriorLights = 0; // Number of Exterior Light Inputs
     int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
 
     // Object Data
     Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
+    Array1D<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
 
     void clear_state() override {
         NumExteriorLights = 0;
         NumExteriorEqs = 0;
         ExteriorLights.deallocate();
+        ExteriorEquipment.deallocate();
     }
 };
 

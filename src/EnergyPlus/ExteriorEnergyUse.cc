@@ -95,24 +95,8 @@ namespace ExteriorEnergyUse {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    int const ElecUse(1);                  // Electricity
-    int const GasUse(2);                   // Gas (Natural)
-    int const WaterUse(3);                 // Water
-    int const CoalUse(4);                  // Coal
-    int const FuelOil1Use(5);              // FuelOil#1
-    int const FuelOil2Use(6);              // FuelOil#2
-    int const PropaneUse(7);               // Propane
-    int const GasolineUse(8);              // Gasoline
-    int const DieselUse(9);                // Diesel
-    int const SteamUse(10);                // Steam
-    int const DistrictCoolUse(11);         // Purchased Cooling
-    int const DistrictHeatUse(12);         // Purchased Heating
-    int const OtherFuel1Use(13);           // OtherFuel1
-    int const OtherFuel2Use(14);           // OtherFuel2
-    bool GetExteriorEnergyInputFlag(true); // First time, input is "gotten"
 
-    int const ScheduleOnly(1);       // exterior lights only on schedule
-    int const AstroClockOverride(2); // exterior lights controlled to turn off during day.
+    bool GetExteriorEnergyInputFlag(true); // First time, input is "gotten"
 
     static std::string const BlankString;
 
@@ -125,7 +109,6 @@ namespace ExteriorEnergyUse {
     // Name Public routines, optionally name Private routines within this module
 
     // Object Data
-    Array1D<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
     std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
 
     // Functions
@@ -133,8 +116,7 @@ namespace ExteriorEnergyUse {
     // Clears the global data in ExteriorEnergyUse.
     // Needed for unit tests, should not be normally called.
     void clear_state()
-    {
-        ExteriorEquipment.deallocate();
+    {        
         UniqueExteriorEquipNames.clear();
         GetExteriorEnergyInputFlag = true;
     }
@@ -203,7 +185,7 @@ namespace ExteriorEnergyUse {
 
         NumFuelEq = inputProcessor->getNumObjectsFound("Exterior:FuelEquipment");
         NumWtrEq = inputProcessor->getNumObjectsFound("Exterior:WaterEquipment");
-        ExteriorEquipment.allocate(NumFuelEq + NumWtrEq);
+        exteriorEnergyUse.ExteriorEquipment.allocate(NumFuelEq + NumWtrEq);
         UniqueExteriorEquipNames.reserve(NumFuelEq + NumWtrEq);
 
         GetExteriorEnergyInputFlag = false;
@@ -256,11 +238,11 @@ namespace ExteriorEnergyUse {
                 }
             }
             if (lAlphaFieldBlanks(3)) {
-                exteriorEnergyUse.ExteriorLights(Item).ControlMode = ScheduleOnly;
+                exteriorEnergyUse.ExteriorLights(Item).ControlMode = exteriorEnergyUse.ScheduleOnly;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "ScheduleNameOnly")) {
-                exteriorEnergyUse.ExteriorLights(Item).ControlMode = ScheduleOnly;
+                exteriorEnergyUse.ExteriorLights(Item).ControlMode = exteriorEnergyUse.ScheduleOnly;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "AstronomicalClock")) {
-                exteriorEnergyUse.ExteriorLights(Item).ControlMode = AstroClockOverride;
+                exteriorEnergyUse.ExteriorLights(Item).ControlMode = exteriorEnergyUse.AstroClockOverride;
             } else {
                 ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3) + " for " +
                                 cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -299,7 +281,7 @@ namespace ExteriorEnergyUse {
             // entries for predefined tables
             PreDefTableEntry(pdchExLtPower, exteriorEnergyUse.ExteriorLights(Item).Name, exteriorEnergyUse.ExteriorLights(Item).DesignLevel);
             sumDesignLevel += exteriorEnergyUse.ExteriorLights(Item).DesignLevel;
-            if (exteriorEnergyUse.ExteriorLights(Item).ControlMode == AstroClockOverride) { // photocell/schedule
+            if (exteriorEnergyUse.ExteriorLights(Item).ControlMode == exteriorEnergyUse.AstroClockOverride) { // photocell/schedule
                 PreDefTableEntry(pdchExLtClock, exteriorEnergyUse.ExteriorLights(Item).Name, "AstronomicalClock");
                 PreDefTableEntry(pdchExLtSchd, exteriorEnergyUse.ExteriorLights(Item).Name, "-");
             } else {
@@ -328,7 +310,7 @@ namespace ExteriorEnergyUse {
             GlobalNames::VerifyUniqueInterObjectName(UniqueExteriorEquipNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
             ++exteriorEnergyUse.NumExteriorEqs;
-            ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name = cAlphaArgs(1);
+            exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name = cAlphaArgs(1);
 
             if (NumAlphas > 3) {
                 EndUseSubcategoryName = cAlphaArgs(4);
@@ -336,9 +318,9 @@ namespace ExteriorEnergyUse {
                 EndUseSubcategoryName = "General";
             }
 
-            ValidateFuelType(
-                ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType, cAlphaArgs(2), TypeString, cCurrentModuleObject, cAlphaFieldNames(2), cAlphaArgs(2));
-            if (ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType == 0) {
+            ValidateFuelType(exteriorEnergyUse,
+                exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType, cAlphaArgs(2), TypeString, cCurrentModuleObject, cAlphaFieldNames(2), cAlphaArgs(2));
+            if (exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType == 0) {
                 if (lAlphaFieldBlanks(2)) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(2) + " is required, missing for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -348,19 +330,19 @@ namespace ExteriorEnergyUse {
                 }
                 ErrorsFound = true;
             } else {
-                if (ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType != WaterUse) {
+                if (exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType != exteriorEnergyUse.WaterUse) {
                     SetupOutputVariable("Exterior Equipment Fuel Rate",
                                         OutputProcessor::Unit::W,
-                                        ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Power,
+                                        exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Power,
                                         "Zone",
                                         "Average",
-                                        ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name);
+                                        exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name);
                     SetupOutputVariable("Exterior Equipment " + TypeString + " Energy",
                                         OutputProcessor::Unit::J,
-                                        ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).CurrentUse,
+                                        exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).CurrentUse,
                                         "Zone",
                                         "Sum",
-                                        ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name,
+                                        exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name,
                                         _,
                                         TypeString,
                                         "ExteriorEquipment",
@@ -368,24 +350,24 @@ namespace ExteriorEnergyUse {
                 } else {
                     SetupOutputVariable("Exterior Equipment Water Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Power,
+                                        exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Power,
                                         "Zone",
                                         "Average",
-                                        ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name);
+                                        exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name);
                     SetupOutputVariable("Exterior Equipment " + TypeString + " Volume",
                                         OutputProcessor::Unit::m3,
-                                        ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).CurrentUse,
+                                        exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).CurrentUse,
                                         "Zone",
                                         "Sum",
-                                        ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name,
+                                        exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name,
                                         _,
                                         TypeString,
                                         "ExteriorEquipment",
                                         EndUseSubcategoryName);
                 }
             }
-            ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
-            if (ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr == 0) {
+            exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
+            if (exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(3) + " is required, missing for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -395,8 +377,8 @@ namespace ExteriorEnergyUse {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr);
-                SchMax = GetScheduleMaxValue(ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr);
+                SchMin = GetScheduleMinValue(exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr);
+                SchMax = GetScheduleMaxValue(exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " minimum, is < 0.0 for " +
@@ -412,7 +394,7 @@ namespace ExteriorEnergyUse {
                     }
                 }
             }
-            ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).DesignLevel = rNumericArgs(1);
+            exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).DesignLevel = rNumericArgs(1);
         }
 
         // =================================  Get Exterior Water Equipment
@@ -434,10 +416,10 @@ namespace ExteriorEnergyUse {
             GlobalNames::VerifyUniqueInterObjectName(UniqueExteriorEquipNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
             ++exteriorEnergyUse.NumExteriorEqs;
-            ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name = cAlphaArgs(1);
-            ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType = WaterUse;
-            ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
-            if (ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr == 0) {
+            exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name = cAlphaArgs(1);
+            exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType = exteriorEnergyUse.WaterUse;
+            exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
+            if (exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(3) + " is required, missing for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -447,8 +429,8 @@ namespace ExteriorEnergyUse {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr);
-                SchMax = GetScheduleMaxValue(ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr);
+                SchMin = GetScheduleMinValue(exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr);
+                SchMax = GetScheduleMaxValue(exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " minimum, is < 0.0 for " +
@@ -471,31 +453,31 @@ namespace ExteriorEnergyUse {
                 EndUseSubcategoryName = "General";
             }
 
-            ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).DesignLevel = rNumericArgs(1);
+            exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).DesignLevel = rNumericArgs(1);
 
             SetupOutputVariable("Exterior Equipment Water Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Power,
+                                exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Power,
                                 "Zone",
                                 "Average",
-                                ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name);
+                                exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name);
 
             SetupOutputVariable("Exterior Equipment Water Volume",
                                 OutputProcessor::Unit::m3,
-                                ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).CurrentUse,
+                                exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).CurrentUse,
                                 "Zone",
                                 "Sum",
-                                ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name,
+                                exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name,
                                 _,
                                 "Water",
                                 "ExteriorEquipment",
                                 EndUseSubcategoryName);
             SetupOutputVariable("Exterior Equipment Mains Water Volume",
                                 OutputProcessor::Unit::m3,
-                                ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).CurrentUse,
+                                exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).CurrentUse,
                                 "Zone",
                                 "Sum",
-                                ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name,
+                                exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name,
                                 _,
                                 "MainsWater",
                                 "ExteriorEquipment",
@@ -507,7 +489,7 @@ namespace ExteriorEnergyUse {
         }
     }
 
-    void ValidateFuelType(int &FuelTypeNumber,                    // Fuel Type to be set in structure.
+    void ValidateFuelType(ExteriorEnergyUseData const &exteriorEnergyUse, int &FuelTypeNumber,                    // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,       // Fuel Type String
                           std::string &FuelTypeString,            // Standardized Fuel Type String (for variable naming)
                           std::string const &CurrentModuleObject, // object being parsed
@@ -536,46 +518,46 @@ namespace ExteriorEnergyUse {
 
         // Select the correct Number for the associated ascii name for the fuel type
         if (UtilityRoutines::SameString(FuelTypeAlpha, "Electricity")) {
-            FuelTypeNumber = ElecUse;
+            FuelTypeNumber = exteriorEnergyUse.ElecUse;
             FuelTypeString = "Electric";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "NaturalGas")) {
-            FuelTypeNumber = GasUse;
+            FuelTypeNumber = exteriorEnergyUse.GasUse;
             FuelTypeString = "Gas";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Coal")) {
-            FuelTypeNumber = CoalUse;
+            FuelTypeNumber = exteriorEnergyUse.CoalUse;
             FuelTypeString = "Coal";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo1")) {
-            FuelTypeNumber = FuelOil1Use;
+            FuelTypeNumber = exteriorEnergyUse.FuelOil1Use;
             FuelTypeString = "FuelOil#1";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Propane")) {
-            FuelTypeNumber = PropaneUse;
+            FuelTypeNumber = exteriorEnergyUse.PropaneUse;
             FuelTypeString = "Propane";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Gasoline")) {
-            FuelTypeNumber = GasolineUse;
+            FuelTypeNumber = exteriorEnergyUse.GasolineUse;
             FuelTypeString = "Gasoline";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Diesel")) {
-            FuelTypeNumber = DieselUse;
+            FuelTypeNumber = exteriorEnergyUse.DieselUse;
             FuelTypeString = "Diesel";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo2")) {
-            FuelTypeNumber = FuelOil2Use;
+            FuelTypeNumber = exteriorEnergyUse.FuelOil2Use;
             FuelTypeString = "FuelOil#2";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel1")) {
-            FuelTypeNumber = OtherFuel1Use;
+            FuelTypeNumber = exteriorEnergyUse.OtherFuel1Use;
             FuelTypeString = "OtherFuel1";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel2")) {
-            FuelTypeNumber = OtherFuel1Use;
+            FuelTypeNumber = exteriorEnergyUse.OtherFuel1Use;
             FuelTypeString = "OtherFuel2";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Water")) {
-            FuelTypeNumber = WaterUse;
+            FuelTypeNumber = exteriorEnergyUse.WaterUse;
             FuelTypeString = "Water";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Steam")) {
-            FuelTypeNumber = SteamUse;
+            FuelTypeNumber = exteriorEnergyUse.SteamUse;
             FuelTypeString = "Steam";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictCooling")) {
-            FuelTypeNumber = DistrictCoolUse;
+            FuelTypeNumber = exteriorEnergyUse.DistrictCoolUse;
             FuelTypeString = "DistrictCooling";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeating")) {
-            FuelTypeNumber = DistrictHeatUse;
+            FuelTypeNumber = exteriorEnergyUse.DistrictHeatUse;
             FuelTypeString = "DistrictHeating";
         } else {
             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\".");
@@ -630,11 +612,11 @@ namespace ExteriorEnergyUse {
             {
                 auto const SELECT_CASE_var(exteriorEnergyUse.ExteriorLights(Item).ControlMode);
 
-                if (SELECT_CASE_var == ScheduleOnly) {
+                if (SELECT_CASE_var == exteriorEnergyUse.ScheduleOnly) {
                     exteriorEnergyUse.ExteriorLights(Item).Power = exteriorEnergyUse.ExteriorLights(Item).DesignLevel * GetCurrentScheduleValue(exteriorEnergyUse.ExteriorLights(Item).SchedPtr);
                     exteriorEnergyUse.ExteriorLights(Item).CurrentUse = exteriorEnergyUse.ExteriorLights(Item).Power * TimeStepZoneSec;
 
-                } else if (SELECT_CASE_var == AstroClockOverride) {
+                } else if (SELECT_CASE_var == exteriorEnergyUse.AstroClockOverride) {
 
                     if (SunIsUp) {
                         exteriorEnergyUse.ExteriorLights(Item).Power = 0.0;
@@ -675,8 +657,8 @@ namespace ExteriorEnergyUse {
         }
 
         for (Item = 1; Item <= exteriorEnergyUse.NumExteriorEqs; ++Item) {
-            ExteriorEquipment(Item).Power = ExteriorEquipment(Item).DesignLevel * GetCurrentScheduleValue(ExteriorEquipment(Item).SchedPtr);
-            ExteriorEquipment(Item).CurrentUse = ExteriorEquipment(Item).Power * TimeStepZoneSec;
+            exteriorEnergyUse.ExteriorEquipment(Item).Power = exteriorEnergyUse.ExteriorEquipment(Item).DesignLevel * GetCurrentScheduleValue(exteriorEnergyUse.ExteriorEquipment(Item).SchedPtr);
+            exteriorEnergyUse.ExteriorEquipment(Item).CurrentUse = exteriorEnergyUse.ExteriorEquipment(Item).Power * TimeStepZoneSec;
         }
     }
 

@@ -3294,14 +3294,14 @@ namespace InternalHeatGains {
                         ZoneOtherEq(Loop).OtherEquipFuelType = noOtherFuelTypeZero;
                         FuelTypeString = AlphaName(2);
                     } else {
-                        ExteriorEnergyUse::ValidateFuelType(ZoneOtherEq(Loop).OtherEquipFuelType,
+                        ExteriorEnergyUse::ValidateFuelType(state.exteriorEnergyUse, ZoneOtherEq(Loop).OtherEquipFuelType,
                                                             AlphaName(2),
                                                             FuelTypeString,
                                                             CurrentModuleObject,
                                                             cAlphaFieldNames(2),
                                                             AlphaName(2));
                         if (ZoneOtherEq(Loop).OtherEquipFuelType == noOtherFuelTypeZero ||
-                            ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::WaterUse) {
+                            ZoneOtherEq(Loop).OtherEquipFuelType == state.exteriorEnergyUse.WaterUse) {
                             ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered=" + AlphaName(2) +
                                             " for " + cAlphaFieldNames(1) + '=' + AlphaName(1));
                             ErrorsFound = true;

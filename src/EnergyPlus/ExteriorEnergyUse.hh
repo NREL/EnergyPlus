@@ -63,24 +63,6 @@ namespace ExteriorEnergyUse {
     // Using/Aliasing
 
     // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const ElecUse;         // Electricity
-    extern int const GasUse;          // Gas (Natural)
-    extern int const WaterUse;        // Water
-    extern int const CoalUse;         // Coal
-    extern int const FuelOil1Use;     // FuelOil#1
-    extern int const FuelOil2Use;     // FuelOil#2
-    extern int const PropaneUse;      // Propane
-    extern int const GasolineUse;     // Gasoline
-    extern int const DieselUse;       // Diesel
-    extern int const SteamUse;        // Steam
-    extern int const DistrictCoolUse; // Purchased Cooling
-    extern int const DistrictHeatUse; // Purchased Heating
-    extern int const OtherFuel1Use;   // OtherFuel1
-    extern int const OtherFuel2Use;   // OtherFuel2
-
-    extern int const ScheduleOnly;       // exterior lights only on schedule
-    extern int const AstroClockOverride; // exterior lights controlled to turn off during day.
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -96,26 +78,7 @@ namespace ExteriorEnergyUse {
 
     // Types
 
-    struct ExteriorEquipmentUsage
-    {
-        // Members
-        std::string Name; // Descriptive name -- will show on reporting
-        int FuelType;
-        int SchedPtr;       // Can be scheduled
-        Real64 DesignLevel; // Design Consumption (Watts, except for Water Equipment)
-        Real64 Power;       // Power = DesignLevel * ScheduleValue
-        Real64 CurrentUse;  // Use for this time step
-        bool ManageDemand;  // Flag to indicate whether to use demand limiting
-        Real64 DemandLimit; // Demand limit set by demand manager [W]
-
-        // Default Constructor
-        ExteriorEquipmentUsage() : FuelType(0), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
-        {
-        }
-    };
-
     // Object Data
-    extern Array1D<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
 
     // Functions
 
@@ -123,7 +86,7 @@ namespace ExteriorEnergyUse {
 
     void GetExteriorEnergyUseInput(ExteriorEnergyUseData &exteriorEnergyUse);
 
-    void ValidateFuelType(int &FuelTypeNumber,                    // Fuel Type to be set in structure.
+    void ValidateFuelType(ExteriorEnergyUseData const &exteriorEnergyUse, int &FuelTypeNumber,                    // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,       // Fuel Type String
                           std::string &FuelTypeString,            // Standardized Fuel Type String (for variable naming)
                           std::string const &CurrentModuleObject, // object being parsed
