@@ -47,6 +47,7 @@
 
 // C++ Headers
 #include <cmath>
+#include <fstream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -115,10 +116,15 @@ namespace PondGroundHeatExchanger {
     //   With Closed-Loop Ground-Source Heat Pump Systems.
     //   ASHRAE Transactions.  106(2):107-121.
 
+    std::ofstream static file("bulkTemps.csv", std::ofstream::out);
+    std::ofstream static file2("pondTemps.csv", std::ofstream::out);
+
     static std::string const BlankString;
     static std::string const fluidNameWater("WATER");
     Real64 const SmallNum(1.0e-30);         // Very small number to avoid div0 errors
     Real64 const StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
+
+    static Real64 currentSimTime;
 
     int NumOfPondGHEs(0); // Number of pond ground heat exchangers
 
@@ -185,6 +191,9 @@ namespace PondGroundHeatExchanger {
         int Item;       // Item to be "gotten"
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
+
+        file << "Time,BulkTemp,BeginEnvrnFlag\n";
+        file2 << "Time,TimeStep,PondTemp,PastBulkTemp,Flux,FluxStar,FluxStarStar\n";
 
         // Initializations and allocations
         DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:Pond";
@@ -443,11 +452,19 @@ namespace PondGroundHeatExchanger {
             this->MyFlag = false;
         }
 
-        Real64 currentSimTime = (DataGlobals::DayOfSim - 1) * 24 + DataGlobals::HourOfDay - 1 + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        if (DataGlobals::BeginEnvrnFlag) {
+            this->prevSimTime = 0.0;
+        }
+
+        currentSimTime = (DataGlobals::DayOfSim - 1) * 24 + DataGlobals::HourOfDay - 1 + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
         if (FirstHVACIteration && (currentSimTime > (this->prevSimTime + DataHVACGlobals::TimeStepSys))) {
             // update past temperature
             this->prevSimTime = currentSimTime;
             this->PastBulkTemperature = this->BulkTemperature;
+
+            if (!DataGlobals::WarmupFlag){
+                file << currentSimTime << "," << this->BulkTemperature << "," << DataGlobals::BeginEnvrnFlag << "\n";
+            }
         }
 
         this->InletTemp = DataLoopNode::Node(InletNodeNum).Temp;
@@ -520,6 +537,10 @@ namespace PondGroundHeatExchanger {
         this->PondTemp = this->PastBulkTemperature + DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys *
                                                          (Flux + 2.0 * FluxStar + 2.0 * FluxStarStar + this->CalcTotalFLux(PondTempStarStarStar)) /
                                                          (6.0 * SpecificHeat * PondMass);
+
+        if (!DataGlobals::WarmupFlag) {
+            file2 << currentSimTime << "," << DataHVACGlobals::TimeStepSys << "," << this->PondTemp << "," << this->PastBulkTemperature << "," << Flux << "," << FluxStar << "," << FluxStarStar << "\n";
+        }
     }
 
     Real64 PondGroundHeatExchangerData::CalcTotalFLux(Real64 const PondBulkTemp // pond temp for this flux calculation
