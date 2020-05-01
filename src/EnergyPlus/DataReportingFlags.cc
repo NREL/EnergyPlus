@@ -89,7 +89,6 @@ namespace DataReportingFlags {
     bool DisplayPerfSimulationFlag(false);        // True when "Performing Simulation" should be displayed
     bool DoWeatherInitReporting(false);           // Init reporting -- items that go onto OutputFileInits (eio)
     bool PrintEndDataDictionary(false);           // Flag for printing "End of Data Dictionary" on output files
-    bool IgnoreInteriorWindowTransmission(false); // True when section "IgnoreInteriorWindowTransmission" is entered
     bool MakeMirroredDetachedShading(true);       // True (default) when Detached Shading Surfaces should be "mirrored"
     bool MakeMirroredAttachedShading(true);       // True (default) when Attached Shading Surfaces should be "mirrored"
     bool DebugOutput(false);

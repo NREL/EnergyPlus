@@ -517,9 +517,19 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Diffuse Solar Absorption Factors");
         ComputeIntSWAbsorpFactors();
 
-        // Calculate factors for exchange of diffuse solar between zones through interzone windows
-        if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Diffuse Solar Exchange through Interzone Windows");
-        ComputeDifSolExcZonesWIZWindows(NumOfZones);
+        if (InterZoneWindow) {
+            if (InitSurfaceHeatBalancefirstTime)  {
+                DisplayString("Computing Interior Diffuse Solar Exchange through Interzone Windows");
+            }
+            ComputeDifSolExcZonesWIZWindows(NumOfZones);
+        } else {
+            if (InitSurfaceHeatBalancefirstTime)  {
+                if (!allocated(FractDifShortZtoZ)) {
+                    FractDifShortZtoZ.allocate(NumOfZones, NumOfZones);
+                }
+                FractDifShortZtoZ = 0.0;
+            }
+        }
 
         // For daylit zones, calculate interior daylight illuminance at reference points and
         // simulate lighting control system to get overhead electric lighting reduction
