@@ -635,37 +635,37 @@ namespace DataSizing {
     void ZoneSizingData::zeroMemberData(int const numOfTimeStepInDay)
     {
         if (!allocated(this->DOASSupMassFlowSeq)) return;
-        for (int timeStepIndex = 0; timeStepIndex < numOfTimeStepInDay; ++timeStepIndex) {
-            this->DOASSupMassFlowSeq[timeStepIndex] = 0.0;
-            this->DOASHeatLoadSeq[timeStepIndex] = 0.0;
-            this->DOASCoolLoadSeq[timeStepIndex] = 0.0;
-            this->DOASHeatAddSeq[timeStepIndex] = 0.0;
-            this->DOASLatAddSeq[timeStepIndex] = 0.0;
-            this->DOASSupTempSeq[timeStepIndex] = 0.0;
-            this->DOASSupHumRatSeq[timeStepIndex] = 0.0;
-            this->DOASTotCoolLoadSeq[timeStepIndex] = 0.0;
-            this->HeatFlowSeq[timeStepIndex] = 0.0;
-            this->HeatFlowSeqNoOA[timeStepIndex] = 0.0;
-            this->HeatLoadSeq[timeStepIndex] = 0.0;
+        for (int timeStepIndex = 1; timeStepIndex <= numOfTimeStepInDay; ++timeStepIndex) {
+            this->DOASSupMassFlowSeq(timeStepIndex) = 0.0;
+            this->DOASHeatLoadSeq(timeStepIndex) = 0.0;
+            this->DOASCoolLoadSeq(timeStepIndex) = 0.0;
+            this->DOASHeatAddSeq(timeStepIndex) = 0.0;
+            this->DOASLatAddSeq(timeStepIndex) = 0.0;
+            this->DOASSupTempSeq(timeStepIndex) = 0.0;
+            this->DOASSupHumRatSeq(timeStepIndex) = 0.0;
+            this->DOASTotCoolLoadSeq(timeStepIndex) = 0.0;
+            this->HeatFlowSeq(timeStepIndex) = 0.0;
+            this->HeatFlowSeqNoOA(timeStepIndex) = 0.0;
+            this->HeatLoadSeq(timeStepIndex) = 0.0;
             // not used directly in output report
-            this->HeatZoneTempSeq[timeStepIndex] = 0.0;
-            this->DesHeatSetPtSeq[timeStepIndex] = 0.0;
-            this->HeatOutTempSeq[timeStepIndex] = 0.0;
-            this->HeatZoneRetTempSeq[timeStepIndex] = 0.0;
-            this->HeatTstatTempSeq[timeStepIndex] = 0.0;
-            this->HeatZoneHumRatSeq[timeStepIndex] = 0.0;
-            this->HeatOutHumRatSeq[timeStepIndex] = 0.0;
-            this->CoolFlowSeq[timeStepIndex] = 0.0;
-            this->CoolFlowSeqNoOA[timeStepIndex] = 0.0;
-            this->CoolLoadSeq[timeStepIndex] = 0.0;
+            this->HeatZoneTempSeq(timeStepIndex) = 0.0;
+            this->DesHeatSetPtSeq(timeStepIndex) = 0.0;
+            this->HeatOutTempSeq(timeStepIndex) = 0.0;
+            this->HeatZoneRetTempSeq(timeStepIndex) = 0.0;
+            this->HeatTstatTempSeq(timeStepIndex) = 0.0;
+            this->HeatZoneHumRatSeq(timeStepIndex) = 0.0;
+            this->HeatOutHumRatSeq(timeStepIndex) = 0.0;
+            this->CoolFlowSeq(timeStepIndex) = 0.0;
+            this->CoolFlowSeqNoOA(timeStepIndex) = 0.0;
+            this->CoolLoadSeq(timeStepIndex) = 0.0;
             // not used directly in output report
-            this->CoolZoneTempSeq[timeStepIndex] = 0.0;
-            this->DesCoolSetPtSeq[timeStepIndex] = 0.0;
-            this->CoolOutTempSeq[timeStepIndex] = 0.0;
-            this->CoolZoneRetTempSeq[timeStepIndex] = 0.0;
-            this->CoolTstatTempSeq[timeStepIndex] = 0.0;
-            this->CoolZoneHumRatSeq[timeStepIndex] = 0.0;
-            this->CoolOutHumRatSeq[timeStepIndex] = 0.0;
+            this->CoolZoneTempSeq(timeStepIndex) = 0.0;
+            this->DesCoolSetPtSeq(timeStepIndex) = 0.0;
+            this->CoolOutTempSeq(timeStepIndex) = 0.0;
+            this->CoolZoneRetTempSeq(timeStepIndex) = 0.0;
+            this->CoolTstatTempSeq(timeStepIndex) = 0.0;
+            this->CoolZoneHumRatSeq(timeStepIndex) = 0.0;
+            this->CoolOutHumRatSeq(timeStepIndex) = 0.0;
         }
         this->CoolDesDay = ""; // name of a cooling design day
         this->HeatDesDay = ""; // name of a heating design day
@@ -757,35 +757,35 @@ namespace DataSizing {
         this->DOASSupTempSeq.allocate(numOfTimeStepInDay);
         this->DOASSupHumRatSeq.allocate(numOfTimeStepInDay);
         this->DOASTotCoolLoadSeq.allocate(numOfTimeStepInDay);
-        for (int timeStepIndex = 0; timeStepIndex < numOfTimeStepInDay; ++timeStepIndex) {
-            this->HeatFlowSeq[timeStepIndex] = 0.0;
-            this->CoolFlowSeq[timeStepIndex] = 0.0;
-            this->HeatFlowSeqNoOA[timeStepIndex] = 0.0;
-            this->CoolFlowSeqNoOA[timeStepIndex] = 0.0;
-            this->HeatLoadSeq[timeStepIndex] = 0.0;
-            this->CoolLoadSeq[timeStepIndex] = 0.0;
-            this->HeatZoneTempSeq[timeStepIndex] = 0.0;
-            this->DesHeatSetPtSeq[timeStepIndex] = 0.0;
-            this->CoolZoneTempSeq[timeStepIndex] = 0.0;
-            this->DesCoolSetPtSeq[timeStepIndex] = 0.0;
-            this->HeatOutTempSeq[timeStepIndex] = 0.0;
-            this->CoolOutTempSeq[timeStepIndex] = 0.0;
-            this->HeatZoneRetTempSeq[timeStepIndex] = 0.0;
-            this->HeatTstatTempSeq[timeStepIndex] = 0.0;
-            this->CoolZoneRetTempSeq[timeStepIndex] = 0.0;
-            this->CoolTstatTempSeq[timeStepIndex] = 0.0;
-            this->HeatZoneHumRatSeq[timeStepIndex] = 0.0;
-            this->CoolZoneHumRatSeq[timeStepIndex] = 0.0;
-            this->HeatOutHumRatSeq[timeStepIndex] = 0.0;
-            this->CoolOutHumRatSeq[timeStepIndex] = 0.0;
-            this->DOASHeatLoadSeq[timeStepIndex] = 0.0;
-            this->DOASCoolLoadSeq[timeStepIndex] = 0.0;
-            this->DOASHeatAddSeq[timeStepIndex] = 0.0;
-            this->DOASLatAddSeq[timeStepIndex] = 0.0;
-            this->DOASSupMassFlowSeq[timeStepIndex] = 0.0;
-            this->DOASSupTempSeq[timeStepIndex] = 0.0;
-            this->DOASSupHumRatSeq[timeStepIndex] = 0.0;
-            this->DOASTotCoolLoadSeq[timeStepIndex] = 0.0;
+        for (int timeStepIndex = 1; timeStepIndex <= numOfTimeStepInDay; ++timeStepIndex) {
+            this->HeatFlowSeq(timeStepIndex) = 0.0;
+            this->CoolFlowSeq(timeStepIndex) = 0.0;
+            this->HeatFlowSeqNoOA(timeStepIndex) = 0.0;
+            this->CoolFlowSeqNoOA(timeStepIndex) = 0.0;
+            this->HeatLoadSeq(timeStepIndex) = 0.0;
+            this->CoolLoadSeq(timeStepIndex) = 0.0;
+            this->HeatZoneTempSeq(timeStepIndex) = 0.0;
+            this->DesHeatSetPtSeq(timeStepIndex) = 0.0;
+            this->CoolZoneTempSeq(timeStepIndex) = 0.0;
+            this->DesCoolSetPtSeq(timeStepIndex) = 0.0;
+            this->HeatOutTempSeq(timeStepIndex) = 0.0;
+            this->CoolOutTempSeq(timeStepIndex) = 0.0;
+            this->HeatZoneRetTempSeq(timeStepIndex) = 0.0;
+            this->HeatTstatTempSeq(timeStepIndex) = 0.0;
+            this->CoolZoneRetTempSeq(timeStepIndex) = 0.0;
+            this->CoolTstatTempSeq(timeStepIndex) = 0.0;
+            this->HeatZoneHumRatSeq(timeStepIndex) = 0.0;
+            this->CoolZoneHumRatSeq(timeStepIndex) = 0.0;
+            this->HeatOutHumRatSeq(timeStepIndex) = 0.0;
+            this->CoolOutHumRatSeq(timeStepIndex) = 0.0;
+            this->DOASHeatLoadSeq(timeStepIndex) = 0.0;
+            this->DOASCoolLoadSeq(timeStepIndex) = 0.0;
+            this->DOASHeatAddSeq(timeStepIndex) = 0.0;
+            this->DOASLatAddSeq(timeStepIndex) = 0.0;
+            this->DOASSupMassFlowSeq(timeStepIndex) = 0.0;
+            this->DOASSupTempSeq(timeStepIndex) = 0.0;
+            this->DOASSupHumRatSeq(timeStepIndex) = 0.0;
+            this->DOASTotCoolLoadSeq(timeStepIndex) = 0.0;
         }
     }
 
