@@ -313,7 +313,7 @@ void EnergyPlus::clearAllStates()
     EMSManager::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
-    ExteriorEnergyUse::clear_state();
+    //ExteriorEnergyUse::clear_state();
     FanCoilUnits::clear_state();
     Fans::clear_state();
     FaultsManager::clear_state();

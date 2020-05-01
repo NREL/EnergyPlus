@@ -50,7 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-
+#include <unordered_map>
 #include <string>
 
 struct BaseGlobalStruct
@@ -104,6 +104,10 @@ struct ExteriorEnergyUseData : BaseGlobalStruct
     int const ScheduleOnly = 1;       // exterior lights only on schedule
     int const AstroClockOverride = 2; // exterior lights controlled to turn off during day.
 
+    std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
+
+    bool GetExteriorEnergyInputFlag = true; // First time, input is "gotten"
+
     struct ExteriorLightUsage
     {
         // Members
@@ -153,11 +157,13 @@ struct ExteriorEnergyUseData : BaseGlobalStruct
     Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
     Array1D<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
 
-    void clear_state() override {
+    void clear_state() {
         NumExteriorLights = 0;
         NumExteriorEqs = 0;
         ExteriorLights.deallocate();
         ExteriorEquipment.deallocate();
+        UniqueExteriorEquipNames.clear();
+        GetExteriorEnergyInputFlag = true;
     }
 };
 

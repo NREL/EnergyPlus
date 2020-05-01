@@ -91,35 +91,16 @@ namespace ExteriorEnergyUse {
     using DataGlobals::TimeStepZone;
     using DataGlobals::TimeStepZoneSec;
 
-    // Use statements for access to subroutines in other modules
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    bool GetExteriorEnergyInputFlag(true); // First time, input is "gotten"
-
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>
-
-    // Name Public routines, optionally name Private routines within this module
-
-    // Object Data
-    std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
-
     // Functions
+    //std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
 
     // Clears the global data in ExteriorEnergyUse.
     // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {        
-        UniqueExteriorEquipNames.clear();
-        GetExteriorEnergyInputFlag = true;
-    }
+   // void clear_state()
+    //{        
+//        UniqueExteriorEquipNames.clear();
+//        GetExteriorEnergyInputFlag = true;
+    //}
 
     void ManageExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse)
     {
@@ -133,9 +114,9 @@ namespace ExteriorEnergyUse {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine provides the usual call for the Simulation Manager.
 
-        if (GetExteriorEnergyInputFlag) {
+        if (exteriorEnergyUse.GetExteriorEnergyInputFlag) {
             GetExteriorEnergyUseInput(exteriorEnergyUse);
-            GetExteriorEnergyInputFlag = false;
+            exteriorEnergyUse.GetExteriorEnergyInputFlag = false;
         }
 
         ReportExteriorEnergyUse(exteriorEnergyUse);
@@ -186,9 +167,9 @@ namespace ExteriorEnergyUse {
         NumFuelEq = inputProcessor->getNumObjectsFound("Exterior:FuelEquipment");
         NumWtrEq = inputProcessor->getNumObjectsFound("Exterior:WaterEquipment");
         exteriorEnergyUse.ExteriorEquipment.allocate(NumFuelEq + NumWtrEq);
-        UniqueExteriorEquipNames.reserve(NumFuelEq + NumWtrEq);
+        exteriorEnergyUse.UniqueExteriorEquipNames.reserve(NumFuelEq + NumWtrEq);
 
-        GetExteriorEnergyInputFlag = false;
+        exteriorEnergyUse.GetExteriorEnergyInputFlag = false;
         exteriorEnergyUse.NumExteriorEqs = 0;
 
         // =================================  Get Exterior Lights
@@ -307,7 +288,7 @@ namespace ExteriorEnergyUse {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
-            GlobalNames::VerifyUniqueInterObjectName(UniqueExteriorEquipNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(exteriorEnergyUse.UniqueExteriorEquipNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
             ++exteriorEnergyUse.NumExteriorEqs;
             exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name = cAlphaArgs(1);
@@ -413,7 +394,7 @@ namespace ExteriorEnergyUse {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
-            GlobalNames::VerifyUniqueInterObjectName(UniqueExteriorEquipNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(exteriorEnergyUse.UniqueExteriorEquipNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
             ++exteriorEnergyUse.NumExteriorEqs;
             exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name = cAlphaArgs(1);
