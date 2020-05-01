@@ -2360,7 +2360,7 @@ namespace WaterCoils {
                     bPRINT = true;
                     SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m3/s]";
                 }
-                TempSize = WaterCoil(CoilNum).DesAirVolFlowRate;
+                TempSize = DataAirFlowUsedForSizing;
                 RequestSizing(state, CompType, CompName, CoolingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
                 WaterCoil(CoilNum).DesAirVolFlowRate = TempSize;
                 WaterCoil(CoilNum).DesAirMassFlowRate = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
