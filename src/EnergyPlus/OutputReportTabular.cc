@@ -4907,22 +4907,22 @@ namespace OutputReportTabular {
 
         // Air- and Evap-cooled chiller
         for (iChiller = 1; iChiller <= NumElectricChillers; ++iChiller) {
-            if (ElectricChiller(iChiller).CondenserType != WaterCooled) {
+            if (ElectricChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumEngineDrivenChillers; ++iChiller) {
-            if (EngineDrivenChiller(iChiller).CondenserType != WaterCooled) {
+            if (EngineDrivenChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += EngineDrivenChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumGTChillers; ++iChiller) {
-            if (GTChiller(iChiller).CondenserType != WaterCooled) {
+            if (GTChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += GTChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumConstCOPChillers; ++iChiller) {
-            if (ConstCOPChiller(iChiller).CondenserType != WaterCooled) {
+            if (ConstCOPChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += ConstCOPChiller(iChiller).CondenserEnergy;
             }
         }
@@ -6535,7 +6535,7 @@ namespace OutputReportTabular {
             consumptionTotal += Lights(iLight).SumConsumption / 1000000000.0;
         }
         PreDefTableEntry(pdchInLtConsump, "Interior Lighting Total", consumptionTotal);
-        
+
         // Exterior Lighting
         consumptionTotal = 0.0;
         for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
@@ -8346,9 +8346,9 @@ namespace OutputReportTabular {
             //  Energy Use Intensities  - Additional Fuel
             useValColAddFuel15 =
                 useVal(3, 15) + useVal(4, 15) + useVal(5, 15) + useVal(6, 15) + useVal(7, 15) + useVal(8, 15) + useVal(9, 15) + useVal(10, 15);
-            useValColAddFuel5 = 
+            useValColAddFuel5 =
                 useVal(3, 5) + useVal(4, 5) + useVal(5, 5) + useVal(6, 5) + useVal(7, 5) + useVal(8, 5) + useVal(9, 5) + useVal(10, 5);
-            useValColAddFuel13 = 
+            useValColAddFuel13 =
                 useVal(3, 13) + useVal(4, 13) + useVal(5, 13) + useVal(6, 13) + useVal(7, 13) + useVal(8, 13) + useVal(9, 13) + useVal(10, 13);
             if (buildingGrossFloorArea > 0) {
                 PreDefTableEntry(pdchLeedEuiOthr, "Miscellaneous", unconvert * 1000 * useValColAddFuel15 / buildingGrossFloorArea, 2);
@@ -9639,7 +9639,7 @@ namespace OutputReportTabular {
             collapsedTimeStep(11) = gatherDemandTimeStamp(3);
             collapsedTotal(13) = gatherDemandTotal(7); // water
             collapsedTimeStep(13) = gatherDemandTimeStamp(7);
-            
+
             // set flag if both puchased heating and steam both have positive demand
             bothDistrHeatNonZero = (gatherDemandTotal(4) > 0.0) && (gatherDemandTotal(5) > 0.0);
             // select the district heating source that has a larger demand
@@ -9688,7 +9688,7 @@ namespace OutputReportTabular {
                 for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 1) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion;   // electricity
                     collapsedEndUseSub(kEndUseSub, jEndUse, 2) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion;   // natural gas
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 3) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 6) * powerConversion;   // gasoline 
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 3) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 6) * powerConversion;   // gasoline
                     collapsedEndUseSub(kEndUseSub, jEndUse, 4) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 8) * powerConversion;   // diesel
                     collapsedEndUseSub(kEndUseSub, jEndUse, 5) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 9) * powerConversion;   // coal
                     collapsedEndUseSub(kEndUseSub, jEndUse, 6) = gatherDemandEndUseSub(kEndUseSub, jEndUse, 10) * powerConversion;  // fuel oil no 1
