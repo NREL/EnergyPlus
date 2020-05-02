@@ -294,6 +294,11 @@ public:
                 // multiply by 10 to get the exponent we want
                 auto str = write_to_string(value * 10, *specs());
 
+                // we need "space" to insert our leading 0
+                if (str.front() != ' ') {
+                    str.insert(str.begin(), ' ');
+                }
+
                 auto begin = std::find(std::begin(str), std::end(str), '.');
                 // ' -1.2345E15'
                 //     ^
@@ -305,7 +310,6 @@ public:
                 //   ^
                 if (*begin != ' ') {
                     // found a sign
-                    assert(begin != str.begin()); // we cannot fit the 0 if this happens
                     std::swap(*begin, *std::prev(begin));
                     // '- .12345E15'
                     //   ^
