@@ -51,11 +51,9 @@
 #include <cmath>
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -67,7 +65,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
@@ -115,7 +112,6 @@ namespace SurfaceGeometry {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
@@ -139,9 +135,6 @@ namespace SurfaceGeometry {
     // referencing another in adjacent zone
     int const UnreconciledZoneSurface(-999); // interim value between entering surfaces ("Surface") and reconciling
     // surface names in other zones
-
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     // DERIVED TYPE DEFINITIONS
 
@@ -239,8 +232,7 @@ namespace SurfaceGeometry {
         using General::RoundSigDigits;
         using namespace DataReportingFlags;
 
-        static ObjexxFCL::gio::Fmt ValFmt("(F20.2)");
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
+
         static std::string const RoutineName("SetUpZoneGeometry: ");
 
         Real64 AverageHeight; // Used to keep track of average height of a surface/zone
@@ -489,10 +481,9 @@ namespace SurfaceGeometry {
                         if (DisplayExtraWarnings) {
                             ShowWarningError(RoutineName + "Entered Ceiling Height for Zone=\"" + Zone(ZoneNum).Name +
                                              "\" significantly different from calculated Ceiling Height");
-                            ObjexxFCL::gio::write(String1, ValFmt) << Zone(ZoneNum).CeilingHeight;
-                            strip(String1);
-                            ObjexxFCL::gio::write(String2, ValFmt) << AverageHeight;
-                            strip(String2);
+                            static constexpr auto ValFmt("{:.2F}");
+                            String1 = format(ValFmt, Zone(ZoneNum).CeilingHeight);
+                            String2 = format(ValFmt, AverageHeight);
                             ShowContinueError(RoutineName + "Entered Ceiling Height=" + String1 + ", Calculated Ceiling Height=" + String2 +
                                               ", entered height will be used in calculations.");
                         }
@@ -932,8 +923,6 @@ namespace SurfaceGeometry {
         int TotOverhangsProjection;
         int TotFins;
         int TotFinsProjection;
-        std::string ClassMsg;
-        std::string Msg2;
         int OpaqueHTSurfs;        // Number of floors, walls and roofs in a zone
         int OpaqueHTSurfsWithWin; // Number of floors, walls and roofs with windows in a zone
         int InternalMassSurfs;    // Number of internal mass surfaces in a zone
@@ -1354,11 +1343,7 @@ namespace SurfaceGeometry {
         }
 
         if (MovedSurfs != TotSurfaces) {
-            ObjexxFCL::gio::write(ClassMsg, fmtLD) << MovedSurfs;
-            strip(ClassMsg);
-            ObjexxFCL::gio::write(Msg2, fmtLD) << TotSurfaces;
-            strip(Msg2);
-            ShowSevereError(RoutineName + "Reordered # of Surfaces (" + ClassMsg + ") not = Total # of Surfaces (" + Msg2 + ')');
+            ShowSevereError(format("{}Reordered # of Surfaces ({}) not = Total # of Surfaces ({})", RoutineName, MovedSurfs, TotSurfaces));
             SurfError = true;
             for (Loop = 1; Loop <= TotSurfaces; ++Loop) {
                 if (SurfaceTmp(Loop).Class != SurfaceClass_Moved) {
@@ -1531,16 +1516,19 @@ namespace SurfaceGeometry {
                                             ShowContinueError("  Area=" + TrimSigDigits(Surface(Found).Area, 1) +
                                                               " in Surface=" + Surface(Found).Name + ", Zone=" + Surface(Found).ZoneName);
                                         } else { // Show multiplier info
-                                            ObjexxFCL::gio::write(MultString, fmtLD) << MultSurfNum;
-                                            strip(MultString);
-                                            ShowContinueError("  Area=" + TrimSigDigits(Surface(SurfNum).Area, 1) + ", Multipliers=" + MultString +
-                                                              ", Total Area=" + TrimSigDigits(Surface(SurfNum).Area * MultSurfNum, 1) +
-                                                              " in Surface=" + Surface(SurfNum).Name + " Zone=" + Surface(SurfNum).ZoneName);
-                                            ObjexxFCL::gio::write(MultString, fmtLD) << MultFound;
-                                            strip(MultString);
-                                            ShowContinueError("  Area=" + TrimSigDigits(Surface(Found).Area, 1) + ", Multipliers=" + MultString +
-                                                              ", Total Area=" + TrimSigDigits(Surface(Found).Area * MultFound, 1) +
-                                                              " in Surface=" + Surface(Found).Name + " Zone=" + Surface(Found).ZoneName);
+                                            ShowContinueError(format("  Area={:.1T}, Multipliers={}, Total Area={:.1T} in Surface={} Zone={}",
+                                                                     Surface(SurfNum).Area,
+                                                                     MultSurfNum,
+                                                                    Surface(SurfNum).Area * MultSurfNum,
+                                                                     Surface(SurfNum).Name,
+                                                                     Surface(SurfNum).ZoneName));
+
+                                            ShowContinueError(format("  Area={:.1T}, Multipliers={}, Total Area={:.1T} in Surface={} Zone={}",
+                                                                     Surface(Found).Area,
+                                                                     MultFound,
+                                                                     Surface(Found).Area * MultFound,
+                                                                     Surface(Found).Name,
+                                                                     Surface(Found).ZoneName));
                                         }
                                     }
                                 }
@@ -5238,7 +5226,6 @@ namespace SurfaceGeometry {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const cModuleObjects(4, {"Shading:Overhang", "Shading:Overhang:Projection", "Shading:Fin", "Shading:Fin:Projection"});
-        static ObjexxFCL::gio::Fmt dfmt("(A,3(2x,f6.2))");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;
@@ -7256,9 +7243,6 @@ namespace SurfaceGeometry {
         using namespace Vectors;
         using General::RoundSigDigits;
         using namespace DataErrorTracking;
-
-        // Locals
-        static ObjexxFCL::gio::Fmt fmt3("(A,I5,A,3(1X,F18.13))");
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -9854,7 +9838,6 @@ namespace SurfaceGeometry {
         using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt VolFmt("(F20.2)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SumAreas;  // Sum of the Zone surface areas that are not "internal mass"
@@ -11228,7 +11211,6 @@ namespace SurfaceGeometry {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt ErrFmt("(' (',F8.3,',',F8.3,',',F8.3,')')");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -11256,9 +11238,8 @@ namespace SurfaceGeometry {
         if (DotSelfX23 <= .1e-6) {
             ShowSevereError("CalcCoordinateTransformation: Invalid dot product, surface=\"" + Surface(SurfNum).Name + "\":");
             for (I = 1; I <= Surface(SurfNum).Sides; ++I) {
-                auto const &point(Surface(SurfNum).Vertex(I));
-                ObjexxFCL::gio::write(ErrLineOut, ErrFmt) << point.x << point.y << point.z;
-                ShowContinueError(ErrLineOut);
+                auto const &point{Surface(SurfNum).Vertex(I)};
+                ShowContinueError(format(" ({:8.3F},{:8.3F},{:8.3F})", point.x, point.y, point.z));
             }
             ShowFatalError("CalcCoordinateTransformation: Program terminates due to preceding condition.", OptionalOutputFileRef{OutputFiles::getSingleton().eso});
             return;
@@ -11432,8 +11413,6 @@ namespace SurfaceGeometry {
         std::string MatNameStAir;   // Name of created air layer material
         int StormWinMatNum;         // Material number of storm window glass layer
         int IntDistance;            // Thickness of air gap between storm window and rest of window (mm)
-        std::string ChrIntDistance; // Character representation of IntDistance
-        std::string ChrNum;         // Character representation of storm window number
         int TotLayers;              // Total layers in a construction
         int TotGlassLayers;         // Total glass layers in a construction
         int TotLayersOld;           // Total layers in old (without storm window) construction
@@ -11456,8 +11435,7 @@ namespace SurfaceGeometry {
             ConstrName = Construct(ConstrNum).Name;
             StormWinMatNum = StormWindow(StormWinNum).StormWinMaterialNum;
             IntDistance = int(1000 * StormWindow(StormWinNum).StormWinDistance);
-            ObjexxFCL::gio::write(ChrIntDistance, fmtLD) << IntDistance;
-            strip(ChrIntDistance);
+            const auto ChrIntDistance = fmt::to_string(IntDistance);
             // Set ShAndSt, which is true if the window has a shaded construction to which a storm window
             // can be added. (A storm window can be added if there is an interior shade or blind and up to three
             // glass layers, or there is a between-glass shade or blind and two glass layers.)
@@ -11485,9 +11463,8 @@ namespace SurfaceGeometry {
             // Loop over unshaded (loop=1) and shaded (loop=2) constructions and create new constructions
             // with storm window and air gap added on outside
             for (loop = 1; loop <= 2; ++loop) {
+                const auto ChrNum = fmt::to_string(StormWinNum);
                 if (loop == 1) {
-                    ObjexxFCL::gio::write(ChrNum, fmtLD) << StormWinNum;
-                    strip(ChrNum);
                     ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum;
                     // If this construction name already exists, set the surface's storm window construction number to it
                     ConstrNewSt = UtilityRoutines::FindItemInList(ConstrNameSt, Construct, TotConstructs);
@@ -12791,10 +12768,10 @@ namespace SurfaceGeometry {
                             // If both sides are already assigned to an enclosure, then merge the two enclosures
                             auto &thisEnclosure(Enclosures(thisSideEnclosureNum));
                             auto &otherEnclosure(Enclosures(otherSideEnclosureNum));
-                            for (auto zName : thisEnclosure.ZoneNames) {
+                            for (const auto &zName : thisEnclosure.ZoneNames) {
                                 otherEnclosure.ZoneNames.push_back(zName);
                             }
-                            for (auto zNum : thisEnclosure.ZoneNums) {
+                            for (const auto &zNum : thisEnclosure.ZoneNums) {
                                 otherEnclosure.ZoneNums.push_back(zNum);
                                 if (radiantSetup) {
                                     Zone(zNum).RadiantEnclosureNum = otherSideEnclosureNum;
@@ -12958,8 +12935,7 @@ namespace SurfaceGeometry {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const TurnThreshold(0.000001); // Sensitivity of convexity test, in radians
-        static ObjexxFCL::gio::Fmt ErrFmt("(' (',F8.3,',',F8.3,',',F8.3,')')");
+        constexpr Real64 TurnThreshold(0.000001); // Sensitivity of convexity test, in radians
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -13066,8 +13042,8 @@ namespace SurfaceGeometry {
                     ShowContinueError("Coincident Vertices will be removed as possible.");
                     for (n = 1; n <= SurfaceTmp(SurfNum).Sides; ++n) {
                         auto const &point(SurfaceTmp(SurfNum).Vertex(n));
-                        ObjexxFCL::gio::write(ErrLineOut, ErrFmt) << point.x << point.y << point.z;
-                        ShowContinueError(ErrLineOut);
+                        static constexpr auto ErrFmt(" ({:8.3F},{:8.3F},{:8.3F})");
+                        ShowContinueError(format(ErrFmt, point.x, point.y, point.z));
                     }
                 }
             }

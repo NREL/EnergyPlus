@@ -553,8 +553,7 @@ namespace SimulationManager {
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
                 ++DayOfSim;
-                ObjexxFCL::gio::write(state.dataGlobals.DayOfSimChr, fmtLD) << DayOfSim;
-                strip(state.dataGlobals.DayOfSimChr);
+                state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);

@@ -15754,7 +15754,6 @@ namespace OutputReportTabular {
 
         // Locals
         // ((month*100 + day)*100 + hour)*100 + minute
-        static ObjexxFCL::gio::Fmt DateFmt("(I2.2,'-',A3,'-',I2.2,':',I2.2)");
 
         int Month;  // month in integer format (1-12)
         int Day;    // day in integer format (1-31)
@@ -15796,7 +15795,7 @@ namespace OutputReportTabular {
             } else {
                 monthName = "***";
             }
-            ObjexxFCL::gio::write(StringOut, DateFmt) << Day << monthName << Hour << Minute;
+            StringOut = format("{:02}-{:3}-{:02}:{:02}", Day, monthName, Hour, Minute);
             if (has(StringOut, "*")) {
                 StringOut = "-";
             }

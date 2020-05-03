@@ -419,27 +419,6 @@ namespace UtilityRoutines {
         return false;
     }
 
-    std::string IPTrimSigDigits(int const IntegerValue)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string String; // Working string
-
-        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
-        return stripped(String);
-    }
-
     size_t case_insensitive_hasher::operator()(const std::string& key) const noexcept {
             std::string keyCopy = MakeUPPERCase(key);
             return std::hash<std::string>()(keyCopy);
@@ -535,7 +514,7 @@ int AbortEnergyPlus(EnergyPlusData &state)
     // SUBROUTINE PARAMETER DEFINITIONS:
     static ObjexxFCL::gio::Fmt fmtLD("*");
     static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
-    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
+
 
     // INTERFACE BLOCK SPECIFICATIONS
 
@@ -550,7 +529,6 @@ int AbortEnergyPlus(EnergyPlusData &state)
     std::string NumSevereDuringWarmup;
     std::string NumWarningsDuringSizing;
     std::string NumSevereDuringSizing;
-    std::string Elapsed;
     int Hours;      // Elapsed Time Hour Reporting
     int Minutes;    // Elapsed Time Minute Reporting
     Real64 Seconds; // Elapsed Time Second Reporting
@@ -629,7 +607,8 @@ int AbortEnergyPlus(EnergyPlusData &state)
     Elapsed_Time -= Minutes * 60.0;
     Seconds = Elapsed_Time;
     if (Seconds < 0.0) Seconds = 0.0;
-    ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
+    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
+    const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
     ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);

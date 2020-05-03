@@ -166,7 +166,6 @@ namespace WaterThermalTanks {
     Array1D<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
     std::unordered_map<std::string, std::string> UniqueWaterThermalTankNames;
 
-    static ObjexxFCL::gio::Fmt fmtLD("*");
 
     bool getWaterThermalTankInputFlag(true); // Calls to Water Heater from multiple places in code
     bool calcWaterThermalTankZoneGainsMyEnvrnFlag(true);
@@ -8256,8 +8255,7 @@ namespace WaterThermalTanks {
                                 std::string IterNum;
                                 General::SolveRoot(Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
                                 if (SolFla == -1) {
-                                    ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                                    strip(IterNum);
+                                    IterNum = fmt::to_string(MaxIte);
                                     if (!DataGlobals::WarmupFlag) {
                                         ++DesupHtr.IterLimitExceededNum1;
                                         if (DesupHtr.IterLimitExceededNum1 == 1) {
@@ -8374,8 +8372,7 @@ namespace WaterThermalTanks {
                                     std::string IterNum;
                                     General::SolveRoot(Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
                                     if (SolFla == -1) {
-                                        ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                                        strip(IterNum);
+                                        IterNum = fmt::to_string(MaxIte);
                                         if (!DataGlobals::WarmupFlag) {
                                             ++DesupHtr.IterLimitExceededNum2;
                                             if (DesupHtr.IterLimitExceededNum2 == 1) {
@@ -8721,8 +8718,7 @@ namespace WaterThermalTanks {
             if (!DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
                 if ((HPSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp) {
                     Real64 HPMinTemp = HPSetPointTemp - DeadBandTempDiff;
-                    std::string HPMinTempChar;
-                    ObjexxFCL::gio::write(HPMinTempChar, fmtLD) << HPMinTemp;
+                    const auto HPMinTempChar = fmt::to_string(HPMinTemp);
                     ++HeatPump.HPSetPointError;
                     //  add logic for warmup, DataGlobals::KickOffSimulation and doing sizing here
                     if (HeatPump.HPSetPointError == 1) {
@@ -9046,8 +9042,7 @@ namespace WaterThermalTanks {
                     General::SolveRoot(Acc, MaxIte, SolFla, hpPartLoadRatio, boundPLRFunc, 0.0, 1.0, Par);
                     if (SolFla == -1) {
                         std::string IterNum;
-                        ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                        strip(IterNum);
+                        IterNum = fmt::to_string(MaxIte);
                         if (!DataGlobals::WarmupFlag) {
                             ++HeatPump.IterLimitExceededNum2;
                             if (HeatPump.IterLimitExceededNum2 == 1) {
@@ -9231,8 +9226,7 @@ namespace WaterThermalTanks {
                         TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, boundPLRFunc, 1.0e-10, 1.0, ParVS);
 
                         if (SolFla == -1) {
-                            ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                            strip(IterNum);
+                            IterNum = fmt::to_string(MaxIte);
                             if (!DataGlobals::WarmupFlag) {
                                 ++HeatPump.IterLimitExceededNum1;
                                 if (HeatPump.IterLimitExceededNum1 == 1) {

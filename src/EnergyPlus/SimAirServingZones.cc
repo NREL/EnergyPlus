@@ -49,13 +49,11 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
-#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -66,7 +64,6 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
-#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACControllers.hh>
@@ -115,7 +112,6 @@
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -2902,7 +2898,6 @@ namespace SimAirServingZones {
         // SUBROUTINE PARAMETER DEFINITIONS:
         // Maximum iterations of an air system/controllers simulation sequence
         int const MaxIter(50);
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK DEFINITIONS: None
 
@@ -2924,7 +2919,6 @@ namespace SimAirServingZones {
         // Placeholder for environment name used in error reporting
         static std::string ErrEnvironmentName;
         // A character string equivalent of ErrCount
-        std::string CharErrOut;
         static bool BypassOAController; // logical to tell ManageControllers to sim or not sim controller in OA System (don't sim here)
 
         // FLOW:
@@ -3025,8 +3019,7 @@ namespace SimAirServingZones {
                             ++ErrCount;
                             if (ErrCount < 15) {
                                 ErrEnvironmentName = EnvironmentName;
-                                ObjexxFCL::gio::write(CharErrOut, fmtLD) << MaxIter;
-                                strip(CharErrOut);
+                                const auto CharErrOut = fmt::to_string(MaxIter);
                                 ShowWarningError("SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
                                                  PrimaryAirSystem(AirLoopNum).Name + ", at " + EnvironmentName + ", " + CurMnDy + ' ' +
                                                  CreateSysTimeIntervalString());
@@ -3144,7 +3137,6 @@ namespace SimAirServingZones {
         // SUBROUTINE PARAMETER DEFINITIONS:
         // Maximum iterations of an air system/controllers simulation sequence
         int const MaxIter(50);
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DEFINITIONS
         // TRUE if controller supports speculative warm restart
@@ -3162,7 +3154,6 @@ namespace SimAirServingZones {
         // Placeholder for environment name used in error reporting
         static std::string ErrEnvironmentName;
         // A character string equivalent of ErrCount
-        std::string CharErrOut;
         int static AirLoopPass;
         static bool BypassOAController;
 
@@ -3253,8 +3244,7 @@ namespace SimAirServingZones {
                         ++ErrCount;
                         if (ErrCount < 15) {
                             ErrEnvironmentName = EnvironmentName;
-                            ObjexxFCL::gio::write(CharErrOut, fmtLD) << MaxIter;
-                            strip(CharErrOut);
+                            const auto CharErrOut = fmt::to_string(MaxIter);
                             ShowWarningError("SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
                                              PrimaryAirSystem(AirLoopNum).Name + ":" + ControllerName + ", at " + EnvironmentName + ", " + CurMnDy +
                                              ' ' + CreateSysTimeIntervalString());
@@ -5296,7 +5286,6 @@ namespace SimAirServingZones {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
 
 
