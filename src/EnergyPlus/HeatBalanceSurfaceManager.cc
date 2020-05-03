@@ -527,7 +527,7 @@ namespace HeatBalanceSurfaceManager {
                 if (!allocated(FractDifShortZtoZ)) {
                     FractDifShortZtoZ.allocate(NumOfZones, NumOfZones);
                 }
-                FractDifShortZtoZ = 0.0;
+                FractDifShortZtoZ.to_identity();
             }
         }
 
