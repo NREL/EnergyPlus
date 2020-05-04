@@ -53,6 +53,7 @@ cmake-build-*
 .se
 .vs
 .vscode
+.clangd
 
 # vim temp file:
 *.swp
