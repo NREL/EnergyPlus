@@ -1816,7 +1816,7 @@ namespace SizingManager {
                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                             VozMax,
                             4);
-                        VozSum += VozMax;
+                        VozSum += VozMax * DataHeatBalance::Zone(zoneNum).Multiplier * DataHeatBalance::Zone(zoneNum).ListMultiplier;
                         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zhdZpz,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZpzHtgByZone,

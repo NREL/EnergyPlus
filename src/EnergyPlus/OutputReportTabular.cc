@@ -6568,7 +6568,27 @@ namespace OutputReportTabular {
         PreDefTableEntry(pdchExLtConsump, "Exterior Lighting Total", consumptionTotal);
 
         // outside air ventilation
+        Real64 totalOccupants = 0.;
+        Real64 totalAverageOccupants = 0.;
+        Real64 totalArea = 0.;
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
+            // occupants
+            if (Zone(iZone).isNominalOccupied) {
+                if (ZonePreDefRep(iZone).NumOccAccumTime > 0) {
+                    PreDefTableEntry(
+                        pdchOaMvAvgNumOcc, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
+                    totalAverageOccupants += (ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime) * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+                }
+            }
+            PreDefTableEntry(pdchOaMvNomNumOcc, Zone(iZone).Name, Zone(iZone).TotOccupants);
+            totalOccupants += Zone(iZone).TotOccupants * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+
+            // Zone volume and area
+            PreDefTableEntry(pdchOaMvZoneVol, Zone(iZone).Name, Zone(iZone).Volume);
+            totalVolume += Zone(iZone).Volume;
+            PreDefTableEntry(pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
+            totalArea += Zone(iZone).FloorArea;
+
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
                 // air loop name
@@ -6586,19 +6606,6 @@ namespace OutputReportTabular {
                     }
                 }
                 PreDefTableEntry(pdchOaMvAirLpNm, Zone(iZone).Name, airLoopName);
-
-                // occupants
-                if (Zone(iZone).isNominalOccupied) {
-                    if (ZonePreDefRep(iZone).NumOccAccumTime > 0) {
-                        PreDefTableEntry(
-                            pdchOaMvAvgNumOcc, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
-                    }
-                }
-                PreDefTableEntry(pdchOaMvNomNumOcc, Zone(iZone).Name, Zone(iZone).TotOccupants);
-
-                // Zone volume and area
-                PreDefTableEntry(pdchOaMvZoneVol, Zone(iZone).Name, Zone(iZone).Volume);
-                PreDefTableEntry(pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
 
 
                 if (Zone(iZone).isNominalOccupied) {
@@ -6674,12 +6681,15 @@ namespace OutputReportTabular {
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                         PreDefTableEntry(pdchOaoMinSimpVent, Zone(iZone).Name, ZonePreDefRep(iZone).SimpVentVolMin / (Zone(iZone).Volume), 3);
                     }
-
-                    totalVolume += Zone(iZone).Volume;
-
                 }
             }
         }
+
+        // add total rows
+        PreDefTableEntry(pdchOaMvZoneVol, "Total", totalVolume);
+        PreDefTableEntry(pdchOaMvZoneArea, "Total", totalArea);
+        PreDefTableEntry(pdchOaMvNomNumOcc, "Total", totalOccupants);
+        PreDefTableEntry(pdchOaMvAvgNumOcc, "Total", totalAverageOccupants);
 
         // Add the number of central air distributions system to the count report
         PreDefTableEntry(pdchHVACcntVal, "HVAC Air Loops", NumPrimaryAirSys);
