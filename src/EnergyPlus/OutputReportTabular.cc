@@ -13247,8 +13247,12 @@ namespace OutputReportTabular {
                     Real64 lightSWConvFromSurf = 0.0;
                     Real64 feneSolarConvFromSurf = 0.0;
 
-                    for (int mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack) {
+                    for (int mStepBack = 1; mStepBack <= NumOfTimeStepInHour * 24; ++mStepBack) {
                         int sourceStep = kTimeStep - mStepBack + 1;
+                        if (mStepBack > kTimeStep) {
+                            sourceStep = NumOfTimeStepInHour * 24 - (mStepBack - kTimeStep) + 1;
+                        }
+                        assert(sourceStep > 0);
                         Real64 thisQRadThermInAbsMult = TMULTseq(desDaySelected, sourceStep, radEnclosureNum) *
                             ITABSFseq(desDaySelected, sourceStep, jSurf) * Surface(jSurf).Area *
                             decayCurve(mStepBack, jSurf);
