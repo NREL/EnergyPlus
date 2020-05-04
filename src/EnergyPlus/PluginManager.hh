@@ -55,25 +55,13 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
-#if LINK_WITH_PYTHON
-#ifdef _DEBUG
-// We don't want to try to import a debug build of Python here
-// so if we are building a Debug build of the C++ code, we need
-// to undefine _DEBUG during the #include command for Python.h.
-// Otherwise it will fail
-#undef _DEBUG
-  #include <Python.h>
-  #define _DEBUG
-#else
-#include <Python.h>
-#endif
-#endif
+typedef void* PyObjectWrap;
 
 namespace EnergyPlus {
 
 namespace PluginManagement {
 
-    void registerNewCallback(int iCalledFrom, std::function<void ()> f);
+    void registerNewCallback(int iCalledFrom, const std::function<void ()>& f);
     void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan);
     std::string pythonStringForUsage();
 
@@ -95,8 +83,8 @@ namespace PluginManagement {
         bool runDuringWarmup;
         std::string stringIdentifier; // for diagnostic reporting
 #if LINK_WITH_PYTHON
-        PyObject *pModule = nullptr;  // reference to module
-        PyObject *pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
+        PyObjectWrap pModule = nullptr;  // reference to module
+        PyObjectWrap pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
 #endif
 
         // setup/shutdown should only be called once construction is completely done, i.e., setup() should only be called once the vector holding all the
@@ -104,11 +92,11 @@ namespace PluginManagement {
         // inside setup() and shutdown() are related to un-managed memory, and it's tricky to manage inside existing constructor/move operations, so they
         // are split out into these explicitly called methods.
         void setup();
-        void shutdown();
+        void shutdown() const;
 
         // methods
         static void reportPythonError();
-        void run(int iCallingPoint); // calls main() on this plugin instance
+        void run(int iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
@@ -150,11 +138,8 @@ namespace PluginManagement {
     class PluginManager {
     public:
         PluginManager();
-        ~PluginManager() {
-#if LINK_WITH_PYTHON
-            Py_FinalizeEx();
-#endif
-        }
+        ~PluginManager();
+
         static int numActiveCallbacks();
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
@@ -209,7 +194,8 @@ namespace PluginManagement {
 
     // some flags
     extern bool fullyReady;
-    extern bool shouldIssueFatalAfterPluginCompletes;
+    extern bool apiErrorFlag;
+
 }
 }
 

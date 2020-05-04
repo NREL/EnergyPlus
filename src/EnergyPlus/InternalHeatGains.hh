@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
   class OutputFiles;
@@ -78,11 +79,11 @@ namespace InternalHeatGains {
     // Functions
     void clear_state();
 
-    void ManageInternalHeatGains(Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
+    void ManageInternalHeatGains(EnergyPlusData &state, Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
 
-    void GetInternalHeatGainsInput(OutputFiles &outputFiles);
+    void GetInternalHeatGainsInput(EnergyPlusData &state, OutputFiles &outputFiles);
 
-    void InitInternalHeatGains();
+    void InitInternalHeatGains(EnergyPlusData &state);
 
     void CheckReturnAirHeatGain();
 

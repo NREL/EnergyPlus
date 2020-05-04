@@ -195,7 +195,7 @@ namespace WaterToAirHeatPumpSimple {
         SimpleWatertoAirHP.deallocate();
     }
 
-    void SimWatertoAirHPSimple(std::string const &CompName,   // Coil Name
+    void SimWatertoAirHPSimple(EnergyPlusData &state, std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                Real64 const SensLoad,         // Sensible demand load [W]
                                Real64 const LatentLoad,       // Latent demand load [W]
@@ -275,7 +275,7 @@ namespace WaterToAirHeatPumpSimple {
 
         if (SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingEquationFit) {
             // Cooling mode
-            InitSimpleWatertoAirHP(HPNum,
+            InitSimpleWatertoAirHP(state, HPNum,
                                    MaxONOFFCyclesperHour,
                                    HPTimeConstant,
                                    FanDelayTime,
@@ -288,7 +288,7 @@ namespace WaterToAirHeatPumpSimple {
             UpdateSimpleWatertoAirHP(HPNum);
         } else if (SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingEquationFit) {
             // Heating mode
-            InitSimpleWatertoAirHP(HPNum,
+            InitSimpleWatertoAirHP(state, HPNum,
                                    MaxONOFFCyclesperHour,
                                    HPTimeConstant,
                                    FanDelayTime,
@@ -811,7 +811,7 @@ namespace WaterToAirHeatPumpSimple {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSimpleWatertoAirHP(int const HPNum,                           // Current HPNum under simulation
+    void InitSimpleWatertoAirHP(EnergyPlusData &state, int const HPNum,                           // Current HPNum under simulation
                                 Real64 const MaxONOFFCyclesperHour,        // Maximum cycling rate of heat pump [cycles/hr]
                                 Real64 const HPTimeConstant,               // Heat pump time constant [s]
                                 Real64 const FanDelayTime,                 // Fan delay time, time delay for the HP's fan to
@@ -905,7 +905,7 @@ namespace WaterToAirHeatPumpSimple {
 
         if (!SysSizingCalc && MySizeFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
             // for each furnace, do the sizing once.
-            SizeHVACWaterToAir(HPNum);
+            SizeHVACWaterToAir(state, HPNum);
 
             MySizeFlag(HPNum) = false;
         }
@@ -1125,7 +1125,7 @@ namespace WaterToAirHeatPumpSimple {
         DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = 0.0;
     }
 
-    void SizeHVACWaterToAir(int const HPNum)
+    void SizeHVACWaterToAir(EnergyPlusData &state, int const HPNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1396,11 +1396,11 @@ namespace WaterToAirHeatPumpSimple {
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
                             case DataAirSystems::structArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(DataFanIndex, VolFlowRate);
+                                FanCoolLoad = Fans::FanDesHeatGain(state, DataFanIndex, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::objectVectorOOFanSystemModel: {
-                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(VolFlowRate);
+                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::fanModelTypeNotYetSet: {
@@ -1485,11 +1485,11 @@ namespace WaterToAirHeatPumpSimple {
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
                             case DataAirSystems::structArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(DataFanIndex, VolFlowRate);
+                                FanCoolLoad = Fans::FanDesHeatGain(state, DataFanIndex, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::objectVectorOOFanSystemModel: {
-                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(VolFlowRate);
+                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::fanModelTypeNotYetSet: {
@@ -1589,11 +1589,11 @@ namespace WaterToAirHeatPumpSimple {
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
                             case DataAirSystems::structArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(DataFanIndex, VolFlowRate);
+                                FanCoolLoad = Fans::FanDesHeatGain(state, DataFanIndex, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::objectVectorOOFanSystemModel: {
-                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(VolFlowRate);
+                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::fanModelTypeNotYetSet: {
@@ -1676,11 +1676,11 @@ namespace WaterToAirHeatPumpSimple {
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
                             case DataAirSystems::structArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(DataFanIndex, VolFlowRate);
+                                FanCoolLoad = Fans::FanDesHeatGain(state, DataFanIndex, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::objectVectorOOFanSystemModel: {
-                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(VolFlowRate);
+                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::fanModelTypeNotYetSet: {
@@ -3025,7 +3025,7 @@ namespace WaterToAirHeatPumpSimple {
         return IndexNum;
     }
 
-    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )
@@ -3129,7 +3129,7 @@ namespace WaterToAirHeatPumpSimple {
         return CoilAirFlowRate;
     }
 
-    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -3193,7 +3193,7 @@ namespace WaterToAirHeatPumpSimple {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )
