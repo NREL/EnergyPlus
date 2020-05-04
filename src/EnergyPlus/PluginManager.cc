@@ -407,6 +407,17 @@ namespace PluginManagement {
         callbacks[iCalledFrom].push_back(f);
     }
 
+    void onBeginEnvironment() {
+        // reset vars and trends -- sensors and actuators are reset by EMS
+        for (auto & v : globalVariableValues) {
+            v = 0;
+        }
+        // reinitialize trend variables so old data are purged
+        for (auto & tr : trends) {
+            tr.reset();
+        }
+    }
+
     int PluginManager::numActiveCallbacks()
     {
         return (int)callbacks.size();

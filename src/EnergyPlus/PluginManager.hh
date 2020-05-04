@@ -63,6 +63,7 @@ namespace PluginManagement {
 
     void registerNewCallback(int iCalledFrom, const std::function<void ()>& f);
     void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan);
+    void onBeginEnvironment();
     std::string pythonStringForUsage();
 
     void clear_state();
@@ -183,6 +184,12 @@ namespace PluginManagement {
             }
             for (int loop = 1; loop <= _numValues; ++loop) {
                 this->times.push_back(-loop * DataGlobals::TimeStepZone);
+            }
+        }
+        void reset() {
+            this->values.clear();
+            for (int i = 1; i <= this->numValues; i++) {
+                this->values.push_back(0);
             }
         }
     };
