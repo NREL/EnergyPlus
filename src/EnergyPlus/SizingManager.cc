@@ -1644,6 +1644,7 @@ namespace SizingManager {
                                                                      VbzByZone(termUnitSizingIndex) /
                                                                          TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling,
                                                                      4); // Voz-clg
+                            
                         }
                         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zvpHtEz,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
@@ -1669,6 +1670,7 @@ namespace SizingManager {
             Real64 VbzSum(0.0);
             Real64 VozClgSum(0.0);
             Real64 VozHtgSum(0.0);
+            Real64 VozSum(0.0);
             Real64 VdzClgSum(0.0);
             Real64 VdzHtgSum(0.0);
             Real64 VpzMinClgSum(0.0);
@@ -1738,11 +1740,12 @@ namespace SizingManager {
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  VpzMinClgByZone(termUnitSizingIndex),
                                                                  4); // Vpz-min
+                        Real64 VozClg = 0.0;
                         if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling > 0.0) {
+                            VozClg = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
                             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zcdVozclg,
                                                                      TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                     VbzByZone(termUnitSizingIndex) /
-                                                                         TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling,
+                                                                     VozClg,
                                                                      4); // Voz-clg
                         }
                         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zcdZpz,
@@ -1799,13 +1802,21 @@ namespace SizingManager {
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  VpzMinHtgByZone(termUnitSizingIndex),
                                                                  4); // Vpz-min
+                        Real64 VozHtg = 0.0;
                         if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating != 0.0) {
+                            VozHtg = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
                             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zhdVozhtg,
                                                                      TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                     VbzByZone(termUnitSizingIndex) /
-                                                                         TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating,
+                                                                     VozHtg,
                                                                      4); // Voz-htg
                         }
+                        // Outdoor Air Summary - Design Zone Outdoor Airflow - Voz
+                        Real64 VozMax = std::max(VozHtg, VozClg);  // take large of the heating and cooling Voz values
+                        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchOaMvDesZnOa,
+                            TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                            VozMax,
+                            4);
+                        VozSum += VozMax;
                         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zhdZpz,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZpzHtgByZone,
@@ -1837,7 +1848,9 @@ namespace SizingManager {
                     }
                 }
             }
-
+            // Outdoor Air Summary - Design Zone Outdoor Airflow - Voz - Total Row
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchOaMvDesZnOa,
+                "Total", VozSum, 4);
             // System Ventilation Parameters, (Table 4)
             if (PzSumBySys(AirLoopNum) != 0.0) {
                 OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62svpRp,
@@ -1900,6 +1913,8 @@ namespace SizingManager {
                                                      4); // Voz-htg
             OutputReportPredefined::PreDefTableEntry(
                 OutputReportPredefined::pdchS62shdEvz, FinalSysSizing(AirLoopNum).AirPriLoopName, EvzMinBySysHeat(AirLoopNum), 4); // Evz-min
+
+
         } // loop over air loops for table writing
     }
 

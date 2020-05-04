@@ -6625,7 +6625,7 @@ namespace OutputReportTabular {
                         PreDefTableEntry(pdchOaoAvgMechVent,
                                          Zone(iZone).Name,
                                          ZonePreDefRep(iZone).MechVentVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume *
-                                                                                  Zone(iZone).Multiplier * Zone(iZone).ListMultiplier), 0);
+                                                                                  Zone(iZone).Multiplier * Zone(iZone).ListMultiplier), 3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                         PreDefTableEntry(pdchOaoMinMechVent,
