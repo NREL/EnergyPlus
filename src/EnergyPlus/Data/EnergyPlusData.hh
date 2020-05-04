@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <unordered_map>
 #include <string>
 
@@ -128,24 +129,6 @@ struct ExteriorEnergyUseData : BaseGlobalStruct
         ExteriorLightUsage()
             : SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ControlMode(1), ManageDemand(false), DemandLimit(0.0),
             PowerActuatorOn(false), SumConsumption(0.0), SumTimeNotZeroCons(0.0)
-        {
-        }
-    };
-
-    struct ExteriorEquipmentUsage
-    {
-        // Members
-        std::string Name; // Descriptive name -- will show on reporting
-        int FuelType;
-        int SchedPtr;       // Can be scheduled
-        Real64 DesignLevel; // Design Consumption (Watts, except for Water Equipment)
-        Real64 Power;       // Power = DesignLevel * ScheduleValue
-        Real64 CurrentUse;  // Use for this time step
-        bool ManageDemand;  // Flag to indicate whether to use demand limiting
-        Real64 DemandLimit; // Demand limit set by demand manager [W]
-
-                            // Default Constructor
-        ExteriorEquipmentUsage() : FuelType(0), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
         {
         }
     };
