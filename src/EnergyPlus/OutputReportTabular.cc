@@ -6572,23 +6572,6 @@ namespace OutputReportTabular {
         Real64 totalAverageOccupants = 0.;
         Real64 totalArea = 0.;
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
-            // occupants
-            if (Zone(iZone).isNominalOccupied) {
-                if (ZonePreDefRep(iZone).NumOccAccumTime > 0) {
-                    PreDefTableEntry(
-                        pdchOaMvAvgNumOcc, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
-                    totalAverageOccupants += (ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime) * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
-                }
-            }
-            PreDefTableEntry(pdchOaMvNomNumOcc, Zone(iZone).Name, Zone(iZone).TotOccupants);
-            totalOccupants += Zone(iZone).TotOccupants * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
-
-            // Zone volume and area
-            PreDefTableEntry(pdchOaMvZoneVol, Zone(iZone).Name, Zone(iZone).Volume);
-            totalVolume += Zone(iZone).Volume;
-            PreDefTableEntry(pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
-            totalArea += Zone(iZone).FloorArea;
-
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
                 // air loop name
@@ -6604,8 +6587,26 @@ namespace OutputReportTabular {
                             airLoopName += "; " + DataAirSystems::PrimaryAirSystem(airLoopNumber).Name;
                         }
                     }
+                    PreDefTableEntry(pdchOaMvAirLpNm, Zone(iZone).Name, airLoopName);
+
+                    // occupants
+                    if (Zone(iZone).isNominalOccupied) {
+                        if (ZonePreDefRep(iZone).NumOccAccumTime > 0) {
+                            PreDefTableEntry(
+                                pdchOaMvAvgNumOcc, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
+                            totalAverageOccupants += (ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime) * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+                        }
+                    }
+                    PreDefTableEntry(pdchOaMvNomNumOcc, Zone(iZone).Name, Zone(iZone).TotOccupants);
+                    totalOccupants += Zone(iZone).TotOccupants * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+
+                    // Zone volume and area
+
+                    PreDefTableEntry(pdchOaMvZoneVol, Zone(iZone).Name, Zone(iZone).Volume);
+                    totalVolume += Zone(iZone).Volume;
+                    PreDefTableEntry(pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
+                    totalArea += Zone(iZone).FloorArea;
                 }
-                PreDefTableEntry(pdchOaMvAirLpNm, Zone(iZone).Name, airLoopName);
 
 
                 if (Zone(iZone).isNominalOccupied) {
