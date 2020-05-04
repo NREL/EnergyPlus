@@ -580,18 +580,12 @@ int AbortEnergyPlus(EnergyPlusData &state)
     ShowRecurringErrors();
     SummarizeErrors();
     CloseMiscOpenFiles();
-    NumWarnings = RoundSigDigits(TotalWarningErrors);
-    strip(NumWarnings);
-    NumSevere = RoundSigDigits(TotalSevereErrors);
-    strip(NumSevere);
-    NumWarningsDuringWarmup = RoundSigDigits(TotalWarningErrorsDuringWarmup);
-    strip(NumWarningsDuringWarmup);
-    NumSevereDuringWarmup = RoundSigDigits(TotalSevereErrorsDuringWarmup);
-    strip(NumSevereDuringWarmup);
-    NumWarningsDuringSizing = RoundSigDigits(TotalWarningErrorsDuringSizing);
-    strip(NumWarningsDuringSizing);
-    NumSevereDuringSizing = RoundSigDigits(TotalSevereErrorsDuringSizing);
-    strip(NumSevereDuringSizing);
+    NumWarnings = fmt::to_string(TotalWarningErrors);
+    NumSevere = fmt::to_string(TotalSevereErrors);
+    NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
+    NumSevereDuringWarmup = fmt::to_string(TotalSevereErrorsDuringWarmup);
+    NumWarningsDuringSizing = fmt::to_string(TotalWarningErrorsDuringSizing);
+    NumSevereDuringSizing = fmt::to_string(TotalSevereErrorsDuringSizing);
 
     // catch up with timings if in middle
     Time_Finish = epElapsedTime();
@@ -700,7 +694,7 @@ void CloseMiscOpenFiles()
     //      INTEGER :: ios
 
     CloseReportIllumMaps();
-    CloseDFSFile();
+    CloseDFSFile(OutputFiles::getSingleton());
 
     if (DebugOutput || OutputFiles::getSingleton().debug.position() > 0) {
         OutputFiles::getSingleton().debug.close();

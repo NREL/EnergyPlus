@@ -117,6 +117,9 @@ public:
     OutputFile bnd{"eplusout.bnd"};
 
     OutputFile debug{"eplusout.dbg"};
+
+    OutputFile dfs{"eplusout.dfs"};
+
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 

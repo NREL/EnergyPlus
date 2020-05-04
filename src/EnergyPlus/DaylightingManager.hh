@@ -75,7 +75,6 @@ namespace DaylightingManager {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int TotWindowsWithDayl;    // Total number of exterior windows in all daylit zones
-    extern int OutputFileDFS;         // Unit number for daylight factors
     extern Array1D<Real64> DaylIllum; // Daylight illuminance at reference points (lux)
     extern int maxNumRefPtInAnyZone;  // The most number of reference points that any single zone has
     extern int maxNumRefPtInAnyEncl;  // The most number of reference points that any single enclosure has
@@ -468,7 +467,7 @@ namespace DaylightingManager {
 
     void CloseReportIllumMaps();
 
-    void CloseDFSFile();
+    void CloseDFSFile(OutputFiles &outputFiles);
 
     void DayltgSetupAdjZoneListsAndPointers(OutputFiles &outputFiles);
 
