@@ -13340,6 +13340,7 @@ namespace OutputReportTabular {
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
+        using DataSurfaces::KivaFoundation;
         using DataSurfaces::OSC;
         using DataSurfaces::OtherSideCoefCalcExt;
         using DataSurfaces::OtherSideCoefNoCalcExt;
@@ -13476,7 +13477,7 @@ namespace OutputReportTabular {
                             auto const SELECT_CASE_var1(curExtBoundCond);
                             if (SELECT_CASE_var1 == ExternalEnvironment) {
                                 delayOpaque(rExtWall) += singleSurfDelay;
-                            } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod)) {
+                            } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) || (SELECT_CASE_var1 == KivaFoundation)) {
                                 delayOpaque(rGrdWall) += singleSurfDelay;
                             } else if ((SELECT_CASE_var1 == OtherSideCoefNoCalcExt) || (SELECT_CASE_var1 == OtherSideCoefCalcExt) ||
                                        (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
@@ -13490,7 +13491,8 @@ namespace OutputReportTabular {
                             auto const SELECT_CASE_var1(curExtBoundCond);
                             if (SELECT_CASE_var1 == ExternalEnvironment) {
                                 delayOpaque(rExtFlr) += singleSurfDelay;
-                            } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod)) {
+                            } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) ||
+                                       (SELECT_CASE_var1 == KivaFoundation)) {
                                 delayOpaque(rGrdFlr) += singleSurfDelay;
                             } else if ((SELECT_CASE_var1 == OtherSideCoefNoCalcExt) || (SELECT_CASE_var1 == OtherSideCoefCalcExt) ||
                                        (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
@@ -13505,8 +13507,8 @@ namespace OutputReportTabular {
                             if (SELECT_CASE_var1 == ExternalEnvironment) {
                                 delayOpaque(rRoof) += singleSurfDelay;
                             } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) ||
-                                       (SELECT_CASE_var1 == OtherSideCoefNoCalcExt) || (SELECT_CASE_var1 == OtherSideCoefCalcExt) ||
-                                       (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
+                                       (SELECT_CASE_var1 == KivaFoundation) || (SELECT_CASE_var1 == OtherSideCoefNoCalcExt) ||
+                                       (SELECT_CASE_var1 == OtherSideCoefCalcExt) || (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
                                 delayOpaque(rOtherRoof) += singleSurfDelay;
                             } else { // interzone
                                 delayOpaque(rIntZonCeil) += singleSurfDelay;
