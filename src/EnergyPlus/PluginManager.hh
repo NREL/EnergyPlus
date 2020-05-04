@@ -96,7 +96,7 @@ namespace PluginManagement {
 
         // methods
         static void reportPythonError();
-        void run(int iCallingPoint) const; // calls main() on this plugin instance
+        bool run(int iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
