@@ -29,7 +29,7 @@ For simplicity in development, these three items may be separated into three sep
 
 For the changes relating to surface temperature control, the approach here will be to add surface control by using either the inside surface face temperature or a temperature at some depth rather than the other temperature options.  From there, the different radiant system models will use that to provide appropriate control for the system.  As this is done, this portion of the control algorithm will be converted to a new subroutine since all three of the radiant system models use similar code to grab the appropriate temperature for control.
 
-The approach for dealing with the temperature internal to the radiant slab will be solved by using existing input.  In the Construction:InternalSource input, the user already has the possibility to request a temperature at a particular location.  This information will now also be used for control when the user picks the slab (interior) temperature as the controlling parameter.  In addition, when the user requests a 2-D simulation of the radiant system, the temperature inside the slab will be changed.  Currently, in the 2-D solution, the temperature is taken at the depth requested by the user but in line with the “source” point.  The temperature used for control in practice is more aligned with the mid-point between tubing.  So, the calculation of that internal temperature during a 2-D solution will be changed so that the temperature is at the depth requested but at the mid-point between the tubes rather than in line with them.
+The approach for dealing with the temperature internal to the radiant slab will be solved by using existing input.  In the Construction:InternalSource input, the user already has the possibility to request a temperature at a particular location.  This information will now also be used for control when the user picks the slab (interior) temperature as the controlling parameter.  In addition, when the user requests a 2-D simulation of the radiant system, the temperature inside the slab will be changed.  Currently, in the 2-D solution, the temperature is taken at the depth requested by the user but in line with the “source” point.  The temperature used for control in practice is more aligned with the mid-point between tubing.  However, given that users could desire to control on a temperature anywhere between the tubes and the mid-point, a new variable will be added to the input to give the user a chance to define the fractional distance between the tubing and the mid-point between the tubing for the temperature.  While EnergyPlus, because of the grid system in the space space method, cannot get exactly to the correct position, it will pick the closest position based on the user input.  So, the calculation of that internal temperature during a 2-D solution will be changed so that the temperature is at the depth requested and where the user requests (via a new Construction:InternalSource parameter).
 
 The approach to dealing with the on-off control is to relax the check on throttling range so that a throttling range can be less than 0.5 but no smaller than 0.0.  If the throttling range is less than 0.5, a warning message will be produced and the simulation allowed to continue.  There will have to be some additional code in the electric radiant system that avoids a divide by zero since in one place it divides by throttling range, but when the user picks a 0.0 throttling range, it can simply do a slightly modified sequence where the panel is either on or off which should be fairly straight forward.
 
@@ -61,12 +61,16 @@ Similar changes need to be made in the constant flow and electric radiant system
 
 Note that the text for the Field: Temperature Calculation Requested After Layer Number in Contstruction:InternalSource will also be modified to reflect this additional interpretation of this input field and the change to its interpretation for 2-D solutions.  Here is the proposed additional text:
 
-In addition, this field is also used by the radiant system model when the user selects the SurfaceInterior control method.  In this control type, the user is controlling the system based on a temperature on the interior of the slab.  This field then also sets this point inside the slab for this control.  Note also that when this field is used in conjunction with a 2-D solution (see next input field) that the interior temperature being calculated (and then used for control) will be calculated at the depth specified and at the mid-point between the tubing (not at the horizontal point in-line with the tubing).
+“In addition, this field is also used by the radiant system model when the user selects the SurfaceInterior control method.  In this control type, the user is controlling the system based on a temperature on the interior of the slab.  This field then also sets this point inside the slab for this control.  Note also that when this field is used in conjunction with a 2-D solution (see next input field) that the interior temperature being calculated (and then used for control) will be calculated at the depth specified and at the mid-point between the tubing (not at the horizontal point in-line with the tubing).”
+
+After the section in Construction:InternalSource entitled “Field: Tube Spacing”, a new field will be added: “Field: Horizontal Location of Control Temperature”.  Here is proposed text for this new section:
+
+“This field defines the location of a control temperature point within the slab in the direction that is horizontal to the main direction of heat transfer.  This is a dimensionless parameter between 0.0 and 1.0.  It is interpreted as the distance perpendicular to the main direction of heat transfer and as a fraction of the total distance between the tubing where water is circulated and the mid-point between the neighboring piping.  So, if the value here is 0.0, then the control point is at the tubing.  If the value for this parameter is 1.0, then the control point is located at the mid-point between the tubing.  For any fraction between 0.0 and 1.0, EnergyPlus will locate the control point as close as possible to the user requested position.  For more information on this parameter and the 2-D solution for radiant systems in EnergyPlus, please refer to the Engineering Reference.”
 
 
 ## Input Description ##
 
-Changes need to be made to existing descriptions (see previous section).
+Changes and additions need to be made to existing descriptions (see previous section).
 
 ## Outputs Description ##
 
@@ -74,11 +78,11 @@ No new input is being proposed so no changes need to be made to the output descr
 
 ## Engineering Reference ##
 
-A variety of changes will need to be made to the Engineering Reference in the section on Low Temperature Radiant System Controls.  The new control options will need to be defined and the changes to the throttling range and its interpretation will also need to be made.
+A variety of changes will need to be made to the Engineering Reference in the section on Low Temperature Radiant System Controls.  The new control options will need to be defined and the changes to the throttling range and its interpretation will also need to be made.  In addition, documentation for the 2-D modeling capabilities will be added to the Engineering Reference as currently there isn’t anything here describing this.  When this is added, a discussion of how the new user position for internal temperature is decided.
 
 ## Example File and Transition Changes ##
 
-New and modified example files will be created to test the new controls that are implemented in this work.  No transition changes are expected since the new controls will simply be a new option for an existing input field.
+New and modified example files will be created to test the new controls that are implemented in this work.  A transition will need to be made for files that use the Construction:InternalSource input since a new parameter is being added and this parameter will NOT be at the end of the existing input.
 
 ## References ##
 
