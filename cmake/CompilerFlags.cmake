@@ -98,6 +98,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
     ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
     ADD_CXX_DEFINITIONS("-Wno-deprecated-copy")
+    ADD_CXX_DEFINITIONS("-Wno-unknown-warning") # allow warning about things on newer compilers without affecting older ones
     ADD_CXX_DEFINITIONS("-Wno-attributes") # Don't warn on attributes Clang doesn't know
     ADD_CXX_DEFINITIONS("-Wno-delete-non-virtual-dtor")
     ADD_CXX_DEFINITIONS("-Wno-missing-braces")
