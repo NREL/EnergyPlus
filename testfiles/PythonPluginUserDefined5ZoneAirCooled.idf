@@ -3704,8 +3704,8 @@
     Central Chiller Outlet Node,  !- Plant Connection 1 Outlet Node Name
     MeetsLoadWithNominalCapacityLowOutLimit,  !- Plant Connection 1 Loading Mode
     NeedsFlowIfLoopOn,       !- Plant Connection 1 Loop Flow Request Mode
-    ,                        !- Plant Connection 1 Initialization Program Calling Manager Name
-    Chiller model simulation programs,  !- Plant Connection 1 Simulation Program Calling Manager Name
+    Chiller Initialization,  !- Plant Connection 1 Initialization Program Calling Manager Name
+    Chiller Simulation,      !- Plant Connection 1 Simulation Program Calling Manager Name
     ,                        !- Plant Connection 2 Inlet Node Name
     ,                        !- Plant Connection 2 Outlet Node Name
     ,                        !- Plant Connection 2 Loading Mode
@@ -3730,15 +3730,22 @@
     ,                        !- Collection Outlet Water Storage Tank Name
     ;                        !- Ambient Zone Name
 
-  PythonPlugin:Instance,
-    Chiller model simulation programs,      !- Name
-    Yes,                                    !- Run During Warmup Days
-    PythonPluginUserDefined5ZoneAirCooled,  !- Python Module Name
-    UserDefinedCoilSim;                    !- Plugin Class Name
 
-PythonPlugin:Variables,
-   ChillerGlobalVars,       !- Name
-   Chiller_ElectEnergy;     !- Variable Name 1
+  PythonPlugin:Instance,
+    Chiller Initialization,  !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginUserDefined5ZoneAirCooled,  !- Python Module Name
+    InitChiller;             !- Plugin Class Name
+
+  PythonPlugin:Instance,
+    Chiller Simulation,      !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginUserDefined5ZoneAirCooled,  !- Python Module Name
+    SimChiller;              !- Plugin Class Name
+
+  PythonPlugin:Variables,
+    ChillerGlobalVars,       !- Name
+    Chiller_ElectEnergy;     !- Variable Name 1
 
   PythonPlugin:OutputVariable,
     Chiller Electricity Consumption,    !- Name
@@ -3909,7 +3916,7 @@ PythonPlugin:Variables,
 
   Output:Variable,*,Main HW Coil Total Heating Rate,hourly;
 
-  Output:Variable,*,Chiller Electricity Consumption,hourly;
+  Output:Variable,Chiller Electricity Consumption,PythonPlugin:OutputVariable,hourly;
 
   Output:VariableDictionary,Regular;
 
