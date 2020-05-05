@@ -407,6 +407,17 @@ namespace PluginManagement {
         callbacks[iCalledFrom].push_back(f);
     }
 
+    void onBeginEnvironment() {
+        // reset vars and trends -- sensors and actuators are reset by EMS
+        for (auto & v : globalVariableValues) {
+            v = 0;
+        }
+        // reinitialize trend variables so old data are purged
+        for (auto & tr : trends) {
+            tr.reset();
+        }
+    }
+
     int PluginManager::numActiveCallbacks()
     {
         return (int)callbacks.size();
@@ -422,8 +433,8 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
         for (auto &plugin : plugins) {
             if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) {
-                plugin.run(iCalledFrom);
-                anyRan = true;
+                bool const didOneRun = plugin.run(iCalledFrom);
+                if (didOneRun) anyRan = true;
             }
         }
 #endif
@@ -724,9 +735,41 @@ namespace PluginManagement {
         globalVariableNames.clear();
         globalVariableValues.clear();
         plugins.clear();
-        pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
         PluginManagement::fullyReady = false;
         PluginManagement::apiErrorFlag = false;
+        PluginManager * p = PluginManagement::pluginManager.release();
+        delete p;
+        wrapperDLLHandle = nullptr;
+        EP_Py_SetPath = nullptr;
+        EP_Py_GetVersion = nullptr;
+        EP_Py_DecodeLocale = nullptr;
+        EP_Py_InitializeEx = nullptr;
+        EP_PyRun_SimpleString = nullptr;
+        EP_Py_FinalizeEx = nullptr;
+        EP_PyErr_Fetch = nullptr;
+        EP_PyObject_Repr = nullptr;
+        EP_PyUnicode_AsEncodedString = nullptr;
+        EP_PyBytes_AsString = nullptr;
+        EP_PyUnicode_DecodeFSDefault = nullptr;
+        EP_PyImport_Import = nullptr;
+        EP_Py_DECREF = nullptr;
+        EP_PyErr_Occurred = nullptr;
+        EP_PyModule_GetDict = nullptr;
+        EP_PyDict_GetItemString = nullptr;
+        EP_PyUnicode_AsUTF8 = nullptr;
+        EP_PyUnicode_AsUTF8String = nullptr;
+        EP_PyCallable_Check = nullptr;
+        EP_PyObject_CallObject = nullptr;
+        EP_PyObject_GetAttrString = nullptr;
+        EP_PyObject_CallFunction = nullptr;
+        EP_PyObject_CallMethod = nullptr;
+        EP_PyList_Check = nullptr;
+        EP_PyList_Size = nullptr;
+        EP_PyList_GetItem = nullptr;
+        EP_PyUnicode_Check = nullptr;
+        EP_PyLong_Check = nullptr;
+        EP_PyLong_AsLong = nullptr;
+        EP_Py_SetPythonHome = nullptr;
 #endif
     }
 
@@ -929,11 +972,11 @@ namespace PluginManagement {
     PluginManager::~PluginManager()
     {
 #if LINK_WITH_PYTHON
-        //(*EP_Py_FinalizeEx)();
+        if (EP_Py_FinalizeEx) (*EP_Py_FinalizeEx)();
 #ifdef _WIN32
-        FreeLibrary((HINSTANCE)wrapperDLLHandle);
+        if (wrapperDLLHandle) FreeLibrary((HINSTANCE)wrapperDLLHandle);
 #else
-        dlclose(wrapperDLLHandle);
+        if (wrapperDLLHandle) dlclose(wrapperDLLHandle);
 #endif  // PLATFORM
 #endif  // LINK_WITH_PYTHON
     }
@@ -1159,8 +1202,9 @@ namespace PluginManagement {
     }
 
 #if LINK_WITH_PYTHON == 1
-    void PluginInstance::run(int iCalledFrom) const
+    bool PluginInstance::run(int iCalledFrom) const
     {
+        // returns true if a plugin actually ran
         const char *functionName = nullptr;
         if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
             if (this->bHasBeginNewEnvironment) {
@@ -1234,7 +1278,7 @@ namespace PluginManagement {
 
         // leave if we didn't find a match
         if (!functionName) {
-            return;
+            return false;
         }
 
         // then call the main function
@@ -1265,10 +1309,12 @@ namespace PluginManagement {
         if (EnergyPlus::PluginManagement::apiErrorFlag) {
             EnergyPlus::ShowFatalError("API problems encountered while running plugin cause program termination.");
         }
+        return true;
     }
 #else
-    void PluginInstance::run(int EP_UNUSED(iCalledFrom)) const
+    bool PluginInstance::run(int EP_UNUSED(iCalledFrom)) const
     {
+        return false;
     }
 #endif
 

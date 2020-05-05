@@ -7961,9 +7961,9 @@
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Program,
-    VAV_5_SchedSetpoint,     !- Name
-    SET VAV_5_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
+!  EnergyManagementSystem:Program,
+!    VAV_5_SchedSetpoint,     !- Name
+!    SET VAV_5_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
 
 !SetpointManager:MixedAir,
 !  VAV_5_CoolC SAT Manager,  !- Name
@@ -7980,15 +7980,15 @@
 !  VAV_5 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_5_HeatC-VAV_5_FanNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Sensor,
-    T_VAV5FanIn,             !- Name
-    VAV_5_HeatC-VAV_5_FanNode,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature; !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    T_VAV5FanIn,             !- Name
+!    VAV_5_HeatC-VAV_5_FanNode,  !- Output:Variable or Output:Meter Index Key Name
+!    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    T_VAV5FanOut,            !- Name
-    VAV_5 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature; !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    T_VAV5FanOut,            !- Name
+!    VAV_5 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
+!    System Node Temperature; !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Actuator,
     VAV_5_CoolC_Setpoint,    !- Name
@@ -8002,11 +8002,11 @@
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Program,
-    VAV5MixedAirManagers,    !- Name
-    SET VAV_5_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV5FanOut - T_VAV5FanIn),  !- Program Line 1
-    SET VAV_5_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV5FanOut - T_VAV5FanIn),  !- Program Line 2
-    SET VAV_5_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV5FanOut - T_VAV5FanIn);  !- <none>
+!  EnergyManagementSystem:Program,
+!    VAV5MixedAirManagers,    !- Name
+!    SET VAV_5_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV5FanOut - T_VAV5FanIn),  !- Program Line 1
+!    SET VAV_5_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV5FanOut - T_VAV5FanIn),  !- Program Line 2
+!    SET VAV_5_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV5FanOut - T_VAV5FanIn);  !- <none>
 
   Sizing:System,
     VAV_5,                   !- AirLoop Name
@@ -8059,49 +8059,49 @@
 !  1.0,  !- Thermostat Tolerance {delta C}
 !  1800;  !- Cycling Run Time {s}
 
-  EnergyManagementSystem:Actuator,
-    VAV_5_NightCycleStatus,  !- Name
-    VAV_5,                   !- Actuated Component Unique Name
-    AirLoopHVAC,             !- Actuated Component Type
-    Availability Status;     !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_5_NightCycleStatus,  !- Name
+!    VAV_5,                   !- Actuated Component Unique Name
+!    AirLoopHVAC,             !- Actuated Component Type
+!    Availability Status;     !- Actuated Component Control Type
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV5,               !- Name
-    Basement,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV5,               !- Name
+!    Basement,                !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    heating_setpoint,        !- Name
-    HTGSETP_SCH,             !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value;          !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    heating_setpoint,        !- Name
+!    HTGSETP_SCH,             !- Output:Variable or Output:Meter Index Key Name
+!    Schedule Value;          !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    cooling_setpoint,        !- Name
-    CLGSETP_SCH,             !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value;          !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    cooling_setpoint,        !- Name
+!    CLGSETP_SCH,             !- Output:Variable or Output:Meter Index Key Name
+!    Schedule Value;          !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Program,
-    VAV_5_NightCycleMGR,     !- Name
-    SET Toffset = 0.8333,    !- Program Line 1
-    SET NoAction = 0.0,      !- Program Line 2
-    SET ForceOff = 1.0,      !- <none>
-    SET CycleOn = 2.0,       !- <none>
-    SET CycleOnZoneFansOnly = 3,  !- <none>
-    SET VAV5_heating_TurnOn  = heating_setpoint,  !- <none>
-    SET VAV5_heating_TurnOff = heating_setpoint + (2*Toffset),  !- <none>
-    SET VAV5_cooling_TurnOn  = cooling_setpoint,  !- <none>
-    SET VAV5_cooling_TurnOff = cooling_setpoint - (2*Toffset),  !- <none>
-    IF TzoneVAV5 < VAV5_heating_TurnOn,  !- <none>
-    SET VAV_5_NightCycleStatus = CycleOn,  !- <none>
-    RETURN,                  !- <none>
-    ELSEIF TzoneVAV5 > VAV5_heating_TurnOff,  !- <none>
-    SET VAV_5_NightCycleStatus = NoAction,  !- <none>
-    ENDIF,                   !- <none>
-    IF TzoneVAV5 > VAV5_cooling_TurnOn,  !- <none>
-    SET VAV_5_NightCycleStatus = CycleOn,  !- <none>
-    ELSEIF TzoneVAV5 < VAV5_cooling_TurnOff,  !- <none>
-    SET VAV_5_NightCycleStatus = NoAction,  !- <none>
-    ENDIF;                   !- <none>
+!  EnergyManagementSystem:Program,
+!    VAV_5_NightCycleMGR,     !- Name
+!    SET Toffset = 0.8333,    !- Program Line 1
+!    SET NoAction = 0.0,      !- Program Line 2
+!    SET ForceOff = 1.0,      !- <none>
+!    SET CycleOn = 2.0,       !- <none>
+!    SET CycleOnZoneFansOnly = 3,  !- <none>
+!    SET VAV5_heating_TurnOn  = heating_setpoint,  !- <none>
+!    SET VAV5_heating_TurnOff = heating_setpoint + (2*Toffset),  !- <none>
+!    SET VAV5_cooling_TurnOn  = cooling_setpoint,  !- <none>
+!    SET VAV5_cooling_TurnOff = cooling_setpoint - (2*Toffset),  !- <none>
+!    IF TzoneVAV5 < VAV5_heating_TurnOn,  !- <none>
+!    SET VAV_5_NightCycleStatus = CycleOn,  !- <none>
+!    RETURN,                  !- <none>
+!    ELSEIF TzoneVAV5 > VAV5_heating_TurnOff,  !- <none>
+!    SET VAV_5_NightCycleStatus = NoAction,  !- <none>
+!    ENDIF,                   !- <none>
+!    IF TzoneVAV5 > VAV5_cooling_TurnOn,  !- <none>
+!    SET VAV_5_NightCycleStatus = CycleOn,  !- <none>
+!    ELSEIF TzoneVAV5 < VAV5_cooling_TurnOff,  !- <none>
+!    SET VAV_5_NightCycleStatus = NoAction,  !- <none>
+!    ENDIF;                   !- <none>
 
   BranchList,
     VAV_5 Air Loop Branches, !- Name
@@ -8328,9 +8328,9 @@
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Program,
-    VAV_1_SchedSetpoint,     !- Name
-    SET VAV_1_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
+!  EnergyManagementSystem:Program,
+!    VAV_1_SchedSetpoint,     !- Name
+!    SET VAV_1_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
 
 !SetpointManager:MixedAir,
 !  VAV_1_CoolC SAT Manager,  !- Name
@@ -8347,15 +8347,15 @@
 !  VAV_1 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_1_HeatC-VAV_1_FanNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Sensor,
-    T_VAV1FanIn,             !- Name
-    VAV_1_HeatC-VAV_1_FanNode,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature; !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    T_VAV1FanIn,             !- Name
+!    VAV_1_HeatC-VAV_1_FanNode,  !- Output:Variable or Output:Meter Index Key Name
+!    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    T_VAV1FanOut,            !- Name
-    VAV_1 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature; !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    T_VAV1FanOut,            !- Name
+!    VAV_1 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
+!    System Node Temperature; !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Actuator,
     VAV_1_CoolC_Setpoint,    !- Name
@@ -8369,11 +8369,11 @@
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Program,
-    VAV1MixedAirManagers,    !- Name
-    SET VAV_1_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),  !- Program Line 1
-    SET VAV_1_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),  !- Program Line 2
-    SET VAV_1_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn);  !- <none>
+!  EnergyManagementSystem:Program,
+!    VAV1MixedAirManagers,    !- Name
+!    SET VAV_1_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),  !- Program Line 1
+!    SET VAV_1_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn),  !- Program Line 2
+!    SET VAV_1_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV1FanOut - T_VAV1FanIn);  !- <none>
 
   Sizing:System,
     VAV_1,                   !- AirLoop Name
@@ -8426,69 +8426,69 @@
 !  1.0,  !- Thermostat Tolerance {delta C}
 !  1800;  !- Cycling Run Time {s}
 
-  EnergyManagementSystem:Actuator,
-    VAV_1_NightCycleStatus,  !- Name
-    VAV_1,                   !- Actuated Component Unique Name
-    AirLoopHVAC,             !- Actuated Component Type
-    Availability Status;     !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_1_NightCycleStatus,  !- Name
+!    VAV_1,                   !- Actuated Component Unique Name
+!    AirLoopHVAC,             !- Actuated Component Type
+!    Availability Status;     !- Actuated Component Control Type
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV1_1,             !- Name
-    Core_bottom,             !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV1_1,             !- Name
+!    Core_bottom,             !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV1_2,             !- Name
-    Perimeter_bot_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV1_2,             !- Name
+!    Perimeter_bot_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV1_3,             !- Name
-    Perimeter_bot_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV1_3,             !- Name
+!    Perimeter_bot_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV1_4,             !- Name
-    Perimeter_bot_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV1_4,             !- Name
+!    Perimeter_bot_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV1_5,             !- Name
-    Perimeter_bot_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV1_5,             !- Name
+!    Perimeter_bot_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
    ! find max and min for "cycleOnAny" operation
 
-  EnergyManagementSystem:Program,
-    VAV_1_NightCycleMGR,     !- Name
-    SET Toffset = 0.8333,    !- Program Line 1
-    SET NoAction = 0.0,      !- Program Line 2
-    SET ForceOff = 1.0,      !- <none>
-    SET CycleOn = 2.0,       !- <none>
-    SET CycleOnZoneFansOnly = 3.0,  !- <none>
-    SET VAV1_heating_TurnOn  = heating_setpoint,  !- <none>
-    SET VAV1_heating_TurnOff = heating_setpoint +  (2 * Toffset),  !- <none>
-    SET VAV1_cooling_TurnOn  = cooling_setpoint,  !- <none>
-    SET VAV1_cooling_TurnOff = cooling_setpoint - (2 * Toffset),  !- <none>
-    SET Tmin = @MIN TzoneVAV1_1 TzoneVAV1_2,  !- <none>
-    SET Tmin = @MIN Tmin        TzoneVAV1_3,  !- <none>
-    SET Tmin = @MIN Tmin        TzoneVAV1_4,  !- <none>
-    SET Tmin = @MIN Tmin        TzoneVAV1_5,  !- <none>
-    SET Tmax = @MAX TzoneVAV1_1 TzoneVAV1_2,  !- <none>
-    SET Tmax = @MAX Tmax        TzoneVAV1_3,  !- <none>
-    SET Tmax = @MAX Tmax        TzoneVAV1_4,  !- <none>
-    SET Tmax = @MAX Tmax        TzoneVAV1_5,  !- <none>
-    IF Tmin < VAV1_heating_TurnOn,  !- <none>
-    SET VAV_1_NightCycleStatus = CycleOn,  !- <none>
-    RETURN,                  !- <none>
-    ELSEIF Tmin > VAV1_heating_TurnOff,  !- <none>
-    SET VAV_1_NightCycleStatus = NoAction,  !- <none>
-    ENDIF,                   !- <none>
-    IF Tmax > VAV1_cooling_TurnOn,  !- <none>
-    SET VAV_1_NightCycleStatus = CycleOn,  !- <none>
-    ELSEIF Tmax < VAV1_cooling_TurnOff,  !- <none>
-    SET VAV_1_NightCycleStatus = NoAction,  !- <none>
-    ENDIF;                   !- <none>
+!  EnergyManagementSystem:Program,
+!    VAV_1_NightCycleMGR,     !- Name
+!    SET Toffset = 0.8333,    !- Program Line 1
+!    SET NoAction = 0.0,      !- Program Line 2
+!    SET ForceOff = 1.0,      !- <none>
+!    SET CycleOn = 2.0,       !- <none>
+!    SET CycleOnZoneFansOnly = 3.0,  !- <none>
+!    SET VAV1_heating_TurnOn  = heating_setpoint,  !- <none>
+!    SET VAV1_heating_TurnOff = heating_setpoint +  (2 * Toffset),  !- <none>
+!    SET VAV1_cooling_TurnOn  = cooling_setpoint,  !- <none>
+!    SET VAV1_cooling_TurnOff = cooling_setpoint - (2 * Toffset),  !- <none>
+!    SET Tmin = @MIN TzoneVAV1_1 TzoneVAV1_2,  !- <none>
+!    SET Tmin = @MIN Tmin        TzoneVAV1_3,  !- <none>
+!    SET Tmin = @MIN Tmin        TzoneVAV1_4,  !- <none>
+!    SET Tmin = @MIN Tmin        TzoneVAV1_5,  !- <none>
+!    SET Tmax = @MAX TzoneVAV1_1 TzoneVAV1_2,  !- <none>
+!    SET Tmax = @MAX Tmax        TzoneVAV1_3,  !- <none>
+!    SET Tmax = @MAX Tmax        TzoneVAV1_4,  !- <none>
+!    SET Tmax = @MAX Tmax        TzoneVAV1_5,  !- <none>
+!    IF Tmin < VAV1_heating_TurnOn,  !- <none>
+!    SET VAV_1_NightCycleStatus = CycleOn,  !- <none>
+!    RETURN,                  !- <none>
+!    ELSEIF Tmin > VAV1_heating_TurnOff,  !- <none>
+!    SET VAV_1_NightCycleStatus = NoAction,  !- <none>
+!    ENDIF,                   !- <none>
+!    IF Tmax > VAV1_cooling_TurnOn,  !- <none>
+!    SET VAV_1_NightCycleStatus = CycleOn,  !- <none>
+!    ELSEIF Tmax < VAV1_cooling_TurnOff,  !- <none>
+!    SET VAV_1_NightCycleStatus = NoAction,  !- <none>
+!    ENDIF;                   !- <none>
 
   BranchList,
     VAV_1 Air Loop Branches, !- Name
@@ -8718,9 +8718,9 @@
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Program,
-    VAV_2_SchedSetpoint,     !- Name
-    SET VAV_2_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
+!  EnergyManagementSystem:Program,
+!    VAV_2_SchedSetpoint,     !- Name
+!    SET VAV_2_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
 
 !SetpointManager:MixedAir,
 !  VAV_2_CoolC SAT Manager,  !- Name
@@ -8737,15 +8737,15 @@
 !  VAV_2 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_2_HeatC-VAV_2_FanNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Sensor,
-    T_VAV2FanIn,             !- Name
-    VAV_2_HeatC-VAV_2_FanNode,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature; !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    T_VAV2FanIn,             !- Name
+!    VAV_2_HeatC-VAV_2_FanNode,  !- Output:Variable or Output:Meter Index Key Name
+!    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    T_VAV2FanOut,            !- Name
-    VAV_2 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature; !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    T_VAV2FanOut,            !- Name
+!    VAV_2 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
+!    System Node Temperature; !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Actuator,
     VAV_2_CoolC_Setpoint,    !- Name
@@ -8759,11 +8759,11 @@
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Program,
-    VAV2MixedAirManagers,    !- Name
-    SET VAV_2_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV2FanOut - T_VAV2FanIn),  !- Program Line 1
-    SET VAV_2_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV2FanOut - T_VAV2FanIn),  !- Program Line 2
-    SET VAV_2_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV2FanOut - T_VAV2FanIn);  !- <none>
+!  EnergyManagementSystem:Program,
+!    VAV2MixedAirManagers,    !- Name
+!    SET VAV_2_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV2FanOut - T_VAV2FanIn),  !- Program Line 1
+!    SET VAV_2_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV2FanOut - T_VAV2FanIn),  !- Program Line 2
+!    SET VAV_2_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV2FanOut - T_VAV2FanIn);  !- <none>
 
   Sizing:System,
     VAV_2,                   !- AirLoop Name
@@ -8816,69 +8816,69 @@
 !  1.0,  !- Thermostat Tolerance {delta C}
 !  1800;  !- Cycling Run Time {s}
 
-  EnergyManagementSystem:Actuator,
-    VAV_2_NightCycleStatus,  !- Name
-    VAV_2,                   !- Actuated Component Unique Name
-    AirLoopHVAC,             !- Actuated Component Type
-    Availability Status;     !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_2_NightCycleStatus,  !- Name
+!    VAV_2,                   !- Actuated Component Unique Name
+!    AirLoopHVAC,             !- Actuated Component Type
+!    Availability Status;     !- Actuated Component Control Type
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV2_1,             !- Name
-    Core_mid,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV2_1,             !- Name
+!    Core_mid,                !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV2_2,             !- Name
-    Perimeter_mid_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV2_2,             !- Name
+!    Perimeter_mid_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV2_3,             !- Name
-    Perimeter_mid_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV2_3,             !- Name
+!    Perimeter_mid_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV2_4,             !- Name
-    Perimeter_mid_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV2_4,             !- Name
+!    Perimeter_mid_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV2_5,             !- Name
-    Perimeter_mid_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV2_5,             !- Name
+!    Perimeter_mid_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
    ! find max and min for "cycleOnAny" operation
 
-  EnergyManagementSystem:Program,
-    VAV_2_NightCycleMGR,     !- Name
-    SET Toffset = 0.8333,    !- Program Line 1
-    SET NoAction = 0.0,      !- Program Line 2
-    SET ForceOff = 1.0,      !- <none>
-    SET CycleOn = 2.0,       !- <none>
-    SET CycleOnZoneFansOnly = 3,  !- <none>
-    SET VAV2_heating_TurnOn  = heating_setpoint,  !- <none>
-    SET VAV2_heating_TurnOff = heating_setpoint + (2*Toffset),  !- <none>
-    SET VAV2_cooling_TurnOn  = cooling_setpoint,  !- <none>
-    SET VAV2_cooling_TurnOff = cooling_setpoint - (2*Toffset),  !- <none>
-    SET Tmin = @MIN TzoneVAV2_1 TzoneVAV2_2,  !- <none>
-    SET Tmin = @MIN Tmin        TzoneVAV2_3,  !- <none>
-    SET Tmin = @MIN Tmin        TzoneVAV2_4,  !- <none>
-    SET Tmin = @MIN Tmin        TzoneVAV2_5,  !- <none>
-    SET Tmax = @MAX TzoneVAV2_1 TzoneVAV2_2,  !- <none>
-    SET Tmax = @MAX Tmax        TzoneVAV2_3,  !- <none>
-    SET Tmax = @MAX Tmax        TzoneVAV2_4,  !- <none>
-    SET Tmax = @MAX Tmax        TzoneVAV2_5,  !- <none>
-    IF Tmin < VAV2_heating_TurnOn,  !- <none>
-    SET VAV_2_NightCycleStatus = CycleOn,  !- <none>
-    RETURN,                  !- <none>
-    ELSEIF Tmin > VAV2_heating_TurnOff,  !- <none>
-    SET VAV_2_NightCycleStatus = NoAction,  !- <none>
-    ENDIF,                   !- <none>
-    IF Tmax > VAV2_cooling_TurnOn,  !- <none>
-    SET VAV_2_NightCycleStatus = CycleOn,  !- <none>
-    ELSEIF Tmax < VAV2_cooling_TurnOff,  !- <none>
-    SET VAV_2_NightCycleStatus = NoAction,  !- <none>
-    ENDIF;                   !- <none>
+!  EnergyManagementSystem:Program,
+!    VAV_2_NightCycleMGR,     !- Name
+!    SET Toffset = 0.8333,    !- Program Line 1
+!    SET NoAction = 0.0,      !- Program Line 2
+!    SET ForceOff = 1.0,      !- <none>
+!    SET CycleOn = 2.0,       !- <none>
+!    SET CycleOnZoneFansOnly = 3,  !- <none>
+!    SET VAV2_heating_TurnOn  = heating_setpoint,  !- <none>
+!    SET VAV2_heating_TurnOff = heating_setpoint + (2*Toffset),  !- <none>
+!    SET VAV2_cooling_TurnOn  = cooling_setpoint,  !- <none>
+!    SET VAV2_cooling_TurnOff = cooling_setpoint - (2*Toffset),  !- <none>
+!    SET Tmin = @MIN TzoneVAV2_1 TzoneVAV2_2,  !- <none>
+!    SET Tmin = @MIN Tmin        TzoneVAV2_3,  !- <none>
+!    SET Tmin = @MIN Tmin        TzoneVAV2_4,  !- <none>
+!    SET Tmin = @MIN Tmin        TzoneVAV2_5,  !- <none>
+!    SET Tmax = @MAX TzoneVAV2_1 TzoneVAV2_2,  !- <none>
+!    SET Tmax = @MAX Tmax        TzoneVAV2_3,  !- <none>
+!    SET Tmax = @MAX Tmax        TzoneVAV2_4,  !- <none>
+!    SET Tmax = @MAX Tmax        TzoneVAV2_5,  !- <none>
+!    IF Tmin < VAV2_heating_TurnOn,  !- <none>
+!    SET VAV_2_NightCycleStatus = CycleOn,  !- <none>
+!    RETURN,                  !- <none>
+!    ELSEIF Tmin > VAV2_heating_TurnOff,  !- <none>
+!    SET VAV_2_NightCycleStatus = NoAction,  !- <none>
+!    ENDIF,                   !- <none>
+!    IF Tmax > VAV2_cooling_TurnOn,  !- <none>
+!    SET VAV_2_NightCycleStatus = CycleOn,  !- <none>
+!    ELSEIF Tmax < VAV2_cooling_TurnOff,  !- <none>
+!    SET VAV_2_NightCycleStatus = NoAction,  !- <none>
+!    ENDIF;                   !- <none>
 
   BranchList,
     VAV_2 Air Loop Branches, !- Name
@@ -9108,9 +9108,9 @@
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Program,
-    VAV_3_SchedSetpoint,     !- Name
-    SET VAV_3_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
+!  EnergyManagementSystem:Program,
+!    VAV_3_SchedSetpoint,     !- Name
+!    SET VAV_3_SAT_setpoint = Seasonal_Reset_SAT_Sched;  !- Program Line 1
 
 !SetpointManager:MixedAir,
 !  VAV_3_CoolC SAT Manager,  !- Name
@@ -9127,15 +9127,15 @@
 !  VAV_3 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_3_HeatC-VAV_3_FanNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Sensor,
-    T_VAV3FanIn,             !- Name
-    VAV_3_HeatC-VAV_3_FanNode,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature; !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    T_VAV3FanIn,             !- Name
+!    VAV_3_HeatC-VAV_3_FanNode,  !- Output:Variable or Output:Meter Index Key Name
+!    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    T_VAV3FanOut,            !- Name
-    VAV_3 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature; !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    T_VAV3FanOut,            !- Name
+!    VAV_3 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
+!    System Node Temperature; !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Actuator,
     VAV_3_CoolC_Setpoint,    !- Name
@@ -9149,11 +9149,11 @@
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Program,
-    VAV3MixedAirManagers,    !- Name
-    SET VAV_3_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV3FanOut - T_VAV3FanIn),  !- Program Line 1
-    SET VAV_3_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV3FanOut - T_VAV3FanIn),  !- Program Line 2
-    SET VAV_3_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV3FanOut - T_VAV3FanIn);  !- <none>
+!  EnergyManagementSystem:Program,
+!    VAV3MixedAirManagers,    !- Name
+!    SET VAV_3_CoolC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV3FanOut - T_VAV3FanIn),  !- Program Line 1
+!    SET VAV_3_HeatC_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV3FanOut - T_VAV3FanIn),  !- Program Line 2
+!    SET VAV_3_OA_Setpoint = Seasonal_Reset_SAT_Sched - ( T_VAV3FanOut - T_VAV3FanIn);  !- <none>
 
   Sizing:System,
     VAV_3,                   !- AirLoop Name
@@ -9206,69 +9206,69 @@
 !  1.0,  !- Thermostat Tolerance {delta C}
 !  1800;  !- Cycling Run Time {s}
 
-  EnergyManagementSystem:Actuator,
-    VAV_3_NightCycleStatus,  !- Name
-    VAV_3,                   !- Actuated Component Unique Name
-    AirLoopHVAC,             !- Actuated Component Type
-    Availability Status;     !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_3_NightCycleStatus,  !- Name
+!    VAV_3,                   !- Actuated Component Unique Name
+!    AirLoopHVAC,             !- Actuated Component Type
+!    Availability Status;     !- Actuated Component Control Type
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV3_1,             !- Name
-    Core_top,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV3_1,             !- Name
+!    Core_top,                !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV3_2,             !- Name
-    Perimeter_top_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV3_2,             !- Name
+!    Perimeter_top_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV3_3,             !- Name
-    Perimeter_top_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV3_3,             !- Name
+!    Perimeter_top_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV3_4,             !- Name
-    Perimeter_top_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV3_4,             !- Name
+!    Perimeter_top_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Sensor,
-    TzoneVAV3_5,             !- Name
-    Perimeter_top_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    TzoneVAV3_5,             !- Name
+!    Perimeter_top_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
+!    Zone Mean Air Temperature;  !- Output:Variable or Output:Meter Name
 
    ! find max and min for "cycleOnAny" operation
 
-  EnergyManagementSystem:Program,
-    VAV_3_NightCycleMGR,     !- Name
-    SET Toffset = 0.8333,    !- Program Line 1
-    SET NoAction = 0.0,      !- Program Line 2
-    SET ForceOff = 1.0,      !- <none>
-    SET CycleOn = 2.0,       !- <none>
-    SET CycleOnZoneFansOnly = 3,  !- <none>
-    SET VAV3_heating_TurnOn  = heating_setpoint,  !- <none>
-    SET VAV3_heating_TurnOff = heating_setpoint + (2*Toffset),  !- <none>
-    SET VAV3_cooling_TurnOn  = cooling_setpoint,  !- <none>
-    SET VAV3_cooling_TurnOff = cooling_setpoint - (2*Toffset),  !- <none>
-    SET Tmin = @MIN TzoneVAV3_1 TzoneVAV3_2,  !- <none>
-    SET Tmin = @MIN Tmin        TzoneVAV3_3,  !- <none>
-    SET Tmin = @MIN Tmin        TzoneVAV3_4,  !- <none>
-    SET Tmin = @MIN Tmin        TzoneVAV3_5,  !- <none>
-    SET Tmax = @MAX TzoneVAV3_1 TzoneVAV3_2,  !- <none>
-    SET Tmax = @MAX Tmax        TzoneVAV3_3,  !- <none>
-    SET Tmax = @MAX Tmax        TzoneVAV3_4,  !- <none>
-    SET Tmax = @MAX Tmax        TzoneVAV3_5,  !- <none>
-    IF Tmin < VAV3_heating_TurnOn,  !- <none>
-    SET VAV_3_NightCycleStatus = CycleOn,  !- <none>
-    RETURN,                  !- <none>
-    ELSEIF Tmin > VAV3_heating_TurnOff,  !- <none>
-    SET VAV_3_NightCycleStatus = NoAction,  !- <none>
-    ENDIF,                   !- <none>
-    IF Tmax > VAV3_cooling_TurnOn,  !- <none>
-    SET VAV_3_NightCycleStatus = CycleOn,  !- <none>
-    ELSEIF Tmax < VAV3_cooling_TurnOff,  !- <none>
-    SET VAV_3_NightCycleStatus = NoAction,  !- <none>
-    ENDIF;                   !- <none>
+!  EnergyManagementSystem:Program,
+!    VAV_3_NightCycleMGR,     !- Name
+!    SET Toffset = 0.8333,    !- Program Line 1
+!    SET NoAction = 0.0,      !- Program Line 2
+!    SET ForceOff = 1.0,      !- <none>
+!    SET CycleOn = 2.0,       !- <none>
+!    SET CycleOnZoneFansOnly = 3,  !- <none>
+!    SET VAV3_heating_TurnOn  = heating_setpoint,  !- <none>
+!    SET VAV3_heating_TurnOff = heating_setpoint + (2*Toffset),  !- <none>
+!    SET VAV3_cooling_TurnOn  = cooling_setpoint,  !- <none>
+!    SET VAV3_cooling_TurnOff = cooling_setpoint - (2*Toffset),  !- <none>
+!    SET Tmin = @MIN TzoneVAV3_1 TzoneVAV3_2,  !- <none>
+!    SET Tmin = @MIN Tmin        TzoneVAV3_3,  !- <none>
+!    SET Tmin = @MIN Tmin        TzoneVAV3_4,  !- <none>
+!    SET Tmin = @MIN Tmin        TzoneVAV3_5,  !- <none>
+!    SET Tmax = @MAX TzoneVAV3_1 TzoneVAV3_2,  !- <none>
+!    SET Tmax = @MAX Tmax        TzoneVAV3_3,  !- <none>
+!    SET Tmax = @MAX Tmax        TzoneVAV3_4,  !- <none>
+!    SET Tmax = @MAX Tmax        TzoneVAV3_5,  !- <none>
+!    IF Tmin < VAV3_heating_TurnOn,  !- <none>
+!    SET VAV_3_NightCycleStatus = CycleOn,  !- <none>
+!    RETURN,                  !- <none>
+!    ELSEIF Tmin > VAV3_heating_TurnOff,  !- <none>
+!    SET VAV_3_NightCycleStatus = NoAction,  !- <none>
+!    ENDIF,                   !- <none>
+!    IF Tmax > VAV3_cooling_TurnOn,  !- <none>
+!    SET VAV_3_NightCycleStatus = CycleOn,  !- <none>
+!    ELSEIF Tmax < VAV3_cooling_TurnOff,  !- <none>
+!    SET VAV_3_NightCycleStatus = NoAction,  !- <none>
+!    ENDIF;                   !- <none>
 
   BranchList,
     VAV_3 Air Loop Branches, !- Name
@@ -9478,10 +9478,10 @@
 !  SHWSys1-Loop-Temp-Schedule,  !- Schedule Name
 !  SHWSys1 Supply Outlet Node;  !- Setpoint Node Name
 
-  EnergyManagementSystem:Sensor,
-    SHWSys1_Loop_Temp_Schedule,  !- Name
-    SHWSys1-Loop-Temp-Schedule,  !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value;          !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    SHWSys1_Loop_Temp_Schedule,  !- Name
+!    SHWSys1-Loop-Temp-Schedule,  !- Output:Variable or Output:Meter Index Key Name
+!    Schedule Value;          !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Actuator,
     SHWSys1_Loop_Setpoint,   !- Name
@@ -9489,9 +9489,9 @@
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Program,
-    SHWSys1_SchedSetpoint,   !- Name
-    SET SHWSys1_Loop_Setpoint = SHWSys1_Loop_Temp_Schedule;  !- Program Line 1
+!  EnergyManagementSystem:Program,
+!    SHWSys1_SchedSetpoint,   !- Name
+!    SET SHWSys1_Loop_Setpoint = SHWSys1_Loop_Temp_Schedule;  !- Program Line 1
 
   PlantEquipmentOperationSchemes,
     SHWSys1 Loop Operation Scheme List,  !- Name
@@ -9787,10 +9787,10 @@
     HW-Loop-Temp-Schedule,   !- Schedule Name
     HeatSys1 Supply Outlet Node;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Sensor,
-    HW_Loop_Temp_Schedule,   !- Name
-    HW-Loop-Temp-Schedule,   !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value;          !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    HW_Loop_Temp_Schedule,   !- Name
+!    HW-Loop-Temp-Schedule,   !- Output:Variable or Output:Meter Index Key Name
+!    Schedule Value;          !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Actuator,
     HeatSys1_Loop_Setpoint,  !- Name
@@ -9798,9 +9798,9 @@
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Program,
-    HeatSys1_SchedSetpoint,  !- Name
-    SET HeatSys1_Loop_Setpoint = HW_Loop_Temp_Schedule;  !- Program Line 1
+!  EnergyManagementSystem:Program,
+!    HeatSys1_SchedSetpoint,  !- Name
+!    SET HeatSys1_Loop_Setpoint = HW_Loop_Temp_Schedule;  !- Program Line 1
 
   PlantEquipmentOperationSchemes,
     HeatSys1 Loop Operation Scheme List,  !- Name
@@ -10245,10 +10245,10 @@
 !  CW-Loop-Temp-Schedule,  !- Schedule Name
 !  CoolSys1 Supply Outlet Node;  !- Setpoint Node Name
 
-  EnergyManagementSystem:Sensor,
-    CW_Loop_Temp_Schedule,   !- Name
-    CW-Loop-Temp-Schedule,   !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value;          !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    CW_Loop_Temp_Schedule,   !- Name
+!    CW-Loop-Temp-Schedule,   !- Output:Variable or Output:Meter Index Key Name
+!    Schedule Value;          !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Actuator,
     CoolSys1_Loop_Setpoint,  !- Name
@@ -10256,9 +10256,9 @@
     System Node Setpoint,    !- Actuated Component Type
     Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Program,
-    CoolSys1_SchedSetpoint,  !- Name
-    SET CoolSys1_Loop_Setpoint = CW_Loop_Temp_Schedule;  !- Program Line 1
+!  EnergyManagementSystem:Program,
+!    CoolSys1_SchedSetpoint,  !- Name
+!    SET CoolSys1_Loop_Setpoint = CW_Loop_Temp_Schedule;  !- Program Line 1
 
   PlantEquipmentOperationSchemes,
     CoolSys1 Loop Operation Scheme List,  !- Name
@@ -11614,32 +11614,40 @@
 
   Output:Variable,*,Zone Air Heat Balance System Air Transfer Rate,hourly;
 
-  EnergyManagementSystem:Sensor,
-    Seasonal_Reset_SAT_Sched,!- Name
-    Seasonal-Reset-Supply-Air-Temp-Sch,  !- Output:Variable or Output:Meter Index Key Name
-    Schedule Value;          !- Output:Variable or Output:Meter Name
+!  EnergyManagementSystem:Sensor,
+!    Seasonal_Reset_SAT_Sched,!- Name
+!    Seasonal-Reset-Supply-Air-Temp-Sch,  !- Output:Variable or Output:Meter Index Key Name
+!    Schedule Value;          !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:ProgramCallingManager,
+!  EnergyManagementSystem:ProgramCallingManager,
+!    EMS-based Setpoint Managers,  !- Name
+!    AfterPredictorAfterHVACManagers,  !- EnergyPlus Model Calling Point
+!    VAV_5_SchedSetpoint,     !- Program Name 1
+!    VAV5MixedAirManagers,    !- Program Name 2
+!    VAV_1_SchedSetpoint,     !- Program Name 3
+!    VAV1MixedAirManagers,    !- Program Name 4
+!    VAV_3_SchedSetpoint,     !- Program Name 5
+!    VAV3MixedAirManagers,    !- Program Name 6
+!    VAV_2_SchedSetpoint,     !- Program Name 7
+!    VAV2MixedAirManagers,    !- Program Name 8
+!    CoolSys1_SchedSetpoint,  !- Program Name 9
+!    HeatSys1_SchedSetpoint,  !- Program Name 10
+!    SHWSys1_SchedSetpoint,   !- Program Name 11
+!    VAV_5_NightCycleMGR,     !- Program Name 12
+!    VAV_1_NightCycleMGR,     !- Program Name 13
+!    VAV_2_NightCycleMGR,     !- Program Name 14
+!    VAV_3_NightCycleMGR;     !- Program Name 15
+
+  PythonPlugin:Instance,
     EMS-based Setpoint Managers,  !- Name
-    AfterPredictorAfterHVACManagers,  !- EnergyPlus Model Calling Point
-    VAV_5_SchedSetpoint,     !- Program Name 1
-    VAV5MixedAirManagers,    !- Program Name 2
-    VAV_1_SchedSetpoint,     !- Program Name 3
-    VAV1MixedAirManagers,    !- Program Name 4
-    VAV_3_SchedSetpoint,     !- Program Name 5
-    VAV3MixedAirManagers,    !- Program Name 6
-    VAV_2_SchedSetpoint,     !- Program Name 7
-    VAV2MixedAirManagers,    !- Program Name 8
-    CoolSys1_SchedSetpoint,  !- Program Name 9
-    HeatSys1_SchedSetpoint,  !- Program Name 10
-    SHWSys1_SchedSetpoint,   !- Program Name 11
-    VAV_5_NightCycleMGR,     !- Program Name 12
-    VAV_1_NightCycleMGR,     !- Program Name 13
-    VAV_2_NightCycleMGR,     !- Program Name 14
-    VAV_3_NightCycleMGR;     !- Program Name 15
+    Yes,                     !- Run During Warmup Days
+    PythonPluginReplaceTraditionalManagers_LargeOffice, !- Python Module Name
+    PythonSetpointManagers;        !- Plugin Class Name
 
   Output:EnergyManagementSystem,
     Verbose,                 !- Actuator Availability Dictionary Reporting
     Verbose,                 !- Internal Variable Availability Dictionary Reporting
     ErrorsOnly;              !- EMS Runtime Language Debug Output Level
 
+  Output:Variable,*,System Node Temperature,hourly;
+  Output:Variable,*,Schedule Value,hourly;

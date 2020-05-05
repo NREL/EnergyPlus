@@ -68,7 +68,7 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
     PlantChillers::GTChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
     PlantChillers::GTChiller(1).HeatRecCapacityFraction = 0.5;
     PlantChillers::GTChiller(1).HeatRecActive = true;
-    PlantChillers::GTChiller(1).CondenserType = PlantChillers::WaterCooled;
+    PlantChillers::GTChiller(1).CondenserType = PlantChillers::CondType::WaterCooled;
     PlantChillers::GTChiller(1).CWLoopNum = 1;
     PlantChillers::GTChiller(1).CDLoopNum = 2;
     PlantChillers::GTChiller(1).EvapVolFlowRate = 1.0;
@@ -105,7 +105,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
     PlantChillers::EngineDrivenChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
     PlantChillers::EngineDrivenChiller(1).HeatRecCapacityFraction = 0.5;
     PlantChillers::EngineDrivenChiller(1).HeatRecActive = true;
-    PlantChillers::EngineDrivenChiller(1).CondenserType = PlantChillers::WaterCooled;
+    PlantChillers::EngineDrivenChiller(1).CondenserType = PlantChillers::CondType::WaterCooled;
     PlantChillers::EngineDrivenChiller(1).CWLoopNum = 1;
     PlantChillers::EngineDrivenChiller(1).CDLoopNum = 2;
     PlantChillers::EngineDrivenChiller(1).EvapVolFlowRate = 1.0;
