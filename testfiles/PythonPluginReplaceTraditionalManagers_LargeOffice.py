@@ -42,12 +42,12 @@ class PythonSetpointManagers(EnergyPlusPlugin):
             "VAV_5_HeatC-VAV_5_FanNode"
         )
         self.handles["VAV_5_CoolC_Setpoint"] = self.e.get_actuator_handle(
-            "System Node Temperature",
+            "System Node Setpoint",
             "Temperature Setpoint",
             "VAV_5_CoolC-VAV_5_HeatCNode"
         )
         self.handles["VAV_5_HeatC_Setpoint"] = self.e.get_actuator_handle(
-            "System Node Temperature",
+            "System Node Setpoint",
             "Temperature Setpoint",
             "VAV_5_HeatC-VAV_5_FanNode"
         )
@@ -75,22 +75,22 @@ class PythonSetpointManagers(EnergyPlusPlugin):
             "VAV_1_HeatC-VAV_1_FanNode"
         )
         self.handles["VAV_1_HeatC_Setpoint"] = self.e.get_actuator_handle(
-            "System Node Temperature",
+            "System Node Setpoint",
             "Temperature Setpoint",
             "VAV_1_HeatC-VAV_1_FanNode"
         )
         self.handles["VAV_1_OA_Setpoint"] = self.e.get_actuator_handle(
-            "System Node Temperature",
+            "System Node Setpoint",
             "Temperature Setpoint",
             "VAV_1_OA-VAV_1_CoolCNode"
         )
         self.handles["VAV_3_SAT_setpoint"] = self.e.get_actuator_handle(
-            "System Node Temperature",
+            "System Node Setpoint",
             "Temperature Setpoint",
             "VAV_3 Supply Equipment Outlet Node"
         )
         self.handles["VAV_3_CoolC_Setpoint"] = self.e.get_actuator_handle(
-            "System Node Temperature",
+            "System Node Setpoint",
             "Temperature Setpoint",
             "VAV_3_CoolC-VAV_3_HeatCNode"
         )
@@ -103,7 +103,7 @@ class PythonSetpointManagers(EnergyPlusPlugin):
             "VAV_3_HeatC-VAV_3_FanNode"
         )
         self.handles["VAV_2_SAT_setpoint"] = self.e.get_actuator_handle(
-            "System Node Temperature",
+            "System Node Setpoint",
             "Temperature Setpoint",
             "VAV_2 Supply Equipment Outlet Node"
         )
@@ -221,7 +221,7 @@ class PythonSetpointManagers(EnergyPlusPlugin):
         )
         self.handles["VAV_2_NightCycleStatus"] = self.e.get_actuator_handle(
             "AirLoopHVAC",
-            "Availability Schedule",
+            "Availability Status",
             "VAV_2"
         )
         self.handles["VAV_3_HeatC_Setpoint"] = self.e.get_actuator_handle(
@@ -231,7 +231,7 @@ class PythonSetpointManagers(EnergyPlusPlugin):
         )
         self.handles["VAV_3_NightCycleStatus"] = self.e.get_actuator_handle(
             "AirLoopHVAC",
-            "Availability Schedule",
+            "Availability Status",
             "VAV_3"
         )
         self.handles["TzoneVAV3_1"] = self.e.get_variable_handle(
@@ -255,7 +255,7 @@ class PythonSetpointManagers(EnergyPlusPlugin):
             "Perimeter_top_ZN_4"
         )
         self.handles["VAV_3_OA_Setpoint"] = self.e.get_actuator_handle(
-            "System Node Temperature",
+            "System Node Setpoint",
             "Temperature Setpoint",
             "VAV_3_OA-VAV_3_CoolCNode"
         )
@@ -265,17 +265,13 @@ class PythonSetpointManagers(EnergyPlusPlugin):
             "HeatSys1 Supply Equipment Outlet Node"
         )
 
-
     def handles_are_valid(self):
         handles_are_valid = True
-
         for (k, v) in self.handles.items():
             if v == -1:
                 handles_are_valid = False
                 self.api.runtime.issue_severe(f"Handle not found for '{k}'")
-
         print(handles_are_valid)
-
         return handles_are_valid
 
     def vav_5_sched_setpoint(self):
@@ -450,29 +446,25 @@ class PythonSetpointManagers(EnergyPlusPlugin):
             self.e.set_actuator_value(self.handles["VAV_3_NightCycleStatus"], self.NoAction)
 
     def on_after_predictor_after_hvac_managers(self) -> int:
-
-        print("\tEntry point")
-
-        if self.e.api_data_fully_ready():
-            if self.need_to_get_handles:
-                self.get_handles()
-                if not self.handles_are_valid():
-                    return 1
-            self.vav_5_sched_setpoint()
-            self.vav_5_mixed_air_managers()
-            self.vav_1_sched_setpoint()
-            self.vav_1_mixed_air_managers()
-            self.vav_3_sched_setpoint()
-            self.vav_3_mixed_air_managers()
-            self.vav_2_sched_setpoint()
-            self.vav_2_mixed_air_managers()
-            self.cool_sys_1_sched_setpoint()
-            self.heat_sys_1_sched_setpoint()
-            self.shw_sys_1_sched_setpoint()
-            self.vav_5_night_cycle_mgr()
-            self.vav_1_night_cycle_mgr()
-            self.vav_2_night_cycle_mgr()
-            self.vav_3_night_cycle_mgr()
-
-        else:
+        if not self.e.api_data_fully_ready():
             return 0
+        if self.need_to_get_handles:
+            self.get_handles()
+            if not self.handles_are_valid():
+                return 1
+        self.vav_5_sched_setpoint()
+        self.vav_5_mixed_air_managers()
+        self.vav_1_sched_setpoint()
+        self.vav_1_mixed_air_managers()
+        self.vav_3_sched_setpoint()
+        self.vav_3_mixed_air_managers()
+        self.vav_2_sched_setpoint()
+        self.vav_2_mixed_air_managers()
+        self.cool_sys_1_sched_setpoint()
+        self.heat_sys_1_sched_setpoint()
+        self.shw_sys_1_sched_setpoint()
+        self.vav_5_night_cycle_mgr()
+        self.vav_1_night_cycle_mgr()
+        self.vav_2_night_cycle_mgr()
+        self.vav_3_night_cycle_mgr()
+        return 0
