@@ -62,29 +62,58 @@ struct ExteriorEnergyUseData;
 
 namespace ExteriorEnergyUse {
 
-    // Using/Aliasing
+    enum class ExteriorFuelUsage {
+        Unknown = 0,
+        ElecUse = 1,
+        GasUse = 2,
+        WaterUse = 3,
+        CoalUse = 4,
+        FuelOil1Use = 5,
+        FuelOil2Use = 6,
+        PropaneUse = 7,
+        GasolineUse = 8,
+        DieselUse = 9,
+        SteamUse = 10,
+        DistrictCoolUse = 11,
+        DistrictHeatUse = 12,
+        OtherFuel1Use = 13,
+        OtherFuel2Use = 14
+    };
 
-    // Data
+    enum class LightControlType {
+        ScheduleOnly = 1,      // exterior lights only on schedule
+        AstroClockOverride = 2 // exterior lights controlled to turn off during day.
+    };
 
-    // DERIVED TYPE DEFINITIONS:
+    struct ExteriorLightUsage
+    {
+        // Members
+        std::string Name;          // Descriptive name -- will show on reporting
+        int SchedPtr;              // Can be scheduled
+        Real64 DesignLevel;        // Consumption in Watts
+        Real64 Power;              // Power = DesignLevel * ScheduleValue
+        Real64 CurrentUse;         // Use for this time step
+        LightControlType ControlMode;           // Control mode Schedule Only or Astronomical Clock plus schedule
+        bool ManageDemand;         // Flag to indicate whether to use demand limiting
+        Real64 DemandLimit;        // Demand limit set by demand manager [W]
+        bool PowerActuatorOn;      // EMS flag
+        Real64 PowerActuatorValue; // EMS value
+        Real64 SumConsumption;     // sum of electric consumption [J] for reporting
+        Real64 SumTimeNotZeroCons; // sum of time of positive electric consumption [hr]
 
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>
-
-    // Clears the global data in ExteriorEnergyUse.
-    // Needed for unit tests, should not be normally called.
-    //void clear_state();
-
-    // Name Public routines, optionally name Private routines within this module
-
-    // Types
+        // Default Constructor
+        ExteriorLightUsage()
+                : SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ControlMode(LightControlType::ScheduleOnly), ManageDemand(false), DemandLimit(0.0),
+                  PowerActuatorOn(false), PowerActuatorValue(0.0), SumConsumption(0.0), SumTimeNotZeroCons(0.0)
+        {
+        }
+    };
 
     struct ExteriorEquipmentUsage
     {
         // Members
         std::string Name; // Descriptive name -- will show on reporting
-        int FuelType;
+        ExteriorFuelUsage FuelType;
         int SchedPtr;       // Can be scheduled
         Real64 DesignLevel; // Design Consumption (Watts, except for Water Equipment)
         Real64 Power;       // Power = DesignLevel * ScheduleValue
@@ -93,19 +122,16 @@ namespace ExteriorEnergyUse {
         Real64 DemandLimit; // Demand limit set by demand manager [W]
 
                             // Default Constructor
-        ExteriorEquipmentUsage() : FuelType(0), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
+        ExteriorEquipmentUsage() : FuelType(ExteriorFuelUsage::Unknown), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
         {
         }
     };
-    // Object Data
-
-    // Functions
 
     void ManageExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
 
     void GetExteriorEnergyUseInput(ExteriorEnergyUseData &exteriorEnergyUse);
 
-    void ValidateFuelType(ExteriorEnergyUseData const &exteriorEnergyUse, int &FuelTypeNumber,                    // Fuel Type to be set in structure.
+    void ValidateFuelType(ExteriorFuelUsage &FuelTypeNumber,                    // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,       // Fuel Type String
                           std::string &FuelTypeString,            // Standardized Fuel Type String (for variable naming)
                           std::string const &CurrentModuleObject, // object being parsed

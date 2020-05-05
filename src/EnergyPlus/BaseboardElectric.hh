@@ -57,6 +57,8 @@
 
 namespace EnergyPlus {
 
+    struct EnergyPlusData;
+
 namespace BaseboardElectric {
 
     // Using/Aliasing
@@ -125,7 +127,7 @@ namespace BaseboardElectric {
 
     void clear_state();
 
-    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
+    void SimElectricBaseboard(EnergyPlus::EnergyPlusData &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
 
     void GetBaseboardInput();
 

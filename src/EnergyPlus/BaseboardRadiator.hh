@@ -57,9 +57,7 @@
 
 namespace EnergyPlus {
 
-// Note: This file contains two modules:
-// Module BaseboardRadiator -- (ref: Object: ZoneHVAC:Baseboard:Convective:Water)
-// Module BaseboardElectric -- (ref: Object: ZoneHVAC:Baseboard:Convective:Electric)
+    struct EnergyPlusData;
 
 namespace BaseboardRadiator {
 
@@ -184,12 +182,6 @@ namespace BaseboardRadiator {
     );
 
 } // namespace BaseboardRadiator
-
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//******************************************************************************************************
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//******************************************************************************************************
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 } // namespace EnergyPlus
 

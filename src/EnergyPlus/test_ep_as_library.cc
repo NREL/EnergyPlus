@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
         return EXIT_FAILURE;
     } else {
-        EnergyPlusData state;
+        EnergyPlus::EnergyPlusData state;
         status = RunEnergyPlus(state, argv[1]);
     }
     if (!std::cin.good()) std::cin.clear();

@@ -64,8 +64,6 @@ namespace EnergyPlus {
 
 namespace ExteriorEnergyUse {
 
-    // Module containing the routines dealing with the reporting of Exterior Energy Usage Elements
-
     // MODULE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   January 2001
@@ -77,30 +75,9 @@ namespace ExteriorEnergyUse {
     // affect simulation results for the energy usage in a building but may affect the "metered"
     // usage of a facility.
 
-    // METHODOLOGY EMPLOYED:
-    // No simulation, this is just reporting consumption.
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::TimeStepZone;
     using DataGlobals::TimeStepZoneSec;
-
-    // Functions
-    //std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
-
-    // Clears the global data in ExteriorEnergyUse.
-    // Needed for unit tests, should not be normally called.
-   // void clear_state()
-    //{        
-//        UniqueExteriorEquipNames.clear();
-//        GetExteriorEnergyInputFlag = true;
-    //}
 
     void ManageExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse)
     {
@@ -219,11 +196,11 @@ namespace ExteriorEnergyUse {
                 }
             }
             if (lAlphaFieldBlanks(3)) {
-                exteriorEnergyUse.ExteriorLights(Item).ControlMode = exteriorEnergyUse.ScheduleOnly;
+                exteriorEnergyUse.ExteriorLights(Item).ControlMode = LightControlType::ScheduleOnly;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "ScheduleNameOnly")) {
-                exteriorEnergyUse.ExteriorLights(Item).ControlMode = exteriorEnergyUse.ScheduleOnly;
+                exteriorEnergyUse.ExteriorLights(Item).ControlMode = LightControlType::ScheduleOnly;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "AstronomicalClock")) {
-                exteriorEnergyUse.ExteriorLights(Item).ControlMode = exteriorEnergyUse.AstroClockOverride;
+                exteriorEnergyUse.ExteriorLights(Item).ControlMode = LightControlType::AstroClockOverride;
             } else {
                 ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3) + " for " +
                                 cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -262,7 +239,7 @@ namespace ExteriorEnergyUse {
             // entries for predefined tables
             PreDefTableEntry(pdchExLtPower, exteriorEnergyUse.ExteriorLights(Item).Name, exteriorEnergyUse.ExteriorLights(Item).DesignLevel);
             sumDesignLevel += exteriorEnergyUse.ExteriorLights(Item).DesignLevel;
-            if (exteriorEnergyUse.ExteriorLights(Item).ControlMode == exteriorEnergyUse.AstroClockOverride) { // photocell/schedule
+            if (exteriorEnergyUse.ExteriorLights(Item).ControlMode == LightControlType::AstroClockOverride) { // photocell/schedule
                 PreDefTableEntry(pdchExLtClock, exteriorEnergyUse.ExteriorLights(Item).Name, "AstronomicalClock");
                 PreDefTableEntry(pdchExLtSchd, exteriorEnergyUse.ExteriorLights(Item).Name, "-");
             } else {
@@ -299,9 +276,8 @@ namespace ExteriorEnergyUse {
                 EndUseSubcategoryName = "General";
             }
 
-            ValidateFuelType(exteriorEnergyUse,
-                exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType, cAlphaArgs(2), TypeString, cCurrentModuleObject, cAlphaFieldNames(2), cAlphaArgs(2));
-            if (exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType == 0) {
+            ValidateFuelType(exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType, cAlphaArgs(2), TypeString, cCurrentModuleObject, cAlphaFieldNames(2), cAlphaArgs(2));
+            if (exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType == ExteriorFuelUsage::Unknown) {
                 if (lAlphaFieldBlanks(2)) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(2) + " is required, missing for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -311,7 +287,7 @@ namespace ExteriorEnergyUse {
                 }
                 ErrorsFound = true;
             } else {
-                if (exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType != exteriorEnergyUse.WaterUse) {
+                if (exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType != ExteriorFuelUsage::WaterUse) {
                     SetupOutputVariable("Exterior Equipment Fuel Rate",
                                         OutputProcessor::Unit::W,
                                         exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Power,
@@ -398,7 +374,7 @@ namespace ExteriorEnergyUse {
 
             ++exteriorEnergyUse.NumExteriorEqs;
             exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).Name = cAlphaArgs(1);
-            exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType = exteriorEnergyUse.WaterUse;
+            exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).FuelType = ExteriorFuelUsage::WaterUse;
             exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
             if (exteriorEnergyUse.ExteriorEquipment(exteriorEnergyUse.NumExteriorEqs).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
@@ -470,7 +446,7 @@ namespace ExteriorEnergyUse {
         }
     }
 
-    void ValidateFuelType(ExteriorEnergyUseData const &exteriorEnergyUse, int &FuelTypeNumber,                    // Fuel Type to be set in structure.
+    void ValidateFuelType(ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber,                    // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,       // Fuel Type String
                           std::string &FuelTypeString,            // Standardized Fuel Type String (for variable naming)
                           std::string const &CurrentModuleObject, // object being parsed
@@ -494,51 +470,51 @@ namespace ExteriorEnergyUse {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        FuelTypeNumber = 0;
+        FuelTypeNumber = ExteriorFuelUsage::Unknown;
         FuelTypeString = "";
 
         // Select the correct Number for the associated ascii name for the fuel type
         if (UtilityRoutines::SameString(FuelTypeAlpha, "Electricity")) {
-            FuelTypeNumber = exteriorEnergyUse.ElecUse;
+            FuelTypeNumber = ExteriorFuelUsage::ElecUse;
             FuelTypeString = "Electric";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "NaturalGas")) {
-            FuelTypeNumber = exteriorEnergyUse.GasUse;
+            FuelTypeNumber = ExteriorFuelUsage::GasUse;
             FuelTypeString = "Gas";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Coal")) {
-            FuelTypeNumber = exteriorEnergyUse.CoalUse;
+            FuelTypeNumber = ExteriorFuelUsage::CoalUse;
             FuelTypeString = "Coal";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo1")) {
-            FuelTypeNumber = exteriorEnergyUse.FuelOil1Use;
+            FuelTypeNumber = ExteriorFuelUsage::FuelOil1Use;
             FuelTypeString = "FuelOil#1";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Propane")) {
-            FuelTypeNumber = exteriorEnergyUse.PropaneUse;
+            FuelTypeNumber = ExteriorFuelUsage::PropaneUse;
             FuelTypeString = "Propane";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Gasoline")) {
-            FuelTypeNumber = exteriorEnergyUse.GasolineUse;
+            FuelTypeNumber = ExteriorFuelUsage::GasolineUse;
             FuelTypeString = "Gasoline";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Diesel")) {
-            FuelTypeNumber = exteriorEnergyUse.DieselUse;
+            FuelTypeNumber = ExteriorFuelUsage::DieselUse;
             FuelTypeString = "Diesel";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo2")) {
-            FuelTypeNumber = exteriorEnergyUse.FuelOil2Use;
+            FuelTypeNumber = ExteriorFuelUsage::FuelOil2Use;
             FuelTypeString = "FuelOil#2";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel1")) {
-            FuelTypeNumber = exteriorEnergyUse.OtherFuel1Use;
+            FuelTypeNumber = ExteriorFuelUsage::OtherFuel1Use;
             FuelTypeString = "OtherFuel1";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel2")) {
-            FuelTypeNumber = exteriorEnergyUse.OtherFuel1Use;
+            FuelTypeNumber = ExteriorFuelUsage::OtherFuel1Use;
             FuelTypeString = "OtherFuel2";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Water")) {
-            FuelTypeNumber = exteriorEnergyUse.WaterUse;
+            FuelTypeNumber = ExteriorFuelUsage::WaterUse;
             FuelTypeString = "Water";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Steam")) {
-            FuelTypeNumber = exteriorEnergyUse.SteamUse;
+            FuelTypeNumber = ExteriorFuelUsage::SteamUse;
             FuelTypeString = "Steam";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictCooling")) {
-            FuelTypeNumber = exteriorEnergyUse.DistrictCoolUse;
+            FuelTypeNumber = ExteriorFuelUsage::DistrictCoolUse;
             FuelTypeString = "DistrictCooling";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeating")) {
-            FuelTypeNumber = exteriorEnergyUse.DistrictHeatUse;
+            FuelTypeNumber = ExteriorFuelUsage::DistrictHeatUse;
             FuelTypeString = "DistrictHeating";
         } else {
             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\".");
@@ -590,15 +566,12 @@ namespace ExteriorEnergyUse {
         int Item; // Loop Control
 
         for (Item = 1; Item <= exteriorEnergyUse.NumExteriorLights; ++Item) {
-            {
-                auto const SELECT_CASE_var(exteriorEnergyUse.ExteriorLights(Item).ControlMode);
-
-                if (SELECT_CASE_var == exteriorEnergyUse.ScheduleOnly) {
+            switch (exteriorEnergyUse.ExteriorLights(Item).ControlMode) {
+                case LightControlType::ScheduleOnly:
                     exteriorEnergyUse.ExteriorLights(Item).Power = exteriorEnergyUse.ExteriorLights(Item).DesignLevel * GetCurrentScheduleValue(exteriorEnergyUse.ExteriorLights(Item).SchedPtr);
                     exteriorEnergyUse.ExteriorLights(Item).CurrentUse = exteriorEnergyUse.ExteriorLights(Item).Power * TimeStepZoneSec;
-
-                } else if (SELECT_CASE_var == exteriorEnergyUse.AstroClockOverride) {
-
+                    break;
+                case LightControlType::AstroClockOverride:
                     if (SunIsUp) {
                         exteriorEnergyUse.ExteriorLights(Item).Power = 0.0;
                         exteriorEnergyUse.ExteriorLights(Item).CurrentUse = 0.0;
@@ -606,10 +579,10 @@ namespace ExteriorEnergyUse {
                         exteriorEnergyUse.ExteriorLights(Item).Power = exteriorEnergyUse.ExteriorLights(Item).DesignLevel * GetCurrentScheduleValue(exteriorEnergyUse.ExteriorLights(Item).SchedPtr);
                         exteriorEnergyUse.ExteriorLights(Item).CurrentUse = exteriorEnergyUse.ExteriorLights(Item).Power * TimeStepZoneSec;
                     }
-
-                } else {
-                    // should not occur
-                }
+                    break;
+                default:
+                    // should not happen
+                    break;
             }
 
             // Reduce lighting power due to demand limiting

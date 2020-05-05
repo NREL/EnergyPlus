@@ -54,10 +54,11 @@
 #include <unordered_map>
 #include <string>
 
-struct BaseGlobalStruct
-{
-    virtual void clear_state() = 0;
-};
+namespace EnergyPlus {
+
+    struct BaseGlobalStruct {
+        virtual void clear_state() = 0;
+    };
 
 //struct OutputReportTabular : BaseGlobalStruct
 //{
@@ -67,146 +68,95 @@ struct BaseGlobalStruct
 //    }
 //};
 
-struct DataGlobal : BaseGlobalStruct
-{
-    // Data
-    bool AnnualSimulation = false;
+    struct DataGlobal : BaseGlobalStruct {
+        // Data
+        bool AnnualSimulation = false;
 
-    // MODULE VARIABLE DECLARATIONS:
-    std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
+        // MODULE VARIABLE DECLARATIONS:
+        std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
 
-    // MODULE PARAMETER DEFINITIONS
-    static constexpr int EndZoneSizingCalc = 4;
+        // MODULE PARAMETER DEFINITIONS
+        static constexpr int EndZoneSizingCalc = 4;
 
-    void clear_state() override {
-        AnnualSimulation = false;
-        DayOfSimChr = "0";
-    }
-};
-
-struct ExteriorEnergyUseData : BaseGlobalStruct
-{
-    // MODULE PARAMETER DEFINITIONS:
-    int const ElecUse = 1;         // Electricity
-    int const GasUse = 2;          // Gas (Natural)
-    int const WaterUse = 3;        // Water
-    int const CoalUse = 4;         // Coal
-    int const FuelOil1Use = 5;     // FuelOil#1
-    int const FuelOil2Use = 6;     // FuelOil#2
-    int const PropaneUse = 7;      // Propane
-    int const GasolineUse = 8;     // Gasoline
-    int const DieselUse = 9;       // Diesel
-    int const SteamUse = 10;        // Steam
-    int const DistrictCoolUse = 11; // Purchased Cooling
-    int const DistrictHeatUse = 12; // Purchased Heating
-    int const OtherFuel1Use = 13;   // OtherFuel1
-    int const OtherFuel2Use = 14;   // OtherFuel2
-
-    int const ScheduleOnly = 1;       // exterior lights only on schedule
-    int const AstroClockOverride = 2; // exterior lights controlled to turn off during day.
-
-    std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
-
-    bool GetExteriorEnergyInputFlag = true; // First time, input is "gotten"
-
-    struct ExteriorLightUsage
-    {
-        // Members
-        std::string Name;          // Descriptive name -- will show on reporting
-        int SchedPtr;              // Can be scheduled
-        Real64 DesignLevel;        // Consumption in Watts
-        Real64 Power;              // Power = DesignLevel * ScheduleValue
-        Real64 CurrentUse;         // Use for this time step
-        int ControlMode;           // Control mode Schedule Only or Astronomical Clock plus schedule
-        bool ManageDemand;         // Flag to indicate whether to use demand limiting
-        Real64 DemandLimit;        // Demand limit set by demand manager [W]
-        bool PowerActuatorOn;      // EMS flag
-        Real64 PowerActuatorValue; // EMS value
-        Real64 SumConsumption;     // sum of electric consumption [J] for reporting
-        Real64 SumTimeNotZeroCons; // sum of time of positive electric consumption [hr]
-
-                                   // Default Constructor
-        ExteriorLightUsage()
-            : SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ControlMode(1), ManageDemand(false), DemandLimit(0.0),
-            PowerActuatorOn(false), SumConsumption(0.0), SumTimeNotZeroCons(0.0)
-        {
+        void clear_state() override {
+            AnnualSimulation = false;
+            DayOfSimChr = "0";
         }
     };
 
-    int NumExteriorLights = 0; // Number of Exterior Light Inputs
-    int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+    struct ExteriorEnergyUseData : BaseGlobalStruct {
 
-    // Object Data
-    Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
-    Array1D<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
+        int NumExteriorLights = 0; // Number of Exterior Light Inputs
+        int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+        Array1D<ExteriorEnergyUse::ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
+        Array1D<ExteriorEnergyUse::ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
+        std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
+        bool GetExteriorEnergyInputFlag = true; // First time, input is "gotten"
+        ExteriorEnergyUseData() : NumExteriorLights(0), NumExteriorEqs(0), GetExteriorEnergyInputFlag(true) {}
 
-    void clear_state() {
-        NumExteriorLights = 0;
-        NumExteriorEqs = 0;
-        ExteriorLights.deallocate();
-        ExteriorEquipment.deallocate();
-        UniqueExteriorEquipNames.clear();
-        GetExteriorEnergyInputFlag = true;
-    }
-};
-
-struct FansData : BaseGlobalStruct
-{
-    // constants
-    static constexpr int ExhaustFanCoupledToAvailManagers = 150;
-    static constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
-
-    // members
-    int NumFans;
-    int NumNightVentPerf;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
-    bool GetFanInputFlag;      // Flag set to make sure you get input once
-    bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-    bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
-
-    FansData() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false), LocalTurnFansOff(false)
-    {
-    }
-
-    void clear_state() override
-    {
-        NumFans = 0;
-        NumNightVentPerf = 0;
-        GetFanInputFlag = true;
-        LocalTurnFansOn = false;
-        LocalTurnFansOff = false;
-    }
-};
-
-struct PipesData : BaseGlobalStruct
-{
-    // MODULE VARIABLE DECLARATIONS
-    int NumLocalPipes = 0;
-    bool GetPipeInputFlag = true;
-
-    void clear_state() override {
-        NumLocalPipes = 0;
-        GetPipeInputFlag = true;
-    }
-};
-
-struct EnergyPlusData : BaseGlobalStruct
-{
-    // module globals
-    DataGlobal dataGlobals;
-    ExteriorEnergyUseData exteriorEnergyUse;
-    FansData fans;
-    PipesData pipes;
-    //OutputReportTabular outputReportTabular;
-
-    // all clear states
-    void clear_state() override
-    {
-        dataGlobals.clear_state();
-        exteriorEnergyUse.clear_state();
-        fans.clear_state();
-        //outputReportTabular.clear_state();
-        pipes.clear_state();
+        void clear_state() {
+            NumExteriorLights = 0;
+            NumExteriorEqs = 0;
+            ExteriorLights.deallocate();
+            ExteriorEquipment.deallocate();
+            UniqueExteriorEquipNames.clear();
+            GetExteriorEnergyInputFlag = true;
+        }
     };
-};
 
+    struct FansData : BaseGlobalStruct {
+        // constants
+        static constexpr int ExhaustFanCoupledToAvailManagers = 150;
+        static constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
+
+        // members
+        int NumFans;
+        int NumNightVentPerf;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
+        bool GetFanInputFlag;      // Flag set to make sure you get input once
+        bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
+        bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
+
+        FansData() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false),
+                     LocalTurnFansOff(false) {}
+
+        void clear_state() override {
+            NumFans = 0;
+            NumNightVentPerf = 0;
+            GetFanInputFlag = true;
+            LocalTurnFansOn = false;
+            LocalTurnFansOff = false;
+        }
+    };
+
+    struct PipesData : BaseGlobalStruct {
+        int NumLocalPipes;
+        bool GetPipeInputFlag;
+
+        PipesData() : NumLocalPipes(0), GetPipeInputFlag(true) {}
+
+        void clear_state() override {
+            NumLocalPipes = 0;
+            GetPipeInputFlag = true;
+        }
+    };
+
+    struct EnergyPlusData : BaseGlobalStruct {
+        // module globals
+        DataGlobal dataGlobals;
+        ExteriorEnergyUseData exteriorEnergyUse;
+        FansData fans;
+        PipesData pipes;
+        //OutputReportTabular outputReportTabular;
+
+        // all clear states
+        void clear_state() override {
+            dataGlobals.clear_state();
+            exteriorEnergyUse.clear_state();
+            fans.clear_state();
+            //outputReportTabular.clear_state();
+            pipes.clear_state();
+        };
+    };
+
+}
 #endif
