@@ -1403,21 +1403,21 @@ namespace FaultsManager {
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Absorption")) {
                     // Read in chiller if not done yet
-                    if (ChillerAbsorption::getInput) {
-                        ChillerAbsorption::GetBLASTAbsorberInput();
-                        ChillerAbsorption::getInput = false;
+                    if (state.dataChillerAbsorbers.getInput) {
+                        ChillerAbsorption::GetBLASTAbsorberInput(state.dataChillerAbsorbers);
+                        state.dataChillerAbsorbers.getInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum =
-                        UtilityRoutines::FindItemInList(FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName, ChillerAbsorption::BLASTAbsorber);
+                        UtilityRoutines::FindItemInList(FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName, state.dataChillerAbsorbers.BLASTAbsorber);
                     if (ChillerNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         ErrorsFound = true;
                     } else {
                         // Link the chiller with the fault model
-                        ChillerAbsorption::BLASTAbsorber(ChillerNum).FaultyChillerSWTFlag = true;
-                        ChillerAbsorption::BLASTAbsorber(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
+                        state.dataChillerAbsorbers.BLASTAbsorber(ChillerNum).FaultyChillerSWTFlag = true;
+                        state.dataChillerAbsorbers.BLASTAbsorber(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Absorption:Indirect")) {

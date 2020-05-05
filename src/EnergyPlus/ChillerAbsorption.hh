@@ -54,21 +54,23 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct ChillerAbsorberData;
+
 namespace ChillerAbsorption {
 
-    extern int const FlowModeNotSet;
-    extern int const ConstantFlow;
-    extern int const NotModulated;
-    extern int const LeavingSetPointModulated;
-
-    extern int numBlastAbsorbers; // number of Absorption Chillers specified in input
-
-    extern bool getInput; // When TRUE, calls subroutine to read input file
+    enum class FlowMode
+    {
+        NOTSET,
+        CONSTANT,
+        NOTMODULATED,
+        LEAVINGSETPOINTMODULATED
+    };
 
     struct ReportVars
     {
@@ -110,7 +112,7 @@ namespace ChillerAbsorption {
         bool NomCapWasAutoSized;          // true if Nominal capacity was autosize on input
         Real64 NomPumpPower;              // W - design nominal capacity of Absorber
         bool NomPumpPowerWasAutoSized;    // true if nominal pump power was autosize on input
-        int FlowMode;                     // one of 3 modes for componet flow during operation
+        FlowMode FlowMode;                     // one of 3 modes for componet flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         Real64 EvapVolFlowRate;           // m3/s - design water volumetric flow rate through the evaporator
@@ -183,7 +185,7 @@ namespace ChillerAbsorption {
         // Default Constructor
         BLASTAbsorberSpecs()
             : Available(false), ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomPumpPower(0.0), NomPumpPowerWasAutoSized(false),
-              FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
+              FlowMode(FlowMode::NOTSET), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0),
               CondMassFlowRateMax(0.0), GenMassFlowRateMax(0.0), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
               CondOutletNodeNum(0), GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
@@ -198,7 +200,7 @@ namespace ChillerAbsorption {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(ChillerAbsorberData &boilers, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -221,12 +223,7 @@ namespace ChillerAbsorption {
         void updateRecords(Real64 MyLoad, bool RunFlag);
     };
 
-    // Object Data
-    extern Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
-
-    void clear_state();
-
-    void GetBLASTAbsorberInput();
+    void GetBLASTAbsorberInput(ChillerAbsorberData &chillers);
 
 } // namespace ChillerAbsorption
 

@@ -97,7 +97,7 @@ namespace Boilers {
         bool NomCapWasAutoSized;      // true if previous was set to autosize input
         Real64 Effic;                 // boiler efficiency at design conditions
         Real64 TempDesBoilerOut;      // C - Boiler design outlet temperature
-        enum FlowMode FlowMode;       // one of 3 modes for component flow during operation
+        FlowMode FlowMode;       // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;  // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;    // true if setpoint warning issued
         Real64 VolFlowRate;           // m3/s - Boiler water design volumetric flow rate
@@ -111,7 +111,7 @@ namespace Boilers {
         Real64 MaxPartLoadRat;        // Maximum allowed operating part load ratio
         Real64 OptPartLoadRat;        // Optimal operating part load ratio
         Real64 OperPartLoadRat;       // Actual operating part load ratio
-        enum TempMode CurveTempMode;  // water temp to use in curve, switch between entering and leaving
+        TempMode CurveTempMode;  // water temp to use in curve, switch between entering and leaving
         int EfficiencyCurvePtr;       // Index to efficiency curve
         Real64 TempUpLimitBoilerOut;  // C - Boiler outlet maximum temperature limit
         Real64 ParasiticElecLoad;     // W - Parasitic electric power (e.g. forced draft fan)

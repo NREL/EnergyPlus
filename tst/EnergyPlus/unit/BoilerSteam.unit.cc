@@ -84,20 +84,19 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     });
 
     ASSERT_TRUE(process_idf(idf_objects, false));
-    EnergyPlusData state;
     GetBoilerInput(state.dataSteamBoilers);
-
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).Name, "STEAM BOILER PLANT BOILER");
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).FuelType, AssignResourceTypeNum("NATURALGAS"));
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).BoilerMaxOperPress, 160000);
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).Effic, 0.8);
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).TempUpLimitBoilerOut, 115);
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).NomCap, AutoSize);
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).MinPartLoadRat, 0.00001);
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).MaxPartLoadRat, 1.0);
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).OptPartLoadRat, 0.2);
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).FullLoadCoef(1), 0.8);
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).FullLoadCoef(2), 0.1);
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).FullLoadCoef(3), 0.1);
-    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).SizFac, 1.0);
+    auto &thisBoiler = state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers);
+    EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
+    EXPECT_EQ(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS"));
+    EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
+    EXPECT_EQ(thisBoiler.Effic, 0.8);
+    EXPECT_EQ(thisBoiler.TempUpLimitBoilerOut, 115);
+    EXPECT_EQ(thisBoiler.NomCap, AutoSize);
+    EXPECT_EQ(thisBoiler.MinPartLoadRat, 0.00001);
+    EXPECT_EQ(thisBoiler.MaxPartLoadRat, 1.0);
+    EXPECT_EQ(thisBoiler.OptPartLoadRat, 0.2);
+    EXPECT_EQ(thisBoiler.FullLoadCoef(1), 0.8);
+    EXPECT_EQ(thisBoiler.FullLoadCoef(2), 0.1);
+    EXPECT_EQ(thisBoiler.FullLoadCoef(3), 0.1);
+    EXPECT_EQ(thisBoiler.SizFac, 1.0);
 }
