@@ -420,6 +420,7 @@ ADD_SIMULATION_TEST(IDF_FILE PythonPluginConstantVolumePurchasedAir.idf EPW_FILE
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginCurveOverride_PackagedTerminalHeatPump.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginCustomOutputVariable.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginCustomSchedule.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE PythonPluginDemandManager_LargeOffice.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginDiscreteAirSystemSizes.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginPlantLoopOverrideControl.idf EPW_FILE USA_FL_Orlando.Intl.AP.722050_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginPlantOperation_largeOff.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
