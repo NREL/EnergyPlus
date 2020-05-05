@@ -62,11 +62,14 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+
+    // Forward declarations
     class OutputFile;
     class OutputFiles;
+    struct EnergyPlusData;
+    struct DataGlobal;
 
 namespace OutputProcessor {
 

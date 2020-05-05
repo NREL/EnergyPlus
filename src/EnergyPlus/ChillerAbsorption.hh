@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -63,14 +64,6 @@ struct EnergyPlusData;
 struct ChillerAbsorberData;
 
 namespace ChillerAbsorption {
-
-    enum class FlowMode
-    {
-        NOTSET,
-        CONSTANT,
-        NOTMODULATED,
-        LEAVINGSETPOINTMODULATED
-    };
 
     struct ReportVars
     {
@@ -112,7 +105,7 @@ namespace ChillerAbsorption {
         bool NomCapWasAutoSized;          // true if Nominal capacity was autosize on input
         Real64 NomPumpPower;              // W - design nominal capacity of Absorber
         bool NomPumpPowerWasAutoSized;    // true if nominal pump power was autosize on input
-        FlowMode FlowMode;                     // one of 3 modes for componet flow during operation
+        DataPlant::FlowMode FlowMode;                     // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         Real64 EvapVolFlowRate;           // m3/s - design water volumetric flow rate through the evaporator
@@ -120,7 +113,7 @@ namespace ChillerAbsorption {
         Real64 CondVolFlowRate;           // m3/s - design water volumetric flow rate through the condenser
         bool CondVolFlowRateWasAutoSized; // true if condenser flow rate was autosize on input
         Real64 EvapMassFlowRateMax;       // Max Design Evaporator Mass Flow Rate converted from Volume Flow Rate
-        Real64 CondMassFlowRateMax;       // Max Design Condeneser Mass Flow Rate [kg/s]
+        Real64 CondMassFlowRateMax;       // Max Design Condenser Mass Flow Rate [kg/s]
         Real64 GenMassFlowRateMax;        // Max Design Generator Mass Flow Rate converted from Volume Flow Rate
         Real64 SizFac;                    // Sizing factor
         int EvapInletNodeNum;             // Node number on the inlet side of the plant
@@ -185,7 +178,7 @@ namespace ChillerAbsorption {
         // Default Constructor
         BLASTAbsorberSpecs()
             : Available(false), ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomPumpPower(0.0), NomPumpPowerWasAutoSized(false),
-              FlowMode(FlowMode::NOTSET), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
+              FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0),
               CondMassFlowRateMax(0.0), GenMassFlowRateMax(0.0), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
               CondOutletNodeNum(0), GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),

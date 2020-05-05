@@ -363,18 +363,18 @@ namespace Boilers {
                                                "Hot Water Nodes");
 
             if (DataIPShortCuts::cAlphaArgs(7) == "CONSTANTFLOW") {
-                boilers.Boiler(BoilerNum).FlowMode = FlowMode::CONSTANT;
+                boilers.Boiler(BoilerNum).FlowMode = DataPlant::FlowMode::CONSTANT;
             } else if (DataIPShortCuts::cAlphaArgs(7) == "LEAVINGSETPOINTMODULATED") {
-                boilers.Boiler(BoilerNum).FlowMode = FlowMode::LEAVINGSETPOINTMODULATED;
+                boilers.Boiler(BoilerNum).FlowMode = DataPlant::FlowMode::LEAVINGSETPOINTMODULATED;
             } else if (DataIPShortCuts::cAlphaArgs(7) == "NOTMODULATED") {
-                boilers.Boiler(BoilerNum).FlowMode = FlowMode::NOTMODULATED;
+                boilers.Boiler(BoilerNum).FlowMode = DataPlant::FlowMode::NOTMODULATED;
             } else {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
                 ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
                 // We will assume variable flow if not specified
-                boilers.Boiler(BoilerNum).FlowMode = FlowMode::NOTMODULATED;
+                boilers.Boiler(BoilerNum).FlowMode = DataPlant::FlowMode::NOTMODULATED;
             }
 
             if (NumAlphas > 7) {
@@ -493,7 +493,7 @@ namespace Boilers {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
             }
 
-            if ((this->FlowMode == FlowMode::LEAVINGSETPOINTMODULATED) || (this->FlowMode == FlowMode::CONSTANT)) {
+            if ((this->FlowMode == DataPlant::FlowMode::LEAVINGSETPOINTMODULATED) || (this->FlowMode == DataPlant::FlowMode::CONSTANT)) {
                 // reset flow priority
                 DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).FlowPriority =
                     DataPlant::LoopFlowStatus_NeedyIfLoopOn;
@@ -519,7 +519,7 @@ namespace Boilers {
                                                this->BranchNum,
                                                this->CompNum);
 
-            if (this->FlowMode == FlowMode::LEAVINGSETPOINTMODULATED) { // check if setpoint on outlet node
+            if (this->FlowMode == DataPlant::FlowMode::LEAVINGSETPOINTMODULATED) { // check if setpoint on outlet node
                 if ((DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
@@ -558,7 +558,7 @@ namespace Boilers {
 
         // every iteration inits.  (most in calc routine)
 
-        if ((this->FlowMode == FlowMode::LEAVINGSETPOINTMODULATED) && this->ModulatedFlowSetToLoop) {
+        if ((this->FlowMode == DataPlant::FlowMode::LEAVINGSETPOINTMODULATED) && this->ModulatedFlowSetToLoop) {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
             if (DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::SingleSetPoint) {
@@ -806,7 +806,7 @@ namespace Boilers {
 
         if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) {
             // Either set the flow to the Constant value or calculate the flow for the variable volume
-            if ((this->FlowMode == FlowMode::CONSTANT) || (this->FlowMode == FlowMode::NOTMODULATED)) {
+            if ((this->FlowMode == DataPlant::FlowMode::CONSTANT) || (this->FlowMode == DataPlant::FlowMode::NOTMODULATED)) {
                 // Then find the flow rate and outlet temp
                 this->BoilerMassFlowRate = BoilerMassFlowRateMax;
                 PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
@@ -824,7 +824,7 @@ namespace Boilers {
                 }
                 this->BoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(BoilerInletNode).Temp;
 
-            } else if (this->FlowMode == FlowMode::LEAVINGSETPOINTMODULATED) {
+            } else if (this->FlowMode == DataPlant::FlowMode::LEAVINGSETPOINTMODULATED) {
                 // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
                 // Then find the flow rate and outlet temp
 

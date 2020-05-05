@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -72,15 +73,6 @@ namespace Boilers {
         LEAVINGBOILERTEMP
     };
 
-    // Boiler flow modes
-    enum class FlowMode
-    {
-        NOTSET,
-        CONSTANT,
-        NOTMODULATED,
-        LEAVINGSETPOINTMODULATED
-    };
-
     struct BoilerSpecs : PlantComponent
     {
         // Members
@@ -97,7 +89,7 @@ namespace Boilers {
         bool NomCapWasAutoSized;      // true if previous was set to autosize input
         Real64 Effic;                 // boiler efficiency at design conditions
         Real64 TempDesBoilerOut;      // C - Boiler design outlet temperature
-        FlowMode FlowMode;       // one of 3 modes for component flow during operation
+        DataPlant::FlowMode FlowMode;       // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;  // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;    // true if setpoint warning issued
         Real64 VolFlowRate;           // m3/s - Boiler water design volumetric flow rate
@@ -145,7 +137,7 @@ namespace Boilers {
         // Default Constructor
         BoilerSpecs()
             : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0),
-              NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(FlowMode::NOTSET), ModulatedFlowSetToLoop(false),
+              NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0),
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
               CurveTempMode(TempMode::NOTSET), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0),

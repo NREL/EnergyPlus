@@ -261,6 +261,15 @@ namespace DataPlant {
     extern int PlantManageSubIterations; // tracks plant iterations to characterize solver
     extern int PlantManageHalfLoopCalls; // tracks number of half loop calls
 
+    // Enum classes
+    enum class FlowMode
+    {
+        NOTSET,
+        CONSTANT,
+        NOTMODULATED,
+        LEAVINGSETPOINTMODULATED
+    };
+
     // Object Data
     extern Array1D<PlantLoopData> PlantLoop;
     extern Array1D<PlantAvailMgrData> PlantAvailMgr;
