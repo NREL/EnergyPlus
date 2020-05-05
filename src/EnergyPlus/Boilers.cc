@@ -98,47 +98,15 @@ namespace Boilers {
     // METHODOLOGY EMPLOYED:
     // The BLAST/DOE-2 empirical model based on mfg. data
 
-    // Boiler normalized efficiency curve types
-    int const Linear(1);
-    int const BiLinear(2);
-    int const Quadratic(3);
-    int const BiQuadratic(4);
-    int const Cubic(5);
-    int const QuadraticLinear(6);
-    int const BiCubic(7);
-
-    // water temperature evaluation method
-    int const BoilerTempModeNotSet(100);
-    int const EnteringBoilerTemp(101);
-    int const LeavingBoilerTemp(102);
-
-    // Boiler flow modes
-    int const FlowModeNotSet(200);
-    int const ConstantFlow(201);
-    int const NotModulated(202);
-    int const LeavingSetPointModulated(203);
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumBoilers(0);
-    bool GetBoilerInputFlag(true);
-    Array1D<BoilerSpecs> Boiler;
-
-    void clear_state()
-    {
-        NumBoilers = 0;
-        Boiler.deallocate();
-        GetBoilerInputFlag = true;
-    }
-
-    PlantComponent *BoilerSpecs::factory(std::string const &objectName)
+    PlantComponent *BoilerSpecs::factory(BoilersData &boilers, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
-        if (GetBoilerInputFlag) {
-            GetBoilerInput();
-            GetBoilerInputFlag = false;
+        if (boilers.GetBoilerInputFlag) {
+            GetBoilerInput(boilers);
+            boilers.GetBoilerInputFlag = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &boiler : Boiler) {
+        for (auto &boiler : boilers.Boiler) {
             if (boiler.Name == objectName) {
                 return &boiler;
             }
@@ -178,7 +146,7 @@ namespace Boilers {
         this->SizeBoiler();
     }
 
-    void GetBoilerInput()
+    void GetBoilerInput(BoilersData &boilers)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -200,21 +168,21 @@ namespace Boilers {
 
         // GET NUMBER OF ALL EQUIPMENT
         DataIPShortCuts::cCurrentModuleObject = "Boiler:HotWater";
-        NumBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        boilers.NumBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (NumBoilers <= 0) {
+        if (boilers.NumBoilers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " Equipment specified in input file");
             ErrorsFound = true;
         }
 
         // See if load distribution manager has already gotten the input
-        if (allocated(Boiler)) return;
+        if (allocated(boilers.Boiler)) return;
 
-        Boiler.allocate(NumBoilers);
+        boilers.Boiler.allocate(boilers.NumBoilers);
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
 
-        for (int BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum) {
+        for (int BoilerNum = 1; BoilerNum <= boilers.NumBoilers; ++BoilerNum) {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
@@ -233,63 +201,63 @@ namespace Boilers {
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBoilerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
-            Boiler(BoilerNum).Name = DataIPShortCuts::cAlphaArgs(1);
-            Boiler(BoilerNum).TypeNum = DataPlant::TypeOf_Boiler_Simple;
+            boilers.Boiler(BoilerNum).Name = DataIPShortCuts::cAlphaArgs(1);
+            boilers.Boiler(BoilerNum).TypeNum = DataPlant::TypeOf_Boiler_Simple;
 
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(2));
 
                 if (SELECT_CASE_var == "ELECTRICITY") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
+                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
+                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gas";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
+                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gas";
+                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
 
                 } else if (SELECT_CASE_var == "DIESEL") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Diesel";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
+                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Diesel";
+                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
 
                 } else if (SELECT_CASE_var == "GASOLINE") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gasoline";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
+                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gasoline";
+                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
 
                 } else if (SELECT_CASE_var == "COAL") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Coal";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("COAL");
+                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Coal";
+                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#1";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
+                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#1";
+                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#2";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
+                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#2";
+                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
 
                 } else if (SELECT_CASE_var == "PROPANE") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Propane";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
+                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Propane";
+                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "OtherFuel1";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
+                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "OtherFuel1";
+                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
 
                 } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "OtherFuel2";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
+                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "OtherFuel2";
+                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
 
                 } else {
                     ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                     // Set to Electric to avoid errors when setting up output variables
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
+                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
+                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
                     ErrorsFound = true;
                 }
             }
 
-            Boiler(BoilerNum).NomCap = DataIPShortCuts::rNumericArgs(1);
+            boilers.Boiler(BoilerNum).NomCap = DataIPShortCuts::rNumericArgs(1);
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
@@ -297,11 +265,11 @@ namespace Boilers {
                 ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(1) + " must be greater than 0.0");
                 ErrorsFound = true;
             }
-            if (Boiler(BoilerNum).NomCap == DataSizing::AutoSize) {
-                Boiler(BoilerNum).NomCapWasAutoSized = true;
+            if (boilers.Boiler(BoilerNum).NomCap == DataSizing::AutoSize) {
+                boilers.Boiler(BoilerNum).NomCapWasAutoSized = true;
             }
 
-            Boiler(BoilerNum).Effic = DataIPShortCuts::rNumericArgs(2);
+            boilers.Boiler(BoilerNum).Effic = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(2) == 0.0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
@@ -311,37 +279,37 @@ namespace Boilers {
             }
 
             if (DataIPShortCuts::cAlphaArgs(3) == "ENTERINGBOILER") {
-                Boiler(BoilerNum).CurveTempMode = EnteringBoilerTemp;
+                boilers.Boiler(BoilerNum).CurveTempMode = TempMode::ENTERINGBOILERTEMP;
             } else if (DataIPShortCuts::cAlphaArgs(3) == "LEAVINGBOILER") {
-                Boiler(BoilerNum).CurveTempMode = LeavingBoilerTemp;
+                boilers.Boiler(BoilerNum).CurveTempMode = TempMode::LEAVINGBOILERTEMP;
             } else {
-                Boiler(BoilerNum).CurveTempMode = BoilerTempModeNotSet;
+                boilers.Boiler(BoilerNum).CurveTempMode = TempMode::NOTSET;
             }
 
-            Boiler(BoilerNum).EfficiencyCurvePtr = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(4));
-            if (Boiler(BoilerNum).EfficiencyCurvePtr > 0) {
-                ErrorsFound |= CurveManager::CheckCurveDims(Boiler(BoilerNum).EfficiencyCurvePtr,  // Curve index
+            boilers.Boiler(BoilerNum).EfficiencyCurvePtr = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(4));
+            if (boilers.Boiler(BoilerNum).EfficiencyCurvePtr > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(boilers.Boiler(BoilerNum).EfficiencyCurvePtr,  // Curve index
                                                             {1, 2},                                // Valid dimensions
                                                             RoutineName,                           // Routine name
                                                             DataIPShortCuts::cCurrentModuleObject, // Object Type
-                                                            Boiler(BoilerNum).Name,                // Object Name
+                                                            boilers.Boiler(BoilerNum).Name,                // Object Name
                                                             DataIPShortCuts::cAlphaFieldNames(4)); // Field Name
 
                 // if curve uses temperature, make sure water temp mode has been set
-                if (CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).NumDims == 2) { // curve uses water temperature
-                    if (Boiler(BoilerNum).CurveTempMode == BoilerTempModeNotSet) {                // throw error
+                if (CurveManager::PerfCurve(boilers.Boiler(BoilerNum).EfficiencyCurvePtr).NumDims == 2) { // curve uses water temperature
+                    if (boilers.Boiler(BoilerNum).CurveTempMode == TempMode::NOTSET) {                // throw error
                         if (!DataIPShortCuts::lAlphaFieldBlanks(3)) {
                             ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                             ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
-                            ShowContinueError("Boiler using curve type of " +
-                                              CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).ObjectType + " must specify " +
+                            ShowContinueError("boilers.Boiler using curve type of " +
+                                              CurveManager::PerfCurve(boilers.Boiler(BoilerNum).EfficiencyCurvePtr).ObjectType + " must specify " +
                                               DataIPShortCuts::cAlphaFieldNames(3));
                             ShowContinueError("Available choices are EnteringBoiler or LeavingBoiler");
                         } else {
                             ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                             ShowContinueError("Field " + DataIPShortCuts::cAlphaFieldNames(3) + " is blank");
-                            ShowContinueError("Boiler using curve type of " +
-                                              CurveManager::PerfCurve(Boiler(BoilerNum).EfficiencyCurvePtr).ObjectType +
+                            ShowContinueError("boilers.Boiler using curve type of " +
+                                              CurveManager::PerfCurve(boilers.Boiler(BoilerNum).EfficiencyCurvePtr).ObjectType +
                                               " must specify either EnteringBoiler or LeavingBoiler");
                         }
                         ErrorsFound = true;
@@ -354,25 +322,25 @@ namespace Boilers {
                 ShowSevereError("..." + DataIPShortCuts::cAlphaFieldNames(4) + " not found.");
                 ErrorsFound = true;
             }
-            Boiler(BoilerNum).VolFlowRate = DataIPShortCuts::rNumericArgs(3);
-            if (Boiler(BoilerNum).VolFlowRate == DataSizing::AutoSize) {
-                Boiler(BoilerNum).VolFlowRateWasAutoSized = true;
+            boilers.Boiler(BoilerNum).VolFlowRate = DataIPShortCuts::rNumericArgs(3);
+            if (boilers.Boiler(BoilerNum).VolFlowRate == DataSizing::AutoSize) {
+                boilers.Boiler(BoilerNum).VolFlowRateWasAutoSized = true;
             }
-            Boiler(BoilerNum).MinPartLoadRat = DataIPShortCuts::rNumericArgs(4);
-            Boiler(BoilerNum).MaxPartLoadRat = DataIPShortCuts::rNumericArgs(5);
-            Boiler(BoilerNum).OptPartLoadRat = DataIPShortCuts::rNumericArgs(6);
+            boilers.Boiler(BoilerNum).MinPartLoadRat = DataIPShortCuts::rNumericArgs(4);
+            boilers.Boiler(BoilerNum).MaxPartLoadRat = DataIPShortCuts::rNumericArgs(5);
+            boilers.Boiler(BoilerNum).OptPartLoadRat = DataIPShortCuts::rNumericArgs(6);
 
-            Boiler(BoilerNum).TempUpLimitBoilerOut = DataIPShortCuts::rNumericArgs(7);
+            boilers.Boiler(BoilerNum).TempUpLimitBoilerOut = DataIPShortCuts::rNumericArgs(7);
             // default to 99.9C if upper temperature limit is left blank.
-            if (Boiler(BoilerNum).TempUpLimitBoilerOut <= 0.0) {
-                Boiler(BoilerNum).TempUpLimitBoilerOut = 99.9;
+            if (boilers.Boiler(BoilerNum).TempUpLimitBoilerOut <= 0.0) {
+                boilers.Boiler(BoilerNum).TempUpLimitBoilerOut = 99.9;
             }
 
-            Boiler(BoilerNum).ParasiticElecLoad = DataIPShortCuts::rNumericArgs(8);
-            Boiler(BoilerNum).SizFac = DataIPShortCuts::rNumericArgs(9);
-            if (Boiler(BoilerNum).SizFac == 0.0) Boiler(BoilerNum).SizFac = 1.0;
+            boilers.Boiler(BoilerNum).ParasiticElecLoad = DataIPShortCuts::rNumericArgs(8);
+            boilers.Boiler(BoilerNum).SizFac = DataIPShortCuts::rNumericArgs(9);
+            if (boilers.Boiler(BoilerNum).SizFac == 0.0) boilers.Boiler(BoilerNum).SizFac = 1.0;
 
-            Boiler(BoilerNum).BoilerInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+            boilers.Boiler(BoilerNum).BoilerInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
                                                                                        ErrorsFound,
                                                                                        DataIPShortCuts::cCurrentModuleObject,
                                                                                        DataIPShortCuts::cAlphaArgs(1),
@@ -380,7 +348,7 @@ namespace Boilers {
                                                                                        DataLoopNode::NodeConnectionType_Inlet,
                                                                                        1,
                                                                                        DataLoopNode::ObjectIsNotParent);
-            Boiler(BoilerNum).BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+            boilers.Boiler(BoilerNum).BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
                                                                                         ErrorsFound,
                                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
@@ -395,24 +363,24 @@ namespace Boilers {
                                                "Hot Water Nodes");
 
             if (DataIPShortCuts::cAlphaArgs(7) == "CONSTANTFLOW") {
-                Boiler(BoilerNum).FlowMode = ConstantFlow;
+                boilers.Boiler(BoilerNum).FlowMode = FlowMode::CONSTANT;
             } else if (DataIPShortCuts::cAlphaArgs(7) == "LEAVINGSETPOINTMODULATED") {
-                Boiler(BoilerNum).FlowMode = LeavingSetPointModulated;
+                boilers.Boiler(BoilerNum).FlowMode = FlowMode::LEAVINGSETPOINTMODULATED;
             } else if (DataIPShortCuts::cAlphaArgs(7) == "NOTMODULATED") {
-                Boiler(BoilerNum).FlowMode = NotModulated;
+                boilers.Boiler(BoilerNum).FlowMode = FlowMode::NOTMODULATED;
             } else {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
                 ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
                 // We will assume variable flow if not specified
-                Boiler(BoilerNum).FlowMode = NotModulated;
+                boilers.Boiler(BoilerNum).FlowMode = FlowMode::NOTMODULATED;
             }
 
             if (NumAlphas > 7) {
-                Boiler(BoilerNum).EndUseSubcategory = DataIPShortCuts::cAlphaArgs(8);
+                boilers.Boiler(BoilerNum).EndUseSubcategory = DataIPShortCuts::cAlphaArgs(8);
             } else {
-                Boiler(BoilerNum).EndUseSubcategory = "Boiler"; // leave this as "boiler" instead of "general" like other end use subcategories since
+                boilers.Boiler(BoilerNum).EndUseSubcategory = "Boiler"; // leave this as "boiler" instead of "general" like other end use subcategories since
                                                                 // it appears this way in existing output files.
             }
         }
@@ -525,7 +493,7 @@ namespace Boilers {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
             }
 
-            if ((this->FlowMode == LeavingSetPointModulated) || (this->FlowMode == ConstantFlow)) {
+            if ((this->FlowMode == FlowMode::LEAVINGSETPOINTMODULATED) || (this->FlowMode == FlowMode::CONSTANT)) {
                 // reset flow priority
                 DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).FlowPriority =
                     DataPlant::LoopFlowStatus_NeedyIfLoopOn;
@@ -551,7 +519,7 @@ namespace Boilers {
                                                this->BranchNum,
                                                this->CompNum);
 
-            if (this->FlowMode == LeavingSetPointModulated) { // check if setpoint on outlet node
+            if (this->FlowMode == FlowMode::LEAVINGSETPOINTMODULATED) { // check if setpoint on outlet node
                 if ((DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
@@ -590,7 +558,7 @@ namespace Boilers {
 
         // every iteration inits.  (most in calc routine)
 
-        if ((this->FlowMode == LeavingSetPointModulated) && this->ModulatedFlowSetToLoop) {
+        if ((this->FlowMode == FlowMode::LEAVINGSETPOINTMODULATED) && this->ModulatedFlowSetToLoop) {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
             if (DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::SingleSetPoint) {
@@ -838,7 +806,7 @@ namespace Boilers {
 
         if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) {
             // Either set the flow to the Constant value or calculate the flow for the variable volume
-            if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
+            if ((this->FlowMode == FlowMode::CONSTANT) || (this->FlowMode == FlowMode::NOTMODULATED)) {
                 // Then find the flow rate and outlet temp
                 this->BoilerMassFlowRate = BoilerMassFlowRateMax;
                 PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
@@ -856,7 +824,7 @@ namespace Boilers {
                 }
                 this->BoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(BoilerInletNode).Temp;
 
-            } else if (this->FlowMode == LeavingSetPointModulated) {
+            } else if (this->FlowMode == FlowMode::LEAVINGSETPOINTMODULATED) {
                 // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
                 // Then find the flow rate and outlet temp
 
@@ -915,9 +883,9 @@ namespace Boilers {
         // calculate normalized efficiency based on curve object type
         if (this->EfficiencyCurvePtr > 0) {
             if (CurveManager::PerfCurve(this->EfficiencyCurvePtr).NumDims == 2) {
-                if (this->CurveTempMode == EnteringBoilerTemp) {
+                if (this->CurveTempMode == TempMode::ENTERINGBOILERTEMP) {
                     EffCurveOutput = CurveManager::CurveValue(this->EfficiencyCurvePtr, this->BoilerPLR, DataLoopNode::Node(BoilerInletNode).Temp);
-                } else if (this->CurveTempMode == LeavingBoilerTemp) {
+                } else if (this->CurveTempMode == TempMode::LEAVINGBOILERTEMP) {
                     EffCurveOutput = CurveManager::CurveValue(this->EfficiencyCurvePtr, this->BoilerPLR, this->BoilerOutletTemp);
                 }
             } else {
@@ -934,10 +902,10 @@ namespace Boilers {
                     ShowContinueError("...Normalized Boiler Efficiency Curve output is less than or equal to 0.");
                     ShowContinueError("...Curve input x value (PLR)     = " + General::TrimSigDigits(this->BoilerPLR, 5));
                     if (CurveManager::PerfCurve(this->EfficiencyCurvePtr).NumDims == 2) {
-                        if (this->CurveTempMode == EnteringBoilerTemp) {
+                        if (this->CurveTempMode == TempMode::ENTERINGBOILERTEMP) {
                             ShowContinueError("...Curve input y value (Tinlet) = " +
                                               General::TrimSigDigits(DataLoopNode::Node(BoilerInletNode).Temp, 2));
-                        } else if (this->CurveTempMode == LeavingBoilerTemp) {
+                        } else if (this->CurveTempMode == TempMode::LEAVINGBOILERTEMP) {
                             ShowContinueError("...Curve input y value (Toutlet) = " + General::TrimSigDigits(this->BoilerOutletTemp, 2));
                         }
                     }
@@ -966,10 +934,10 @@ namespace Boilers {
                     ShowContinueError("...Boiler Efficiency calculations shown below.");
                     ShowContinueError("...Curve input x value (PLR)     = " + General::TrimSigDigits(this->BoilerPLR, 5));
                     if (CurveManager::PerfCurve(this->EfficiencyCurvePtr).NumDims == 2) {
-                        if (this->CurveTempMode == EnteringBoilerTemp) {
+                        if (this->CurveTempMode == TempMode::ENTERINGBOILERTEMP) {
                             ShowContinueError("...Curve input y value (Tinlet) = " +
                                               General::TrimSigDigits(DataLoopNode::Node(BoilerInletNode).Temp, 2));
-                        } else if (this->CurveTempMode == LeavingBoilerTemp) {
+                        } else if (this->CurveTempMode == TempMode::LEAVINGBOILERTEMP) {
                             ShowContinueError("...Curve input y value (Toutlet) = " + General::TrimSigDigits(this->BoilerOutletTemp, 2));
                         }
                     }

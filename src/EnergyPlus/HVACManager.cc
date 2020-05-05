@@ -515,7 +515,7 @@ namespace HVACManager {
             UpdateNodeThermalHistory();
 
             if (OutputReportTabular::displayHeatEmissionsSummary) {
-                OutputReportTabular::CalcHeatEmissionReport();
+                OutputReportTabular::CalcHeatEmissionReport(state);
             }
 
             ManageEMS(emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
@@ -538,7 +538,7 @@ namespace HVACManager {
                     if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                         if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                     }
-                    UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
+                    UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 }
                 if (ZoneSizingCalc) {
                     UpdateZoneSizing(state.dataGlobals, OutputFiles::getSingleton(), DuringDay);

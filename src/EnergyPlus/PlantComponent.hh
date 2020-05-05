@@ -49,12 +49,12 @@
 #define PLANTCOMPONENT_HH_INCLUDED
 
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
 // Forward Declarations
 struct PlantLocation;
+struct EnergyPlusData;
 
 class PlantComponent
 {

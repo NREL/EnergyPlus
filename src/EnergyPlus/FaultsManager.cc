@@ -789,20 +789,20 @@ namespace FaultsManager {
 
             // Boiler check and link
             {
-                if (Boilers::GetBoilerInputFlag) {
-                    Boilers::GetBoilerInput();
-                    Boilers::GetBoilerInputFlag = false;
+                if (state.dataBoilers.GetBoilerInputFlag) {
+                    Boilers::GetBoilerInput(state.dataBoilers);
+                    state.dataBoilers.GetBoilerInputFlag = false;
                 }
                 // Check the boiler name and boiler type
-                int BoilerNum = UtilityRoutines::FindItemInList(FaultsBoilerFouling(jFault_BoilerFouling).BoilerName, Boilers::Boiler);
+                int BoilerNum = UtilityRoutines::FindItemInList(FaultsBoilerFouling(jFault_BoilerFouling).BoilerName, state.dataBoilers.Boiler);
                 if (BoilerNum <= 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
                                     "\" not found.");
                     ErrorsFound = true;
                 } else {
                     // Link the boiler with the fault model
-                    Boilers::Boiler(BoilerNum).FaultyBoilerFoulingFlag = true;
-                    Boilers::Boiler(BoilerNum).FaultyBoilerFoulingIndex = jFault_BoilerFouling;
+                    state.dataBoilers.Boiler(BoilerNum).FaultyBoilerFoulingFlag = true;
+                    state.dataBoilers.Boiler(BoilerNum).FaultyBoilerFoulingIndex = jFault_BoilerFouling;
                 }
             }
         }

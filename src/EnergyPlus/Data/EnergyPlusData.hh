@@ -49,6 +49,7 @@
 #define EnergyPlusData_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <unordered_map>
@@ -67,6 +68,19 @@ namespace EnergyPlus {
 //    void clear_state() override {
 //    }
 //};
+
+    struct BoilersData : BaseGlobalStruct {
+        int NumBoilers = 0;                   // Number of boilers
+        bool GetBoilerInputFlag = true;       // Boiler input flag, false if input is processed
+        Array1D<Boilers::BoilerSpecs> Boiler;
+
+        void clear_state()
+        {
+            NumBoilers = 0;
+            GetBoilerInputFlag = true;
+            Boiler.deallocate();
+        }
+    };
 
     struct DataGlobal : BaseGlobalStruct {
         // Data
@@ -142,6 +156,7 @@ namespace EnergyPlus {
 
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
+        BoilersData dataBoilers;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -150,6 +165,7 @@ namespace EnergyPlus {
 
         // all clear states
         void clear_state() override {
+            dataBoilers.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();

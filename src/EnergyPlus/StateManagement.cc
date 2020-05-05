@@ -250,7 +250,6 @@ void EnergyPlus::clearAllStates()
     AirflowNetworkBalanceManager::clear_state();
     BaseboardElectric::clear_state();
     BaseboardRadiator::clear_state();
-    Boilers::clear_state();
     BoilerSteam::clear_state();
     BranchInputManager::clear_state();
     CoolingPanelSimple::clear_state();

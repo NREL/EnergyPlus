@@ -723,7 +723,7 @@ namespace OutputReportTabular {
         OutputReportTabular::ResetTabularReports();
     }
 
-    void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
+    void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -792,7 +792,7 @@ namespace OutputReportTabular {
                 GatherSourceEnergyEndUseResultsForTimestep(t_timeStepType);
                 GatherPeakDemandForTimestep(t_timeStepType);
                 GatherHeatGainReport(t_timeStepType);
-                GatherHeatEmissionReport(t_timeStepType);
+                GatherHeatEmissionReport(state, t_timeStepType);
             }
         }
     }
@@ -4783,7 +4783,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType)
+    void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Gathers the data each zone timestep for the heat gain report.
@@ -4811,7 +4811,7 @@ namespace OutputReportTabular {
             return;
         }
 
-        CalcHeatEmissionReport();
+        CalcHeatEmissionReport(state);
         BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * convertJtoGJ;
         BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * convertJtoGJ;
         BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
@@ -4822,7 +4822,7 @@ namespace OutputReportTabular {
     }
 
 
-    void CalcHeatEmissionReport()
+    void CalcHeatEmissionReport(EnergyPlusData &state)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Gathers the data each zone timestep for the heat gain report.
@@ -4830,8 +4830,6 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using Boilers::Boiler;
-        using Boilers::NumBoilers;
         using ChillerElectricEIR::ElectricEIRChiller;
         using ChillerElectricEIR::NumElectricEIRChillers;
         using ChillerReformulatedEIR::ElecReformEIRChiller;
@@ -4944,8 +4942,8 @@ namespace OutputReportTabular {
         }
 
         // Water / steam boiler
-        for (iBoiler = 1; iBoiler <= NumBoilers; ++iBoiler) {
-            SysTotalHVACRejectHeatLoss += Boiler(iBoiler).FuelConsumed + Boiler(iBoiler).ParasiticElecConsumption - Boiler(iBoiler).BoilerEnergy;
+        for (iBoiler = 1; iBoiler <= state.dataBoilers.NumBoilers; ++iBoiler) {
+            SysTotalHVACRejectHeatLoss += state.dataBoilers.Boiler(iBoiler).FuelConsumed + state.dataBoilers.Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers.Boiler(iBoiler).BoilerEnergy;
         }
 
         // DX Coils air to air
