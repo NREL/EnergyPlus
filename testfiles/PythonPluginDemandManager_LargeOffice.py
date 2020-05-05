@@ -26,13 +26,13 @@ class ManageDemand(EnergyPlusPlugin):
                     "Facility Total Electric Demand Power",
                     "Whole Building")
 
-                self.pump_override_report_handle = self.api.exchange.get_global_handle("argTargetDemand")
+                self.argTargetDemand_handle = self.api.exchange.get_global_handle("argTargetDemand")
                 
-                self.pump_override_report_handle = self.api.exchange.get_global_handle("argCrntDmnd")
+                self.argCrntDmnd_handle = self.api.exchange.get_global_handle("argCrntDmnd")
 
-                self.pump_override_report_handle = self.api.exchange.get_global_handle("argTrendDirection")
+                self.argTrendDirection_handle= self.api.exchange.get_global_handle("argTrendDirection")
 
-                self.pump_override_report_handle = self.api.exchange.get_global_handle("argDmndMngrState")
+                self.argDmndMngrState_handle = self.api.exchange.get_global_handle("argDmndMngrState")
 
                 self.need_to_get_handles = False
 
