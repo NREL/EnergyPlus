@@ -52,8 +52,6 @@
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
-#include <EnergyPlus/BoilerSteam.hh>
-#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
@@ -250,7 +248,6 @@ void EnergyPlus::clearAllStates()
     AirflowNetworkBalanceManager::clear_state();
     BaseboardElectric::clear_state();
     BaseboardRadiator::clear_state();
-    BoilerSteam::clear_state();
     BranchInputManager::clear_state();
     CoolingPanelSimple::clear_state();
     ChillerAbsorption::clear_state();

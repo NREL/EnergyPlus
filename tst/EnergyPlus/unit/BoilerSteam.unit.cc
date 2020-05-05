@@ -84,20 +84,20 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     });
 
     ASSERT_TRUE(process_idf(idf_objects, false));
+    EnergyPlusData state;
+    GetBoilerInput(state.dataSteamBoilers);
 
-    GetBoilerInput();
-
-    EXPECT_EQ(Boiler(NumBoilers).Name, "STEAM BOILER PLANT BOILER");
-    EXPECT_EQ(Boiler(NumBoilers).FuelType, AssignResourceTypeNum("NATURALGAS"));
-    EXPECT_EQ(Boiler(NumBoilers).BoilerMaxOperPress, 160000);
-    EXPECT_EQ(Boiler(NumBoilers).Effic, 0.8);
-    EXPECT_EQ(Boiler(NumBoilers).TempUpLimitBoilerOut, 115);
-    EXPECT_EQ(Boiler(NumBoilers).NomCap, AutoSize);
-    EXPECT_EQ(Boiler(NumBoilers).MinPartLoadRat, 0.00001);
-    EXPECT_EQ(Boiler(NumBoilers).MaxPartLoadRat, 1.0);
-    EXPECT_EQ(Boiler(NumBoilers).OptPartLoadRat, 0.2);
-    EXPECT_EQ(Boiler(NumBoilers).FullLoadCoef(1), 0.8);
-    EXPECT_EQ(Boiler(NumBoilers).FullLoadCoef(2), 0.1);
-    EXPECT_EQ(Boiler(NumBoilers).FullLoadCoef(3), 0.1);
-    EXPECT_EQ(Boiler(NumBoilers).SizFac, 1.0);
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).Name, "STEAM BOILER PLANT BOILER");
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).FuelType, AssignResourceTypeNum("NATURALGAS"));
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).BoilerMaxOperPress, 160000);
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).Effic, 0.8);
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).TempUpLimitBoilerOut, 115);
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).NomCap, AutoSize);
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).MinPartLoadRat, 0.00001);
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).MaxPartLoadRat, 1.0);
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).OptPartLoadRat, 0.2);
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).FullLoadCoef(1), 0.8);
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).FullLoadCoef(2), 0.1);
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).FullLoadCoef(3), 0.1);
+    EXPECT_EQ(state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers).SizFac, 1.0);
 }

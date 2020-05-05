@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <unordered_map>
@@ -70,14 +71,27 @@ namespace EnergyPlus {
 //};
 
     struct BoilersData : BaseGlobalStruct {
-        int NumBoilers = 0;                   // Number of boilers
-        bool GetBoilerInputFlag = true;       // Boiler input flag, false if input is processed
+        int numBoilers = 0;                   // Number of boilers
+        bool getBoilerInputFlag = true;       // Boiler input flag, false if input is processed
         Array1D<Boilers::BoilerSpecs> Boiler;
 
         void clear_state()
         {
-            NumBoilers = 0;
-            GetBoilerInputFlag = true;
+            numBoilers = 0;
+            getBoilerInputFlag = true;
+            Boiler.deallocate();
+        }
+    };
+
+    struct BoilerSteamData : BaseGlobalStruct {
+        int numBoilers = 0;
+        bool getSteamBoilerInput = true;
+        Array1D<BoilerSteam::BoilerSpecs> Boiler;
+
+        void clear_state()
+        {
+            numBoilers = 0;
+            getSteamBoilerInput = true;
             Boiler.deallocate();
         }
     };
@@ -157,6 +171,7 @@ namespace EnergyPlus {
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
         BoilersData dataBoilers;
+        BoilerSteamData dataSteamBoilers;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -166,6 +181,7 @@ namespace EnergyPlus {
         // all clear states
         void clear_state() override {
             dataBoilers.clear_state();
+            dataSteamBoilers.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();

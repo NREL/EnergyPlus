@@ -101,9 +101,9 @@ namespace Boilers {
     PlantComponent *BoilerSpecs::factory(BoilersData &boilers, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
-        if (boilers.GetBoilerInputFlag) {
+        if (boilers.getBoilerInputFlag) {
             GetBoilerInput(boilers);
-            boilers.GetBoilerInputFlag = false;
+            boilers.getBoilerInputFlag = false;
         }
         // Now look for this particular pipe in the list
         for (auto &boiler : boilers.Boiler) {
@@ -168,9 +168,9 @@ namespace Boilers {
 
         // GET NUMBER OF ALL EQUIPMENT
         DataIPShortCuts::cCurrentModuleObject = "Boiler:HotWater";
-        boilers.NumBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        boilers.numBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (boilers.NumBoilers <= 0) {
+        if (boilers.numBoilers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " Equipment specified in input file");
             ErrorsFound = true;
         }
@@ -178,11 +178,11 @@ namespace Boilers {
         // See if load distribution manager has already gotten the input
         if (allocated(boilers.Boiler)) return;
 
-        boilers.Boiler.allocate(boilers.NumBoilers);
+        boilers.Boiler.allocate(boilers.numBoilers);
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
 
-        for (int BoilerNum = 1; BoilerNum <= boilers.NumBoilers; ++BoilerNum) {
+        for (int BoilerNum = 1; BoilerNum <= boilers.numBoilers; ++BoilerNum) {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine

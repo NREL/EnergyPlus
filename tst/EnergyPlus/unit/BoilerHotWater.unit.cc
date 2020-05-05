@@ -181,7 +181,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
     ASSERT_TRUE(process_idf(idf_objects));
     GetBoilerInput(state.dataBoilers);
 
-    EXPECT_EQ(1, state.dataBoilers.NumBoilers);
+    EXPECT_EQ(1, state.dataBoilers.numBoilers);
     EXPECT_EQ(AutoSize, state.dataBoilers.Boiler(1).VolFlowRate);
 
 }

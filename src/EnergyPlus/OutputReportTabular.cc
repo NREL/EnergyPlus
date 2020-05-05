@@ -4942,7 +4942,7 @@ namespace OutputReportTabular {
         }
 
         // Water / steam boiler
-        for (iBoiler = 1; iBoiler <= state.dataBoilers.NumBoilers; ++iBoiler) {
+        for (iBoiler = 1; iBoiler <= state.dataBoilers.numBoilers; ++iBoiler) {
             SysTotalHVACRejectHeatLoss += state.dataBoilers.Boiler(iBoiler).FuelConsumed + state.dataBoilers.Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers.Boiler(iBoiler).BoilerEnergy;
         }
 
