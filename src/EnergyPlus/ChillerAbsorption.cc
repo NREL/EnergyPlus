@@ -67,6 +67,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -148,7 +149,7 @@ namespace ChillerAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void BLASTAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void BLASTAbsorberSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
 
         this->EquipFlowCtrl = DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum).FlowCtrl;
@@ -194,7 +195,7 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    void BLASTAbsorberSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;

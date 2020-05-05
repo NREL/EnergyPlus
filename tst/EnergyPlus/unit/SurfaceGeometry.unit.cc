@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -685,7 +686,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     GetConstructData(FoundError);
     GetZoneData(FoundError); // Read Zone data from input file
     DataHeatBalance::AnyCTF = true;
-    SetupZoneGeometry(outputFiles(), FoundError); // this calls GetSurfaceData()
+    SetupZoneGeometry(state, outputFiles(), FoundError); // this calls GetSurfaceData()
 
     EXPECT_FALSE(FoundError);
 
@@ -2579,7 +2580,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     Surface(6).Vertex(3) = Vector(10., 0., 3.);
     Surface(6).Vertex(4) = Vector(10., 8., 3.);
 
-    CalculateZoneVolume(enteredCeilingHeight);
+    CalculateZoneVolume(outputFiles(), enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2645,7 +2646,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
     Zone(1).FloorArea = 80.;
     Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(enteredCeilingHeight);
+    CalculateZoneVolume(outputFiles(), enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2711,7 +2712,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     Zone(1).FloorArea = 80.;
     Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(enteredCeilingHeight);
+    CalculateZoneVolume(outputFiles(), enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2777,7 +2778,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     Zone(1).CeilingArea = 80.;
     Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(enteredCeilingHeight);
+    CalculateZoneVolume(outputFiles(), enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2838,7 +2839,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     Surface(4).Vertex(3) = Vector(10., 8., 0.);
     Surface(4).Vertex(4) = Vector(10., 8., 3.);
 
-    CalculateZoneVolume(enteredCeilingHeight);
+    CalculateZoneVolume(outputFiles(), enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -4825,7 +4826,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(outputFiles(), ErrorsFound);
+    SetupZoneGeometry(state, outputFiles(), ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -4963,7 +4964,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(outputFiles(), ErrorsFound);
+    SetupZoneGeometry(state, outputFiles(), ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -5104,7 +5105,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(outputFiles(), ErrorsFound);
+    SetupZoneGeometry(state, outputFiles(), ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -5352,7 +5353,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
+    SetupZoneGeometry(state, OutputFiles::getSingleton(), ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries

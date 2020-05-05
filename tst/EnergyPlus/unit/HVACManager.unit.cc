@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
@@ -115,7 +116,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
 
     // Call HVACManager
-    ReportAirHeatBalance();
+    ReportAirHeatBalance(state);
 
     EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixVolume, DataHeatBalance::ZnAirRpt(2).MixVolume, 0.0001);
     EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixVdotCurDensity, DataHeatBalance::ZnAirRpt(2).MixVdotCurDensity, 0.0001);
@@ -178,7 +179,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
     DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
     // Call HVACManager
-    ReportAirHeatBalance();
+    ReportAirHeatBalance(state);
 
     EXPECT_NEAR(2.9971591, DataHeatBalance::ZnAirRpt(1).InfilVolumeCurDensity, 0.0001);
     EXPECT_NEAR(5.9943183, DataHeatBalance::ZnAirRpt(1).VentilVolumeCurDensity, 0.0001);
@@ -230,7 +231,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
     Fans::Fan.allocate(1);
-    Fans::NumFans = 1;
+    state.fans.NumFans = 1;
     Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_ZoneExhaust;
     Fans::Fan(1).OutletAirMassFlowRate = 1.0;
     Fans::Fan(1).OutletAirTemp = 22.0;
@@ -241,7 +242,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     DataLoopNode::Node(1).MassFlowRate = 0.0;
 
     // Call HVACManager
-    ReportAirHeatBalance();
+    ReportAirHeatBalance(state);
 
     EXPECT_NEAR(9.7853391, DataHeatBalance::ZnAirRpt(1).ExfilTotalLoss, 0.0001);
     EXPECT_NEAR(26.056543, DataHeatBalance::ZnAirRpt(2).ExfilTotalLoss, 0.0001);

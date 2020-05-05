@@ -55,6 +55,7 @@
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -80,7 +81,7 @@ struct CoilCoolingDXCurveFitOperatingMode
     std::string object_name = "Coil:Cooling:DX:CurveFit:OperatingMode";
 
     void instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
-    void size();
+    void size(EnergyPlusData &state);
     CoilCoolingDXCurveFitOperatingModeInputSpecification original_input_specs;
     CoilCoolingDXCurveFitOperatingMode() = default;
     explicit CoilCoolingDXCurveFitOperatingMode(const std::string& name_to_find);

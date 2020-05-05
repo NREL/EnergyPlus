@@ -45,6 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/Component.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 
@@ -66,7 +67,7 @@ namespace DataPlant {
         return false;
     }
 
-    void CompData::simulate(bool const FirstHVACIteration, bool &InitLoopEquip, bool const GetCompSizFac) {
+    void CompData::simulate(EnergyPlusData &state, bool const FirstHVACIteration, bool &InitLoopEquip, bool const GetCompSizFac) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -115,7 +116,7 @@ namespace DataPlant {
             DataPlant::TypeOf_Pipe, DataPlant::TypeOf_PipeSteam, DataPlant::TypeOf_SolarCollectorICS, DataPlant::TypeOf_SolarCollectorFlatPlate};
         if (this->compPtr != nullptr) {
             if (InitLoopEquip) {
-                this->compPtr->onInitLoopEquip(this->location);
+                this->compPtr->onInitLoopEquip(state, this->location);
                 this->compPtr->getDesignCapacities(this->location, this->MaxLoad, this->MinLoad, this->OptLoad);
                 this->compPtr->getDesignTemperatures(this->TempDesCondIn, this->TempDesEvapOut);
 
@@ -137,7 +138,7 @@ namespace DataPlant {
                     return;
                 }
             }
-            this->compPtr->simulate(this->location, FirstHVACIteration, this->MyLoad, this->ON);
+            this->compPtr->simulate(state, this->location, FirstHVACIteration, this->MyLoad, this->ON);
         }
     }
 
