@@ -116,30 +116,15 @@ namespace ChillerElectricEIR {
     // REFERENCES:
     // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-    // MODULE VARIABLE DECLARATIONS:
-    int NumElectricEIRChillers(0); // Number of electric EIR chillers specified in input
-    bool getInputFlag(true);       // When TRUE, calls subroutine to read input file.
-
-    // Object Data
-    Array1D<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
-
-    // Functions
-    void clear_state()
-    {
-        NumElectricEIRChillers = 0; // Number of electric EIR chillers specified in input
-        getInputFlag = true;
-        ElectricEIRChiller.deallocate();
-    }
-
-    PlantComponent *ElectricEIRChillerSpecs::factory(std::string const &objectName)
+    PlantComponent *ElectricEIRChillerSpecs::factory(ChillerElectricEIRData &chillers, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (getInputFlag) {
-            GetElectricEIRChillerInput();
-            getInputFlag = false;
+        if (chillers.getInputFlag) {
+            GetElectricEIRChillerInput(chillers);
+            chillers.getInputFlag = false;
         }
         // Now look for this particular object in the list
-        for (auto &obj : ElectricEIRChiller) {
+        for (auto &obj : chillers.ElectricEIRChiller) {
             if (obj.Name == objectName) {
                 return &obj;
             }
@@ -230,7 +215,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void GetElectricEIRChillerInput()
+    void GetElectricEIRChillerInput(ChillerElectricEIRData &chillers)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Richard Raustad, FSEC
@@ -247,18 +232,18 @@ namespace ChillerElectricEIR {
         static ObjexxFCL::gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric:EIR";
-        NumElectricEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        chillers.NumElectricEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (NumElectricEIRChillers <= 0) {
+        if (chillers.NumElectricEIRChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // ALLOCATE ARRAYS
-        ElectricEIRChiller.allocate(NumElectricEIRChillers);
+        chillers.ElectricEIRChiller.allocate(chillers.NumElectricEIRChillers);
 
         // Load arrays with electric EIR chiller data
-        for (int EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum) {
+        for (int EIRChillerNum = 1; EIRChillerNum <= chillers.NumElectricEIRChillers; ++EIRChillerNum) {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
@@ -279,31 +264,32 @@ namespace ChillerElectricEIR {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            ElectricEIRChiller(EIRChillerNum).Name = DataIPShortCuts::cAlphaArgs(1);
+            auto &thisChiller = chillers.ElectricEIRChiller(EIRChillerNum);
+            thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
 
             //   Performance curves
-            ElectricEIRChiller(EIRChillerNum).ChillerCapFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(2));
-            if (ElectricEIRChiller(EIRChillerNum).ChillerCapFTIndex == 0) {
+            thisChiller.ChillerCapFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(2));
+            if (thisChiller.ChillerCapFTIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + " \"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                 ErrorsFound = true;
             }
 
-            ElectricEIRChiller(EIRChillerNum).ChillerEIRFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(3));
-            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFTIndex == 0) {
+            thisChiller.ChillerEIRFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(3));
+            if (thisChiller.ChillerEIRFTIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
                 ErrorsFound = true;
             }
 
-            ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(4));
-            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex == 0) {
+            thisChiller.ChillerEIRFPLRIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(4));
+            if (thisChiller.ChillerEIRFPLRIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + DataIPShortCuts::cAlphaArgs(4));
                 ErrorsFound = true;
             }
 
-            ElectricEIRChiller(EIRChillerNum).EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
                                                                                                      ErrorsFound,
                                                                                                      DataIPShortCuts::cCurrentModuleObject,
                                                                                                      DataIPShortCuts::cAlphaArgs(1),
@@ -311,7 +297,7 @@ namespace ChillerElectricEIR {
                                                                                                      DataLoopNode::NodeConnectionType_Inlet,
                                                                                                      1,
                                                                                                      DataLoopNode::ObjectIsNotParent);
-            ElectricEIRChiller(EIRChillerNum).EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
                                                                                                       ErrorsFound,
                                                                                                       DataIPShortCuts::cCurrentModuleObject,
                                                                                                       DataIPShortCuts::cAlphaArgs(1),
@@ -326,11 +312,11 @@ namespace ChillerElectricEIR {
                                                "Chilled Water Nodes");
 
             if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "WaterCooled")) {
-                ElectricEIRChiller(EIRChillerNum).CondenserType = DataPlant::CondenserType::WATERCOOLED;
+                thisChiller.CondenserType = DataPlant::CondenserType::WATERCOOLED;
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "AirCooled")) {
-                ElectricEIRChiller(EIRChillerNum).CondenserType = DataPlant::CondenserType::AIRCOOLED;
+                thisChiller.CondenserType = DataPlant::CondenserType::AIRCOOLED;
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "EvaporativelyCooled")) {
-                ElectricEIRChiller(EIRChillerNum).CondenserType = DataPlant::CondenserType::EVAPCOOLED;
+                thisChiller.CondenserType = DataPlant::CondenserType::EVAPCOOLED;
             } else {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + ": " + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + DataIPShortCuts::cAlphaArgs(9));
@@ -338,7 +324,7 @@ namespace ChillerElectricEIR {
                 ErrorsFound = true;
             }
 
-            if (ElectricEIRChiller(EIRChillerNum).CondenserType == DataPlant::CondenserType::AIRCOOLED || ElectricEIRChiller(EIRChillerNum).CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
+            if (thisChiller.CondenserType == DataPlant::CondenserType::AIRCOOLED || thisChiller.CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
                 // Connection not required for air or evap cooled condenser
                 // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
                 // since it is not used elsewhere for connection
@@ -357,7 +343,7 @@ namespace ChillerElectricEIR {
                     }
                 }
 
-                ElectricEIRChiller(EIRChillerNum).CondInletNodeNum =
+                thisChiller.CondInletNodeNum =
                     NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
                                                         ErrorsFound,
                                                         DataIPShortCuts::cCurrentModuleObject,
@@ -367,13 +353,13 @@ namespace ChillerElectricEIR {
                                                         2,
                                                         DataLoopNode::ObjectIsNotParent);
                 bool Okay;
-                OutAirNodeManager::CheckAndAddAirNodeNumber(ElectricEIRChiller(EIRChillerNum).CondInletNodeNum, Okay);
+                OutAirNodeManager::CheckAndAddAirNodeNumber(thisChiller.CondInletNodeNum, Okay);
                 if (!Okay) {
                     ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError("Adding OutdoorAir:Node=" + DataIPShortCuts::cAlphaArgs(7));
                 }
 
-                ElectricEIRChiller(EIRChillerNum).CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
                                                                                                           ErrorsFound,
                                                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                                                           DataIPShortCuts::cAlphaArgs(1),
@@ -382,7 +368,7 @@ namespace ChillerElectricEIR {
                                                                                                           2,
                                                                                                           DataLoopNode::ObjectIsNotParent);
 
-            } else if (ElectricEIRChiller(EIRChillerNum).CondenserType == DataPlant::CondenserType::WATERCOOLED) {
+            } else if (thisChiller.CondenserType == DataPlant::CondenserType::WATERCOOLED) {
                 // Condenser inlet node name is necessary for water-cooled condenser
                 if (DataIPShortCuts::lAlphaFieldBlanks(7) || DataIPShortCuts::lAlphaFieldBlanks(8)) {
                     ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
@@ -390,7 +376,7 @@ namespace ChillerElectricEIR {
                     ErrorsFound = true;
                 }
 
-                ElectricEIRChiller(EIRChillerNum).CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
                                                                                                          ErrorsFound,
                                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -399,7 +385,7 @@ namespace ChillerElectricEIR {
                                                                                                          2,
                                                                                                          DataLoopNode::ObjectIsNotParent);
 
-                ElectricEIRChiller(EIRChillerNum).CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
                                                                                                           ErrorsFound,
                                                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                                                           DataIPShortCuts::cAlphaArgs(1),
@@ -421,7 +407,7 @@ namespace ChillerElectricEIR {
                     ShowContinueError("Condenser Inlet or Outlet Node Name is blank.");
                     ErrorsFound = true;
                 }
-                ElectricEIRChiller(EIRChillerNum).CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
                                                                                                          ErrorsFound,
                                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -430,7 +416,7 @@ namespace ChillerElectricEIR {
                                                                                                          2,
                                                                                                          DataLoopNode::ObjectIsNotParent);
 
-                ElectricEIRChiller(EIRChillerNum).CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
                                                                                                           ErrorsFound,
                                                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                                                           DataIPShortCuts::cAlphaArgs(1),
@@ -449,24 +435,24 @@ namespace ChillerElectricEIR {
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(10));
                 if (SELECT_CASE_var == "CONSTANTFLOW") {
-                    ElectricEIRChiller(EIRChillerNum).FlowMode = DataPlant::FlowMode::CONSTANT;
+                    thisChiller.FlowMode = DataPlant::FlowMode::CONSTANT;
                 } else if (SELECT_CASE_var == "LEAVINGSETPOINTMODULATED") {
-                    ElectricEIRChiller(EIRChillerNum).FlowMode = DataPlant::FlowMode::LEAVINGSETPOINTMODULATED;
+                    thisChiller.FlowMode = DataPlant::FlowMode::LEAVINGSETPOINTMODULATED;
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
-                    ElectricEIRChiller(EIRChillerNum).FlowMode = DataPlant::FlowMode::NOTMODULATED;
+                    thisChiller.FlowMode = DataPlant::FlowMode::NOTMODULATED;
                 } else {
                     ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + DataIPShortCuts::cAlphaArgs(10));
                     ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
-                    ElectricEIRChiller(EIRChillerNum).FlowMode = DataPlant::FlowMode::NOTMODULATED;
+                    thisChiller.FlowMode = DataPlant::FlowMode::NOTMODULATED;
                 }
             }
 
             //   Chiller rated performance data
-            ElectricEIRChiller(EIRChillerNum).RefCap = DataIPShortCuts::rNumericArgs(1);
-            if (ElectricEIRChiller(EIRChillerNum).RefCap == DataSizing::AutoSize) {
-                ElectricEIRChiller(EIRChillerNum).RefCapWasAutoSized = true;
+            thisChiller.RefCap = DataIPShortCuts::rNumericArgs(1);
+            if (thisChiller.RefCap == DataSizing::AutoSize) {
+                thisChiller.RefCapWasAutoSized = true;
             }
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
@@ -474,32 +460,32 @@ namespace ChillerElectricEIR {
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
                 ErrorsFound = true;
             }
-            ElectricEIRChiller(EIRChillerNum).RefCOP = DataIPShortCuts::rNumericArgs(2);
+            thisChiller.RefCOP = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(2) == 0.0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 2));
                 ErrorsFound = true;
             }
-            ElectricEIRChiller(EIRChillerNum).TempRefEvapOut = DataIPShortCuts::rNumericArgs(3);
-            ElectricEIRChiller(EIRChillerNum).TempRefCondIn = DataIPShortCuts::rNumericArgs(4);
-            ElectricEIRChiller(EIRChillerNum).EvapVolFlowRate = DataIPShortCuts::rNumericArgs(5);
-            if (ElectricEIRChiller(EIRChillerNum).EvapVolFlowRate == DataSizing::AutoSize) {
-                ElectricEIRChiller(EIRChillerNum).EvapVolFlowRateWasAutoSized = true;
+            thisChiller.TempRefEvapOut = DataIPShortCuts::rNumericArgs(3);
+            thisChiller.TempRefCondIn = DataIPShortCuts::rNumericArgs(4);
+            thisChiller.EvapVolFlowRate = DataIPShortCuts::rNumericArgs(5);
+            if (thisChiller.EvapVolFlowRate == DataSizing::AutoSize) {
+                thisChiller.EvapVolFlowRateWasAutoSized = true;
             }
-            ElectricEIRChiller(EIRChillerNum).CondVolFlowRate = DataIPShortCuts::rNumericArgs(6);
-            if (ElectricEIRChiller(EIRChillerNum).CondVolFlowRate == DataSizing::AutoSize) {
-                ElectricEIRChiller(EIRChillerNum).CondVolFlowRateWasAutoSized = true;
+            thisChiller.CondVolFlowRate = DataIPShortCuts::rNumericArgs(6);
+            if (thisChiller.CondVolFlowRate == DataSizing::AutoSize) {
+                thisChiller.CondVolFlowRateWasAutoSized = true;
             }
 
-            ElectricEIRChiller(EIRChillerNum).MinPartLoadRat = DataIPShortCuts::rNumericArgs(7);
-            ElectricEIRChiller(EIRChillerNum).MaxPartLoadRat = DataIPShortCuts::rNumericArgs(8);
-            ElectricEIRChiller(EIRChillerNum).OptPartLoadRat = DataIPShortCuts::rNumericArgs(9);
-            ElectricEIRChiller(EIRChillerNum).MinUnloadRat = DataIPShortCuts::rNumericArgs(10);
-            ElectricEIRChiller(EIRChillerNum).SizFac = DataIPShortCuts::rNumericArgs(15);
-            if (ElectricEIRChiller(EIRChillerNum).SizFac <= 0.0) ElectricEIRChiller(EIRChillerNum).SizFac = 1.0;
+            thisChiller.MinPartLoadRat = DataIPShortCuts::rNumericArgs(7);
+            thisChiller.MaxPartLoadRat = DataIPShortCuts::rNumericArgs(8);
+            thisChiller.OptPartLoadRat = DataIPShortCuts::rNumericArgs(9);
+            thisChiller.MinUnloadRat = DataIPShortCuts::rNumericArgs(10);
+            thisChiller.SizFac = DataIPShortCuts::rNumericArgs(15);
+            if (thisChiller.SizFac <= 0.0) thisChiller.SizFac = 1.0;
 
-            if (ElectricEIRChiller(EIRChillerNum).MinPartLoadRat > ElectricEIRChiller(EIRChillerNum).MaxPartLoadRat) {
+            if (thisChiller.MinPartLoadRat > thisChiller.MaxPartLoadRat) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(7) + " [" + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(7), 3) +
                                   "] > " + DataIPShortCuts::cNumericFieldNames(8) + " [" +
@@ -508,8 +494,8 @@ namespace ChillerElectricEIR {
                 ErrorsFound = true;
             }
 
-            if (ElectricEIRChiller(EIRChillerNum).MinUnloadRat < ElectricEIRChiller(EIRChillerNum).MinPartLoadRat ||
-                ElectricEIRChiller(EIRChillerNum).MinUnloadRat > ElectricEIRChiller(EIRChillerNum).MaxPartLoadRat) {
+            if (thisChiller.MinUnloadRat < thisChiller.MinPartLoadRat ||
+                thisChiller.MinUnloadRat > thisChiller.MaxPartLoadRat) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(10) + " = " + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(10), 3));
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(10) + " must be greater than or equal to the " +
@@ -519,8 +505,8 @@ namespace ChillerElectricEIR {
                 ErrorsFound = true;
             }
 
-            if (ElectricEIRChiller(EIRChillerNum).OptPartLoadRat < ElectricEIRChiller(EIRChillerNum).MinPartLoadRat ||
-                ElectricEIRChiller(EIRChillerNum).OptPartLoadRat > ElectricEIRChiller(EIRChillerNum).MaxPartLoadRat) {
+            if (thisChiller.OptPartLoadRat < thisChiller.MinPartLoadRat ||
+                thisChiller.OptPartLoadRat > thisChiller.MaxPartLoadRat) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(9) + " = " + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(9), 3));
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(9) + " must be greater than or equal to the " +
@@ -530,11 +516,11 @@ namespace ChillerElectricEIR {
                 ErrorsFound = true;
             }
 
-            ElectricEIRChiller(EIRChillerNum).CondenserFanPowerRatio = DataIPShortCuts::rNumericArgs(11);
-            ElectricEIRChiller(EIRChillerNum).CompPowerToCondenserFrac = DataIPShortCuts::rNumericArgs(12);
+            thisChiller.CondenserFanPowerRatio = DataIPShortCuts::rNumericArgs(11);
+            thisChiller.CompPowerToCondenserFrac = DataIPShortCuts::rNumericArgs(12);
 
-            if (ElectricEIRChiller(EIRChillerNum).CompPowerToCondenserFrac < 0.0 ||
-                ElectricEIRChiller(EIRChillerNum).CompPowerToCondenserFrac > 1.0) {
+            if (thisChiller.CompPowerToCondenserFrac < 0.0 ||
+                thisChiller.CompPowerToCondenserFrac > 1.0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(12) + " = " + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(12), 3));
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(12) + " must be greater than or equal to zero");
@@ -542,17 +528,17 @@ namespace ChillerElectricEIR {
                 ErrorsFound = true;
             }
 
-            ElectricEIRChiller(EIRChillerNum).TempLowLimitEvapOut = DataIPShortCuts::rNumericArgs(13);
+            thisChiller.TempLowLimitEvapOut = DataIPShortCuts::rNumericArgs(13);
 
             // These are the heat recovery inputs
-            ElectricEIRChiller(EIRChillerNum).DesignHeatRecVolFlowRate = DataIPShortCuts::rNumericArgs(14);
-            if (ElectricEIRChiller(EIRChillerNum).DesignHeatRecVolFlowRate == DataSizing::AutoSize) {
-                ElectricEIRChiller(EIRChillerNum).DesignHeatRecVolFlowRateWasAutoSized = true;
+            thisChiller.DesignHeatRecVolFlowRate = DataIPShortCuts::rNumericArgs(14);
+            if (thisChiller.DesignHeatRecVolFlowRate == DataSizing::AutoSize) {
+                thisChiller.DesignHeatRecVolFlowRateWasAutoSized = true;
             }
-            if ((ElectricEIRChiller(EIRChillerNum).DesignHeatRecVolFlowRate > 0.0) ||
-                (ElectricEIRChiller(EIRChillerNum).DesignHeatRecVolFlowRate == DataSizing::AutoSize)) {
-                ElectricEIRChiller(EIRChillerNum).HeatRecActive = true;
-                ElectricEIRChiller(EIRChillerNum).HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(11),
+            if ((thisChiller.DesignHeatRecVolFlowRate > 0.0) ||
+                (thisChiller.DesignHeatRecVolFlowRate == DataSizing::AutoSize)) {
+                thisChiller.HeatRecActive = true;
+                thisChiller.HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(11),
                                                                                                             ErrorsFound,
                                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                                             DataIPShortCuts::cAlphaArgs(1),
@@ -560,12 +546,12 @@ namespace ChillerElectricEIR {
                                                                                                             DataLoopNode::NodeConnectionType_Inlet,
                                                                                                             3,
                                                                                                             DataLoopNode::ObjectIsNotParent);
-                if (ElectricEIRChiller(EIRChillerNum).HeatRecInletNodeNum == 0) {
+                if (thisChiller.HeatRecInletNodeNum == 0) {
                     ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + DataIPShortCuts::cAlphaArgs(11));
                     ErrorsFound = true;
                 }
-                ElectricEIRChiller(EIRChillerNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(12),
+                thisChiller.HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(12),
                                                                                                              ErrorsFound,
                                                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                                                              DataIPShortCuts::cAlphaArgs(1),
@@ -573,12 +559,12 @@ namespace ChillerElectricEIR {
                                                                                                              DataLoopNode::NodeConnectionType_Outlet,
                                                                                                              3,
                                                                                                              DataLoopNode::ObjectIsNotParent);
-                if (ElectricEIRChiller(EIRChillerNum).HeatRecOutletNodeNum == 0) {
+                if (thisChiller.HeatRecOutletNodeNum == 0) {
                     ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + '=' + DataIPShortCuts::cAlphaArgs(12));
                     ErrorsFound = true;
                 }
-                if (ElectricEIRChiller(EIRChillerNum).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                if (thisChiller.CondenserType != DataPlant::CondenserType::WATERCOOLED) {
                     ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError("Heat Recovery requires a Water Cooled Condenser.");
                     ErrorsFound = true;
@@ -590,39 +576,39 @@ namespace ChillerElectricEIR {
                                                    DataIPShortCuts::cAlphaArgs(12),
                                                    "Heat Recovery Nodes");
                 // store heat recovery volume flow for plant sizing
-                if (ElectricEIRChiller(EIRChillerNum).DesignHeatRecVolFlowRate > 0.0) {
-                    PlantUtilities::RegisterPlantCompDesignFlow(ElectricEIRChiller(EIRChillerNum).HeatRecInletNodeNum,
-                                                                ElectricEIRChiller(EIRChillerNum).DesignHeatRecVolFlowRate); // CR 6953
+                if (thisChiller.DesignHeatRecVolFlowRate > 0.0) {
+                    PlantUtilities::RegisterPlantCompDesignFlow(thisChiller.HeatRecInletNodeNum,
+                                                                thisChiller.DesignHeatRecVolFlowRate); // CR 6953
                 }
                 if (NumNums > 17) {
                     if (!DataIPShortCuts::lNumericFieldBlanks(18)) {
-                        ElectricEIRChiller(EIRChillerNum).HeatRecCapacityFraction = DataIPShortCuts::rNumericArgs(18);
+                        thisChiller.HeatRecCapacityFraction = DataIPShortCuts::rNumericArgs(18);
                     } else {
-                        ElectricEIRChiller(EIRChillerNum).HeatRecCapacityFraction = 1.0;
+                        thisChiller.HeatRecCapacityFraction = 1.0;
                     }
                 } else {
-                    ElectricEIRChiller(EIRChillerNum).HeatRecCapacityFraction = 1.0;
+                    thisChiller.HeatRecCapacityFraction = 1.0;
                 }
 
                 if (NumAlphas > 13) {
                     if (!DataIPShortCuts::lAlphaFieldBlanks(14)) {
-                        ElectricEIRChiller(EIRChillerNum).HeatRecInletLimitSchedNum =
+                        thisChiller.HeatRecInletLimitSchedNum =
                             ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(14));
-                        if (ElectricEIRChiller(EIRChillerNum).HeatRecInletLimitSchedNum == 0) {
+                        if (thisChiller.HeatRecInletLimitSchedNum == 0) {
                             ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                             ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(14) + '=' + DataIPShortCuts::cAlphaArgs(14));
                             ErrorsFound = true;
                         }
                     } else {
-                        ElectricEIRChiller(EIRChillerNum).HeatRecInletLimitSchedNum = 0;
+                        thisChiller.HeatRecInletLimitSchedNum = 0;
                     }
                 } else {
-                    ElectricEIRChiller(EIRChillerNum).HeatRecInletLimitSchedNum = 0;
+                    thisChiller.HeatRecInletLimitSchedNum = 0;
                 }
 
                 if (NumAlphas > 14) {
                     if (!DataIPShortCuts::lAlphaFieldBlanks(15)) {
-                        ElectricEIRChiller(EIRChillerNum).HeatRecSetPointNodeNum =
+                        thisChiller.HeatRecSetPointNodeNum =
                             NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(15),
                                                                 ErrorsFound,
                                                                 DataIPShortCuts::cCurrentModuleObject,
@@ -632,17 +618,17 @@ namespace ChillerElectricEIR {
                                                                 1,
                                                                 DataLoopNode::ObjectIsNotParent);
                     } else {
-                        ElectricEIRChiller(EIRChillerNum).HeatRecSetPointNodeNum = 0;
+                        thisChiller.HeatRecSetPointNodeNum = 0;
                     }
                 } else {
-                    ElectricEIRChiller(EIRChillerNum).HeatRecSetPointNodeNum = 0;
+                    thisChiller.HeatRecSetPointNodeNum = 0;
                 }
 
             } else {
-                ElectricEIRChiller(EIRChillerNum).HeatRecActive = false;
-                ElectricEIRChiller(EIRChillerNum).DesignHeatRecMassFlowRate = 0.0;
-                ElectricEIRChiller(EIRChillerNum).HeatRecInletNodeNum = 0;
-                ElectricEIRChiller(EIRChillerNum).HeatRecOutletNodeNum = 0;
+                thisChiller.HeatRecActive = false;
+                thisChiller.DesignHeatRecMassFlowRate = 0.0;
+                thisChiller.HeatRecInletNodeNum = 0;
+                thisChiller.HeatRecOutletNodeNum = 0;
                 if (!DataIPShortCuts::lAlphaFieldBlanks(11) || !DataIPShortCuts::lAlphaFieldBlanks(12)) {
                     //  IF (DataIPShortCuts::cAlphaArgs(11) /= ' ' .or. DataIPShortCuts::cAlphaArgs(12) /= ' ') THEN
                     ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
@@ -652,10 +638,10 @@ namespace ChillerElectricEIR {
             }
 
             //   Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
-            if (ElectricEIRChiller(EIRChillerNum).ChillerCapFTIndex > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerCapFTIndex,
-                                                           ElectricEIRChiller(EIRChillerNum).TempRefEvapOut,
-                                                           ElectricEIRChiller(EIRChillerNum).TempRefCondIn);
+            if (thisChiller.ChillerCapFTIndex > 0) {
+                Real64 CurveVal = CurveManager::CurveValue(thisChiller.ChillerCapFTIndex,
+                                                           thisChiller.TempRefEvapOut,
+                                                           thisChiller.TempRefCondIn);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
                     ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError(
@@ -664,10 +650,10 @@ namespace ChillerElectricEIR {
                 }
             }
 
-            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFTIndex > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerEIRFTIndex,
-                                                           ElectricEIRChiller(EIRChillerNum).TempRefEvapOut,
-                                                           ElectricEIRChiller(EIRChillerNum).TempRefCondIn);
+            if (thisChiller.ChillerEIRFTIndex > 0) {
+                Real64 CurveVal = CurveManager::CurveValue(thisChiller.ChillerEIRFTIndex,
+                                                           thisChiller.TempRefEvapOut,
+                                                           thisChiller.TempRefCondIn);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
                     ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError(
@@ -676,8 +662,8 @@ namespace ChillerElectricEIR {
                 }
             }
 
-            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex, 1.0);
+            if (thisChiller.ChillerEIRFPLRIndex > 0) {
+                Real64 CurveVal = CurveManager::CurveValue(thisChiller.ChillerEIRFPLRIndex, 1.0);
 
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
                     ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
@@ -687,11 +673,11 @@ namespace ChillerElectricEIR {
                 }
             }
 
-            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex > 0) {
+            if (thisChiller.ChillerEIRFPLRIndex > 0) {
                 bool FoundNegValue = false;
                 Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
                 for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
-                    Real64 CurveValTmp = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex, double(CurveCheck / 10.0));
+                    Real64 CurveValTmp = CurveManager::CurveValue(thisChiller.ChillerEIRFPLRIndex, double(CurveCheck / 10.0));
                     if (CurveValTmp < 0.0) FoundNegValue = true;
                     CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
                 }
@@ -712,28 +698,28 @@ namespace ChillerElectricEIR {
                 }
             }
             //   Basin heater power as a function of temperature must be greater than or equal to 0
-            ElectricEIRChiller(EIRChillerNum).BasinHeaterPowerFTempDiff = DataIPShortCuts::rNumericArgs(16);
+            thisChiller.BasinHeaterPowerFTempDiff = DataIPShortCuts::rNumericArgs(16);
             if (DataIPShortCuts::rNumericArgs(16) < 0.0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError(DataIPShortCuts::cNumericFieldNames(16) + " must be >= 0");
                 ErrorsFound = true;
             }
 
-            ElectricEIRChiller(EIRChillerNum).BasinHeaterSetPointTemp = DataIPShortCuts::rNumericArgs(17);
+            thisChiller.BasinHeaterSetPointTemp = DataIPShortCuts::rNumericArgs(17);
 
-            if (ElectricEIRChiller(EIRChillerNum).BasinHeaterPowerFTempDiff > 0.0) {
+            if (thisChiller.BasinHeaterPowerFTempDiff > 0.0) {
                 if (NumNums < 17) {
-                    ElectricEIRChiller(EIRChillerNum).BasinHeaterSetPointTemp = 2.0;
+                    thisChiller.BasinHeaterSetPointTemp = 2.0;
                 }
-                if (ElectricEIRChiller(EIRChillerNum).BasinHeaterSetPointTemp < 2.0) {
+                if (thisChiller.BasinHeaterSetPointTemp < 2.0) {
                     ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + " \"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError(DataIPShortCuts::cNumericFieldNames(17) + " is less than 2 deg C. Freezing could occur.");
                 }
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(13)) {
-                ElectricEIRChiller(EIRChillerNum).BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(13));
-                if (ElectricEIRChiller(EIRChillerNum).BasinHeaterSchedulePtr == 0) {
+                thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(13));
+                if (thisChiller.BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowWarningError(DataIPShortCuts::cAlphaFieldNames(13) + " \"" + DataIPShortCuts::cAlphaArgs(13) +
                                      "\" was not found. Basin heater operation will not be modeled and the simulation continues");
@@ -741,9 +727,9 @@ namespace ChillerElectricEIR {
             }
 
             if (NumAlphas > 15) {
-                ElectricEIRChiller(EIRChillerNum).EndUseSubcategory = DataIPShortCuts::cAlphaArgs(16);
+                thisChiller.EndUseSubcategory = DataIPShortCuts::cAlphaArgs(16);
             } else {
-                ElectricEIRChiller(EIRChillerNum).EndUseSubcategory = "General";
+                thisChiller.EndUseSubcategory = "General";
             }
         }
 

@@ -53,18 +53,17 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct ChillerElectricEIRData;
+
 namespace ChillerElectricEIR {
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumElectricEIRChillers; // Number of electric EIR chillers specified in input
-
-    extern bool getInputFlag; // When TRUE, calls subroutine to read input file.
 
     struct ElectricEIRChillerSpecs : PlantComponent
     {
@@ -226,7 +225,7 @@ namespace ChillerElectricEIR {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(ChillerElectricEIRData &state, std::string const &objectName);
 
         void setupOutputVars();
 
@@ -255,13 +254,7 @@ namespace ChillerElectricEIR {
         void update(Real64 MyLoad, bool RunFlag);
     };
 
-    // Object Data
-    extern Array1D<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
-
-    // Functions
-    void clear_state();
-
-    void GetElectricEIRChillerInput();
+    void GetElectricEIRChillerInput(ChillerElectricEIRData &chillers);
 
 } // namespace ChillerElectricEIR
 

@@ -52,6 +52,7 @@
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <unordered_map>
@@ -107,6 +108,19 @@ namespace EnergyPlus {
             numBlastAbsorbers = 0;
             getInput = true;
             BLASTAbsorber.deallocate();
+        }
+    };
+
+    struct ChillerElectricEIRData : BaseGlobalStruct {
+        int NumElectricEIRChillers = 0;
+        bool getInputFlag = true;
+        Array1D<ChillerElectricEIR::ElectricEIRChillerSpecs> ElectricEIRChiller;
+
+        void clear_state()
+        {
+            NumElectricEIRChillers = 0;
+            getInputFlag = true;
+            ElectricEIRChiller.deallocate();
         }
     };
 
@@ -187,6 +201,7 @@ namespace EnergyPlus {
         BoilersData dataBoilers;
         BoilerSteamData dataSteamBoilers;
         ChillerAbsorberData dataChillerAbsorbers;
+        ChillerElectricEIRData dataChillerElectricEIR;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -198,6 +213,7 @@ namespace EnergyPlus {
             dataBoilers.clear_state();
             dataSteamBoilers.clear_state();
             dataChillerAbsorbers.clear_state();
+            dataChillerElectricEIR.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();
