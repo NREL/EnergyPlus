@@ -18,34 +18,35 @@ TOKEN_GROUP = 100
 # object level tokens
 TOKEN_MEMO = 10
 TOKEN_MIN_FIELDS = 11
-TOKEN_EXTENSIBLE = 12
-TOKEN_FORMAT = 13
-TOKEN_UNIQUE_OBJ = 14
-TOKEN_REQUIRED_OBJ = 15
-TOKEN_REFERENCE_CLASS_NAME = 17
-TOKEN_OBSOLETE = 18
+TOKEN_MAX_FIELDS = 12
+TOKEN_EXTENSIBLE = 13
+TOKEN_FORMAT = 14
+TOKEN_UNIQUE_OBJ = 15
+TOKEN_REQUIRED_OBJ = 16
+TOKEN_REFERENCE_CLASS_NAME = 18
+TOKEN_OBSOLETE = 19
 
 # field level tokens
-TOKEN_KEY = 19
-TOKEN_NOTE = 20
-TOKEN_OBJ_LIST = 21
-TOKEN_DEFAULT = 22
-TOKEN_AUTOCALCULATABLE = 23
-TOKEN_AUTOSIZABLE = 24
-TOKEN_MIN = 25
-TOKEN_MIN_EXCLUSIVE = 26
-TOKEN_MAX = 27
-TOKEN_MAX_EXCLUSIVE = 28
-TOKEN_BEGIN_EXTENSIBLE = 29
-TOKEN_UNITS = 30
-TOKEN_TYPE = 31
-TOKEN_REQUIRED_FIELD = 32
-TOKEN_REFERENCE = 33
-TOKEN_IP_UNITS = 34
-TOKEN_UNITS_BASED_ON_FIELD = 35
-TOKEN_DEPRECATED = 36
-TOKEN_EXTERNAL_LIST = 37
-TOKEN_RETAIN_CASE = 38
+TOKEN_KEY = 20
+TOKEN_NOTE = 21
+TOKEN_OBJ_LIST = 22
+TOKEN_DEFAULT = 23
+TOKEN_AUTOCALCULATABLE = 24
+TOKEN_AUTOSIZABLE = 25
+TOKEN_MIN = 26
+TOKEN_MIN_EXCLUSIVE = 27
+TOKEN_MAX = 28
+TOKEN_MAX_EXCLUSIVE = 29
+TOKEN_BEGIN_EXTENSIBLE = 30
+TOKEN_UNITS = 31
+TOKEN_TYPE = 32
+TOKEN_REQUIRED_FIELD = 33
+TOKEN_REFERENCE = 34
+TOKEN_IP_UNITS = 35
+TOKEN_UNITS_BASED_ON_FIELD = 36
+TOKEN_DEPRECATED = 37
+TOKEN_EXTERNAL_LIST = 38
+TOKEN_RETAIN_CASE = 39
 
 # above object level group string
 GROUP_STR = 'group'
@@ -54,6 +55,7 @@ GROUP_STR = 'group'
 EXTENSIBLE_STR = 'extensible:'
 MEMO_STR = 'memo'
 MIN_FIELDS_STR = 'min-fields'
+MAX_FIELDS_STR = 'max-fields'
 FORMAT_STR = 'format'
 FIELD_STR = 'field'
 UNIQUE_OBJ_STR = 'unique-object'
@@ -175,7 +177,8 @@ def parse_obj(data):
     while True:
         token = look_ahead(data)
         if token == TOKEN_NONE:
-            raise RuntimeError("TOKEN_NONE returned")
+            raise RuntimeError("TOKEN_NONE returned in parse_obj: "
+                               "{}".format(parse_string(data)))
 
         elif token == TOKEN_END:
             return root
@@ -219,6 +222,17 @@ def parse_obj(data):
             if 'min_fields' in root:
                 raise KeyError("min_fields already exists, must define only one per object")
             root['min_fields'] = num
+
+        elif token == TOKEN_MAX_FIELDS:
+            next_token(data)
+            if look_ahead(data) != TOKEN_NUMBER:
+                raise RuntimeError("expected number after /max-fields")
+            num = parse_number(data)
+            if num is None:
+                raise RuntimeError("parse number returned None")
+            if 'max_fields' in root:
+                raise KeyError("max_fields already exists, must define only one per object")
+            root['max_fields'] = num
 
         elif token == TOKEN_FORMAT:
             next_token(data)
@@ -341,7 +355,7 @@ def parse_field(data, token):
     while True:
         token = look_ahead(data)
         if token == TOKEN_NONE:
-            raise RuntimeError("token none returned in parse field")
+            raise RuntimeError("token none returned in parse field: {}".format(data))
 
         elif token == TOKEN_EXCLAMATION:
             next_token(data)
@@ -584,6 +598,8 @@ def next_token(data):
             return TOKEN_FORMAT
         if match_string(data, MIN_FIELDS_STR):
             return TOKEN_MIN_FIELDS
+        if match_string(data, MAX_FIELDS_STR):
+            return TOKEN_MAX_FIELDS
         if match_string(data, REQUIRED_OBJ_STR):
             return TOKEN_REQUIRED_OBJ
         if match_string(data, UNIQUE_OBJ_STR):
