@@ -1785,7 +1785,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     // check chiller inputs
     auto thisChiller = &state.dataChillerAbsorbers.BLASTAbsorber(AbsChillNum);
     EXPECT_EQ(thisChiller->NomCap, 100000.0);
-    EXPECT_EQ(thisChiller->FlowMode, ChillerAbsorption::FlowMode::LEAVINGSETPOINTMODULATED);
+    EXPECT_EQ(thisChiller->FlowMode, DataPlant::FlowMode::LEAVINGSETPOINTMODULATED);
     // define local var
     int EvapInletNode = thisChiller->EvapInletNodeNum;
     int EvapOutletNode = thisChiller->EvapOutletNodeNum;
