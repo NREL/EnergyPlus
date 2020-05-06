@@ -270,6 +270,14 @@ namespace DataPlant {
         LEAVINGSETPOINTMODULATED
     };
 
+    enum class CondenserType
+    {
+        NOTSET,
+        AIRCOOLED,
+        WATERCOOLED,
+        EVAPCOOLED
+    };
+
     // Object Data
     extern Array1D<PlantLoopData> PlantLoop;
     extern Array1D<PlantAvailMgrData> PlantAvailMgr;

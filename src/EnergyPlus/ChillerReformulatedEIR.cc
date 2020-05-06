@@ -117,11 +117,6 @@ namespace ChillerReformulatedEIR {
     // 1. Hydeman, M., P. Sreedharan, N. Webb, and S. Blanc. 2002. "Development and Testing of a Reformulated
     //    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
-    // Chiller type parameters
-    int const AirCooled(1);   // Air-cooled condenser currently not allowed
-    int const WaterCooled(2); // Only water-cooled condensers are currently allowed
-    int const EvapCooled(3);  // Evap-cooled condenser currently not allowed
-
     // chiller flow modes
     int const FlowModeNotSet(200);
     int const ConstantFlow(201);
@@ -377,7 +372,7 @@ namespace ChillerReformulatedEIR {
                                                DataIPShortCuts::cAlphaArgs(7),
                                                "Chilled Water Nodes");
 
-            ElecReformEIRChiller(EIRChillerNum).CondenserType = WaterCooled;
+            ElecReformEIRChiller(EIRChillerNum).CondenserType = DataPlant::CondenserType::WATERCOOLED;
 
             // Condenser inlet/outlet node names are necessary
             if (DataIPShortCuts::lAlphaFieldBlanks(8)) {
@@ -556,7 +551,7 @@ namespace ChillerReformulatedEIR {
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + '=' + DataIPShortCuts::cAlphaArgs(12));
                     ErrorsFound = true;
                 }
-                if (ElecReformEIRChiller(EIRChillerNum).CondenserType != WaterCooled) {
+                if (ElecReformEIRChiller(EIRChillerNum).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
                     ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                     ShowContinueError("Heat Recovery requires a Water Cooled Condenser.");
                     ErrorsFound = true;
@@ -787,7 +782,7 @@ namespace ChillerReformulatedEIR {
                                                     _,
                                                     this->EvapInletNodeNum,
                                                     _);
-            if (this->CondenserType != AirCooled) {
+            if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED) {
                 PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                                         DataPlant::TypeOf_Chiller_ElectricReformEIR,
                                                         this->CDLoopNum,
@@ -820,7 +815,7 @@ namespace ChillerReformulatedEIR {
                     this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, DataPlant::TypeOf_Chiller_ElectricReformEIR, true);
             }
 
-            if ((this->CondenserType != AirCooled) && (this->HeatRecActive)) {
+            if ((this->CondenserType != DataPlant::CondenserType::AIRCOOLED) && (this->HeatRecActive)) {
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, DataPlant::TypeOf_Chiller_ElectricReformEIR, false);
             }
@@ -897,7 +892,7 @@ namespace ChillerReformulatedEIR {
                                                this->CWBranchNum,
                                                this->CWCompNum);
 
-            if (this->CondenserType == WaterCooled) {
+            if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
 
                 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                         this->TempRefCondIn,
@@ -974,7 +969,7 @@ namespace ChillerReformulatedEIR {
         PlantUtilities::SetComponentFlowRate(
             mdot, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
 
-        if (this->CondenserType == WaterCooled) {
+        if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
             PlantUtilities::SetComponentFlowRate(
                 mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDLoopNum, this->CDLoopSideNum, this->CDBranchNum, this->CDCompNum);
         }
@@ -1041,7 +1036,7 @@ namespace ChillerReformulatedEIR {
         Real64 tmpCondVolFlowRate = this->CondVolFlowRate;
 
         int PltSizCondNum(0); // Plant Sizing index for condenser loop
-        if (this->CondenserType == WaterCooled) {
+        if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
             PltSizCondNum = DataPlant::PlantLoop(this->CDLoopNum).PlantSizNum;
         }
 
@@ -1873,7 +1868,7 @@ namespace ChillerReformulatedEIR {
                 DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock == 1) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             }
-            if (this->CondenserType == WaterCooled) {
+            if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
                 if (DataPlant::PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
                     DataBranchAirLoopPlant::ControlType_SeriesActive) {
                     this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
@@ -1909,7 +1904,7 @@ namespace ChillerReformulatedEIR {
 
         // Set mass flow rates
 
-        if (this->CondenserType == WaterCooled) {
+        if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
             this->CondMassFlowRate = this->CondMassFlowRateMax;
             PlantUtilities::SetComponentFlowRate(this->CondMassFlowRate,
                                                  this->CondInletNodeNum,
@@ -2036,12 +2031,8 @@ namespace ChillerReformulatedEIR {
         // If FlowLock is False (0), the chiller sets the plant loop mdot
         // If FlowLock is True (1),  the new resolved plant loop mdot is used
         if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
-            if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
-                DataPlant::CompSetPtBasedSchemeType) {
-                this->PossibleSubcooling = false;
-            } else {
-                this->PossibleSubcooling = true;
-            }
+            this->PossibleSubcooling = !(DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
+                                         DataPlant::CompSetPtBasedSchemeType);
 
             Real64 EvapDeltaTemp(0.0); // Evaporator temperature difference [C]
 

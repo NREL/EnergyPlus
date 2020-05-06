@@ -61,10 +61,6 @@ namespace EnergyPlus {
 
 namespace ChillerReformulatedEIR {
 
-    // Chiller type parameters
-    extern int const WaterCooled; // Only water-cooled condensers are currently allowed
-    extern int const EvapCooled;  // Evap-cooled condenser currently not allowed
-
     // chiller flow modes
     extern int const FlowModeNotSet;
     extern int NumElecReformEIRChillers; // Number of electric reformulated EIR chillers specified in input
@@ -79,7 +75,7 @@ namespace ChillerReformulatedEIR {
         std::string CAPFTName;            // CAPFT curve name
         std::string EIRFTName;            // EIRFT curve name
         std::string EIRFPLRName;          // EIRPLR curve name
-        int CondenserType;                // Type of Condenser. Water Cooled is the only available option for now
+        DataPlant::CondenserType CondenserType;   // Type of Condenser. Water Cooled is the only available option for now
         int PartLoadCurveType;            // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift //zrp
         Real64 RefCap;                    // Reference capacity of the chiller [W]
         bool RefCapWasAutoSized;          // reference capacity was autosized on input
@@ -221,7 +217,8 @@ namespace ChillerReformulatedEIR {
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(0), PartLoadCurveType(0), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(FlowModeNotSet),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::NOTSET), PartLoadCurveType(0), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0),
+              FlowMode(FlowModeNotSet),
               ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false),
               EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0),
               CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),

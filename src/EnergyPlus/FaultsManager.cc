@@ -589,7 +589,7 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
 
-                        if (ChillerElectricEIR::ElectricEIRChiller(ChillerNum).CondenserType != ChillerElectricEIR::WaterCooled) {
+                        if (ChillerElectricEIR::ElectricEIRChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                              cAlphaArgs(5) +
@@ -619,7 +619,7 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
 
-                        if (ChillerReformulatedEIR::ElecReformEIRChiller(ChillerNum).CondenserType != ChillerReformulatedEIR::WaterCooled) {
+                        if (ChillerReformulatedEIR::ElecReformEIRChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                              cAlphaArgs(5) +

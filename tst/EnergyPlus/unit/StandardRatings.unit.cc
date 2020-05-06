@@ -249,13 +249,13 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     using CurveManager::NumCurves;
     using StandardRatings::CalcChillerIPLV;
     using DataPlant::TypeOf_Chiller_ElectricEIR;
-    
+
     // Setup an air-cooled Chiller:Electric:EIR chiller
     ChillerElectricEIR::ElectricEIRChiller.allocate(1);
     ChillerElectricEIR::ElectricEIRChiller(1).Name = "Air Cooled Chiller";
     ChillerElectricEIR::ElectricEIRChiller(1).RefCap = 216000; // W
     ChillerElectricEIR::ElectricEIRChiller(1).RefCOP = 2.81673861898309; // W/W
-    ChillerElectricEIR::ElectricEIRChiller(1).CondenserType = ChillerElectricEIR::AirCooled;
+    ChillerElectricEIR::ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AIRCOOLED;
     ChillerElectricEIR::ElectricEIRChiller(1).MinUnloadRat = 0.15;
 
     int CurveNum;
