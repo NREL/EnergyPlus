@@ -54,7 +54,6 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
@@ -97,7 +96,6 @@ namespace FaultsManager {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::ScheduleAlwaysOn;
 
     // Data
@@ -1422,20 +1420,20 @@ namespace FaultsManager {
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Absorption:Indirect")) {
                     // Read in chiller if not done yet
-                    if (ChillerIndirectAbsorption::GetInput) {
-                        ChillerIndirectAbsorption::GetIndirectAbsorberInput();
-                        ChillerIndirectAbsorption::GetInput = false;
+                    if (state.dataChillerIndirectAbsorption.GetInput) {
+                        ChillerIndirectAbsorption::GetIndirectAbsorberInput(state.dataChillerIndirectAbsorption);
+                        state.dataChillerIndirectAbsorption.GetInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = UtilityRoutines::FindItemInList(FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName,
-                                                                 ChillerIndirectAbsorption::IndirectAbsorber);
+                                                                 state.dataChillerIndirectAbsorption.IndirectAbsorber);
                     if (ChillerNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         ErrorsFound = true;
                     } else {
-                        ChillerIndirectAbsorption::IndirectAbsorber(ChillerNum).FaultyChillerSWTFlag = true;
-                        ChillerIndirectAbsorption::IndirectAbsorber(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
+                        state.dataChillerIndirectAbsorption.IndirectAbsorber(ChillerNum).FaultyChillerSWTFlag = true;
+                        state.dataChillerIndirectAbsorption.IndirectAbsorber(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                     }
                 }
             }
@@ -1924,7 +1922,7 @@ namespace FaultsManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FaultFac(0.0);  // fault modification factor
-        Real64 OffsetAct(0.0); // actual offset after applying the modification factor
+        Real64 OffsetAct;      // actual offset after applying the modification factor
 
         // Check fault availability schedules
         if (GetCurrentScheduleValue(this->AvaiSchedPtr) > 0.0) {

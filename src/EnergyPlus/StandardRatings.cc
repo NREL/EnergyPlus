@@ -599,28 +599,11 @@ namespace StandardRatings {
         // This subroutine writes the IPLV values in SI and IP units to
         // the "eio" and tabular output files for EIR Chillers.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace OutputReportPredefined;
         using DataPlant::TypeOf_Chiller_ElectricEIR;
         using DataPlant::TypeOf_Chiller_ElectricReformEIR;
         using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);
@@ -672,30 +655,12 @@ namespace StandardRatings {
         // Checks the limits of the various curves used in EIR chiller and returns .FALSE. if the limits do not include
         // the standard test condition(s).
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using CurveManager::GetCurveMinMaxValues;
         using CurveManager::GetCurveName;
         using DataGlobals::DisplayExtraWarnings;
         using DataPlant::TypeOf_Chiller_ElectricEIR;
         using DataPlant::TypeOf_Chiller_ElectricReformEIR;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // (function of leaving chilled water temperature and
-        //  entering condenser fluid temperature)
-        // (function of leaving chilled water temperature and
-        //  entering condenser fluid temperature)
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        int const AirCooled(1);
-        int const WaterCooled(2);
 
         // Following parameters are taken from AHRI 551/591,2011 Table 3
         Real64 const HighEWTemp(30.0);       // Entering water temp in degrees C at full load capacity (85F)
@@ -705,14 +670,6 @@ namespace StandardRatings {
         Real64 const LeavingWaterTemp(6.67); // Evaporator leaving water temperature in degrees C [44 F]
 
         static std::string const RoutineName("CheckCurveLimitsForIPLV: "); // Include trailing blank space
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         //  Minimum and Maximum independent variable limits from Total Cooling Capacity Function of Temperature Curve
         static Real64 CapacityLWTempMin(0.0);           // Capacity modifier Min value (leaving water temp), from the Curve:BiQuadratic object
