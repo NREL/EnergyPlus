@@ -61,22 +61,10 @@ namespace EnergyPlus {
 
 namespace PlantChillers {
 
-    // chiller flow modes
-    extern int const FlowModeNotSet;
-    extern int const ConstantFlow;
-    extern int const NotModulated;
-    extern int const LeavingSetPointModulated;
-
     extern int NumElectricChillers;     // number of Electric chillers specified in input
     extern int NumEngineDrivenChillers; // number of EngineDriven chillers specified in input
     extern int NumGTChillers;           // number of GT chillers specified in input
     extern int NumConstCOPChillers;
-
-    enum class CondType{
-        WaterCooled,
-        AirCooled,
-        EvapCooled
-    };
 
     struct BaseChillerSpecs : PlantComponent // NOTE: This base class is abstract, derived classes must override pure virtual methods
     {
@@ -89,11 +77,11 @@ namespace PlantChillers {
         // temperature at the chiller condenser side inlet
         Real64 TempRiseCoef;              // (GT ADJTC(2)) correction factor for off ChillDesign oper.
         Real64 TempDesEvapOut;            // C - (GT ADJTC(3)The design primary loop fluid
-        CondType CondenserType;                // Type of Condenser - Air or Water Cooled
+        DataPlant::CondenserType CondenserType;  // Type of Condenser - Air or Water Cooled
         Real64 NomCap;                    // design nominal capacity of chiller
         bool NomCapWasAutoSized;          // true if NomCap was autosize on input
         Real64 COP;                       // COP
-        int FlowMode;                     // one of 3 modes for component flow during operation
+        DataPlant::FlowMode FlowMode;     // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         bool HRSPErrDone;                 // TRUE if set point warning issued for heat recovery loop
@@ -162,7 +150,8 @@ namespace PlantChillers {
         // Default Constructor
         BaseChillerSpecs()
             : MinPartLoadRat(0.0), MaxPartLoadRat(1.0), OptPartLoadRat(1.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
-              CondenserType(CondType::WaterCooled), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
+              CondenserType(DataPlant::CondenserType::WATERCOOLED), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0), FlowMode(DataPlant::FlowMode::NOTSET),
+              ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), HRSPErrDone(false), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
               EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
