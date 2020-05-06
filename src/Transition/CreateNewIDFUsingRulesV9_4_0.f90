@@ -119,6 +119,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
   LOGICAL :: processNumberErrFlag
   INTEGER :: convertedNumber
+  LOGICAL :: alreadyProcessedOneOutputDiagnostic=.false.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -405,6 +406,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                       OutArgs(CurField) = 'Yes'
                     END IF
                   END DO
+
+
+              CASE('OUTPUT:DIAGNOSTICS')
+                  ! This is now a unique object, but it should be quite rare to encounter cases where two of these were present
+                  ! and this doesn't affect the simulation, so do nothing fancy but write any extra one as a comment
+                  ! and write to the audit file. The user will already get a warning in the console about it being unique
+                  IF (.not. alreadyProcessedOneOutputDiagnostic) THEN
+                    CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                    OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                    NoDiff=.true.
+                    alreadyProcessedOneOutputDiagnostic=.true.
+                  ELSE
+                    WRITE(Auditf,fmta) 'Object="'//TRIM(ObjectName)//'" is now a uniue object in the "new" IDD.'
+                    WRITE(Auditf,fmta) '... will be listed as comments on the new output file.'
+                    CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
+                    Written=.true.
+                  ENDIF
 
               ! If your original object starts with P, insert the rules here
 
