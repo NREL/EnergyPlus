@@ -109,7 +109,7 @@ namespace PondGroundHeatExchanger {
 
         int WaterIndex;
 
-        Real64 prevSimTime;
+        bool firstTimeThrough;
 
         // Default Constructor
         PondGroundHeatExchangerData()
@@ -117,7 +117,7 @@ namespace PondGroundHeatExchanger {
               GrndConductivity(0.0), CircuitLength(0.0), BulkTemperature(0.0), PastBulkTemperature(0.0), NumCircuits(0), InletNodeNum(0),
               OutletNodeNum(0), FrozenErrIndex(0), ConsecutiveFrozen(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletTemp(0.0),
               OutletTemp(0.0), MassFlowRate(0.0), PondTemp(0.0), HeatTransferRate(0.0), Energy(0.0), OneTimeFlag(true), MyFlag(true),
-              setupOutputVarsFlag(true), WaterIndex(0), prevSimTime(0.0)
+              setupOutputVarsFlag(true), WaterIndex(0), firstTimeThrough(true)
         {
         }
 
