@@ -190,81 +190,82 @@ namespace BoilerSteam {
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBoilerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
-            boilers.Boiler(BoilerNum).Name = DataIPShortCuts::cAlphaArgs(1);
+            auto &thisBoiler = boilers.Boiler(BoilerNum);
+            thisBoiler.Name = DataIPShortCuts::cAlphaArgs(1);
 
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(2));
 
                 if (SELECT_CASE_var == "ELECTRICITY") {
-                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
-                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
+                    thisBoiler.BoilerFuelTypeForOutputVariable = "Electric";
+                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gas";
-                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
+                    thisBoiler.BoilerFuelTypeForOutputVariable = "Gas";
+                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
 
                 } else if (SELECT_CASE_var == "DIESEL") {
-                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Diesel";
-                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
+                    thisBoiler.BoilerFuelTypeForOutputVariable = "Diesel";
+                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
 
                 } else if (SELECT_CASE_var == "GASOLINE") {
-                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gasoline";
-                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
+                    thisBoiler.BoilerFuelTypeForOutputVariable = "Gasoline";
+                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
 
                 } else if (SELECT_CASE_var == "COAL") {
-                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Coal";
-                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("COAL");
+                    thisBoiler.BoilerFuelTypeForOutputVariable = "Coal";
+                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#1";
-                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
+                    thisBoiler.BoilerFuelTypeForOutputVariable = "FuelOil#1";
+                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#2";
-                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
+                    thisBoiler.BoilerFuelTypeForOutputVariable = "FuelOil#2";
+                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
 
                 } else if (SELECT_CASE_var == "PROPANE") {
-                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Propane";
-                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
+                    thisBoiler.BoilerFuelTypeForOutputVariable = "Propane";
+                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "OtherFuel1";
-                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
+                    thisBoiler.BoilerFuelTypeForOutputVariable = "OtherFuel1";
+                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
 
                 } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "OtherFuel2";
-                    boilers.Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
+                    thisBoiler.BoilerFuelTypeForOutputVariable = "OtherFuel2";
+                    thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
 
                 } else {
                     ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
 
                     // Set to Electric to avoid errors when setting up output variables
-                    boilers.Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
+                    thisBoiler.BoilerFuelTypeForOutputVariable = "Electric";
                     ErrorsFound = true;
                 }
             }
 
             // INPUTS from the IDF file
-            boilers.Boiler(BoilerNum).BoilerMaxOperPress = DataIPShortCuts::rNumericArgs(1);
-            if (boilers.Boiler(BoilerNum).BoilerMaxOperPress < 1e5) {
+            thisBoiler.BoilerMaxOperPress = DataIPShortCuts::rNumericArgs(1);
+            if (thisBoiler.BoilerMaxOperPress < 1e5) {
                 ShowWarningMessage(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Field: Maximum Operation Pressure units are Pa. Verify units.");
             }
-            boilers.Boiler(BoilerNum).Effic = DataIPShortCuts::rNumericArgs(2);
-            boilers.Boiler(BoilerNum).TempUpLimitBoilerOut = DataIPShortCuts::rNumericArgs(3);
-            boilers.Boiler(BoilerNum).NomCap = DataIPShortCuts::rNumericArgs(4);
-            if (boilers.Boiler(BoilerNum).NomCap == DataSizing::AutoSize) {
-                boilers.Boiler(BoilerNum).NomCapWasAutoSized = true;
+            thisBoiler.Effic = DataIPShortCuts::rNumericArgs(2);
+            thisBoiler.TempUpLimitBoilerOut = DataIPShortCuts::rNumericArgs(3);
+            thisBoiler.NomCap = DataIPShortCuts::rNumericArgs(4);
+            if (thisBoiler.NomCap == DataSizing::AutoSize) {
+                thisBoiler.NomCapWasAutoSized = true;
             }
-            boilers.Boiler(BoilerNum).MinPartLoadRat = DataIPShortCuts::rNumericArgs(5);
-            boilers.Boiler(BoilerNum).MaxPartLoadRat = DataIPShortCuts::rNumericArgs(6);
-            boilers.Boiler(BoilerNum).OptPartLoadRat = DataIPShortCuts::rNumericArgs(7);
-            boilers.Boiler(BoilerNum).FullLoadCoef(1) = DataIPShortCuts::rNumericArgs(8);
-            boilers.Boiler(BoilerNum).FullLoadCoef(2) = DataIPShortCuts::rNumericArgs(9);
-            boilers.Boiler(BoilerNum).FullLoadCoef(3) = DataIPShortCuts::rNumericArgs(10);
-            boilers.Boiler(BoilerNum).SizFac = DataIPShortCuts::rNumericArgs(11);
-            if (boilers.Boiler(BoilerNum).SizFac <= 0.0) boilers.Boiler(BoilerNum).SizFac = 1.0;
+            thisBoiler.MinPartLoadRat = DataIPShortCuts::rNumericArgs(5);
+            thisBoiler.MaxPartLoadRat = DataIPShortCuts::rNumericArgs(6);
+            thisBoiler.OptPartLoadRat = DataIPShortCuts::rNumericArgs(7);
+            thisBoiler.FullLoadCoef(1) = DataIPShortCuts::rNumericArgs(8);
+            thisBoiler.FullLoadCoef(2) = DataIPShortCuts::rNumericArgs(9);
+            thisBoiler.FullLoadCoef(3) = DataIPShortCuts::rNumericArgs(10);
+            thisBoiler.SizFac = DataIPShortCuts::rNumericArgs(11);
+            if (thisBoiler.SizFac <= 0.0) thisBoiler.SizFac = 1.0;
 
             if ((DataIPShortCuts::rNumericArgs(8) + DataIPShortCuts::rNumericArgs(9) + DataIPShortCuts::rNumericArgs(10)) == 0.0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
@@ -285,7 +286,7 @@ namespace BoilerSteam {
                                   General::RoundSigDigits(DataIPShortCuts::rNumericArgs(3), 3));
                 ErrorsFound = true;
             }
-            boilers.Boiler(BoilerNum).BoilerInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+            thisBoiler.BoilerInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
                                                                                        ErrorsFound,
                                                                                        DataIPShortCuts::cCurrentModuleObject,
                                                                                        DataIPShortCuts::cAlphaArgs(1),
@@ -293,7 +294,7 @@ namespace BoilerSteam {
                                                                                        DataLoopNode::NodeConnectionType_Inlet,
                                                                                        1,
                                                                                        DataLoopNode::ObjectIsNotParent);
-            boilers.Boiler(BoilerNum).BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+            thisBoiler.BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
                                                                                         ErrorsFound,
                                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
@@ -316,12 +317,12 @@ namespace BoilerSteam {
                 }
             }
 
-            boilers.Boiler(BoilerNum).FluidIndex = SteamFluidIndex;
+            thisBoiler.FluidIndex = SteamFluidIndex;
 
             if (NumAlphas > 4) {
-                boilers.Boiler(BoilerNum).EndUseSubcategory = DataIPShortCuts::cAlphaArgs(5);
+                thisBoiler.EndUseSubcategory = DataIPShortCuts::cAlphaArgs(5);
             } else {
-                boilers.Boiler(BoilerNum).EndUseSubcategory = "General";
+                thisBoiler.EndUseSubcategory = "General";
             }
         }
 
