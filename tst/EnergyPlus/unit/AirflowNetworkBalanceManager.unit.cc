@@ -3720,7 +3720,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
         "    4.2672,                  !- Vertex 4 Y-coordinate {m}",
         "    4.5034;                  !- Vertex 4 Z-coordinate {m}",
 
-        "  ZoneProperty:UserViewFactors:bySurfaceName,",
+        "  ZoneProperty:UserViewFactors:BySurfaceName,",
         "    ATTIC ZONE,              !- Zone Name",
         "    Attic Floor,		!=From Surface 1",
         "    Attic Floor,		!=To Surface 1",
@@ -16253,7 +16253,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
         "    4.2672,                  !- Vertex 4 Y-coordinate {m}",
         "    4.5034;                  !- Vertex 4 Z-coordinate {m}",
 
-        "  ZoneProperty:UserViewFactors:bySurfaceName,",
+        "  ZoneProperty:UserViewFactors:BySurfaceName,",
         "    ATTIC ZONE,              !- Zone Name",
         "    Attic Floor,		!=From Surface 1",
         "    Attic Floor,		!=To Surface 1",
