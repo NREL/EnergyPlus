@@ -53,29 +53,18 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace CostEstimateManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    void SimCostEstimate(EnergyPlusData &state);
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+    void GetCostEstimateInput(EnergyPlusData &state);
 
-    // MODULE VARIABLE DECLARATIONS:
-    // na
+    void CheckCostEstimateInput(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors in input, fatal at end of routine
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Functions
-
-    void SimCostEstimate();
-
-    void GetCostEstimateInput();
-
-    void CheckCostEstimateInput(bool &ErrorsFound); // Set to true if errors in input, fatal at end of routine
-
-    void CalcCostEstimate();
+    void CalcCostEstimate(EnergyPlusData &state);
 
 } // namespace CostEstimateManager
 

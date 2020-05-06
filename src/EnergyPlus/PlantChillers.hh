@@ -54,17 +54,15 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
-namespace PlantChillers {
+// Forward declarations
+struct EnergyPlusData;
+struct PlantChillersData;
 
-    extern int NumElectricChillers;     // number of Electric chillers specified in input
-    extern int NumEngineDrivenChillers; // number of EngineDriven chillers specified in input
-    extern int NumGTChillers;           // number of GT chillers specified in input
-    extern int NumConstCOPChillers;
+namespace PlantChillers {
 
     struct BaseChillerSpecs : PlantComponent // NOTE: This base class is abstract, derived classes must override pure virtual methods
     {
@@ -233,11 +231,11 @@ namespace PlantChillers {
         {
         }
 
-        static void getInput();
+        static void getInput(PlantChillersData &chillers);
 
         void setupOutputVariables();
 
-        static ElectricChillerSpecs *factory(std::string const &chillerName);
+        static ElectricChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -330,9 +328,9 @@ namespace PlantChillers {
         {
         }
 
-        static EngineDrivenChillerSpecs *factory(std::string const &chillerName);
+        static EngineDrivenChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
 
-        static void getInput();
+        static void getInput(PlantChillersData &chillers);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -422,9 +420,9 @@ namespace PlantChillers {
         {
         }
 
-        static GTChillerSpecs *factory(std::string const &chillerName);
+        static GTChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
 
-        static void getInput();
+        static void getInput(PlantChillersData &chillers);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -454,9 +452,9 @@ namespace PlantChillers {
         {
         }
 
-        static ConstCOPChillerSpecs *factory(std::string const &chillerName);
+        static ConstCOPChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
 
-        static void getInput();
+        static void getInput(PlantChillersData &chillers);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -470,14 +468,6 @@ namespace PlantChillers {
 
         void update(Real64 MyLoad, bool RunFlag);
     };
-
-    // Object Data
-    extern Array1D<ElectricChillerSpecs> ElectricChiller;
-    extern Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller;
-    extern Array1D<GTChillerSpecs> GTChiller;
-    extern Array1D<ConstCOPChillerSpecs> ConstCOPChiller;
-
-    void clear_state();
 
 } // namespace PlantChillers
 

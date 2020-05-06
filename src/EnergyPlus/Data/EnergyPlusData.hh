@@ -48,6 +48,10 @@
 #ifndef EnergyPlusData_hh_INCLUDED
 #define EnergyPlusData_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_map>
+#include <string>
+
 // EnergyPlus Headers
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
@@ -59,8 +63,7 @@
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
-#include <unordered_map>
-#include <string>
+#include <EnergyPlus/PlantChillers.hh>
 
 namespace EnergyPlus {
 
@@ -249,6 +252,40 @@ namespace EnergyPlus {
         }
     };
 
+    struct PlantChillersData : BaseGlobalStruct {
+
+        int NumElectricChillers = 0;
+        int NumEngineDrivenChillers = 0;
+        int NumGTChillers = 0;
+        int NumConstCOPChillers = 0;
+
+        bool GetEngineDrivenInput = true;
+        bool GetElectricInput = true;
+        bool GetGasTurbineInput = true;
+        bool GetConstCOPInput = true;
+
+        Array1D<PlantChillers::ElectricChillerSpecs> ElectricChiller;
+        Array1D<PlantChillers::EngineDrivenChillerSpecs> EngineDrivenChiller;
+        Array1D<PlantChillers::GTChillerSpecs> GTChiller;
+        Array1D<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
+
+        void clear_state()
+        {
+            NumElectricChillers = 0;
+            NumEngineDrivenChillers = 0;
+            NumGTChillers = 0;
+            NumConstCOPChillers = 0;
+            GetEngineDrivenInput = true;
+            GetElectricInput = true;
+            GetGasTurbineInput = true;
+            GetConstCOPInput = true;
+            ElectricChiller.deallocate();
+            EngineDrivenChiller.deallocate();
+            GTChiller.deallocate();
+            ConstCOPChiller.deallocate();
+        }
+    };
+
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
         BoilersData dataBoilers;
@@ -263,6 +300,7 @@ namespace EnergyPlus {
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
         PipesData pipes;
+        PlantChillersData dataPlantChillers;
         //OutputReportTabular outputReportTabular;
 
         // all clear states
@@ -280,6 +318,7 @@ namespace EnergyPlus {
             fans.clear_state();
             //outputReportTabular.clear_state();
             pipes.clear_state();
+            dataPlantChillers.clear_state();
         };
     };
 
