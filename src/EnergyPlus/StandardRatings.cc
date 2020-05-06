@@ -279,10 +279,6 @@ namespace StandardRatings {
         // (function of leaving chilled water temperature and
         //  entering condenser fluid temperature)
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int const AirCooled(1);
-        int const WaterCooled(2);
-
         Real64 const EvapOutletTemp(6.67); // (44F)
         Real64 const Acc(0.0001);          // Accuracy of result
         int const NumOfReducedCap(4);      // Number of reduced capacity test conditions (100%,75%,50%,and 25%)

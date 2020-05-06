@@ -953,7 +953,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ChillerHeater:Absorption:DoubleEffect")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ExhFiredAbsorption;
-                                this_comp.compPtr = ChillerExhaustAbsorption::ExhaustAbsorberSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = ChillerExhaustAbsorption::ExhaustAbsorberSpecs::factory(state.dataChillerExhaustAbsorption, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ThermalStorage:ChilledWater:Mixed")) {
                                 this_comp.TypeOf_Num = TypeOf_ChilledWaterTankMixed;
