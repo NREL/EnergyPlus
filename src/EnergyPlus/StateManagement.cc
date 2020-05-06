@@ -249,7 +249,6 @@ void EnergyPlus::clearAllStates()
     BaseboardRadiator::clear_state();
     BranchInputManager::clear_state();
     CoolingPanelSimple::clear_state();
-    ChillerReformulatedEIR::clear_state();
     CoilCoolingDX::clear_state();
     CondenserLoopTowers::clear_state();
     CoolTower::clear_state();

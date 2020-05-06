@@ -53,19 +53,17 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct ChillerReformulatedEIRData;
+
 namespace ChillerReformulatedEIR {
-
-    // chiller flow modes
-    extern int const FlowModeNotSet;
-    extern int NumElecReformEIRChillers; // Number of electric reformulated EIR chillers specified in input
-
-    extern bool GetInputREIR; // When TRUE, calls subroutine to read input file
 
     struct ReformulatedEIRChillerSpecs : PlantComponent
     {
@@ -80,7 +78,7 @@ namespace ChillerReformulatedEIR {
         Real64 RefCap;                    // Reference capacity of the chiller [W]
         bool RefCapWasAutoSized;          // reference capacity was autosized on input
         Real64 RefCOP;                    // Reference coefficient of performance [W/W]
-        int FlowMode;                     // one of 3 modes for component flow during operation
+        DataPlant::FlowMode FlowMode;                     // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         Real64 EvapVolFlowRate;           // Reference water volumetric flow rate through the evaporator [m3/s]
@@ -218,7 +216,7 @@ namespace ChillerReformulatedEIR {
         // Default Constructor
         ReformulatedEIRChillerSpecs()
             : TypeNum(0), CondenserType(DataPlant::CondenserType::NOTSET), PartLoadCurveType(0), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0),
-              FlowMode(FlowModeNotSet),
+              FlowMode(DataPlant::FlowMode::NOTSET),
               ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false),
               EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0),
               CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
@@ -245,7 +243,7 @@ namespace ChillerReformulatedEIR {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(ChillerReformulatedEIRData &chillers, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -276,12 +274,7 @@ namespace ChillerReformulatedEIR {
         Real64 condOutTempResidual(Real64 FalsiCondOutTemp, Array1D<Real64> const &Par);
     };
 
-    // Object Data
-    extern Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
-
-    void clear_state();
-
-    void GetElecReformEIRChillerInput();
+    void GetElecReformEIRChillerInput(ChillerReformulatedEIRData &chillers);
 
 } // namespace ChillerReformulatedEIR
 

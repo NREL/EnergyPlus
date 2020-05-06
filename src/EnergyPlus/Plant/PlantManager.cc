@@ -1047,7 +1047,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = ChillerReformulatedEIR::ReformulatedEIRChillerSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = ChillerReformulatedEIR::ReformulatedEIRChillerSpecs::factory(state.dataChillerReformulatedEIR, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Electric")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Electric;
                                 if (LoopSideNum == DemandSide) {

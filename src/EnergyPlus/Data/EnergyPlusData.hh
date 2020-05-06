@@ -56,6 +56,7 @@
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <unordered_map>
@@ -135,6 +136,19 @@ namespace EnergyPlus {
         {
             Sim_GetInput = true;
             ExhaustAbsorber.deallocate();
+        }
+    };
+
+    struct ChillerReformulatedEIRData : BaseGlobalStruct {
+        int NumElecReformEIRChillers = 0;
+        bool GetInputREIR = true;
+        Array1D<ChillerReformulatedEIR::ReformulatedEIRChillerSpecs> ElecReformEIRChiller;
+
+        void clear_state()
+        {
+            NumElecReformEIRChillers = 0;
+            GetInputREIR = true;
+            ElecReformEIRChiller.deallocate();
         }
     };
 
@@ -244,6 +258,7 @@ namespace EnergyPlus {
         ChillerExhaustAbsorptionData dataChillerExhaustAbsorption;
         ChillerIndirectAbsoprtionData dataChillerIndirectAbsorption;
         ChillerGasAbsorptionData dataChillerGasAbsorption;
+        ChillerReformulatedEIRData dataChillerReformulatedEIR;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -259,6 +274,7 @@ namespace EnergyPlus {
             dataChillerExhaustAbsorption.clear_state();
             dataChillerGasAbsorption.clear_state();
             dataChillerIndirectAbsorption.clear_state();
+            dataChillerReformulatedEIR.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();

@@ -4830,8 +4830,6 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using ChillerReformulatedEIR::ElecReformEIRChiller;
-        using ChillerReformulatedEIR::NumElecReformEIRChillers;
         using CondenserLoopTowers::NumSimpleTowers;
         using CondenserLoopTowers::towers;
         using DataEnvironment::WeatherFileLocationTitle;
@@ -4933,9 +4931,9 @@ namespace OutputReportTabular {
                 SysTotalHVACRejectHeatLoss += state.dataChillerElectricEIR.ElectricEIRChiller(iChiller).CondEnergy;
             }
         }
-        for (iChiller = 1; iChiller <= NumElecReformEIRChillers; ++iChiller) {
-            if (ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
-                SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
+        for (iChiller = 1; iChiller <= state.dataChillerReformulatedEIR.NumElecReformEIRChillers; ++iChiller) {
+            if (state.dataChillerReformulatedEIR.ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataChillerReformulatedEIR.ElecReformEIRChiller(iChiller).CondEnergy;
             }
         }
 
@@ -8596,7 +8594,7 @@ namespace OutputReportTabular {
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
 
                 Array1D_string rowHeadTemp(rowHead);
-                // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+                // Before outputing to SQL, we forward fill the End use column (rowHead)
                 // for better sql queries
                 FillRowHead(rowHeadTemp);
 
