@@ -1657,6 +1657,7 @@ namespace ZoneEquipmentManager {
             // Use the max occupancy data from the PEOPLE structure to calculate design min OA for each zone
             // from the outside air flow per person input
             TotPeopleInZone = 0.0;
+            Real64 ZoneMinOccupancy = 0.;
             ZoneIndex = FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
             for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
                 if (People(PeopleNum).ZonePtr == FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
@@ -1668,6 +1669,7 @@ namespace ZoneEquipmentManager {
                     } else {
                         FinalZoneSizing(CtrlZoneNum).ZonePeakOccupancy = TotPeopleInZone;
                     }
+                    ZoneMinOccupancy += TotPeopleInZone * ScheduleManager::GetScheduleMinValue(People(PeopleNum).NumberOfPeoplePtr);
                 }
             }
             FinalZoneSizing(CtrlZoneNum).TotalZoneFloorArea =
@@ -1683,6 +1685,15 @@ namespace ZoneEquipmentManager {
             FinalZoneSizing(CtrlZoneNum).TotPeopleInZone = TotPeopleInZone;
             FinalZoneSizing(CtrlZoneNum).TotalOAFromPeople = OAFromPeople;
             FinalZoneSizing(CtrlZoneNum).TotalOAFromArea = OAFromArea;
+
+            // save Voz for predefined outdoor air summary report
+            Real64 MinEz = std::min(FinalZoneSizing(CtrlZoneNum).ZoneADEffCooling, FinalZoneSizing(CtrlZoneNum).ZoneADEffHeating);
+            if (MinEz != 0) {
+                DataHeatBalance::ZonePreDefRep(ZoneIndex).VozMin = (ZoneMinOccupancy * FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer + OAFromArea) / MinEz;
+            } else {
+                DataHeatBalance::ZonePreDefRep(ZoneIndex).VozMin = ZoneMinOccupancy * FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer + OAFromArea; //assume divide by 1 as air distribution effectiveness.
+            }
+
             // Calculate the design min OA flow rate for this zone
             UseOccSchFlag = false;
             UseMinOASchFlag = false;

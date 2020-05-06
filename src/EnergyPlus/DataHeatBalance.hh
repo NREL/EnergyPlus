@@ -2316,6 +2316,7 @@ namespace DataHeatBalance {
         Real64 AFNInfilVolMin;   // a large number since finding minimum volume
         Real64 SimpVentVolTotal; // volume for simple 'ZoneVentilation' of outside air for entire simulation
         Real64 SimpVentVolMin;   // a large number since finding minimum volume
+        Real64 VozMin;           // minimum outdoor zone ventilation 
         // for Sensible Heat Gas Component Report
         // annual
         Real64 SHGSAnHvacHt;    // hvac air heating

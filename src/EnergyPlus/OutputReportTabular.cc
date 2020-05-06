@@ -6571,6 +6571,7 @@ namespace OutputReportTabular {
         Real64 totalOccupants = 0.;
         Real64 totalAverageOccupants = 0.;
         Real64 totalArea = 0.;
+        Real64 totalVozMin = 0;
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
@@ -6606,6 +6607,10 @@ namespace OutputReportTabular {
                     totalVolume += Zone(iZone).Volume;
                     PreDefTableEntry(pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
                     totalArea += Zone(iZone).FloorArea;
+
+                    // minimum dynamic target ventilation Voz-dyn-min
+                    PreDefTableEntry(pdchOaMvMinDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozMin, 3);
+                    totalVozMin += ZonePreDefRep(iZone).VozMin;
                 }
 
 
@@ -6614,7 +6619,7 @@ namespace OutputReportTabular {
                     PreDefTableEntry(pdchOaTaBzMechVent,
                         Zone(iZone).Name,
                         ZonePreDefRep(iZone).MechVentVolTotal + ZonePreDefRep(iZone).SimpVentVolTotal ,
-                        3);
+                        0);
                 }
 
                 // infiltration
@@ -6691,6 +6696,7 @@ namespace OutputReportTabular {
         PreDefTableEntry(pdchOaMvZoneArea, "Total", totalArea);
         PreDefTableEntry(pdchOaMvNomNumOcc, "Total", totalOccupants);
         PreDefTableEntry(pdchOaMvAvgNumOcc, "Total", totalAverageOccupants);
+        PreDefTableEntry(pdchOaMvMinDynTrgVent, "Total", totalVozMin, 3);
 
         // Add the number of central air distributions system to the count report
         PreDefTableEntry(pdchHVACcntVal, "HVAC Air Loops", NumPrimaryAirSys);
