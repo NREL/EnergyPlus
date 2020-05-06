@@ -5711,7 +5711,7 @@ namespace OutputReportTabular {
         }
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
-        outputFiles.audit.ensure_open();
+        outputFiles.audit.ensure_open("WriteTabularReports");
         print(outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
         print(outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
         print(outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);

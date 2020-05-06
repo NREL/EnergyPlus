@@ -386,8 +386,8 @@ namespace CommandLineInterface {
 
         // EnergyPlus files
         OutputFiles::getSingleton().audit.fileName = outputFilePrefix + normalSuffix + ".audit";
-        outputBndFileName = outputFilePrefix + normalSuffix + ".bnd";
-        outputDxfFileName = outputFilePrefix + normalSuffix + ".dxf";
+        OutputFiles::getSingleton().bnd.fileName = outputFilePrefix + normalSuffix + ".bnd";
+        OutputFiles::getSingleton().dxf.fileName = outputFilePrefix + normalSuffix + ".dxf";
         OutputFiles::getSingleton().eio.fileName = outputFilePrefix + normalSuffix + ".eio";
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
@@ -430,9 +430,9 @@ namespace CommandLineInterface {
         outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
         outputEddFileName = outputFilePrefix + normalSuffix + ".edd";
         outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
-        outputSlnFileName = outputFilePrefix + normalSuffix + ".sln";
-        outputSciFileName = outputFilePrefix + normalSuffix + ".sci";
-        outputWrlFileName = outputFilePrefix + normalSuffix + ".wrl";
+        OutputFiles::getSingleton().sln.fileName = outputFilePrefix + normalSuffix + ".sln";
+        OutputFiles::getSingleton().sci.fileName = outputFilePrefix + normalSuffix + ".sci";
+        OutputFiles::getSingleton().wrl.fileName = outputFilePrefix + normalSuffix + ".wrl";
         outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
         OutputFiles::getSingleton().debug.fileName = outputFilePrefix + normalSuffix + ".dbg";
         outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
@@ -571,7 +571,7 @@ namespace CommandLineInterface {
             }
         }
 
-        OutputFiles::getSingleton().debug.ensure_open();
+        OutputFiles::getSingleton().debug.ensure_open("OpenOutputFiles");
 
         // TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 

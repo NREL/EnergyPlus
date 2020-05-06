@@ -57,13 +57,13 @@
 
 namespace EnergyPlus {
 
-OutputFile &OutputFile::ensure_open()
+OutputFile &OutputFile::ensure_open(const std::string &caller)
 {
     if (!good()) {
         open();
     }
     if (!good()) {
-        ShowFatalError("OpenOutputFiles: Could not open file " + fileName + " for output (write).");
+        ShowFatalError(fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
     }
     return *this;
 }
