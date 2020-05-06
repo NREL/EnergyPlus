@@ -54,6 +54,7 @@
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <unordered_map>
@@ -136,6 +137,17 @@ namespace EnergyPlus {
         }
     };
 
+    struct ChillerGasAbsorptionData : BaseGlobalStruct {
+        bool getGasAbsorberInputs = true;
+        Array1D<ChillerGasAbsorption::GasAbsorberSpecs> GasAbsorber;
+
+        void clear_state()
+        {
+            getGasAbsorberInputs = true;
+            GasAbsorber.deallocate();
+        }
+    };
+
     struct DataGlobal : BaseGlobalStruct {
         // Data
         bool AnnualSimulation = false;
@@ -215,6 +227,7 @@ namespace EnergyPlus {
         ChillerAbsorberData dataChillerAbsorbers;
         ChillerElectricEIRData dataChillerElectricEIR;
         ChillerExhaustAbsorptionData dataChillerExhaustAbsorption;
+        ChillerGasAbsorptionData dataChillerGasAbsorption;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -228,6 +241,7 @@ namespace EnergyPlus {
             dataChillerAbsorbers.clear_state();
             dataChillerElectricEIR.clear_state();
             dataChillerExhaustAbsorption.clear_state();
+            dataChillerGasAbsorption.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();
