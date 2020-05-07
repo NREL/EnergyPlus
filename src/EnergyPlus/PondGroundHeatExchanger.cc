@@ -115,13 +115,12 @@ namespace PondGroundHeatExchanger {
     //   With Closed-Loop Ground-Source Heat Pump Systems.
     //   ASHRAE Transactions.  106(2):107-121.
 
-    Real64 const SmallNum(1.0e-30);         // Very small number to avoid div0 errors
-    Real64 const StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
+    Real64 constexpr SmallNum(1.0e-30);         // Very small number to avoid div0 errors
+    Real64 constexpr StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
+    auto constexpr fluidNameWater("WATER");
 
     int NumOfPondGHEs(0); // Number of pond ground heat exchangers
-
     bool GetInputFlag(true);
-
     Array1D<PondGroundHeatExchangerData> PondGHE;
 
     void PondGroundHeatExchangerData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -208,7 +207,7 @@ namespace PondGroundHeatExchanger {
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
 
-            PondGHE(Item).WaterIndex = FluidProperties::FindGlycol("WATER");
+            PondGHE(Item).WaterIndex = FluidProperties::FindGlycol(fluidNameWater);
 
             // General user input data
             PondGHE(Item).Name = DataIPShortCuts::cAlphaArgs(1);
@@ -445,7 +444,7 @@ namespace PondGroundHeatExchanger {
             // update past temperature
             this->PastBulkTemperature = this->BulkTemperature;
             this->firstTimeThrough = false;
-        } else {
+        } else if (!FirstHVACIteration){
             this->firstTimeThrough = true;
         }
 
@@ -497,9 +496,9 @@ namespace PondGroundHeatExchanger {
 
         Real64 PondMass = this->Depth * this->Area *
                           FluidProperties::GetDensityGlycol(
-                              "WATER", max(this->PondTemp, DataPrecisionGlobals::constant_zero), this->WaterIndex, RoutineName);
+                              fluidNameWater, max(this->PondTemp, DataPrecisionGlobals::constant_zero), this->WaterIndex, RoutineName);
 
-        Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol("WATER",
+        Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater,
                                                                      max(this->PondTemp, DataPrecisionGlobals::constant_zero),
                                                                      this->WaterIndex,
                                                                      RoutineName);
@@ -765,18 +764,18 @@ namespace PondGroundHeatExchanger {
         Real64 ConvCoefIn = Conductivity * NusseltNum / this->TubeInDiameter;
 
         // now find properties of pond water - always assume pond fluid is water
-        Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol("WATER", max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
-        Real64 WaterConductivity = FluidProperties::GetConductivityGlycol("WATER", max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
-        Real64 WaterViscosity = FluidProperties::GetViscosityGlycol("WATER", max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
-        Real64 WaterDensity = FluidProperties::GetDensityGlycol("WATER", max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterConductivity = FluidProperties::GetConductivityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterViscosity = FluidProperties::GetViscosityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterDensity = FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
 
         // derived properties for natural convection coefficient
         // expansion coef (Beta) = -1/Rho. dRho/dT
         // The following code includes some slight modifications from Simon's original code.
         // It guarantees that the delta T is 10C and also avoids the problems associated with
         // water hitting a maximum density at around 4C. (RKS)
-        Real64 ExpansionCoef = -(FluidProperties::GetDensityGlycol("WATER", max(PondTemperature, 10.0) + 5.0, this->WaterIndex, CalledFrom) -
-                                 FluidProperties::GetDensityGlycol("WATER", max(PondTemperature, 10.0) - 5.0, this->WaterIndex, CalledFrom)) /
+        Real64 ExpansionCoef = -(FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) + 5.0, this->WaterIndex, CalledFrom) -
+                                 FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) - 5.0, this->WaterIndex, CalledFrom)) /
                                (10.0 * WaterDensity);
 
         Real64 ThermDiff = WaterConductivity / (WaterDensity * WaterSpecHeat);
