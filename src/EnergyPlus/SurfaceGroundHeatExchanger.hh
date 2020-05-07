@@ -61,38 +61,10 @@ namespace EnergyPlus {
 
 namespace SurfaceGroundHeatExchanger {
 
-//    extern Real64 const SmallNum;        // Very small number to avoid div0 errors
-//    extern Real64 const StefBoltzmann;   // Stefan-Boltzmann constant
-//    extern Real64 const SurfaceHXHeight; // Surface Height above ground -- used in height dependent calcs.
-//
-//    extern int const SurfCond_Ground;
-//    extern int const SurfCond_Exposed;
-//
     namespace loc {
         extern int const MaxCTFTerms; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
                                       // to avoid static initialization order bug: Keep them in sync
     }                                 // namespace loc
-//
-//    // MODULE VARIABLE DECLARATIONS:
-//    extern Real64 FlowRate;      // water mass flow rate
-//    extern Real64 TopSurfTemp;   // Top  surface temperature
-//    extern Real64 BtmSurfTemp;   // Bottom  surface temperature
-//    extern Real64 TopSurfFlux;   // Top  surface heat flux
-//    extern Real64 BtmSurfFlux;   // Bottom  surface heat flux
-//    extern Real64 SourceFlux;    // total heat transfer rate, Watts
-//    extern Array1D_bool CheckEquipName;
-//
-//    // weather data records updated every zone time step
-//    extern Real64 PastBeamSolarRad;    // Previous beam normal solar irradiance
-//    extern Real64 PastSolarDirCosVert; // Previous vertical component of solar normal
-//    extern Real64 PastDifSolarRad;     // Previous sky diffuse solar horizontal irradiance
-//    extern Real64 PastGroundTemp;      // Previous ground temperature
-//    extern bool PastIsRain;            // Previous Surfaces are wet for this time interval
-//    extern bool PastIsSnow;            // Previous Snow on the ground for this time interval
-//    extern Real64 PastOutDryBulbTemp;  // Previous outdoor air dry bulb temperature
-//    extern Real64 PastOutWetBulbTemp;  // Previous outdoor air wet bulb temperature
-//    extern Real64 PastSkyTemp;         // Previous sky temperature
-//    extern Real64 PastWindSpeed;       // Previous outdoor air wind speed
 
     // get input flag
     extern bool GetInputFlag;
