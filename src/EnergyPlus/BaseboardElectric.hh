@@ -131,9 +131,9 @@ namespace BaseboardElectric {
 
     void GetBaseboardInput();
 
-    void InitBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum);
+    void InitBaseboard(EnergyPlus::EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum);
 
-    void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
+    void SizeElectricBaseboard(EnergyPlus::EnergyPlusData &state, int const BaseboardNum);
 
     void SimElectricConvective(int const BaseboardNum, Real64 const LoadMet);
 
