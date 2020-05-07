@@ -6577,8 +6577,9 @@ namespace OutputReportTabular {
         Real64 totalTotVentVol = 0;
         Real64 totalInfilVol = 0;
         Real64 totalVentInfilVol = 0;
-        Real64 totalMechVentPerOcc = 0;
-        Real64 totalInfilPerOcc = 0;
+        Real64 totalMechVentRateOcc = 0;
+        Real64 totalNatVentRateOcc = 0;
+        Real64 totalInfilRateOcc = 0;
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             Real64 zoneMult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
@@ -6621,25 +6622,46 @@ namespace OutputReportTabular {
                     totalVozMin += ZonePreDefRep(iZone).VozMin * zoneMult;
 
                     // Mechanical ventilation
-                    PreDefTableEntry(pdchOaTaBzMechVent, Zone(iZone).Name,
-                        ZonePreDefRep(iZone).MechVentVolTotal + ZonePreDefRep(iZone).SimpVentVolTotal, 0);
-                    totalMechVentVol += (ZonePreDefRep(iZone).MechVentVolTotal + ZonePreDefRep(iZone).SimpVentVolTotal) * zoneMult;
+                    PreDefTableEntry(pdchOaTaBzMechVent, Zone(iZone).Name, ZonePreDefRep(iZone).MechVentVolTotal, 0);
+                    totalMechVentVol += ZonePreDefRep(iZone).MechVentVolTotal * zoneMult;
+
+                    // Natural ventilation
+                    PreDefTableEntry(pdchOaTaBzNatVent, Zone(iZone).Name, ZonePreDefRep(iZone).SimpVentVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal, 0);
+                    totalNatVentVol += (ZonePreDefRep(iZone).SimpVentVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal) * zoneMult;
+
+                    // Total ventilation 
+                    PreDefTableEntry(pdchOaTaBzTotVent, Zone(iZone).Name, ZonePreDefRep(iZone).MechVentVolTotal
+                        + ZonePreDefRep(iZone).SimpVentVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal, 0);
 
                     // infiltration
-                    PreDefTableEntry(pdchOaTaBzInfil, Zone(iZone).Name,
-                        ZonePreDefRep(iZone).InfilVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal, 0);
-                    totalInfilVol += (ZonePreDefRep(iZone).InfilVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal) * zoneMult;
+                    PreDefTableEntry(pdchOaTaBzInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolTotal, 0);
+                    totalInfilVol += ZonePreDefRep(iZone).InfilVolTotal * zoneMult;
+
+                    // Total ventilation and infiltration
+                    PreDefTableEntry(pdchOaTaBzTotVentInfil, Zone(iZone).Name, ZonePreDefRep(iZone).MechVentVolTotal
+                        + ZonePreDefRep(iZone).SimpVentVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal + ZonePreDefRep(iZone).InfilVolTotal, 0);
 
                     if (Zone(iZone).isNominalOccupied) {
                         // Mechanical ventilation
-                        Real64 mechVent = (ZonePreDefRep(iZone).MechVentVolTotalOcc + ZonePreDefRep(iZone).SimpVentVolTotalOcc) / ZonePreDefRep(iZone).TotTimeOcc;
+                        Real64 mechVent = ZonePreDefRep(iZone).MechVentVolTotalOcc / ZonePreDefRep(iZone).TotTimeOcc;
                         PreDefTableEntry(pdchOaOccBzMechVent, Zone(iZone).Name, mechVent);
-                        totalMechVentPerOcc += mechVent * zoneMult;
+                        totalMechVentRateOcc += mechVent * zoneMult;
+
+                        // Natural ventilation
+                        Real64 natVent = (ZonePreDefRep(iZone).SimpVentVolTotalOcc + ZonePreDefRep(iZone).AFNInfilVolTotalOcc) / ZonePreDefRep(iZone).TotTimeOcc;
+                        PreDefTableEntry(pdchOaOccBzNatVent, Zone(iZone).Name, natVent);
+                        totalNatVentRateOcc += natVent * zoneMult;
+
+                        // Total ventilation 
+                        PreDefTableEntry(pdchOaOccBzTotVent, Zone(iZone).Name, mechVent + natVent);
 
                         // infiltration
-                        Real64 infil = (ZonePreDefRep(iZone).InfilVolTotalOcc + ZonePreDefRep(iZone).AFNInfilVolTotalOcc) / ZonePreDefRep(iZone).TotTimeOcc;
+                        Real64 infil = (ZonePreDefRep(iZone).InfilVolTotalOcc) / ZonePreDefRep(iZone).TotTimeOcc;
                         PreDefTableEntry(pdchOaOccBzInfil, Zone(iZone).Name, infil);
-                        totalInfilPerOcc += infil * zoneMult; 
+                        totalInfilRateOcc += infil * zoneMult; 
+
+                        // Total ventilation and infiltration
+                        PreDefTableEntry(pdchOaOccBzTotVentInfil, Zone(iZone).Name, mechVent + natVent + infil);
                     }
                 }
 
@@ -6714,10 +6736,16 @@ namespace OutputReportTabular {
         PreDefTableEntry(pdchOaMvMinDynTrgVent, "Total", totalVozMin, 3);
 
         PreDefTableEntry(pdchOaTaBzMechVent, "Total", totalMechVentVol, 0);
+        PreDefTableEntry(pdchOaTaBzNatVent, "Total", totalNatVentVol, 0);
+        PreDefTableEntry(pdchOaTaBzTotVent, "Total", totalMechVentVol + totalNatVentVol, 0);
         PreDefTableEntry(pdchOaTaBzInfil, "Total", totalInfilVol, 0);
+        PreDefTableEntry(pdchOaTaBzTotVentInfil,  "Total", totalMechVentVol + totalNatVentVol + totalInfilVol, 0);
 
-        PreDefTableEntry(pdchOaOccBzMechVent, "Total", totalMechVentPerOcc);
-        PreDefTableEntry(pdchOaOccBzInfil, "Total", totalInfilPerOcc);
+        PreDefTableEntry(pdchOaOccBzMechVent, "Total", totalMechVentRateOcc);
+        PreDefTableEntry(pdchOaOccBzNatVent, "Total", totalNatVentRateOcc);
+        PreDefTableEntry(pdchOaOccBzTotVent, "Total", totalMechVentRateOcc + totalNatVentRateOcc);
+        PreDefTableEntry(pdchOaOccBzInfil, "Total", totalInfilRateOcc);
+        PreDefTableEntry(pdchOaOccBzTotVentInfil, "Total", totalMechVentRateOcc + totalNatVentRateOcc + totalInfilRateOcc);
 
 
         // Add the number of central air distributions system to the count report

@@ -2375,10 +2375,10 @@ namespace OutputReportPredefined {
 
         pdstOAtotAirByZone = newPreDefSubTable(pdrOutsideAir, "Total Outdoor Air by Zone");
         pdchOaTaBzMechVent = newPreDefColumn(pdstOAtotAirByZone, "Mechanical Ventilation [m3]");
-        pdchOaTaBzNatVent = newPreDefColumn(pdstOAtotAirByZone, "Natural Ventilation [m3]"); //todo
-        pdchOaTaBzTotVent = newPreDefColumn(pdstOAtotAirByZone, "Total Ventilation [m3]"); //todo
+        pdchOaTaBzNatVent = newPreDefColumn(pdstOAtotAirByZone, "Natural Ventilation [m3]");
+        pdchOaTaBzTotVent = newPreDefColumn(pdstOAtotAirByZone, "Total Ventilation [m3]");
         pdchOaTaBzInfil = newPreDefColumn(pdstOAtotAirByZone, "Infiltration [m3]");
-        pdchOaTaBzTotVentInfil = newPreDefColumn(pdstOAtotAirByZone, "Total Ventilation and Infiltration [m3]"); //todo
+        pdchOaTaBzTotVentInfil = newPreDefColumn(pdstOAtotAirByZone, "Total Ventilation and Infiltration [m3]");
         pdchOaTaBzDynTrgVent = newPreDefColumn(pdstOAtotAirByZone, "Dynamic Target Ventilation - Voz-dyn [m3]"); //todo
         pdchOaTaBzTmBelow = newPreDefColumn(pdstOAtotAirByZone, "Time Below Voz-dyn [hr]"); //todo
         pdchOaTaBzTmAt = newPreDefColumn(pdstOAtotAirByZone, "Time At Voz-dyn [hr]"); //todo
@@ -2386,11 +2386,11 @@ namespace OutputReportPredefined {
         pdchOaTaBzTmAboveUnocc = newPreDefColumn(pdstOAtotAirByZone, "Time Above Zero When Unoccupied [hr]"); //todo
 
         pdstOAavgOccByZone = newPreDefSubTable(pdrOutsideAir, "Average Outdoor Air During Occupancy by Zone - Flow Rates");
-        pdchOaOccBzMechVent = newPreDefColumn(pdstOAavgOccByZone, "Mechanical Ventilation [m3/s]"); //todo
-        pdchOaOccBzNatVent = newPreDefColumn(pdstOAavgOccByZone, "Natural Ventilation [m3/s]"); //todo
-        pdchOaOccBzTotVent = newPreDefColumn(pdstOAavgOccByZone, "Total Ventilation [m3/s]"); //todo
-        pdchOaOccBzInfil = newPreDefColumn(pdstOAavgOccByZone, "Infiltration [m3/s]"); //todo
-        pdchOaOccBzTotVentInfil = newPreDefColumn(pdstOAavgOccByZone, "Total Ventilation and Infiltration [m3/s]"); //todo
+        pdchOaOccBzMechVent = newPreDefColumn(pdstOAavgOccByZone, "Mechanical Ventilation [m3/s]");
+        pdchOaOccBzNatVent = newPreDefColumn(pdstOAavgOccByZone, "Natural Ventilation [m3/s]");
+        pdchOaOccBzTotVent = newPreDefColumn(pdstOAavgOccByZone, "Total Ventilation [m3/s]");
+        pdchOaOccBzInfil = newPreDefColumn(pdstOAavgOccByZone, "Infiltration [m3/s]");
+        pdchOaOccBzTotVentInfil = newPreDefColumn(pdstOAavgOccByZone, "Total Ventilation and Infiltration [m3/s]");
         pdchOaOccBzDynTrgVent = newPreDefColumn(pdstOAavgOccByZone, "Dynamic Target Ventilation - Voz-dyn [m3/s]"); //todo
         pdchOaOccBzTmBelow = newPreDefColumn(pdstOAavgOccByZone, "Time Below Voz-dyn [hr]"); //todo
         pdchOaOccBzTmAt = newPreDefColumn(pdstOAavgOccByZone, "Time At Voz-dyn [hr]"); //todo
