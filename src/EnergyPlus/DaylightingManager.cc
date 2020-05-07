@@ -548,7 +548,6 @@ namespace DaylightingManager {
         Real64 DaylFac2; // sky daylight factor at ref pt 2
 
         // added for output all daylight factors
-        int write_stat;
         Real64 DFClrSky1;
         Real64 DFClrTbSky1;
         Real64 DFIntSky1;
