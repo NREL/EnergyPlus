@@ -671,7 +671,9 @@ namespace SurfaceGroundHeatExchanger {
         loopSideNum = this->LoopSideNum;
 
         // check if we are in very first call for this zone time step
-        if (BeginTimeStepFlag && FirstHVACIteration && PlantLoop(loopNum).LoopSide(loopSideNum).FlowLock == 1) {
+        if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && this->firstTimeThrough) {
+            this->firstTimeThrough = false;
+
             // calc temps and fluxes with past env. conditions and average source flux
             SourceFlux = this->QSrcAvg;
             // starting values for the surface temps
@@ -848,10 +850,11 @@ namespace SurfaceGroundHeatExchanger {
                 }
             } // end surface heat balance iteration
 
-        } else { // end source flux iteration
+        } else if (!FirstHVACIteration) { // end source flux iteration
 
             // For the rest of the system time steps ...
             // update source flux from Twi
+            this->firstTimeThrough = true;
             SourceFlux = this->CalcSourceFlux();
         }
     }
@@ -1392,12 +1395,11 @@ namespace SurfaceGroundHeatExchanger {
 
         loopNum = this->LoopNum;
         loopSideNum = this->LoopSideNum;
-        if (PlantLoop(loopNum).LoopSide(loopSideNum).FlowLock > 0) { // only update in normal mode !DSU
-            if (this->LastSysTimeElapsed == SysTimeElapsed) {
-                // Still iterating or reducing system time step, so subtract old values which were
-                // not valid
-                this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / TimeStepZone;
-            }
+        if (this->LastSysTimeElapsed == SysTimeElapsed) {
+            // Still iterating or reducing system time step, so subtract old values which were
+            // not valid
+            this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / TimeStepZone;
+        } else {
 
             // Update the running average and the "last" values with the current values of the appropriate variables
             this->QSrcAvg += this->QSrc * TimeStepSys / TimeStepZone;
