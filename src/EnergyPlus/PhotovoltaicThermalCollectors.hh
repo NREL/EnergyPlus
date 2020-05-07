@@ -209,7 +209,7 @@ namespace PhotovoltaicThermalCollectors {
 
        void BIPVTcalculate();
 
-       void BIPVT_MaxHeatGain_calculate();
+       void BIPVT_MaxHeatGain_calculate(Real64 tsp, std::string Mode, Real64 &bfr, Real64 &q, Real64 &tfout, Real64 &ThEff, Real64 &tpv);
 
        void solve_lin_sys_back_sub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
 
@@ -222,7 +222,6 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetPVTcollectorsInput();
 
-
     void GetPVTSimpleCollectorsInput(int NumSimplePVTPerform, Array1D<SimplePVTModelStruct> &tmpSimplePVTperf);
 
     void GetBIPVTCollectorsInput(int NumBIPVTPerform, Array1D<BIPVTModelStruct> &tmpBIPVTperf);
@@ -230,7 +229,6 @@ namespace PhotovoltaicThermalCollectors {
     void GetMainPVTInput(int NumPVT, Array1D<PVTCollectorStruct> &PVT, Array1D<SimplePVTModelStruct> tmpSimplePVTperf, Array1D<BIPVTModelStruct> tmpBIPVTperf);
 
     void simPVTfromOASys(EnergyPlusData &state, int index, bool FirstHVACIteration);
-
 
     int getPVTindexFromName(std::string const &name);
 
