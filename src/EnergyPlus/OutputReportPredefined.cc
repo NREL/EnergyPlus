@@ -2370,8 +2370,8 @@ namespace OutputReportPredefined {
         pdchOaMvNomNumOcc = newPreDefColumn(pdstOAmechVentParByZone, "Nominal Number of Occupants");
         pdchOaMvZoneVol = newPreDefColumn(pdstOAmechVentParByZone, "Zone Volume [m3]");
         pdchOaMvZoneArea = newPreDefColumn(pdstOAmechVentParByZone, "Zone Area [m2]"); 
-        pdchOaMvDesZnOa = newPreDefColumn(pdstOAmechVentParByZone, "Design Zone Outdoor Airflow - Voz [m3/s]"); //todo
-        pdchOaMvMinDynTrgVent = newPreDefColumn(pdstOAmechVentParByZone, "Minimum Dynamic Target Ventilation - Voz-dyn-min [m3/s]"); //todo
+        pdchOaMvDesZnOa = newPreDefColumn(pdstOAmechVentParByZone, "Design Zone Outdoor Airflow - Voz [m3/s]"); 
+        pdchOaMvMinDynTrgVent = newPreDefColumn(pdstOAmechVentParByZone, "Minimum Dynamic Target Ventilation - Voz-dyn-min [m3/s]");
 
         pdstOAtotAirByZone = newPreDefSubTable(pdrOutsideAir, "Total Outdoor Air by Zone");
         pdchOaTaBzMechVent = newPreDefColumn(pdstOAtotAirByZone, "Mechanical Ventilation [m3]");

@@ -4798,21 +4798,25 @@ namespace SystemReports {
                 // accumulate the occupied time
                 ZonePreDefRep(ActualZoneNum).TotTimeOcc += TimeStepSys;
                 // mechnical ventilation
-                ZonePreDefRep(ActualZoneNum).MechVentVolTotal += ZoneOAVolCrntRho(CtrlZoneNum);
+                ZonePreDefRep(ActualZoneNum).MechVentVolTotalOcc += ZoneOAVolCrntRho(CtrlZoneNum);
                 if ((ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys) < ZonePreDefRep(ActualZoneNum).MechVentVolMin) {
                     ZonePreDefRep(ActualZoneNum).MechVentVolMin = ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys;
                 }
                 // infiltration
-                ZonePreDefRep(ActualZoneNum).InfilVolTotal += ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
+                ZonePreDefRep(ActualZoneNum).InfilVolTotalOcc += ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
                 if (ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity < ZonePreDefRep(ActualZoneNum).InfilVolMin) {
                     ZonePreDefRep(ActualZoneNum).InfilVolMin = ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
                 }
                 //'simple' mechanical ventilation
-                ZonePreDefRep(ActualZoneNum).SimpVentVolTotal += ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
+                ZonePreDefRep(ActualZoneNum).SimpVentVolTotalOcc += ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
                 if (ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity < ZonePreDefRep(ActualZoneNum).SimpVentVolMin) {
                     ZonePreDefRep(ActualZoneNum).SimpVentVolMin = ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
                 }
             }
+            // accumulate during occupancy or not
+            ZonePreDefRep(ActualZoneNum).MechVentVolTotal += ZoneOAVolCrntRho(CtrlZoneNum);
+            ZonePreDefRep(ActualZoneNum).InfilVolTotal += ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
+            ZonePreDefRep(ActualZoneNum).SimpVentVolTotal += ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
 
             // now combine Vent load from zone forced air units with primary air system
             ZoneVentLoad = ZAirSysZoneVentLoad + ZFAUZoneVentLoad;

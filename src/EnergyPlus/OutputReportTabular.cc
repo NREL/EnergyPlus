@@ -6572,7 +6572,15 @@ namespace OutputReportTabular {
         Real64 totalAverageOccupants = 0.;
         Real64 totalArea = 0.;
         Real64 totalVozMin = 0;
+        Real64 totalMechVentVol = 0;
+        Real64 totalNatVentVol = 0;
+        Real64 totalTotVentVol = 0;
+        Real64 totalInfilVol = 0;
+        Real64 totalVentInfilVol = 0;
+        Real64 totalMechVentPerOcc = 0;
+        Real64 totalInfilPerOcc = 0;
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
+            Real64 zoneMult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
                 // air loop name
@@ -6595,38 +6603,45 @@ namespace OutputReportTabular {
                         if (ZonePreDefRep(iZone).NumOccAccumTime > 0) {
                             PreDefTableEntry(
                                 pdchOaMvAvgNumOcc, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
-                            totalAverageOccupants += (ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime) * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+                            totalAverageOccupants += (ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime) * zoneMult;
                         }
                     }
                     PreDefTableEntry(pdchOaMvNomNumOcc, Zone(iZone).Name, Zone(iZone).TotOccupants);
-                    totalOccupants += Zone(iZone).TotOccupants * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+                    totalOccupants += Zone(iZone).TotOccupants * zoneMult;
 
                     // Zone volume and area
 
                     PreDefTableEntry(pdchOaMvZoneVol, Zone(iZone).Name, Zone(iZone).Volume);
-                    totalVolume += Zone(iZone).Volume;
+                    totalVolume += Zone(iZone).Volume * zoneMult;
                     PreDefTableEntry(pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
-                    totalArea += Zone(iZone).FloorArea;
+                    totalArea += Zone(iZone).FloorArea * zoneMult;
 
                     // minimum dynamic target ventilation Voz-dyn-min
                     PreDefTableEntry(pdchOaMvMinDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozMin, 3);
-                    totalVozMin += ZonePreDefRep(iZone).VozMin;
-                }
+                    totalVozMin += ZonePreDefRep(iZone).VozMin * zoneMult;
 
-
-                if (Zone(iZone).isNominalOccupied) {
                     // Mechanical ventilation
-                    PreDefTableEntry(pdchOaTaBzMechVent,
-                        Zone(iZone).Name,
-                        ZonePreDefRep(iZone).MechVentVolTotal + ZonePreDefRep(iZone).SimpVentVolTotal ,
-                        0);
+                    PreDefTableEntry(pdchOaTaBzMechVent, Zone(iZone).Name,
+                        ZonePreDefRep(iZone).MechVentVolTotal + ZonePreDefRep(iZone).SimpVentVolTotal, 0);
+                    totalMechVentVol += (ZonePreDefRep(iZone).MechVentVolTotal + ZonePreDefRep(iZone).SimpVentVolTotal) * zoneMult;
+
+                    // infiltration
+                    PreDefTableEntry(pdchOaTaBzInfil, Zone(iZone).Name,
+                        ZonePreDefRep(iZone).InfilVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal, 0);
+                    totalInfilVol += (ZonePreDefRep(iZone).InfilVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal) * zoneMult;
+
+                    if (Zone(iZone).isNominalOccupied) {
+                        // Mechanical ventilation
+                        Real64 mechVent = (ZonePreDefRep(iZone).MechVentVolTotalOcc + ZonePreDefRep(iZone).SimpVentVolTotalOcc) / ZonePreDefRep(iZone).TotTimeOcc;
+                        PreDefTableEntry(pdchOaOccBzMechVent, Zone(iZone).Name, mechVent);
+                        totalMechVentPerOcc += mechVent * zoneMult;
+
+                        // infiltration
+                        Real64 infil = (ZonePreDefRep(iZone).InfilVolTotalOcc + ZonePreDefRep(iZone).AFNInfilVolTotalOcc) / ZonePreDefRep(iZone).TotTimeOcc;
+                        PreDefTableEntry(pdchOaOccBzInfil, Zone(iZone).Name, infil);
+                        totalInfilPerOcc += infil * zoneMult; 
+                    }
                 }
-
-                // infiltration
-                PreDefTableEntry(pdchOaTaBzInfil,
-                                Zone(iZone).Name,
-                                ZonePreDefRep(iZone).InfilVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal, 0);
-
 
 
 // OLD CODE RELATED TO OUTSIDE AIR VENTILATION BELOW HERE
@@ -6697,6 +6712,13 @@ namespace OutputReportTabular {
         PreDefTableEntry(pdchOaMvNomNumOcc, "Total", totalOccupants);
         PreDefTableEntry(pdchOaMvAvgNumOcc, "Total", totalAverageOccupants);
         PreDefTableEntry(pdchOaMvMinDynTrgVent, "Total", totalVozMin, 3);
+
+        PreDefTableEntry(pdchOaTaBzMechVent, "Total", totalMechVentVol, 0);
+        PreDefTableEntry(pdchOaTaBzInfil, "Total", totalInfilVol, 0);
+
+        PreDefTableEntry(pdchOaOccBzMechVent, "Total", totalMechVentPerOcc);
+        PreDefTableEntry(pdchOaOccBzInfil, "Total", totalInfilPerOcc);
+
 
         // Add the number of central air distributions system to the count report
         PreDefTableEntry(pdchHVACcntVal, "HVAC Air Loops", NumPrimaryAirSys);
