@@ -267,7 +267,7 @@ void LinesOut(std::string const &option)
             if (Surface(surf).Sides == 0) continue;
             print(slnfile, "{}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);
             for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                static constexpr auto fmt700("{:10.2F},{:10.2F},{:10.2F},{:10.2F},{:10.2F},{:10.2F}");
+                static constexpr auto fmt700("{:10.2F},{:10.2F},{:10.2F},{:10.2F},{:10.2F},{:10.2F}\n");
 
                 if (vert != Surface(surf).Sides) {
                     print(slnfile,
@@ -297,12 +297,12 @@ void LinesOut(std::string const &option)
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Sides == 0) continue;
             // process heat transfer surfaces
-            print(slnfile, " Surface={}, Name={}, Azimuth={:.1R}", cSurfaceClass(Surface(surf).Class), Surface(surf).Name, Surface(surf).Azimuth);
+            print(slnfile, " Surface={}, Name={}, Azimuth={:.1R}\n", cSurfaceClass(Surface(surf).Class), Surface(surf).Name, Surface(surf).Azimuth);
             print(slnfile, "  {},  !- Number of (X,Y,Z) groups in this surface\n", Surface(surf).Sides);
             for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
                 std::string optcommasemi = ",";
                 if (vert == Surface(surf).Sides) optcommasemi = ";";
-                static constexpr auto fmtcoord("  {:10.2F},{:10.2F},{:10.2F}{}  !- {} {}");
+                static constexpr auto fmtcoord("  {:10.2F},{:10.2F},{:10.2F}{}  !- {} {}\n");
                 print(slnfile,
                       fmtcoord,
                       Surface(surf).Vertex(vert).x,
@@ -1788,8 +1788,8 @@ void CostInfoOut(OutputFiles &outputFiles)
     auto scifile = outputFiles.sci.open("CostInfoOut");
 
     print(scifile, "{:12}{:12}\n", TotSurfaces, count(uniqueSurf));
-    print(scifile, "{}\n", "data for surfaces useful for cost information");
-    print(scifile, "{}\n", "Number, Name, Construction, class, area, grossarea");
+    print(scifile, "{}\n", " data for surfaces useful for cost information");
+    print(scifile, "{}\n", " Number, Name, Construction, class, area, grossarea");
 
     for (int surf = 1; surf <= TotSurfaces; ++surf) {
         // if (surface(surf)%class .eq. SurfaceClass_IntMass) CYCLE

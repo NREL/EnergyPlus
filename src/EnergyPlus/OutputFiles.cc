@@ -45,7 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/OutputFiles.hh>
 
 #include "DataStringGlobals.hh"
@@ -53,7 +52,6 @@
 
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 
 namespace EnergyPlus {
 
