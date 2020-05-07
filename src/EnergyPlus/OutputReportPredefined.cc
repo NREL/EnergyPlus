@@ -2697,7 +2697,7 @@ namespace OutputReportPredefined {
         }
 
         if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
-            tableEntry(numTableEntry).charEntry = format("{:12.{}F}", tableEntryReal, sigDigitCount);
+            tableEntry(numTableEntry).charEntry = format("{:#12.{}F}", tableEntryReal, sigDigitCount);
         } else {
             tableEntry(numTableEntry).charEntry = format("{:12.{}Z}", tableEntryReal, sigDigitCount);
         }

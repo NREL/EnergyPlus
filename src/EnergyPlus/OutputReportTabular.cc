@@ -15691,12 +15691,10 @@ namespace OutputReportTabular {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        const auto nDigits = [&]() {
-                if (RealIn < 0.0) return numDigits - 1;
-                if (numDigits > 9) return 9;
-                if (numDigits < 0) return 0;
-                return numDigits;
-            }();
+        int nDigits = numDigits;
+        if (RealIn < 0.0) --nDigits;
+        if (nDigits > 9) nDigits = 9;
+        if (nDigits < 0) nDigits = 0;
 
         if (std::abs(RealIn) > maxvalDigitsA.at(nDigits)) {
             return format("{:12.6Z}", RealIn);
