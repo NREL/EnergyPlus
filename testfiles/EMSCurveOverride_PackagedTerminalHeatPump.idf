@@ -2115,6 +2115,3 @@
     HTML;                    !- Column Separator
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
-  Output:Variable,Zone1PTHPDXCoolCoil,Cooling Coil Total Cooling Rate,timestep;
-  Output:Variable,Zone2PTHPDXCoolCoil,Cooling Coil Total Cooling Rate,timestep;
-  Output:Variable,Zone3PTHPDXCoolCoil,Cooling Coil Total Cooling Rate,timestep;

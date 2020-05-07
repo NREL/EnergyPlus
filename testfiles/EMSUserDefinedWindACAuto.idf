@@ -1716,8 +1716,6 @@
 
   Output:Variable,*,Zone 1 WinAC Electricity Power,hourly;
 
-  Output:Variable,*,Zone 1 WinAC Electricity Consumption,hourly;
-
   Output:Variable,Zone1WindACAirOutletNode,System Node Mass Flow Rate,hourly;
 
   Output:Variable,Zone2WindACAirOutletNode,System Node Mass Flow Rate,hourly;
