@@ -93,6 +93,8 @@ void DisplayString(std::string const &String) // String to be displayed
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // na
+    if (DataGlobals::fMessagePtr) DataGlobals::fMessagePtr(String);
+    if (DataGlobals::messageCallback) DataGlobals::messageCallback(String.c_str());
 
     if (KickOffSimulation && !DeveloperFlag) return;
     std::cout << String << std::endl;
