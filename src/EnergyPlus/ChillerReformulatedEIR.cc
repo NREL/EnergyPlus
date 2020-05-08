@@ -1453,13 +1453,9 @@ namespace ChillerReformulatedEIR {
                         "EIR as a function of PLR curve output at various part-load ratios and condenser water temperatures shown below:");
                     ShowContinueError("PLR           =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
 
-                    const auto cond_temp_error = format("'Cond Temp(C) = ' {:7.2F}", fmt::join(CondTempArray, " "));
-                    std::cout << cond_temp_error << '\n';
-                    ShowContinueError(cond_temp_error);
+                    ShowContinueError(format("Cond Temp(C) = {:7.2F}", fmt::join(CondTempArray, " ")));
 
-                    const auto curve_temp_error = format("'Curve Temp(C) = ' {:7.2F}", fmt::join(CurveValArray, " "));
-                    std::cout << curve_temp_error << '\n';
-                    ShowContinueError(curve_temp_error);
+                    ShowContinueError(format("Curve Output = {:7.2F}", fmt::join(CurveValArray, " ")));
                     
                     ErrorsFound = true;
                 }

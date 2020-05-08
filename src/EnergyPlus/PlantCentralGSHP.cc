@@ -1316,9 +1316,7 @@ namespace PlantCentralGSHP {
                     ShowContinueError("EIR as a function of PLR curve output at various part-load ratios shown below:");
                     ShowContinueError("PLR   =  0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
 
-                    const auto curve_output = format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ","));
-                    std::cout << curve_output << '\n';
-                    ShowContinueError(curve_output);
+                    ShowContinueError(format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ",")));
 
                     CHErrorsFound = true;
                 }
