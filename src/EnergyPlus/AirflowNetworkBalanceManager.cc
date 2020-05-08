@@ -8643,11 +8643,13 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkZnRpt(i).MixVolume = (AirflowNetworkExchangeData(i).SumMMCp / CpAir / AirDensity) * ReportingConstant;
             AirflowNetworkZnRpt(i).MixMass = (AirflowNetworkExchangeData(i).SumMMCp / CpAir) * ReportingConstant;
             // save values for predefined report
+            Real64 StdDensInfilVolume = (AirflowNetworkExchangeData(i).SumMCp / CpAir / StdRhoAir) * ReportingConstant;  // compute volume using standard density air
+            ZonePreDefRep(i).AFNInfilVolTotal += StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
+            if (StdDensInfilVolume < ZonePreDefRep(i).AFNInfilVolMin) {
+                ZonePreDefRep(i).AFNInfilVolMin = StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
+            }
             if (ZonePreDefRep(i).isOccupied) {
-                ZonePreDefRep(i).AFNInfilVolTotal += AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
-                if (AirflowNetworkZnRpt(i).InfilVolume < ZonePreDefRep(i).AFNInfilVolMin) {
-                    ZonePreDefRep(i).AFNInfilVolMin = AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
-                }
+                ZonePreDefRep(i).AFNInfilVolTotalOcc += StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
             }
 
             Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(OutHumRat, Zone(i).OutDryBulbTemp);
