@@ -80,6 +80,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -165,7 +166,7 @@ namespace InternalHeatGains {
         ErrorsFound = false;
     }
 
-    void ManageInternalHeatGains(Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
+    void ManageInternalHeatGains(EnergyPlusData &state, Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
 
         // SUBROUTINE INFORMATION:
@@ -203,7 +204,7 @@ namespace InternalHeatGains {
 
         // FLOW:
         if (GetInternalHeatGainsInputFlag) {
-            GetInternalHeatGainsInput(OutputFiles::getSingleton());
+            GetInternalHeatGainsInput(state, OutputFiles::getSingleton());
             GetInternalHeatGainsInputFlag = false;
         }
 
@@ -211,7 +212,7 @@ namespace InternalHeatGains {
             if (InitOnly) return;
         }
 
-        InitInternalHeatGains();
+        InitInternalHeatGains(state);
 
         ReportInternalHeatGains();
 
@@ -221,7 +222,7 @@ namespace InternalHeatGains {
         if (ZoneSizingCalc) GatherComponentLoadsIntGain();
     }
 
-    void GetInternalHeatGainsInput(OutputFiles &outputFiles)
+    void GetInternalHeatGainsInput(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1423,7 +1424,7 @@ namespace InternalHeatGains {
                         }
                     }
                     if (Lights(Loop).ZonePtr > 0) {
-                        Lights(Loop).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(Zone(Lights(Loop).ZonePtr).Name, retNodeName);
+                        Lights(Loop).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(state, Zone(Lights(Loop).ZonePtr).Name, retNodeName);
                     }
 
                     if ((Lights(Loop).ZoneReturnNum == 0) && (Lights(Loop).FractionReturnAir > 0.0) && (!lAlphaFieldBlanks(7))) {
@@ -3943,7 +3944,7 @@ namespace InternalHeatGains {
                 if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
                     Real64 TAirInSizing = 0.0;
                     // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite object
-                    SetPointManager::GetSetPointManagerInputData(ErrorsFound);
+                    SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
                     for (int SetPtMgrNum = 1; SetPtMgrNum <= SetPointManager::NumSZClSetPtMgrs; ++SetPtMgrNum) {
                         if (SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == Loop) {
                             TAirInSizing = SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
@@ -5135,7 +5136,7 @@ namespace InternalHeatGains {
         }
     }
 
-    void InitInternalHeatGains()
+    void InitInternalHeatGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5540,14 +5541,14 @@ namespace InternalHeatGains {
 
         if (NumZoneITEqStatements > 0) CalcZoneITEq();
 
-        CalcWaterThermalTankZoneGains();
+        CalcWaterThermalTankZoneGains(state);
         PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
         CalcWaterUseZoneGains();
         FigureFuelCellZoneGains();
         FigureMicroCHPZoneGains();
         initializeElectricPowerServiceZoneGains();
         FigureTDDZoneGains();
-        FigureRefrigerationZoneGains();
+        FigureRefrigerationZoneGains(state);
 
         // store pointer values to hold generic internal gain values constant for entire timestep
         UpdateInternalGainValues();

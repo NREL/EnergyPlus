@@ -87,6 +87,7 @@
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -283,7 +284,7 @@ namespace HeatBalanceManager {
         UniqueConstructNames.clear();
     }
 
-    void ManageHeatBalance(OutputFiles &outputFiles)
+    void ManageHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -335,7 +336,7 @@ namespace HeatBalanceManager {
 
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
-            GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+            GetHeatBalanceInput(state); // Obtains heat balance related parameters from input file
             HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles);
 
             // Surface octree setup
@@ -367,7 +368,7 @@ namespace HeatBalanceManager {
         // may be a radiant system in the building which will require iteration between
         // the HVAC system (called from the Air Heat Balance) and the zone (simulated
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
-        ManageSurfaceHeatBalance();
+        ManageSurfaceHeatBalance(state);
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
         RecKeepHeatBalance(outputFiles);                                             // Do any heat balance related record keeping
 
@@ -375,7 +376,7 @@ namespace HeatBalanceManager {
         //   You do get a shift in the Air Handling System Summary for the building electric loads
         // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
-        ReportHeatBalance(outputFiles); // Manage heat balance reporting until the new reporting is in place
+        ReportHeatBalance(state, outputFiles); // Manage heat balance reporting until the new reporting is in place
 
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
@@ -387,7 +388,7 @@ namespace HeatBalanceManager {
             CheckWarmupConvergence();
             if (!WarmupFlag) {
                 DayOfSim = 0; // Reset DayOfSim if Warmup converged
-                DayOfSimChr = "0";
+                state.dataGlobals.DayOfSimChr = "0";
 
                 ManageEMS(emsCallFromBeginNewEvironmentAfterWarmUp, anyRan); // calling point
             }
@@ -401,7 +402,7 @@ namespace HeatBalanceManager {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHeatBalanceInput()
+    void GetHeatBalanceInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -456,7 +457,7 @@ namespace HeatBalanceManager {
 
         GetConstructData(ErrorsFound); // Read constructs from input file/transfer from legacy data structure
 
-        GetBuildingData(ErrorsFound); // Read building data from input file
+        GetBuildingData(state, ErrorsFound); // Read building data from input file
 
         // Added SV 6/26/2013 to load scheduled surface gains
         GetScheduledSurfaceGains(ErrorsFound);
@@ -480,7 +481,7 @@ namespace HeatBalanceManager {
 
         // following is done to "get internal heat gains" input so that lights are gotten before
         // daylighting input
-        ManageInternalHeatGains(true);
+        ManageInternalHeatGains(state, true);
     }
 
     void CheckUsedConstructions(bool &ErrorsFound)
@@ -4597,7 +4598,7 @@ namespace HeatBalanceManager {
         } // End of ConstrNum DO loop
     }
 
-    void GetBuildingData(bool &ErrorsFound) // If errors found in input
+    void GetBuildingData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -4635,7 +4636,7 @@ namespace HeatBalanceManager {
 
         GetZoneData(ErrorsFound); // Read Zone data from input file
 
-        SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
+        SetupZoneGeometry(state, OutputFiles::getSingleton(), ErrorsFound);
     }
 
     void GetZoneData(bool &ErrorsFound) // If errors found in input
@@ -5905,7 +5906,7 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance(OutputFiles &outputFiles)
+    void ReportHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5958,7 +5959,7 @@ namespace HeatBalanceManager {
 
         if (!WarmupFlag && DoOutputReporting) {
             CalcMoreNodeInfo();
-            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
@@ -6001,13 +6002,13 @@ namespace HeatBalanceManager {
                 }
             }
             CalcMoreNodeInfo();
-            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
-            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }

@@ -72,6 +72,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -162,7 +163,7 @@ namespace ChillerElectricEIR {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void ElectricEIRChillerSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ElectricEIRChillerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -230,7 +231,7 @@ namespace ChillerElectricEIR {
         sizFac = this->SizFac;
     }
 
-    void ElectricEIRChillerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    void ElectricEIRChillerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;
@@ -238,7 +239,7 @@ namespace ChillerElectricEIR {
         this->initialize(runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->size();
+            this->size(state);
         }
     }
 
@@ -1239,7 +1240,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::size()
+    void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1471,7 +1472,7 @@ namespace ChillerElectricEIR {
                     DataSizing::DataFractionUsedForSizing = 0.000114;
                     Real64 TempSize = this->CondVolFlowRate;
                     bool bPRINT = true; // TRUE if sizing is reported to output (eio)
-                    ReportSizingManager::RequestSizing(CompType, this->Name, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                    ReportSizingManager::RequestSizing(state, CompType, this->Name, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                     this->CondVolFlowRate = TempSize;
                     DataSizing::DataConstantUsedForSizing = 0.0;
                     DataSizing::DataFractionUsedForSizing = 0.0;

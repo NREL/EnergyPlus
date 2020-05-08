@@ -156,7 +156,7 @@ if(NOT MSVC)
   endif()
   ei_add_cxx_compiler_flag("-pedantic")
   ei_add_cxx_compiler_flag("-Wall")
-  ei_add_cxx_compiler_flag("-Wextra")
+  #ei_add_cxx_compiler_flag("-Wextra")
   #ei_add_cxx_compiler_flag("-Weverything")              # clang
 
   ei_add_cxx_compiler_flag("-Wundef")

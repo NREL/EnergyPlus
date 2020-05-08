@@ -178,7 +178,7 @@ namespace RuntimeLanguageProcessor {
 
     void BeginEnvrnInitializeRuntimeLanguage();
 
-    void ParseStack(int const StackNum);
+    void ParseStack(OutputFiles &outputFiles, int const StackNum);
 
     int AddInstruction(int const StackNum,
                        int const LineNum,
@@ -205,7 +205,8 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(std::string const &InString, // String of expression text written in the Runtime Language
+    void ParseExpression(OutputFiles &outputFiles,
+                         std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
                          std::string const &Line      // Actual line from string

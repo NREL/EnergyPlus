@@ -108,7 +108,7 @@ namespace DataRuntimeLanguage {
     int const OperatorGreaterThan(12);    // >
     int const OperatorRaiseToPower(13);   // ^
     int const OperatorLogicalAND(14);     // &&
-    int const OperatiorLogicalOR(15);     // ||
+    int const OperatorLogicalOR(15);     // ||
     // note there is an important check "> 15" to distinguish operators from functions
     //  so becareful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
 
