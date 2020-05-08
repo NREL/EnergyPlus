@@ -1031,10 +1031,6 @@ namespace ChillerReformulatedEIR {
 
         bool ErrorsFound(false); // If errors detected in input
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_530("('Cond Temp (C) = ',11(F7.2))");
-        static ObjexxFCL::gio::Fmt Format_531("('Curve Output  = ',11(F7.2))");
-
         Real64 tmpNomCap = this->RefCap;
         Real64 tmpEvapVolFlowRate = this->EvapVolFlowRate;
         Real64 tmpCondVolFlowRate = this->CondVolFlowRate;
@@ -1456,8 +1452,15 @@ namespace ChillerReformulatedEIR {
                     ShowContinueError(
                         "EIR as a function of PLR curve output at various part-load ratios and condenser water temperatures shown below:");
                     ShowContinueError("PLR           =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-                    ShowContinueError(format("'Cond Temp(C) = ' {:7.2F}\n", fmt::join(CondTempArray, " ")));
-                    ShowContinueError(format("'Curve Temp(C) = ' {:7.2F}\n", fmt::join(CurveValArray, " ")));
+
+                    const auto cond_temp_error = format("'Cond Temp(C) = ' {:7.2F}", fmt::join(CondTempArray, " "));
+                    std::cout << cond_temp_error << '\n';
+                    ShowContinueError(cond_temp_error);
+
+                    const auto curve_temp_error = format("'Curve Temp(C) = ' {:7.2F}", fmt::join(CurveValArray, " "));
+                    std::cout << curve_temp_error << '\n';
+                    ShowContinueError(curve_temp_error);
+                    
                     ErrorsFound = true;
                 }
             }
@@ -1827,7 +1830,6 @@ namespace ChillerReformulatedEIR {
         // 1. Hydeman, M., P. Sreedharan, N. Webb, and S. Blanc. 2002. "Development and Testing of a Reformulated
         //    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
-        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcElecReformEIRChillerModel");
 
         this->ChillerPartLoadRatio = 0.0;
