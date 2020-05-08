@@ -1394,7 +1394,7 @@ namespace RootFinder {
 
         CheckIncrementRoundOff = false;
         // Check for round-off error in X increments since last iterate
-        if (RootFinderData.CurrentPoint.DefinedFlag) {
+        if ((RootFinderData.CurrentPoint.DefinedFlag) && (X > 0.0)) {
             // TODO: Use typical value for X averaged over successive iterations
             TolX = RootFinderData.Controls.TolX * std::abs(X) + RootFinderData.Controls.ATolX;
             DeltaX = X - RootFinderData.CurrentPoint.X;
