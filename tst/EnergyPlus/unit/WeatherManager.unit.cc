@@ -1039,5 +1039,6 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
     OpenWeatherFile(ErrorsFound);
     ReadWeatherForDay(0, 1, false);
 
-    EXPECT_EQ(TomorrowHorizIRSky(1, 1), 345.73838855245953);
+    Real64 expected_IRHorizSky = 345.73838855245953;
+    EXPECT_NEAR(TomorrowHorizIRSky(1, 1), expected_IRHorizSky, 0.001);
 }
