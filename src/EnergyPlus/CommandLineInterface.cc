@@ -589,11 +589,6 @@ namespace CommandLineInterface {
             }
         }
 
-<<<<<<< HEAD
-=======
-        OutputFiles::getSingleton().debug.ensure_open();
-
->>>>>>> origin/develop
         // TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 
         // Preprocessors (These will likely move to a new file)

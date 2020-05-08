@@ -323,9 +323,7 @@ namespace SimulationManager {
         }
         ResultsFramework::resultsFramework->setupOutputOptions();
 
-        ////  Change to following once dbg is converted to OutputFiles
-        //    outputFiles.dbg.ensure_open(outputFiles.outputControl.dbg);
-        OutputFileDebug = outputFiles.open_gio(DataStringGlobals::outputDbgFileName, "OutputFileDebug", outputFiles.outputControl.dbg);
+        outputFiles.debug.ensure_open(outputFiles.outputControl.dbg);
 
         // CreateSQLiteDatabase();
         sqlite = EnergyPlus::CreateSQLiteDatabase();

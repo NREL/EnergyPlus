@@ -69,12 +69,8 @@ public:
     OutputFile &ensure_open(bool output_to_file = true);
 
     std::string fileName;
-<<<<<<< HEAD
     void open(bool output_to_file = true);
-=======
-    void open();
     std::fstream::pos_type position() const noexcept;
->>>>>>> origin/develop
     std::vector<std::string> getLines();
     void open_as_stringstream();
     std::string get_output();

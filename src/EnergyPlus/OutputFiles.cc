@@ -132,16 +132,12 @@ OutputFile::OutputFile(std::string FileName) : fileName(std::move(FileName))
 {
 }
 
-<<<<<<< HEAD
-void OutputFile::open(bool output_to_file)
-=======
 std::ostream::pos_type OutputFile::position() const noexcept
 {
     return os->tellg();
 }
 
-void OutputFile::open()
->>>>>>> origin/develop
+void OutputFile::open(bool output_to_file)
 {
     if (!output_to_file) {
         os = std::unique_ptr<std::iostream>(new std::iostream(nullptr));

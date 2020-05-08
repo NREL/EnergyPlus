@@ -3609,16 +3609,11 @@ namespace OutputProcessor {
         bool PrintTimeStamp;
         std::string cReportID;
 
-<<<<<<< HEAD
         if (!ResultsFramework::resultsFramework->SMMeters.rVariablesScanned()) {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Simulation);
-=======
-        if (!ResultsFramework::OutputSchema->SMMeters.rVariablesScanned()) {
-            ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Simulation);
         }
-        if (ResultsFramework::OutputSchema->SMMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->SMMeters.newRow(dataGlobals.DayOfSimChr);
->>>>>>> origin/develop
+        if (ResultsFramework::resultsFramework->SMMeters.rDataFrameEnabled()) {
+            ResultsFramework::resultsFramework->SMMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
         }
 
         PrintTimeStamp = true;
