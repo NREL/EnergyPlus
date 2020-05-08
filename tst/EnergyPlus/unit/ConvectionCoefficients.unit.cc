@@ -1360,6 +1360,15 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    DataHeatBalSurface::TempSurfInTmp.allocate(6);
+    DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
+    DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
+    DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
+    DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
+    DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
+    DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(DataHeatBalSurface::TempSurfInTmp);
+
     int algorithm_identifier;
 
     algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
@@ -1484,6 +1493,15 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections_Implicit)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
+
+    DataHeatBalSurface::TempSurfInTmp.allocate(6);
+    DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
+    DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
+    DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
+    DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
+    DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
+    DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(DataHeatBalSurface::TempSurfInTmp);
 
     int algorithm_identifier;
 
@@ -1611,4 +1629,3 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections_BadInput)
 
     ASSERT_DEATH(process_idf(idf_objects), "");
 }
-
