@@ -1156,23 +1156,6 @@ namespace ConvectionCoefficients {
                                                      HcExt_AlamdariHammondStableHorizontal,
                                                      HcExt_AlamdariHammondUnstableHorizontal});
 
-        int const NumValidSpecificExtWindConvValueTypes(15);
-        static Array1D_string const ValidSpecificExtWindConvValueTypes(15,
-                                                                       {"SIMPLECOMBINED",
-                                                                        "TARPWINDWARD",
-                                                                        "TARPLEEWARD",
-                                                                        "MOWITTWINDWARD",
-                                                                        "MOWITTLEEWARD",
-                                                                        "DOE2WINDWARD",
-                                                                        "DOE2LEEWARD",
-                                                                        "NUSSELTJURGES",
-                                                                        "MCADAMS",
-                                                                        "MITCHELL",
-                                                                        "EMMELVERTICAL",
-                                                                        "EMMELROOF",
-                                                                        "BLOCKENWINDWARD",
-                                                                        "CLEARROOF",
-                                                                        "USERCURVE"});
         static Array1D_int const MoreSpecificExtWindConvectionValue(15,
                                                                     {HcExt_ASHRAESimpleCombined,
                                                                      HcExt_SparrowWindward,
@@ -1189,19 +1172,6 @@ namespace ConvectionCoefficients {
                                                                      HcExt_BlockenWindward,
                                                                      HcExt_ClearRoof,
                                                                      HcExt_UserCurve});
-
-        int const NumValidSpecificExtNatConvectValueTypes(10);
-        static Array1D_string const ValidSpecificExtNatConvectValueTypes(10,
-                                                                         {"ASHRAEVERTICALWALL",
-                                                                          "ALAMDARIHAMMONDVERTICALWALL",
-                                                                          "FOHANNOPOLIDORIVERTICALWALL",
-                                                                          "WALTONUNSTABLEHORIZONTALORTILT",
-                                                                          "WALTONSTABLEHORIZONTALORTILT",
-                                                                          "ALAMDARIHAMMONDSTABLEHORIZONTAL",
-                                                                          "ALAMDARIHAMMONDUNSTABLEHORIZONTAL",
-                                                                          "ISO15099WINDOWS",
-                                                                          "USERCURVE",
-                                                                          "NONE"});
 
         // CeilingDiffuser and TrombeWall Interior types are only Zone Level settings.
         int const NumValidIntConvectionValueTypes(34);
@@ -2185,12 +2155,6 @@ namespace ConvectionCoefficients {
                 &InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum
             };
             for (int i = 2; i <= NumAlphas-1; i+=2){ //up to 45
-                std::string eqname = cAlphaArgs(i);
-                std::string curvename = cAlphaArgs(i+1);
-                std::string sourcefield = cAlphaFieldNames(i);
-                std::string curvefield = cAlphaFieldNames(i+1);
-                std::string modulename = cAlphaArgs(1);
-
                 ErrorsFound = SetAdaptiveConvectionAlgoInsideCoefficient( AdaptiveConvectionAlgoInsideDefaults[(i/2)-1], cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1));
             }
         } // end of 'SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections'
