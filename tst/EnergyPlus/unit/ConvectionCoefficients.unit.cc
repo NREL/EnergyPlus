@@ -1372,7 +1372,7 @@ TEST_F(ConvectionCoefficientsFixture, AdaptiveModelSelections)
     int algorithm_identifier;
 
     algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
-    ASSERT_EQ(algorithm_identifier, HcExt_NaturalASHRAEVerticalWall);
+    ASSERT_EQ(algorithm_identifier, HcInt_ASHRAEVerticalWall);
     algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
     algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;
