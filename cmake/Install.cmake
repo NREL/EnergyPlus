@@ -546,9 +546,10 @@ if ( BUILD_DOCS )
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/PlantApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/index.html" DESTINATION "./Documentation" COMPONENT Documentation)
 else()
   message(AUTHOR_WARNING "BUILD_DOCS isn't enabled, so package won't include the PDFs")
-endif ()
+endif()
 
 ##########################################################   S Y S T E M    L I B R A R I E S   ######################################################
 
