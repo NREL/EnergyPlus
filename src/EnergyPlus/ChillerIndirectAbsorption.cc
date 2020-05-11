@@ -108,6 +108,8 @@ namespace ChillerIndirectAbsorption {
 
     auto constexpr calcChillerAbsorptionIndirect("CALC Chiller:Absorption:Indirect ");
     auto constexpr waterIndex(1);
+    const char * fluidNameSteam = "STEAM";
+    const char * fluidNameWater = "WATER";
 
     PlantComponent *IndirectAbsorberSpecs::factory(ChillerIndirectAbsoprtionData &chillers, std::string const &objectName)
     {
@@ -340,7 +342,7 @@ namespace ChillerIndirectAbsorption {
                     UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(16), "HotWater")) {
                     thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Water;
                     //       Default to Steam if left blank
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(16), "Steam") || DataIPShortCuts::cAlphaArgs(16).empty()) {
+                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(16), fluidNameSteam) || DataIPShortCuts::cAlphaArgs(16).empty()) {
                     thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Steam;
                 } else {
                     ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
@@ -379,7 +381,7 @@ namespace ChillerIndirectAbsorption {
                                                        DataIPShortCuts::cAlphaArgs(10),
                                                        "Hot Water Nodes");
                 } else {
-                    thisChiller.SteamFluidIndex = FluidProperties::FindRefrigerant("Steam");
+                    thisChiller.SteamFluidIndex = FluidProperties::FindRefrigerant(fluidNameSteam);
                     thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(9),
                                                                                                               ErrorsFound,
                                                                                                               DataIPShortCuts::cCurrentModuleObject,
@@ -650,7 +652,7 @@ namespace ChillerIndirectAbsorption {
                                     "Sum",
                                     this->Name,
                                     _,
-                                    "Steam",
+                                    fluidNameSteam,
                                     "Cooling",
                                     _,
                                     "Plant");
@@ -847,7 +849,7 @@ namespace ChillerIndirectAbsorption {
                     this->GenMassFlowRateMax = rho * this->GeneratorVolFlowRate;
 
                 } else {
-                    Real64 SteamDensity = FluidProperties::GetSatDensityRefrig("STEAM",
+                    Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(fluidNameSteam,
                                                                                DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
                                                                                1.0,
                                                                                this->SteamFluidIndex,
@@ -1317,7 +1319,7 @@ namespace ChillerIndirectAbsorption {
                         }
                     }
                 } else {
-                    Real64 SteamDensity = FluidProperties::GetSatDensityRefrig("STEAM",
+                    Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(fluidNameSteam,
                                                                                DataSizing::PlantSizData(PltSizSteamNum).ExitTemp,
                                                                                1.0,
                                                                                this->SteamFluidIndex,
@@ -1326,20 +1328,20 @@ namespace ChillerIndirectAbsorption {
                     Real64 GeneratorOutletTemp = DataSizing::PlantSizData(PltSizSteamNum).ExitTemp - SteamDeltaT;
 
                     // dry enthalpy of steam (quality = 1)
-                    Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig("STEAM",
+                    Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
                                                                                    DataSizing::PlantSizData(PltSizSteamNum).ExitTemp,
                                                                                    1.0,
                                                                                    this->SteamFluidIndex,
                                                                                    SizeChillerAbsorptionIndirect + this->Name);
 
                     // wet enthalpy of steam (quality = 0)
-                    Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig("STEAM",
+                    Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
                                                                                    DataSizing::PlantSizData(PltSizSteamNum).ExitTemp,
                                                                                    0.0,
                                                                                    this->SteamFluidIndex,
                                                                                    SizeChillerAbsorptionIndirect + this->Name);
                     Real64 CpWater =
-                        FluidProperties::GetSpecificHeatGlycol("WATER", GeneratorOutletTemp, const_cast<int &>(waterIndex), RoutineName);
+                        FluidProperties::GetSpecificHeatGlycol(fluidNameWater, GeneratorOutletTemp, const_cast<int &>(waterIndex), RoutineName);
                     Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
                     //         calculate the mass flow rate through the generator
                     Real64 SteamMassFlowRate = (tmpNomCap * SteamInputRatNom) / ((HfgSteam) + (SteamDeltaT * CpWater));
@@ -1909,14 +1911,14 @@ namespace ChillerIndirectAbsorption {
             } else { // using a steam plant for the generator
 
                 // enthalpy of dry steam at generator inlet
-                Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig("STEAM",
+                Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
                                                                                DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
                                                                                1.0,
                                                                                this->SteamFluidIndex,
                                                                                calcChillerAbsorptionIndirect + this->Name);
 
                 // enthalpy of wet steam at generator inlet
-                Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig("STEAM",
+                Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
                                                                                DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
                                                                                0.0,
                                                                                this->SteamFluidIndex,
@@ -1931,7 +1933,7 @@ namespace ChillerIndirectAbsorption {
                 // heat of vaporization of steam
                 Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
                 CpFluid = FluidProperties::GetSpecificHeatGlycol(
-                    "WATER", SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorptionIndirect + this->Name);
+                    fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorptionIndirect + this->Name);
                 this->GenMassFlowRate = this->QGenerator / (HfgSteam + CpFluid * SteamDeltaT);
                 PlantUtilities::SetComponentFlowRate(this->GenMassFlowRate,
                                                      this->GeneratorInletNodeNum,
@@ -1946,12 +1948,12 @@ namespace ChillerIndirectAbsorption {
                     this->SteamOutletEnthalpy = DataLoopNode::Node(this->GeneratorInletNodeNum).Enthalpy;
                 } else {
                     this->GenOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
-                    this->SteamOutletEnthalpy = FluidProperties::GetSatEnthalpyRefrig("STEAM",
+                    this->SteamOutletEnthalpy = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
                                                                                       DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
                                                                                       0.0,
                                                                                       this->SteamFluidIndex,
                                                                                       LoopLossesChillerAbsorptionIndirect + this->Name);
-                    CpFluid = FluidProperties::GetSpecificHeatGlycol("WATER",
+                    CpFluid = FluidProperties::GetSpecificHeatGlycol(fluidNameWater,
                                                                      DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
                                                                      const_cast<int &>(waterIndex),
                                                                      calcChillerAbsorptionIndirect + this->Name);
@@ -1962,11 +1964,11 @@ namespace ChillerIndirectAbsorption {
 
                     // temperature of condensed steam leaving generator (after condensate trap)
                     Real64 TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(
-                        "STEAM", DataEnvironment::OutBaroPress, this->SteamFluidIndex, LoopLossesChillerAbsorptionIndirect + this->Name);
+                        fluidNameSteam, DataEnvironment::OutBaroPress, this->SteamFluidIndex, LoopLossesChillerAbsorptionIndirect + this->Name);
 
                     // enthalpy  of condensed steam leaving generator (after condensate trap)
                     Real64 EnthAtAtmPress = FluidProperties::GetSatEnthalpyRefrig(
-                        "STEAM", TempWaterAtmPress, 0.0, this->SteamFluidIndex, LoopLossesChillerAbsorptionIndirectSpace + this->Name);
+                        fluidNameSteam, TempWaterAtmPress, 0.0, this->SteamFluidIndex, LoopLossesChillerAbsorptionIndirectSpace + this->Name);
 
                     // Point 4 at atm - loop delta subcool during return journey back to pump
 
