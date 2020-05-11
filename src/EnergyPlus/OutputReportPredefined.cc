@@ -530,27 +530,6 @@ namespace OutputReportPredefined {
     // Outside Air Report
     int pdrOutsideAir;
 
-    // remove this subtable when new subtables have been implemented
-    int pdstOAavgOcc;
-    int pdchOaoAvgNumOcc1;
-    int pdchOaoNomNumOcc1;
-    int pdchOaoZoneVol1;
-    int pdchOaoAvgMechVent;
-    int pdchOaoAvgInfil;
-    int pdchOaoAvgAFNInfil;
-    int pdchOaoAvgSimpVent;
-    int pdchOaoAvgTotVent;
-    // remove this subtable when new subtables have been implemented
-    int pdstOAminOcc;
-    int pdchOaoAvgNumOcc2;
-    int pdchOaoNomNumOcc2;
-    int pdchOaoZoneVol2;
-    int pdchOaoMinMechVent;
-    int pdchOaoMinInfil;
-    int pdchOaoMinAFNInfil;
-    int pdchOaoMinSimpVent;
-    int pdchOaoMinTotVent;
-
     int pdstOAmechVentParByZone;
     int pdchOaMvAirLpNm;
     int pdchOaMvAvgNumOcc;
@@ -1389,26 +1368,6 @@ namespace OutputReportPredefined {
         pdchULnotMetHeatOcc = 0;
         pdchULnotMetCoolOcc = 0;
         pdrOutsideAir = 0;
-        // remove this subtable when new subtables have been implemented
-        pdstOAavgOcc = 0;
-        pdchOaoAvgNumOcc1 = 0;
-        pdchOaoNomNumOcc1 = 0;
-        pdchOaoZoneVol1 = 0;
-        pdchOaoAvgMechVent = 0;
-        pdchOaoAvgInfil = 0;
-        pdchOaoAvgAFNInfil = 0;
-        pdchOaoAvgSimpVent = 0;
-        pdchOaoAvgTotVent = 0;
-        // remove this subtable when new subtables have been implemented
-        pdstOAminOcc = 0;
-        pdchOaoAvgNumOcc2 = 0;
-        pdchOaoNomNumOcc2 = 0;
-        pdchOaoZoneVol2 = 0;
-        pdchOaoMinMechVent = 0;
-        pdchOaoMinInfil = 0;
-        pdchOaoMinAFNInfil = 0;
-        pdchOaoMinSimpVent = 0;
-        pdchOaoMinTotVent = 0;
 
         pdstOAmechVentParByZone = 0;
         pdchOaMvAirLpNm = 0;
@@ -2343,26 +2302,6 @@ namespace OutputReportPredefined {
 
         // Outside Air Report
         pdrOutsideAir = newPreDefReport("OutdoorAirSummary", "OA", "Outdoor Air Summary");
-
-        // remove this subtable when new subtables have been implemented
-        pdstOAavgOcc = newPreDefSubTable(pdrOutsideAir, "Average Outdoor Air During Occupied Hours");
-
-        pdchOaoAvgMechVent = newPreDefColumn(pdstOAavgOcc, "Mechanical Ventilation [ach]"); //done?
-        pdchOaoAvgInfil = newPreDefColumn(pdstOAavgOcc, "Infiltration [ach]");
-        pdchOaoAvgAFNInfil = newPreDefColumn(pdstOAavgOcc, "AFN Infiltration [ach]");
-        pdchOaoAvgSimpVent = newPreDefColumn(pdstOAavgOcc, "Simple Ventilation [ach]"); //done?
-        addFootNoteSubTable(pdstOAavgOcc, "Values shown for a single zone without multipliers");
-
-        // remove this subtable when new subtables have been implemented
-        pdstOAminOcc = newPreDefSubTable(pdrOutsideAir, "Minimum Outdoor Air During Occupied Hours");
-
-        pdchOaoMinMechVent = newPreDefColumn(pdstOAminOcc, "Mechanical Ventilation [ach]");
-        pdchOaoMinInfil = newPreDefColumn(pdstOAminOcc, "Infiltration [ach]");
-        pdchOaoMinAFNInfil = newPreDefColumn(pdstOAminOcc, "AFN Infiltration [ach]");
-        pdchOaoMinSimpVent = newPreDefColumn(pdstOAminOcc, "Simple Ventilation [ach]");
-        addFootNoteSubTable(pdstOAminOcc, "Values shown for a single zone without multipliers");
-
-
 
         pdstOAmechVentParByZone = newPreDefSubTable(pdrOutsideAir, "Mechanical Ventilation Parameters by Zone");
         pdchOaMvAirLpNm = newPreDefColumn(pdstOAmechVentParByZone, "AirLoop Name");

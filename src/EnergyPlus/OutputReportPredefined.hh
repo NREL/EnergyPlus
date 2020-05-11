@@ -514,27 +514,6 @@ namespace OutputReportPredefined {
     // Outside Air Report
     extern int pdrOutsideAir;
 
-    // remove this subtable when new subtables have been implemented
-    extern int pdstOAavgOcc;
-    extern int pdchOaoAvgNumOcc1;
-    extern int pdchOaoNomNumOcc1;
-    extern int pdchOaoZoneVol1;
-    extern int pdchOaoAvgMechVent;
-    extern int pdchOaoAvgInfil;
-    extern int pdchOaoAvgAFNInfil;
-    extern int pdchOaoAvgSimpVent;
-    extern int pdchOaoAvgTotVent;
-    // remove this subtable when new subtables have been implemented
-    extern int pdstOAminOcc;
-    extern int pdchOaoAvgNumOcc2;
-    extern int pdchOaoNomNumOcc2;
-    extern int pdchOaoZoneVol2;
-    extern int pdchOaoMinMechVent;
-    extern int pdchOaoMinInfil;
-    extern int pdchOaoMinAFNInfil;
-    extern int pdchOaoMinSimpVent;
-    extern int pdchOaoMinTotVent;
-
     extern int pdstOAmechVentParByZone;
     extern int pdchOaMvAirLpNm;
     extern int pdchOaMvAvgNumOcc;

@@ -6584,6 +6584,11 @@ namespace OutputReportTabular {
             Real64 zoneMult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
+                // AFN infiltration -- check that afn sim is being done.
+                if (AirflowNetwork::SimulateAirflowNetwork < AirflowNetwork::AirflowNetworkControlMultizone) {
+                    ZonePreDefRep(iZone).AFNInfilVolTotal = 0.0;
+                }
+
                 // air loop name
                 std::string airLoopName = "";
                 int ctrlZoneNum = DataHeatBalance::Zone(iZone).ZoneEqNum;
@@ -6662,67 +6667,6 @@ namespace OutputReportTabular {
 
                         // Total ventilation and infiltration
                         PreDefTableEntry(pdchOaOccBzTotVentInfil, Zone(iZone).Name, mechVent + natVent + infil);
-                    }
-                }
-
-
-// OLD CODE RELATED TO OUTSIDE AIR VENTILATION BELOW HERE
-
-
-
-                if (Zone(iZone).isNominalOccupied) {
-                    if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(pdchOaoAvgMechVent,
-                                         Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).MechVentVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume *
-                                                                                  Zone(iZone).Multiplier * Zone(iZone).ListMultiplier), 3);
-                    }
-                    if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
-                        PreDefTableEntry(pdchOaoMinMechVent,
-                                         Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).MechVentVolMin /
-                                             (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
-                                         3);
-                    }
-
-                    if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(pdchOaoAvgInfil,
-                                         Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).InfilVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
-                                         3);
-                    }
-                    if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
-                        PreDefTableEntry(pdchOaoMinInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolMin / (Zone(iZone).Volume), 3);
-                    }
-                    // AFN infiltration -- check that afn sim is being done.
-                    if (AirflowNetwork::SimulateAirflowNetwork < AirflowNetwork::AirflowNetworkControlMultizone) {
-                        ZonePreDefRep(iZone).AFNInfilVolMin = 0.0;
-                        ZonePreDefRep(iZone).AFNInfilVolTotal = 0.0;
-                        if (!(AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-                              AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
-                            ZonePreDefRep(iZone).AFNInfilVolMin = 0.0;
-                            ZonePreDefRep(iZone).AFNInfilVolTotal = 0.0;
-                        }
-                    }
-                    if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(pdchOaoAvgAFNInfil,
-                                         Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).AFNInfilVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
-                                         3);
-                    }
-
-                    if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
-                        PreDefTableEntry(pdchOaoMinAFNInfil, Zone(iZone).Name, ZonePreDefRep(iZone).AFNInfilVolMin / (Zone(iZone).Volume), 3);
-                    }
-                    // simple 'ZoneVentilation'
-                    if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(pdchOaoAvgSimpVent,
-                                         Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).SimpVentVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
-                                         3);
-                    }
-                    if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
-                        PreDefTableEntry(pdchOaoMinSimpVent, Zone(iZone).Name, ZonePreDefRep(iZone).SimpVentVolMin / (Zone(iZone).Volume), 3);
                     }
                 }
             }
