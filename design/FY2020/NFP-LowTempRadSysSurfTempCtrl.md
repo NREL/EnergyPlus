@@ -4,7 +4,7 @@ Low Temperature Radiant System Surface Temperature Control
 **Rick Strand, University of Illinois at Urbana-Champaign**
 
  - Original Date: April 29, 2020
- - Revision Date: (none, original version)
+ - Latest Revision Date: May 11, 2020 (Version 4, Design Document)
  
 
 ## Justification for New Feature ##
@@ -33,7 +33,8 @@ The approach for dealing with the temperature internal to the radiant slab will 
 
 The approach to dealing with the on-off control is to relax the check on throttling range so that a throttling range can be less than 0.5 but no smaller than 0.0.  If the throttling range is less than 0.5, a warning message will be produced and the simulation allowed to continue.  There will have to be some additional code in the electric radiant system that avoids a divide by zero since in one place it divides by throttling range, but when the user picks a 0.0 throttling range, it can simply do a slightly modified sequence where the panel is either on or off which should be fairly straight forward.
 
-The change for the variable flow radiant system to use a zero flow when the setpoint is met is a matter of adjusting the equations that define what the flow is.  Currently, if defines the zero flow point as the control temperature adjusted by half of the throttling range (or basically 50% flow at the setpoint temperature rather than 0% flow).  This change is relatively straight forward and will require testing as well as documentation changes to reflect this.  As this is a change in the interpretation of an input parameter rather than an actual change to the input in EnergyPlus, no transition changes are recommended.
+The change for the variable flow radiant system regarding what point in the system the schedule defines will implement a new parameter that will offer two possibilities.  For this new setpoint interpretation parameter, the two options will be “ZeroFlow” and “HalfFlow”.  For the “ZeroFlow” option, the setpoint temperature established by the user will set the temperature at which there is no flow through the radiant system and the full throttling range is used to establish when the flow is at 100%.  For the “HalfFlow” option, the setpoint temperature schedule defines when the flow to the system is 50% of the maximum flow and the setpoint is the mid-point of the throttling range.  The ”HalfFlow” option is what EnergyPlus currently does and this will be used to transition older files up to the current version.  The “ZeroFlow” option is what is typically used in industry when controlling low temperature radiant systems.
+
 
 ## Testing/Validation/Data Sources ##
 
@@ -67,6 +68,9 @@ After the section in Construction:InternalSource entitled “Field: Tube Spacing
 
 “This field defines the location of a control temperature point within the slab in the direction that is horizontal to the main direction of heat transfer.  This is a dimensionless parameter between 0.0 and 1.0.  It is interpreted as the distance perpendicular to the main direction of heat transfer and as a fraction of the total distance between the tubing where water is circulated and the mid-point between the neighboring piping.  So, if the value here is 0.0, then the control point is at the tubing.  If the value for this parameter is 1.0, then the control point is located at the mid-point between the tubing.  For any fraction between 0.0 and 1.0, EnergyPlus will locate the control point as close as possible to the user requested position.  For more information on this parameter and the 2-D solution for radiant systems in EnergyPlus, please refer to the Engineering Reference.”
 
+For the new parameter in the variable flow radiant systems, a new field will be added at the end of the input description.  This new field will be called “Field: Setpoint Flow Interpretation”.  Here is proposed additional text for this new field:
+
+“This input field defines how the setpoint schedules relate to the flow rate of the system.  The two options are ‘ZeroFlow’ and ‘HalfFlow’.  When the user selects ‘ZeroFlow’, the temperature setpoint schedule is used to define when the system is a zero flow.  So, for example, when this parameter is ‘ZeroFlow’ and the current setpoint schedule for cooling is 24C, then the cooling flow rate when the control parameter is at or below 24C is zero.  Once the controlled temperature goes above 24C, the flow rate will throttling from 0% to 100% when the temperature reaches the throttling range temperature above 24C.  If this parameter is ‘HalfFlow’, the temperature setpoint schedule is used to define when the system is at half flow.  So, for example when the parameter is ‘HalfFlow’, the current setpoint schedule for cooling is 24C, and the throttling range is 2C, when the control parameter is at 24C, the flow rate for the system will be set to 50% of the maximum flow.  The flow will vary from 0% at half the throttling range below the setpoint value (or 23C in this example) to 100% at half the throttling range above the setpoint value (or 25C in this example).  A similar interpretation is used for heating.”
 
 ## Input Description ##
 
@@ -82,7 +86,7 @@ A variety of changes will need to be made to the Engineering Reference in the se
 
 ## Example File and Transition Changes ##
 
-New and modified example files will be created to test the new controls that are implemented in this work.  A transition will need to be made for files that use the Construction:InternalSource input since a new parameter is being added and this parameter will NOT be at the end of the existing input.
+New and modified example files will be created to test the new controls that are implemented in this work.  A transition will need to be made for files that use the Construction:InternalSource input since a new parameter is being added and this parameter will NOT be at the end of the existing input.  A default value for this new parameter will be 0.0 as that is what is currently done in EnergyPlus.  A transition will also be needed for the new parameter used to define the controls for the variable flow radiant system.  The transition will take existing variable flow radiant system definitions and add the new parameter with “HalfFlow” as the input.
 
 ## References ##
 
