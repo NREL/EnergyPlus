@@ -247,6 +247,8 @@ namespace ConvectionCoefficients {
     RoofGeoCharactisticsStruct RoofGeo;
 
     std::unordered_map<std::string, int> HcInt_ConvectionTypesMap = {
+        {"VALUE", -999},
+        {"SCHEDULE", -999},
         {"USERCURVE", HcInt_UserCurve},
         {"ASHRAEVERTICALWALL", HcInt_ASHRAEVerticalWall},
         {"WALTONUNSTABLEHORIZONTALORTILT", HcInt_WaltonUnstableHorizontalOrTilt},
