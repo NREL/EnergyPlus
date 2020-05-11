@@ -1342,9 +1342,6 @@ namespace HVACCooledBeam {
         if (Contaminant.GenericContamSimulation) {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
-
-        // set OA volume flow rate report variable
-        CoolBeam(CBNum).CalcOutdoorAirVolumeFlowRate();
     }
 
     void ReportCoolBeam(int const CBNum)
@@ -1388,6 +1385,9 @@ namespace HVACCooledBeam {
         CoolBeam(CBNum).BeamCoolingEnergy = CoolBeam(CBNum).BeamCoolingRate * ReportingConstant;
         CoolBeam(CBNum).SupAirCoolingEnergy = CoolBeam(CBNum).SupAirCoolingRate * ReportingConstant;
         CoolBeam(CBNum).SupAirHeatingEnergy = CoolBeam(CBNum).SupAirHeatingRate * ReportingConstant;
+
+        // set zone OA volume flow rate report variable
+        CoolBeam(CBNum).CalcOutdoorAirVolumeFlowRate();
     }
 
     void CoolBeamData::CalcOutdoorAirVolumeFlowRate()

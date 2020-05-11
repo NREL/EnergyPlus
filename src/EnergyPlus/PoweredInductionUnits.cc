@@ -2086,7 +2086,7 @@ namespace PoweredInductionUnits {
         PIU(PIUNum).SensCoolEnergy = PIU(PIUNum).SensCoolRate * TimeStepSys * SecInHour;
 
         // set zone OA Volume flow rate
-        PIU( PIUNum ).CalcOutdoorAirVolumeFlowRate();
+        PIU(PIUNum).CalcOutdoorAirVolumeFlowRate();
     }
 
     // ===================== Utilities =====================================

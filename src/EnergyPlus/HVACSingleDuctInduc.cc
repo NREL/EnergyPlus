@@ -251,10 +251,10 @@ namespace HVACSingleDuctInduc {
         // the tasks usually done by the Update and Report routines are not required in a compound terminal unit.
 
         // Update the current unit's outlet nodes. No update needed
-        IndUnit(IUNum).UpdateIndUnit();
+        // CALL UpdateIndUnit(IUNum);
 
         // Fill the report variables. There are no report variables
-        // CALL ReportIndUnit(IUNum)
+        IndUnit(IUNum).ReportIndUnit();
     }
 
     void GetIndUnits()
@@ -1599,11 +1599,11 @@ namespace HVACSingleDuctInduc {
         return YesNo;
     }
 
-    void IndUnitData::UpdateIndUnit()
+    void IndUnitData::ReportIndUnit()
     {
-        // Purpose: this subroutine updates the UpdateIndUnit.
+        // Purpose: this subroutine for reporting
 
-        // set OA volume flow rate report variable
+        // set zone OA volume flow rate
         this->CalcOutdoorAirVolumeFlowRate();
     }
 
