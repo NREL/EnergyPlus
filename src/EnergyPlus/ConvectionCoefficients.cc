@@ -932,12 +932,8 @@ namespace ConvectionCoefficients {
         static std::string const RoutineName("GetUserConvectionCoefficients");
         static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
         bool ErrorsFound = false;
-        bool IsValidType = true;
 
-        if (HcInt_ConvectionTypesMap.find(equationName) == HcInt_ConvectionTypesMap.end()){
-            IsValidType = false;
-        }
-        else {
+        if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()){
             *InsideFaceAdaptiveConvectionAlgoParam = HcInt_ConvectionTypesMap[equationName];
             if (HcInt_ConvectionTypesMap[equationName] == HcInt_UserCurve) {
                 *InsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, HcInsideUserCurve);
@@ -948,7 +944,7 @@ namespace ConvectionCoefficients {
                 }
             }
         }
-        if (!IsValidType) {
+        else {
             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
             ShowContinueError("Invalid Key choice Entered, for " + sourceFieldName + '=' + equationName);
             ErrorsFound = true;
@@ -960,12 +956,8 @@ namespace ConvectionCoefficients {
         static std::string const RoutineName("GetUserConvectionCoefficients");
         static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
         bool ErrorsFound = false;
-        bool IsValidType = true;
 
-        if (HcExt_ConvectionTypesMap.find(equationName) == HcExt_ConvectionTypesMap.end()){
-            IsValidType = false;
-        }
-        else {
+        if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()){
             *OutsideFaceAdaptiveConvectionAlgoParam = HcExt_ConvectionTypesMap[equationName];
             if (HcInt_ConvectionTypesMap[equationName] == HcExt_UserCurve) {
                 *OutsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, HcInsideUserCurve);
@@ -976,7 +968,7 @@ namespace ConvectionCoefficients {
                 }
             }
         }
-        if (!IsValidType) {
+        else {
             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
             ShowContinueError("Invalid Key choice Entered, for " + sourceFieldName + '=' + equationName);
             ErrorsFound = true;
@@ -1117,13 +1109,10 @@ namespace ConvectionCoefficients {
         Array1D<Real64> Numbers(2);
         int NumAlphas;
         int NumNumbers;
-        int Loop;
-        int Loop1;
         int Count;
         int Status;
         int Found;
         bool ErrorsFound(false);
-        bool IsValidType(false);
         int ExtValue;
         int IntValue;
         int Ptr;
@@ -1138,7 +1127,7 @@ namespace ConvectionCoefficients {
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:UserCurve";
         int TotInsideHcUserCurves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         HcInsideUserCurve.allocate(TotInsideHcUserCurves);
-        for (Loop = 1; Loop <= TotInsideHcUserCurves; ++Loop) {
+        for (int Loop = 1; Loop <= TotInsideHcUserCurves; ++Loop) {
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
@@ -1243,7 +1232,7 @@ namespace ConvectionCoefficients {
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:UserCurve";
         int TotOutsideHcUserCurves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         HcOutsideUserCurve.allocate(TotOutsideHcUserCurves);
-        for (Loop = 1; Loop <= TotOutsideHcUserCurves; ++Loop) {
+        for (int Loop = 1; Loop <= TotOutsideHcUserCurves; ++Loop) {
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
@@ -1339,7 +1328,7 @@ namespace ConvectionCoefficients {
         TotExtConvCoeff = 0;
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
         Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        for (Loop = 1; Loop <= Count; ++Loop) {
+        for (int Loop = 1; Loop <= Count; ++Loop) {
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           Alphas,
@@ -1374,7 +1363,7 @@ namespace ConvectionCoefficients {
         }
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
         Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        for (Loop = 1; Loop <= Count; ++Loop) {
+        for (int Loop = 1; Loop <= Count; ++Loop) {
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           Alphas,
@@ -1436,7 +1425,7 @@ namespace ConvectionCoefficients {
         //   Now, get for real and check for consistency
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
         Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        for (Loop = 1; Loop <= Count; ++Loop) {
+        for (int Loop = 1; Loop <= Count; ++Loop) {
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           Alphas,
@@ -1469,144 +1458,133 @@ namespace ConvectionCoefficients {
                                             " cannot be specified for OtherSideCoefficient Surface=" + Alphas(1));
                             ErrorsFound = true;
                         }
-                        IsValidType = false;
                         ExtValue = 0;
                         PotentialAssignedValue = 0;
-                        for (Loop1 = 1; Loop1 <= NumValidExtConvectionValueTypes; ++Loop1) {
-                            if (Alphas(Ptr + 1) != ValidExtConvectionValueTypes(Loop1)) continue;
-                            ExtValue = ExtConvectionValue(Loop1);
-                            IsValidType = true;
-                            break;
-                        }
+                        std::string equationName = Alphas(Ptr + 1);
+                        if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()){
+                            ExtValue = HcExt_ConvectionTypesMap[equationName];
 
-                        if (IsValidType && (Loop1 > 2) && (Loop1 <= 7)) {
-                            PotentialAssignedValue = -ExtValue;
-                        } else if (IsValidType && Loop1 == 1) { // Value
-                            ++TotExtConvCoeff;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                            UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
-                            if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
-                                                  RoundSigDigits(Numbers(NumField), 5) + "].");
-                                ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
-                                                  ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
-                                //            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
-                                //                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
-                                //                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
-                                ShowContinueError("Limits are set (or default) in HeatBalanceAlgorithm object.");
+                            if ((equationName == "SIMPLECOMBINED") || (equationName == "TARP") || (equationName == "MOWITT") || (equationName == "DOE-2") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
+                                PotentialAssignedValue = -ExtValue;
+                            } else if (equationName == "VALUE") {
+                                ++TotExtConvCoeff;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
+                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
+                                if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                    ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
+                                                      RoundSigDigits(Numbers(NumField), 5) + "].");
+                                    ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
+                                                      ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
+                                    ShowContinueError("Limits are set (or default) in HeatBalanceAlgorithm object.");
+                                    ErrorsFound = true;
+                                }
+                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
+                                if (!lAlphaFieldBlanks(Ptr + 2)) {
+                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                    ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
+                                                      '=' + Alphas(Ptr + 2) + " is ignored.");
+                                }
+                                PotentialAssignedValue = TotExtConvCoeff;
+                            } else if (equationName == "SCHEDULE") { // Schedule
+                                ++TotExtConvCoeff;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
+                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSchedule;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
+                                if (UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex == 0) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
+                                    ErrorsFound = true;
+                                } else {
+                                    UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                }
+                                PotentialAssignedValue = TotExtConvCoeff;
+                            } else if (ExtValue == HcExt_UserCurve) { // User curve
+                                ++TotExtConvCoeff;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
+                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex =
+                                    UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcOutsideUserCurve);
+                                if (UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex == 0) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
+                                    ErrorsFound = true;
+                                }
+                                PotentialAssignedValue = TotExtConvCoeff;
+                            } else if (ExtValue > HcExt_UserCurve) {
+                                // specificmodel
+                                ++TotExtConvCoeff;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
+                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).HcModelEq = ExtValue;
+                                PotentialAssignedValue = TotExtConvCoeff;
+
+                            } else {
+                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
+                                ShowContinueError("Check Input Entered :" + Alphas(Ptr + 1));
                                 ErrorsFound = true;
                             }
-                            UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
-                            if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
-                                ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
-                                                  '=' + Alphas(Ptr + 2) + " is ignored.");
-                            }
-                            PotentialAssignedValue = TotExtConvCoeff;
-                        } else if (IsValidType && Loop1 == 2) { // Schedule
-                            ++TotExtConvCoeff;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                            UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSchedule;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
-                            if (UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex == 0) {
+                            if (Surface(Found).ExtConvCoeff != 0) {
                                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
+                                ShowContinueError("Duplicate (Outside) assignment attempt");
                                 ErrorsFound = true;
                             } else {
-                                UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                Surface(Found).ExtConvCoeff = PotentialAssignedValue;
                             }
-                            PotentialAssignedValue = TotExtConvCoeff;
-                        } else if (IsValidType && ExtValue == HcExt_UserCurve) { // User curve
-
-                            ++TotExtConvCoeff;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                            UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex =
-                                UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcOutsideUserCurve);
-                            if (UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
-                                ErrorsFound = true;
-                            }
-                            PotentialAssignedValue = TotExtConvCoeff;
-                        } else if (IsValidType && ExtValue > HcExt_UserCurve) {
-                            // specificmodel
-                            ++TotExtConvCoeff;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                            UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).HcModelEq = ExtValue;
-                            PotentialAssignedValue = TotExtConvCoeff;
-
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
-                            ShowContinueError("Check Input Entered :" + Alphas(Ptr + 1));
-                            ErrorsFound = true;
-                        }
-                        if (Surface(Found).ExtConvCoeff != 0) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                            ShowContinueError("Duplicate (Outside) assignment attempt");
-                            ErrorsFound = true;
-                        } else {
-                            Surface(Found).ExtConvCoeff = PotentialAssignedValue;
                         }
 
                     } else if (SELECT_CASE_var == "INSIDE") {
-                        IsValidType = false;
                         IntValue = 0;
                         PotentialAssignedValue = 0;
-                        for (Loop1 = 1; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) {
-                            if (Alphas(Ptr + 1) != ValidIntConvectionValueTypes(Loop1)) continue;
-                            IntValue = IntConvectionValue(Loop1);
-                            IsValidType = true;
-                            break;
+                        std::string equationName = Alphas(Ptr + 1);
+                        if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()){
+                            if(equationName == "VALUE") {
+                                ++TotIntConvCoeff;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
+                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
+                                if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                    ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
+                                                      RoundSigDigits(Numbers(NumField), 5) + "].");
+                                    ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
+                                                      ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
+                                    ShowContinueError("Limits are set (or default) in HeatBalanceAlgorithm object.");
+                                    ErrorsFound = true;
+                                }
+                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
+                                if (!lAlphaFieldBlanks(Ptr + 2)) {
+                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                    ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 1) + "\", " +
+                                                      cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
+                                }
+                                PotentialAssignedValue = TotIntConvCoeff;
+                            }
+                            else if (equationName == "SCHEDULE") {
+                                ++TotIntConvCoeff;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
+                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSchedule;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
+                                if (UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex == 0) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
+                                    ErrorsFound = true;
+                                } else {
+                                    UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                }
+                                PotentialAssignedValue = TotIntConvCoeff;
+                            }
+                            else{
+                                IntValue = HcInt_ConvectionTypesMap[equationName];
+                            }
                         }
 
-                        if (IsValidType && (Loop1 > 2) && (Loop1 <= 5)) {
-                            PotentialAssignedValue = -IntValue;
-                        } else if (IsValidType && Loop1 == 1) { // Value
-                            ++TotIntConvCoeff;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                            UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
-                            if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
-                                                  RoundSigDigits(Numbers(NumField), 5) + "].");
-                                ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
-                                                  ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
-                                //            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
-                                //                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
-                                //                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
-                                ShowContinueError("Limits are set (or default) in HeatBalanceAlgorithm object.");
-                                ErrorsFound = true;
-                            }
-                            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
-                            if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
-                                ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 1) + "\", " + cAlphaFieldNames(Ptr + 2) +
-                                                  '=' + Alphas(Ptr + 2) + " is ignored.");
-                            }
-                            PotentialAssignedValue = TotIntConvCoeff;
-                        } else if (IsValidType && Loop1 == 2) { // Schedule
-                            ++TotIntConvCoeff;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                            UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSchedule;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
-                            if (UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
-                                ErrorsFound = true;
-                            } else {
-                                UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
-                            }
-                            PotentialAssignedValue = TotIntConvCoeff;
-                        } else if (IsValidType && IntValue == HcInt_UserCurve) {
+                        if (IntValue == HcInt_UserCurve) {
                             ++TotIntConvCoeff;
                             UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
                             UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
@@ -1619,7 +1597,7 @@ namespace ConvectionCoefficients {
                                 ErrorsFound = true;
                             }
                             PotentialAssignedValue = TotIntConvCoeff;
-                        } else if (IsValidType && IntValue > HcInt_UserCurve) {
+                        } else if (IntValue > HcInt_UserCurve) {
                             // specificmodel
                             ++TotIntConvCoeff;
                             UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
@@ -1652,8 +1630,6 @@ namespace ConvectionCoefficients {
                             Surface(Found).IntConvCoeff = PotentialAssignedValue;
                         }
 
-                    } else if (SELECT_CASE_var == BlankString) { // Blank
-
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                         ShowContinueError("Invalid Value Entered, for " + cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
@@ -1669,7 +1645,7 @@ namespace ConvectionCoefficients {
 
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
         Count = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        for (Loop = 1; Loop <= Count; ++Loop) {
+        for (int Loop = 1; Loop <= Count; ++Loop) {
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           Loop,
                                           Alphas,
@@ -1695,178 +1671,163 @@ namespace ConvectionCoefficients {
                 {
                     auto const SELECT_CASE_var(Alphas(Ptr));
                     if (SELECT_CASE_var == "OUTSIDE") {
-                        IsValidType = false;
-                        for (Loop1 = 1; Loop1 <= NumValidExtConvectionValueTypes; ++Loop1) {
-                            if (Alphas(Ptr + 1) != ValidExtConvectionValueTypes(Loop1)) continue;
-                            ExtValue = ExtConvectionValue(Loop1);
-                            IsValidType = true;
-                            break;
-                        }
+                        std::string equationName = Alphas(Ptr + 1);
+                        if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()){
+                            ExtValue = HcExt_ConvectionTypesMap[equationName];
+                            if (equationName == "SIMPLE") {
+                                ApplyConvectionValue(Alphas(1), "OUTSIDE", -ExtValue);
+                            } else if (equationName == "VALUE") {
+                                // SimpleValueAssignment via UserExtConvectionCoeffs array
+                                ++TotExtConvCoeff;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
+                                if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                    ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
+                                                      RoundSigDigits(Numbers(NumField), 5) + "].");
+                                    ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
+                                                      ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
+                                    ShowContinueError("Limits are set (or default) in HeatBalanceAlgorithm object.");
+                                    ErrorsFound = true;
+                                }
+                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
+                                if (!lAlphaFieldBlanks(Ptr + 2)) {
+                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                    ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
+                                                      '=' + Alphas(Ptr + 2) + " is ignored.");
+                                }
+                                ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                            } else if (equationName == "SCHEDULE") {
+                                ++TotExtConvCoeff;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSchedule;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
+                                if (UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex == 0) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
+                                    ErrorsFound = true;
+                                } else {
+                                    UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                }
+                                ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                            } else if (ExtValue == HcExt_UserCurve) { // User curve
+                                ++TotExtConvCoeff;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex =
+                                    UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcOutsideUserCurve);
+                                if (UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex == 0) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
+                                    ErrorsFound = true;
+                                }
+                                PotentialAssignedValue = TotExtConvCoeff;
+                                ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
 
-                        if (IsValidType && (Loop1 > 2) && (Loop1 <= 7)) {
-                            ApplyConvectionValue(Alphas(1), "OUTSIDE", -ExtValue);
-                        } else if (IsValidType && Loop1 == 1) { // Value
-                            // SimpleValueAssignment via UserExtConvectionCoeffs array
-                            ++TotExtConvCoeff;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                            UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                            if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
-                                                  RoundSigDigits(Numbers(NumField), 5) + "].");
-                                ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
-                                                  ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
-                                //            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
-                                //                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
-                                //                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
-                                ShowContinueError("Limits are set (or default) in HeatBalanceAlgorithm object.");
-                                ErrorsFound = true;
-                            }
-                            UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
-                            if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
-                                ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
-                                                  '=' + Alphas(Ptr + 2) + " is ignored.");
-                            }
-                            ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
-                        } else if (IsValidType && Loop1 == 2) { // Schedule
-                            ++TotExtConvCoeff;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                            UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSchedule;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
-                            if (UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
-                                ErrorsFound = true;
+                            } else if (ExtValue > HcExt_UserCurve) {
+                                // specificmodel
+                                ++TotExtConvCoeff;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).HcModelEq = ExtValue;
+                                PotentialAssignedValue = TotExtConvCoeff;
+                                ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
                             } else {
-                                UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
-                            }
-                            ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
-                        } else if (IsValidType && ExtValue == HcExt_UserCurve) { // User curve
-                            ++TotExtConvCoeff;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                            UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex =
-                                UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcOutsideUserCurve);
-                            if (UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
+                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
+                                ShowContinueError("Check Input Entered :" + Alphas(Ptr + 1));
                                 ErrorsFound = true;
                             }
-                            PotentialAssignedValue = TotExtConvCoeff;
-                            ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
-
-                        } else if (IsValidType && ExtValue > HcExt_UserCurve) {
-                            // specificmodel
-                            ++TotExtConvCoeff;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                            UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                            UserExtConvectionCoeffs(TotExtConvCoeff).HcModelEq = ExtValue;
-                            PotentialAssignedValue = TotExtConvCoeff;
-                            ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
-                        } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
-                            ShowContinueError("Check Input Entered :" + Alphas(Ptr + 1));
-                            ErrorsFound = true;
                         }
-
                     } else if (SELECT_CASE_var == "INSIDE") {
-                        IsValidType = false;
-                        for (Loop1 = 1; Loop1 <= NumValidIntConvectionValueTypes; ++Loop1) {
-                            if (Alphas(Ptr + 1) != ValidIntConvectionValueTypes(Loop1)) continue;
-                            IntValue = IntConvectionValue(Loop1);
-                            IsValidType = true;
-                            break;
-                        }
+                        std::string equationName = Alphas(Ptr + 1);
+                        if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()){
+                            IntValue = HcInt_ConvectionTypesMap[equationName];
+                            if ((equationName == "SIMPLE") || (equationName == "TARP") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
+                                ApplyConvectionValue(Alphas(1), "INSIDE", -IntValue);
+                            } else if (equationName == "VALUE") { // Value
+                                // SimpleValueAssignment via UserExtConvectionCoeffs array
+                                ++TotIntConvCoeff;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
+                                if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
+                                    ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
+                                                      RoundSigDigits(Numbers(NumField), 5) + "].");
+                                    ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
+                                                      ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
+                                    //            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
+                                    //                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
+                                    //                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
+                                    ShowContinueError("Limits are set (or default) in HeatBalanceAlgorithm object.");
+                                    ErrorsFound = true;
+                                }
+                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
+                                if (!lAlphaFieldBlanks(Ptr + 2)) {
+                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                    ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
+                                                      '=' + Alphas(Ptr + 2) + " is ignored.");
+                                }
+                                ApplyConvectionValue(Alphas(1), "INSIDE", TotIntConvCoeff);
+                            } else if (equationName == "SCHEDULE") { // Schedule
+                                ++TotIntConvCoeff;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSchedule;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
+                                if (UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex == 0) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
+                                    ErrorsFound = true;
+                                } else {
+                                    UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                }
+                                ApplyConvectionValue(Alphas(1), "INSIDE", TotIntConvCoeff);
+                            } else if (IntValue == HcInt_UserCurve) {
+                                ++TotIntConvCoeff;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex =
+                                    UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcInsideUserCurve);
+                                if (UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex == 0) {
 
-                        if (IsValidType && (Loop1 > 2) && (Loop1 <= 5)) {
-                            ApplyConvectionValue(Alphas(1), "INSIDE", -IntValue);
-                        } else if (IsValidType && Loop1 == 1) { // Value
-                            // SimpleValueAssignment via UserExtConvectionCoeffs array
-                            ++TotIntConvCoeff;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                            UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-                            if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                ShowContinueError(cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
-                                                  RoundSigDigits(Numbers(NumField), 5) + "].");
-                                ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
-                                                  ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
-                                //            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
-                                //                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
-                                //                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
-                                ShowContinueError("Limits are set (or default) in HeatBalanceAlgorithm object.");
-                                ErrorsFound = true;
-                            }
-                            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
-                            if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
-                                ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
-                                                  '=' + Alphas(Ptr + 2) + " is ignored.");
-                            }
-                            ApplyConvectionValue(Alphas(1), "INSIDE", TotIntConvCoeff);
-                        } else if (IsValidType && Loop1 == 2) { // Schedule
-                            ++TotIntConvCoeff;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                            UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSchedule;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(Alphas(Ptr + 2));
-                            if (UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
-                                ErrorsFound = true;
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
+                                    ErrorsFound = true;
+                                }
+                                PotentialAssignedValue = TotIntConvCoeff;
+                                ApplyConvectionValue(Alphas(1), "INSIDE", TotIntConvCoeff);
+                            } else if (IntValue > HcInt_UserCurve) {
+                                // specificmodel
+                                ++TotIntConvCoeff;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).HcModelEq = IntValue;
+                                PotentialAssignedValue = TotIntConvCoeff;
+                                ApplyConvectionValue(Alphas(1), "INSIDE", TotIntConvCoeff);
+
                             } else {
-                                UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
-                            }
-                            ApplyConvectionValue(Alphas(1), "INSIDE", TotIntConvCoeff);
-                        } else if (IsValidType && IntValue == HcInt_UserCurve) {
-                            ++TotIntConvCoeff;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                            UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex =
-                                UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcInsideUserCurve);
-                            if (UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex == 0) {
-
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
-                                ErrorsFound = true;
-                            }
-                            PotentialAssignedValue = TotIntConvCoeff;
-                            ApplyConvectionValue(Alphas(1), "INSIDE", TotIntConvCoeff);
-                        } else if (IsValidType && IntValue > HcInt_UserCurve) {
-                            // specificmodel
-                            ++TotIntConvCoeff;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                            UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).HcModelEq = IntValue;
-                            PotentialAssignedValue = TotIntConvCoeff;
-                            ApplyConvectionValue(Alphas(1), "INSIDE", TotIntConvCoeff);
-
-                        } else {
-                            // treat CeilingDiffuser and TrombeWall special
-                            if (UtilityRoutines::SameString(Alphas(Ptr + 1), "CEILINGDIFFUSER") ||
-                                UtilityRoutines::SameString(Alphas(Ptr + 1), "TROMBEWALL")) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
-                                ShowContinueError("invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1) +
-                                                  "\". This type is only applicable at a Zone level.");
-                                ErrorsFound = true;
-                            } else { // really invalid
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 1) + " entered=" + Alphas(Ptr + 1));
-                                ErrorsFound = true;
+                                // treat CeilingDiffuser and TrombeWall special
+                                if (UtilityRoutines::SameString(Alphas(Ptr + 1), "CEILINGDIFFUSER") ||
+                                    UtilityRoutines::SameString(Alphas(Ptr + 1), "TROMBEWALL")) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
+                                    ShowContinueError("invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1) +
+                                                      "\". This type is only applicable at a Zone level.");
+                                    ErrorsFound = true;
+                                } else { // really invalid
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 1) + " entered=" + Alphas(Ptr + 1));
+                                    ErrorsFound = true;
+                                }
                             }
                         }
-
-                    } else if (SELECT_CASE_var == BlankString) { // Blank
-
                     } else { // Error Case
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                         ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
@@ -1880,7 +1841,7 @@ namespace ConvectionCoefficients {
             }
         }
 
-        for (Loop = 1; Loop <= TotIntConvCoeff; ++Loop) {
+        for (int Loop = 1; Loop <= TotIntConvCoeff; ++Loop) {
             if (UserIntConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
             if (UserIntConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
             if (CheckScheduleValueMinMax(UserIntConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
@@ -1892,7 +1853,7 @@ namespace ConvectionCoefficients {
             ErrorsFound = true;
         }
 
-        for (Loop = 1; Loop <= TotExtConvCoeff; ++Loop) {
+        for (int Loop = 1; Loop <= TotExtConvCoeff; ++Loop) {
             if (UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
             if (UserExtConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
             if (CheckScheduleValueMinMax(UserExtConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
@@ -1908,7 +1869,7 @@ namespace ConvectionCoefficients {
                 return e.OutsideConvectionAlgo == DataHeatBalance::ASHRAESimple;
             })) {
             Count = 0;
-            for (Loop = 1; Loop <= TotExtConvCoeff; ++Loop) {
+            for (int Loop = 1; Loop <= TotExtConvCoeff; ++Loop) {
                 SurfNum = UserExtConvectionCoeffs(Loop).WhichSurface;
                 // Tests show that Zone will override the simple convection specification of global.
                 if (SurfNum <= 0) continue;               // ignore this error condition
