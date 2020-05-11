@@ -8030,3 +8030,165 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     parseStatLine(koppenLineNoDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
     EXPECT_EQ((int)StatLineType::KoppenLine, (int)lineTypeReturn);
 }
+
+TEST(OutputReportTabularTest, GetDelaySequencesSurfaceOrder_test)
+{
+
+    int coolDesSelected = 1;
+    int iZone = 1;
+    TotDesDays = 2;
+    TotRunDesPersDays = 3;
+    NumOfTimeStepInHour = 4;
+
+    NumOfZones = 1;
+    Zone.allocate(NumOfZones);
+
+    Zone(iZone).SurfaceFirst = 1;
+    Zone(iZone).SurfaceLast = 4;
+    Zone(iZone).RadiantEnclosureNum = 1;
+    int radEnclosureNum = 1;
+
+    TotSurfaces = 4;
+    Surface.allocate(TotSurfaces);
+
+    Array1D<Real64> peopleDelaySeq;
+    peopleDelaySeq.allocate(NumOfTimeStepInHour * 24);
+    peopleDelaySeq = 0.;
+
+    Array1D<Real64> peopleDelaySeqCool;
+    peopleDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    peopleDelaySeqCool = 0.;
+
+    Array1D<Real64> equipDelaySeqCool;
+    equipDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    equipDelaySeqCool = 0.;
+
+    Array1D<Real64> hvacLossDelaySeqCool;
+    hvacLossDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    hvacLossDelaySeqCool = 0.;
+
+    Array1D<Real64> powerGenDelaySeqCool;
+    powerGenDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    powerGenDelaySeqCool = 0.;
+
+    Array1D<Real64> lightDelaySeqCool;
+    lightDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    lightDelaySeqCool = 0.;
+
+    Array1D<Real64> feneSolarDelaySeqCool;
+    feneSolarDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    feneSolarDelaySeqCool = 0.;
+
+    Array3D<Real64> feneCondInstantSeq;
+    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+    feneCondInstantSeq = 0.0;
+
+    Array2D<Real64> surfDelaySeqCool;
+    surfDelaySeqCool.allocate(NumOfTimeStepInHour * 24, TotSurfaces);
+    surfDelaySeqCool = 0.0;
+
+    AllocateLoadComponentArrays();
+
+    // Set surface values
+    std::vector<Real64> surfBaseValue{100.0, 200.0, 300.0, 400.0};
+    Surface(1).Area = 10;
+    Surface(2).Area = 20;
+    Surface(3).Area = 30;
+    Surface(4).Area = 40;
+    Surface(1).HeatTransSurf = true;
+    Surface(2).HeatTransSurf = true;
+    Surface(3).HeatTransSurf = true;
+    Surface(4).HeatTransSurf = false;
+    Surface(1).Class = SurfaceClass_Window;
+    Surface(2).Class = SurfaceClass_Wall;
+    Surface(3).Class = SurfaceClass_Floor;
+    Surface(4).Class = SurfaceClass_Shading;
+
+    for (int jSurf = 1; jSurf <= 4; ++jSurf) {
+        for (int step = 1; step <= 10; ++step) {
+            OutputReportTabular::TMULTseq(coolDesSelected, step, radEnclosureNum) = 0.1 * step;
+            OutputReportTabular::ITABSFseq(coolDesSelected, step, jSurf) = 0.2 * step * surfBaseValue[jSurf - 1];
+            OutputReportTabular::decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
+            OutputReportTabular::peopleRadSeq(coolDesSelected, step, iZone) = 0.4 * step;
+            OutputReportTabular::equipRadSeq(coolDesSelected, step, iZone) = 0.5 * step;
+            OutputReportTabular::hvacLossRadSeq(coolDesSelected, step, iZone) = 0.6 * step;
+            OutputReportTabular::powerGenRadSeq(coolDesSelected, step, iZone) = 0.7 * step;
+            OutputReportTabular::lightLWRadSeq(coolDesSelected, step, iZone) = 0.8 * step;
+        }
+    }
+
+    GetDelaySequences(coolDesSelected,
+                      true,
+                      iZone,
+                      peopleDelaySeqCool,
+                      equipDelaySeqCool,
+                      hvacLossDelaySeqCool,
+                      powerGenDelaySeqCool,
+                      lightDelaySeqCool,
+                      feneSolarDelaySeqCool,
+                      feneCondInstantSeq,
+                      surfDelaySeqCool);
+
+    // Save some results from first pass
+    Real64 peopleDelaySeqCool1 = peopleDelaySeqCool(1);
+    Real64 equipDelaySeqCool1 = equipDelaySeqCool(2);
+    Real64 hvacLossDelaySeqCool1 = hvacLossDelaySeqCool(3);
+    Real64 powerGenDelaySeqCool1 = powerGenDelaySeqCool(4);
+    Real64 lightDelaySeqCool1 = lightDelaySeqCool(5);
+    Real64 feneSolarDelaySeqCool1 = feneSolarDelaySeqCool(6);
+
+    // Rearrange surface values
+    surfBaseValue = {300.0, 100.0, 400.0, 200.0};
+    Surface(2).Area = 10;
+    Surface(4).Area = 20;
+    Surface(1).Area = 30;
+    Surface(3).Area = 40;
+    Surface(2).HeatTransSurf = true;
+    Surface(4).HeatTransSurf = true;
+    Surface(1).HeatTransSurf = true;
+    Surface(3).HeatTransSurf = false;
+    Surface(2).Class = SurfaceClass_Window;
+    Surface(4).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass_Floor;
+    Surface(3).Class = SurfaceClass_Shading;
+
+    for (int jSurf = 1; jSurf <= 4; ++jSurf) {
+        for (int step = 1; step <= 10; ++step) {
+            OutputReportTabular::TMULTseq(coolDesSelected, step, radEnclosureNum) = 0.1 * step;
+            OutputReportTabular::ITABSFseq(coolDesSelected, step, jSurf) = 0.2 * step * surfBaseValue[jSurf - 1];
+            OutputReportTabular::decayCurveCool(step, jSurf) = 0.3 * step * surfBaseValue[jSurf - 1];
+            OutputReportTabular::peopleRadSeq(coolDesSelected, step, iZone) = 0.4 * step;
+            OutputReportTabular::equipRadSeq(coolDesSelected, step, iZone) = 0.5 * step;
+            OutputReportTabular::hvacLossRadSeq(coolDesSelected, step, iZone) = 0.6 * step;
+            OutputReportTabular::powerGenRadSeq(coolDesSelected, step, iZone) = 0.7 * step;
+            OutputReportTabular::lightLWRadSeq(coolDesSelected, step, iZone) = 0.8 * step;
+        }
+    }
+
+    GetDelaySequences(coolDesSelected,
+                      true,
+                      iZone,
+                      peopleDelaySeqCool,
+                      equipDelaySeqCool,
+                      hvacLossDelaySeqCool,
+                      powerGenDelaySeqCool,
+                      lightDelaySeqCool,
+                      feneSolarDelaySeqCool,
+                      feneCondInstantSeq,
+                      surfDelaySeqCool);
+
+    // Save some results from second pass
+    Real64 peopleDelaySeqCool2 = peopleDelaySeqCool(1);
+    Real64 equipDelaySeqCool2 = equipDelaySeqCool(2);
+    Real64 hvacLossDelaySeqCool2 = hvacLossDelaySeqCool(3);
+    Real64 powerGenDelaySeqCool2 = powerGenDelaySeqCool(4);
+    Real64 lightDelaySeqCool2 = lightDelaySeqCool(5);
+    Real64 feneSolarDelaySeqCool2 = feneSolarDelaySeqCool(6);
+
+    EXPECT_EQ(peopleDelaySeqCool1, peopleDelaySeqCool2);
+    EXPECT_EQ(equipDelaySeqCool1, equipDelaySeqCool2);
+    EXPECT_EQ(hvacLossDelaySeqCool1, hvacLossDelaySeqCool2);
+    EXPECT_EQ(powerGenDelaySeqCool1, powerGenDelaySeqCool2);
+    EXPECT_EQ(lightDelaySeqCool1, lightDelaySeqCool2);
+    EXPECT_EQ(feneSolarDelaySeqCool1, feneSolarDelaySeqCool2);
+}

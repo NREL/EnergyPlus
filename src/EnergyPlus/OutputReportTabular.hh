@@ -783,7 +783,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports(EnergyPlusData &state, OutputFiles &outputFiles);
+    void WriteTabularReports(EnergyPlus::EnergyPlusData &state, OutputFiles &outputFiles);
 
     void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 
@@ -793,7 +793,7 @@ namespace OutputReportTabular {
                                    int const colNum             // Column number
     );
 
-    void FillRemainingPredefinedEntries(EnergyPlusData &state);
+    void FillRemainingPredefinedEntries(EnergyPlus::EnergyPlusData &state);
 
     void WriteMonthlyTables();
 
