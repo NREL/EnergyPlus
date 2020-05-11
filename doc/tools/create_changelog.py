@@ -71,7 +71,6 @@ PRS = {'Unknown': []}
 for valid_pr_type in ValidPRTypes:
     PRS[valid_pr_type] = []
 
-query_args = urlencode({'access_token': github_token})
 # use the GitHub API to get pull request info
 for pr_num in pr_numbers:
 
@@ -83,11 +82,11 @@ for pr_num in pr_numbers:
         continue
 
     # set the url for this pull request
-    github_url = "https://api.github.com/repos/NREL/EnergyPlus/issues/" + pr_num + '?' + query_args
+    github_url = "https://api.github.com/repos/NREL/EnergyPlus/issues/" + pr_num
 
     # make the request
     try:
-        req = Request(github_url)
+        req = Request(github_url, headers={'Authorization': 'token %s' % github_token})
         response = urlopen(req)
         the_page = response.read().decode('utf-8')
     except Exception as e:

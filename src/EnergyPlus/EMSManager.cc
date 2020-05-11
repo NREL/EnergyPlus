@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -278,7 +279,6 @@ namespace EMSManager {
 
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::emsCallFromBeginNewEvironment;
         using DataGlobals::emsCallFromExternalInterface;
         using DataGlobals::emsCallFromSetupSimulation;
         using DataGlobals::emsCallFromUserDefinedComponentModel;
@@ -304,7 +304,10 @@ namespace EMSManager {
         anyProgramRan = false;
         if (!AnyEnergyManagementSystemInModel) return; // quick return if nothing to do
 
-        if (iCalledFrom == emsCallFromBeginNewEvironment) BeginEnvrnInitializeRuntimeLanguage();
+        if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
+            BeginEnvrnInitializeRuntimeLanguage();
+            PluginManagement::onBeginEnvironment();
+        }
 
         InitEMS(iCalledFrom);
 
@@ -563,7 +566,6 @@ namespace EMSManager {
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::emsCallFromAfterHVACManagers;
         using DataGlobals::emsCallFromBeforeHVACManagers;
-        using DataGlobals::emsCallFromBeginNewEvironment;
         using DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp;
         using DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
         using DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance;
@@ -964,7 +966,7 @@ namespace EMSManager {
                     auto const SELECT_CASE_var(cAlphaArgs(2));
 
                     if (SELECT_CASE_var == "BEGINNEWENVIRONMENT") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironment;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = DataGlobals::emsCallFromBeginNewEvironment;
                     } else if (SELECT_CASE_var == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironmentAfterWarmUp;
                     } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {

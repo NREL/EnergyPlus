@@ -171,7 +171,6 @@ namespace DataStringGlobals {
     std::string outputMapTxtFileName("eplusmap.txt");
     std::string outputEddFileName("eplusout.edd");
     std::string outputIperrFileName("eplusout.iperr");
-    std::string outputDbgFileName("eplusout.dbg");
     std::string outputPerfLogFileName("eplusout_perflog.csv");
     std::string outputSlnFileName("eplusout.sln");
     std::string outputSciFileName("eplusout.sci");

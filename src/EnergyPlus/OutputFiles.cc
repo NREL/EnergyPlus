@@ -128,6 +128,11 @@ OutputFile::OutputFile(std::string FileName) : fileName(std::move(FileName))
 {
 }
 
+std::ostream::pos_type OutputFile::position() const noexcept
+{
+    return os->tellg();
+}
+
 void OutputFile::open()
 {
     os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc));

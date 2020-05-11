@@ -69,6 +69,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -148,7 +149,7 @@ namespace ChillerIndirectAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void IndirectAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void IndirectAbsorberSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
 
@@ -207,7 +208,7 @@ namespace ChillerIndirectAbsorption {
         sizFac = this->SizFac;
     }
 
-    void IndirectAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    void IndirectAbsorberSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;

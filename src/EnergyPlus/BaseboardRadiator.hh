@@ -150,7 +150,7 @@ namespace BaseboardRadiator {
 
     void clear_state();
 
-    void SimBaseboard(std::string const &EquipName,
+    void SimBaseboard(EnergyPlusData &state, std::string const &EquipName,
                       int const ActualZoneNum,
                       int const ControlledZoneNum,
                       bool const FirstHVACIteration,
@@ -159,9 +159,9 @@ namespace BaseboardRadiator {
 
     void GetBaseboardInput();
 
-    void InitBaseboard(int const BaseboardNum, int const ControlledZoneNumSub);
+    void InitBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub);
 
-    void SizeBaseboard(int const BaseboardNum);
+    void SizeBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
     void SimHWConvective(int &BaseboardNum, Real64 &LoadMet);
 
