@@ -55,27 +55,29 @@
 #include <ostream>
 
 namespace EnergyPlus {
+class OutputFile
+{
+public:
+    void close();
+    void del();
+    bool good() const;
+    void open_at_end();
+    std::string fileName;
+    void open();
+    std::vector<std::string> getLines();
+    void open_as_stringstream();
+    std::string get_output();
+
+private:
+    explicit OutputFile(std::string FileName);
+    std::unique_ptr<std::iostream> os;
+    template <typename... Args> friend void print(OutputFile &of, fmt::string_view format_str, const Args &... args);
+    friend class OutputFiles;
+};
+
 class OutputFiles
 {
 public:
-    class OutputFile
-    {
-    public:
-        void close();
-        bool good() const;
-        void open_at_end();
-        std::string fileName;
-        void open();
-        std::vector<std::string> getLines();
-        void open_as_stringstream();
-        std::string get_output();
-
-    private:
-        explicit OutputFile(std::string FileName);
-        std::unique_ptr<std::iostream> os;
-        template <typename... Args> friend void print(OutputFiles::OutputFile &of, fmt::string_view format_str, const Args &... args);
-        friend class OutputFiles;
-    };
 
     class GIOOutputFile
     {
@@ -93,6 +95,19 @@ public:
     };
 
     OutputFile eio{"eplusout.eio"};
+
+    OutputFile zsz{""};
+    std::string outputZszCsvFileName{"epluszsz.csv"};
+    std::string outputZszTabFileName{"epluszsz.tab"};
+    std::string outputZszTxtFileName{"epluszsz.txt"};
+
+    OutputFile ssz{""};
+    std::string outputSszCsvFileName{"eplusssz.csv"};
+    std::string outputSszTabFileName{"eplusssz.tab"};
+    std::string outputSszTxtFileName{"eplusssz.txt"};
+
+    OutputFile mtr{"eplusout.mtr"};
+
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 
@@ -128,7 +143,7 @@ template <typename... Args> void print(OutputFiles::GIOOutputFile &outputFile, f
     EnergyPlus::vprint(outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
-template <typename... Args> void print(OutputFiles::OutputFile &outputFile, fmt::string_view format_str, const Args &... args)
+template <typename... Args> void print(OutputFile &outputFile, fmt::string_view format_str, const Args &... args)
 {
     assert(outputFile.os);
     EnergyPlus::vprint(*outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));

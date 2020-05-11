@@ -66,6 +66,10 @@ namespace HeatingCoils {
     // MODULE PARAMETER DEFINITIONS
     extern Real64 const MinAirMassFlow;
     extern int NumDesuperheaterCoil; // Total number of desuperheater heating coil objects in input
+    extern int NumElecCoil;
+    extern int NumElecCoilMultiStage;
+    extern int NumFuelCoil;
+    extern int NumGasCoilMultiStage;
 
     // reclaim heat object types
     extern int const COMPRESSORRACK_REFRIGERATEDCASE;

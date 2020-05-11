@@ -77,6 +77,7 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
@@ -4388,6 +4389,9 @@ namespace SystemReports {
         using HVACVariableRefrigerantFlow::GetVRFTUOutAirNode;
         using HVACVariableRefrigerantFlow::GetVRFTUReturnAirNode;
         using HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode;
+        using HybridUnitaryAirConditioners::GetHybridUnitaryACOutAirNode;
+        using HybridUnitaryAirConditioners::GetHybridUnitaryACReturnAirNode;
+        using HybridUnitaryAirConditioners::GetHybridUnitaryACZoneInletNode;
         using OutdoorAirUnit::GetOutdoorAirUnitOutAirNode;
         using OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode;
         using OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode;
@@ -4665,9 +4669,33 @@ namespace SystemReports {
                             ZFAUZoneVentLoad += 0.0;
                         }
 
+                    } else if (SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num) {
+                        OutAirNode =
+                            GetHybridUnitaryACOutAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                        if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
+
+                        ZoneInletAirNode =
+                            GetHybridUnitaryACZoneInletNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                        if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
+
+                        ReturnAirNode =
+                            GetHybridUnitaryACReturnAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                        if ((OutAirNode > 0) && (ReturnAirNode > 0)) {
+                            //						ZFAUEnthMixedAir = PsyHFnTdbW( Node( MixedAirNode ).Temp, Node( MixedAirNode
+                            //).HumRat
+                            //);
+                            ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                            ZFAUEnthOutdoorAir = PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
+                            // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
+
+                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSys * SecInHour; //*KJperJ
+                        } else {
+                            ZFAUZoneVentLoad += 0.0;
+                        }
+
                     } else if (SELECT_CASE_var == UnitHeater_Num || SELECT_CASE_var == VentilatedSlab_Num ||
                                //	ZoneHVAC:EvaporativeCoolerUnit ?????
-                               SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num || ZoneEvaporativeCoolerUnit_Num ||
+                               SELECT_CASE_var == ZoneEvaporativeCoolerUnit_Num ||
                                SELECT_CASE_var == AirDistUnit_Num || SELECT_CASE_var == BBWaterConvective_Num ||
                                SELECT_CASE_var == BBElectricConvective_Num || SELECT_CASE_var == HiTempRadiant_Num ||
                                //	not sure how HeatExchanger:* could be used as zone equipment ?????

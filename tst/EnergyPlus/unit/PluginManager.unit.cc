@@ -67,14 +67,14 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_EQ(0, globalVarIndex);
 
     // now create a trend variable to track it
-    size_t const numVals = 4;
-    PluginManagement::trends.emplace_back("TREND_VAR", numVals, globalVarIndex);
+    size_t const numValues = 4;
+    PluginManagement::trends.emplace_back("TREND_VAR", numValues, globalVarIndex);
     int trendVarIndex = pluginManager.getTrendVariableHandle("trend_var");
     EXPECT_EQ(0, trendVarIndex);
 
     // initially it should be filled with zeroes
-    EXPECT_EQ(numVals, pluginManager.getTrendVariableHistorySize(trendVarIndex));
-    for (size_t i = 0; i < numVals; i++) {
+    EXPECT_EQ(numValues, pluginManager.getTrendVariableHistorySize(trendVarIndex));
+    for (size_t i = 0; i < numValues; i++) {
         EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(trendVarIndex, i));
     }
 

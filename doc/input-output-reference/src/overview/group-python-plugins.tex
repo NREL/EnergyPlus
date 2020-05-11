@@ -1,0 +1,299 @@
+\section{Group -- Python Plugins / Python EMS}\label{group-plugins}
+
+The Energy Management System in EnergyPlus was a major breakthrough in provided user-defined capabilities.
+By allowing the user to read simulation data, perform custom calculations, and ultimately manipulate control settings, the door was opened to any number of new applications, including evaluation of custom control strategies or custom physical component models.
+However, users were limited to writing scripts in the built-in, custom, EnergyPlus Runtime Language, and debugging was possible, but difficult.
+
+Users have pushed EMS in many ways well beyond a traditional Energy ``Management'' System.
+At this point, a lot of EMS scripts are what would be called ``plugins'' in most software environments.
+As of version 9.3 of EnergyPlus, a new way to write these plugins, in the Python programming language was made available.
+
+Note: This functionality relies on some aspects of the EnergyPlus API for making calls into EnergyPlus when these plugins are running.
+A majority of the API is described in section~\ref{sec:api-usage}, and it is highly recommended that that section be read first, as this section will only focus on the differences, and additions.
+One point should be made perfectly clear.
+There are two Python-related ways of interacting with EnergyPlus.
+We can call these ``modes'', with each clarified here:
+
+\begin{description}
+    \item[Library Mode] In library mode, an external script (C or Python) is written which leverages the EnergyPlus API to register callback functions and initiate a simulation from a function call.
+    \item[Plugin Mode] In plugin mode, a (typically) small Python script is written, then by specifying parameters in an input file, the client runs EnergyPlus(.exe) in a traditional fashion, and that EnergyPlus run will call out to the Python script as needed.
+\end{description}
+
+These two operation modes cannot be mixed.
+In plugin mode, EnergyPlus creates a new Python instance internally to allow processing the user-defined scripts.
+When EnergyPlus is run in an API mode, it cannot create a new Python session internally, as it may be in an existing Python session.
+Thus, if a plugin object is found in input during an API call, the program will abort.
+
+The API section has information about how to access output variable data, meters, internal variable data, simulation parameters, and actuators, so these do not need additional information here.
+However, plugin objects have additional ways to interact with the simulation, and the plugins themselves need description, which is here.
+
+\subsection{Python Plugin}
+
+For EnergyPlus, a Python Plugin is a user-defined Python class that overrides a premade \verb=EnergyPlusPlugin= base class.
+This base class creates overrideable functions that, when overridden, determine when the user-defined code will be called by EnergyPlus.
+The functions are structured in this way to allow a single class to defined multiple plugins.
+In this way, data can be shared between multiple calling points on the same class instance by using regular Python class members.
+
+The \verb=EnergyPlusPlugin= base class is defined in a `plugin.py` file inside the `pyenergyplus` folder, which is located in the root EnergyPlus install directory.
+When EnergyPlus starts up, if any plugins are to be run, it starts up a Python instance and adds the executable directory to the current Python search path.
+In this way, a user plugin should always \verb=from pyenergyplus.plugin import EnergyPlusPlugin=.
+This will ensure that when EnergyPlus processes this Python file, it always finds this imported base class.
+The user will then create a derived class that inherits this base class, and write custom functions.
+
+A minimal plugin does not actually have to interact with EnergyPlus.
+It is expected that essentially every plugin will at least read data from sensors or meters, or write data using actuators, but it is not necessary.
+Just like when calling EnergyPlus as a library, when operating in plugin mode, this data is accessed through the same API methods.
+To learn how to interact with the simulation API, see the API usage section:~\ref{sec:api-usage}.
+Consider this minimal plugin:
+
+\begin{lstlisting}
+from pyenergyplus.plugin import EnergyPlusPlugin
+
+class DummyPlugin(EnergyPlusPlugin):
+
+def on_end_of_zone_timestep_before_zone_reporting(self):
+return 0
+\end{lstlisting}
+
+This skeleton captures the use of a plugin to do nothing, but still shows some important features.
+\begin{enumerate}
+    \item The base class plugin is properly imported.
+    \item A user-defined class is created which inherits the EnergyPlusPlugin base class.
+    \item A method is overridden, which is named appropriately to describe when EnergyPlus will be calling this function, in this case, at the end of each zone time step but before zone-level data is reported.
+    \item The custom method returns zero to indicate success.
+\end{enumerate}
+
+Several notes can be taken from this list.
+The name of the function matters, as it determines when the function will be called.
+The full list of possible names are:
+\begin{itemize}
+    \item \verb=on_begin_new_environment=
+    \item \verb=on_after_new_environment_warmup_is_complete=
+    \item \verb=on_begin_zone_timestep_before_init_heat_balance=
+    \item \verb=on_begin_zone_timestep_after_init_heat_balance=
+    \item \verb=on_begin_timestep_before_predictor=
+    \item \verb=on_after_predictor_before_hvac_managers=
+    \item \verb=on_after_predictor_after_hvac_managers=
+    \item \verb=on_inside_hvac_system_iteration_loop=
+    \item \verb=on_end_of_zone_timestep_before_zone_reporting=
+    \item \verb=on_end_of_zone_timestep_after_zone_reporting=
+    \item \verb=on_end_of_system_timestep_before_hvac_reporting=
+    \item \verb=on_end_of_system_timestep_after_hvac_reporting=
+    \item \verb=on_end_of_zone_sizing=
+    \item \verb=on_end_of_system_sizing=
+    \item \verb=on_end_of_component_input_read_in=
+    \item \verb=on_user_defined_component_model=
+    \item \verb=on_unitary_system_sizing=
+\end{itemize}
+
+The meaning of these names can be found in the EMSApplicationGuide which comes with the EnergyPlus install.
+
+It is possible future versions of the program will expose additional calling points.
+Note: a single class can override multiple functions, so that the same class instance is called at multiple points in a simulation.
+
+Once this plugin is created, it can be placed in a number of locations on the filesystem, as described in the PythonPlugin:SearchPaths section~\ref{subsec:plugin-search-paths}.
+The plugin instance, along with any other plugin related obejcts are declared in the input file, and then EnergyPlus is executed.
+More data is provided in each of the specific object sections below.
+
+\subsection{PythonPlugin:SearchPaths}\label{subsec:plugin-search-paths}
+
+Once EnergyPlus initiates a Python process, it will need to know where to search for user-defined plugin script files
+A Python search path is managed that contains a list of possible folders where Python will search when encountering an import statement.
+The folder containing the currently running EnergyPlus process will be added no matter what, as this directory contains the plugin and API code, but additional folders can be specified to meet specific needs.
+These options are described in the inputs of the object.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+An identifier given to this object.
+The object is required to be unique, so this field is only used for reporting purposes.
+
+\paragraph{Field: Add Current Working Directory to Search Path}
+
+Based on different workflows, EnergyPlus may be executed in directories far away from where the actual binary is stored.
+In these cases, it may be useful to put plugin files in the current working directory, even if the simulation input file is not located there.
+Turning this field to Yes will add the current working directory to the list of search paths.
+
+\paragraph{Field: Add Input File Directory to Search Path}
+
+In a lot of cases, it is expected that the plugin will be tied closely to a specific input file.
+In these cases, it may be useful to keep plugin files right next to the input file, regardless of the current working directory.
+Turning this field to Yes will add the directory where the input file is located to the list of search paths.
+
+\paragraph{Field: Search Path 1-5}
+
+There are also some cases, where a user may keep a specific library of plugin scripts that work with a variety of input files.
+In this case, they may want to just point EnergyPlus to a custom directory away from any specific input file or working directory.
+Declaring a path in these fields will add those paths to the list of search paths.
+Note: This does not check the filesystem for path existence.
+
+\subsection{PythonPlugin:Instance}
+
+This object captures a single plugin instance for EnergyPlus.
+As previously described, a single plugin may be called at multiple calling points if there are multiple functions overridden.
+A single instance is analogous to a single user-defined class that inherits the EnergyPlusPlugin base class.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This field represents an identifier for this plugin within EnergyPlus.
+In most cases, this field is just used for reporting, but for user-defined-components, this name is used as the name of the EMS program manager.
+Note that if this instance is used for that application, the plugin must override the \verb=on_user_defined_component_model= function.
+
+\paragraph{Field: Run During Warmup Days}
+
+This field specifies whether EnergyPlus should execute this plugin during warmup days.
+In most applications, this should not be enabled, both for runtime savings, and because warmups are just used to initialize the simulation state.
+
+\paragraph{Field: Python Module Name}
+
+This is the name of the Python plugin file name -- except -- no file extension.
+For \verb=pluginA.py=, just use \verb=pluginA=.
+This file should be found in one of the folders in the plugin search path, which the user can customize using the PythonPlugin:SearchPaths object.
+
+\paragraph{Field: Plugin Class Name}
+
+This is the name of the user-defined class inside the plugin file.
+This class must inherit the EnergyPlusPlugin base class, or the simulation will issue an error and abort.
+
+\subsection{Global and Trend Variable API Methods}
+
+Plugins have two areas of data storage/bookkeeping that are not available on the regular EnergyPlus API: Global variables and Trend variables
+
+\begin{description}
+    \item[Global Variables] Global variables, in this context, reflect variables which are given space in EnergyPlus, and can be accessed in read/write fashion by all running plugin instances at any time.
+    Global variables can then be further used as the basis for creating custom output variables and trend variables.
+    Global variables are declared in the input file, then accessed by name in the plugin script.
+    An example usage is provided below in the global variable section.
+    \item[Trend Variables] Trend variables are used to track the history of a previously declared plugin global variable.
+    By first declaring a plugin global variable, and then assigning that value in plugins, this trend mechanism will keep history.
+    The actual number of history terms is declared in the input file, and the trend variables are accessed by name in the plugin script.
+    Example usage is provided below in the trend variable section.
+\end{description}
+
+\subsection{PythonPlugin:Variables}
+
+This object defines the ``global'' variables described elsewhere in this section.
+The term global is carried along as it is the convention used in traditional EMS applications.
+There are a few reasons why users may need to use global variables:
+\begin{itemize}
+    \item If a variable value is to be read/write between multiple plugins in different files.
+    \item If a client wants to create a custom output variable, these are based on, and reference, existing global variables.
+    \item If a client wants to create a trend variable, these are based on, and reference, existing global variables.
+\end{itemize}
+
+To use a global variable, an input object must be defined in the current input file, which specifies the variable name.
+Then, in a plugin, a handle can be looked up for this global variable using the \verb=get_global_handle= function, which accepts the variable name as the only argument.
+With the handle, the current value of the global variable can be looked up using the \verb=get_global_value= function, which takes only the handle for the variable.
+Finally, to update the value of the global variable, the \verb=set_global_value= function is used, which takes a handle and a new value.
+
+Assuming a global variable is defined on input called ``OutdoorTemperature'', an example of this inside a plugin function follows:
+
+\begin{lstlisting}
+global_var_handle = self.api.exchange.get_global_handle('OutdoorTemperature')
+var_value = self.api.exchange.get_global_value(global_var_handle)
+self.api.exchange.set_global_value(global_var_handle, 3.141)
+\end{lstlisting}
+
+\subsubsection{Inputs}
+
+The inputs required to declare a global variable consist of the unique PythonPlugin:GlobalVariable object, along with a series of names
+NOTE: Right now, the number of available variables is limited at five, but a future version will make this an unlimited object.
+However, in many cases, using global variables is not necessary to achieve the client needs.
+With the capabilities that come with using Python as a language, many of the reasons to declare and share global variables are eliminated.
+
+\paragraph{Field: Name}
+
+This field is the name of this variables object, however since this is required to be a unique object, it does not do much.
+It is purely used for reporting of errors.
+
+\paragraph{Field Variable Name 1-5}
+
+This field is used to declare and identify a plugin variable inside EnergyPlus.
+This name is used as the identifier when accessing this value to read/write in user-defind plugins.
+
+\subsection{PythonPlugin:TrendVariable}
+
+Trend variables allow a predeclared global variable to be tracked over time steps in the simulation.
+Once these are declared, a number of useful worker functions can be employed to process and read data from the trend.
+Note that trend variables are initially declared with values of zero at each history place, so the first few calls into the simulation could result in unexpected values of the trend.
+
+To use a trend variable, an input object must be defind int he current input file, which specifies the attributes of the trend, including a name and a number of history terms to keep.
+Then, in a plugin, a handle can be looked up for this trend variable using the \verb=get_trend_handle= function, which accepts the trend variable name as the only argument.
+With the handle, a number of aspects can be processed/looked up:
+
+\begin{itemize}
+    \item The trend value at a specific point in history can be retrieved using the \verb=get_trend_value= function, which accepts a trend handle and an index specifying how far back in history to evaluate the lookup.
+    \item The average trend value over a specific range can be retrieved using the \verb=get_trend_average= function, which accepts a trend handle and a count of how far back in history to evaluate.
+    \item The minimum trend value over a specific range can be retreived using the \verb=get_trend_min= function, which accepts a trend handle and a count of how far back in history to evaluate.
+    \item The maximum trend value over a specific range can be retreived using the \verb=get_trend_max= function, which accepts a trend handle and a count of how far back in history to evaluate.
+    \item The sum of a trend value over a specific range can be retrieved using the \verb=get_trend_sum= function, which accepts a trend handle and a count of how far back in history to evaluate.
+    \item The trajectory of a trend (slope of a linear regression line) over a specific range can be calculated using the \verb=get_trend_direction= function, which accepts a trend handle and a count of how far back in history to evaluate.
+\end{itemize}
+
+Assuming a global variable is defind on input called ``CustomTemperature'', and a trend variable is declared called ``TrendVar'' with at least 5 history terms saved, an example usage of this inside a plugin function follows:
+
+\begin{lstlisting}
+# update the variable throughout the simulation
+global_var_handle = self.api.exchange.get_global_handle('CustomTemperature')
+self.api.exchange.set_global_value(global_var_handle, 3.141)
+
+# get trend values as needed
+trend_var_handle = self.api.exchange.get_trend_handle('TrendVar')
+trend_avg = self.api.exchange.get_trend_average(trend_var_handle, 5)
+trend_min = self.api.exchange.get_trend_min(trend_var_handle, 5)
+trend_max = self.api.exchange.get_trend_max(trend_var_handle, 5)
+trend_sum = self.api.exchange.get_trend_sum(trend_var_handle, 5)
+trend_dir = self.api.exchange.get_trend_direction(trend_var_handle, 5)
+\end{lstlisting}
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This field is the name of the trend object, and is used both for reporting purposes, as well as to identify this trend inside of plugin code.
+
+\paragraph{Field: Name of a Python Plugin Variable}
+
+This field should include the name of a plugin variable that is declared in the PythonPlugin:Variables object.
+A trend variable is simply a wrapper around an existing variable object, which must be read/written by plugins, so first declare the variable, then add a trend to it as needed by referencing the name here.
+
+\paragraph{Field: Number of Timesteps to be Logged}
+
+This field specified the number of history terms to keep for this trend.
+Trend variables are stored for this number of zone time steps.
+If a plugin attempts to access a trend parameter at greater than this number, an error will occur.
+
+\subsection{Packaging Details}
+
+Implementing these plugins required structural additions to the package and to the build process.
+From a user perspective, the only thing that will be noticed likely is the additional size of the installer.
+At the very onset of this project, it was decided that we would package Python into the installer, and not require a user to install an external version.
+This has been successful, however, at the cost of a larger install footprint.
+The EnergyPlus install now includes a Python binary shared library, along with the core Python standard library of code.
+This allows users to create user-defined plugins that access all of the standard Python library capabilities.
+
+The main question received about this is about installing non-standard Python packages.
+While we have not polished up the instructions on the process, some advice can be given.
+However, note that if you break your Python install, either system or EnergyPlus version, in the process, you could end up with a very, very, very broken system.
+So do not do this if you do not understand the consequences and have a solid understanding of Python package management.
+Also, once you start down this process of using anything non-standard, the development team will no longer be able to help you debug any plugin problems.
+
+Some possibilities for using external libraries include:
+\begin{itemize}
+    \item If the external package you are wanting is pure Python code, then you can download and extract it right into a local directory, add it to the SearchPaths object, and the Python process set up by EnergyPlus should be able to find it.
+    \item For native code libraries, if you are able to install a Python version on your system with an identical version to the one that is packaged up with your install of EnergyPlus, you may be able to leverage that separate module directory.
+          Use Pip or whatever package management tool you choose to install the package.
+          This will install it in that version.
+          Then you can try to point EnergyPlus to that directory, or copy those files from one package into the EnergyPlus package.
+\end{itemize}
+
+It is hoped that future versions of this will include a package management tool with EnergyPlus itself, so that installing native packages is straightforward.
+
+One additional note is that we are currently not linking to Python for our 32-bit Windows builds.
+Doing this would have taken significant extra effort to develop the build process to handle both 32 and 64 bit options.
+We have very few 32-bit users, and the effort was not justified.
+If you are in the rare case of needing Python Plugins, yet also being on a 32-bit Windows machine, consult the development team and a custom build could possibly be built manually.
+

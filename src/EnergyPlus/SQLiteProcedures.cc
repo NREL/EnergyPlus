@@ -1810,9 +1810,9 @@ void SQLite::createSQLiteDaylightMap(int const mapNum,
                                      int const dayOfMonth,
                                      int const hourOfDay,
                                      int const nX,
-                                     Array1<Real64> const &x,
+                                     Array1D<Real64> const &x,
                                      int const nY,
-                                     Array1<Real64> const &y,
+                                     Array1D<Real64> const &y,
                                      Array2<Real64> const &illuminance)
 {
     if (m_writeOutputToSQLite) {

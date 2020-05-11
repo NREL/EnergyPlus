@@ -54,12 +54,15 @@
 
 // C++ Headers
 #include <cstdint> // C++11
+#include <cassert>
 
-#include <EnergyPlus/TypeDefs.h>
+#include <EnergyPlus/api/TypeDefs.h>
 
-// macro to supress unused parameter
+// macro to suppress unused parameter
 // UNUSED( foo );
 #define EP_UNUSED(expr)
+// macro to guarantee array sizing in debug builds
+#define EP_SIZE_CHECK(array, min_size) assert(min_size >= 0);assert(array.size() >= (size_t)min_size)
 
 typedef std::int32_t Int32;
 typedef std::int64_t Int64;

@@ -245,7 +245,8 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       FanOpMode(0),              // fan operating mode, constant or cycling fan
       parentModeRatedGrossTotalCap(0.0),
       parentModeRatedEvapAirFlowRate(0.0),
-      parentModeRatedCondAirFlowRate(0.0),
+      parentModeRatedCondAirFlowRate(0.0), 
+      parentOperatingMode(0),
 
       ambPressure(0.0),          // outdoor pressure {Pa}
       PLR(0.0),                  // coil operating part load ratio
@@ -349,16 +350,27 @@ void CoilCoolingDXCurveFitSpeed::size()
     SizingString = "Gross Sensible Heat Ratio";
     DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
     DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName);
+    if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 2) {
+        ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName, 0.667);
+    } else if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 3) {
+        ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName, 0.333);    
+    } else {
+        ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName);
+    }
     DataSizing::DataFlowUsedForSizing = 0.0;
     DataSizing::DataCapacityUsedForSizing = 0.0;
     //  DataSizing::DataEMSOverrideON = false;
     //  DataSizing::DataEMSOverride = 0.0;
 
+    if (this->indexSHRFT > 0 && this->indexSHRFFF > 0) {
+        this->RatedCBF = 0.001;
+    } else {
+    
     this->RatedCBF = CalcBypassFactor(RatedInletAirTemp,
                                       RatedInletAirHumRat,
                                       Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
                                       DataEnvironment::StdPressureSeaLevel);
+    }
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
 }
 

@@ -78,6 +78,12 @@ Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00,{J/k
 
 See [#PR7577](https://github.com/NREL/EnergyPlus/pull/7577)
 
+### EIO output for ShadowCalculations
+
+The eio output related to `ShadowCalculations` has been changed to reflect the new input fields. See Rules9-2-0-to-9-3-0.md.
+
+See [#PR7302](https://github.com/NREL/EnergyPlus/pull/7302)
+
 ### End Use By Subcategory in SQL
 
 In the SQL Output file, for `ReportName = "AnnualBuildingUtilityPerformanceSummary"` and `ReportName = "DemandEndUseComponentsSummary"`,
@@ -209,3 +215,43 @@ This results in additional end-use meters, e.g. General:Cooling:Electricity whic
 And it results in more outputs attached to the General:* meters.
 
 See [PR #7794](https://github.com/NREL/EnergyPlus/pull/7794)
+See [7743](https://github.com/NREL/EnergyPlus/pull/7743/)
+
+See [7761](https://github.com/NREL/EnergyPlus/pull/7761) 
+and the [NFP](https://github.com/energy-plus/EnergyPlus/blob/PerfOverrideAndReporting/design/FY2020/NFP-PerformanceOverRidesAndReporting.md)
+
+### New _perflog.csv file as Log File for PerformancePrecisionTradeoffs
+
+A new file has been added with the suffix _perflog.csv specifically to help with 
+performance tuning for a specific input file. Instead of disappearing, it gets
+appended to each simulation so experimentation can be done. It appears when
+ever the PerformancePrecisionTradeoffs object is used. For each simulation a line is added
+that contains the following:
+
+- Program
+- Version
+- TimeStamp
+- Use Coil Direct Solution
+- Zone Radiant Exchange Algorithm
+- Number of Timesteps per Hour
+- Minimum Number of Warmup Days
+- SuppressAllBeginEnvironmentResets
+- MaxZoneTempDiff
+- Electricity ABUPS Total [J]
+- Natural Gas ABUPS Total [J]
+- Additional Fuel ABUPS Total [J]
+- District Cooling ABUPS Total [J]
+- District Heating ABUPS Total [J]
+- Water ABUPS Total [m3]
+- Values Gathered Over [hours]
+- Run Time [seconds]
+- Run Time [string]
+- Number of Warnings
+- Number of Severe
+
+See [7761](https://github.com/NREL/EnergyPlus/pull/7761) 
+and the [NFP](https://github.com/energy-plus/EnergyPlus/blob/PerfOverrideAndReporting/design/FY2020/NFP-PerformanceOverRidesAndReporting.md)
+
+
+
+

@@ -26,23 +26,36 @@ if (UNIX)
   set(CPACK_BINARY_NSIS    OFF CACHE BOOL "Recommended OFF")
 
   if(APPLE)
-    set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW package, which is the recommended method")
-    set(CPACK_BINARY_STGZ    OFF CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_IFW   ON CACHE BOOL "Enable to build IFW package, which is the recommended method")
+    set(CPACK_BINARY_STGZ OFF CACHE BOOL "Recommended OFF")
 
     # Mac Specific options to turn off
     set(CPACK_BINARY_BUNDLE        OFF CACHE BOOL "Recommended OFF")
     set(CPACK_BINARY_DRAGNDROP     OFF CACHE BOOL "Recommended OFF")
     set(CPACK_BINARY_OSXX11        OFF CACHE BOOL "Recommended OFF")
-    set(CPACK_BINARY_PACKAGEMAKER  OFF CACHE BOOL "This was the legacy method on Apple, superseded by IFW.")
+    set(CPACK_BINARY_PACKAGEMAKER  OFF CACHE BOOL "This was the legacy method on Apple, superseded by IFW")
     set(CPACK_BINRARY_PRODUCTBUILD OFF CACHE BOOL "Recommended OFF")
 
   else()
-    set(CPACK_BINARY_IFW     OFF CACHE BOOL "This should be off")
-    set(CPACK_BINARY_STGZ ON CACHE BOOL "Enable to build a Linux sh installer script, which is the recommended method") # Uses STGZ currently (install .sh script CACHE BOOL)
+    # TODO: Make IFW recommended? Deprecate STGZ?
+    set(CPACK_BINARY_IFW   ON CACHE BOOL "Enable to build IFW package, which is the recommended method")
+    set(CPACK_BINARY_STGZ  ON CACHE BOOL "Enable to build a Linux sh installer script, which is the legacy method")
 
     # Unix (non Apple CACHE BOOL) specific option to turn off
     set(CPACK_BINARY_TZ  OFF CACHE BOOL "Recommended OFF")
   endif()
+
+  # TODO: the "FORCE" is temporary to avoid people having an existing build directory miss the fact that the recommended method changed
+  # TODO: remove after next release
+  if (UNIX AND NOT APPLE)
+    if(NOT CPACK_BINARY_IFW)
+      set(CPACK_BINARY_STGZ  OFF CACHE BOOL "This was the legacy method on Linux, superseded by IFW" FORCE)
+      set(CPACK_BINARY_IFW    ON CACHE BOOL "Enable to build IFW package, which is the recommend method" FORCE)
+      message("Switching from STGZ to IFW as the supported generator has changed on Linux")
+    endif()
+  endif()
+  # END TODO
+
   # Tar.gz for inclusion in other programs for eg
   set(CPACK_BINARY_TGZ    ON CACHE BOOL "Enable to build a tar.gz package, recommended for an official release")
 
@@ -55,15 +68,6 @@ elseif(WIN32)
   set(CPACK_BINARY_7Z    OFF CACHE BOOL "Recommended OFF")
   set(CPACK_BINARY_NUGET OFF CACHE BOOL "Recommended OFF")
   set(CPACK_BINARY_WIX   OFF CACHE BOOL "Recommended OFF")
-
-
-  # TODO: the "FORCE" is temporary to avoid people having an existing build directory build IFW, remove after next release
-  # We want to force update the cache to avoid user suddenly getting build errors
-  if(CPACK_BINARY_NSIS)
-    set(CPACK_BINARY_NSIS  OFF CACHE BOOL "This was the legacy method on Windows, superseded by IFW" FORCE)
-    set(CPACK_BINARY_IFW    ON CACHE BOOL "Enable to build IFW package, which is the recommend method" FORCE)
-    message("Switching from NSIS to IFW as the supported generator has changed on Windows")
-  endif()
 
 endif()
 
@@ -290,6 +294,9 @@ set( RULES_XLS Rules9-2-0-to-9-3-0.md )
 install(FILES "${PROJECT_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
 install(FILES "${PROJECT_SOURCE_DIR}/release/favicon.png" DESTINATION "./")
 install(FILES "${PROJECT_SOURCE_DIR}/release/readme.html" DESTINATION "./")
+if (LINK_WITH_PYTHON)
+  install(FILES "${PROJECT_SOURCE_DIR}/release/PythonLicense.txt" DESTINATION "./")
+endif()
 set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/release/readme.html")
 
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
@@ -404,6 +411,7 @@ endif()
 #set(CPACK_IFW_PACKAGE_WIZARD_DEFAULT_HEIGHT 480)
 set(CPACK_IFW_PACKAGE_WINDOW_ICON "${PROJECT_SOURCE_DIR}/release/ep_nobg.png")
 
+set(CPACK_IFW_VERBOSE ON)
 
 if( APPLE )
   set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
@@ -428,16 +436,13 @@ if( APPLE )
   set(CPACK_IFW_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/release/ep.icns")
 elseif(WIN32)
 
-  # TODO: TEMP
-  set(CPACK_IFW_VERBOSE ON)
-
   # Will also set CPACK_IFW_PACKAGE_START_MENU_DIRECTORY (name of default program group in Windows start menu)
   set(CPACK_IFW_PACKAGE_NAME "EnergyPlusV${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
 
   set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_IFW_PACKAGE_NAME}" )
   set(CPACK_IFW_TARGET_DIRECTORY "C:/${CPACK_PACKAGE_INSTALL_DIRECTORY}" )
 
-    # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
+  # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
   set(CPACK_IFW_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/release/ep.ico")
 
   # You need at least one "install(..." command for it to be registered as a component
@@ -445,13 +450,11 @@ elseif(WIN32)
   install(CODE "MESSAGE(\"Copying and Registering DLLs\")" COMPONENT CopyAndRegisterSystemDLLs)
   install(CODE "MESSAGE(\"Creating start menu.\")" COMPONENT CreateStartMenu)
 
-endif()
+elseif(UNIX)
+  set(CPACK_PACKAGE_DEFAULT_LOCATION "/usr/local")
+  set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+  set(CPACK_IFW_TARGET_DIRECTORY "/usr/local/${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
 
-if(UNIX)
-  install(FILES doc/man/energyplus.1 DESTINATION "./")
-endif()
-
-if( UNIX AND NOT APPLE )
   INSTALL(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare" DESTINATION "PostProcess/EP-Compare/")
   INSTALL(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHInterfaces5001.so" DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
   INSTALL(FILES "${PROJECT_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHObjectArray5001.so" DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
@@ -472,6 +475,10 @@ if( UNIX AND NOT APPLE )
   install(PROGRAMS "${PROJECT_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
   install(PROGRAMS scripts/runepmacro DESTINATION "./")
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
+
+  # You need at least one "install(..." command for it to be registered as a component
+  install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
+  install(FILES doc/man/energyplus.1 DESTINATION "./")
 endif()
 
 # TODO: Unused now
@@ -482,69 +489,40 @@ set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CMakeCPackOptions.cmake")
 ##########################################################   D O C U M E N T A T I O N   #############################################################
 
 if ( BUILD_DOCS )
-  # Call the build of target documentation explicitly here.
-  # Note: This is because you can't do `add_dependencies(package documentation)` (https://gitlab.kitware.com/cmake/cmake/issues/8438)
-  # Adding another custom target to be added to the "ALL" one (so it runs) and make it depend on the actual "documentation" target doesn't work
-  # because it'll always run if you have enabled BUILD_DOCS, regardless of whether you are calling the target "package" or not
-  #  add_custom_target(run_documentation ALL)
-  #  add_dependencies(run_documentation documentation)
-  #message(FATAL_ERROR "CMAKE_COMMAND=${CMAKE_COMMAND}")
-
-  # +env will pass the current environment and will end up respecting the -j parameter
-  #                                 this ↓↓↓ here -- https://stackoverflow.com/a/41268443/531179
-  #install(CODE "execute_process(COMMAND +env \"${CMAKE_COMMAND}\" --build \"${PROJECT_BINARY_DIR}\" --target documentation)")
-  # Except it doesn't work with install(execute_process...
-
-  # Passing $(MAKE) doesn't work either, and isn't a great idea for cross platform support anyways
-  # install(CODE "execute_process(COMMAND ${MAKE} ${DOC_BUILD_FLAGS} -C \"${PROJECT_BINARY_DIR}\" documentation)")
-
-  # So instead, we just used the number of threads that are available. That's not ideal, since it ignores any "-j N" option passed by the user
-  # But LaTeX should run quickly enough to not be a major inconvenience.
-  # There no need to do that for Ninja for eg, so only do it for Make and MSVC
-
-  # flag -j to cmake --build was added at 3.12 (VERSION_GREATER_EQUAL need cmake >= 3.7, we apparently support 2.8...)
-  if(NOT(CMAKE_VERSION VERSION_LESS "3.12") AND ((CMAKE_GENERATOR MATCHES "Make") OR WIN32))
-    include(ProcessorCount)
-    ProcessorCount(N)
-    if(NOT N EQUAL 0)
-      set(DOC_BUILD_FLAGS "-j ${N}")
-    endif()
-  endif()
-  if(WIN32)
-    # Win32 is multi config, so you must specify a config when calling cmake.
-    # Let's just use Release, it won't have any effect on LaTeX anyways.
-    set(DOC_CONFIG_FLAG "--config Release")
-  endif()
-
-  # Getting these commands to work (especially with macro expansion) is tricky. Check the resulting `cmake_install.cmake` file in your build folder if need to debug this
-  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${PROJECT_BINARY_DIR}\" ${DOC_CONFIG_FLAG} ${DOC_BUILD_FLAGS} --target documentation)"
-          COMPONENT Documentation)
-
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/EMSApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/EngineeringReference.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/EnergyPlusEssentials.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/ExternalInterfacesApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/GettingStarted.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/InputOutputReference.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/InterfaceDeveloper.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/ModuleDeveloper.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/OutputDetailsAndExamples.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/PlantApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc-pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/EMSApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/EngineeringReference.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/EnergyPlusEssentials.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/ExternalInterfacesApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/GettingStarted.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/InputOutputReference.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/InterfaceDeveloper.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/ModuleDeveloper.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/OutputDetailsAndExamples.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/PlantApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
 else()
   message(AUTHOR_WARNING "BUILD_DOCS isn't enabled, so package won't include the PDFs")
 endif ()
 
 ##########################################################   S Y S T E M    L I B R A R I E S   ######################################################
 
-# Set to TRUE to install the Windows Universal CRT libraries for app-local deployment (e.g. to Windows XP).
-# This is meaningful only with MSVC from Visual Studio 2015 or higher, which is our case
-SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-INCLUDE(InstallRequiredSystemLibraries)
-INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
+# Add compiler-provided system runtime libraries
+if( WIN32 AND NOT UNIX )
+  # Skip the call to install(PROGRAMS) so we can specify our own install rule (using the value of `CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS`)
+  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+
+  # Set to TRUE to install the Windows Universal CRT libraries for app-local deployment (e.g. to Windows XP, but apparently needed for Windows 8 too).
+  # This is meaningful only with MSVC from Visual Studio 2015 or higher, which is our case
+  SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+
+  include(InstallRequiredSystemLibraries)
+  if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+    install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
+  endif()
+endif()
 
 ######################################################################################################################################################
 #                                                    P A C K A G I N G   &   C O M P O N E N T S                                                     #
@@ -622,10 +600,12 @@ cpack_add_component(CopyAndRegisterSystemDLLs
   HIDDEN
 )
 
-#cpack_add_component(Libraries
-#  DISPLAY_NAME "Install required system libraries"
-#  DESCRIPTION  "This is probably not required right now..."
-#)
+cpack_add_component(Libraries
+  DISPLAY_NAME "Install required system libraries"
+  DESCRIPTION  "Install compiler-provided system runtime libraries, and Windows Universal CRT libraries for app-local deployment"
+  REQUIRED
+  HIDDEN
+)
 
 # Regular stuff, like chmod +x
 cpack_ifw_configure_component(Unspecified
@@ -633,7 +613,7 @@ cpack_ifw_configure_component(Unspecified
 )
 
 cpack_ifw_configure_component(Symlinks
-    SCRIPT cmake/qtifw/install_mac_createsymlinks.qs
+    SCRIPT cmake/qtifw/install_unix_createsymlinks.qs
     REQUIRES_ADMIN_RIGHTS
 )
 

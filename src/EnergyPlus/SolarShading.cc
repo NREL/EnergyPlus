@@ -220,6 +220,7 @@ namespace SolarShading {
         bool MustAllocSolarShading(true);
         bool GetInputFlag(true);
         bool firstTime(true);
+        std::vector<unsigned> penumbraIDs;
     } // namespace
 
     std::ofstream shd_stream; // Shading file stream
@@ -261,6 +262,12 @@ namespace SolarShading {
     Array1D<Real64> XTEMP1; // Temporary 'X' values for HC vertices of the overlap
     Array1D<Real64> YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
     int maxNumberOfFigures(0);
+
+#ifdef EP_NO_OPENGL
+    bool penumbra = false;
+#else
+    std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
+#endif
 
     int const NPhi = 6;                      // Number of altitude angle steps for sky integration
     int const NTheta = 24;                   // Number of azimuth angle steps for sky integration
@@ -579,9 +586,9 @@ namespace SolarShading {
         using DataSystemVariables::DisableGroupSelfShading;
         using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DataSystemVariables::SutherlandHodgman;
+        using DataSystemVariables::ShadingMethod;
+        using DataSystemVariables::shadingMethod;
         using DataSystemVariables::SlaterBarsky;
-        using DataSystemVariables::UseImportedSunlitFrac;
-        using DataSystemVariables::UseScheduledSunlitFrac;
         using ScheduleManager::ScheduleFileShadingProcessed;
 
 
@@ -633,133 +640,169 @@ namespace SolarShading {
             MaxHCS = 15000;
         }
 
-        if (NumAlphas >= 1) {
-            if (UtilityRoutines::SameString(cAlphaArgs(1), "AverageOverDaysInFrequency")) {
-                DetailedSolarTimestepIntegration = false;
-                cAlphaArgs(1) = "AverageOverDaysInFrequency";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(1), "TimestepFrequency")) {
-                DetailedSolarTimestepIntegration = true;
-                cAlphaArgs(1) = "TimestepFrequency";
+        int aNum = 1;
+        unsigned pixelRes = 512u;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Scheduled")) {
+                shadingMethod = ShadingMethod::Scheduled;
+                cAlphaArgs(aNum) = "Scheduled";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Imported")) {
+                if (ScheduleFileShadingProcessed) {
+                    shadingMethod = ShadingMethod::Imported;
+                    cAlphaArgs(aNum) = "Imported";
+                } else {
+                    ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                    ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) +
+                                      "\" while no Schedule:File:Shading object is defined, InternalCalculation will be used.");
+                }
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "PolygonClipping")) {
+                shadingMethod = ShadingMethod::PolygonClipping;
+                cAlphaArgs(aNum) = "PolygonClipping";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "PixelCounting")) {
+                shadingMethod = ShadingMethod::PixelCounting;
+                cAlphaArgs(aNum) = "PixelCounting";
+                if (NumNumbers >= 3) {
+                    pixelRes = (unsigned)rNumericArgs(3);
+                }
+#ifdef EP_NO_OPENGL
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\"");
+                ShowContinueError("This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)");
+                ShowContinueError("PolygonClipping will be used instead");
+                shadingMethod = ShadingMethod::PolygonClipping;
+                cAlphaArgs(aNum) = "PolygonClipping";
+#else
+                auto error_callback = [](const int messageType, const std::string & message, void * /*contextPtr*/){
+                    if (messageType == Pumbra::MSG_ERR) {
+                        ShowSevereError(message);
+                    } else if (messageType == Pumbra::MSG_WARN) {
+                        ShowWarningError(message);
+                    } else /*if (messageType == MSG_INFO)*/ {
+                        ShowMessage(message);
+                    }
+                };
+                if (Pumbra::Penumbra::isValidContext()) {
+                    penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(error_callback, pixelRes));
+                } else {
+                    ShowWarningError("No GPU found (required for PixelCounting)");
+                    ShowContinueError("PolygonClipping will be used instead");
+                    shadingMethod = ShadingMethod::PolygonClipping;
+                    cAlphaArgs(aNum) = "PolygonClipping";
+                }
+#endif
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(1) + "\", AverageOverDaysInFrequency will be used.");
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", PolygonClipping will be used.");
+            }
+        } else {
+            cAlphaArgs(aNum) = "PolygonClipping";
+            shadingMethod = ShadingMethod::PolygonClipping;
+        }
+
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Periodic")) {
                 DetailedSolarTimestepIntegration = false;
-                cAlphaArgs(1) = "AverageOverDaysInFrequency";
+                cAlphaArgs(aNum) = "Periodic";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Timestep")) {
+                DetailedSolarTimestepIntegration = true;
+                cAlphaArgs(aNum) = "Timestep";
+            } else {
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", Periodic will be used.");
+                DetailedSolarTimestepIntegration = false;
+                cAlphaArgs(aNum) = "Periodic";
             }
         } else {
             DetailedSolarTimestepIntegration = false;
-            cAlphaArgs(1) = "AverageOverDaysInFrequency";
+            cAlphaArgs(aNum) = "Periodic";
         }
 
-        if (NumAlphas >= 2) {
-            if (UtilityRoutines::SameString(cAlphaArgs(2), "SutherlandHodgman")) {
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "SutherlandHodgman")) {
                 SutherlandHodgman = true;
-                cAlphaArgs(2) = "SutherlandHodgman";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "ConvexWeilerAtherton")) {
+                cAlphaArgs(aNum) = "SutherlandHodgman";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "ConvexWeilerAtherton")) {
                 SutherlandHodgman = false;
-                cAlphaArgs(2) = "ConvexWeilerAtherton";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "SlaterBarskyandSutherlandHodgman")) {
+                cAlphaArgs(aNum) = "ConvexWeilerAtherton";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "SlaterBarskyandSutherlandHodgman")) {
                 SutherlandHodgman = true;
                 SlaterBarsky = true;
-                cAlphaArgs(2) = "SlaterBarskyandSutherlandHodgman";
-            } else if (lAlphaFieldBlanks(2)) {
+                cAlphaArgs(aNum) = "SlaterBarskyandSutherlandHodgman";
+            } else if (lAlphaFieldBlanks(aNum)) {
                 if (!SutherlandHodgman) { // if already set.
-                    cAlphaArgs(2) = "ConvexWeilerAtherton";
+                    cAlphaArgs(aNum) = "ConvexWeilerAtherton";
                 } else {
                     if (!SlaterBarsky) {
-                        cAlphaArgs(2) = "SutherlandHodgman";
+                        cAlphaArgs(aNum) = "SutherlandHodgman";
                     } else {
-                        cAlphaArgs(2) = "SlaterBarskyandSutherlandHodgman";
+                        cAlphaArgs(aNum) = "SlaterBarskyandSutherlandHodgman";
                     }
                 }
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2));
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
                 if (!SutherlandHodgman) {
-                    ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", ConvexWeilerAtherton will be used.");
+                    ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", ConvexWeilerAtherton will be used.");
                 } else {
                     if (!SlaterBarsky) {
-                        ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", SutherlandHodgman will be used.");
+                        ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", SutherlandHodgman will be used.");
                     } else {
-                        ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", SlaterBarskyandSutherlandHodgman will be used.");
+                        ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", SlaterBarskyandSutherlandHodgman will be used.");
                     }
 
                 }
             }
         } else {
             if (!SutherlandHodgman) {
-                cAlphaArgs(2) = "ConvexWeilerAtherton";
+                cAlphaArgs(aNum) = "ConvexWeilerAtherton";
             } else {
                 if (!SlaterBarsky) {
-                    cAlphaArgs(2) = "SutherlandHodgman";
+                    cAlphaArgs(aNum) = "SutherlandHodgman";
                 } else {
-                    cAlphaArgs(2) = "SlaterBarskyandSutherlandHodgman";
+                    cAlphaArgs(aNum) = "SlaterBarskyandSutherlandHodgman";
                 }
             }
         }
 
-        if (NumAlphas >= 3) {
-            if (UtilityRoutines::SameString(cAlphaArgs(3), "SimpleSkyDiffuseModeling")) {
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "SimpleSkyDiffuseModeling")) {
                 DetailedSkyDiffuseAlgorithm = false;
-                cAlphaArgs(3) = "SimpleSkyDiffuseModeling";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(3), "DetailedSkyDiffuseModeling")) {
+                cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "DetailedSkyDiffuseModeling")) {
                 DetailedSkyDiffuseAlgorithm = true;
-                cAlphaArgs(3) = "DetailedSkyDiffuseModeling";
+                cAlphaArgs(aNum) = "DetailedSkyDiffuseModeling";
             } else if (lAlphaFieldBlanks(3)) {
                 DetailedSkyDiffuseAlgorithm = false;
-                cAlphaArgs(3) = "SimpleSkyDiffuseModeling";
+                cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(3) + "\", SimpleSkyDiffuseModeling will be used.");
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", SimpleSkyDiffuseModeling will be used.");
             }
         } else {
-            cAlphaArgs(3) = "SimpleSkyDiffuseModeling";
+            cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
             DetailedSkyDiffuseAlgorithm = false;
         }
 
-        if (NumAlphas >= 4) {
-            if (UtilityRoutines::SameString(cAlphaArgs(4), "ScheduledShading")) {
-                UseScheduledSunlitFrac = true;
-                cAlphaArgs(4) = "ScheduledShading";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(4), "ImportedShading")) {
-                if (ScheduleFileShadingProcessed) {
-                    UseImportedSunlitFrac = true;
-                    cAlphaArgs(4) = "ImportedShading";
-                } else {
-                    ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(4));
-                    ShowContinueError("Value entered=\"" + cAlphaArgs(4) +
-                                      "\" while no Schedule:File:Shading object is defined, InternalCalculation will be used.");
-                }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(4), "InternalCalculation")) {
-                UseScheduledSunlitFrac = false;
-                UseImportedSunlitFrac = false;
-                cAlphaArgs(4) = "InternalCalculation";
-            } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(4));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(4) + "\", InternalCalculation will be used.");
-            }
-        } else {
-            cAlphaArgs(4) = "InternalCalculation";
-            UseScheduledSunlitFrac = false;
-            UseImportedSunlitFrac = false;
-        }
-
-        if (NumAlphas >= 5) {
-            if (UtilityRoutines::SameString(cAlphaArgs(5), "Yes")) {
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Yes")) {
                 ReportExtShadingSunlitFrac = true;
-                cAlphaArgs(5) = "Yes";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(5), "No")) {
+                cAlphaArgs(aNum) = "Yes";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "No")) {
                 ReportExtShadingSunlitFrac = false;
-                cAlphaArgs(5) = "No";
+                cAlphaArgs(aNum) = "No";
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(5));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(5) + "\", InternalCalculation will be used.");
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", InternalCalculation will be used.");
             }
         } else {
-            cAlphaArgs(5) = "No";
+            cAlphaArgs(aNum) = "No";
             ReportExtShadingSunlitFrac = false;
         }
         int ExtShadingSchedNum;
-        if (UseImportedSunlitFrac) {
+        if (shadingMethod == ShadingMethod::Imported) {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(Surface(SurfNum).Name + "_shading");
                 if (ExtShadingSchedNum) {
@@ -775,32 +818,34 @@ namespace SolarShading {
         bool DisableSelfShadingWithinGroup = false;
         bool DisableSelfShadingBetweenGroup = false;
 
-        if (NumAlphas >= 6) {
-            if (UtilityRoutines::SameString(cAlphaArgs(6), "Yes")) {
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Yes")) {
                 DisableSelfShadingWithinGroup = true;
-                cAlphaArgs(6) = "Yes";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(6), "No")) {
-                cAlphaArgs(6) = "No";
+                cAlphaArgs(aNum) = "Yes";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "No")) {
+                cAlphaArgs(aNum) = "No";
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(6) + "\", all shading effects would be considered.");
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", all shading effects would be considered.");
             }
         } else {
-            cAlphaArgs(6) = "No";
+            cAlphaArgs(aNum) = "No";
         }
 
-        if (NumAlphas >= 7) {
-            if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {
+        aNum++;
+        if (NumAlphas >= aNum) {
+            if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Yes")) {
                 DisableSelfShadingBetweenGroup = true;
-                cAlphaArgs(7) = "Yes";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "No")) {
-                cAlphaArgs(7) = "No";
+                cAlphaArgs(aNum) = "Yes";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "No")) {
+                cAlphaArgs(aNum) = "No";
             } else {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7));
-                ShowContinueError("Value entered=\"" + cAlphaArgs(7) + "\", all shading effects would be considered.");
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", all shading effects would be considered.");
             }
         } else {
-            cAlphaArgs(7) = "No";
+            cAlphaArgs(aNum) = "No";
         }
 
         if (DisableSelfShadingBetweenGroup && DisableSelfShadingWithinGroup) {
@@ -809,16 +854,17 @@ namespace SolarShading {
             DisableGroupSelfShading = true;
         }
 
+        aNum++;
         int SurfZoneGroup, CurZoneGroup;
         if (DisableGroupSelfShading) {
             Array1D_int DisableSelfShadingGroups;
             int NumOfShadingGroups;
-            if (NumAlphas >= 8) {
+            if (NumAlphas >= aNum) {
                 // Read all shading groups
-                NumOfShadingGroups = NumAlphas - 7;
+                NumOfShadingGroups = NumAlphas - (aNum - 1);
                 DisableSelfShadingGroups.allocate(NumOfShadingGroups);
                 for (int i = 1; i <= NumOfShadingGroups; i++) {
-                    Found = UtilityRoutines::FindItemInList(cAlphaArgs(i + 7), ZoneList, NumOfZoneLists);
+                    Found = UtilityRoutines::FindItemInList(cAlphaArgs(i + (aNum - 1)), ZoneList, NumOfZoneLists);
                     if (Found != 0) DisableSelfShadingGroups(i) = Found;
                 }
 
@@ -885,17 +931,19 @@ namespace SolarShading {
 
         print(outputFiles.eio,
               "{}",
-              "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, "
-              "Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling "
-              "Algorithm, External Shading Calculation Method, Output External Shading Calculation Results, Disable "
+              "! <Shadowing/Sun Position Calculations Annual Simulations>, Shading Calculation Method, "
+              "Shading Calculation Update Frequency Method, Shading Calculation Update Frequency {days}, "
+              "Maximum Figures in Shadow Overlap Calculations {}, Polygon Clipping Algorithm, Pixel Counting Resolution, Sky Diffuse Modeling "
+              "Algorithm, Output External Shading Calculation Results, Disable "
               "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones\n");
         print(outputFiles.eio,
-              "Shadowing/Sun Position Calculations Annual Simulations,{},{},{},{},{},{},{},{},{}\n",
+              "Shadowing/Sun Position Calculations Annual Simulations,{},{},{},{},{},{},{},{},{},{}\n",
               cAlphaArgs(1),
+              cAlphaArgs(2),
               ShadowingCalcFrequency,
               MaxHCS,
-              cAlphaArgs(2),
               cAlphaArgs(3),
+              pixelRes,
               cAlphaArgs(4),
               cAlphaArgs(5),
               cAlphaArgs(6),
@@ -2978,9 +3026,9 @@ namespace SolarShading {
         }
     }
 
-    bool polygon_contains_point(int const nsides,           // number of sides (vertices)
-                                Array1A<Vector> polygon_3d, // points of polygon
-                                Vector const &point_3d,     // point to be tested
+    bool polygon_contains_point(int const nsides,            // number of sides (vertices)
+                                Array1D<Vector> &polygon_3d, // points of polygon
+                                Vector const &point_3d,      // point to be tested
                                 bool const ignorex,
                                 bool const ignorey,
                                 bool const ignorez)
@@ -3011,7 +3059,7 @@ namespace SolarShading {
         bool inside; // return value, true=inside, false = not inside
 
         // Argument array dimensioning
-        polygon_3d.dim(nsides);
+        EP_SIZE_CHECK(polygon_3d, nsides);
 
         // Locals
         // Function argument definitions:
@@ -3216,7 +3264,7 @@ namespace SolarShading {
         } // enclosure loop
     }
 
-    void CLIP(int const NVT, Array1<Real64> &XVT, Array1<Real64> &YVT, Array1<Real64> &ZVT)
+    void CLIP(int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3331,12 +3379,12 @@ namespace SolarShading {
         }
     }
 
-    void CTRANS(int const NS,        // Surface number whose vertex coordinates are being transformed
-                int const NGRS,      // Base surface number for surface NS
-                int &NVT,            // Number of vertices for surface NS
-                Array1<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
-                Array1<Real64> &YVT,
-                Array1<Real64> &ZVT)
+    void CTRANS(int const NS,         // Surface number whose vertex coordinates are being transformed
+                int const NGRS,       // Base surface number for surface NS
+                int &NVT,             // Number of vertices for surface NS
+                Array1D<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
+                Array1D<Real64> &YVT,
+                Array1D<Real64> &ZVT)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5027,8 +5075,8 @@ namespace SolarShading {
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
         using DataSystemVariables::ReportExtShadingSunlitFrac;
-        using DataSystemVariables::UseScheduledSunlitFrac;
-        using DataSystemVariables::UseImportedSunlitFrac;
+        using DataSystemVariables::ShadingMethod;
+        using DataSystemVariables::shadingMethod;
         using ScheduleManager::LookUpScheduleValue;
 
         // Locals
@@ -5066,7 +5114,7 @@ namespace SolarShading {
             CosIncAng(iTimeStep, iHour, SurfNum) = CTHETA(SurfNum);
         }
 
-        if ((UseScheduledSunlitFrac || UseImportedSunlitFrac) && !DoingSizing && KindOfSim == ksRunPeriodWeather){
+        if ((shadingMethod == ShadingMethod::Scheduled || shadingMethod == ShadingMethod::Imported) && !DoingSizing && KindOfSim == ksRunPeriodWeather){
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).SchedExternalShadingFrac) {
                     SunlitFrac(iTimeStep, iHour, SurfNum) = LookUpScheduleValue(Surface(SurfNum).ExternalShadingSchInd, iHour, iTimeStep);
@@ -5273,6 +5321,8 @@ namespace SolarShading {
         BKS.dimension(MaxGSS, 0);
         SBS.dimension(MaxGSS, 0);
 
+        penumbraIDs.clear();
+
         HTS = 0;
 
         // Check every surface as a possible shadow receiving surface ("RS" = receiving surface).
@@ -5289,9 +5339,109 @@ namespace SolarShading {
 
             if (!ShadowingSurf && !Surface(GRSNR).HeatTransSurf) continue;
             HTS = GRSNR;
+
+#ifndef EP_NO_OPENGL
+            if (penumbra) {
+                bool skipSurface = Surface(GRSNR).MirroredSurf;   // Penumbra doesn't need mirrored surfaces TODO: Don't bother creating them in the first place?
+
+                // Skip interior surfaces if the other side has already been added to penumbra
+                if (Surface(GRSNR).ExtBoundCond > 0) {
+                    if (Surface(Surface(GRSNR).ExtBoundCond).PenumbraID >= 0) {
+                        Surface(GRSNR).PenumbraID = Surface(Surface(GRSNR).ExtBoundCond).PenumbraID;
+                        skipSurface = true;
+                    }
+                }
+
+                if (!skipSurface) {
+                    // Add surfaces to penumbra...
+                    Pumbra::Polygon poly;
+
+                    if (Surface(GRSNR).Reveal > 0.0) {
+                        Real64 R = Surface(GRSNR).Reveal;
+                        auto& norm = Surface(GRSNR).NewellSurfaceNormalVector;
+                        auto& v = Surface(GRSNR).Vertex;
+                        for (unsigned i = 0; i < v.size(); ++i) {
+                            poly.push_back(v[i].x);
+                            poly.push_back(v[i].y);
+                            poly.push_back(v[i].z);
+
+
+                            Vector vPrev;
+                            if (i == 0) {
+                                vPrev = v[v.size() - 1];
+                            } else {
+                                vPrev = v[i - 1];
+                            }
+
+                            Pumbra::Polygon rPoly; // Reveal surface
+                            rPoly.push_back(v[i].x);
+                            rPoly.push_back(v[i].y);
+                            rPoly.push_back(v[i].z);
+
+
+                            rPoly.push_back(v[i].x + norm.x*R);
+                            rPoly.push_back(v[i].y + norm.y*R);
+                            rPoly.push_back(v[i].z + norm.z*R);
+
+                            rPoly.push_back(vPrev.x + norm.x*R);
+                            rPoly.push_back(vPrev.y + norm.y*R);
+                            rPoly.push_back(vPrev.z + norm.z*R);
+
+                            rPoly.push_back(vPrev.x);
+                            rPoly.push_back(vPrev.y);
+                            rPoly.push_back(vPrev.z);
+
+                            Pumbra::Surface rSurf(rPoly);
+                            penumbra->addSurface(rSurf);
+
+                        }
+                    } else {
+                        for (auto v : Surface(GRSNR).Vertex) {
+                            poly.push_back(v.x);
+                            poly.push_back(v.y);
+                            poly.push_back(v.z);
+                        }
+                    }
+                    Pumbra::Surface pSurf(poly);
+
+                    // Punch holes for subsurfaces
+                    if (Surface(GRSNR).BaseSurf == GRSNR) {  // Only look for subsurfaces on base surfaces
+                        for (int subSurface = 1; subSurface <= TotSurfaces; ++subSurface) {
+                            if (Surface(subSurface).BaseSurf != GRSNR) continue; // Ignore subsurfaces of other surfaces
+                            if (!Surface(subSurface).HeatTransSurf) continue;    // Skip non heat transfer subsurfaces
+                            if (subSurface == GRSNR) continue;                   // Surface itself cannot be its own subsurface
+
+                            Pumbra::Polygon subPoly;
+                            if (Surface(subSurface).Reveal > 0.0) {
+                                Real64 R = Surface(subSurface).Reveal;
+                                auto& norm = Surface(subSurface).NewellSurfaceNormalVector;
+                                for (auto v : Surface(subSurface).Vertex) {
+                                    subPoly.push_back(v.x + norm.x*R);
+                                    subPoly.push_back(v.y + norm.y*R);
+                                    subPoly.push_back(v.z + norm.z*R);
+                                }
+                            } else {
+                                for (auto v : Surface(subSurface).Vertex) {
+                                    subPoly.push_back(v.x);
+                                    subPoly.push_back(v.y);
+                                    subPoly.push_back(v.z);
+                                }
+                            }
+
+                            pSurf.addHole(subPoly);
+                        }
+                    }
+                    Surface(GRSNR).PenumbraID = penumbra->addSurface(pSurf);
+                    penumbraIDs.push_back(Surface(GRSNR).PenumbraID);
+                }
+            }
+#endif
+
             if (!ShadowingSurf && !Surface(GRSNR).ExtSolar) continue; // Skip surfaces with no external solar
 
-            if (!ShadowingSurf && Surface(GRSNR).BaseSurf != GRSNR) continue; // Skip subsurfaces (SBS)
+            if (!ShadowingSurf && Surface(GRSNR).BaseSurf != GRSNR) { // Skip subsurfaces (SBS)
+                continue;
+            }
 
             // Get the lowest point of receiving surface
             ZMIN = minval(Surface(GRSNR).Vertex, &Vector::z);
@@ -5390,7 +5540,7 @@ namespace SolarShading {
                     if (!Surface(BackSurfaceNumber).HeatTransSurf) continue;              // Skip non-heat transfer surfaces
                     if (Surface(BackSurfaceNumber).BaseSurf == GRSNR) continue;           // Skip subsurfaces of this GRSNR
                     if (BackSurfaceNumber == GRSNR) continue;                             // A back surface cannot be GRSNR itself
-                    if (Surface(BackSurfaceNumber).Zone != Surface(GRSNR).Zone) continue; // Skip if back surface not in zone
+                    if (Surface(BackSurfaceNumber).SolarEnclIndex != Surface(GRSNR).SolarEnclIndex) continue; // Skip if back surface not in same solar enclosure
 
                     if (Surface(BackSurfaceNumber).Class == SurfaceClass_IntMass) continue;
 
@@ -5523,6 +5673,12 @@ namespace SolarShading {
             ShowContinueError("...Add Output:Diagnostics,DisplayExtraWarnings; to see individual severes for each surface.");
             TotalSevereErrors += TotalCastingNonConvexSurfaces;
         }
+
+#ifndef EP_NO_OPENGL
+        if (penumbra && penumbra->getNumSurfaces() > 0) {
+            penumbra->setModel();
+        }
+#endif
     }
 
     void SHADOW(int const iHour, // Hour index
@@ -5567,7 +5723,6 @@ namespace SolarShading {
         Real64 ZS; // Intermediate result
         int N;     // Vertex number
         int NGRS;  // Coordinate transformation index
-        int NZ;    // Zone Number of surface
         int NVT;
         static Array1D<Real64> XVT; // X Vertices of Shadows
         static Array1D<Real64> YVT; // Y vertices of Shadows
@@ -5601,13 +5756,21 @@ namespace SolarShading {
 
         SAREA = 0.0;
 
+#ifndef EP_NO_OPENGL
+        if (penumbra) {
+            Real64 ElevSun = PiOvr2 - std::acos(SUNCOS(3));
+            Real64 AzimSun = std::atan2(SUNCOS(1), SUNCOS(2));
+            penumbra->setSunPosition(AzimSun, ElevSun);
+            penumbra->submitPSSA();
+        }
+#endif
+
         for (GRSNR = 1; GRSNR <= TotSurfaces; ++GRSNR) {
 
             if (!ShadowComb(GRSNR).UseThisSurf) continue;
 
             SAREA(GRSNR) = 0.0;
 
-            NZ = Surface(GRSNR).Zone;
             NGSS = ShadowComb(GRSNR).NumGenSurf;
             NGSSHC = 0;
             NBKS = ShadowComb(GRSNR).NumBackSurf;
@@ -5629,40 +5792,64 @@ namespace SolarShading {
                 SAREA(HTS) = Surface(GRSNR).NetAreaShadowCalc;
             } else { // Surface in sun and either shading surfaces or subsurfaces present (or both)
 
-                NGRS = Surface(GRSNR).BaseSurf;
-                if (Surface(GRSNR).ShadowingSurf) NGRS = GRSNR;
+#ifndef EP_NO_OPENGL
+                auto id = Surface(HTS).PenumbraID;
+                if (penumbra && id >= 0) {
+                    // SAREA(HTS) = buildingPSSF.at(id) / CTHETA(HTS);
+                    SAREA(HTS) = penumbra->fetchPSSA(id) / CTHETA(HTS);
+                    // SAREA(HTS) = penumbra->fetchPSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
+                    for (int SS = 1; SS <= NSBS; ++SS) {
+                        auto HTSS = ShadowComb(HTS).SubSurf(SS);
+                        id = Surface(HTSS).PenumbraID;
+                        if (id >= 0) {
+                            // SAREA(HTSS) = buildingPSSF.at(id) / CTHETA(HTSS);
+                            SAREA(HTSS) = penumbra->fetchPSSA(id) / CTHETA(HTSS);
+                            // SAREA(HTSS) = penumbra->fetchPSSA(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
+                            if (SAREA(HTSS) > 0.0) {
+                                if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
+                            }
+                        }
+                    }
+                } else if (!penumbra) {
+#else
+                {
+#endif
+                    NGRS = Surface(GRSNR).BaseSurf;
+                    if (Surface(GRSNR).ShadowingSurf) NGRS = GRSNR;
 
-                // Compute the X and Y displacements of a shadow.
-                XS = Surface(NGRS).lcsx.x * SUNCOS(1) + Surface(NGRS).lcsx.y * SUNCOS(2) + Surface(NGRS).lcsx.z * SUNCOS(3);
-                YS = Surface(NGRS).lcsy.x * SUNCOS(1) + Surface(NGRS).lcsy.y * SUNCOS(2) + Surface(NGRS).lcsy.z * SUNCOS(3);
-                ZS = Surface(NGRS).lcsz.x * SUNCOS(1) + Surface(NGRS).lcsz.y * SUNCOS(2) + Surface(NGRS).lcsz.z * SUNCOS(3);
+                    // Compute the X and Y displacements of a shadow.
+                    XS = Surface(NGRS).lcsx.x * SUNCOS(1) + Surface(NGRS).lcsx.y * SUNCOS(2) + Surface(NGRS).lcsx.z * SUNCOS(3);
+                    YS = Surface(NGRS).lcsy.x * SUNCOS(1) + Surface(NGRS).lcsy.y * SUNCOS(2) + Surface(NGRS).lcsy.z * SUNCOS(3);
+                    ZS = Surface(NGRS).lcsz.x * SUNCOS(1) + Surface(NGRS).lcsz.y * SUNCOS(2) + Surface(NGRS).lcsz.z * SUNCOS(3);
 
-                if (std::abs(ZS) > 1.e-4) {
-                    XShadowProjection = XS / ZS;
-                    YShadowProjection = YS / ZS;
-                    if (std::abs(XShadowProjection) < 1.e-8) XShadowProjection = 0.0;
-                    if (std::abs(YShadowProjection) < 1.e-8) YShadowProjection = 0.0;
-                } else {
-                    XShadowProjection = 0.0;
-                    YShadowProjection = 0.0;
-                }
+                    if (std::abs(ZS) > 1.e-4) {
+                        XShadowProjection = XS / ZS;
+                        YShadowProjection = YS / ZS;
+                        if (std::abs(XShadowProjection) < 1.e-8) XShadowProjection = 0.0;
+                        if (std::abs(YShadowProjection) < 1.e-8) YShadowProjection = 0.0;
+                    } else {
+                        XShadowProjection = 0.0;
+                        YShadowProjection = 0.0;
+                    }
 
-                CTRANS(GRSNR, NGRS, NVT, XVT, YVT, ZVT); // Transform coordinates of the receiving surface to 2-D form
+                    CTRANS(GRSNR, NGRS, NVT, XVT, YVT, ZVT); // Transform coordinates of the receiving surface to 2-D form
 
-                // Re-order its vertices to clockwise sequential.
-                for (N = 1; N <= NVT; ++N) {
-                    XVS(N) = XVT(NVT + 1 - N);
-                    YVS(N) = YVT(NVT + 1 - N);
-                }
+                    // Re-order its vertices to clockwise sequential.
+                    for (N = 1; N <= NVT; ++N) {
+                        XVS(N) = XVT(NVT + 1 - N);
+                        YVS(N) = YVT(NVT + 1 - N);
+                    }
 
-                HTRANS1(1, NVT); // Transform to homogeneous coordinates.
+                    HTRANS1(1, NVT); // Transform to homogeneous coordinates.
 
-                HCAREA(1) = -HCAREA(1); // Compute (+) gross surface area.
-                HCT(1) = 1.0;
+                    HCAREA(1) = -HCAREA(1); // Compute (+) gross surface area.
+                    HCT(1) = 1.0;
 
-                SHDGSS(NGRS, iHour, TS, GRSNR, NGSS, HTS); // Determine shadowing on surface.
-                if (!CalcSkyDifShading) {
-                    SHDBKS(NGRS, GRSNR, NBKS, HTS); // Determine possible back surfaces.
+                    SHDGSS(NGRS, iHour, TS, GRSNR, NGSS, HTS); // Determine shadowing on surface.
+
+                    if (!CalcSkyDifShading) {
+                        SHDBKS(Surface(GRSNR).BaseSurf, GRSNR, NBKS, HTS); // Determine possible back surfaces.
+                    }
                 }
 
                 SHDSBS(iHour, GRSNR, NBKS, NSBS, HTS, TS); // Subtract subsurf areas from total
@@ -5672,7 +5859,6 @@ namespace SolarShading {
                 SAREA(HTS) = max(0.0, SAREA(HTS));
 
                 SAREA(HTS) = min(SAREA(HTS), SurfArea);
-
             } // ...end of surface in sun/surface with shaders and/or subsurfaces IF-THEN block
 
             // NOTE:
@@ -6188,57 +6374,89 @@ namespace SolarShading {
 
             if (!UseSimpleDistribution) { // Compute overlaps
 
-                FINSHC = FSBSHC + NSBSHC;
+                std::map<unsigned, float> pssas;
 
-                JBKS = 0;
-                JBKSbase = 0;
-
-                for (int IBKS = 1; IBKS <= NBKSHC; ++IBKS) { // Loop over back surfaces to GRSNR this hour. NBKSHC is the number of
-                    // back surfaces that would receive beam radiation from the base surface, GRSNR,
-                    // if the base surface was transparent. In general, some (at least one) or all of these
-                    // will receive beam radiation from the exterior window subsurface, HTSS, of GRSNR,
-                    // depending on the size of HTSS and its location on GRSNR
-
-                    BackSurfNum = HCNS(FBKSHC - 1 + IBKS);
-
-                    // Determine if this back surface number can receive beam radiation from the
-                    // exterior window, HTSS, this hour, i.e., overlap area is positive
-
-                    LOCHCA = FINSHC - 1;
-
-                    MULTOL(FBKSHC - 1 + IBKS, FSBSHC - 1, NSBSHC);
-
-                    // Compute overlap area for this back surface
-
-                    NINSHC = LOCHCA - FINSHC + 1;
-                    if (NINSHC <= 0) continue;
-                    OverlapArea = HCAREA(FINSHC);
-                    for (int J = 2; J <= NINSHC; ++J) {
-                        OverlapArea += HCAREA(FINSHC - 1 + J) * (1.0 - HCT(FINSHC - 1 + J));
+#ifndef EP_NO_OPENGL
+                if (penumbra) {
+                    // Add back surfaces to array
+                    std::vector<unsigned> pbBackSurfaces;
+                    for (auto bkSurfNum : ShadowComb(GRSNR).BackSurf) {
+                        if (bkSurfNum == 0) continue;
+                        if (CTHETA(bkSurfNum) < SunIsUpValue) {
+                            pbBackSurfaces.push_back(Surface(bkSurfNum).PenumbraID);
+                        }
                     }
+                    pssas = penumbra->calculateInteriorPSSAs({(unsigned)Surface(HTSS).PenumbraID}, pbBackSurfaces);
+                    //penumbra->renderInteriorScene({(unsigned)Surface(HTSS).PenumbraID}, pbBackSurfaces);
 
-                    if (OverlapArea > 0.001) {
-                        ++JBKS;
-                        if (Surface(BackSurfNum).BaseSurf == BackSurfNum) JBKSbase = JBKS;
-                        if (JBKS <= MaxBkSurf) {
-                            BackSurfaces(TS, iHour, JBKS, HTSS) = BackSurfNum;
-                            // Remove following IF check: multiplying by sunlit fraction in the following is incorrect
-                            // (FCW, 6/28/02)
-                            // IF (WindowRevealStatus(HTSS,IHOUR,TS) == WindowShadedOnlyByReveal) THEN
-                            //  OverlapArea = OverlapArea*(SAREA(HTSS)/Surface(HTSS)%Area)
-                            // ENDIF
+                    JBKS = 0;
+                    for (auto bkSurfNum : ShadowComb(GRSNR).BackSurf) {
+                        if (bkSurfNum == 0) continue;
+                        if (pssas[Surface(bkSurfNum).PenumbraID] > 0) {
+                            ++JBKS;
+                            BackSurfaces(TS, iHour, JBKS, HTSS) = bkSurfNum;
+                            OverlapArea = pssas[Surface(bkSurfNum).PenumbraID]/CTHETA(HTSS);
                             OverlapAreas(TS, iHour, JBKS, HTSS) = OverlapArea * SurfaceWindow(HTSS).GlazedFrac;
-                            // If this is a subsurface, subtract its overlap area from the base surface
-                            if (Surface(BackSurfNum).BaseSurf != BackSurfNum && JBKSbase != 0) {
-                                OverlapAreas(TS, iHour, JBKSbase, HTSS) =
-                                    max(0.0, OverlapAreas(TS, iHour, JBKSbase, HTSS) - OverlapAreas(TS, iHour, JBKS, HTSS));
-                            }
                         }
                     }
 
-                } // End of loop over back surfaces
-            }
+                }
+#endif
 
+                if (!penumbra) {
+
+                    FINSHC = FSBSHC + NSBSHC;
+
+                    JBKS = 0;
+                    JBKSbase = 0;
+
+                    for (int IBKS = 1; IBKS <= NBKSHC; ++IBKS) { // Loop over back surfaces to GRSNR this hour. NBKSHC is the number of
+                        // back surfaces that would receive beam radiation from the base surface, GRSNR,
+                        // if the base surface was transparent. In general, some (at least one) or all of these
+                        // will receive beam radiation from the exterior window subsurface, HTSS, of GRSNR,
+                        // depending on the size of HTSS and its location on GRSNR
+
+                        BackSurfNum = HCNS(FBKSHC - 1 + IBKS);
+
+                        // Determine if this back surface number can receive beam radiation from the
+                        // exterior window, HTSS, this hour, i.e., overlap area is positive
+
+                        LOCHCA = FINSHC - 1;
+
+                        MULTOL(FBKSHC - 1 + IBKS, FSBSHC - 1, NSBSHC);
+
+                        // Compute overlap area for this back surface
+
+                        NINSHC = LOCHCA - FINSHC + 1;
+                        if (NINSHC <= 0) continue;
+                        OverlapArea = HCAREA(FINSHC);
+                        for (int J = 2; J <= NINSHC; ++J) {
+                            OverlapArea += HCAREA(FINSHC - 1 + J) * (1.0 - HCT(FINSHC - 1 + J));
+                        }
+
+                        if (OverlapArea > 0.001) {
+                            ++JBKS;
+                            if (Surface(BackSurfNum).BaseSurf == BackSurfNum) JBKSbase = JBKS;
+                            if (JBKS <= MaxBkSurf) {
+                                BackSurfaces(TS, iHour, JBKS, HTSS) = BackSurfNum;
+                                // Remove following IF check: multiplying by sunlit fraction in the following is incorrect
+                                // (FCW, 6/28/02)
+                                // IF (WindowRevealStatus(HTSS,IHOUR,TS) == WindowShadedOnlyByReveal) THEN
+                                //  OverlapArea = OverlapArea*(SAREA(HTSS)/Surface(HTSS)%Area)
+                                // ENDIF
+                                OverlapAreas(TS, iHour, JBKS, HTSS) = OverlapArea * SurfaceWindow(HTSS).GlazedFrac;
+                                // If this is a subsurface, subtract its overlap area from the base surface
+                                if (Surface(BackSurfNum).BaseSurf != BackSurfNum && JBKSbase != 0) {
+                                    OverlapAreas(TS, iHour, JBKSbase, HTSS) =
+                                        max(0.0, OverlapAreas(TS, iHour, JBKSbase, HTSS) - OverlapAreas(TS, iHour, JBKS, HTSS));
+                                }
+
+                            }
+                        }
+
+                    } // End of loop over back surfaces
+                }
+            }
         } // End of check that sunlit area > 0.
     }
 
@@ -6273,7 +6491,6 @@ namespace SolarShading {
 
         using General::BlindBeamBeamTrans;
         using General::InterpBlind;
-        using General::InterpProfAng;
         using General::InterpProfSlatAng;
         using General::InterpSlatAng;
         using General::InterpSw;
@@ -7768,6 +7985,8 @@ namespace SolarShading {
 
                                     if (Construct(ConstrNumBack).TypeIsAirBoundaryInteriorWindow) {
                                         TransBeamWin = 1.0;
+                                        AbsBeamWinEQL = 0.0;
+                                        AbsBeamTotWin = 0.0;
                                     } else if (ShadeFlagBack <= 0) {
                                         for (Lay = 1; Lay <= NBackGlass; ++Lay) {
                                             AbsBeamWin(Lay) = POLYF(CosIncBack, Construct(ConstrNumBack).AbsBeamBackCoef({1, 6}, Lay));
@@ -8300,66 +8519,59 @@ namespace SolarShading {
                                     // Equivalent Layer window model has no distinction when treating windows with and
                                     // without shades (interior, inbetween and exterior shades)
 
-                                    if (Construct(ConstrNumBack).TypeIsAirBoundaryInteriorWindow) {
-                                        TransBeamWin = 1.0;
-                                        AbsBeamWinEQL = 0.0;
-                                        AbsBeamTotWin = 0.0;
+                                    CosIncBack = std::abs(CosIncAng(TimeStep, HourOfDay, BackSurfNum));
+                                    //  Note in equivalent layer window model if storm window exists it is defined as part of
+                                    //  window construction, hence it does not require a separate treatment
+                                    AbsBeamWinEQL = 0.0;
+                                    TransBeamWin = 0.0;
+
+                                    // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
+                                    // or interior window (treates windows with/without shades as defined) for this timestep
+
+                                    // call the ASHWAT fenestration model for beam radiation here
+                                    CalcEQLOpticalProperty(BackSurfNum, isBEAM, AbsSolBeamBackEQL);
+
+                                    EQLNum = Construct(ConstrNumBack).EQLConsPtr;
+                                    AbsBeamWinEQL({ 1, CFS(EQLNum).NL }) = AbsSolBeamBackEQL(1, { 1, CFS(EQLNum).NL });
+                                    // get the interior beam transmitted through back exterior or interior EQL window
+                                    TransBeamWin = AbsSolBeamBackEQL(1, CFS(EQLNum).NL + 1);
+                                    //   Absorbed by the interior shade layer of back exterior window
+                                    if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
+                                        IntBeamAbsByShadFac(BackSurfNum) = BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL) /
+                                            (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
+                                        BABSZone += BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL);
                                     }
-                                    else {
+                                    //   Absorbed by the exterior shade layer of back exterior window
+                                    if (CFS(EQLNum).L(1).LTYPE != ltyGLAZE) {
+                                        IntBeamAbsByShadFac(BackSurfNum) =
+                                            BOverlap * AbsSolBeamBackEQL(1, 1) / (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
+                                        BABSZone += BOverlap * AbsSolBeamBackEQL(1, 1);
+                                    }
 
-                                        CosIncBack = std::abs(CosIncAng(TimeStep, HourOfDay, BackSurfNum));
-                                        //  Note in equivalent layer window model if storm window exists it is defined as part of
-                                        //  window construction, hence it does not require a separate treatment
-                                        AbsBeamWinEQL = 0.0;
-                                        TransBeamWin = 0.0;
-
-                                        // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
-                                        // or interior window (treates windows with/without shades as defined) for this timestep
-
-                                        // call the ASHWAT fenestration model for beam radiation here
-                                        CalcEQLOpticalProperty(BackSurfNum, isBEAM, AbsSolBeamBackEQL);
-
-                                        EQLNum = Construct(ConstrNumBack).EQLConsPtr;
-                                        AbsBeamWinEQL({ 1, CFS(EQLNum).NL }) = AbsSolBeamBackEQL(1, { 1, CFS(EQLNum).NL });
-                                        // get the interior beam transmitted through back exterior or interior EQL window
-                                        TransBeamWin = AbsSolBeamBackEQL(1, CFS(EQLNum).NL + 1);
-                                        //   Absorbed by the interior shade layer of back exterior window
-                                        if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
-                                            IntBeamAbsByShadFac(BackSurfNum) = BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL) /
-                                                (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
-                                            BABSZone += BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL);
-                                        }
-                                        //   Absorbed by the exterior shade layer of back exterior window
-                                        if (CFS(EQLNum).L(1).LTYPE != ltyGLAZE) {
-                                            IntBeamAbsByShadFac(BackSurfNum) =
-                                                BOverlap * AbsSolBeamBackEQL(1, 1) / (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
-                                            BABSZone += BOverlap * AbsSolBeamBackEQL(1, 1);
-                                        }
-
-                                        // determine the number of glass layers
-                                        NBackGlass = 0;
-                                        for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
-                                            if (CFS(EQLNum).L(Lay).LTYPE != ltyGLAZE) continue;
-                                            ++NBackGlass;
-                                        }
-                                        if (NBackGlass >= 2) {
-                                            // If the number of glass is greater than 2, in between glass shade can be present
-                                            for (Lay = 2; Lay <= CFS(EQLNum).NL - 1; ++Lay) {
-                                                if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
-                                                    // if there is in between shade glass determine the shade absorptance
-                                                    IntBeamAbsByShadFac(BackSurfNum) += BOverlap * AbsSolBeamBackEQL(1, Lay) / Surface(BackSurfNum).Area;
-                                                    BABSZone += BOverlap * AbsSolBeamBackEQL(1, Lay);
-                                                }
+                                    // determine the number of glass layers
+                                    NBackGlass = 0;
+                                    for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
+                                        if (CFS(EQLNum).L(Lay).LTYPE != ltyGLAZE) continue;
+                                        ++NBackGlass;
+                                    }
+                                    if (NBackGlass >= 2) {
+                                        // If the number of glass is greater than 2, in between glass shade can be present
+                                        for (Lay = 2; Lay <= CFS(EQLNum).NL - 1; ++Lay) {
+                                            if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
+                                                // if there is in between shade glass determine the shade absorptance
+                                                IntBeamAbsByShadFac(BackSurfNum) += BOverlap * AbsSolBeamBackEQL(1, Lay) / Surface(BackSurfNum).Area;
+                                                BABSZone += BOverlap * AbsSolBeamBackEQL(1, Lay);
                                             }
                                         }
-                                        // Sum of interior beam absorbed by all glass layers of back window
-                                        AbsBeamTotWin = 0.0;
-                                        for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
-                                            AbsBeamTotWin += AbsBeamWinEQL(Lay);
-                                            AWinSurf(Lay, BackSurfNum) += BOverlap * AbsBeamWinEQL(Lay) /
-                                                (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea); //[-]
-                                        }
                                     }
+                                    // Sum of interior beam absorbed by all glass layers of back window
+                                    AbsBeamTotWin = 0.0;
+                                    for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
+                                        AbsBeamTotWin += AbsBeamWinEQL(Lay);
+                                        AWinSurf(Lay, BackSurfNum) += BOverlap * AbsBeamWinEQL(Lay) /
+                                            (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea); //[-]
+                                    }
+
                                     // To BABSZon, add interior beam glass absorption and overall beam transmission for this back window
 
                                     BABSZone += BOverlap * (AbsBeamTotWin + TransBeamWin);
@@ -8397,6 +8609,10 @@ namespace SolarShading {
                                 // Opaque surface
 
                                 AISurf(FloorNum) += BTOTWinZone * ISABSF(FloorNum) / Surface(FloorNum).Area; //[-]
+                            } else if (Construct(FlConstrNum).TypeIsAirBoundaryInteriorWindow) {
+                                    TransBeamWin = 1.0;
+                                    AbsBeamWinEQL = 0.0;
+                                    AbsBeamTotWin = 0.0;
                             } else {
                                 // Window
 
@@ -9380,70 +9596,72 @@ namespace SolarShading {
 
                 K = Surface(SBSNR).Construction;
 
-                if ((OverlapStatus != TooManyVertices) && (OverlapStatus != TooManyFigures) && (SAREA(HTS) > 0.0)) {
+                if (!penumbra) {
+                    if ((OverlapStatus != TooManyVertices) && (OverlapStatus != TooManyFigures) && (SAREA(HTS) > 0.0)) {
 
-                    // Re-order vertices to clockwise sequential; compute homogeneous coordinates.
-                    NVS = Surface(SBSNR).Sides;
-                    for (N = 1; N <= NVS; ++N) {
-                        XVS(N) = ShadeV(SBSNR).XV(NVS + 1 - N);
-                        YVS(N) = ShadeV(SBSNR).YV(NVS + 1 - N);
+                        // Re-order vertices to clockwise sequential; compute homogeneous coordinates.
+                        NVS = Surface(SBSNR).Sides;
+                        for (N = 1; N <= NVS; ++N) {
+                            XVS(N) = ShadeV(SBSNR).XV(NVS + 1 - N);
+                            YVS(N) = ShadeV(SBSNR).YV(NVS + 1 - N);
+                        }
+                        LOCHCA = FSBSHC;
+                        HTRANS1(LOCHCA, NVS);
+                        HCAREA(LOCHCA) = -HCAREA(LOCHCA);
+                        HCT(LOCHCA) = 1.0;
+                        NSBSHC = LOCHCA - FSBSHC + 1;
+
+                        // Determine sunlit area of subsurface due to shadows on general receiving surface.
+                        if (NGSSHC > 0) {
+                            MULTOL(LOCHCA, FGSSHC - 1, NGSSHC);
+                            if ((OverlapStatus != TooManyVertices) && (OverlapStatus != TooManyFigures)) NSBSHC = LOCHCA - FSBSHC + 1;
+                        }
                     }
-                    LOCHCA = FSBSHC;
-                    HTRANS1(LOCHCA, NVS);
-                    HCAREA(LOCHCA) = -HCAREA(LOCHCA);
-                    HCT(LOCHCA) = 1.0;
-                    NSBSHC = LOCHCA - FSBSHC + 1;
 
-                    // Determine sunlit area of subsurface due to shadows on general receiving surface.
-                    if (NGSSHC > 0) {
-                        MULTOL(LOCHCA, FGSSHC - 1, NGSSHC);
-                        if ((OverlapStatus != TooManyVertices) && (OverlapStatus != TooManyFigures)) NSBSHC = LOCHCA - FSBSHC + 1;
-                    }
-                }
+                    if ((OverlapStatus == TooManyVertices) || (OverlapStatus == TooManyFigures) ||
+                        (SAREA(HTS) <= 0.0)) { // General receiving surface totally shaded.
 
-                if ((OverlapStatus == TooManyVertices) || (OverlapStatus == TooManyFigures) ||
-                    (SAREA(HTS) <= 0.0)) { // General receiving surface totally shaded.
+                        SAREA(HTSS) = 0.0;
 
-                    SAREA(HTSS) = 0.0;
+                        if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = 0.0;
 
-                    if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = 0.0;
+                    } else if ((NGSSHC <= 0) || (NSBSHC == 1)) { // No shadows.
 
-                } else if ((NGSSHC <= 0) || (NSBSHC == 1)) { // No shadows.
-
-                    SAREA(HTSS) = HCAREA(FSBSHC);
-                    SAREA(HTS) -= SAREA(HTSS); // Revise sunlit area of general receiving surface.
-
-                    // TH. This is a bug.  SunLitFracWithoutReveal should be a ratio of area
-                    // IF(IHour > 0 .AND. TS > 0) SunLitFracWithoutReveal(HTSS,IHour,TS) = &
-                    //      Surface(HTSS)%NetAreaShadowCalc
-
-                    // new code fixed part of CR 7596. TH 5/29/2009
-                    if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).NetAreaShadowCalc;
-
-                    SHDRVL(HTSS, SBSNR, iHour, TS); // Determine shadowing from reveal.
-
-                    if ((OverlapStatus == TooManyVertices) || (OverlapStatus == TooManyFigures)) SAREA(HTSS) = 0.0;
-
-                } else { // Compute area.
-
-                    A = HCAREA(FSBSHC);
-                    for (J = 2; J <= NSBSHC; ++J) {
-                        A += HCAREA(FSBSHC - 1 + J) * (1.0 - HCT(FSBSHC - 1 + J));
-                    }
-                    SAREA(HTSS) = A;
-                    if (SAREA(HTSS) > 0.0) {
-
+                        SAREA(HTSS) = HCAREA(FSBSHC);
                         SAREA(HTS) -= SAREA(HTSS); // Revise sunlit area of general receiving surface.
 
-                        if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
+                        // TH. This is a bug.  SunLitFracWithoutReveal should be a ratio of area
+                        // IF(IHour > 0 .AND. TS > 0) SunLitFracWithoutReveal(HTSS,IHour,TS) = &
+                        //      Surface(HTSS)%NetAreaShadowCalc
+
+                        // new code fixed part of CR 7596. TH 5/29/2009
+                        if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).NetAreaShadowCalc;
 
                         SHDRVL(HTSS, SBSNR, iHour, TS); // Determine shadowing from reveal.
 
                         if ((OverlapStatus == TooManyVertices) || (OverlapStatus == TooManyFigures)) SAREA(HTSS) = 0.0;
 
-                    } else { // General receiving surface totally shaded.
+                    } else { // Compute area.
 
-                        SAREA(HTSS) = 0.0;
+                        A = HCAREA(FSBSHC);
+                        for (J = 2; J <= NSBSHC; ++J) {
+                            A += HCAREA(FSBSHC - 1 + J) * (1.0 - HCT(FSBSHC - 1 + J));
+                        }
+                        SAREA(HTSS) = A;
+                        if (SAREA(HTSS) > 0.0) {
+
+                            SAREA(HTS) -= SAREA(HTSS); // Revise sunlit area of general receiving surface.
+
+                            if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
+
+                            SHDRVL(HTSS, SBSNR, iHour, TS); // Determine shadowing from reveal.
+
+                            if ((OverlapStatus == TooManyVertices) || (OverlapStatus == TooManyFigures)) SAREA(HTSS) = 0.0;
+
+                        } else { // General receiving surface totally shaded.
+
+                            SAREA(HTSS) = 0.0;
+                        }
                     }
                 }
 

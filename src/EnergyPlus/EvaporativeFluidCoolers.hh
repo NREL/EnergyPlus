@@ -270,7 +270,7 @@ namespace EvaporativeFluidCoolers {
 
         void CalcTwoSpeedEvapFluidCooler();
 
-        Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA, Array1<Real64> const &Par);
+        Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA, Array1D<Real64> const &Par);
 
         void SimSimpleEvapFluidCooler(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
     };

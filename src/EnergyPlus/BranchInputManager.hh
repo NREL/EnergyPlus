@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -210,23 +209,23 @@ namespace BranchInputManager {
     void GetBranchList(std::string const &LoopName,       // Name of Loop Branch List is on
                        std::string const &BranchListName, // Branch List Name from Input
                        int &NumBranchNames,               // Number of Branches for this Branch List
-                       Array1S_string BranchNames,        // Names of Branches on this Branch List
+                       Array1D_string &BranchNames,       // Names of Branches on this Branch List
                        std::string const &LoopType        // Type of Loop Branch list is on
     );
 
     int NumBranchesInBranchList(std::string const &BranchListName);
 
-    void GetBranchData(std::string const &LoopName,        // Loop Name of this Branch
-                       std::string const &BranchName,      // Requested Branch Name
-                       int &PressCurveType,                // Index of a pressure curve object
-                       int &PressCurveIndex,               // Index of a pressure curve object
-                       int &NumComps,                      // Number of Components on Branch
-                       Array1S_string CompType,            // Component Type for each item on Branch
-                       Array1S_string CompName,            // Component Name for each item on Branch
-                       Array1S_string CompInletNodeNames,  // Component Inlet Node IDs for each item on Branch
-                       Array1S_int CompInletNodeNums,      // Component Inlet Node Numbers for each item on Branch
-                       Array1S_string CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
-                       Array1S_int CompOutletNodeNums,     // Component Outlet Node Numbers for each item on Branch
+    void GetBranchData(std::string const &LoopName,         // Loop Name of this Branch
+                       std::string const &BranchName,       // Requested Branch Name
+                       int &PressCurveType,                 // Index of a pressure curve object
+                       int &PressCurveIndex,                // Index of a pressure curve object
+                       int &NumComps,                       // Number of Components on Branch
+                       Array1D_string &CompType,            // Component Type for each item on Branch
+                       Array1D_string &CompName,            // Component Name for each item on Branch
+                       Array1D_string &CompInletNodeNames,  // Component Inlet Node IDs for each item on Branch
+                       Array1D_int &CompInletNodeNums,      // Component Inlet Node Numbers for each item on Branch
+                       Array1D_string &CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
+                       Array1D_int &CompOutletNodeNums,     // Component Outlet Node Numbers for each item on Branch
                        bool &ErrorsFound);
 
     int NumCompsInBranch(std::string const &BranchName);
@@ -238,13 +237,13 @@ namespace BranchInputManager {
                               bool &ErrFound               // Set to true if error found, false otherwise
     );
 
-    void GetInternalBranchData(std::string const &LoopName,        // Loop Name for Branch
-                               std::string const &BranchName,      // Requested Branch Name
-                               int &PressCurveType,                // Index of pressure curve object
-                               int &PressCurveIndex,               // Index of pressure curve object
-                               int &NumComps,                      // Number of Components on Branch
-                               Array1S<ComponentData> BComponents, // Component data returned
-                               bool &ErrorsFound                   // True when Loop Name is already assigned and this not same loop
+    void GetInternalBranchData(std::string const &LoopName,         // Loop Name for Branch
+                               std::string const &BranchName,       // Requested Branch Name
+                               int &PressCurveType,                 // Index of pressure curve object
+                               int &PressCurveIndex,                // Index of pressure curve object
+                               int &NumComps,                       // Number of Components on Branch
+                               Array1D<ComponentData> &BComponents, // Component data returned
+                               bool &ErrorsFound                    // True when Loop Name is already assigned and this not same loop
     );
 
     void GetNumSplitterMixerInConntrList(std::string const &LoopName,          // Loop Name for this Splitter (used in error message)
@@ -266,8 +265,8 @@ namespace BranchInputManager {
                       std::string &OutletNodeName,          // Outlet Node ID
                       int &OutletNodeNum,                   // Outlet Node Number
                       int &NumInletNodes,                   // Number of Inlet Nodes
-                      Array1S_string InletNodeNames,        // Inlet Node IDs
-                      Array1S_int InletNodeNums,            // Inlet Node Numbers
+                      Array1D_string &InletNodeNames,        // Inlet Node IDs
+                      Array1D_int &InletNodeNums,            // Inlet Node Numbers
                       bool &ErrorsFound,
                       Optional_int_const ConnectorNumber = _, // number of the current item in connector list
                       Optional_int MixerNumber = _            // Mixer number for this specific splitter
@@ -280,8 +279,8 @@ namespace BranchInputManager {
                          std::string &InletNodeName,           // Inlet Node ID
                          int &InletNodeNum,                    // Inlet Node Number
                          int &NumOutletNodes,                  // Number of Outlet Nodes
-                         Array1S_string OutletNodeNames,       // Outlet Node IDs
-                         Array1S_int OutletNodeNums,           // Outlet Node Numbers
+                         Array1D_string &OutletNodeNames,       // Outlet Node IDs
+                         Array1D_int &OutletNodeNums,           // Outlet Node Numbers
                          bool &ErrorsFound,
                          Optional_int_const ConnectorNumber = _, // number of the current item in connector list
                          Optional_int SplitterNumber = _         // splitter number for this specific splitter

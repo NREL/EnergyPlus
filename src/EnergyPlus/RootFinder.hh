@@ -49,7 +49,6 @@
 #define RootFinder_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -156,8 +155,8 @@ namespace RootFinder {
                           Real64 const Y                      // Y value for current iterate, F(X)=Y
     );
 
-    void SortHistory(int const N,               // Number of points to sort in history array
-                     Array1S<PointType> History // Array of PointType variables. At least N of them
+    void SortHistory(int const N,                // Number of points to sort in history array
+                     Array1D<PointType> &History // Array of PointType variables. At least N of them
     );
 
     void AdvanceRootFinder(RootFinderDataType &RootFinderData); // Data used by root finding algorithm

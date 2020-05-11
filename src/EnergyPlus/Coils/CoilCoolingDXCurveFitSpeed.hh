@@ -120,6 +120,7 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 parentModeRatedGrossTotalCap = 0.0;
     Real64 parentModeRatedEvapAirFlowRate = 0.0;
     Real64 parentModeRatedCondAirFlowRate = 0.0;
+    int parentOperatingMode = 0;
 
     // speed class objects
     Real64 ambPressure = 0.0; // outdoor pressure {Pa]

@@ -3391,8 +3391,8 @@ namespace DesiccantDehumidifiers {
         if (present(RegenCoilLoadmet)) RegenCoilLoadmet = RegenCoilActual;
     }
 
-    Real64 HotWaterCoilResidual(Real64 const HWFlow,      // hot water flow rate in kg/s
-                                Array1<Real64> const &Par // Par(5) is the requested coil load
+    Real64 HotWaterCoilResidual(Real64 const HWFlow,       // hot water flow rate in kg/s
+                                Array1D<Real64> const &Par // Par(5) is the requested coil load
     )
     {
 

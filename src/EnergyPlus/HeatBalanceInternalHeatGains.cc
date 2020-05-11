@@ -56,20 +56,18 @@
 
 namespace EnergyPlus {
 
-// outside of Module
-
 void SetupZoneInternalGain(int const ZoneNum,
                            std::string const &cComponentObject, // object class name for device contributing internal gain
                            std::string const &cComponentName,   // user unique name for device
                            int const IntGainComp_TypeOfNum,
-                           Optional<Real64> ConvectionGainRate, // pointer target for remote convection gain value to be accessed
-                           Optional<Real64> ReturnAirConvectionGainRate,
-                           Optional<Real64> ThermalRadiationGainRate, // pointer target for remote IR radiation gain value to be accessed
-                           Optional<Real64> LatentGainRate,
-                           Optional<Real64> ReturnAirLatentGainRate,
-                           Optional<Real64> CarbonDioxideGainRate,
-                           Optional<Real64> GenericContamGainRate,
-                           Optional<int> RetNodeNum // for return air heat gains
+                           Real64 *ConvectionGainRate, // pointer target for remote convection gain value to be accessed
+                           Real64 *ReturnAirConvectionGainRate,
+                           Real64 *ThermalRadiationGainRate, // pointer target for remote IR radiation gain value to be accessed
+                           Real64 *LatentGainRate,
+                           Real64 *ReturnAirLatentGainRate,
+                           Real64 *CarbonDioxideGainRate,
+                           Real64 *GenericContamGainRate,
+                           int RetNodeNum // for return air heat gains
 )
 {
 
@@ -150,51 +148,42 @@ void SetupZoneInternalGain(int const ZoneNum,
     ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).CompTypeOfNum = IntGainComp_TypeOfNum;
 
     // note pointer assignments in code below!
-    if (present(ConvectionGainRate)) {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrConvectGainRate >>= ConvectionGainRate;
+    if (ConvectionGainRate) {
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrConvectGainRate = ConvectionGainRate;
     } else {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrConvectGainRate >>= ZeroPointerVal;
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrConvectGainRate = &DataHeatBalance::zeroPointerVal;
     }
-
-    if (present(ReturnAirConvectionGainRate)) {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirConvGainRate >>= ReturnAirConvectionGainRate;
+    if (ReturnAirConvectionGainRate) {
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirConvGainRate = ReturnAirConvectionGainRate;
     } else {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirConvGainRate >>= ZeroPointerVal;
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirConvGainRate = &DataHeatBalance::zeroPointerVal;
     }
-
-    if (present(ThermalRadiationGainRate)) {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrRadiantGainRate >>= ThermalRadiationGainRate;
+    if (ThermalRadiationGainRate) {
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrRadiantGainRate = ThermalRadiationGainRate;
     } else {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrRadiantGainRate >>= ZeroPointerVal;
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrRadiantGainRate = &DataHeatBalance::zeroPointerVal;
     }
-
-    if (present(LatentGainRate)) {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrLatentGainRate >>= LatentGainRate;
+    if (LatentGainRate) {
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrLatentGainRate = LatentGainRate;
     } else {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrLatentGainRate >>= ZeroPointerVal;
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrLatentGainRate = &DataHeatBalance::zeroPointerVal;
     }
-
-    if (present(ReturnAirLatentGainRate)) {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirLatentGainRate >>= ReturnAirLatentGainRate;
+    if (ReturnAirLatentGainRate) {
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirLatentGainRate = ReturnAirLatentGainRate;
     } else {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirLatentGainRate >>= ZeroPointerVal;
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirLatentGainRate = &DataHeatBalance::zeroPointerVal;
     }
-
-    if (present(CarbonDioxideGainRate)) {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrCarbonDioxideGainRate >>= CarbonDioxideGainRate;
+    if (CarbonDioxideGainRate) {
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrCarbonDioxideGainRate = CarbonDioxideGainRate;
     } else {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrCarbonDioxideGainRate >>= ZeroPointerVal;
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrCarbonDioxideGainRate = &DataHeatBalance::zeroPointerVal;
     }
-
-    if (present(GenericContamGainRate)) {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrGenericContamGainRate >>= GenericContamGainRate;
+    if (GenericContamGainRate) {
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrGenericContamGainRate = GenericContamGainRate;
     } else {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrGenericContamGainRate >>= ZeroPointerVal;
+        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).PtrGenericContamGainRate = &DataHeatBalance::zeroPointerVal;
     }
-
-    if (present(RetNodeNum)) {
-        ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).ReturnAirNodeNum = RetNodeNum;
-    }
+    ZoneIntGain(ZoneNum).Device(ZoneIntGain(ZoneNum).NumberOfDevices).ReturnAirNodeNum = RetNodeNum;
 }
 
 } // namespace EnergyPlus

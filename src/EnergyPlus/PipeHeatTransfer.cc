@@ -708,7 +708,7 @@ namespace PipeHeatTransfer {
                     "Pipe Ambient Heat Transfer Energy", OutputProcessor::Unit::J, PipeHT(Item).EnvHeatLossEnergy, "Plant", "Sum", PipeHT(Item).Name);
 
                 SetupZoneInternalGain(
-                    PipeHT(Item).EnvrZonePtr, "Pipe:Indoor", PipeHT(Item).Name, IntGainTypeOf_PipeIndoor, PipeHT(Item).ZoneHeatGainRate);
+                    PipeHT(Item).EnvrZonePtr, "Pipe:Indoor", PipeHT(Item).Name, IntGainTypeOf_PipeIndoor, &PipeHT(Item).ZoneHeatGainRate);
             }
 
             SetupOutputVariable("Pipe Mass Flow Rate", OutputProcessor::Unit::kg_s, PipeHT(Item).MassFlowRate, "Plant", "Average", PipeHT(Item).Name);

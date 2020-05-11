@@ -421,7 +421,7 @@ namespace ExternalInterface {
     }
 
     void ParseString(std::string const &str, // The string, with all elements separated by ';'
-                     Array1S_string ele,     // The elements
+                     Array1D_string &ele,     // The elements
                      int const nEle          // The number of elements
     )
     {
@@ -2391,11 +2391,11 @@ namespace ExternalInterface {
         firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
     }
 
-    void GetReportVariableKey(Array1S_string const varKeys,  // Standard variable name
+    void GetReportVariableKey(const Array1D_string &varKeys,  // Standard variable name
                               int const numberOfKeys,        // Number of keys=size(varKeys)
-                              Array1S_string const varNames, // Standard variable name
-                              Array1S_int keyVarIndexes,     // Array index
-                              Array1S_int varTypes           // Types of variables in keyVarIndexes
+                              const Array1D_string &varNames, // Standard variable name
+                              Array1D_int &keyVarIndexes,     // Array index
+                              Array1D_int &varTypes           // Types of variables in keyVarIndexes
     )
     {
         // SUBROUTINE INFORMATION:

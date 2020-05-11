@@ -336,9 +336,16 @@ namespace ResultsFramework {
         return variableMap.at(lastVarID);
     }
 
-    void DataFrame::newRow(const int month, const int dayOfMonth, const int hourOfDay, const int curMin)
+    void DataFrame::newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin)
     {
         char buffer[100];
+        if (curMin > 0) {
+            hourOfDay -= 1;
+        }
+        if (curMin == 60) {
+            curMin = 0;
+            hourOfDay += 1;
+        }
         int cx = snprintf(buffer, 100, "%02d/%02d %02d:%02d:00", month, dayOfMonth, hourOfDay, curMin );
 
         // future start of ISO 8601 datetime output

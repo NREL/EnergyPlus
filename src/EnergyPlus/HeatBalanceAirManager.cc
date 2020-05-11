@@ -4221,7 +4221,7 @@ namespace HeatBalanceAirManager {
         if(DataGlobals::externalHVACManager) {
           DataGlobals::externalHVACManager();
         } else {
-          ManageHVAC();
+          ManageHVAC(OutputFiles::getSingleton());
         }
 
         // Do Final Temperature Calculations for Heat Balance before next Time step

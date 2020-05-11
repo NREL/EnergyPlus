@@ -185,8 +185,7 @@ namespace DataPlant {
 
         Real64 EvaluateLoopSetPointLoad(int FirstBranchNum,
                                         int LastBranchNum,
-                                        Real64 ThisLoopSideFlow,
-                                        Array1S_int LastComponentSimulated);
+                                        Real64 ThisLoopSideFlow);
 
         void ResolveParallelFlows(Real64 ThisLoopSideFlow, bool FirstHVACIteration);
 

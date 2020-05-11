@@ -391,8 +391,35 @@ namespace OutputReportTabular {
     extern std::string activeForName;
     extern std::string prevReportName;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
-    // PRIVATE      DateToStr
+    // LineTypes for reading the stat file
+    enum class StatLineType {
+        Initialized, // used as a dummy placeholder
+        StatisticsLine,
+        LocationLine,
+        LatLongLine,
+        ElevationLine,
+        StdPressureLine,
+        DataSourceLine,
+        WMOStationLine,
+        DesignConditionsLine,
+        heatingConditionsLine,
+        coolingConditionsLine,
+        stdHDDLine,
+        stdCDDLine,
+        maxDryBulbLine,
+        minDryBulbLine,
+        maxDewPointLine,
+        minDewPointLine,
+        wthHDDLine,
+        wthCDDLine,
+        KoppenLine,
+        KoppenDes1Line,
+        KoppenDes2Line,
+        AshStdLine,
+        AshStdDes1Line,
+        AshStdDes2Line,
+        AshStdDes3Line,
+    };
 
     // Types
 
@@ -755,6 +782,8 @@ namespace OutputReportTabular {
 
     void WriteTabularReports();
 
+    void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
+
     void FillWeatherPredefinedEntries();
 
     std::string GetColumnUsingTabs(std::string const &inString, // Input String
@@ -870,9 +899,9 @@ namespace OutputReportTabular {
     void WriteTextLine(std::string const &lineOfText, Optional_bool_const isBold = _);
 
     void WriteTable(Array2S_string const body, // row,column
-                    Array1S_string const rowLabels,
-                    Array1S_string const columnLabels,
-                    Array1S_int widthColumn,
+                    const Array1D_string &rowLabels,
+                    const Array1D_string &columnLabels,
+                    Array1D_int &widthColumn,
                     Optional_bool_const transposeXML = _,
                     Optional_string_const footnoteText = _);
 

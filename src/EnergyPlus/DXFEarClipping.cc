@@ -109,7 +109,7 @@ namespace DXFEarClipping {
 
     // Functions
 
-    bool InPolygon(Vector const &point, Array1A<Vector> poly, int const nsides)
+    bool InPolygon(Vector const &point, Array1D<Vector> &poly, int const nsides)
     {
         // this routine is not used in the current scheme
 
@@ -117,7 +117,7 @@ namespace DXFEarClipping {
         bool InPolygon;
 
         // Argument array dimensioning
-        poly.dim(nsides);
+        EP_SIZE_CHECK(poly, nsides);
 
         // Locals
         //'Return TRUE if the point (xp,yp) lies inside the circumcircle
@@ -184,7 +184,7 @@ namespace DXFEarClipping {
     }
 
     int Triangulate(int const nsides, // number of sides to polygon
-                    Array1A<Vector> polygon,
+                    Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,       // surface tilt angle
@@ -223,7 +223,7 @@ namespace DXFEarClipping {
         int Triangulate;
 
         // Argument array dimensioning
-        polygon.dim(nsides);
+        EP_SIZE_CHECK(polygon, nsides);
 
         // Locals
         // Subroutine argument definitions:
@@ -465,9 +465,9 @@ namespace DXFEarClipping {
         return angle;
     }
 
-    bool polygon_contains_point_2d(int const nsides,           // number of sides (vertices)
-                                   Array1A<Vector_2d> polygon, // points of polygon
-                                   Vector_2d const &point      // point to be tested
+    bool polygon_contains_point_2d(int const nsides,            // number of sides (vertices)
+                                   Array1D<Vector_2d> &polygon, // points of polygon
+                                   Vector_2d const &point       // point to be tested
     )
     {
 
@@ -495,7 +495,7 @@ namespace DXFEarClipping {
         bool inside; // return value, true=inside, false = not inside
 
         // Argument array dimensioning
-        polygon.dim(nsides);
+        EP_SIZE_CHECK(polygon, nsides);
 
         // Locals
         // Function argument definitions:
@@ -533,16 +533,16 @@ namespace DXFEarClipping {
     }
 
     void generate_ears(int const nvert, // number of vertices in polygon
-                       Array1A<Vector_2d> vertex,
-                       Array1A_int ears,       // number of ears possible (dimensioned to nvert)
-                       int &nears,             // number of ears found
-                       Array1A_int r_vertices, // number of reflex vertices (>180) possible
-                       int &nrverts,           // number of reflex vertices found (>=180)
-                       Array1A_int c_vertices, // number of convex vertices
-                       int &ncverts,           // number of convex vertices found (< 180)
-                       Array1A_bool removed,   // array that shows if a vertex has been removed (calling routine)
-                       Array1A_int earvert,    // vertex indicators for first ear
-                       Array1A<Real64> rangles)
+                       Array1D<Vector_2d> &vertex,
+                       Array1D_int &ears,       // number of ears possible (dimensioned to nvert)
+                       int &nears,              // number of ears found
+                       Array1D_int &r_vertices, // number of reflex vertices (>180) possible
+                       int &nrverts,            // number of reflex vertices found (>=180)
+                       Array1D_int &c_vertices, // number of convex vertices
+                       int &ncverts,            // number of convex vertices found (< 180)
+                       Array1D_bool &removed,   // array that shows if a vertex has been removed (calling routine)
+                       Array1D_int &earvert,    // vertex indicators for first ear
+                       Array1D<Real64> &rangles)
     {
 
         // Subroutine information:
@@ -567,13 +567,13 @@ namespace DXFEarClipping {
         // na
 
         // Argument array dimensioning
-        vertex.dim(nvert);
-        ears.dim(nvert);
-        r_vertices.dim(nvert);
-        c_vertices.dim(nvert);
-        removed.dim(nvert);
-        earvert.dim(3);
-        rangles.dim(nvert);
+        EP_SIZE_CHECK(vertex, nvert);
+        EP_SIZE_CHECK(ears, nvert);
+        EP_SIZE_CHECK(r_vertices, nvert);
+        EP_SIZE_CHECK(c_vertices, nvert);
+        EP_SIZE_CHECK(removed, nvert);
+        EP_SIZE_CHECK(earvert, 3);
+        EP_SIZE_CHECK(rangles, nvert);
 
         // Locals
         // Subroutine argument definitions:
@@ -685,12 +685,12 @@ namespace DXFEarClipping {
     }
 
     void CalcWallCoordinateTransformation(int const nsides,
-                                          Array1A<Vector> polygon,
+                                          Array1D<Vector> &polygon,
                                           Real64 const surfazimuth,
                                           Real64 const EP_UNUSED(surftilt), // unused1208
-                                          Array1A<Real64> xvt,
-                                          Array1A<Real64> yvt,
-                                          Array1A<Real64> zvt)
+                                          Array1D<Real64> &xvt,
+                                          Array1D<Real64> &yvt,
+                                          Array1D<Real64> &zvt)
     {
 
         // Subroutine information:
@@ -713,10 +713,10 @@ namespace DXFEarClipping {
         // na
 
         // Argument array dimensioning
-        polygon.dim(nsides);
-        xvt.dim(nsides);
-        yvt.dim(nsides);
-        zvt.dim(nsides);
+        EP_SIZE_CHECK(polygon, nsides);
+        EP_SIZE_CHECK(xvt, nsides);
+        EP_SIZE_CHECK(yvt, nsides);
+        EP_SIZE_CHECK(zvt, nsides);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -749,12 +749,12 @@ namespace DXFEarClipping {
     }
 
     void CalcRfFlrCoordinateTransformation(int const nsides,
-                                           Array1A<Vector> polygon,
+                                           Array1D<Vector> &polygon,
                                            Real64 const EP_UNUSED(surfazimuth), // unused1208
                                            Real64 const surftilt,
-                                           Array1A<Real64> xvt,
-                                           Array1A<Real64> yvt,
-                                           Array1A<Real64> zvt)
+                                           Array1D<Real64> &xvt,
+                                           Array1D<Real64> &yvt,
+                                           Array1D<Real64> &zvt)
     {
 
         // Subroutine information:
@@ -777,10 +777,10 @@ namespace DXFEarClipping {
         // na
 
         // Argument array dimensioning
-        polygon.dim(nsides);
-        xvt.dim(nsides);
-        yvt.dim(nsides);
-        zvt.dim(nsides);
+        EP_SIZE_CHECK(polygon, nsides);
+        EP_SIZE_CHECK(xvt, nsides);
+        EP_SIZE_CHECK(yvt, nsides);
+        EP_SIZE_CHECK(zvt, nsides);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

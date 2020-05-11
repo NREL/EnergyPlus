@@ -3369,7 +3369,7 @@ namespace PlantCondLoopOperation {
                         SetupEMSActuator(ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
-                                         "[W]",
+                                         "[fraction]",
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideOn,
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideValue);
                     }

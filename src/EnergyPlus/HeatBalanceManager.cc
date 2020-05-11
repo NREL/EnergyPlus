@@ -97,6 +97,7 @@
 #include <EnergyPlus/MatrixDataManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
@@ -282,7 +283,7 @@ namespace HeatBalanceManager {
         UniqueConstructNames.clear();
     }
 
-    void ManageHeatBalance()
+    void ManageHeatBalance(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -335,7 +336,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
-            HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
+            HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles);
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -368,13 +369,13 @@ namespace HeatBalanceManager {
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance();
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
-        RecKeepHeatBalance(OutputFiles::getSingleton());                                             // Do any heat balance related record keeping
+        RecKeepHeatBalance(outputFiles);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
         // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
-        ReportHeatBalance(); // Manage heat balance reporting until the new reporting is in place
+        ReportHeatBalance(outputFiles); // Manage heat balance reporting until the new reporting is in place
 
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
@@ -393,7 +394,7 @@ namespace HeatBalanceManager {
         }
 
         if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
-            ReportWarmupConvergence(OutputFiles::getSingleton());
+            ReportWarmupConvergence(outputFiles);
         }
     }
 
@@ -1115,6 +1116,11 @@ namespace HeatBalanceManager {
             ZoneAirSolutionAlgo = Use3rdOrder;
             AlphaName(1) = "ThirdOrderBackwardDifference";
         }
+        if (DataHeatBalance::OverrideZoneAirSolutionAlgo) {
+            ZoneAirSolutionAlgo = UseEulerMethod;
+            AlphaName(1) = "EulerMethod";
+        }
+
 
         // Write Solution Algorithm to the initialization output file for User Verification
         static constexpr auto Format_726(
@@ -4994,14 +5000,14 @@ namespace HeatBalanceManager {
 
     void ProcessZoneData(std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
-                         Array1_string const &cAlphaArgs,
+                         Array1D_string const &cAlphaArgs,
                          int &NumAlphas,
-                         Array1<Real64> const &rNumericArgs,
+                         Array1D<Real64> const &rNumericArgs,
                          int &NumNumbers,
-                         Array1_bool const &EP_UNUSED(lNumericFieldBlanks), // Unused
-                         Array1_bool const &lAlphaFieldBlanks,
-                         Array1_string const &cAlphaFieldNames,
-                         Array1_string const &EP_UNUSED(cNumericFieldNames), // Unused
+                         Array1D_bool const &EP_UNUSED(lNumericFieldBlanks), // Unused
+                         Array1D_bool const &lAlphaFieldBlanks,
+                         Array1D_string const &cAlphaFieldNames,
+                         Array1D_string const &EP_UNUSED(cNumericFieldNames), // Unused
                          bool &ErrorsFound                                   // If errors found in input
     )
     {
@@ -5885,7 +5891,7 @@ namespace HeatBalanceManager {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
                 auto &thisConstruct(thisSurface.Construction);
-                if (!Construct(thisConstruct).WindowTypeBSDF) {
+                if (!Construct(thisConstruct).WindowTypeBSDF && !Construct(thisConstruct).TypeIsAirBoundaryInteriorWindow) {
                     FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
                     FenLaySurfTempBack(Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
                 }
@@ -5899,7 +5905,7 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance()
+    void ReportHeatBalance(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5935,8 +5941,9 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
+        static constexpr auto EndOfHeaderString("End of Data Dictionary");                   // End of data dictionary marker
         static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
-        static ObjexxFCL::gio::Fmt EndOfDataFormat("(\"End of Data\")");                     // Signifies the end of the data block in the output file
+        static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -5970,16 +5977,21 @@ namespace HeatBalanceManager {
             if (PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && DoOutputReporting) {
                     ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
-                    ObjexxFCL::gio::write(OutputFileMeters, EndOfHeaderFormat);
+                    print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
                     ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
                         << "1"
                         << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
-                    ObjexxFCL::gio::write(OutputFileMeters, EnvironmentStampFormat)
-                        << "1"
-                        << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
+                    print(outputFiles.mtr,
+                          EnvironmentStampFormatStr,
+                          "1",
+                          "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                          Latitude,
+                          Longitude,
+                          TimeZoneNumber,
+                          Elevation);
                     PrintEnvrnStampWarmup = false;
                 }
             }
@@ -7548,15 +7560,26 @@ namespace HeatBalanceManager {
                 if (UtilityRoutines::SameString(solarMethod, "GroupedZones")) {
                     thisConstruct.TypeIsAirBoundarySolar = true;
                 } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
-                    ShowWarningError(RoutineName + ": Construction:AirBoundary Solar and Daylighting Method=InteriorWindow is not functional.");
-                    ShowContinueError("Using GroupedZones method instead for Construction:AirBoundary = " + thisConstruct.Name + ".");
-                    thisConstruct.TypeIsAirBoundarySolar = true;
-                    // thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
-                    // thisConstruct.TransDiff = 1.0;
-                    // thisConstruct.TransDiffVis = 1.0;
-                    // thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
-                    // thisConstruct.TransSolBeamCoef = 1.0;
-                    // thisConstruct.ReflectSolDiffBack = 0.0;
+                    thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
+                    thisConstruct.TransDiff = 1.0;
+                    thisConstruct.TransDiffVis = 1.0;
+                    thisConstruct.AbsDiffBackShade = 0.0;
+                    thisConstruct.ShadeAbsorpThermal = 0.0;
+                    thisConstruct.ReflectSolDiffBack = 0.0;
+                    thisConstruct.ReflectSolDiffFront = 0.0;
+                    thisConstruct.ReflectVisDiffFront = 0.0;
+                    thisConstruct.AbsBeamShadeCoef = 0.0;
+                    thisConstruct.TransSolBeamCoef = 0.0;
+                    thisConstruct.TransSolBeamCoef(1) = 1.0;
+                    thisConstruct.ReflSolBeamFrontCoef = 0.0;
+                    thisConstruct.ReflSolBeamBackCoef = 0.0;
+                    thisConstruct.TransVisBeamCoef = 0.0;
+                    thisConstruct.TransVisBeamCoef(1) = 1.0;
+                    thisConstruct.AbsBeamCoef = 0.0;
+                    thisConstruct.AbsBeamBackCoef = 0.0;
+                    thisConstruct.AbsDiff = 0.0;
+                    thisConstruct.AbsDiffBack = 0.0;
                 }
 
                 // Radiant Exchange Method

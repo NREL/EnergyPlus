@@ -61,7 +61,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInput )
     CoilCoolingDXCurveFitPerformance thisPerf("coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
-    EXPECT_FALSE(thisPerf.hasAlternateMode);
+    EXPECT_EQ(thisPerf.hasAlternateMode,coilNormalMode);
 }
 
 TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode )
@@ -71,5 +71,5 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode )
     CoilCoolingDXCurveFitPerformance thisPerf("coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
-    EXPECT_TRUE(thisPerf.hasAlternateMode);
+    EXPECT_EQ(thisPerf.hasAlternateMode,coilEnhancedMode);
 }

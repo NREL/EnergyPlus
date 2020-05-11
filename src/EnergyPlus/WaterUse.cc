@@ -723,10 +723,10 @@ namespace WaterUse {
                                   "WaterUse:Equipment",
                                   this->Name,
                                   DataHeatBalance::IntGainTypeOf_WaterUseEquipment,
-                                  this->SensibleRateNoMultiplier,
-                                  _,
-                                  _,
-                                  this->LatentRateNoMultiplier);
+                                  &this->SensibleRateNoMultiplier,
+                                  nullptr,
+                                  nullptr,
+                                  &this->LatentRateNoMultiplier);
         }
     }
 

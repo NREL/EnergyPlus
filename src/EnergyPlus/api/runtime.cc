@@ -210,13 +210,13 @@ void callbackEndOfAfterComponentGetInput(void (*f)()) {
     callbackEndOfAfterComponentGetInput(std::function<void ()>(f));
 }
 
-void callbackUserDefinedComponentModel(std::function<void ()> f) {
-    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUserDefinedComponentModel, f);
-}
-
-void callbackUserDefinedComponentModel(void (*f)()) {
-    callbackUserDefinedComponentModel(std::function<void ()>(f));
-}
+//void callbackUserDefinedComponentModel(std::function<void ()> f) {
+//    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUserDefinedComponentModel, f);
+//}
+//
+//void callbackUserDefinedComponentModel(void (*f)()) {
+//    callbackUserDefinedComponentModel(std::function<void ()>(f));
+//}
 
 void callbackUnitarySystemSizing(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing, f);

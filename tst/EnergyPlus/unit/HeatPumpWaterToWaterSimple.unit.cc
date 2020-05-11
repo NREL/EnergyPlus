@@ -787,7 +787,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance();
+                    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 

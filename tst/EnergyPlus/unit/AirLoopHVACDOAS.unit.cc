@@ -52,11 +52,12 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
-
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -75,7 +76,6 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace DataSurfaces;
@@ -172,8 +172,9 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    25;                      !- Maximum HVAC Iterations",
 
         "  ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    7,                       !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    7,                       !- Shading Calculation Update Frequency",
         "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
 
         "  Timestep,6;",
@@ -4013,7 +4014,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     // Mixer outlet
     EXPECT_NEAR(23.0, DataLoopNode::Node(68).Temp, 0.0001);
     EXPECT_NEAR(0.5, DataLoopNode::Node(68).MassFlowRate, 0.0001);
-    // Outlet of HX 
+    // Outlet of HX
     EXPECT_NEAR(-8.0710884, DataLoopNode::Node(67).Temp, 0.0001);
     // Outlet of Central DOAS
     EXPECT_NEAR(4.5, DataLoopNode::Node(70).Temp, 0.0001);
@@ -4024,6 +4025,248 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     EXPECT_NEAR(4.5, DataLoopNode::Node(4).Temp, 0.0001);
     EXPECT_NEAR(4.5, DataLoopNode::Node(5).Temp, 0.0001);
     EXPECT_NEAR(4.5, DataLoopNode::Node(6).Temp, 0.0001);
-
 }
+
+TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
+{
+    // 7686
+    std::string const idf_objects = delimited_string({
+        "  Version,9.3;",
+        "  AirLoopHVAC:DedicatedOutdoorAirSystem,",
+        "    AirLoopHVAC DOAS,        !- Name",
+        "    AirLoopDOAS OA system,   !- AirLoopHVAC:OutdoorAirSystem Name",
+        "    ALWAYS_ON,               !- Availability Schedule Name",
+        "    AirLoopDOASMixer,        !- AirLoopHVAC:Mixer Name",
+        "    AirLoopDOASSplitter,     !- AirLoopHVAC:Splitter Name",
+        "    4.5,                     !- Preheat Design Temperature {C}",
+        "    0.004,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}",
+        "    17.5,                    !- Precool Design Temperature {C}",
+        "    0.012,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}",
+        "    5,                       !- Number of AirLoopHVAC",
+        "    PSZ-AC:1,                !- AirLoopHVAC 1 Name",
+        "    PSZ-AC:2,                !- AirLoopHVAC 2 Name",
+        "    PSZ-AC:3,                !- AirLoopHVAC 3 Name",
+        "    PSZ-AC:4,                !- AirLoopHVAC 4 Name",
+        "    PSZ-AC:5;                !- AirLoopHVAC 5 Name",
+
+        "  AirLoopHVAC:Mixer,",
+        "    AirLoopDOASMixer,        !- Name",
+        "    AirLoopDOASMixerOutlet,  !- Outlet Node Name",
+        "    PSZ-AC:1_OARelief Node,  !- Inlet 1 Node Name",
+        "    PSZ-AC:2_OARelief Node,  !- Inlet 2 Node Name",
+        "    PSZ-AC:3_OARelief Node,  !- Inlet 3 Node Name",
+        "    PSZ-AC:4_OARelief Node,  !- Inlet 4 Node Name",
+        "    PSZ-AC:5_OARelief Node;  !- Inlet 5 Node Name",
+
+        "  AirLoopHVAC:Splitter,",
+        "    AirLoopDOASSplitter,     !- Name",
+        "    AirLoopDOASSplitterInlet,!- Inlet Node Name",
+        "    PSZ-AC:1_OAInlet Node,   !- Outlet 1 Node Name",
+        "    PSZ-AC:2_OAInlet Node,   !- Outlet 2 Node Name",
+        "    PSZ-AC:3_OAInlet Node,   !- Outlet 3 Node Name",
+        "    PSZ-AC:4_OAInlet Node,   !- Outlet 4 Node Name",
+        "    PSZ-AC:5_OAInlet Node;   !- Outlet 5 Node Name",
+
+        "  Schedule:Compact,",
+        "    OA Cooling Supply Air Temp Sch,  !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,17.5;       !- Field 3",
+
+        "  Schedule:Compact,",
+        "    OA Heating Supply Air Temp Sch,  !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,4.5;        !- Field 3",
+
+        "  SetpointManager:Scheduled,",
+        "    OA Air Temp Manager 1,   !- Name",
+        "    Temperature,             !- Control Variable",
+        "    OA Cooling Supply Air Temp Sch,  !- Schedule Name",
+        "    AirLoopDOASSplitterInlet;!- Setpoint Node or NodeList Name",
+
+        "  SetpointManager:Scheduled,",
+        "    OA Air Temp Manager 2,   !- Name",
+        "    Temperature,             !- Control Variable",
+        "    OA Heating Supply Air Temp Sch,  !- Schedule Name",
+        "    OA Heating Coil 1 Air Outlet Node;  !- Setpoint Node or NodeList Name",
+
+        "  AirLoopHVAC:OutdoorAirSystem,",
+        "    AirLoopDOAS OA system,   !- Name",
+        "    OA Sys 1 Controllers,    !- Controller List Name",
+        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
+        "    OA Sys 1 Avail List;     !- Availability Manager List Name",
+
+        "  AvailabilityManagerAssignmentList,",
+        "    OA Sys 1 Avail List,     !- Name",
+        "    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type",
+        "    OA Sys 1 Avail;          !- Availability Manager 1 Name",
+
+        "  AvailabilityManager:Scheduled,",
+        "    OA Sys 1 Avail,          !- Name",
+        "    Always_ON;               !- Schedule Name",
+
+        "  AirLoopHVAC:ControllerList,",
+        "    OA Sys 1 Controllers,    !- Name",
+        "    Controller:WaterCoil,    !- Controller 1 Object Type",
+        "    OA CC Controller 1,      !- Controller 1 Name",
+        "    Controller:WaterCoil,    !- Controller 2 Object Type",
+        "    OA HC Controller 1;      !- Controller 2 Name",
+
+        "  Schedule:Compact,",
+        "    Min OA Sched,            !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: Weekdays,           !- Field 2",
+        "    Until: 6:00,0.0,         !- Field 3",
+        "    Until: 20:00,1.0,        !- Field 5",
+        "    Until: 24:00,0.02,       !- Field 7",
+        "    For: AllOtherDays,       !- Field 9",
+        "    Until: 24:00,0.02;       !- Field 10",
+
+        "  AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
+        "    OA Sys 1 Equipment,      !- Name",
+        "    Fan:SystemModel,         !- Component 1 Object Type",
+        "    OA Supply Fan,           !- Component 1 Name",
+        "    Humidifier:Steam:Electric,  !- Component 2 Object Type",
+        "    DOAS OA Humidifier;      !- Component 2 Name",
+
+        "  Humidifier:Steam:Electric,",
+        "    DOAS OA Humidifier,      !- Name",
+        "    ALWAYS_ON,           !- Availability Schedule Name",
+        "    autosize,                !- Rated Capacity {m3/s}",
+        "    autosize,                !- Rated Power {W}",
+        "    0,                       !- Rated Fan Power {W}",
+        "    0,                       !- Standby Power {W}",
+        "    OA Supply Fan Outlet Node,  !- Air Inlet Node Name",
+        "    AirLoopDOASSplitterInlet,  !- Air Outlet Node Name",
+        "    ;                        !- Water Storage Tank Name",
+
+        "  SetpointManager:Scheduled,",
+        "    Main Humidifier setpoint Mgr,  !- Name",
+        "    MinimumHumidityRatio,    !- Control Variable",
+        "    Humidifier Setpoint Schedule,  !- Schedule Name",
+        "    DOAS Humidifier Air Outlet;  !- Setpoint Node or NodeList Name",
+
+        "  Schedule:Compact,",
+        "    Humidifier Setpoint Schedule,  !- Name",
+        "    HumidityRatio,           !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: Alldays,            !- Field 2",
+        "    Until: 24:00,0.001;      !- Field 3",
+
+        "  ScheduleTypeLimits,",
+        "    HumidityRatio,           !- Name",
+        "    0.0001,                  !- Lower Limit Value",
+        "    0.0120,                  !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+        "  Fan:SystemModel,",
+        "    OA Supply Fan,           !- Name",
+        "    ALWAYS_ON,               !- Availability Schedule Name",
+        "    Outside Air Inlet Node 1,!- Air Inlet Node Name",
+        "    OA Supply Fan Outlet Node,  !- Air Outlet Node Name",
+        "    Autosize,                !- Design Maximum Air Flow Rate {m3/s}",
+        "    Discrete,                !- Speed Control Method",
+        "    0.25,                    !- Electric Power Minimum Flow Rate Fraction",
+        "    600.0,                   !- Design Pressure Rise {Pa}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Air Stream Fraction",
+        "    Autosize,                !- Design Electric Power Consumption {W}",
+        "    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    ,                        !- Electric Power Function of Flow Fraction Curve Name",
+        "    ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
+        "    ,                        !- Night Ventilation Mode Flow Fraction",
+        "    ,                        !- Motor Loss Zone Name",
+        "    ,                        !- Motor Loss Radiative Fraction",
+        "    General;                 !- End-Use Subcategory",
+
+
+        "  OutdoorAir:NodeList,",
+        "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
+
+        "  NodeList,",
+        "    OutsideAirInletNodes,    !- Name",
+        "    Outside Air Inlet Node 1;!- Node 1 Name",
+
+        "  Schedule:Compact,",
+        "    ALWAYS_ON,               !- Name",
+        "    On/Off,                  !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1;          !- Field 3",
+        "  Schedule:Compact,",
+        "    CoolingCoilAvailSched,   !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: WeekDays,           !- Field 2",
+        "    Until: 6:00,0.0,         !- Field 3",
+        "    Until: 20:00,1.0,        !- Field 5",
+        "    Until: 24:00,0.0,        !- Field 7",
+        "    For: SummerDesignDay WinterDesignDay, !- Field 9",
+        "    Until: 24:00,1.0,        !- Field 10",
+        "    For: AllOtherDays,       !- Field 12",
+        "    Until: 24:00,0.0;        !- Field 13",
+
+        "  OutdoorAir:Mixer,",
+        "    PSZ-AC:1_OAMixing Box,   !- Name",
+        "    PSZ-AC:1_OA-PSZ-AC:1_CoolCNode,  !- Mixed Air Node Name",
+        "    PSZ-AC:1_OAInlet Node,   !- Outdoor Air Stream Node Name",
+        "    PSZ-AC:1_OARelief Node,  !- Relief Air Stream Node Name",
+        "    PSZ-AC:1 Supply Equipment Inlet Node;  !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    PSZ-AC:2_OAMixing Box,   !- Name",
+        "    PSZ-AC:2_OA-PSZ-AC:2_CoolCNode,  !- Mixed Air Node Name",
+        "    PSZ-AC:2_OAInlet Node,   !- Outdoor Air Stream Node Name",
+        "    PSZ-AC:2_OARelief Node,  !- Relief Air Stream Node Name",
+        "    PSZ-AC:2 Supply Equipment Inlet Node;  !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    PSZ-AC:3_OAMixing Box,   !- Name",
+        "    PSZ-AC:3_OA-PSZ-AC:3_CoolCNode,  !- Mixed Air Node Name",
+        "    PSZ-AC:3_OAInlet Node,   !- Outdoor Air Stream Node Name",
+        "    PSZ-AC:3_OARelief Node,  !- Relief Air Stream Node Name",
+        "    PSZ-AC:3 Supply Equipment Inlet Node;  !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    PSZ-AC:4_OAMixing Box,   !- Name",
+        "    PSZ-AC:4_OA-PSZ-AC:4_CoolCNode,  !- Mixed Air Node Name",
+        "    PSZ-AC:4_OAInlet Node,   !- Outdoor Air Stream Node Name",
+        "    PSZ-AC:4_OARelief Node,  !- Relief Air Stream Node Name",
+        "    PSZ-AC:4 Supply Equipment Inlet Node;  !- Return Air Stream Node Name",
+
+        "  OutdoorAir:Mixer,",
+        "    PSZ-AC:5_OAMixing Box,   !- Name",
+        "    PSZ-AC:5_OA-PSZ-AC:5_CoolCNode,  !- Mixed Air Node Name",
+        "    PSZ-AC:5_OAInlet Node,   !- Outdoor Air Stream Node Name",
+        "    PSZ-AC:5_OARelief Node,  !- Relief Air Stream Node Name",
+        "    PSZ-AC:5 Supply Equipment Inlet Node;  !- Return Air Stream Node Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    MixedAir::GetOutsideAirSysInputs();
+    MixedAir::GetOASysInputFlag = false;
+    MixedAir::GetOAMixerInputs();
+
+    DataAirSystems::PrimaryAirSystem.allocate(5);
+    DataAirSystems::PrimaryAirSystem(1).Name = "PSZ-AC:1";
+    DataAirSystems::PrimaryAirSystem(2).Name = "PSZ-AC:2";
+    DataAirSystems::PrimaryAirSystem(3).Name = "PSZ-AC:3";
+    DataAirSystems::PrimaryAirSystem(4).Name = "PSZ-AC:4";
+    DataAirSystems::PrimaryAirSystem(5).Name = "PSZ-AC:5";
+
+    AirLoopHVACDOAS::AirLoopDOAS::getAirLoopDOASInput();
+
+    EXPECT_EQ(DataAirLoop::OutsideAirSys(1).ComponentType(2), "HUMIDIFIER:STEAM:ELECTRIC");
+    EXPECT_EQ(DataAirLoop::OutsideAirSys(1).InletNodeNum(2), 2);
+    EXPECT_EQ(DataAirLoop::OutsideAirSys(1).OutletNodeNum(2), 23);
+}
+
 } // namespace EnergyPlus

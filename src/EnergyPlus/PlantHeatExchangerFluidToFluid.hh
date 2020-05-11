@@ -169,7 +169,7 @@ namespace PlantHeatExchangerFluidToFluid {
         void findDemandSideLoopFlow(Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
 
         Real64 demandSideFlowResidual(Real64 DmdSideMassFlowRate,
-                                      Array1<Real64> const &Par // Par(1) = HX index number
+                                      Array1D<Real64> const &Par // Par(1) = HX index number
         );
     };
 

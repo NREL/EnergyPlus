@@ -827,7 +827,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsDepth) {
     EXPECT_TRUE(errorsFound);
 }
 
-TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadTimeStepSelection) {
+TEST_F(EnergyPlusFixture, DISABLED_SiteGroundDomainSlab_CheckInputs_BadTimeStepSelection) {
 
     std::string const idf_objects = delimited_string({
                                                              "Site:GroundDomain:Slab,",

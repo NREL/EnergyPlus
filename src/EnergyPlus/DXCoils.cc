@@ -1469,7 +1469,7 @@ namespace DXCoils {
                                           "Coil:Cooling:DX:SingleSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecCoolingDXCoilSingleSpeed,
-                                          DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
+                                          &DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
                     DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
@@ -2372,10 +2372,10 @@ namespace DXCoils {
                                           "Coil:Heating:DX:SingleSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecHeatingDXCoilSingleSpeed,
-                                          DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,
-                                          _,
-                                          _,
-                                          DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate);
+                                          &DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,
+                                          nullptr,
+                                          nullptr,
+                                          &DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate);
                     DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
@@ -2942,7 +2942,7 @@ namespace DXCoils {
                                           "Coil:Cooling:DX:TwoSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecCoolingDXCoilTwoSpeed,
-                                          DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
+                                          &DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
                     DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
@@ -4258,7 +4258,7 @@ namespace DXCoils {
                                           "Coil:Cooling:DX:MultiSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecCoolingDXCoilMultiSpeed,
-                                          DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
+                                          &DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
                     DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
@@ -4706,10 +4706,10 @@ namespace DXCoils {
                                           "Coil:Heating:DX:MultiSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecHeatingDXCoilMultiSpeed,
-                                          DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,
-                                          _,
-                                          _,
-                                          DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate);
+                                          &DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,
+                                          nullptr,
+                                          nullptr,
+                                          &DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate);
                     DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
@@ -13963,7 +13963,7 @@ namespace DXCoils {
     }
 
     Real64 CalcTwoSpeedDXCoilIEERResidual(Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                          Array1<Real64> const &Par           // par(1) = DX coil number
+                                          Array1D<Real64> const &Par          // par(1) = DX coil number
     )
     {
         // FUNCTION INFORMATION:
@@ -16813,8 +16813,8 @@ namespace DXCoils {
         }
     }
 
-    Real64 FanSpdResidualCool(Real64 const FanSpdRto,   // indoor unit fan speed ratio
-                              Array1<Real64> const &Par // parameters
+    Real64 FanSpdResidualCool(Real64 const FanSpdRto,    // indoor unit fan speed ratio
+                              Array1D<Real64> const &Par // parameters
     )
     {
         // FUNCTION INFORMATION:
@@ -16853,8 +16853,8 @@ namespace DXCoils {
         return FanSpdResidualCool;
     }
 
-    Real64 FanSpdResidualHeat(Real64 const FanSpdRto,   // indoor unit fan speed ratio
-                              Array1<Real64> const &Par // parameters
+    Real64 FanSpdResidualHeat(Real64 const FanSpdRto,    // indoor unit fan speed ratio
+                              Array1D<Real64> const &Par // parameters
     )
     {
         // FUNCTION INFORMATION:

@@ -871,7 +871,7 @@ namespace ThermalChimney {
         } // ... end of zone loads report variable update loop.
     }
 
-    void GaussElimination(Array2A<Real64> EquaCoef, Array1A<Real64> EquaConst, Array1A<Real64> ThermChimSubTemp, int const NTC)
+    void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC)
     {
         // SUBROUTINE INFORMATION:
 
@@ -888,8 +888,8 @@ namespace ThermalChimney {
 
         // Argument array dimensioning
         EquaCoef.dim(NTC, NTC);
-        EquaConst.dim(NTC);
-        ThermChimSubTemp.dim(NTC);
+        EP_SIZE_CHECK(EquaConst, NTC);
+        EP_SIZE_CHECK(ThermChimSubTemp, NTC);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

@@ -129,10 +129,10 @@ namespace General {
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
-                   std::function<Real64(Real64 const, Array1<Real64> const &)> f,
+                   std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
                    Real64 const X_0,         // 1st bound of interval that contains the solution
                    Real64 const X_1,         // 2nd bound of interval that contains the solution
-                   Array1<Real64> const &Par // array with additional parameters used for function evaluation
+                   Array1D<Real64> const &Par // array with additional parameters used for function evaluation
     )
     {
 
@@ -481,10 +481,10 @@ namespace General {
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
-                   std::function<Real64(Real64 const, Array1<Real64> const &)> f,
+                   std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
                    Real64 const X_0,           // 1st bound of interval that contains the solution
                    Real64 const X_1,           // 2nd bound of interval that contains the solution
-                   Array1<Real64> const &Par,  // array with additional parameters used for function evaluation
+                   Array1D<Real64> const &Par, // array with additional parameters used for function evaluation
                    int const AlgorithmTypeNum, // ALgorithm selection
                    Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
                    Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations

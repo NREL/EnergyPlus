@@ -321,7 +321,7 @@ The design humidity ratio exiting the precooling coil (if any) in kilograms of w
 
 \paragraph{Field: Number of AirLoopHVAC}\label{field-number-of-airloophvac}
 
-The number of AirLoopHVAC, which will be served by this central DOAS. 
+The number of AirLoopHVAC, which will be served by this central DOAS.
 
 \paragraph{Field: AirLoopHVAC \textless{}\#\textgreater{} Name}\label{field-airloophvac-name}
 
@@ -351,7 +351,7 @@ An example of this statement in an IDF is:
 
 \subsection{AirLoopHVAC:Mixer}\label{airloophvacmixer}
 
-The AirLoopHVAC:Mixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This component must be referenced in an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem} object. The multiple inlet nodes are relief nodes of \hyperref[outdoorairmixe]{OutdoorAir:Mixer}, whihc is a component of AirLoopHVAC, served by the AirLoopHVAC:DedicatedOutdoorAirSystem object. The single outlet node is connected into either outdoor or a heat exchanger. The heat exchanger must be lisdted as a compoenent in AirLoopHVAC:OutdoorAirSystem, referenced in the AirLoopHVAC:DedicatedOutdoorAirSystem object. 
+The AirLoopHVAC:Mixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This component must be referenced in an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem} object. The multiple inlet nodes are relief nodes of \hyperref[outdoorairmixe]{OutdoorAir:Mixer}, whihc is a component of AirLoopHVAC, served by the AirLoopHVAC:DedicatedOutdoorAirSystem object. The single outlet node is connected into either outdoor or a heat exchanger. The heat exchanger must be listed as a component in AirLoopHVAC:OutdoorAirSystem, referenced in the AirLoopHVAC:DedicatedOutdoorAirSystem object. 
 
 \subsubsection{Inputs}\label{inputs-5-002}
 
@@ -412,5 +412,3 @@ An input example is shown below.
     PSZ-AC:4_OAInlet Node,  !- Outlet 4 Node Name
     PSZ-AC:5_OAInlet Node;  !- Outlet 5 Node Name
 \end{lstlisting}
-
-

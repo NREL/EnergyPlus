@@ -309,10 +309,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
                                                       "    ,                        !- Maximum Number of Warmup Days                        ",
                                                       "    6;                       !- Minimum Number of Warmup Days                        ",
                                                       "  ShadowCalculation,                                                                 ",
-                                                      "    TimestepFrequency,       !- Calculation Method                                   ",
-                                                      "    ,                        !- Calculation Frequency                                ",
+                                                      "    PolygonClipping,         !- Shading Calculation Method                           ",
+                                                      "    Timestep,                !- Shading Calculation Update Frequency Method          ",
+                                                      "    ,                        !- Shading Calculation Update Frequency                 ",
                                                       "    ,                        !- Maximum Figures in Shadow Overlap Calculations       ",
                                                       "    ,                        !- Polygon Clipping Algorithm                           ",
+                                                      "    ,                        !- Pixel Counting Resolution                            ",
                                                       "    DetailedSkyDiffuseModeling;  !- Sky Diffuse Modeling Algorithm                   ",
                                                       "  SurfaceConvectionAlgorithm:Inside,TARP;                                            ",
                                                       "  SurfaceConvectionAlgorithm:Outside,TARP;                                           ",
@@ -688,12 +690,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
                                                       "    ,                        !- Maximum Number of Warmup Days                        ",
                                                       "    6;                       !- Minimum Number of Warmup Days                        ",
                                                       "  ShadowCalculation,                                                                 ",
-                                                      "    TimestepFrequency,          !- Calculation Method                                ",
-                                                      "    ,                           !- Calculation Frequency                             ",
+                                                      "    Scheduled,               !- Shading Calculation Method                           ",
+                                                      "    Timestep,                !- Shading Calculation Update Frequency Method          ",
+                                                      "    ,                        !- Shading Calculation Update Frequency                 ",
                                                       "    ,                           !- Maximum Figures in Shadow Overlap Calculations    ",
                                                       "    ,                           !- Polygon Clipping Algorithm                        ",
+                                                      "    ,                        !- Pixel Counting Resolution                            ",
                                                       "    DetailedSkyDiffuseModeling, !- Sky Diffuse Modeling Algorithm                    ",
-                                                      "    ScheduledShading,           !- External Shading Calculation Method               ",
                                                       "    Yes;                        !- Output External Shading Calculation Results       ",
                                                       "  SurfaceConvectionAlgorithm:Inside,TARP;                                            ",
                                                       "  SurfaceConvectionAlgorithm:Outside,TARP;                                           ",
@@ -1054,7 +1057,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     DataSurfaces::ShadingTransmittanceVaries = true;
     DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
-    DataSystemVariables::UseScheduledSunlitFrac = true;
+    DataSystemVariables::shadingMethod = DataSystemVariables::ShadingMethod::Scheduled;
     SolarDistribution = FullExterior;
 
     CalcSkyDifShading = true;
@@ -1068,7 +1071,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     DataBSDFWindow::SUNCOSTS(4, 9, 3) = 0.1;
     FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
 
-    EXPECT_TRUE(UseScheduledSunlitFrac);
+    EXPECT_TRUE(DataSystemVariables::shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
     EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(2, 9, 4));
     EXPECT_FALSE(SolarShading::SUNCOS(3) < 0.00001);
     EXPECT_DOUBLE_EQ(0.00001, DataEnvironment::SunIsUpValue);
@@ -1094,12 +1097,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
                                                       "    ,                        !- Maximum Number of Warmup Days                        ",
                                                       "    6;                       !- Minimum Number of Warmup Days                        ",
                                                       "  ShadowCalculation,                                                                 ",
-                                                      "    TimestepFrequency,          !- Calculation Method                                ",
-                                                      "    ,                           !- Calculation Frequency                             ",
+                                                      "    PolygonClipping,         !- Shading Calculation Method                           ",
+                                                      "    Timestep,                !- Shading Calculation Update Frequency Method          ",
+                                                      "    ,                        !- Shading Calculation Update Frequency                 ",
                                                       "    ,                           !- Maximum Figures in Shadow Overlap Calculations    ",
                                                       "    ,                           !- Polygon Clipping Algorithm                        ",
+                                                      "    ,                           !- Pixel Counting Resolution                         ",
                                                       "    ,                           !- Sky Diffuse Modeling Algorithm                    ",
-                                                      "    ,                           !- External Shading Calculation Method               ",
                                                       "    ,                           !- Output External Shading Calculation Results       ",
                                                       "    Yes,                        !- Disable Shading within A Zone Group               ",
                                                       "    ,                           !- Disable Shading between Zone Groups               ",
@@ -1477,10 +1481,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
                                                       "    ,                        !- Maximum Number of Warmup Days                        ",
                                                       "    6;                       !- Minimum Number of Warmup Days                        ",
                                                       "  ShadowCalculation,                                                                 ",
-                                                      "    TimestepFrequency,       !- Calculation Method                                   ",
-                                                      "    ,                        !- Calculation Frequency                                ",
+                                                      "    PolygonClipping,         !- Shading Calculation Method                           ",
+                                                      "    Timestep,                !- Shading Calculation Update Frequency Method          ",
+                                                      "    ,                        !- Shading Calculation Update Frequency                 ",
                                                       "    ,                        !- Maximum Figures in Shadow Overlap Calculations       ",
                                                       "    ,                        !- Polygon Clipping Algorithm                           ",
+                                                      "    ,                        !- Pixel Counting Resolution                            ",
                                                       "    DetailedSkyDiffuseModeling;  !- Sky Diffuse Modeling Algorithm                   ",
                                                       "  SurfaceConvectionAlgorithm:Inside,TARP;                                            ",
                                                       "  SurfaceConvectionAlgorithm:Outside,TARP;                                           ",

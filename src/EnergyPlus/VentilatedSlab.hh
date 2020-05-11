@@ -302,7 +302,7 @@ namespace VentilatedSlab {
         // Default Constructor
         VentilatedSlabData()
             : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0), ControlType(0),
-              ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0), Fan_Index(0),
+              ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0), Fan_Index(0), FanType_Num(0),
               ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OAControlType(0), MinOASchedPtr(0), MaxOASchedPtr(0),
               TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0),
               MinOutAirMassFlow(0.0), SysConfg(0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0), HCoil_PlantTypeNum(0),

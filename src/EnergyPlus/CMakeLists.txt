@@ -256,6 +256,18 @@ SET( SRC
   GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh
   GroundTemperatureModeling/GroundTemperatureModelManager.cc
   GroundTemperatureModeling/GroundTemperatureModelManager.hh
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
+  GroundTemperatureModeling/XingGroundTemperatureModel.cc
+  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
@@ -328,18 +340,6 @@ SET( SRC
   HybridEvapCoolingModel.hh
   HybridModel.cc
   HybridModel.hh
-  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
-  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
-  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
-  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
-  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
-  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
-  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
-  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
-  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
-  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
-  GroundTemperatureModeling/XingGroundTemperatureModel.cc
-  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
@@ -450,6 +450,8 @@ SET( SRC
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
+  PlantLoopHeatPumpEIR.cc
+  PlantLoopHeatPumpEIR.hh
   Plant/PlantLocation.hh
   Plant/PlantManager.cc
   Plant/PlantManager.hh
@@ -462,6 +464,8 @@ SET( SRC
   PlantValves.cc
   PlantValves.hh
   Platform.hh
+  PluginManager.cc
+  PluginManager.hh
   PollutionModule.cc
   PollutionModule.hh
   PondGroundHeatExchanger.cc
@@ -527,6 +531,8 @@ SET( SRC
   SplitterComponent.hh
   StandardRatings.cc
   StandardRatings.hh
+  StateManagement.cc
+  StateManagement.hh
   SteamBaseboardRadiator.cc
   SteamBaseboardRadiator.hh
   SteamCoils.cc
@@ -602,8 +608,6 @@ SET( SRC
   WaterToAirHeatPump.hh
   WaterToAirHeatPumpSimple.cc
   WaterToAirHeatPumpSimple.hh
-  PlantLoopHeatPumpEIR.cc
-  PlantLoopHeatPumpEIR.hh
   WaterToWaterHeatPumps.hh
   WaterUse.cc
   WaterUse.hh
@@ -638,11 +642,7 @@ SET( SRC
   ZonePlenum.cc
   ZonePlenum.hh
   ZoneTempPredictorCorrector.cc
-  ZoneTempPredictorCorrector.hh
-  StateManagement.cc
-  StateManagement.hh
-  PluginManager.cc
-  PluginManager.hh)
+  ZoneTempPredictorCorrector.hh)
 
 CREATE_SRC_GROUPS( "${SRC}" )
 
@@ -686,6 +686,12 @@ if(LINK_WITH_PYTHON)
   # if we aren't, then the identified interpreter can be whatever bit it wants
   if(MSVC)
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
+#    if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64"))
+#      message(SEND_ERROR "Found 64-bit Python but attempting to generate non-64-bit EnergyPlus; this is invalid")
+#    endif()
+#    if(("${PYTHON_BIT_SIZE}" STREQUAL "32") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32"))
+#      message(SEND_ERROR "Found 32-bit Python but attempting to generate non-32-bit EnergyPlus; this is invalid")
+#    endif()
   endif()
 
   # now we need to get the Python libs and add the include path for further compiling
@@ -707,6 +713,9 @@ endif()
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
 target_link_libraries( energypluslib fmt::fmt objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib )
+if (OPENGL_FOUND)
+  target_link_libraries( energypluslib penumbra )
+endif()
 add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
@@ -723,19 +732,23 @@ if(LINK_WITH_PYTHON)
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
-SET( API_CORE_SRC
+SET( API_HEADERS
   api/func.h
-  api/func.cc
   api/runtime.h
-  api/runtime.cc
   api/datatransfer.h
-  api/datatransfer.cc
   api/EnergyPlusPgm.hh
+  api/EnergyPlusAPI.h
+  api/TypeDefs.h
+)
+SET( API_CORE_SRC
+  api/func.cc
+  api/runtime.cc
+  api/datatransfer.cc
   api/EnergyPlusPgm.cc
 )
 
 if(APPLE OR UNIX)
-  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC})
+  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} ${API_HEADERS})
 else()  # windows
   add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
@@ -767,8 +780,8 @@ add_custom_command(
         TARGET energyplus
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
-        -DREPO_ROOT="${PROJECT_SOURCE_DIR}"
-        -DEXECUTABLE_PATH="$<TARGET_FILE:energyplus>"
+        -DREPO_ROOT=${PROJECT_SOURCE_DIR}
+        -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
         -DCMAKE_VERSION_MAJOR="${CMAKE_VERSION_MAJOR}"
         -DCMAKE_VERSION_MINOR="${CMAKE_VERSION_MINOR}"
         -DCMAKE_VERSION_PATCH="${CMAKE_VERSION_PATCH}"
@@ -824,10 +837,18 @@ if(LINK_WITH_PYTHON)
 endif()
 
 if(BUILD_PACKAGE)
+  # if we are building package, we need to drop in some API/Plugin stuff
   if(LINK_WITH_PYTHON)
+    # we'll want to grab the standard lib for python plugins
     install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/python_standard_lib/"
             DESTINATION "./python_standard_lib")
   endif()
+  # we'll want to always provide the C API headers
+  foreach(HEADER ${API_HEADERS})
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}"
+            DESTINATION "./include/EnergyPlus/api")
+  endforeach()
+  # we'll want to always grab the python API wrapper
   install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/pyenergyplus/"
           DESTINATION "./pyenergyplus")
 endif()
@@ -896,7 +917,6 @@ if( BUILD_TESTING )
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/plugin_tester.py" "${PROJECT_SOURCE_DIR}/testfiles/PythonPluginCustomTrendVariable.py"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
   endif()
-
 endif()
 
 if(UNIX AND NOT APPLE)

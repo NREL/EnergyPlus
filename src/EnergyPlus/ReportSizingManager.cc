@@ -195,14 +195,14 @@ namespace ReportSizingManager {
         }
     }
 
-    void RequestSizing(std::string const &CompType,      // type of component
-                       std::string const &CompName,      // name of component
-                       int const SizingType,             // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
-                       std::string const &SizingString,  // string containing info for eio report
-                       Real64 &SizingResult,             // result of the sizing procedure
-                       bool const PrintWarningFlag,      // TRUE when requesting output (eio) reporting
-                       std::string const &CallingRoutine // name of calling routine for warning messages
-    )
+    void RequestSizing(std::string const &CompType,       // type of component
+                       std::string const &CompName,       // name of component
+                       int const SizingType,              // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
+                       std::string const &SizingString,   // string containing info for eio report
+                       Real64 &SizingResult,              // result of the sizing procedure
+                       bool const PrintWarningFlag,       // TRUE when requesting output (eio) reporting
+                       std::string const &CallingRoutine, // name of calling routine for warning messages
+                       Real64 const fraction)
     {
         // SUBROUTINE INFORMATION :
         // AUTHOR         Richard Raustad, FSEC
@@ -1987,7 +1987,9 @@ namespace ReportSizingManager {
                                                   DataFlowUsedForSizing,
                                                   AutosizeDes,
                                                   CallingRoutine);
-
+                        if (fraction < 1.0) {
+                            AutosizeDes *= fraction;
+                        }
                     } else {
                         AutosizeDes = 1.0;
                     }
@@ -3108,7 +3110,9 @@ namespace ReportSizingManager {
                                                   DataFlowUsedForSizing,
                                                   AutosizeDes,
                                                   CallingRoutine);
-
+                        if (fraction < 1.0) {
+                            AutosizeDes *= fraction;
+                        }
                     } else {
                         ShowSevereError(CallingRoutine + ' ' + CompType + ' ' + CompName);
                         ShowContinueError("... DataFlowUsedForSizing and DataCapacityUsedForSizing " + SizingString +

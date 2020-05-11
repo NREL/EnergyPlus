@@ -104,6 +104,7 @@
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -5253,7 +5254,7 @@ namespace SimAirServingZones {
         // have moved std 62.1 table report writing to ManageSystemVentilationAdjustments in SizingManager
     }
 
-    void UpdateSysSizing(int const CallIndicator)
+    void UpdateSysSizing(OutputFiles &outputFiles, int const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5295,16 +5296,8 @@ namespace SimAirServingZones {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static ObjexxFCL::gio::Fmt SSizeFmt10("('Time')");
-        static ObjexxFCL::gio::Fmt SSizeFmt11("(A1,A,A,A1,A,A,A1,A,A,A1,A,A)");
-        static ObjexxFCL::gio::Fmt SSizeFmt12("(A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A)");
-        static ObjexxFCL::gio::Fmt SSizeFmt20("(I2.2,':',I2.2,':00')");
-        static ObjexxFCL::gio::Fmt SSizeFmt21("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
-        static ObjexxFCL::gio::Fmt SSizeFmt22("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
-        static ObjexxFCL::gio::Fmt SSizeFmt30("('Coinc Peak   ')");
-        static ObjexxFCL::gio::Fmt SSizeFmt31("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
-        static ObjexxFCL::gio::Fmt SSizeFmt40("('NonCoinc Peak')");
-        static ObjexxFCL::gio::Fmt SSizeFmt41("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )");
+
+
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -7129,11 +7122,10 @@ namespace SimAirServingZones {
                 }
 
                 // write out the sys design calc results
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt10, flags);
-                }
+
+
+                print(outputFiles.ssz, "Time");
+                // static ObjexxFCL::gio::Fmt SSizeFmt11("(A1,A,A,A1,A,A,A1,A,A,A1,A,A)");
                 // for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
                 // 	{ IOFlags flags; flags.ADVANCE( "No" ); ObjexxFCL::gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep <<
                 // CalcSysSizing( I ).AirPriLoopName << ":Des Heat Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName <<
@@ -7142,19 +7134,37 @@ namespace SimAirServingZones {
                 // }
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
                     for (J = 1; J <= TotDesDays + TotRunDesPersDays; ++J) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt12, flags)
-                                << SizingFileColSep << CalcSysSizing(I).AirPriLoopName << ":DesPer" << J << ":Des Heat Mass Flow [kg/s]"
-                                << SizingFileColSep << CalcSysSizing(I).AirPriLoopName << ":DesPer" << J << ":Des Heat Cap [W]" << SizingFileColSep
-                                << CalcSysSizing(I).AirPriLoopName << ":DesPer" << J << ":Des Cool Mass Flow [kg/s]" << SizingFileColSep
-                                << CalcSysSizing(I).AirPriLoopName << ":DesPer" << J << ":Des Sens Cool Cap [W]" << SizingFileColSep
-                                << CalcSysSizing(I).AirPriLoopName << ":DesPer" << J << ":Des Tot Cool Cap [W]";
-                        }
+                        static constexpr auto SSizeFmt12("{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}");
+                        print(outputFiles.ssz,
+                              SSizeFmt12,
+                              SizingFileColSep,
+                              CalcSysSizing(I).AirPriLoopName,
+                              ":DesPer",
+                              J,
+                              ":Des Heat Mass Flow [kg/s]",
+                              SizingFileColSep,
+                              CalcSysSizing(I).AirPriLoopName,
+                              ":DesPer",
+                              J,
+                              ":Des Heat Cap [W]",
+                              SizingFileColSep,
+                              CalcSysSizing(I).AirPriLoopName,
+                              ":DesPer",
+                              J,
+                              ":Des Cool Mass Flow [kg/s]",
+                              SizingFileColSep,
+                              CalcSysSizing(I).AirPriLoopName,
+                              ":DesPer",
+                              J,
+                              ":Des Sens Cool Cap [W]",
+                              SizingFileColSep,
+                              CalcSysSizing(I).AirPriLoopName,
+                              ":DesPer",
+                              J,
+                              ":Des Tot Cool Cap [W]");
                     }
                 }
-                ObjexxFCL::gio::write(OutputFileSysSizing);
+                print(outputFiles.ssz, "\n");
                 //      HourFrac = 0.0
                 Minutes = 0;
                 TimeStepIndex = 0;
@@ -7168,57 +7178,60 @@ namespace SimAirServingZones {
                         } else {
                             HourPrint = HourCounter - 1;
                         }
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt20, flags) << HourPrint << Minutes;
-                        }
+                        static constexpr auto SSizeFmt20("{:02}:{:02}:00");
+                        print(outputFiles.ssz, SSizeFmt20, HourPrint, Minutes);
                         for (I = 1; I <= NumPrimaryAirSys; ++I) {
                             for (J = 1; J <= TotDesDays + TotRunDesPersDays; ++J) {
-                                {
-                                    IOFlags flags;
-                                    flags.ADVANCE("No");
-                                    ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt22, flags)
-                                        << SizingFileColSep << SysSizing(J, I).HeatFlowSeq(TimeStepIndex) << SizingFileColSep
-                                        << SysSizing(J, I).HeatCapSeq(TimeStepIndex) << SizingFileColSep << SysSizing(J, I).CoolFlowSeq(TimeStepIndex)
-                                        << SizingFileColSep << SysSizing(J, I).SensCoolCapSeq(TimeStepIndex) << SizingFileColSep
-                                        << SysSizing(J, I).TotCoolCapSeq(TimeStepIndex);
-                                }
+                                static constexpr auto SSizeFmt22("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
+
+                                print(outputFiles.ssz,
+                                      SSizeFmt22,
+                                      SizingFileColSep,
+                                      SysSizing(J, I).HeatFlowSeq(TimeStepIndex),
+                                      SizingFileColSep,
+                                      SysSizing(J, I).HeatCapSeq(TimeStepIndex),
+                                      SizingFileColSep,
+                                      SysSizing(J, I).CoolFlowSeq(TimeStepIndex),
+                                      SizingFileColSep,
+                                      SysSizing(J, I).SensCoolCapSeq(TimeStepIndex),
+                                      SizingFileColSep,
+                                      SysSizing(J, I).TotCoolCapSeq(TimeStepIndex));
                             }
                         }
-                        ObjexxFCL::gio::write(OutputFileSysSizing);
+                        print(outputFiles.ssz, "\n");
                     }
                 }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt30, flags);
-                }
+
+                static constexpr auto SSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
+                print(outputFiles.ssz, "Coinc Peak   ");
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt31, flags)
-                            << SizingFileColSep << CalcSysSizing(I).CoinHeatMassFlow << SizingFileColSep << CalcSysSizing(I).CoinCoolMassFlow
-                            << SizingFileColSep << CalcSysSizing(I).HeatCap << SizingFileColSep << CalcSysSizing(I).SensCoolCap;
-                    }
+                    print(outputFiles.ssz,
+                          SSizeFmt31,
+                          SizingFileColSep,
+                          CalcSysSizing(I).CoinHeatMassFlow,
+                          SizingFileColSep,
+                          CalcSysSizing(I).CoinCoolMassFlow,
+                          SizingFileColSep,
+                          CalcSysSizing(I).HeatCap,
+                          SizingFileColSep,
+                          CalcSysSizing(I).SensCoolCap);
                 }
-                ObjexxFCL::gio::write(OutputFileSysSizing);
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt40, flags);
-                }
+                print(outputFiles.ssz, "\n");
+
+                print(outputFiles.ssz, "NonCoinc Peak");
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt41, flags)
-                            << SizingFileColSep << CalcSysSizing(I).NonCoinHeatMassFlow << SizingFileColSep << CalcSysSizing(I).NonCoinCoolMassFlow
-                            << SizingFileColSep << CalcSysSizing(I).HeatCap << SizingFileColSep << CalcSysSizing(I).SensCoolCap;
-                    }
+                    print(outputFiles.ssz,
+                          SSizeFmt31,
+                          SizingFileColSep,
+                          CalcSysSizing(I).NonCoinHeatMassFlow,
+                          SizingFileColSep,
+                          CalcSysSizing(I).NonCoinCoolMassFlow,
+                          SizingFileColSep,
+                          CalcSysSizing(I).HeatCap,
+                          SizingFileColSep,
+                          CalcSysSizing(I).SensCoolCap);
                 }
-                ObjexxFCL::gio::write(OutputFileSysSizing);
+                print(outputFiles.ssz, "\n");
 
                 // have moved a big section to later in calling order, write predefined standard 62.1 report data
             }

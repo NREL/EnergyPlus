@@ -115,7 +115,7 @@ namespace ZoneEquipmentManager {
 
     void RezeroZoneSizingArrays();
 
-    void UpdateZoneSizing(int const CallIndicator);
+    void UpdateZoneSizing(OutputFiles &outputFiles, int const CallIndicator);
 
     void SimZoneEquipment(bool const FirstHVACIteration, bool &SimAir);
 

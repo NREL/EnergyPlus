@@ -211,7 +211,6 @@ namespace SizingManager {
         //  EXTERNAL            ReportSysSizing
         std::string curName;
         int NumSizingPeriodsPerformed;
-        int write_stat;
         int numZoneSizeIter; // number of times to repeat zone sizing calcs. 1 normal, 2 load component reporting
         int iZoneCalcIter;   // index for repeating the zone sizing calcs
         static bool runZeroingOnce(true);
@@ -222,8 +221,6 @@ namespace SizingManager {
 
         // FLOW:
 
-        OutputFileZoneSizing = 0;
-        OutputFileSysSizing = 0;
         TimeStepInDay = 0;
         SysSizingRunDone = false;
         ZoneSizingRunDone = false;
@@ -286,44 +283,25 @@ namespace SizingManager {
             DoOutputReporting = false;
             ZoneSizingCalc = true;
             Available = true;
-            OutputFileZoneSizing = GetNewUnitNumber();
+
             if (SizingFileColSep == CharComma) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszCsvFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputZszCsvFileName + " for output (write).");
-                }
+                outputFiles.zsz.fileName = outputFiles.outputZszCsvFileName;
             } else if (SizingFileColSep == CharTab) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTabFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputZszTabFileName + " for output (write).");
-                }
+                outputFiles.zsz.fileName = outputFiles.outputZszTabFileName;
             } else {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTxtFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputZszTxtFileName + " for output (write).");
-                }
+                outputFiles.zsz.fileName = outputFiles.outputZszTxtFileName;
+            }
+
+            outputFiles.zsz.open();
+            if (!outputFiles.zsz.good() != 0) {
+                ShowFatalError(RoutineName + "Could not open file " + outputFiles.zsz.fileName + " for output (write).");
             }
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
             ResetEnvironmentCounter();
             KickOffSizing = true;
-            SetupZoneSizing(ErrorsFound); // Should only be done ONCE
+            SetupZoneSizing(outputFiles, ErrorsFound); // Should only be done ONCE
             KickOffSizing = false;
 
             for (iZoneCalcIter = 1; iZoneCalcIter <= numZoneSizeIter; ++iZoneCalcIter) { // normally this is performed once but if load component
@@ -395,7 +373,7 @@ namespace SizingManager {
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
-                            UpdateZoneSizing(BeginDay);
+                            UpdateZoneSizing(outputFiles, BeginDay);
                             UpdateFacilitySizing(BeginDay);
                         }
 
@@ -426,18 +404,7 @@ namespace SizingManager {
                                 }
 
                                 // set flag for pulse used in load component reporting
-                                doLoadComponentPulseNow = false;
-                                if (isPulseZoneSizing) {
-                                    if (!WarmupFlag) {
-                                        if (DayOfSim == 1) {         // first day of sizing period
-                                            if (HourOfDay == 10) {   // at 10am
-                                                if (TimeStep == 1) { // first timestep in hour
-                                                    doLoadComponentPulseNow = true;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                doLoadComponentPulseNow = CalcdoLoadComponentPulseNow(isPulseZoneSizing,WarmupFlag,HourOfDay,TimeStep,KindOfSim,DayOfSim);
 
                                 ManageWeather();
 
@@ -451,7 +418,7 @@ namespace SizingManager {
                                     DesDayWeath(CurOverallSimDay).Press(TimeStepInDay) = OutBaroPress;
                                 }
 
-                                ManageHeatBalance();
+                                ManageHeatBalance(outputFiles);
 
                                 BeginHourFlag = false;
                                 BeginDayFlag = false;
@@ -465,7 +432,7 @@ namespace SizingManager {
                         } // ... End hour loop.
 
                         if (EndDayFlag) {
-                            UpdateZoneSizing(EndDay);
+                            UpdateZoneSizing(outputFiles, EndDay);
                             UpdateFacilitySizing(EndDay);
                         }
 
@@ -481,7 +448,7 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(EndZoneSizingCalc);
+                    UpdateZoneSizing(outputFiles, EndZoneSizingCalc);
                     UpdateFacilitySizing(EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
@@ -521,38 +488,18 @@ namespace SizingManager {
 
             SysSizingCalc = true;
             Available = true;
-            OutputFileSysSizing = GetNewUnitNumber();
             if (SizingFileColSep == CharComma) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszCsvFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputSszCsvFileName + " for output (write).");
-                }
+                outputFiles.ssz.fileName = outputFiles.outputSszCsvFileName;
             } else if (SizingFileColSep == CharTab) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTabFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputSszTabFileName + " for output (write).");
-                }
+                outputFiles.ssz.fileName = outputFiles.outputSszTabFileName;
             } else {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTxtFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputSszTxtFileName + " for output (write).");
-                }
+                outputFiles.ssz.fileName = outputFiles.outputSszTxtFileName;
             }
+            outputFiles.ssz.open();
+            if (!outputFiles.ssz.good()) {
+                ShowFatalError(RoutineName + "Could not open file " + outputFiles.ssz.fileName + " for output (write).");
+            }
+
             SimAir = true;
             SimZoneEquip = true;
 
@@ -612,7 +559,7 @@ namespace SizingManager {
                             DisplayString("Calculating System sizing");
                             DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                         }
-                        UpdateSysSizing(BeginDay);
+                        UpdateSysSizing(outputFiles, BeginDay);
                     }
 
                     for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -641,7 +588,7 @@ namespace SizingManager {
 
                             ManageWeather();
 
-                            UpdateSysSizing(DuringDay);
+                            UpdateSysSizing(outputFiles, DuringDay);
 
                             BeginHourFlag = false;
                             BeginDayFlag = false;
@@ -653,7 +600,7 @@ namespace SizingManager {
 
                     } // ... End hour loop.
 
-                    if (EndDayFlag) UpdateSysSizing(EndDay);
+                    if (EndDayFlag) UpdateSysSizing(outputFiles, EndDay);
 
                     if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
                         ++CurOverallSimDay;
@@ -664,7 +611,7 @@ namespace SizingManager {
             } // ... End environment loop
 
             if (NumSizingPeriodsPerformed > 0) {
-                UpdateSysSizing(EndSysSizingCalc);
+                UpdateSysSizing(outputFiles, EndSysSizingCalc);
                 SysSizingRunDone = true;
             } else {
                 ShowSevereError(RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
@@ -884,6 +831,31 @@ namespace SizingManager {
         if (ErrorsFound) {
             ShowFatalError("Program terminates due to preceding conditions.");
         }
+    }
+
+    bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
+                                     bool const WarmupFlag,
+                                     int const HourOfDay,
+                                     int const TimeStep,
+                                     int const KindOfSim,
+                                     int const DayOfSim
+                                     )
+    {
+        // This routine decides whether or not to do a Load Component Pulse.  True when yes it should, false when in shouldn't
+        // This check looks to do the pulse at the first time step of the 10th hour of the day while not in warmup mode.
+        // This needs to be done not just on the first day of a simulation because when the user picks a design day derived from
+        // an attached weather file the design day is not necessarily the first day of the simulation.
+
+        int const HourDayToPulse (10);
+        int const TimeStepToPulse (1);
+        
+        if ( (isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
+             ((KindOfSim == ksRunPeriodDesign) || (DayOfSim == 1)) ) {
+            return true;
+        } else {
+            return false;
+        }
+        
     }
 
     void ManageSystemSizingAdjustments()
@@ -2165,14 +2137,14 @@ namespace SizingManager {
 
     void ProcessInputOARequirements(std::string const &CurrentModuleObject,
                                     int const OAIndex,
-                                    Array1_string const &Alphas,
+                                    Array1D_string const &Alphas,
                                     int &NumAlphas,
-                                    Array1<Real64> const &Numbers,
+                                    Array1D<Real64> const &Numbers,
                                     int &NumNumbers,
-                                    Array1_bool const &EP_UNUSED(lNumericBlanks), // Unused
-                                    Array1_bool const &lAlphaBlanks,
-                                    Array1_string const &cAlphaFields,
-                                    Array1_string const &EP_UNUSED(cNumericFields), // Unused
+                                    Array1D_bool const &EP_UNUSED(lNumericBlanks), // Unused
+                                    Array1D_bool const &lAlphaBlanks,
+                                    Array1D_string const &cAlphaFields,
+                                    Array1D_string const &EP_UNUSED(cNumericFields), // Unused
                                     bool &ErrorsFound                               // If errors found in input
     )
     {
@@ -3905,7 +3877,7 @@ namespace SizingManager {
         }
     }
 
-    void SetupZoneSizing(bool &ErrorsFound)
+    void SetupZoneSizing(OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3937,7 +3909,7 @@ namespace SizingManager {
         CurOverallSimDay = 0;
         while (Available) { // do for each environment
 
-            GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
+            GetNextEnvironment(outputFiles, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -3971,7 +3943,7 @@ namespace SizingManager {
 
             ManageWeather();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -3982,7 +3954,7 @@ namespace SizingManager {
             //          ! do another timestep=1
             ManageWeather();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
             //         do an end of day, end of environment time step
 
@@ -3992,7 +3964,7 @@ namespace SizingManager {
 
             ManageWeather();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
         } // ... End environment loop.
     }

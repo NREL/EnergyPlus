@@ -3681,7 +3681,7 @@ namespace HVACMultiSpeedHeatPump {
     //******************************************************************************
 
     Real64 MSHPCyclingResidual(Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1<Real64> const &Par  // par(1) = MSHPNum
+                               Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
         // FUNCTION INFORMATION:
@@ -3757,8 +3757,8 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    Real64 MSHPVarSpeedResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                Array1<Real64> const &Par // par(1) = MSHPNum
+    Real64 MSHPVarSpeedResidual(Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
         // FUNCTION INFORMATION:
@@ -4355,8 +4355,8 @@ namespace HVACMultiSpeedHeatPump {
         HeatCoilLoadmet = QCoilActual;
     }
 
-    Real64 HotWaterCoilResidual(Real64 const HWFlow,      // hot water flow rate in kg/s
-                                Array1<Real64> const &Par // Par(5) is the requested coil load
+    Real64 HotWaterCoilResidual(Real64 const HWFlow,       // hot water flow rate in kg/s
+                                Array1D<Real64> const &Par // Par(5) is the requested coil load
     )
     {
 

@@ -95,7 +95,7 @@ function(target_architecture output_var)
             list(APPEND ARCH ppc64)
         endif()
     else()
-      file(WRITE "${PROJECT_BINARY_DIR}/arch.c" "${archdetect_c_code}")
+        file(WRITE "${PROJECT_BINARY_DIR}/arch.c" "${archdetect_c_code}")
 
         enable_language(C)
 

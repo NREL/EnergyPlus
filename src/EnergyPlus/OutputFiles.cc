@@ -74,7 +74,7 @@ std::ostream &get_out_stream(int const FileID, const std::string &fileName)
     }
 }
 
-bool OutputFiles::OutputFile::good() const
+bool OutputFile::good() const
 {
     if (os) {
         return os->good();
@@ -83,17 +83,25 @@ bool OutputFiles::OutputFile::good() const
     }
 }
 
-void OutputFiles::OutputFile::close()
+void OutputFile::close()
 {
     os.reset();
 }
 
-void OutputFiles::OutputFile::open_as_stringstream()
+void OutputFile::del()
+{
+    if (os) {
+        os.reset();
+        std::remove(fileName.c_str());
+    }
+}
+
+void OutputFile::open_as_stringstream()
 {
     os = std::unique_ptr<std::iostream>(new std::stringstream());
 }
 
-std::string OutputFiles::OutputFile::get_output()
+std::string OutputFile::get_output()
 {
     auto *ss = dynamic_cast<std::stringstream *>(os.get());
     if (ss) {
@@ -103,16 +111,16 @@ std::string OutputFiles::OutputFile::get_output()
     }
 }
 
-OutputFiles::OutputFile::OutputFile(std::string FileName) : fileName(std::move(FileName))
+OutputFile::OutputFile(std::string FileName) : fileName(std::move(FileName))
 {
 }
 
-void OutputFiles::OutputFile::open()
+void OutputFile::open()
 {
     os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc));
 }
 
-std::vector<std::string> OutputFiles::OutputFile::getLines()
+std::vector<std::string> OutputFile::getLines()
 {
     if (os) {
         // avoid saving and reloading the file by simply reading the current input stream
@@ -134,7 +142,7 @@ std::vector<std::string> OutputFiles::OutputFile::getLines()
     return std::vector<std::string>();
 }
 
-void OutputFiles::OutputFile::open_at_end()
+void OutputFile::open_at_end()
 {
     os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::ate));
 }

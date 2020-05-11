@@ -243,12 +243,8 @@ namespace DataGlobals {
     extern int OutputStandardError;                  // Unit number for the standard error output file
     extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern std::ostream *eio_stream;                 // Internal stream used for eio output (used for unit tests)
     extern int OutputFileDebug;                      // Unit number for debug outputs
-    extern int OutputFileZoneSizing;                 // Unit number of zone sizing calc output file
-    extern int OutputFileSysSizing;                  // Unit number of system sizing calc output file
-    extern int OutputFileMeters;                     // Unit number for meters output
-    extern std::ostream *mtr_stream;                 // Internal stream used for mtr output (used for performance)
+    extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int OutputFileShadingFrac;                // Unit number for shading output
     extern int StdMeterRecordCount;                  // Count of Meter output records
     extern int OutputFileBNDetails;                  // Unit number for Branch-Node Details
@@ -301,6 +297,7 @@ namespace DataGlobals {
     extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
     extern bool AnyBasementsInModel;     // true if there are any basements in the input file
     extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
+    extern bool createPerfLog; //true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
     extern int Progress;
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);

@@ -573,7 +573,7 @@ namespace FuelCellElectricGenerator {
                                         Real64 &PelDiff    // if constrained then this is the difference, positive
         );
 
-        Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, Array1<Real64> const &Par);
+        Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, Array1D<Real64> const &Par);
 
         static void FigureGaseousWaterEnthalpy(Real64 FluidTemp, Real64 &HGasWater);
 

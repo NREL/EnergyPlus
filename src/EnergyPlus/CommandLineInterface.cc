@@ -60,6 +60,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReports.hh>
@@ -129,7 +130,7 @@ namespace CommandLineInterface {
         // Define options
         ezOptionParser opt;
 
-        opt.overview = VerString;
+        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage();
 
         opt.syntax = "energyplus [options] [input-file]";
 
@@ -421,7 +422,7 @@ namespace CommandLineInterface {
 
         outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
         outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
-        outputMtrFileName = outputFilePrefix + normalSuffix + ".mtr";
+        OutputFiles::getSingleton().mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
         outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         outputDfsFileName = outputFilePrefix + normalSuffix + ".dfs";
@@ -433,6 +434,7 @@ namespace CommandLineInterface {
         outputWrlFileName = outputFilePrefix + normalSuffix + ".wrl";
         outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
         outputDbgFileName = outputFilePrefix + normalSuffix + ".dbg";
+        outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
         outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
         outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
         outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
@@ -441,12 +443,12 @@ namespace CommandLineInterface {
         outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
         outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
         outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
-        outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
-        outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
-        outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
-        outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
-        outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
-        outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
+        OutputFiles::getSingleton().outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
+        OutputFiles::getSingleton().outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
+        OutputFiles::getSingleton().outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
+        OutputFiles::getSingleton().outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
+        OutputFiles::getSingleton().outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
+        OutputFiles::getSingleton().outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
         outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
         outputExtShdFracFileName = outputFilePrefix + shdSuffix + ".csv";
         if (suffixType == "L" || suffixType == "l") {
@@ -895,7 +897,7 @@ namespace CommandLineInterface {
             if (iostatus != 0) {
                 ShowFatalError("EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write).");
             }
-            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrFileName;
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << OutputFiles::getSingleton().mtr.fileName;
             ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrCsvFileName;
             ObjexxFCL::gio::close(fileUnitNumber);
         }

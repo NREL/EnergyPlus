@@ -370,7 +370,7 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
 
                         ManageExteriorEnergyUse();
 
-                        ManageHeatBalance();
+                        ManageHeatBalance(outputFiles);
 
                         BeginHourFlag = false;
                         BeginDayFlag = false;

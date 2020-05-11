@@ -2422,9 +2422,9 @@ DCtoACInverter::DCtoACInverter(std::string const &objectName)
                                       "ElectricLoadCenter:Inverter:Simple",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterSimple,
-                                      qdotConvZone_,
-                                      _,
-                                      qdotRadZone_);
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
                 break;
             }
             case InverterModelType::curveFuncOfPower: {
@@ -2432,9 +2432,9 @@ DCtoACInverter::DCtoACInverter(std::string const &objectName)
                                       "ElectricLoadCenter:Inverter:FunctionOfPower",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
-                                      qdotConvZone_,
-                                      _,
-                                      qdotRadZone_);
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
                 break;
             }
             case InverterModelType::cECLookUpTableModel: {
@@ -2442,9 +2442,9 @@ DCtoACInverter::DCtoACInverter(std::string const &objectName)
                                       "ElectricLoadCenter:Inverter:LookUpTable",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
-                                      qdotConvZone_,
-                                      _,
-                                      qdotRadZone_);
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
                 break;
             }
             case InverterModelType::notYetSet: {
@@ -2790,9 +2790,9 @@ ACtoDCConverter::ACtoDCConverter(std::string const &objectName)
                                   "ElectricLoadCenter:Storage:Converter",
                                   name_,
                                   DataHeatBalance::IntGainTypeOf_ElectricLoadCenterConverter,
-                                  qdotConvZone_,
-                                  _,
-                                  qdotRadZone_);
+                                  &qdotConvZone_,
+                                  nullptr,
+                                  &qdotRadZone_);
         }
     } else {
         ShowSevereError(routineName + " did not find power converter name = " + objectName);
@@ -3168,9 +3168,9 @@ ElectricStorage::ElectricStorage( // main constructor
                                       "ElectricLoadCenter:Storage:Simple",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageSimple,
-                                      qdotConvZone_,
-                                      _,
-                                      qdotRadZone_);
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
                 break;
             }
             case StorageModelType::kiBaMBattery: {
@@ -3178,9 +3178,9 @@ ElectricStorage::ElectricStorage( // main constructor
                                       "ElectricLoadCenter:Storage:Battery",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageBattery,
-                                      qdotConvZone_,
-                                      _,
-                                      qdotRadZone_);
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
                 break;
             }
             case StorageModelType::storageTypeNotSet: {
@@ -4109,9 +4109,9 @@ ElectricTransformer::ElectricTransformer(std::string const &objectName)
                                   "ElectricLoadCenter:Transformer",
                                   name_,
                                   DataHeatBalance::IntGainTypeOf_ElectricLoadCenterTransformer,
-                                  qdotConvZone_,
-                                  _,
-                                  qdotRadZone_);
+                                  &qdotConvZone_,
+                                  nullptr,
+                                  &qdotRadZone_);
         }
 
     } else {

@@ -3647,8 +3647,8 @@ namespace ScheduleManager {
     }
 
     void ProcessForDayTypes(std::string const &ForDayField, // Field containing the "FOR:..."
-                            Array1A_bool TheseDays,         // Array to contain returned "true" days
-                            Array1A_bool AlReady,           // Array of days already done
+                            Array1D_bool &TheseDays,        // Array to contain returned "true" days
+                            Array1D_bool &AlReady,          // Array of days already done
                             bool &ErrorsFound               // Will be true if error found.
     )
     {
@@ -3673,8 +3673,8 @@ namespace ScheduleManager {
         // na
 
         // Argument array dimensioning
-        TheseDays.dim(MaxDayTypes);
-        AlReady.dim(MaxDayTypes);
+        EP_SIZE_CHECK(TheseDays, MaxDayTypes);
+        EP_SIZE_CHECK(AlReady, MaxDayTypes);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

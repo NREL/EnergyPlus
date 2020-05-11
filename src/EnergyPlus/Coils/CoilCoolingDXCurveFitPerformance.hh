@@ -71,6 +71,7 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
     int compressor_fuel_type;
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
+    std::string alternate_operating_mode2_name;
     std::string capacity_control;
 };
 
@@ -80,13 +81,14 @@ struct CoilCoolingDXCurveFitPerformance
     void instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
     void simulate(const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
-                  bool useAlternateMode,
+                  int useAlternateMode,
                   Real64 &PLR,
                   int &speedNum,
                   Real64 &speedRatio,
                   int &fanOpMode,
                   DataLoopNode::NodeData &condInletNode,
-                  DataLoopNode::NodeData &condOutletNode);
+                  DataLoopNode::NodeData &condOutletNode,
+                  Real64 LoadSHR = 0.0);
 
     void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
                    const DataLoopNode::NodeData &inletNode,
@@ -104,6 +106,7 @@ struct CoilCoolingDXCurveFitPerformance
     CoilCoolingDXCurveFitPerformance() = default;
     explicit CoilCoolingDXCurveFitPerformance(const std::string &name);
     void size();
+    void setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 
     std::string name;
     Real64 crankcaseHeaterCap = 0.0;
@@ -131,10 +134,15 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 RTF = 0.0;
     bool oneTimeEIOHeaderWrite = true;
     Real64 wasteHeatRate = 0.0;
+    int OperatingMode = 0;
+    Real64 ModeRatio = 0.0;
+    Real64 recoveredEnergyRate = 0.0;
+    Real64 NormalSHR = 0.0;
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
-    bool hasAlternateMode = false;
-    CoilCoolingDXCurveFitOperatingMode alternateMode; // enhanced dehumidifcation
+    int hasAlternateMode = 0; // 0 Normal, 1 Enhanced, 2 SubcoolReheat
+    CoilCoolingDXCurveFitOperatingMode alternateMode; // enhanced dehumidifcation or Subcool mode
+    CoilCoolingDXCurveFitOperatingMode alternateMode2; // Reheat mode
 };
 
 } // namespace EnergyPlus

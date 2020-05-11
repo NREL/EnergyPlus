@@ -448,8 +448,9 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
         "    25;                      !- Maximum HVAC Iterations",
 
         "  ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    7,                       !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    7,                       !- Shading Calculation Update Frequency",
         "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
 
         "  Timestep,6;",
@@ -2021,8 +2022,9 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
         "    25;                      !- Maximum HVAC Iterations",
 
         "  ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    7,                       !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    7,                       !- Shading Calculation Update Frequency",
         "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
 
         "  Timestep,6;",

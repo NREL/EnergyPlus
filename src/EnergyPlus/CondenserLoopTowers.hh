@@ -402,20 +402,20 @@ namespace CondenserLoopTowers {
 
         void report(bool RunFlag);
 
-        Real64 residualUA(Real64 UA,                // UA of cooling tower
-                          Array1<Real64> const &Par // par(1) = design tower load [W]
+        Real64 residualUA(Real64 UA,                 // UA of cooling tower
+                          Array1D<Real64> const &Par // par(1) = design tower load [W]
         );
 
-        Real64 residualTa(Real64 FlowRatio,         // water or air flow ratio of cooling tower
-                          Array1<Real64> const &Par // par(1) = tower number
+        Real64 residualTa(Real64 FlowRatio,          // water or air flow ratio of cooling tower
+                          Array1D<Real64> const &Par // par(1) = tower number
         );
 
-        Real64 residualTr(Real64 Trange,            // cooling tower range temperature [C]
-                          Array1<Real64> const &Par // par(1) = tower number
+        Real64 residualTr(Real64 Trange,             // cooling tower range temperature [C]
+                          Array1D<Real64> const &Par // par(1) = tower number
         );
 
-        Real64 residualMerkelLoad(Real64 _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                  Array1<Real64> const &Par // par(1) = Tower number
+        Real64 residualMerkelLoad(Real64 _AirFlowRateRatio,  // fan speed ratio (1.0 is continuous, 0.0 is off)
+                                  Array1D<Real64> const &Par // par(1) = Tower number
         );
 
         static PlantComponent *factory(std::string const &objectName);

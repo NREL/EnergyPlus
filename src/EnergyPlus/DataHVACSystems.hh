@@ -79,8 +79,8 @@ namespace EnergyPlus {
         ) = 0;
 
         virtual void sizeSystem(bool const FirstHVACIteration, int const AirLoopNum) = 0;
-        virtual int getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
-        virtual int getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
+        virtual int getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
+        virtual int getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
 
     };
 

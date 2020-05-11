@@ -75,6 +75,11 @@ using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
 namespace EnergyPlus {
+
+    int const coilNormalMode = 0;       // Normal operation mode
+    int const coilEnhancedMode = 1;     // Enhanced operation mode
+    int const coilSubcoolReheatMode = 2; // SubcoolReheat operation mode
+
     std::vector<CoilCoolingDX> coilCoolingDXs;
     bool coilCoolingDXGetInputFlag = true;
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
@@ -135,6 +140,12 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     bool errorsFound = false;
     this->name = input_data.name;
     this->performance = CoilCoolingDXCurveFitPerformance(input_data.performance_object_name);
+
+    if (!this->performance.original_input_specs.base_operating_mode_name.empty() &&
+        !this->performance.original_input_specs.alternate_operating_mode_name.empty() && 
+        !this->performance.original_input_specs.alternate_operating_mode2_name.empty()) {
+        this->CoolingCoilType = DataHVACGlobals::CoilDX_SubcoolReheat;
+    }
 
     // other construction below
     this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.evaporator_inlet_node_name,
@@ -372,6 +383,37 @@ void CoilCoolingDX::oneTimeInit() {
                             _,
                             "System");
     }
+    if (this->CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
+        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode",
+                            OutputProcessor::Unit::None,
+                            this->performance.OperatingMode,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio", 
+                            OutputProcessor::Unit::None, 
+                            this->performance.ModeRatio, 
+                            "System", 
+                            "Average", 
+                            this->name);
+        SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy Rate",
+                            OutputProcessor::Unit::W,
+                            this->recoveredHeatEnergyRate,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy",
+                            OutputProcessor::Unit::J,
+                            this->recoveredHeatEnergy,
+                            "System",
+                            "Sum",
+                            this->name,
+                            _,
+                            "ENERGYTRANSFER",
+                            "HEATRECOVERY",
+                            _,
+                            "System");
+    }
 
 }
 
@@ -416,7 +458,7 @@ void CoilCoolingDX::size() {
     this->performance.size();
 }
 
-void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode)
+void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();
@@ -432,7 +474,10 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     // call the simulation, which returns useful data
     // TODO: check the avail schedule and reset data/pass through data as needed
     // TODO: check the minOATcompressor and reset data/pass through data as needed
-    this->performance.simulate(evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+    this->performance.OperatingMode = 0;
+    this->performance.ModeRatio = 0.0;
+    this->performance.simulate(
+        evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, LoadSHR);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // after we have made a call to simulate, the component should be fully sized, so we can report standard ratings
@@ -476,7 +521,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
             Real64 condAirMassFlow = condInletNode.MassFlowRate; // TODO: How is this getting a value?
             Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
-            if (!useAlternateMode) {
+            if (useAlternateMode == coilNormalMode) {
                 this->evapCondPumpElecPower = this->performance.normalMode.getCurrentEvapCondPumpPower(speedNum);
             }
             DataWater::WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
@@ -513,6 +558,11 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->partLoadRatioReport = PLR;
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
+
+    if (useAlternateMode == coilSubcoolReheatMode) {
+        this->recoveredHeatEnergyRate = this->performance.recoveredEnergyRate;
+        this->recoveredHeatEnergy = this->recoveredHeatEnergyRate * reportingConstant;
+    }
 
     // Fishy global things that need to be set here, try to set the AFN stuff now
     // This appears to be the only location where airLoopNum gets used

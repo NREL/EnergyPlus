@@ -468,7 +468,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     for (int gainType = 1; gainType <= numGainTypes; ++gainType) {
         convGains(gainType) = 100 * gainType;
         expectedTotConvGains += convGains(gainType);
-        SetupZoneInternalGain(zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes(gainType), "Gain", gainType, convGains(gainType));
+        SetupZoneInternalGain(zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes(gainType), "Gain", gainType, &convGains(gainType));
     }
 
     InternalHeatGains::UpdateInternalGainValues();
