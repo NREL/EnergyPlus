@@ -25,7 +25,7 @@ if( EXISTS ${XELATEX} )
   get_directory_property(hasParent PARENT_DIRECTORY)
   if(hasParent AND BUILD_DOCS_ONLY_WITH_PACKAGE)
     # Because we don't want to rebuild doc automatically, we do not add it to the 'ALL' rule
-    message(AUTHOR_WARNING "The target `docs` was added, but not the default build rule. It will be triggered by `make docs` or `make package`")
+    message(AUTHOR_WARNING "The target `docs` was added, but not to the default build rule. It will be triggered by `make docs` or `make package`")
     add_custom_target(docs)
   else()
     # Building standalone, so add to ALL
