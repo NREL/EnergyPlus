@@ -304,7 +304,10 @@ namespace EMSManager {
         anyProgramRan = false;
         if (!AnyEnergyManagementSystemInModel) return; // quick return if nothing to do
 
-        if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) BeginEnvrnInitializeRuntimeLanguage();
+        if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
+            BeginEnvrnInitializeRuntimeLanguage();
+            PluginManagement::onBeginEnvironment();
+        }
 
         InitEMS(iCalledFrom);
 
