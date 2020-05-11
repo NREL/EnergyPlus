@@ -274,9 +274,11 @@ namespace PhotovoltaicThermalCollectors {
         int NumAlphas;           // Number of Alphas for each GetObjectItem call
         int NumNumbers;          // Number of Numbers for each GetObjectItem call
         int IOStatus;            // Used in GetObjectItem
+        int Found;
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         using DataGlobals::ScheduleAlwaysOn;
         using ScheduleManager::GetScheduleIndex;
+        using DataSurfaces::OSCM;
 
         tmpBIPVTperf.allocate(NumBIPVTPerform);
         for (Item = 1; Item <= NumBIPVTPerform; ++Item) {
@@ -294,6 +296,13 @@ namespace PhotovoltaicThermalCollectors {
             if (UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound)) continue;
             tmpBIPVTperf(Item).Name = DataIPShortCuts::cAlphaArgs(1);
             tmpBIPVTperf(Item).OSCMName = DataIPShortCuts::cAlphaArgs(2);
+            Found = UtilityRoutines::FindItemInList(tmpBIPVTperf(Item).OSCMName, OSCM);
+            if (Found == 0) {
+                std::string object_name = "SolarCollectorPerformance:PhotovoltaicThermal:BIPVT";
+                ShowSevereError(DataIPShortCuts::cAlphaFieldNames(2) + " not found = " + tmpBIPVTperf(Item).OSCMName + " in " + object_name + " = " + tmpBIPVTperf(Item).Name);
+                ErrorsFound = true;
+            }
+            tmpBIPVTperf(Item).OSCMPtr = Found;
             tmpBIPVTperf(Item).PVEffGapWidth = DataIPShortCuts::rNumericArgs(1);
             tmpBIPVTperf(Item).EffCollHeight = DataIPShortCuts::rNumericArgs(2);
             tmpBIPVTperf(Item).EffCollWidth = DataIPShortCuts::rNumericArgs(3);
@@ -406,7 +415,7 @@ namespace PhotovoltaicThermalCollectors {
                     if (ThisParamObj > 0) {
                         PVT(Item).BIPVT = tmpBIPVTperf(ThisParamObj); // entire structure assigned
                         // do one-time setups on input data
-                        PVT(Item).AreaCol = DataSurfaces::Surface(PVT(Item).SurfNum).Area * PVT(Item).BIPVT.PVAreaFract;
+                        PVT(Item).AreaCol = PVT(Item).BIPVT.EffCollWidth * PVT(Item).BIPVT.EffCollHeight;
                         PVT(Item).PVTModelType = BIPVTmodel;
                     } else {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
@@ -1182,6 +1191,7 @@ namespace PhotovoltaicThermalCollectors {
         // ???
 
         static std::string const RoutineName("CalcBIPVTcollectors");
+        using ScheduleManager::GetCurrentScheduleValue;
 
         int InletNode = this->HVACInletNodeNum;
         Real64 mdot = this->MassFlowRate;
@@ -1194,7 +1204,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 small_num(1.0e-10);
         std::string Mode("Heating");
 
-        if (this->HeatingUseful && this->BypassDamperOff && (mdot > 0.0)) {
+        if (this->HeatingUseful && this->BypassDamperOff && (mdot > 0.0) && (GetCurrentScheduleValue(this->BIPVT.SchedPtr) > 0.0)) {
 
             if ((DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint - Tinlet) > 0.1) {
                 BIPVT_MaxHeatGain_calculate(DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint,
@@ -1220,8 +1230,9 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.MdotWorkFluid = mdot;
             this->Report.ToutletWorkFluid = PotentialOutletTemp;
             this->Report.BypassStatus = BypassFraction;
+            if (PotentialHeatGain > 0.0) this->BIPVT.LastCollectorTemp = Tcollector;
 
-        } else if (this->CoolingUseful && this->BypassDamperOff && (mdot > 0.0)) {
+        } else if (this->CoolingUseful && this->BypassDamperOff && (mdot > 0.0) && (GetCurrentScheduleValue(this->BIPVT.SchedPtr) > 0.0)) {
 
             Mode = "Cooling";
             if ((Tinlet - DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint) > 0.1) {
@@ -1270,7 +1281,7 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
             this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             this->Report.ThermEfficiency = 0.0;
-            this->BIPVT.LastCollectorTemp = Tcollector;
+            if(PotentialHeatGain < 0.0) this->BIPVT.LastCollectorTemp = Tcollector;
             this->Report.BypassStatus = BypassFraction;
         } else {
             this->Report.TinletWorkFluid = Tinlet;
@@ -1285,8 +1296,8 @@ namespace PhotovoltaicThermalCollectors {
         }
     } // namespace PhotovoltaicThermalCollectors
 
-    void PVTCollectorStruct::BIPVT_MaxHeatGain_calculate(Real64 tsp, std::string Mode, Real64 &bfr, Real64 &q, Real64 &tfout, Real64 &ThEff, 
-        Real64 &tpv)
+    void PVTCollectorStruct::BIPVT_MaxHeatGain_calculate(Real64 tsp, std::string Mode, Real64 &bfr, Real64 &q, Real64 &tmixed,
+        Real64 &ThEff, Real64 &tpv)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         K. Haddad
@@ -1312,10 +1323,10 @@ namespace PhotovoltaicThermalCollectors {
         // BIPVT model parameters
         Real64 tsurr, tsurrK;                  // surrouding temperature (DegC, DegK)
         Real64 t1, t1K, t1_new;                // temperature of pv backing surface (DegC, DegK, DegC)
-        Real64 tpv_new;                        // temperature of pv surface (DegC, DegC)
-        Real64 tpvg, tpvgK, tpvg_new;          // temperature of pv glass cover (DegC, DegK,DegC)
+        Real64 tpv_new;                    // temperature of pv surface (DegC, DegC)
+        Real64 tpvg,tpvgK, tpvg_new;                // temperature of pv glass cover (DegC, DegK,DegC)
         Real64 tfavg;                          // average fluid temperature (DegC)
-        Real64 tmixed;                         // mixed air temperature (DegC)
+        Real64 tfout;                          // outlet fluid temperature from BIPVT channel (DegC)
         Real64 hconvf1(100.0);                 // heat transfer coefficient between fluid and backing surface (W/m2-K)
         Real64 hconvf2(100.0);                 // heat transfer coefficient between fluid and bldg surface (W/m2-K)
         Real64 hpvg_pv;                        // conductance of pv glass cover (W/m2-K)
@@ -1331,7 +1342,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 a, b, c, d;                                                    // constants
         Real64 err_tpvg(1.0), err_tpv(1.0), err_t1(1.0), err_mdot_bipvt(1.0); // convergence errors for temperatures
         const Real64 tol(1.0e-3);                                             // temperature convergence tolerance
-        const Real64 rf(0.75);                                                 // relaxation factor
+        const Real64 rf(0.75);                                                // relaxation factor
         const Real64 degc_to_kelvin(273.15);                                  // conversion constant degC to Kelvin
         Real64 ebal1, ebal2, ebal3;                                           // energy balances on 3 surfaces
         Real64 jj[9];                                                         // 3x3 array for coefficient matrix
@@ -1339,6 +1350,8 @@ namespace PhotovoltaicThermalCollectors {
         Real64 y[3];                                                          // solution array for tpvg,tpv, and t1
         int m(3);                                                             // parameter for number of unknwons
         int i;                                                                // index
+        const int MaxNumIter(50);                                             // maximum number of iterations
+        int iter(0);                                                          // iteration counter
 
         // boundary conditions parameters
         int InletNode = this->HVACInletNodeNum;
@@ -1425,8 +1438,17 @@ namespace PhotovoltaicThermalCollectors {
             ebal1 = s1 + hpv_1 * (tpv - t1) + hconvf1 * (tfavg - t1) + hrad12 * (t2 - t1);
             ebal2 = s + hpvg_pv * (tpvg - tpv) + hpv_1 * (t1 - tpv);
             ebal3 = HcExt * (tpvg - tamb) + hrad_surr * (tpvg - tsurr) + hpvg_pv * (tpvg - tpv);
+            iter += 1;
+            if (iter == 50) {
+                ShowSevereError("Function PVTCollectorStruct::BIPVT_MaxHeatGain_calculate: Maximum number of iterations 50 reached");
+                break;
+            }
         }
-        if (q > 0.0) ThEff = q / (DataHeatBalance::QRadSWOutIncident(this->SurfNum) + small_num); // Thermal efficiency of BIPVT (W)
+        if (q > 0.0) ThEff = q / (DataHeatBalance::QRadSWOutIncident(this->SurfNum) + small_num); // Thermal efficiency of BIPVT
+        this->BIPVT.Tcoll = t1;
+        this->BIPVT.HrPlen = hrad12;
+        this->BIPVT.Tplen = tfavg;
+        this->BIPVT.HcPlen = hconvf2;
     }
 
     void PVTCollectorStruct::solve_lin_sys_back_sub(Real64 jj[9], Real64 f[3], Real64 (&y)[3])
@@ -1505,6 +1527,8 @@ namespace PhotovoltaicThermalCollectors {
 
         int InletNode;
         int OutletNode;
+        int thisOSCM;
+        using DataSurfaces::OSCM;
 
         {
             auto const SELECT_CASE_var(this->WorkingFluidType);
@@ -1533,6 +1557,15 @@ namespace PhotovoltaicThermalCollectors {
                 DataLoopNode::Node(OutletNode).HumRat = DataLoopNode::Node(InletNode).HumRat; // assumes dewpoint bound on cooling ....
                 DataLoopNode::Node(OutletNode).Enthalpy =
                     Psychrometrics::PsyHFnTdbW(this->Report.ToutletWorkFluid, DataLoopNode::Node(OutletNode).HumRat);
+
+                // update the OtherSideConditionsModel coefficients for BIPVT
+                if (this->PVTModelType == BIPVTmodel) {
+                    thisOSCM = this->BIPVT.OSCMPtr;
+                    OSCM(thisOSCM).TConv = this->BIPVT.Tplen;
+                    OSCM(thisOSCM).HConv = this->BIPVT.HcPlen;
+                    OSCM(thisOSCM).TRad = this->BIPVT.Tcoll;
+                    OSCM(thisOSCM).HRad = this->BIPVT.HrPlen;
+                }
             }
         }
     }
@@ -1654,6 +1687,96 @@ namespace PhotovoltaicThermalCollectors {
         bool dummyRunFlag(true);
 
         PVT(index).simulate(state, dummyLoc, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
+    }
+
+    void GetPVTmodelIndex(int const SurfacePtr, int &PVTIndex)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         K. Haddad (adpated from subroutine "GetTranspiredCollectorIndex")
+        //       DATE WRITTEN   May 2020. 
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // object oriented "Get" routine for establishing correct integer index from outside this module
+
+        // METHODOLOGY EMPLOYED:
+        // mine Surface derived type for correct index/number of surface
+        // mine PVT derived type that has the surface.
+
+        // Using/Aliasing
+        using DataSurfaces::Surface;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int PVTNum;  // temporary
+        int ThisSurf; // temporary
+        int thisPVT;
+        bool Found;
+
+        if (GetInputFlag) {
+            GetPVTcollectorsInput();
+            GetInputFlag = false;
+        }
+
+        if (SurfacePtr == 0) {
+            ShowFatalError("Invalid surface passed to GetPVTmodelIndex, Surface name = " + Surface(SurfacePtr).Name);
+        }
+
+        PVTNum = 0;
+        Found = false;
+        for (thisPVT = 1; thisPVT <= NumPVT; ++thisPVT) {
+            if (SurfacePtr == PVT(thisPVT).SurfNum) {
+                Found = true;
+                PVTNum = thisPVT;
+            }
+        }
+
+        if (!Found) {
+            ShowFatalError("Did not find surface in PVT description in GetPVTmodelIndex, Surface name = " + Surface(SurfacePtr).Name);
+        }
+        else {
+
+            PVTIndex = PVTNum;
+        }
+    }
+
+    void SetPVTQdotSource(int const PVTNum,
+        Real64 const QSource // source term in Watts
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         K. Haddad (adapted from subroutine "SetUTSCQdotSource")
+        //       DATE WRITTEN   May 2020
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // object oriented "Set" routine for updating sink term without exposing variables
+
+        // METHODOLOGY EMPLOYED:
+        // update derived type with new data , turn power into W/m2
+
+        PVT(PVTNum).QdotSource = QSource / PVT(PVTNum).AreaCol;
+    }
+
+    void GetPVTTsColl(int const PVTNum, Real64 &TsColl)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         <author>
+        //       DATE WRITTEN   <date_written>
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // object oriented "Get" routine for collector surface temperature
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        if(PVT(PVTNum).PVTModelType == BIPVTmodel) {
+            TsColl = PVT(PVTNum).BIPVT.CollectorTemp;
+        }
     }
 
 } // namespace PhotovoltaicThermalCollectors
