@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -250,7 +251,7 @@ namespace HVACSingleDuctInduc {
         // the tasks usually done by the Update and Report routines are not required in a compound terminal unit.
 
         // Update the current unit's outlet nodes. No update needed
-        // CALL UpdateIndUnit(IUNum)
+        IndUnit(IUNum).UpdateIndUnit();
 
         // Fill the report variables. There are no report variables
         // CALL ReportIndUnit(IUNum)
@@ -475,6 +476,13 @@ namespace HVACSingleDuctInduc {
                     ErrorsFound = true;
                 }
             }
+            // report variable for all single duct air terminals
+            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                IndUnit(IUNum).OutdoorAirFlowRate,
+                                "System",
+                                "Average",
+                                IndUnit(IUNum).Name);
         }
 
         Alphas.deallocate();
@@ -1589,6 +1597,24 @@ namespace HVACSingleDuctInduc {
         }
 
         return YesNo;
+    }
+
+    void IndUnitData::UpdateIndUnit()
+    {
+        // Purpose: this subroutine updates the UpdateIndUnit.
+
+        // set OA volume flow rate report variable
+        this->CalcOutdoorAirVolumeFlowRate();
+    }
+
+    void IndUnitData::CalcOutdoorAirVolumeFlowRate()
+    {
+        // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
+        if (this->AirLoopNum > 0) {
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+        } else {
+            this->OutdoorAirFlowRate = 0.0;
+        }
     }
 
 } // namespace HVACSingleDuctInduc

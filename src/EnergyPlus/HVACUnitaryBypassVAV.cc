@@ -1849,6 +1849,13 @@ namespace HVACUnitaryBypassVAV {
             BypassDuctFlowFraction = 0.0;
         }
 
+        if (CBVAV(CBVAVNum).AirLoopNumber > 0 && DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate > 0.0) {
+            DataAirLoop::AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac = DataLoopNode::Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate /
+                                                                             DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate;
+        } else {
+            DataAirLoop::AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac = 0.0;
+        }
+
         CalcCBVAV(state, CBVAVNum, FirstHVACIteration, PartLoadFrac, QSensUnitOut, OnOffAirFlowRatio, HXUnitOn);
 
         // If unit is scheduled OFF, setpoint is equal to inlet node temperature.
