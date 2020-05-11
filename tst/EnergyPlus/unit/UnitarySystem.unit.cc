@@ -14339,11 +14339,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_VariableSpeedDXCoilsNoLoadFlowRate
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;                             // indicate zone data is available
-    thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
+    thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
     ;
     // Verify UnitarySystem air flow rates are read in as AutoSized
@@ -14356,7 +14356,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_VariableSpeedDXCoilsNoLoadFlowRate
     DataGlobals::BeginEnvrnFlag = false;
     int AirLoopNum = 0;
 
-    thisSys->sizeSystem(FirstHVACIteration, AirLoopNum);
+    thisSys->sizeSystem(state, FirstHVACIteration, AirLoopNum);
     EXPECT_EQ(1.500, thisSys->m_DesignFanVolFlowRate);
     EXPECT_EQ(1.500, thisSys->m_MaxCoolAirVolFlow);
     EXPECT_EQ(1.500, thisSys->m_MaxHeatAirVolFlow);
@@ -14648,11 +14648,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;                             // indicate zone data is available
-    thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
+    thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
     ;
     // Verify UnitarySystem air flow rates are read in as AutoSized
@@ -14666,7 +14666,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
     DataGlobals::BeginEnvrnFlag = false;
     int AirLoopNum = 0;
 
-    thisSys->sizeSystem(FirstHVACIteration, AirLoopNum);
+    thisSys->sizeSystem(state, FirstHVACIteration, AirLoopNum);
     EXPECT_EQ(1.500, thisSys->m_DesignFanVolFlowRate);
     EXPECT_EQ(1.500, thisSys->m_MaxCoolAirVolFlow);
     EXPECT_EQ(1.500, thisSys->m_MaxHeatAirVolFlow);
