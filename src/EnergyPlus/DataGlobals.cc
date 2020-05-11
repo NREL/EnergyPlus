@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputFiles.hh>
 
 namespace EnergyPlus {
@@ -88,7 +89,6 @@ namespace DataGlobals {
     // Thus, all variables in this module must be PUBLIC.
     bool runReadVars(false);
     bool DDOnlySimulation(false);
-    bool AnnualSimulation(false);
     bool outputEpJSONConversion(false);
     bool outputEpJSONConversionOnly(false);
     bool isEpJSON(false);
@@ -102,7 +102,6 @@ namespace DataGlobals {
     int const BeginDay(1);
     int const DuringDay(2);
     int const EndDay(3);
-    int const EndZoneSizingCalc(4);
     int const EndSysSizingCalc(5);
 
     // Parameters for KindOfSim
@@ -180,7 +179,6 @@ namespace DataGlobals {
     bool BeginFullSimFlag(false);       // True until full simulation has begun, False after first time step
     bool BeginTimeStepFlag(false);      // True at the start of each time step, False after first subtime step of time step
     int DayOfSim(0);                    // Counter for days (during the simulation)
-    std::string DayOfSimChr("0");       // Counter for days (during the simulation) (character -- for reporting)
     int CalendarYear(0);                // Calendar year of the current day of simulation
     std::string CalendarYearChr;        // Calendar year of the current day of simulation (character -- for reporting)
     bool EndEnvrnFlag(false);           // True at the end of each environment (last time step of last hour of last day of environ)
@@ -269,10 +267,8 @@ namespace DataGlobals {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-
         runReadVars = false;
         DDOnlySimulation = false;
-        AnnualSimulation = false;
         outputEpJSONConversion = false;
         outputEpJSONConversionOnly = false;
         isEpJSON = false;
@@ -286,7 +282,6 @@ namespace DataGlobals {
         BeginFullSimFlag = false;
         BeginTimeStepFlag = false;
         DayOfSim = 0;
-        DayOfSimChr = "0";
         CalendarYear = 0;
         CalendarYearChr = "0";
         EndEnvrnFlag = false;

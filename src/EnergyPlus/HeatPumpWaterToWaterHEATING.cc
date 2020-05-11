@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -141,7 +142,7 @@ namespace HeatPumpWaterToWaterHEATING {
     }
 
 
-    void GshpPeHeatingSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+    void GshpPeHeatingSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                                       bool EP_UNUSED(RunFlag)) {
 
         // Simulate the model for the Demand "MyLoad"
@@ -174,7 +175,7 @@ namespace HeatPumpWaterToWaterHEATING {
         OptLoad = this->NomCap * this->OptPartLoadRat;
     }
 
-    void GshpPeHeatingSpecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) {
+    void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;

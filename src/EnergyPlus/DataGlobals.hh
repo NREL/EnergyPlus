@@ -65,7 +65,6 @@ namespace DataGlobals {
 
     extern bool runReadVars;
     extern bool DDOnlySimulation;
-    extern bool AnnualSimulation;
     extern bool outputEpJSONConversion;
     extern bool outputEpJSONConversionOnly;
     extern bool isEpJSON;
@@ -79,7 +78,6 @@ namespace DataGlobals {
     extern int const BeginDay;
     extern int const DuringDay;
     extern int const EndDay;
-    extern int const EndZoneSizingCalc;
     extern int const EndSysSizingCalc;
 
     // Parameters for KindOfSim
@@ -216,7 +214,6 @@ namespace DataGlobals {
     extern bool BeginFullSimFlag;       // True until full simulation has begun, False after first time step
     extern bool BeginTimeStepFlag;      // True at the start of each time step, False after first subtime step of time step
     extern int DayOfSim;                // Counter for days (during the simulation)
-    extern std::string DayOfSimChr;     // Counter for days (during the simulation) (character -- for reporting)
     extern int CalendarYear;            // Calendar year of the current day of simulation
     extern std::string CalendarYearChr; // Calendar year of the current day of simulation (character -- for reporting)
     extern bool EndEnvrnFlag;           // True at the end of each environment (last time step of last hour of last day of environ)

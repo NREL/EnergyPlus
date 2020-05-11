@@ -57,14 +57,14 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include <functional>
 
 namespace EnergyPlus {
 class OutputFile;
 
-
-int AbortEnergyPlus();
+int AbortEnergyPlus(EnergyPlusData &state);
 
 void CloseMiscOpenFiles();
 

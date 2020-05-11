@@ -51,6 +51,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/Branch.hh>
 #include <EnergyPlus/Plant/ConnectedLoopData.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/LoopSidePumpInformation.hh>
 #include <EnergyPlus/Plant/MixerData.hh>
 #include <EnergyPlus/Plant/PlantConvergencePoint.hh>
@@ -161,9 +162,9 @@ namespace DataPlant {
 
         Real64 DetermineLoopSideFlowRate(int ThisSideInletNode, Real64 ThisSideLoopFlowRequest);
 
-        void SimulateAllLoopSideBranches(Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
+        void SimulateAllLoopSideBranches(EnergyPlusData &state, Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
 
-        void SimulateLoopSideBranchGroup(int FirstBranchNum,
+        void SimulateLoopSideBranchGroup(EnergyPlusData &state, int FirstBranchNum,
                                          int LastBranchNum,
                                          Real64 FlowRequest,
                                          bool FirstHVACIteration,
@@ -177,7 +178,7 @@ namespace DataPlant {
 
         void DisableAnyBranchPumpsConnectedToUnloadedEquipment();
 
-        void DoFlowAndLoadSolutionPass(int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
+        void DoFlowAndLoadSolutionPass(EnergyPlusData &state, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
 
         Real64 CalcOtherSideDemand(Real64 ThisLoopSideFlow);
 
@@ -205,7 +206,7 @@ namespace DataPlant {
 
         bool CheckPlantConvergence(bool FirstHVACIteration);
 
-        void solve(bool FirstHVACIteration, bool &ReSimOtherSideNeeded);
+        void solve(EnergyPlusData &state, bool FirstHVACIteration, bool &ReSimOtherSideNeeded);
 
     };
 } // namespace DataPlant

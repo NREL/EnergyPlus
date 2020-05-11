@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -211,7 +212,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneData(ErrorsFound);
-    GetZoneEquipmentData();
+    GetZoneEquipmentData(state);
 
     GetMaterialData(outputFiles(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors

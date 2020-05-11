@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -128,7 +129,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
     auto numZones = inputProcessor->getNumObjectsFound("Zone");
     ZoneReOrder.allocate(numZones);
     GetZoneData(ErrorsFound);
-    GetAirFlowFlag(outputFiles(), ErrorsFound);
+    GetAirFlowFlag(state, outputFiles(), ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 }
 
@@ -470,7 +471,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_FALSE(ErrorsFound);
     AllocateHeatBalArrays();
     ErrorsFound = false;
-    GetSimpleAirModelInputs(outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     SetZoneMassConservationFlag();
     // setup zone equipment configuration
@@ -669,7 +670,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     ErrorsFound = false;
-    GetSimpleAirModelInputs(outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // first 2 have indexes swapped now since they are in lexicigraphical order now according to the new input processor
@@ -1567,7 +1568,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation(outputFiles());
+    SimulationManager::ManageSimulation(state, outputFiles());
     DataGlobals::DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
     WeatherManager::Envrn = 1;
 
@@ -1576,9 +1577,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataGlobals::HourOfDay = 11;
     DataGlobals::CurrentTime = 11.0;
     WeatherManager::SetCurrentWeather();
-    HeatBalanceManager::ManageHeatBalance(outputFiles());
+    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance(outputFiles());
+    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
     // Find the fenestration surface
     int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
     int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", DataHeatBalance::Construct);
@@ -1593,9 +1594,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataGlobals::HourOfDay = 14;
     DataGlobals::CurrentTime = 14.0;
     WeatherManager::SetCurrentWeather();
-    HeatBalanceManager::ManageHeatBalance(outputFiles());
+    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance(outputFiles());
+    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
     int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", DataHeatBalance::Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
     transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);

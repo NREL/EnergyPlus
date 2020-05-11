@@ -86,6 +86,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -370,7 +371,7 @@ namespace AirflowNetworkBalanceManager {
         UniqueAirflowNetworkSurfaceName.clear();
     }
 
-    void ManageAirflowNetworkBalance(Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
+    void ManageAirflowNetworkBalance(EnergyPlusData &state, Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
                                      Optional_int_const Iter,                // Iteration number
                                      Optional_bool ResimulateAirZone         // True when solution technique on third iteration
     )
@@ -402,7 +403,7 @@ namespace AirflowNetworkBalanceManager {
         int AFNSupplyFanType = 0;
 
         if (AirflowNetworkGetInputFlag) {
-            GetAirflowNetworkInput(OutputFiles::getSingleton());
+            GetAirflowNetworkInput(state, OutputFiles::getSingleton());
             AirflowNetworkGetInputFlag = false;
             return;
         }
@@ -495,7 +496,7 @@ namespace AirflowNetworkBalanceManager {
 
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
             if (ValidateDistributionSystemFlag) {
-                ValidateDistributionSystem();
+                ValidateDistributionSystem(state);
                 ValidateFanFlowRate();
                 ValidateDistributionSystemFlag = false;
             }
@@ -522,7 +523,7 @@ namespace AirflowNetworkBalanceManager {
         UpdateAirflowNetwork(FirstHVACIteration);
     }
 
-    static bool getAirflowElementInput()
+    static bool getAirflowElementInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason DeGraw
@@ -661,7 +662,7 @@ namespace AirflowNetworkBalanceManager {
                 // This breaks the component model, need to fix
                 bool fanErrorFound = false;
                 int fanIndex;
-                GetFanIndex(thisObjectName, fanIndex, fanErrorFound);
+                GetFanIndex(state.fans, thisObjectName, fanIndex, fanErrorFound);
                 if (fanErrorFound) {
                     ShowSevereError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName + " is not found in Fan:ZoneExhaust objects.");
                     success = false;
@@ -671,13 +672,13 @@ namespace AirflowNetworkBalanceManager {
                 GetFanVolFlow(fanIndex, flowRate);
                 flowRate *= StdRhoAir;
                 bool nodeErrorsFound{false};
-                int inletNode = GetFanInletNode("Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
-                int outletNode = GetFanOutletNode("Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
+                int inletNode = GetFanInletNode(state.fans, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
+                int outletNode = GetFanOutletNode(state.fans, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
                 if (nodeErrorsFound) {
                     success = false;
                 }
                 int fanType_Num;
-                GetFanType(thisObjectName, fanType_Num, fanErrorFound);
+                GetFanType(state.fans, thisObjectName, fanType_Num, fanErrorFound);
                 if (fanType_Num != FanType_ZoneExhaust) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " = " + thisObjectName + ". The specified " + "Name" +
                                     " is not found as a valid Fan:ZoneExhaust object.");
@@ -1382,7 +1383,7 @@ namespace AirflowNetworkBalanceManager {
 
                 } else {
 
-                    GetFanIndex(fan_name, fanIndex, FanErrorFound);
+                    GetFanIndex(state.fans, fan_name, fanIndex, FanErrorFound);
 
                     if (FanErrorFound) {
                         ShowSevereError("...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).Name);
@@ -1392,7 +1393,7 @@ namespace AirflowNetworkBalanceManager {
                     GetFanVolFlow(fanIndex, flowRate);
                     flowRate *= StdRhoAir;
 
-                    GetFanType(fan_name, fanType_Num, FanErrorFound);
+                    GetFanType(state.fans, fan_name, fanType_Num, FanErrorFound);
                     SupplyFanType = fanType_Num;
                 }
 
@@ -1415,16 +1416,16 @@ namespace AirflowNetworkBalanceManager {
                 }
                 bool ErrorsFound{false};
                 if (fanType_Num == FanType_SimpleConstVolume) {
-                    inletNode = GetFanInletNode("Fan:ConstantVolume", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode("Fan:ConstantVolume", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(state.fans, "Fan:ConstantVolume", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode(state.fans, "Fan:ConstantVolume", fan_name, ErrorsFound);
                 }
                 if (fanType_Num == FanType_SimpleOnOff && !DisSysCompCVFData(i).FanModelFlag) {
-                    inletNode = GetFanInletNode("Fan:OnOff", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode("Fan:OnOff", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(state.fans, "Fan:OnOff", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode(state.fans, "Fan:OnOff", fan_name, ErrorsFound);
                 }
                 if (fanType_Num == FanType_SimpleVAV && !DisSysCompCVFData(i).FanModelFlag) {
-                    inletNode = GetFanInletNode("Fan:VariableVolume", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode("Fan:VariableVolume", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(state.fans, "Fan:VariableVolume", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode(state.fans, "Fan:VariableVolume", fan_name, ErrorsFound);
                     VAVSystem = true;
                 }
                 SupplyFanInletNode = inletNode;
@@ -1493,7 +1494,7 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompHXData(i).EPlusType = hx_type;                            // coil type
                 DisSysCompHXData(i).L = L;                                          // Air path length
                 DisSysCompHXData(i).hydraulicDiameter = D;                          // Air path hydraulic diameter
-                DisSysCompHXData(i).CoilParentExists = HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent(hx_type, hx_name);
+                DisSysCompHXData(i).CoilParentExists = HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent(state, hx_type, hx_name);
                 ++i;
             }
         }
@@ -1549,7 +1550,7 @@ namespace AirflowNetworkBalanceManager {
         return success;
     }
 
-    void GetAirflowNetworkInput(OutputFiles &outputFiles)
+    void GetAirflowNetworkInput(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2456,7 +2457,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // *** Read AirflowNetwork element data
-        ErrorsFound = ErrorsFound || !getAirflowElementInput();
+        ErrorsFound = ErrorsFound || !getAirflowElementInput(state);
 
         // *** Read AirflowNetwork simulation surface data
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface";
@@ -3333,7 +3334,7 @@ namespace AirflowNetworkBalanceManager {
                 IntraZoneNodeData(i).RAFNNodeName = Alphas(2); // Name of RoomAir node
                 IntraZoneNodeData(i).Height = Numbers(1);      // Nodal height
                 // verify RoomAir model node names(May be too early to check and move to another subroutine)
-                GetRAFNNodeNum(IntraZoneNodeData(i).RAFNNodeName, IntraZoneNodeData(i).ZoneNum, IntraZoneNodeData(i).RAFNNodeNum, Errorfound1);
+                GetRAFNNodeNum(state, IntraZoneNodeData(i).RAFNNodeName, IntraZoneNodeData(i).ZoneNum, IntraZoneNodeData(i).RAFNNodeNum, Errorfound1);
                 if (Errorfound1) ErrorsFound = true;
                 if (IntraZoneNodeData(i).RAFNNodeNum == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "='" + Alphas(1) + "' invalid name " + cAlphaFields(2) + "='" + Alphas(2));
@@ -3342,7 +3343,7 @@ namespace AirflowNetworkBalanceManager {
                 IntraZoneNodeData(i).AFNZoneNum =
                     UtilityRoutines::FindItemInList(Alphas(3), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones);
                 if (MultizoneZoneData(IntraZoneNodeData(i).AFNZoneNum).RAFNNodeNum == 0) {
-                    GetRAFNNodeNum(MultizoneZoneData(IntraZoneNodeData(i).AFNZoneNum).ZoneName,
+                    GetRAFNNodeNum(state, MultizoneZoneData(IntraZoneNodeData(i).AFNZoneNum).ZoneName,
                                    IntraZoneNodeData(i).ZoneNum,
                                    MultizoneZoneData(IntraZoneNodeData(i).AFNZoneNum).RAFNNodeNum,
                                    Errorfound1);
@@ -9597,7 +9598,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void ValidateDistributionSystem()
+    void ValidateDistributionSystem(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9666,7 +9667,7 @@ namespace AirflowNetworkBalanceManager {
             LocalError = false;
             for (j = 1; j <= NumOfNodes; ++j) { // NodeID
                 if (DisSysNodeData(i).EPlusName == NodeID(j)) {
-                    DisSysNodeData(i).AirLoopNum = GetAirLoopNumber(j);
+                    DisSysNodeData(i).AirLoopNum = GetAirLoopNumber(state, j);
                     if (DisSysNodeData(i).AirLoopNum == 0) {
                         ShowSevereError(RoutineName + "The Node or Component Name defined in " + DisSysNodeData(i).Name +
                                         " is not found in the AirLoopHVAC.");
@@ -9957,7 +9958,7 @@ namespace AirflowNetworkBalanceManager {
                     if (IsNotOK) {
                         ErrorsFound = true;
                     } else {
-                        SetHeatingCoilAirLoopNumber(DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
+                        SetHeatingCoilAirLoopNumber(state, DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
@@ -9965,7 +9966,7 @@ namespace AirflowNetworkBalanceManager {
                     if (IsNotOK) {
                         ErrorsFound = true;
                     } else {
-                        SetHeatingCoilAirLoopNumber(DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
+                        SetHeatingCoilAirLoopNumber(state, DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "COIL:COOLING:WATER") {
@@ -10040,9 +10041,9 @@ namespace AirflowNetworkBalanceManager {
                 UtilityRoutines::SameString(DisSysCompTermUnitData(i).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat")) {
                 LocalError = false;
                 if (UtilityRoutines::SameString(DisSysCompTermUnitData(i).EPlusType, "AirTerminal:SingleDuct:ConstantVolume:Reheat"))
-                    GetHVACSingleDuctSysIndex(DisSysCompTermUnitData(i).Name, n, LocalError, "AirflowNetwork:Distribution:Component:TerminalUnit");
+                    GetHVACSingleDuctSysIndex(state, DisSysCompTermUnitData(i).Name, n, LocalError, "AirflowNetwork:Distribution:Component:TerminalUnit");
                 if (UtilityRoutines::SameString(DisSysCompTermUnitData(i).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat"))
-                    GetHVACSingleDuctSysIndex(DisSysCompTermUnitData(i).Name,
+                    GetHVACSingleDuctSysIndex(state, DisSysCompTermUnitData(i).Name,
                                               n,
                                               LocalError,
                                               "AirflowNetwork:Distribution:Component:TerminalUnit",
@@ -11083,7 +11084,7 @@ namespace AirflowNetworkBalanceManager {
         return ACH;
     }
 
-    int GetAirLoopNumber(int const NodeNumber) // Get air loop number for each distribution node and linkage
+    int GetAirLoopNumber(EnergyPlusData &state, int const NodeNumber) // Get air loop number for each distribution node and linkage
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -11331,7 +11332,7 @@ namespace AirflowNetworkBalanceManager {
                             for (TUNum = 1; TUNum <= DisSysNumOfTermUnits; ++TUNum) {
                                 if (UtilityRoutines::SameString(DisSysCompTermUnitData(TUNum).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat")) {
                                     LocalError = false;
-                                    GetHVACSingleDuctSysIndex(DisSysCompTermUnitData(TUNum).Name,
+                                    GetHVACSingleDuctSysIndex(state, DisSysCompTermUnitData(TUNum).Name,
                                                               TermNum,
                                                               LocalError,
                                                               "AirflowNetwork:Distribution:Component:TerminalUnit",

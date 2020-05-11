@@ -68,6 +68,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -203,7 +204,7 @@ namespace PurchasedAirManager {
 
     } // namespace
 
-    void SimPurchasedAir(std::string const &PurchAirName,
+    void SimPurchasedAir(EnergyPlusData &state, std::string const &PurchAirName,
                          Real64 &SysOutputProvided,
                          Real64 &MoistOutputProvided, // Moisture output provided (kg/s), dehumidification = negative
                          bool const FirstHVACIteration,
@@ -259,11 +260,11 @@ namespace PurchasedAirManager {
             }
         }
 
-        InitPurchasedAir(PurchAirNum, FirstHVACIteration, ControlledZoneNum, ActualZoneNum);
+        InitPurchasedAir(state, PurchAirNum, FirstHVACIteration, ControlledZoneNum, ActualZoneNum);
 
         CalcPurchAirLoads(PurchAirNum, SysOutputProvided, MoistOutputProvided, ControlledZoneNum, ActualZoneNum);
 
-        UpdatePurchasedAir(PurchAirNum, FirstHVACIteration);
+        UpdatePurchasedAir(state, PurchAirNum, FirstHVACIteration);
 
         ReportPurchasedAir(PurchAirNum);
     }
@@ -1086,7 +1087,7 @@ namespace PurchasedAirManager {
         }
     }
 
-    void InitPurchasedAir(int const PurchAirNum,
+    void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum,
                           bool const EP_UNUSED(FirstHVACIteration), // unused1208
                           int const ControlledZoneNum,
                           int const ActualZoneNum)
@@ -1161,9 +1162,9 @@ namespace PurchasedAirManager {
 
                 // link with return plenum if used (i.e., PlenumExhaustAirNodeNum will be non-zero)
                 if (PurchAir(Loop).PlenumExhaustAirNodeNum > 0) {
-                    PurchAir(Loop).ReturnPlenumIndex = GetReturnPlenumIndex(PurchAir(Loop).PlenumExhaustAirNodeNum);
+                    PurchAir(Loop).ReturnPlenumIndex = GetReturnPlenumIndex(state, PurchAir(Loop).PlenumExhaustAirNodeNum);
                     if (PurchAir(Loop).ReturnPlenumIndex > 0) {
-                        GetReturnPlenumName(PurchAir(Loop).ReturnPlenumIndex, PurchAir(Loop).ReturnPlenumName);
+                        GetReturnPlenumName(state, PurchAir(Loop).ReturnPlenumIndex, PurchAir(Loop).ReturnPlenumName);
                         InitializePlenumArrays(Loop);
                     } else {
                         ShowSevereError("InitPurchasedAir: " + PurchAir(Loop).cObjectName + " = " + PurchAir(Loop).Name +
@@ -1244,7 +1245,7 @@ namespace PurchasedAirManager {
 
         if (!SysSizingCalc && InitPurchasedAirMySizeFlag(PurchAirNum)) {
 
-            SizePurchasedAir(PurchAirNum);
+            SizePurchasedAir(state, PurchAirNum);
 
             InitPurchasedAirMySizeFlag(PurchAirNum) = false;
         }
@@ -1360,7 +1361,7 @@ namespace PurchasedAirManager {
         //      ENDIF
     }
 
-    void SizePurchasedAir(int const PurchAirNum)
+    void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1456,11 +1457,11 @@ namespace PurchasedAirManager {
                                 ((PurchAir(PurchAirNum).HeatingLimit == LimitFlowRate) ||
                                  (PurchAir(PurchAirNum).HeatingLimit == LimitFlowRateAndCapacity))) {
                                 TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
-                                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                 HeatingAirVolFlowDes = TempSize;
                             } else {
                                 if (ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow > 0.0) {
-                                    RequestSizing(CompType,
+                                    RequestSizing(state, CompType,
                                                   CompName,
                                                   SizingMethod,
                                                   SizingString,
@@ -1475,7 +1476,7 @@ namespace PurchasedAirManager {
                             ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * Zone(DataZoneNumber).FloorArea;
                             TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                             DataScalableSizingON = true;
-                            RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                             HeatingAirVolFlowDes = TempSize;
                         } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
                             DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
@@ -1484,7 +1485,7 @@ namespace PurchasedAirManager {
                                  (PurchAir(PurchAirNum).HeatingLimit == LimitFlowRateAndCapacity))) {
                                 TempSize = AutoSize;
                                 DataScalableSizingON = true;
-                                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                 HeatingAirVolFlowDes = TempSize;
                             }
 
@@ -1500,13 +1501,13 @@ namespace PurchasedAirManager {
                              (PurchAir(PurchAirNum).HeatingLimit == LimitFlowRateAndCapacity))) {
                             TempSize = AutoSize;
                             DataScalableSizingON = true;
-                            RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                             DataAutosizedHeatingCapacity = TempSize;
                             DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                             SizingMethod = HeatingAirflowSizing;
                             PrintFlag = true;
                             TempSize = AutoSize;
-                            RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                             HeatingAirVolFlowDes = TempSize;
                         }
                     }
@@ -1538,7 +1539,7 @@ namespace PurchasedAirManager {
                     SizingString = "";
                     ZoneHeatingOnlyFan = true;
                     PrintFlag = false;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     MaxHeatSensCapDes = TempSize;
                     ZoneHeatingOnlyFan = false;
                     if (MaxHeatSensCapDes < SmallLoad) {
@@ -1598,11 +1599,11 @@ namespace PurchasedAirManager {
                                  (PurchAir(PurchAirNum).CoolingLimit == LimitFlowRateAndCapacity) ||
                                  (PurchAir(PurchAirNum).OutdoorAir && PurchAir(PurchAirNum).EconomizerType != NoEconomizer))) {
                                 TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                 CoolingAirVolFlowDes = TempSize;
                             } else {
                                 if (ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
-                                    RequestSizing(CompType,
+                                    RequestSizing(state, CompType,
                                                   CompName,
                                                   SizingMethod,
                                                   SizingString,
@@ -1617,7 +1618,7 @@ namespace PurchasedAirManager {
                             ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * Zone(DataZoneNumber).FloorArea;
                             TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                             DataScalableSizingON = true;
-                            RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                             CoolingAirVolFlowDes = TempSize;
                         } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
                             if ((ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow == AutoSize) &&
@@ -1627,7 +1628,7 @@ namespace PurchasedAirManager {
                                 DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                                 TempSize = AutoSize;
                                 DataScalableSizingON = true;
-                                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                 CoolingAirVolFlowDes = TempSize;
                             }
                         } else {
@@ -1641,14 +1642,14 @@ namespace PurchasedAirManager {
                             SizingMethod = CoolingCapacitySizing;
                             TempSize = AutoSize;
                             PrintFlag = false;
-                            RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                             DataAutosizedCoolingCapacity = TempSize;
                             DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                             SizingMethod = CoolingAirflowSizing;
                             PrintFlag = true;
                             TempSize = AutoSize;
                             DataScalableSizingON = true;
-                            RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                             CoolingAirVolFlowDes = TempSize;
                         }
                     }
@@ -1685,7 +1686,7 @@ namespace PurchasedAirManager {
                     ZoneCoolingOnlyFan = true;
                     PrintFlag = false;
                     TempSize = PurchAir(PurchAirNum).MaxCoolTotCap;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     MaxCoolTotCapDes = TempSize;
                     ZoneCoolingOnlyFan = false;
                     if (MaxCoolTotCapDes < SmallLoad) {
@@ -1743,14 +1744,14 @@ namespace PurchasedAirManager {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (PurchAir(PurchAirNum).MaxHeatVolFlowRate > 0.0) {
-                        RequestSizing(
+                        RequestSizing(state,
                             CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxHeatVolFlowRate, PrintFlag, RoutineName);
                     }
                     MaxHeatVolFlowRateDes = 0.0;
                 } else {
                     ZoneHeatingOnlyFan = true;
                     TempSize = PurchAir(PurchAirNum).MaxHeatVolFlowRate;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     MaxHeatVolFlowRateDes = TempSize;
                     PurchAir(PurchAirNum).MaxHeatVolFlowRate = MaxHeatVolFlowRateDes;
                     ZoneHeatingOnlyFan = false;
@@ -1766,14 +1767,14 @@ namespace PurchasedAirManager {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (PurchAir(PurchAirNum).MaxHeatSensCap > 0.0) {
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxHeatSensCap, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxHeatSensCap, PrintFlag, RoutineName);
                     }
                 } else {
                     TempSize = PurchAir(PurchAirNum).MaxHeatSensCap;
                     ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
                     ZoneHeatingOnlyFan = true;
                     PrintFlag = false;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     MaxHeatSensCapDes = TempSize;
                     ZoneHeatingOnlyFan = false;
                 }
@@ -1830,13 +1831,13 @@ namespace PurchasedAirManager {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (PurchAir(PurchAirNum).MaxCoolVolFlowRate > 0.0) {
-                        RequestSizing(
+                        RequestSizing(state,
                             CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxCoolVolFlowRate, PrintFlag, RoutineName);
                     }
                 } else {
                     ZoneCoolingOnlyFan = true;
                     TempSize = PurchAir(PurchAirNum).MaxCoolVolFlowRate;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     MaxCoolVolFlowRateDes = TempSize;
                     PurchAir(PurchAirNum).MaxCoolVolFlowRate = MaxCoolVolFlowRateDes;
                     ZoneCoolingOnlyFan = false;
@@ -1852,14 +1853,14 @@ namespace PurchasedAirManager {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (PurchAir(PurchAirNum).MaxCoolTotCap > 0.0) {
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxCoolTotCap, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxCoolTotCap, PrintFlag, RoutineName);
                     }
                 } else {
                     ZoneCoolingOnlyFan = true;
                     ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
                     PrintFlag = false;
                     TempSize = PurchAir(PurchAirNum).MaxCoolTotCap;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     MaxCoolTotCapDes = TempSize;
                     ZoneCoolingOnlyFan = false;
                 }
@@ -2938,7 +2939,7 @@ namespace PurchasedAirManager {
         }
     }
 
-    void UpdatePurchasedAir(int const PurchAirNum, bool const FirstHVACIteration)
+    void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2968,7 +2969,7 @@ namespace PurchasedAirManager {
 
             // if all ideal loads air systems connected to the same plenum have been simulated, simulate the zone air plenum
             if (all(PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated)) {
-                SimAirZonePlenum(PurchAir(PurchAirNum).ReturnPlenumName,
+                SimAirZonePlenum(state, PurchAir(PurchAirNum).ReturnPlenumName,
                                  DataZoneEquipment::ZoneReturnPlenum_Type,
                                  PurchAir(PurchAirNum).ReturnPlenumIndex,
                                  FirstHVACIteration,
