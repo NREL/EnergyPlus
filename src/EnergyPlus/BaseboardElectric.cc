@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <cmath>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BaseboardElectric.hh>
@@ -77,39 +76,17 @@ namespace BaseboardElectric {
     //       DATE WRITTEN   Nov 2001
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-    // Needs description
-
-    // METHODOLOGY EMPLOYED:
-    // Needs description, as appropriate
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
     using namespace DataGlobals;
 
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
 
-    // Data
     // MODULE PARAMETER DEFINITIONS
-    std::string const cCMO_BBRadiator_Electric("ZoneHVAC:Baseboard:Convective:Electric");
-    Real64 const SimpConvAirFlowSpeed(0.5); // m/s
-
-    // DERIVED TYPE DEFINITIONS
+    const char * cCMO_BBRadiator_Electric = "ZoneHVAC:Baseboard:Convective:Electric";
+    constexpr Real64 SimpConvAirFlowSpeed(0.5); // m/s
 
     // MODULE VARIABLE DECLARATIONS:
     int NumBaseboards(0);
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
-
-    // Object Data
     Array1D<BaseboardParams> Baseboard;
     Array1D<BaseboardNumericFieldData> BaseboardNumericFields;
 
@@ -118,8 +95,6 @@ namespace BaseboardElectric {
     void clear_state()
     {
         NumBaseboards = 0;
-        MySizeFlag.deallocate();
-        CheckEquipName.deallocate();
         Baseboard.deallocate();
         BaseboardNumericFields.deallocate();
     }
@@ -136,29 +111,8 @@ namespace BaseboardElectric {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the Electric Baseboard units.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using General::TrimSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int BaseboardNum;               // index of unit in baseboard array
         static bool GetInputFlag(true); // one time get input flag
@@ -182,12 +136,12 @@ namespace BaseboardElectric {
                 ShowFatalError("SimElectricBaseboard:  Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) +
                                ", Number of Units=" + TrimSigDigits(NumBaseboards) + ", Entered Unit name=" + EquipName);
             }
-            if (CheckEquipName(BaseboardNum)) {
+            if (Baseboard(BaseboardNum).CheckEquipName) {
                 if (EquipName != Baseboard(BaseboardNum).EquipName) {
                     ShowFatalError("SimElectricBaseboard: Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) + ", Unit name=" + EquipName +
                                    ", stored Unit Name for that index=" + Baseboard(BaseboardNum).EquipName);
                 }
-                CheckEquipName(BaseboardNum) = false;
+                Baseboard(BaseboardNum).CheckEquipName = false;
             }
         }
 
@@ -218,9 +172,6 @@ namespace BaseboardElectric {
         // METHODOLOGY EMPLOYED:
         // Standard input processor calls.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using GlobalNames::VerifyUniqueBaseboardName;
         using namespace DataIPShortCuts;
@@ -233,10 +184,6 @@ namespace BaseboardElectric {
         using DataZoneEquipment::ZoneEquipList;
         using General::TrimSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetBaseboardInput: "); // include trailing blank space
         int const iHeatCAPMAlphaNum(3);                              // get input index to baseboard heating capacity sizing method
@@ -244,12 +191,6 @@ namespace BaseboardElectric {
         int const iHeatCapacityPerFloorAreaNumericNum(2);            // get input index to baseboard heating capacity per floor area sizing
         int const iHeatFracOfAutosizedCapacityNumericNum(
             3); //  get input index to baseboard heating capacity sizing as fraction of autozized heating capacity
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum;
@@ -271,9 +212,7 @@ namespace BaseboardElectric {
         NumBaseboards = NumConvElecBaseboards;
 
         Baseboard.allocate(NumBaseboards);
-        CheckEquipName.allocate(NumBaseboards);
         BaseboardNumericFields.allocate(NumBaseboards);
-        CheckEquipName = true;
 
         if (NumConvElecBaseboards > 0) { // Get the data for cooling schemes
             BaseboardNum = 0;
@@ -451,29 +390,10 @@ namespace BaseboardElectric {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the Baseboard units during simulation.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipInputsFilled;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNode;
@@ -486,9 +406,7 @@ namespace BaseboardElectric {
         if (MyOneTimeFlag) {
             // initialize the environment and sizing flags
             MyEnvrnFlag.allocate(NumBaseboards);
-            MySizeFlag.allocate(NumBaseboards);
             MyEnvrnFlag = true;
-            MySizeFlag = true;
 
             MyOneTimeFlag = false;
         }
@@ -503,11 +421,11 @@ namespace BaseboardElectric {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(BaseboardNum)) {
+        if (!SysSizingCalc && Baseboard(BaseboardNum).MySizeFlag) {
             // for each coil, do the sizing once.
             SizeElectricBaseboard(state, BaseboardNum);
 
-            MySizeFlag(BaseboardNum) = false;
+            Baseboard(BaseboardNum).MySizeFlag = false;
         }
 
         // Set the reporting variables to zero at each timestep.
@@ -540,9 +458,6 @@ namespace BaseboardElectric {
         // Obtains flow rates from the zone sizing arrays and plant sizing data. UAs are
         // calculated by numerically inverting the baseboard calculation routine.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSizing;
         using DataHeatBalance::Zone;
@@ -551,37 +466,22 @@ namespace BaseboardElectric {
         using ReportSizingManager::ReportSizingOutput;
         using ReportSizingManager::RequestSizing;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeElectricBaseboard");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool IsAutoSize;            // Indicator to autosizing nominal capacity
-        Real64 NominalCapacityDes;  // Design nominal capacity for reporting
-        Real64 NominalCapacityUser; // User hard-sized nominal capacity for reporting
 
         std::string CompName;     // component name
         std::string CompType;     // component type
         std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;          // autosized value of coil input field
-        int FieldNum = 1;         // IDD numeric field number where input field description is found
-        int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
-                          // HeatingCapacitySizing, etc.)
-        bool PrintFlag;   // TRUE when sizing information is reported in the eio file
-        int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
-                                // FractionOfAutosizedHeatingCapacity )
+        int FieldNum;             // IDD numeric field number where input field description is found
+        int SizingMethod;         // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
+                                  // HeatingCapacitySizing, etc.)
+        bool PrintFlag;           // TRUE when sizing information is reported in the eio file
+        int CapSizingMethod;      // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
+                                  // FractionOfAutosizedHeatingCapacity )
 
-        IsAutoSize = false;
-        NominalCapacityDes = 0.0;
-        NominalCapacityUser = 0.0;
         DataScalableCapSizingON = false;
 
         if (CurZoneEqNum > 0) {
@@ -643,26 +543,10 @@ namespace BaseboardElectric {
         //  model might be made more sophisticated and might use some of those data structures in the future
         //  so they are left in place even though this model does not utilize them.
 
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // unused0909    USE DataEnvironment, ONLY: OutBaroPress
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
         using Psychrometrics::PsyCpAirFnW;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirInletTemp;
@@ -674,7 +558,6 @@ namespace BaseboardElectric {
         Real64 QBBCap;
 
         AirInletTemp = Baseboard(BaseboardNum).AirInletTemp;
-        AirOutletTemp = AirInletTemp;
         CpAir = PsyCpAirFnW(Baseboard(BaseboardNum).AirInletHumRat);
         AirMassFlowRate = SimpConvAirFlowSpeed;
         CapacitanceAir = CpAir * AirMassFlowRate;
@@ -717,31 +600,8 @@ namespace BaseboardElectric {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         Baseboard(BaseboardNum).Energy = Baseboard(BaseboardNum).Power * TimeStepSys * SecInHour;
         Baseboard(BaseboardNum).ElecUseLoad = Baseboard(BaseboardNum).ElecUseRate * TimeStepSys * SecInHour;

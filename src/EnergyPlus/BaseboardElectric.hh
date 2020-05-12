@@ -57,27 +57,10 @@
 
 namespace EnergyPlus {
 
+    // Forward declarations
     struct EnergyPlusData;
 
 namespace BaseboardElectric {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const cCMO_BBRadiator_Electric;
-    extern Real64 const SimpConvAirFlowSpeed; // m/s
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumBaseboards;
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
-
-    // Types
 
     struct BaseboardParams
     {
@@ -99,11 +82,14 @@ namespace BaseboardElectric {
         int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
                                       // FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        bool MySizeFlag;
+        bool CheckEquipName;
 
         // Default Constructor
         BaseboardParams()
             : SchedPtr(0), NominalCapacity(0.0), BaseboardEfficiency(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0),
-              Energy(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), ZonePtr(0), HeatingCapMethod(0.0), ScaledHeatingCapacity(0.0)
+              Energy(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), ZonePtr(0), HeatingCapMethod(0.0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
+              CheckEquipName(true)
         {
         }
     };
