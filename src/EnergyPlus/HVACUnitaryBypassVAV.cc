@@ -1849,13 +1849,6 @@ namespace HVACUnitaryBypassVAV {
             BypassDuctFlowFraction = 0.0;
         }
 
-        if (CBVAV(CBVAVNum).AirLoopNumber > 0 && DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate > 0.0) {
-            DataAirLoop::AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac = DataLoopNode::Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate /
-                                                                             DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate;
-        } else {
-            DataAirLoop::AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac = 0.0;
-        }
-
         CalcCBVAV(state, CBVAVNum, FirstHVACIteration, PartLoadFrac, QSensUnitOut, OnOffAirFlowRatio, HXUnitOn);
 
         // If unit is scheduled OFF, setpoint is equal to inlet node temperature.
@@ -3391,6 +3384,13 @@ namespace HVACUnitaryBypassVAV {
         MinHumRat = min(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(OutletNode).HumRat);
         LoadMet = DataLoopNode::Node(OutletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRat) -
                                                                  Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, MinHumRat));
+
+        // calculate OA fraction used for zone OA volume flow rate calc 
+        DataAirLoop::AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac = 0.0;
+        if (DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate > 0.0) {
+            DataAirLoop::AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac =
+                DataLoopNode::Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate / DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate;
+        }
     }
 
     void GetZoneLoads(int const CBVAVNum // Index to CBVAV unit being simulated
