@@ -3,7 +3,7 @@ Allow Multiple Scheduled Shades to Reference a Single Window
 
 **Jason Glazer, GARD Analytics**
 
- - May 11, 2020
+ - May 12, 2020
  
 
 ## Justification for New Feature ##
@@ -39,8 +39,10 @@ insert text
 Address the first request to allow multiple WindowShadingControl object to be used for a single window and not produce
 an error. Error message that is currently produced “Fenestration surface named "FOOBAR" appears on
 more than one WindowShadingControl list” will be removed to accommodate residential buildings where 
-interior shading is defined by summer and winter shading factors. The implementation will provide appropriate 
-error checking  for, e.g., two shading control schedules that overlap, two shading controls that are not scheduled, etc.
+interior shading is defined by summer and winter shading factors. 
+
+Also, where multiple WindowShadingControls each deploy the same shade on the same window(s) in a zone, no error 
+message will be generated and the shade will be deployed if any of the WindowShadingControls are activated.
 
 ## Approach ##
 
@@ -48,13 +50,23 @@ The error message is currently produced in SufaceGeometry::InitialAssociateWindo
 a single windows shading control pointer allowed for each Surface() in EnergyPlus. This will be changed to allow for a vector
 of references and all code related to this will be modified to allow multiple window shading controls.
 
+If the schedules enable two different WindowShadingControls to be active at the same time (scheduled or not), and 
+they deploy the same shading material or shading construction they will any being control activation will prompt the 
+deployment of the shading material or shaded construction. In other words, if multiple WindowShadingControls activate the 
+same shade, they will behave in an "OR" fashion where any active WindowShadingControl will deploy the shade. 
+
+The implementation will provide appropriate error checking for, e.g., warnings when two or more shading control schedules that 
+overlap, errors if they overlap with different materials, warnings if two shading controls that are not scheduled, etc.
+Testing will also be conducted to see the difficulty if allowing WindowShadingControls to control shades in other zones that are 
+part of the same solar enclosure.
+
 ## Testing/Validation/Data Sources ##
 
 insert text
 
 ## Input Output Reference Documentation ##
 
-No new fields or objects will be added but a paragraph will be added to WindowShadingControl describing this new capability.
+No new fields or objects will be added but paragraphs will be added to WindowShadingControl describing this new capability.
 
 ## Input Description ##
 
