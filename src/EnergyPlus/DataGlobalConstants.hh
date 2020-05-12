@@ -244,7 +244,7 @@ namespace DataGlobalConstants {
 
     extern std::string FuelTypeInput;
     extern std::string FuelTypeForOutputVar;
-    extern int FuelType;
+    extern int FuelTypeNum;
     extern bool ErrorsFound;
 
     // DERIVED TYPE DEFINITIONS:
@@ -261,9 +261,9 @@ namespace DataGlobalConstants {
 
     std::string GetResourceTypeChar(int const ResourceTypeNum);
 
-    void ValidateResourceTypes(std::string FuelTypeInput,
+    void ValidateFuelTypesWithAssignResourceTypeNum(std::string FuelTypeInput,
                                std::string FuelTypeForOutputVar,
-                               int FuelType);
+                               int FuelTypeNum);
 
 } // namespace DataGlobalConstants
 

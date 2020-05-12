@@ -237,9 +237,9 @@ namespace Boilers {
             Boiler(BoilerNum).TypeNum = DataPlant::TypeOf_Boiler_Simple;
 
             DataGlobalConstants::FuelTypeInput = DataIPShortCuts::cAlphaArgs(2);
-            DataGlobalConstants::FuelTypeForOutputVar = Boiler(BoilerNum).BoilerFuelTypeForOutputVariable;
-            DataGlobalConstants::FuelType = Boiler(BoilerNum).FuelType;
-            DataGlobalConstants::ValidateResourceTypes(DataGlobalConstants::FuelTypeInput, DataGlobalConstants::FuelTypeForOutputVar, DataGlobalConstants::FuelType);
+            DataGlobalConstants::ValidateFuelTypesWithAssignResourceTypeNum(DataGlobalConstants::FuelTypeInput, DataGlobalConstants::FuelTypeForOutputVar, DataGlobalConstants::FuelTypeNum);
+            Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelTypeForOutputVar;
+            Boiler(BoilerNum).FuelType = DataGlobalConstants::FuelTypeNum;
 
             Boiler(BoilerNum).NomCap = DataIPShortCuts::rNumericArgs(1);
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
