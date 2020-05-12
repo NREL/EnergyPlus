@@ -6545,7 +6545,7 @@ namespace OutputReportTabular {
         // Exterior Lighting
         consumptionTotal = 0.0;
         for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
-            if (state.exteriorEnergyUse.ExteriorLights(iLight).ControlMode == 1) { // photocell/schedule
+            if (state.exteriorEnergyUse.ExteriorLights(iLight).ControlMode == ExteriorEnergyUse::LightControlType::ScheduleOnly) { // photocell/schedule
                 PreDefTableEntry(pdchExLtAvgHrSchd,
                                  state.exteriorEnergyUse.ExteriorLights(iLight).Name,
                                  ScheduleAverageHoursPerWeek(state.exteriorEnergyUse.ExteriorLights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
@@ -12379,10 +12379,10 @@ namespace OutputReportTabular {
             // show the line definition for the decay curves
             print(outputFiles.eio,
                   "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
-                  "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
+                  "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n");
             print(outputFiles.eio,
                   "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
-                  "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
+                  "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n");
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                 ZoneData &zd(Zone(iZone));
@@ -13207,28 +13207,12 @@ namespace OutputReportTabular {
         // static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
         static Array3D_bool adjFenDone;
 
-        Array1D<Real64> peopleRadIntoSurf;
-        Array1D<Real64> equipRadIntoSurf;
-        Array1D<Real64> hvacLossRadIntoSurf;
-        Array1D<Real64> powerGenRadIntoSurf;
-        Array1D<Real64> lightLWRadIntoSurf;
-
         if (!initAdjFenDone) {
             adjFenDone.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
             adjFenDone = false;
             initAdjFenDone = true;
         }
 
-        peopleRadIntoSurf.allocate(NumOfTimeStepInHour * 24);
-        peopleRadIntoSurf = 0.;
-        equipRadIntoSurf.allocate(NumOfTimeStepInHour * 24);
-        equipRadIntoSurf = 0.;
-        hvacLossRadIntoSurf.allocate(NumOfTimeStepInHour * 24);
-        hvacLossRadIntoSurf = 0.;
-        powerGenRadIntoSurf.allocate(NumOfTimeStepInHour * 24);
-        powerGenRadIntoSurf = 0.;
-        lightLWRadIntoSurf.allocate(NumOfTimeStepInHour * 24);
-        lightLWRadIntoSurf = 0.;
         int radEnclosureNum = Zone(zoneIndex).RadiantEnclosureNum;
 
         if (desDaySelected != 0) {
@@ -13254,15 +13238,7 @@ namespace OutputReportTabular {
                 for (int jSurf = Zone(zoneIndex).SurfaceFirst; jSurf <= Zone(zoneIndex).SurfaceLast; ++jSurf) {
                     if (!Surface(jSurf).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
-                    // determine for each timestep the amount of radiant heat for each end use absorbed in each surface
-                    Real64 QRadThermInAbsMult =
-                        TMULTseq(desDaySelected, kTimeStep, radEnclosureNum) * ITABSFseq(desDaySelected, kTimeStep, jSurf) * Surface(jSurf).Area;
-                    peopleRadIntoSurf(kTimeStep) = peopleRadSeq(desDaySelected, kTimeStep, zoneIndex) * QRadThermInAbsMult;
-                    equipRadIntoSurf(kTimeStep) = equipRadSeq(desDaySelected, kTimeStep, zoneIndex) * QRadThermInAbsMult;
-                    hvacLossRadIntoSurf(kTimeStep) = hvacLossRadSeq(desDaySelected, kTimeStep, zoneIndex) * QRadThermInAbsMult;
-                    powerGenRadIntoSurf(kTimeStep) = powerGenRadSeq(desDaySelected, kTimeStep, zoneIndex) * QRadThermInAbsMult;
-                    lightLWRadIntoSurf(kTimeStep) = lightLWRadSeq(desDaySelected, kTimeStep, zoneIndex) * QRadThermInAbsMult;
-                    // for each time step, step back through time and apply decay curve
+                    // for each time step, step back through time and apply decay curve to radiant heat for each end use absorbed in each surface
                     Real64 peopleConvFromSurf = 0.0;
                     Real64 equipConvFromSurf = 0.0;
                     Real64 hvacLossConvFromSurf = 0.0;
@@ -13270,16 +13246,22 @@ namespace OutputReportTabular {
                     Real64 lightLWConvFromSurf = 0.0;
                     Real64 lightSWConvFromSurf = 0.0;
                     Real64 feneSolarConvFromSurf = 0.0;
+
                     for (int mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack) {
-                        peopleConvFromSurf += peopleRadIntoSurf(kTimeStep - mStepBack + 1) * decayCurve(mStepBack, jSurf);
-                        equipConvFromSurf += equipRadIntoSurf(kTimeStep - mStepBack + 1) * decayCurve(mStepBack, jSurf);
-                        hvacLossConvFromSurf += hvacLossRadIntoSurf(kTimeStep - mStepBack + 1) * decayCurve(mStepBack, jSurf);
-                        powerGenConvFromSurf += powerGenRadIntoSurf(kTimeStep - mStepBack + 1) * decayCurve(mStepBack, jSurf);
-                        lightLWConvFromSurf += lightLWRadIntoSurf(kTimeStep - mStepBack + 1) * decayCurve(mStepBack, jSurf);
+                        int sourceStep = kTimeStep - mStepBack + 1;
+                        Real64 thisQRadThermInAbsMult = TMULTseq(desDaySelected, sourceStep, radEnclosureNum) *
+                            ITABSFseq(desDaySelected, sourceStep, jSurf) * Surface(jSurf).Area *
+                            decayCurve(mStepBack, jSurf);
+                        peopleConvFromSurf += peopleRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
+                        equipConvFromSurf += equipRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
+                        hvacLossConvFromSurf += hvacLossRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
+                        powerGenConvFromSurf += powerGenRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
+                        lightLWConvFromSurf += lightLWRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
                         // short wave is already accumulated by surface
-                        lightSWConvFromSurf += lightSWRadSeq(desDaySelected, kTimeStep - mStepBack + 1, jSurf) * decayCurve(mStepBack, jSurf);
-                        feneSolarConvFromSurf += feneSolarRadSeq(desDaySelected, kTimeStep - mStepBack + 1, jSurf) * decayCurve(mStepBack, jSurf);
+                        lightSWConvFromSurf += lightSWRadSeq(desDaySelected, sourceStep, jSurf) * decayCurve(mStepBack, jSurf);
+                        feneSolarConvFromSurf += feneSolarRadSeq(desDaySelected, sourceStep, jSurf) * decayCurve(mStepBack, jSurf);
                     } // for mStepBack
+
                     peopleConvIntoZone += peopleConvFromSurf;
                     equipConvIntoZone += equipConvFromSurf;
                     hvacLossConvIntoZone += hvacLossConvFromSurf;
@@ -13318,12 +13300,6 @@ namespace OutputReportTabular {
             decayCurve.deallocate();
 
         } // if desDaySelected != 0
-
-        peopleRadIntoSurf.deallocate();
-        equipRadIntoSurf.deallocate();
-        hvacLossRadIntoSurf.deallocate();
-        powerGenRadIntoSurf.deallocate();
-        lightLWRadIntoSurf.deallocate();
     }
 
     // Used to construct the tabular output for a single cell in the component load summary reports based on moving average
@@ -13360,6 +13336,7 @@ namespace OutputReportTabular {
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
+        using DataSurfaces::KivaFoundation;
         using DataSurfaces::OSC;
         using DataSurfaces::OtherSideCoefCalcExt;
         using DataSurfaces::OtherSideCoefNoCalcExt;
@@ -13496,7 +13473,7 @@ namespace OutputReportTabular {
                             auto const SELECT_CASE_var1(curExtBoundCond);
                             if (SELECT_CASE_var1 == ExternalEnvironment) {
                                 delayOpaque(rExtWall) += singleSurfDelay;
-                            } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod)) {
+                            } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) || (SELECT_CASE_var1 == KivaFoundation)) {
                                 delayOpaque(rGrdWall) += singleSurfDelay;
                             } else if ((SELECT_CASE_var1 == OtherSideCoefNoCalcExt) || (SELECT_CASE_var1 == OtherSideCoefCalcExt) ||
                                        (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
@@ -13510,7 +13487,8 @@ namespace OutputReportTabular {
                             auto const SELECT_CASE_var1(curExtBoundCond);
                             if (SELECT_CASE_var1 == ExternalEnvironment) {
                                 delayOpaque(rExtFlr) += singleSurfDelay;
-                            } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod)) {
+                            } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) ||
+                                       (SELECT_CASE_var1 == KivaFoundation)) {
                                 delayOpaque(rGrdFlr) += singleSurfDelay;
                             } else if ((SELECT_CASE_var1 == OtherSideCoefNoCalcExt) || (SELECT_CASE_var1 == OtherSideCoefCalcExt) ||
                                        (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
@@ -13525,8 +13503,8 @@ namespace OutputReportTabular {
                             if (SELECT_CASE_var1 == ExternalEnvironment) {
                                 delayOpaque(rRoof) += singleSurfDelay;
                             } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) ||
-                                       (SELECT_CASE_var1 == OtherSideCoefNoCalcExt) || (SELECT_CASE_var1 == OtherSideCoefCalcExt) ||
-                                       (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
+                                       (SELECT_CASE_var1 == KivaFoundation) || (SELECT_CASE_var1 == OtherSideCoefNoCalcExt) ||
+                                       (SELECT_CASE_var1 == OtherSideCoefCalcExt) || (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
                                 delayOpaque(rOtherRoof) += singleSurfDelay;
                             } else { // interzone
                                 delayOpaque(rIntZonCeil) += singleSurfDelay;

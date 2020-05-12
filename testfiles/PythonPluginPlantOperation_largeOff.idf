@@ -1,10 +1,6 @@
-!-PythonPlugin LrgOff_GridStorageEMSSmoothing
-!!
-! This example file is based RefBldgLargeOfficeNew2004_Chicago.idf
+! EMSPlantOperation_LargeOff.idf
 !
-! Demonstrate on-site storage of grid electricity, controlled to follow smooth out demand.
-!
-! Description:  12 story plus basement, office building.
+! Description:  12 story plus basement, office building, derived from DOE Commerical Reference Building model
 ! Form:         Area = 46,320 m2 (498,588 ft2); Number of Stories = 12; Shape = rectangle, Aspect ratio = 1.5
 ! Envelope:     Envelope thermal properties vary with climate according to ASHRAE Standard 90.1-2004.
 !               Opaque constructions: mass walls; built-up flat roof (insulation above deck); slab-on-grade floor
@@ -35,7 +31,7 @@
 ! Pumps:                          Yes
 ! Boilers:                        Boiler:HotWater (gas-fired)
 ! Chillers:                       Chiller:Electric:ReformulatedEIR (water-cooled)
-!
+! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 19
 
   Version,9.3;
@@ -44,23 +40,21 @@
     YES,                     !- Do Zone Sizing Calculation
     YES,                     !- Do System Sizing Calculation
     YES,                     !- Do Plant Sizing Calculation
-    yes,                     !- Run Simulation for Sizing Periods
-    no,                      !- Run Simulation for Weather File Run Periods
-    no,                      !- Do HVAC Sizing Simulation for Sizing Periods
-    2;                       !- Maximum Number of HVAC Sizing Simulation Passes
+    YES,                     !- Run Simulation for Sizing Periods
+    No;                      !- Run Simulation for Weather File Run Periods
 
   Building,
     Ref Bldg Large Office New2004_v1.3_5.0,  !- Name
     0.0000,                  !- North Axis {deg}
     City,                    !- Terrain
-    0.0400,                  !- Loads Convergence Tolerance Value
+    0.0400,                  !- Loads Convergence Tolerance Value {W}
     0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
   RunPeriod,
-    annual,                  !- Name
+    Annual,                  !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -210,7 +204,7 @@
   ShadowCalculation,
     PolygonClipping,         !- Shading Calculation Method
     Periodic,                !- Shading Calculation Update Frequency Method
-    30,                      !- Shading Calculation Update Frequency
+    7,                       !- Shading Calculation Update Frequency
     15000;                   !- Maximum Figures in Shadow Overlap Calculations
 
   Timestep,6;
@@ -3141,7 +3135,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3163,7 +3157,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3185,7 +3179,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3207,7 +3201,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3229,7 +3223,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3251,7 +3245,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3273,7 +3267,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3295,7 +3289,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3317,7 +3311,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3339,7 +3333,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3361,7 +3355,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3383,7 +3377,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3405,7 +3399,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3427,7 +3421,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3449,7 +3443,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3471,7 +3465,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -4162,97 +4156,97 @@
   InternalMass,
     Basement Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Basement,                !- Zone Name
+    Basement,                !- Zone or ZoneList Name
     7126.2120;               !- Surface Area {m2}
 
   InternalMass,
     Core_bottom Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_bottom,             !- Zone Name
+    Core_bottom,             !- Zone or ZoneList Name
     5064.6464;               !- Surface Area {m2}
 
   InternalMass,
     Core_mid Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_mid,                !- Zone Name
+    Core_mid,                !- Zone or ZoneList Name
     5064.6464;               !- Surface Area {m2}
 
   InternalMass,
     Core_top Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_top,                !- Zone Name
+    Core_top,                !- Zone or ZoneList Name
     5064.6464;               !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_bot_ZN_1,      !- Zone Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
     626.8394;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_bot_ZN_2,      !- Zone Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
     403.9503;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_bot_ZN_3,      !- Zone Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
     626.8257;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_bot_ZN_4,      !- Zone Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
     403.9503;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_mid_ZN_1,      !- Zone Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
     626.8394;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_mid_ZN_2,      !- Zone Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
     403.9503;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_mid_ZN_3,      !- Zone Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
     626.8257;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_mid_ZN_4,      !- Zone Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
     403.9503;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_top_ZN_1,      !- Zone Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
     626.8394;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_top_ZN_2,      !- Zone Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
     403.9503;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_top_ZN_3,      !- Zone Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
     626.8257;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_top_ZN_4,      !- Zone Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
     403.9503;                !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
@@ -5223,8 +5217,8 @@
     Basement VAV Box,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Core_bottom Equipment,   !- Name
@@ -5233,8 +5227,8 @@
     Core_bottom VAV Box,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Core_mid Equipment,      !- Name
@@ -5243,8 +5237,8 @@
     Core_mid VAV Box,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Core_top Equipment,      !- Name
@@ -5253,8 +5247,8 @@
     Core_top VAV Box,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_1 Equipment,  !- Name
@@ -5263,8 +5257,8 @@
     Perimeter_bot_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_2 Equipment,  !- Name
@@ -5273,8 +5267,8 @@
     Perimeter_bot_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_3 Equipment,  !- Name
@@ -5283,8 +5277,8 @@
     Perimeter_bot_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_4 Equipment,  !- Name
@@ -5293,8 +5287,8 @@
     Perimeter_bot_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_1 Equipment,  !- Name
@@ -5303,8 +5297,8 @@
     Perimeter_mid_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_2 Equipment,  !- Name
@@ -5313,8 +5307,8 @@
     Perimeter_mid_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_3 Equipment,  !- Name
@@ -5323,8 +5317,8 @@
     Perimeter_mid_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_4 Equipment,  !- Name
@@ -5333,8 +5327,8 @@
     Perimeter_mid_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_1 Equipment,  !- Name
@@ -5343,8 +5337,8 @@
     Perimeter_top_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_2 Equipment,  !- Name
@@ -5353,8 +5347,8 @@
     Perimeter_top_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_3 Equipment,  !- Name
@@ -5363,8 +5357,8 @@
     Perimeter_top_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_4 Equipment,  !- Name
@@ -5373,8 +5367,8 @@
     Perimeter_top_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 ! ***SIZING & CONTROLS***
 
@@ -5400,7 +5394,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Basement,        !- Name
@@ -5429,7 +5428,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Core_bottom,     !- Name
@@ -5458,7 +5462,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Core_mid,        !- Name
@@ -5487,7 +5496,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Core_top,        !- Name
@@ -5516,7 +5530,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_1,  !- Name
@@ -5545,7 +5564,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_2,  !- Name
@@ -5574,7 +5598,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_3,  !- Name
@@ -5603,7 +5632,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_4,  !- Name
@@ -5632,7 +5666,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_1,  !- Name
@@ -5661,7 +5700,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_2,  !- Name
@@ -5690,7 +5734,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_3,  !- Name
@@ -5719,7 +5768,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_4,  !- Name
@@ -5748,7 +5802,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_1,  !- Name
@@ -5777,7 +5836,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_2,  !- Name
@@ -5806,7 +5870,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_3,  !- Name
@@ -5835,7 +5904,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_4,  !- Name
@@ -7302,7 +7376,7 @@
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
     ,                        !- Heat Recovery Inlet Node Name
     ,                        !- Heat Recovery Outlet Node Name
-    0.5;                     !- Sizing Factor
+    0.8;                     !- Sizing Factor
 
   SetpointManager:Scheduled,
     CoolSys1 Chiller 1 Setpoint Manager,  !- Name
@@ -7336,7 +7410,7 @@
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
     ,                        !- Heat Recovery Inlet Node Name
     ,                        !- Heat Recovery Outlet Node Name
-    0.5;                     !- Sizing Factor
+    0.2;                     !- Sizing Factor
 
   SetpointManager:Scheduled,
     CoolSys1 Chiller 2 Setpoint Manager,  !- Name
@@ -7352,9 +7426,9 @@
     AUTOSIZE,                !- Design Air Flow Rate {m3/s}
     AUTOSIZE,                !- Design Fan Power {W}
     AUTOSIZE,                !- Design U-Factor Times Area Value {W/K}
-    autocalculate,           !- Free Convection Air Flow Rate {m3/s}
-    ,                        !- Free Convection Air Flow Rate Sizing Factor
-    autocalculate,           !- Free Convection U-Factor Times Area Value {W/K}
+    autocalculate,           !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                        !- Free Convection Regime Air Flow Rate Sizing Factor
+    autocalculate,           !- Free Convection Regime U-Factor Times Area Value {W/K}
     ,                        !- Free Convection U-Factor Times Area Value Sizing Factor
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
@@ -7396,23 +7470,8 @@
     1,                       !- Coefficient 2 of the Part Load Performance Curve
     0,                       !- Coefficient 3 of the Part Load Performance Curve
     0,                       !- Coefficient 4 of the Part Load Performance Curve
-    autosize,                !- Design Minimum Flow Rate {m3/s}
-    Intermittent,            !- Pump Control Type
-    ,                        !- Pump Flow Rate Schedule Name
-    ,                        !- Pump Curve Name
-    ,                        !- Impeller Diameter {m}
-    ,                        !- VFD Control Type
-    ,                        !- Pump rpm Schedule Name
-    ,                        !- Minimum Pressure Schedule
-    ,                        !- Maximum Pressure Schedule
-    ,                        !- Minimum RPM Schedule
-    ,                        !- Maximum RPM Schedule
-    ,                        !- Zone Name
-    ,                        !- Skin Loss Radiative Fraction
-    PowerPerFlow,            !- Design Power Sizing Method
-    348701.1,                !- Design Electric Power per Unit Flow Rate {W/(m3/s)}
-    1.282051282,             !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}
-    0.0;                     !- Design Minimum Flow Rate Fraction
+    0.0,                     !- Design Minimum Flow Rate {m3/s}
+    Intermittent;            !- Pump Control Type
 
   Pump:VariableSpeed,
     HeatSys1 Pump,           !- Name
@@ -7439,33 +7498,7 @@
     AUTOSIZE,                !- Design Power Consumption {W}
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
-    Intermittent,            !- Pump Control Type
-    ,                        !- Pump Flow Rate Schedule Name
-    ,                        !- Pump Curve Name
-    ,                        !- Impeller Diameter {m}
-    ,                        !- Rotational Speed {rev/min}
-    ,                        !- Zone Name
-    ,                        !- Skin Loss Radiative Fraction
-    PowerPerFlow,            !- Design Power Sizing Method
-    301156.1,                !- Design Electric Power per Unit Flow Rate {W/(m3/s)}
-    ;                        !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}
-
-  PlantEquipmentList,
-    CoolSys1 Equipment List, !- Name
-    Chiller:Electric:ReformulatedEIR,  !- Equipment 1 Object Type
-    CoolSys1 Chiller 1,      !- Equipment 1 Name
-    Chiller:Electric:ReformulatedEIR,  !- Equipment 2 Object Type
-    CoolSys1 Chiller 2;      !- Equipment 2 Name
-
-  PlantEquipmentList,
-    HeatSys1 Equipment List, !- Name
-    Boiler:HotWater,         !- Equipment 1 Object Type
-    HeatSys1 Boiler;         !- Equipment 1 Name
-
-  CondenserEquipmentList,
-    TowerWaterSys Equipment List,  !- Name
-    CoolingTower:SingleSpeed,!- Equipment 1 Object Type
-    TowerWaterSys CoolTower; !- Equipment 1 Name
+    Intermittent;            !- Pump Control Type
 
 ! ***SIZING & CONTROLS***
 
@@ -7473,19 +7506,13 @@
     CoolSys1,                !- Plant or Condenser Loop Name
     Cooling,                 !- Loop Type
     6.67,                    !- Design Loop Exit Temperature {C}
-    6.67,                    !- Loop Design Temperature Difference {deltaC}
-    Coincident,              !- Sizing Option
-    1,                       !- Zone Timesteps in Averaging Window
-    None;                    !- Coincident Sizing Factor Mode
+    6.67;                    !- Loop Design Temperature Difference {deltaC}
 
   Sizing:Plant,
     HeatSys1,                !- Plant or Condenser Loop Name
     Heating,                 !- Loop Type
     82.2,                    !- Design Loop Exit Temperature {C}
-    11.1,                    !- Loop Design Temperature Difference {deltaC}
-    Coincident,              !- Sizing Option
-    2,                       !- Zone Timesteps in Averaging Window
-    None;                    !- Coincident Sizing Factor Mode
+    11.1;                    !- Loop Design Temperature Difference {deltaC}
 
   Sizing:Plant,
     TowerWaterSys,           !- Plant or Condenser Loop Name
@@ -7653,39 +7680,181 @@
 
   PlantEquipmentOperationSchemes,
     CoolSys1 Loop Operation Scheme List,  !- Name
-    PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type
+    PlantEquipmentOperation:UserDefined,  !- Control Scheme 1 Object Type
     CoolSys1 Operation Scheme,  !- Control Scheme 1 Name
     ALWAYS_ON;               !- Control Scheme 1 Schedule Name
 
   PlantEquipmentOperationSchemes,
     HeatSys1 Loop Operation Scheme List,  !- Name
-    PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type
+    PlantEquipmentOperation:UserDefined,  !- Control Scheme 1 Object Type
     HeatSys1 Operation Scheme,  !- Control Scheme 1 Name
     ALWAYS_ON;               !- Control Scheme 1 Schedule Name
 
   CondenserEquipmentOperationSchemes,
     TowerWaterSys Loop Operation Scheme List,  !- Name
-    PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type
+    PlantEquipmentOperation:UserDefined,  !- Control Scheme 1 Object Type
     TowerWaterSys Operation Scheme,  !- Control Scheme 1 Name
     ALWAYS_ON;               !- Control Scheme 1 Schedule Name
 
-  PlantEquipmentOperation:HeatingLoad,
+  Output:EnergyManagementSystem,
+    Verbose,                 !- Actuator Availability Dictionary Reporting
+    Verbose,                 !- Internal Variable Availability Dictionary Reporting
+    ErrorsOnly;              !- EMS Runtime Language Debug Output Level
+
+  PlantEquipmentOperation:UserDefined,
     HeatSys1 Operation Scheme,  !- Name
-    0.0,                     !- Load Range 1 Lower Limit {W}
-    1000000000000000,        !- Load Range 1 Upper Limit {W}
-    HeatSys1 Equipment List; !- Range 1 Equipment List Name
+    Heating_dispatch,        !- Main Model Program Calling Manager Name
+    ,                        !- Initialization Program Calling Manager Name
+    Boiler:HotWater,         !- Equipment 1 Object Type
+    HeatSys1 Boiler;         !- Equipment 1 Name
 
-  PlantEquipmentOperation:CoolingLoad,
+!  EnergyManagementSystem:ProgramCallingManager,
+!    Heating_dispatch,        !- Name
+!    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
+!    Heating_dispatch_Values; !- Program Name 1
+
+  PythonPlugin:Instance,
+    Heating_dispatch,                  !- Name
+    Yes,                                    !- Run During Warmup Days
+    PythonPluginPlantOperation_largeOff,    !- Python Module Name
+    Heating_dispatch_Values;           !- Plugin Class Name
+
+!  EnergyManagementSystem:Program,
+!    Heating_dispatch_Values, !- Name
+!    IF HeatSys1_LoopDmnd > 0.0,  !- Program Line 1
+!    SET Boiler_Disptch = HeatSys1_LoopDmnd,  !- Program Line 2
+!    ELSE,                    !- <none>
+!    SET Boiler_Disptch = 0.0,!- <none>
+!    ENDIF;                   !- <none>
+
+!  EnergyManagementSystem:InternalVariable,
+!    HeatSys1_LoopDmnd,       !- Name
+!    HeatSys1 Operation Scheme,  !- Internal Data Index Key Name
+!    Supply Side Current Demand Rate;  !- Internal Data Type
+
+!  EnergyManagementSystem:Actuator,
+!    Boiler_Disptch,          !- Name
+!    HeatSys1 Operation Scheme:HeatSys1 Boiler,  !- Actuated Component Unique Name
+!    Plant Equipment Operation,  !- Actuated Component Type
+!    Distributed Load Rate;   !- Actuated Component Control Type
+
+  PlantEquipmentOperation:UserDefined,
     CoolSys1 Operation Scheme,  !- Name
-    0.0,                     !- Load Range 1 Lower Limit {W}
-    100000000000000,         !- Load Range 1 Upper Limit {W}
-    CoolSys1 Equipment List; !- Range 1 Equipment List Name
+    Cooling_dispatch,        !- Main Model Program Calling Manager Name
+    Init_Chiller_Capacity,   !- Initialization Program Calling Manager Name
+    Chiller:Electric:ReformulatedEIR,  !- Equipment 1 Object Type
+    CoolSys1 Chiller 1,      !- Equipment 1 Name
+    Chiller:Electric:ReformulatedEIR,  !- Equipment 2 Object Type
+    CoolSys1 Chiller 2;      !- Equipment 2 Name
 
-  PlantEquipmentOperation:CoolingLoad,
+ ! EnergyManagementSystem:ProgramCallingManager,
+ !   Init_Chiller_Capacity,         !- Name
+ !   UserDefinedComponentModel,     !- EnergyPlus Model Calling Point
+ !   Init_Chiller_Capacity_Values;  !- Program Name 1
+
+  PythonPlugin:Instance,
+    Init_Chiller_Capacity,                              !- Name
+    Yes,                                                !- Run During Warmup Days
+    PythonPluginPlantOperation_largeOff,                !- Python Module Name
+    Init_Chiller_Capacity_and_Cooling_dispatch_Values;  !- Plugin Class Name
+
+  PythonPlugin:Variables,
+    PythonGlobalVars,           !- Name
+    totChilCap;     !- Variable Name 1
+
+!  EnergyManagementSystem:Program,
+!    Init_Chiller_Capacity_Values,  !- Name
+!    Set totChilCap = Chil1_Cap + Chil2_Cap;  !- Program Line 1
+
+!  EnergyManagementSystem:GlobalVariable,
+!    totChilCap;              !- Erl Variable 1 Name
+
+!  EnergyManagementSystem:ProgramCallingManager,
+!    Cooling_dispatch,        !- Name
+!    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
+!    Cooling_dispatch_Values; !- Program Name 1
+
+  PythonPlugin:Instance,
+    Cooling_dispatch,                                   !- Name
+    Yes,                                                !- Run During Warmup Days
+    PythonPluginPlantOperation_largeOff,                !- Python Module Name
+    Init_Chiller_Capacity_and_Cooling_dispatch_Values;  !- Plugin Class Name
+
+!  EnergyManagementSystem:Program,
+!    Cooling_dispatch_Values, !- Name
+!    IF CoolSys1_LoopDmnd < 0.0,  !- Program Line 1
+!    Set UniformPLR  = CoolSys1_LoopDmnd / totChilCap,  !- Program Line 2
+!    Set UniformPLR  =  @min UniformPLR 1.0,  !- <none>
+!    SET Chil1_Disptch = UniformPLR*Chil1_Cap,  !- <none>
+!    SET Chil2_Disptch = UniformPLR*Chil2_Cap,  !- <none>
+!    ELSE,                    !- <none>
+!    SET Chil1_Disptch = 0.0, !- <none>
+!    SET Chil2_Disptch = 0.0, !- <none>
+!    ENDIF;                   !- <none>
+
+!  EnergyManagementSystem:InternalVariable,
+!    CoolSys1_LoopDmnd,       !- Name
+!    CoolSys1 Operation Scheme,  !- Internal Data Index Key Name
+!    Supply Side Current Demand Rate;  !- Internal Data Type
+
+!  EnergyManagementSystem:InternalVariable,
+!    Chil1_Cap,               !- Name
+!    CoolSys1 Chiller 1,      !- Internal Data Index Key Name
+!    Chiller Nominal Capacity;!- Internal Data Type
+
+!  EnergyManagementSystem:InternalVariable,
+!    Chil2_Cap,               !- Name
+!    CoolSys1 Chiller 2,      !- Internal Data Index Key Name
+!    Chiller Nominal Capacity;!- Internal Data Type
+
+!  EnergyManagementSystem:Actuator,
+!    Chil1_Disptch,           !- Name
+!    CoolSys1 Operation Scheme:CoolSys1 Chiller 1,  !- Actuated Component Unique Name
+!    Plant Equipment Operation,  !- Actuated Component Type
+!    Distributed Load Rate;   !- Actuated Component Control Type
+
+!  EnergyManagementSystem:Actuator,
+!    Chil2_Disptch,           !- Name
+!    CoolSys1 Operation Scheme:CoolSys1 Chiller 2,  !- Actuated Component Unique Name
+!    Plant Equipment Operation,  !- Actuated Component Type
+!    Distributed Load Rate;   !- Actuated Component Control Type
+
+  PlantEquipmentOperation:UserDefined,
     TowerWaterSys Operation Scheme,  !- Name
-    0.0,                     !- Load Range 1 Lower Limit {W}
-    1000000000000,           !- Load Range 1 Upper Limit {W}
-    TowerWaterSys Equipment List;  !- Range 1 Equipment List Name
+    Tower_dispatch,          !- Main Model Program Calling Manager Name
+    ,                        !- Initialization Program Calling Manager Name
+    CoolingTower:SingleSpeed,!- Equipment 1 Object Type
+    TowerWaterSys CoolTower; !- Equipment 1 Name
+
+!  EnergyManagementSystem:ProgramCallingManager,
+!    Tower_dispatch,             !- Name
+!    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
+!    Tower_dispatch_Values;      !- Program Name 1
+
+  PythonPlugin:Instance,
+    Tower_dispatch,             !- Name
+    Yes,                                    !- Run During Warmup Days
+    PythonPluginPlantOperation_largeOff,    !- Python Module Name
+    Tower_dispatch_Values;                  !- Plugin Class Name
+
+!  EnergyManagementSystem:Program,
+!    Tower_dispatch_Values,   !- Name
+!    IF TowerWaterSys_LoopDmnd < 0.0,  !- Program Line 1
+!    SET Tower_Disptch = TowerWaterSys_LoopDmnd,  !- Program Line 2
+!    ELSE,                    !- <none>
+!    SET Tower_Disptch = 0.0, !- <none>
+!    ENDIF;                   !- <none>
+
+!  EnergyManagementSystem:InternalVariable,
+!    TowerWaterSys_LoopDmnd,  !- Name
+!    TowerWaterSys Operation Scheme,  !- Internal Data Index Key Name
+!    Supply Side Current Demand Rate;  !- Internal Data Type
+
+!  EnergyManagementSystem:Actuator,
+!    Tower_Disptch,           !- Name
+!    TowerWaterSys Operation Scheme:TowerWaterSys CoolTower,  !- Actuated Component Unique Name
+!    Plant Equipment Operation,  !- Actuated Component Type
+!    Distributed Load Rate;   !- Actuated Component Control Type
 
 ! ***LOOPS***
 
@@ -9232,7 +9401,71 @@
 
   Output:Meter,Electricity:Facility,HOURLY;
 
+  Output:Meter,Fans:Electricity,HOURLY;
+
+  Output:Meter,Cooling:Electricity,HOURLY;
+
+  Output:Meter,Heating:Electricity,HOURLY;
+
+  Output:Meter,InteriorLights:Electricity,HOURLY;
+
+  Output:Meter,InteriorEquipment:Electricity,HOURLY;
+
+  Output:Meter,Gas:Facility,HOURLY;
+
+  Output:Meter,Heating:Gas,HOURLY;
+
+  Output:Meter,Water Heater:WaterSystems:Gas,HOURLY;
+
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,HOURLY;
+
+  Output:Variable,*,Site Outdoor Air Humidity Ratio,HOURLY;
+
+  Output:Variable,*,Site Outdoor Air Relative Humidity,HOURLY;
+
+  Output:Variable,*,Boiler Gas Energy,HOURLY;
+
+  Output:Variable,*,Boiler Inlet Temperature,HOURLY;
+
+  Output:Variable,*,Boiler Outlet Temperature,HOURLY;
+
+  Output:Variable,*,Boiler Part Load Ratio,HOURLY;
+
+  Output:Variable,*,Chiller Part Load Ratio,HOURLY;
+
+  Output:Variable,*,Chiller Electric Energy,HOURLY;
+
+  Output:Variable,*,Chiller COP,HOURLY;
+
+  Output:Variable,*,Chiller Electric Power,HOURLY;
+
+  Output:Variable,*,Chiller Evaporator Cooling Rate,HOURLY;
+
+  Output:Variable,*,Plant System Cycle On Off Status,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Cooling Demand Rate,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Heating Demand Rate,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Inlet Mass Flow Rate,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Inlet Temperature,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Outlet Temperature,HOURLY;
+
+  Output:Variable,*,Plant Supply Side Unmet Demand Rate,HOURLY;
+
+  Output:Variable,*,Air System Heating Coil Hot Water Energy,HOURLY;
+
+  Output:Variable,*,Air System Outdoor Air Flow Fraction,HOURLY;
+
+  Output:Variable,*,Air System Simulation Cycle On Off Status,HOURLY;
+
+  Output:Variable,*,Air System Outdoor Air Economizer Status,HOURLY;
+
+  Output:Variable,*,Air System Total Heating Energy,HOURLY;
+
+  Output:Variable,*,Air System Total Cooling Energy,HOURLY;
 
   Output:Variable,*,Air System Fan Electric Energy,HOURLY;
 
@@ -9356,260 +9589,98 @@
 
 ! ***ENVIRONMENTAL FACTORS REPORTING***
 
-  ElectricLoadCenter:Distribution,
-    Grid Battery Load Center,!- Name
-    ,                        !- Generator List Name
-    ,                        !- Generator Operation Scheme Type
-    0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
-    ,                        !- Generator Track Schedule Name Scheme Schedule Name
-    ,                        !- Generator Track Meter Scheme Meter Name
-    DirectCurrentWithInverterDCStorage,  !- Electrical Buss Type
-    Storage Inverter,        !- Inverter Name
-    Battery,                 !- Electrical Storage Object Name
-    ,                        !- Transformer Object Name
-    TrackChargeDischargeSchedules,  !- Storage Operation Scheme
-    ,                        !- Storage Control Track Meter Name
-    Grid Charge Converter,   !- Storage Converter Object Name
-    0.96,                    !- Maximum Storage State of Charge Fraction
-    0.4,                     !- Minimum Storage State of Charge Fraction
-    1000000,                 !- Design Storage Control Charge Power {W}
-    Charge Schedule,         !- Storage Charge Power Fraction Schedule Name
-    51000000,                !- Design Storage Control Discharge Power {W}
-    Discharge Schedule,      !- Storage Discharge Power Fraction Schedule Name
-    ,                        !- Storage Control Utility Demand Target {W}
-    ;                        !- Storage Control Utility Demand Target Fraction Schedule Name
+  Output:EnvironmentalImpactFactors,
+    Monthly;                 !- Reporting Frequency
+
+  EnvironmentalImpactFactors,
+    0.663,                   !- District Heating Efficiency
+    4.18,                    !- District Cooling COP {W/W}
+    0.585,                   !- Steam Conversion Efficiency
+    80.7272,                 !- Total Carbon Equivalent Emission Factor From N2O {kg/kg}
+    6.2727,                  !- Total Carbon Equivalent Emission Factor From CH4 {kg/kg}
+    0.2727;                  !- Total Carbon Equivalent Emission Factor From CO2 {kg/kg}
+
+! Indiana electricity source and emission factors based on Deru and Torcellini 2007
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    kg,                      !- Units of Measure
+    ,                        !- Energy per Unit Factor
+    3.546,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    3.417E+02,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.186E-01,               !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    7.472E-01,               !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    6.222E-01,               !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    8.028E-03,               !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.872E+00,               !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    0.0,                     !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.739E-02,               !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    0.0,                     !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    0.0,                     !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    1.019E-02,               !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    5.639E-06,               !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    2.778E-05,               !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.4309556,               !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Deru and Torcellini 2007
+! Source Energy and Emission Factors for Energy Use in Buildings
+! NREL/TP-550-38617
+! source factor and Higher Heating Values from Table 5
+! post-combustion emission factors for boiler from Table 9 (with factor of 1000 correction for natural gas)
+
+  FuelFactors,
+    NaturalGas,              !- Existing Fuel Resource Name
+    m3,                      !- Units of Measure
+    37631000,                !- Energy per Unit Factor
+    1.092,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    5.21E+01,                !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    3.99E-02,                !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.06E-03,                !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.73E-02,                !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    1.06E-03,                !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    2.68E-04,                !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    0.0,                     !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    3.59E-03,                !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    0.0,                     !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    0,                       !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.61E-03,                !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.11E-07,                !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    2.13E-07,                !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0,                       !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
 
-  Schedule:Compact,
-    Charge Schedule,         !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay, !- Field 2
-    Until: 08:00,1.0,        !- Field 3
-    Until: 22:00,0.0,        !- Field 5
-    Until: 24:00,1.0,        !- Field 7
-    For: Saturday WinterDesignDay, !- Field 9
-    Until: 08:00,1.0,        !- Field 10
-    Until: 18:00,0.0,        !- Field 12
-    Until: 24:00,1.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,1.0;        !- Field 17
-
-  Schedule:Compact,
-    Discharge Schedule,      !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay, !- Field 2
-    Until: 10:00,0.0,        !- Field 3
-    Until: 22:00,1.0,        !- Field 5
-    Until: 24:00,0.0,        !- Field 7
-    For: Saturday WinterDesignDay, !- Field 9
-    Until: 10:00,0.0,        !- Field 10
-    Until: 18:00,1.0,        !- Field 12
-    Until: 24:00,0.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,0.0;        !- Field 17
-
-  ElectricLoadCenter:Storage:Converter,
-    Grid Charge Converter,   !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    SimpleFixed,             !- Power Conversion Efficiency Method
-    0.95,                    !- Simple Fixed Efficiency
-    ,                        !- Design Maximum Continuous Input Power {W}
-    ,                        !- Efficiency Function of Power Curve Name
-    20,                      !- Ancillary Power Consumed In Standby {W}
-    ,                        !- Zone Name
-    0.25;                    !- Radiative Fraction
-
-  ElectricLoadCenter:Storage:Simple,
-    Battery,                 !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Zone Name
-    0.0,                     !- Radiative Fraction for Zone Heat Gains
-    0.8,                     !- Nominal Energetic Efficiency for Charging
-    0.8,                     !- Nominal Discharging Energetic Efficiency
-    1.0E13,                  !- Maximum Storage Capacity {J}
-    1000000,                 !- Maximum Power for Discharging {W}
-    1000000,                 !- Maximum Power for Charging {W}
-    5.0E12;                  !- Initial State of Charge {J}
-
-  ElectricLoadCenter:Inverter:LookUpTable,
-    Storage Inverter,        !- Name
-    ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Zone Name
-    0.25,                    !- Radiative Fraction
-    14000,                   !- Rated Maximum Continuous Output Power {W}
-    200.0,                   !- Night Tare Loss Power {W}
-    368,                     !- Nominal Voltage Input {V}
-    0.839,                   !- Efficiency at 10% Power and Nominal Voltage
-    0.897,                   !- Efficiency at 20% Power and Nominal Voltage
-    0.916,                   !- Efficiency at 30% Power and Nominal Voltage
-    0.931,                   !- Efficiency at 50% Power and Nominal Voltage
-    0.934,                   !- Efficiency at 75% Power and Nominal Voltage
-    0.930;                   !- Efficiency at 100% Power and Nominal Voltage
-
-  Output:Variable,*,Inverter DC to AC Efficiency,hourly;
-
-  Output:Variable,*,Inverter DC Input Electric Power,hourly;
-
-  Output:Variable,*,Inverter DC Input Electric Energy,hourly;
-
-  Output:Variable,*,Inverter AC Output Electric Power,hourly;
-
-  Output:Variable,*,Inverter AC Output Electric Energy,hourly;
-
-  Output:Variable,*,Inverter Conversion Loss Power,hourly;
-
-  Output:Variable,*,Inverter Conversion Loss Energy,hourly;
-
-  Output:Variable,*,Inverter Conversion Loss Decrement Energy,hourly;
-
-  Output:Variable,*,Inverter Thermal Loss Rate,hourly;
-
-  Output:Variable,*,Inverter Thermal Loss Energy,hourly;
-
-  Output:Variable,*,Inverter Ancillary AC Electric Power,hourly;
-
-  Output:Variable,*,Inverter Ancillary AC Electric Energy,hourly;
-
-  Output:Variable,*,Electric Storage Simple Charge State,hourly;
-
-  Output:Variable,*,Electric Storage Charge Power,hourly;
-
-  Output:Variable,*,Electric Storage Charge Energy,hourly;
-
-  Output:Variable,*,Electric Storage Production Decrement Energy,hourly;
-
-  Output:Variable,*,Electric Storage Discharge Power,hourly;
-
-  Output:Variable,*,Electric Storage Discharge Energy,hourly;
-
-  Output:Variable,*,Electric Storage Thermal Loss Rate,hourly;
-
-  Output:Variable,*,Electric Storage Thermal Loss Energy,hourly;
-
-  Output:Variable,*,Converter AC to DC Efficiency,hourly;
-
-  Output:Variable,*,Converter AC Input Electric Power,hourly;
-
-  Output:Variable,*,Converter AC Input Electric Energy,hourly;
-
-  Output:Variable,*,Converter DC Output Electric Power,hourly;
-
-  Output:Variable,*,Converter DC Output Electric Energy,hourly;
-
-  Output:Variable,*,Converter Electric Loss Power,hourly;
-
-  Output:Variable,*,Converter Electric Loss Energy,hourly;
-
-  Output:Variable,*,Converter Electric Loss Decrement Energy,hourly;
-
-  Output:Variable,*,Converter Thermal Loss Rate,hourly;
-
-  Output:Variable,*,Converter Thermal Loss Energy,hourly;
-
-  Output:Variable,*,Converter Ancillary AC Electric Power,hourly;
-
-  Output:Variable,*,Converter Ancillary AC Electric Energy,hourly;
-
-  Output:Variable,*,Electric Load Center Produced Electric Power,hourly;
-
-  Output:Variable,*,Electric Load Center Produced Electric Energy,hourly;
-
-  Output:Variable,*,Electric Load Center Supplied Electric Power,hourly;
-
-  Output:Variable,*,Electric Load Center Drawn Electric Power,hourly;
-
-  Output:Variable,*,Electric Load Center Produced Thermal Rate,hourly;
-
-  Output:Variable,*,Electric Load Center Produced Thermal Energy,hourly;
-
-  Output:Variable,*,Electric Load Center Requested Electric Power,hourly;
-
-  Output:Variable,*,Facility Total Purchased Electric Power,hourly;
-
-  Output:Variable,*,Facility Total Purchased Electric Energy,hourly;
-
-  Output:Variable,*,Facility Total Surplus Electric Power,hourly;
-
-  Output:Variable,*,Facility Total Surplus Electric Energy,hourly;
-
-  Output:Variable,*,Facility Net Purchased Electric Power,hourly;
-
-  Output:Variable,*,Facility Net Purchased Electric Energy,hourly;
-
-  Output:Variable,*,Facility Total Building Electric Demand Power,hourly;
-
-  Output:Variable,*,Facility Total HVAC Electric Demand Power,hourly;
-
-  Output:Variable,*,Facility Total Electric Demand Power,hourly;
-
-  Output:Variable,*,Facility Total Produced Electric Power,hourly;
-
-  Output:Variable,*,Facility Total Produced Electric Energy,hourly;
-
-! Begin EMS demo of controlling a big battery to smooth out building demand load factor
-
-!  EnergyManagementSystem:Sensor,
-!    CurntFacilityElectDemand,!- Name
-!    Whole Building,          !- Output:Variable or Output:Meter Index Key Name
-!    Facility Total Electric Demand Power;  !- Output:Variable or Output:Meter Name
-
-!  EnergyManagementSystem:Sensor,
-!    CurntStorageSOC,         !- Name
-!    Battery,                 !- Output:Variable or Output:Meter Index Key Name
-!    Electric Storage Simple Charge State;  !- Output:Variable or Output:Meter Name
-
-!  EnergyManagementSystem:InternalVariable,
-!    MaxSOC,                  !- Name
-!    BATTERY,                 !- Internal Data Index Key Name
-!    Electrical Storage Simple Maximum Capacity;  !- Internal Data Type
-
-!  EnergyManagementSystem:TrendVariable,
-!    FacilityElectTrend,      !- Name
-!    CurntFacilityElectDemand,!- EMS Variable Name
-!    1008;                    !- Number of Timesteps to be Logged
-
-!  EnergyManagementSystem:Actuator,
-!    dischargeRate,           !- Name
-!    GRID BATTERY LOAD CENTER,!- Actuated Component Unique Name
-!    Electrical Storage,      !- Actuated Component Type
-!    Power Draw Rate;         !- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    chargeRate,              !- Name
-!    GRID BATTERY LOAD CENTER,!- Actuated Component Unique Name
-!    Electrical Storage,      !- Actuated Component Type
-!    Power Charge Rate;       !- Actuated Component Control Type
-
-!  EnergyManagementSystem:ProgramCallingManager,
-!    Demand Manager Demonstration,  !- Name
-!    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
-!    BatteryControlDemandDemo;!- Program Name 1
-
-!  EnergyManagementSystem:Program,
-!    BatteryControlDemandDemo,!- Name
-!    Set fracSOC = CurntStorageSOC / MaxSOC,  !- Program Line 1
-!    Set avgFacilDemand = @trendAverage FacilityElectTrend 1008,  !- Program Line 2
-!    set dischargeRate = 0.0, !- <none>
-!    set chargeRate = 0.0,    !- <none>
-!    set dampenFactor = 0.8,  !- <none>
-!    If ( CurntFacilityElectDemand > (avgFacilDemand * 1.05 ) ),  !- <none>
-!    set dischargeRate = ( CurntFacilityElectDemand - avgFacilDemand ) * dampenFactor,  !- <none>
-!    ELSEIF ( CurntFacilityElectDemand < (avgFacilDemand * 0.95 ) ),  !- <none>
-!    set chargeRate = ( avgFacilDemand - CurntFacilityElectDemand ) * dampenFactor,  !- <none>
-!    ENDIF;                   !- <none>
-
-  PythonPlugin:Variables,
-    MyGlobalVariables,            !- Name
-    CurntFacilityElectDemand;     !- Variable Name 1
-
-  PythonPlugin:TrendVariable,
-    CurntFacilityElectDemandTrend,  !- Name
-    CurntFacilityElectDemand,       !- Variable Name
-    1008;                           !- Number of Timesteps to be Logged
-
-  PythonPlugin:Instance,
-    Test Out Trends,  !- Name
-    Yes,                     !- Run During Warmup Days
-    PythonPluginLrgOff_GridStorageSmoothing,  !- Python Module Name
-    BatteryControlDemandDemo;         !- Plugin Class Name
