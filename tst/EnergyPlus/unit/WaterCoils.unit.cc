@@ -1357,7 +1357,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
          "	Coil:Cooling:Water,",
          "	Zone1FanCoilCoolingCoil, !- Name",
          "	FanAndCoilAvailSched, !- Availability Schedule Namev",
-         "	0.0002, !- Design Water Flow Rate { m3 / s }",
+         "	Autosize, !- Design Water Flow Rate { m3 / s }",
          "	Autosize, !- Design Air Flow Rate { m3 / s }",
          "	7.22,   !- Design Inlet Water Temperature { Cv }",
          "	24.340, !- Design Inlet Air Temperature { C }",
@@ -1403,7 +1403,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
          "	Zone1FanCoilFan, !- Supply Air Fan Name",
          "	Coil:Cooling:Water, !- Cooling Coil Object Type",
          "	Zone1FanCoilCoolingCoil, !- Cooling Coil Name",
-         "	0.00014, !- Maximum Cold Water Flow Rate { m3 / s }",
+         "	0.0002, !- Maximum Cold Water Flow Rate { m3 / s }",
          "	0.0, !- Minimum Cold Water Flow Rate { m3 / s }",
          "	0.001, !- Cooling Convergence Tolerance",
          "	Coil:Heating:Water, !- Heating Coil Object Type",
@@ -1582,14 +1582,21 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
 
     // User-specified air volume flow rate from the ZoneHVAC:FourPipeFanCoil object
     DataSizing::ZoneEqSizing(CurZoneEqNum).AirVolFlow = 0.5;
+    // User-specified water flow rate from the ZoneHVAC:FourPipeFanCoil object
+    DataSizing::ZoneEqSizing(CurZoneEqNum).MaxCWVolFlow = 0.0002;
 
     // Initial design air volume flow rate based on the design conditions
     WaterCoil(2).DesAirVolFlowRate = 1.0;
+    // Initial design water flow rate based on the design conditions
+    WaterCoil(2).MaxWaterVolFlowRate = 0.00014;
 
     // normal cooling simulation for constant fan variable flow fan coil
     Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
 
     // Expect final design air volume flow rate to equal the user-specified air volume flow rate from the ZoneHVAC:FourPipeFanCoil object
     EXPECT_EQ(WaterCoil(2).DesAirVolFlowRate, 0.5);
+    // Expect final design water flow rate to equal the user-specified air volume flow rate from the ZoneHVAC:FourPipeFanCoil object
+    EXPECT_EQ(WaterCoil(2).MaxWaterVolFlowRate, 0.0002);
+
 
 }
