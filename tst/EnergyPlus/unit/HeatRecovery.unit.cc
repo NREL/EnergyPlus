@@ -3944,7 +3944,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
     EXPECT_EQ(ExchCond(ExchNum).NomSupAirVolFlow, 1.0);
 }
 
-TEST_F(EnergyPlusFixture, HeatRecovery_NominalFlowSizingOptionsTest)
+TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
 {
 
     std::string const idf_objects = delimited_string({
@@ -3965,8 +3965,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalFlowSizingOptionsTest)
         "      VAV WITH REHEAT Supply Equipment Inlet Node,  !- Return Air Node Name",
         "      VAV WITH REHEAT_OA-VAV WITH REHEAT_CoolCNode,  !- Mixed Air Node Name",
         "      VAV WITH REHEAT_OAInlet Node,  !- Actuator Node Name",
-        "      AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}",
-        "      AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "      0.5,                     !- Minimum Outdoor Air Flow Rate {m3/s}",
+        "      1.0,                     !- Maximum Outdoor Air Flow Rate {m3/s}",
         "      NoEconomizer,            !- Economizer Control Type",
         "      ModulateFlow,            !- Economizer Control Action Type",
         "      ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
@@ -4010,7 +4010,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalFlowSizingOptionsTest)
         "    HeatExchanger:AirToAir:SensibleAndLatent,",
         "      HEATRECOVERY HX GENERIC, !- Name",
         "      ,                        !- Availability Schedule Name",
-        "      AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}",
+        "      0.5,                     !- Nominal Supply Air Flow Rate {m3/s}",
         "      0.70,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "      0.60,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
         "      0.70,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
@@ -4074,26 +4074,63 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalFlowSizingOptionsTest)
     EXPECT_EQ(thisOAController.Lockout, MixedAir::NoLockoutPossible); // no lockout
     EXPECT_EQ(thisOAController.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
     EXPECT_FALSE(thisOAController.EconBypass); // no bypass
-    EXPECT_FALSE(SizeHRHXtoMinFlow); // initialized to false
-    // test 1: Economizer Type = NoEconomizer 
-    SizeHRHXtoMinFlow = GetHeatRecoveryHXMinFlowSizingFlag(thisHX.EconoLockOut, DataSizing::CurOASysNum);
-    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum OA
-    ;
-    // test 2: Economizer Type = DifferentialDryBulb but no bypass
-    thisOAController.Econo = MixedAir::DifferentialDryBulb;
-    SizeHRHXtoMinFlow = GetHeatRecoveryHXMinFlowSizingFlag(thisHX.EconoLockOut, DataSizing::CurOASysNum);
-    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum OA 
-    ;
-    // test 3: Economizer Type = DifferentialDryBulb and allow bypass
-    thisOAController.EconBypass = true; // allow bypass
-    SizeHRHXtoMinFlow = GetHeatRecoveryHXMinFlowSizingFlag(thisHX.EconoLockOut, DataSizing::CurOASysNum);
-    EXPECT_TRUE(SizeHRHXtoMinFlow); // sized to minimum OA
-    ;
-    // test 4: Economizer Type = DifferentialDryBulb and no bypass
-    thisOAController.EconBypass = false; // no bypass
-    thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenWithinEconomizerLimits;
-    SizeHRHXtoMinFlow = GetHeatRecoveryHXMinFlowSizingFlag(thisHX.EconoLockOut, DataSizing::CurOASysNum);
-    EXPECT_FALSE(SizeHRHXtoMinFlow); // sized to maximum OA
+
+    int CompanionCoilNum = 0;
+    bool HXUnitOn = true;
+    bool FirstHVACIteration = false;
+    bool EconomizerFlag = false;
+    bool HighHumCtrlFlag = false;
+    int FanOpMode = 2; // 2 = constant fan
+
+    DataEnvironment::OutBaroPress = 101325.0;
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
+
+    thisHX.ExchTypeNum = HX_AIRTOAIR_GENERIC;
+    thisHX.SupInTemp = 10.0;
+    thisHX.SecInTemp = 20.0;
+    thisHX.SupInHumRat = 0.01;
+    thisHX.SecInHumRat = 0.01;
+    thisHX.SupInEnth = PsyHFnTdbW(thisHX.SupInTemp, thisHX.SupInHumRat);
+    thisHX.SecInEnth = PsyHFnTdbW(thisHX.SecInTemp, thisHX.SecInHumRat);
+    Node(thisHX.SupInletNode).Temp = thisHX.SupInTemp;
+    Node(thisHX.SecInletNode).Temp = thisHX.SecInTemp;
+    Node(thisHX.SupInletNode).HumRat = thisHX.SupInHumRat;
+    Node(thisHX.SecInletNode).HumRat = thisHX.SecInHumRat;
+    Node(thisHX.SupInletNode).Enthalpy = thisHX.SupInEnth;
+    Node(thisHX.SecInletNode).Enthalpy = thisHX.SecInEnth;
+
+    // test 1: primary and secondary flow rate equal
+    Node(thisHX.SupInletNode).MassFlowRate = thisHX.NomSupAirVolFlow * DataEnvironment::StdRhoAir;
+    thisHX.NomSecAirVolFlow = thisHX.NomSupAirVolFlow;
+    Node(thisHX.SecInletNode).MassFlowRate = thisHX.NomSecAirVolFlow * DataEnvironment::StdRhoAir;
+    Node(thisHX.SupOutletNode).TempSetPoint = 19.0;
+    InitHeatRecovery(state, ExchNum, CompanionCoilNum, 0);
+    CalcAirToAirGenericHeatExch(ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    UpdateHeatRecovery(ExchNum);
+    EXPECT_DOUBLE_EQ(10.0, thisHX.SupInTemp);
+    EXPECT_DOUBLE_EQ(20.0, thisHX.SecInTemp);
+    EXPECT_NEAR(0.70, thisHX.SensEffectiveness, 0.0001);
+    EXPECT_NEAR(0.60, thisHX.LatEffectiveness, 0.0001);
+    EXPECT_GT(thisHX.SupOutTemp, thisHX.SupInTemp);
+    EXPECT_EQ(0, thisHX.UnBalancedErrCount); // balanced flow
+    EXPECT_EQ(0, thisHX.LowFlowErrCount ); // flow ratio within range, < 1.3 
+
+    // test 2: secondary flow is 10 times primary
+    Node(thisHX.SupInletNode).MassFlowRate = thisHX.NomSupAirVolFlow * DataEnvironment::StdRhoAir;
+    thisHX.NomSecAirVolFlow = 10.0 * thisHX.NomSupAirVolFlow;
+    Node(thisHX.SecInletNode).MassFlowRate = thisHX.NomSecAirVolFlow * DataEnvironment::StdRhoAir;
+    Node(thisHX.SupOutletNode).TempSetPoint = 19.0;
+    InitHeatRecovery(state, ExchNum, CompanionCoilNum, 0);
+    CalcAirToAirGenericHeatExch(ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
+    UpdateHeatRecovery(ExchNum);
+    EXPECT_DOUBLE_EQ(10.0, thisHX.SupInTemp);
+    EXPECT_DOUBLE_EQ(20.0, thisHX.SecInTemp);
+    EXPECT_NEAR(0.70, thisHX.SensEffectiveness, 0.0001);
+    EXPECT_NEAR(0.60, thisHX.LatEffectiveness, 0.0001);
+    EXPECT_GT(thisHX.SupOutTemp, thisHX.SupInTemp);
+    EXPECT_EQ(1, thisHX.UnBalancedErrCount); // unbalanced flow
+    EXPECT_EQ(1, thisHX.LowFlowErrCount ); // out fo range flow ratio, > 1.3
+
 }
 
 TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
@@ -4184,7 +4221,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     // run HX sizing calculation
     SizeHeatRecovery(state, ExchNum);
     // check autosized nominal supply flow
-    EXPECT_EQ(thisHX.NomSupAirVolFlow, 1.0); // maximum flow
+    EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.2); // maximum flow
 
     // test 4: the HX is on OA system, with economizer and lockout
     thisOAController.Econo = MixedAir::DifferentialDryBulb;

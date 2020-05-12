@@ -313,7 +313,6 @@ namespace DataSizing {
     int DataDesicDehumNum(0);                       // index to desiccant dehumidifier
     bool DataDesicRegCoil(false);                   // TRUE if heating coil desiccant regeneration coil
     bool HRFlowSizingFlag(false);                   // True, if it is a heat recovery heat exchanger flow sizing
-    bool SizeHRHXtoMinFlow(false);                  // true, if the heat recovery heat exchanger nominal flow is sized to min OA flow
     Real64 DataWaterCoilSizCoolDeltaT(0.0);         // used for sizing cooling coil water design flow rate
     Real64 DataWaterCoilSizHeatDeltaT(0.0);         // used for sizing heating coil water design flow rate
     bool DataNomCapInpMeth(false);                  // True if heating coil is sized by CoilPerfInpMeth == NomCa
@@ -484,7 +483,6 @@ namespace DataSizing {
         DataCoilSizingFanCoolLoad = 0.0;
         DataCoilSizingCapFT = 1.0;
         DataDesAccountForFanHeat = true;
-        SizeHRHXtoMinFlow = false;
 
         NumZoneHVACSizing = 0;
         NumAirTerminalSizingSpec = 0;

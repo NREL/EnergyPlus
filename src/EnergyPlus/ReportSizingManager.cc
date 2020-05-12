@@ -2632,22 +2632,23 @@ namespace ReportSizingManager {
                     if (HRFlowSizingFlag) { // HX sizing
                         if (CurOASysNum) {
                             // size to supply air duct flow rate
-                            {
-                                auto const SELECT_CASE_var(CurDuctType);
-                                if (SELECT_CASE_var == Main) {
-                                    AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
-                                } else if (SELECT_CASE_var == Cooling) {
-                                    AutosizeDes = FinalSysSizing(CurSysNum).DesCoolVolFlow;
-                                } else if (SELECT_CASE_var == Heating) {
-                                    AutosizeDes = FinalSysSizing(CurSysNum).DesHeatVolFlow;
-                                } else if (SELECT_CASE_var == Other) {
-                                    AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
-                                } else {
-                                    AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
-                                }
-                            }
-                            if (SizeHRHXtoMinFlow && FinalSysSizing(CurSysNum).DesOutAirVolFlow > 0.0) {
+                            if (FinalSysSizing(CurSysNum).DesOutAirVolFlow > 0.0) {
                                 AutosizeDes = FinalSysSizing(CurSysNum).DesOutAirVolFlow;
+                            } else {
+                                {
+                                    auto const SELECT_CASE_var(CurDuctType);
+                                    if (SELECT_CASE_var == Main) {
+                                        AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                    } else if (SELECT_CASE_var == Cooling) {
+                                        AutosizeDes = FinalSysSizing(CurSysNum).DesCoolVolFlow;
+                                    } else if (SELECT_CASE_var == Heating) {
+                                        AutosizeDes = FinalSysSizing(CurSysNum).DesHeatVolFlow;
+                                    } else if (SELECT_CASE_var == Other) {
+                                        AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                    } else {
+                                        AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                    }
+                                }
                             }
                         } else {
                             {
