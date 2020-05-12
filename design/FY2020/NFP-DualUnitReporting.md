@@ -61,7 +61,7 @@ Output:SQLite,
        \type choice
        \key Simple
        \key SimpleAndTabular
-  A2;  \field Unit Conversion
+  A2;  \field Tabular Unit Conversion
        \type choice
        \key UseOutputControlTableStyle
        \key None
@@ -73,14 +73,15 @@ Output:SQLite,
 
 ```
 
-The default of UseOutputControlTableStyle will let the SQL file follow the unit conversion specified in
-the OutputControl:Table:Style just as it currently does but the other options would allow different 
-unit conversions or no unit conversions at all to apply to the SQL file.
+The default of UseOutputControlTableStyle will let the tables in the SQL file follow the unit conversion 
+specified in the OutputControl:Table:Style just as it currently does but the other options would allow different 
+unit conversions or no unit conversions at all to apply to the tables in the SQL file. The timeseries data
+in the SQL file does not have, and will not have, unit conversions performed.
 
 
 ## Testing/Validation/Data Sources ##
 
-Will test that the unit conversion in the SQL file is correct.
+Will test that the unit conversion in the SQL file for tables is correct.
 
 ## Input Output Reference Documentation ##
 
