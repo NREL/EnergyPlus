@@ -49,6 +49,9 @@
 #include <cassert>
 #include <cmath>
 
+// Eigen Headers
+#include <Eigen/Dense>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/ArrayS.functions.hh>
@@ -116,6 +119,9 @@ namespace HeatBalanceIntRadExchange {
     using namespace DataSystemVariables;
     using namespace DataViewFactorInformation;
     using namespace DataTimings;
+    using Eigen::MatrixXd;
+    using Eigen::ArrayXd;
+    using Eigen::Map;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -1550,55 +1556,46 @@ namespace HeatBalanceIntRadExchange {
         Real64 CheckConvergeTolerance; // check value for actual warning
 
         bool Converged;
-        int i;
-        int j;
-        static int LargestSurf(0);
 
         // FLOW:
         OriginalCheckValue = std::abs(sum(F) - N);
-
-        //  Allocate and zero arrays
-        Array2D<Real64> FixedAF(F); // store for largest area check
 
         Accelerator = 1.0;
         ConvrgOld = 10.0;
         LargestArea = maxval(A);
 
+        // set up eigen maps to existing arrays
+        Map<MatrixXd> viewFactors(F.data(), N, N);
+        Map<const ArrayXd> areas(A.data(), N);
+
+        // copy the current view factors for modification
+        MatrixXd fixedAF = viewFactors;
+
+        // find the largest area and its index
+        Eigen::Index largestAreaIndex;
+        Real64 const largestArea(areas.maxCoeff(&largestAreaIndex));
+        Real64 const totalArea(areas.sum());
+
         //  Check for Strange Geometry
-        if (LargestArea > (sum(A) - LargestArea)) {
-            for (i = 1; i <= N; ++i) {
-                if (LargestArea != A(i)) continue;
-                LargestSurf = i;
-                break;
-            }
-            FixedAF(LargestSurf, LargestSurf) = min(0.9, 1.2 * LargestArea / sum(A)); // Give self view to big surface
+        if (largestArea > 0.5 * totalArea) {
+            fixedAF(largestAreaIndex, largestAreaIndex) = min(0.9, 1.2 * largestArea / totalArea); // Give self view to big surface
         }
 
-        //  Set up AF matrix.
-        Array2D<Real64> AF(N, N); // = (AREA * DIRECT VIEW FACTOR) MATRIX
-        for (i = 1; i <= N; ++i) {
-            for (j = 1; j <= N; ++j) {
-                AF(j, i) = FixedAF(j, i) * A(i);
-            }
-        }
+        // multiple view factors by area, each column is a single surface
+        fixedAF.array().colwise() *= areas;
 
-        //  Enforce reciprocity by averaging AiFij and AjFji
-        FixedAF = 0.5 * (AF + transpose(AF)); // Performance Slow way to average with transpose (heap use)
+        // Enforce reciprocity by averaging AiFij and AjFji
+        fixedAF += fixedAF.transpose().eval();
+        fixedAF *= 0.5;
 
-        AF.deallocate();
-
-        Array2D<Real64> FixedF(N, N); // CORRECTED MATRIX OF VIEW FACTORS (N X N)
+        MatrixXd fixedF(N, N);
 
         NumIterations = 0;
         RowSum = 0.0;
-        //  Check for physically unreasonable enclosures.
 
+        //  Check for physically unreasonable enclosures.
         if (N <= 3) {
-            for (i = 1; i <= N; ++i) {
-                for (j = 1; j <= N; ++j) {
-                    FixedF(j, i) = FixedAF(j, i) / A(i);
-                }
-            }
+            fixedF = fixedAF.array().colwise() / areas;
 
             ShowWarningError("Surfaces in Zone/Enclosure=\"" + enclName + "\" do not define an enclosure.");
             ShowContinueError("Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.");
@@ -1608,37 +1605,26 @@ namespace HeatBalanceIntRadExchange {
             ShowContinueError(
                 "it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed enclosure.");
 
-            RowSum = sum(FixedF);
+            RowSum = fixedF.sum();
             if (RowSum > (N + 0.01)) {
                 // Reciprocity enforced but there is more radiation than possible somewhere since the sum of one of the rows
                 // is now greater than unity.  This should not be allowed as it can cause issues with the heat balance.
                 // Correct this by finding the largest row summation and dividing all of the elements in the F matrix by
                 // this max summation.  This will provide a cap on radiation so that no row has a sum greater than unity
                 // and will still maintain reciprocity.
-                Array1D<Real64> sumFixedF;
-                Real64 MaxFixedFRowSum;
-                sumFixedF.allocate(N);
-                sumFixedF = 0.0;
-                for (i = 1; i <= N; ++i) {
-                    for (j = 1; j <= N; ++j) {
-                        sumFixedF(i) += FixedF(i, j);
-                    }
-                    if (i == 1) {
-                        MaxFixedFRowSum = sumFixedF(i);
-                    } else {
-                        if (sumFixedF(i) > MaxFixedFRowSum) MaxFixedFRowSum = sumFixedF(i);
-                    }
-                }
-                sumFixedF.deallocate();
-                if (MaxFixedFRowSum < 1.0) {
+
+                Real64 maxFixedFColSum;
+                maxFixedFColSum = fixedF.array().colwise().sum().maxCoeff();
+
+                if (maxFixedFColSum < 1.0) {
                     ShowFatalError(" FixViewFactors: Three surface or less zone failing ViewFactorFix correction which should never happen.");
                 } else {
-                    FixedF *= (1.0 / MaxFixedFRowSum);
+                    fixedF *= (1.0 / maxFixedFColSum);
                 }
-                RowSum = sum(FixedF); // needs to be recalculated
+                RowSum = fixedF.sum(); // needs to be recalculated
             }
             FinalCheckValue = FixedCheckValue = std::abs(RowSum - N);
-            F = FixedF;
+            viewFactors = fixedF;
             for (int zoneNum : zoneNums) {
                 Zone(zoneNum).EnforcedReciprocity = true;
             }
@@ -1647,51 +1633,39 @@ namespace HeatBalanceIntRadExchange {
         } //  N <= 3 Case
 
         //  Regular fix cases
-        Array1D<Real64> RowCoefficient(N);
+        ArrayXd colCoefficient(N);
         Converged = false;
         while (!Converged) {
             ++NumIterations;
-            for (i = 1; i <= N; ++i) {
-                // Determine row coefficients which will enforce closure.
-                Real64 const sum_FixedAF_i(sum(FixedAF(_, i)));
-                if (std::abs(sum_FixedAF_i) > 1.0e-10) {
-                    RowCoefficient(i) = A(i) / sum_FixedAF_i;
-                } else {
-                    RowCoefficient(i) = 1.0;
-                }
-                FixedAF(_, i) *= RowCoefficient(i);
-            }
+            // correct the A*F value by ensuring the i-th column sums to Ai
+            colCoefficient = fixedAF.array().colwise().sum();
+            colCoefficient = (colCoefficient.abs() > 1.0e-10).select(areas / colCoefficient, 1.0);
+            fixedAF.array().colwise() *= colCoefficient;
 
             //  Enforce reciprocity by averaging AiFij and AjFji
-            FixedAF = 0.5 * (FixedAF + transpose(FixedAF));
+            fixedAF += fixedAF.transpose().eval();
+            fixedAF *= 0.5;
 
             //  Form FixedF matrix
-            for (i = 1; i <= N; ++i) {
-                for (j = 1; j <= N; ++j) {
-                    FixedF(j, i) = FixedAF(j, i) / A(i);
-                    if (std::abs(FixedF(j, i)) < 1.e-10) {
-                        FixedF(j, i) = 0.0;
-                        FixedAF(j, i) = 0.0;
-                    }
-                }
-            }
+            fixedF = fixedAF.array().colwise() / areas;
 
-            ConvrgNew = std::abs(sum(FixedF) - N);
+            // set fixedAF first using fixedF
+            fixedAF = (fixedF.array().abs() < 1.0e-10).select(0.0, fixedAF);
+            fixedF = (fixedF.array().abs() < 1.0e-10).select(0.0, fixedF);
+
+            ConvrgNew = std::abs(fixedF.sum() - N);
             if (std::abs(ConvrgOld - ConvrgNew) < DifferenceConvergence || ConvrgNew <= PrimaryConvergence) { //  Change in sum of Fs must be small.
                 Converged = true;
             }
             ConvrgOld = ConvrgNew;
             if (NumIterations > 400) { //  If everything goes bad,enforce reciprocity and go home.
                 //  Enforce reciprocity by averaging AiFij and AjFji
-                FixedAF = 0.5 * (FixedAF + transpose(FixedAF));
+                fixedAF += fixedAF.transpose().eval();
+                fixedAF *= 0.5;
 
-                //  Form FixedF matrix
-                for (i = 1; i <= N; ++i) {
-                    for (j = 1; j <= N; ++j) {
-                        FixedF(j, i) = FixedAF(j, i) / A(i);
-                    }
-                }
-                Real64 const sum_FixedF(sum(FixedF));
+                fixedF = fixedAF.array().colwise() / areas;
+
+                Real64 const sum_FixedF(fixedF.sum());
                 FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs(sum_FixedF - N);
                 if (CheckConvergeTolerance > 0.005) {
                     ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
@@ -1701,7 +1675,7 @@ namespace HeatBalanceIntRadExchange {
                     ShowContinueError("If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK.");
                 }
                 if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
-                    F = FixedF;
+                    viewFactors = fixedF;
                     FinalCheckValue = FixedCheckValue;
                 }
                 RowSum = sum_FixedF;
@@ -1710,13 +1684,13 @@ namespace HeatBalanceIntRadExchange {
         }
         FixedCheckValue = ConvrgNew;
         if (FixedCheckValue < OriginalCheckValue) {
-            F = FixedF;
+            viewFactors = fixedF;
             FinalCheckValue = FixedCheckValue;
         } else {
             FinalCheckValue = OriginalCheckValue;
-            RowSum = sum(FixedF);
+            RowSum = fixedF.sum();
             if (std::abs(RowSum - N) < PrimaryConvergence) {
-                F = FixedF;
+                viewFactors = fixedF;
                 FinalCheckValue = FixedCheckValue;
             } else {
                 ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" + enclName +
@@ -1783,165 +1757,44 @@ namespace HeatBalanceIntRadExchange {
         ++NumCalcScriptF_Calls;
 #endif
 
+        // Array2D<Real64>::size_type l(0u);
+
         // Load Cmatrix with AF (AREA * DIRECT VIEW FACTOR) matrix
-        Array2D<Real64> Cmatrix(N, N);        // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
-        assert(equal_dimensions(Cmatrix, F)); // For linear indexing
-        Array2D<Real64>::size_type l(0u);
-        for (int j = 1; j <= N; ++j) {
-            for (int i = 1; i <= N; ++i, ++l) {
-                Cmatrix[l] = A(i) * F[l]; // [ l ] == ( i, j )
-            }
-        }
+        Map<const ArrayXd> areas(A.data(), N);
+        MatrixXd CMatrix(N, N);
+        CMatrix = Map<const MatrixXd>(F.data(), N, N);
+        CMatrix.array().colwise() *= areas.array();
 
         // Load Cmatrix with (AF - EMISS/REFLECTANCE) matrix
-        Array1D<Real64> Excite(N); // Excitation vector = A*EMISS/REFLECTANCE
-        l = 0u;
-        for (int i = 1; i <= N; ++i, l += N + 1) {
-            Real64 EMISS_i(EMISS(i));
-            if (EMISS_i > MaxEmissLimit) { // Check/limit EMISS for this surface to avoid divide by zero below
-                EMISS_i = EMISS(i) = MaxEmissLimit;
-                ShowWarningError("A thermal emissivity above 0.99999 was detected. This is not allowed. Value was reset to 0.99999");
-            }
-            Real64 const EMISS_i_fac(A(i) / (1.0 - EMISS_i));
-            Excite(i) = -EMISS_i * EMISS_i_fac; // Set up matrix columns for partial radiosity calculation
-            Cmatrix[l] -= EMISS_i_fac;          // Coefficient matrix for partial radiosity calculation // [ l ] == ( i, i )
+        Map<ArrayXd> emissivity(EMISS.data(), N);
+
+        // ensure max limit not exceeded
+        if ((emissivity > MaxEmissLimit).any()) {
+            emissivity = (emissivity > MaxEmissLimit).select(MaxEmissLimit, emissivity);
+            ShowWarningError("A thermal emissivity above 0.99999 was detected. This is not allowed. Value(s) reset to 0.99999");
         }
 
-        Array2D<Real64> Cinverse(N, N);       // Inverse of Cmatrix
-        CalcMatrixInverse(Cmatrix, Cinverse); // SOLVE THE LINEAR SYSTEM
-        Cmatrix.clear();                      // Release memory ASAP
+        // set the excitation vector first to A/(1-emiss) so it can be used to modify CMatrix
+        ArrayXd excitation(N);
+        excitation = areas / (1.0 - emissivity);
 
-        // Scale Cinverse colums by excitation to get partial radiosity matrix
-        l = 0u;
-        for (int j = 1; j <= N; ++j) {
-            Real64 const e_j(Excite(j));
-            for (int i = 1; i <= N; ++i, ++l) {
-                Cinverse[l] *= e_j; // [ l ] == ( i, j )
-            }
-        }
-        Excite.clear(); // Release memory ASAP
+        // modify CMatrix
+        CMatrix -= excitation.matrix().asDiagonal();
 
-        // Form Script F matrix transposed
-        assert(equal_dimensions(Cinverse, ScriptF)); // For linear indexing
-        Array2D<Real64>::size_type m(0u);
-        for (int i = 1; i <= N; ++i) { // Inefficient order for cache but can reuse multiplier so faster choice depends on N
-            Real64 const EMISS_i(EMISS(i));
-            Real64 const EMISS_fac(EMISS_i / (1.0 - EMISS_i));
-            l = static_cast<Array2D<Real64>::size_type>(i - 1);
-            for (int j = 1; j <= N; ++j, l += N, ++m) {
-                if (i == j) {
-                    //        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=1
-                    ScriptF[m] = EMISS_fac * (Cinverse[l] - EMISS_i); // [ l ] = ( i, j ), [ m ] == ( j, i )
-                } else {
-                    //        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
-                    ScriptF[m] = EMISS_fac * Cinverse[l]; // [ l ] == ( i, j ), [ m ] == ( j, i )
-                }
-            }
-        }
-    }
+        // finalise the calculation of the excitation array
+        excitation *= -emissivity;
 
-    void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form
-                           Array2<Real64> &I  // Returned as inverse matrix
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Jakob Asmundsson
-        //       DATE WRITTEN   January 1999
-        //       MODIFIED       September 2000 (RKS for EnergyPlus)
-        //       RE-ENGINEERED  June 2014 (Stuart Mentzer): Performance/memory tuning rewrite
+        // map the scriptF matrix so it can be assigned to
+        Map<MatrixXd> scriptF(ScriptF.data(), N, N);
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // To find the inverse of Matrix, using partial pivoting.
+        MatrixXd Cinverse(N, N);
+        Cinverse = CMatrix.inverse();
 
-        // METHODOLOGY EMPLOYED:
-        // Inverse is found using partial pivoting and Gauss elimination
+        Cinverse *= excitation.matrix().asDiagonal();
 
-        // REFERENCES:
-        // Any Linear Algebra book
-
-        // Validation
-        assert(A.square());
-        assert(A.I1() == A.I2());
-        assert(equal_dimensions(A, I));
-
-        // Initialization
-        int const l(A.l1());
-        int const u(A.u1());
-        int const n(u - l + 1);
-        I.to_identity(); // I starts out as identity
-
-        // Could do row scaling here to improve condition and then check min pivot isn't too small
-
-        // Compute in-place LU decomposition of [A|I] with row pivoting
-        for (int i = l; i <= u; ++i) {
-
-            // Find pivot row in column i below diagonal
-            int iPiv = i;
-            Real64 aPiv(std::abs(A(i, i)));
-            auto ik(A.index(i, i + 1));
-            for (int k = i + 1; k <= u; ++k, ++ik) {
-                Real64 const aAki(std::abs(A[ik])); // [ ik ] == ( i, k )
-                if (aAki > aPiv) {
-                    iPiv = k;
-                    aPiv = aAki;
-                }
-            }
-            assert(aPiv != 0.0); //? Is zero pivot possible for some user inputs? If so if test/handler needed
-
-            // Swap row i with pivot row
-            if (iPiv != i) {
-                auto ji(A.index(l, i));    // [ ji ] == ( j, i )
-                auto pj(A.index(l, iPiv)); // [ pj ] == ( j, iPiv )
-                for (int j = l; j <= u; ++j, ji += n, pj += n) {
-                    Real64 const Aij(A[ji]);
-                    A[ji] = A[pj];
-                    A[pj] = Aij;
-                    Real64 const Iij(I[ji]);
-                    I[ji] = I[pj];
-                    I[pj] = Iij;
-                }
-            }
-
-            // Put multipliers in column i and reduce block below A(i,i)
-            Real64 const Aii_inv(1.0 / A(i, i));
-            for (int k = i + 1; k <= u; ++k) {
-                Real64 const multiplier(A(i, k) * Aii_inv);
-                A(i, k) = multiplier;
-                if (multiplier != 0.0) {
-                    auto ji(A.index(i + 1, i)); // [ ji ] == ( j, i )
-                    auto jk(A.index(i + 1, k)); // [ jk ] == ( j, k )
-                    for (int j = i + 1; j <= u; ++j, ji += n, jk += n) {
-                        A[jk] -= multiplier * A[ji];
-                    }
-                    ji = A.index(l, i);
-                    jk = A.index(l, k);
-                    for (int j = l; j <= u; ++j, ji += n, jk += n) {
-                        Real64 const Iij(I[ji]);
-                        if (Iij != 0.0) {
-                            I[jk] -= multiplier * Iij;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Perform back-substitution on [U|I] to put inverse in I
-        for (int k = u; k >= l; --k) {
-            Real64 const Akk_inv(1.0 / A(k, k));
-            auto jk(A.index(l, k)); // [ jk ] == ( j, k )
-            for (int j = l; j <= u; ++j, jk += n) {
-                I[jk] *= Akk_inv;
-            }
-            auto ik(A.index(k, l));             // [ ik ] == ( i, k )
-            for (int i = l; i < k; ++i, ++ik) { // Eliminate kth column entries from I in rows above k
-                Real64 const Aik(A[ik]);
-                auto ji(A.index(l, i)); // [ ji ] == ( j, i )
-                auto jk(A.index(l, k)); // [ jk ] == ( k, j )
-                for (int j = l; j <= u; ++j, ji += n, jk += n) {
-                    I[ji] -= Aik * I[jk];
-                }
-            }
-        }
+        Cinverse -= emissivity.matrix().asDiagonal();
+        Cinverse.array().colwise() *= (emissivity / (1.0 - emissivity));
+        scriptF = Cinverse.transpose();
     }
 
     void CalcFMRT(int const N,             // Number of surfaces
