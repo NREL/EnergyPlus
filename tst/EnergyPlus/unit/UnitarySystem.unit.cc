@@ -350,6 +350,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     DataSizing::FinalSysSizing(1).CoolSupTemp = 10.0;
     DataSizing::FinalSysSizing(1).MixHumRatAtCoolPeak = 0.01;
     DataSizing::FinalSysSizing(1).DesMainVolFlow = 0.159;
+    DataSizing::FinalSysSizing(1).DesCoolVolFlow = 0.159;
+    DataSizing::FinalSysSizing(1).DesHeatVolFlow = 0.159;
     DataSizing::FinalSysSizing(1).HeatSupTemp = 25.0;
     DataSizing::FinalSysSizing(1).HeatOutTemp = 5.0;
     DataSizing::FinalSysSizing(1).HeatRetTemp = 20.0;
@@ -481,7 +483,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 
     // Show coil sizes in UnitarySystem
     EXPECT_NEAR(6672.0, WaterCoils::WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
-    EXPECT_NEAR(1154.0, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate, 1.0);
+    EXPECT_NEAR(3848.0, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate, 1.0);
 
     // the water cooling coil sizes are only different by the air density used in capacity calculation
     // water coils use StdRhoAir and UnitarySystem coils use actual air density
@@ -493,8 +495,9 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 
     EXPECT_NEAR(coil1CoolingCoilRate, rhoRatio * WaterCoils::WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
     EXPECT_NEAR(coil1CoolingCoilRate, rhoRatio * mySys->m_DesignCoolingCapacity, 1.0);
-    EXPECT_NEAR(coil2HeatingCoilRate, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate, 1.0);
-    EXPECT_NEAR(coil2HeatingCoilRate, mySys->m_DesignHeatingCapacity, 1.0);
+    // the heating coils are sized differently since SysAirMinFlowRat is not accounted for
+    EXPECT_NE(coil2HeatingCoilRate, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate, 1.0);
+    EXPECT_NE(coil2HeatingCoilRate, mySys->m_DesignHeatingCapacity, 1.0);
 }
 
 TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
@@ -11087,7 +11090,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).CoolSupHumRat = 0.0085;
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).MixTempAtCoolPeak = 28.0;
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).MixHumRatAtCoolPeak = 0.0075;
-    DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow = 1.005;
+    DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesCoolVolFlow = 1.005;
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow = 0.2;
 
     DataAirSystems::PrimaryAirSystem.allocate(1);

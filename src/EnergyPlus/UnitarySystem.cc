@@ -1457,6 +1457,7 @@ namespace UnitarySystems {
         std::string SystemType;    // type of air loop equipment
         std::string HXCoilName;    // cooling coil name in HXAssisted parent
         int ActualCoolCoilType;    // cooling coil type in HXAssisted parent
+        int SaveCurDuctType;       // used during sizing to save the current duct type
         Real64 QActual;            // water coil output [W]
         Real64 capacityMultiplier; // used for ASHRAE model sizing
 
@@ -1580,6 +1581,8 @@ namespace UnitarySystems {
             SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
             // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
             TempSize = this->m_MaxCoolAirVolFlow;
+            SaveCurDuctType = DataSizing::CurDuctType;
+            DataSizing::CurDuctType = DataHVACGlobals::Cooling;
             if ((CoolingSAFlowMethod == SupplyAirFlowRate) || (CoolingSAFlowMethod == None)) {
                 ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 SysCoolingFlow = TempSize;
@@ -1627,6 +1630,7 @@ namespace UnitarySystems {
                 ShowContinueError("Illegal entry for Cooling Supply Air Flow Rate Method.");
             }
 
+            DataSizing::CurDuctType = SaveCurDuctType;
             EqSizing.CoolingAirFlow = true;
             EqSizing.CoolingAirVolFlow = SysCoolingFlow;
 
@@ -1688,17 +1692,10 @@ namespace UnitarySystems {
             SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
             // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
             TempSize = this->m_MaxHeatAirVolFlow;
+            SaveCurDuctType = DataSizing::CurDuctType;
+            DataSizing::CurDuctType = DataHVACGlobals::Heating;
             if ((HeatingSAFlowMethod == SupplyAirFlowRate) || (HeatingSAFlowMethod == None)) {
                 ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize && DataSizing::FinalSysSizing.allocated()) {
-                    if (DataSizing::CurSysNum > 0 && DataSizing::CurOASysNum == 0) {
-                        if ((this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater ||
-                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel ||
-                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric) &&
-                            DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat > 0.0)
-                            TempSize *= DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat;
-                    }
-                }
                 SysHeatingFlow = TempSize;
             } else if (HeatingSAFlowMethod == FlowPerFloorArea) {
                 ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -1738,6 +1735,7 @@ namespace UnitarySystems {
                 ShowContinueError("Illegal entry for Heating Supply Air Flow Rate Method.");
             }
 
+            DataSizing::CurDuctType = SaveCurDuctType;
             EqSizing.HeatingAirFlow = true;
             EqSizing.HeatingAirVolFlow = SysHeatingFlow;
 
@@ -1793,11 +1791,7 @@ namespace UnitarySystems {
         // Delete next 2 lines and uncomment 2 lines inside next if (HeatPump) statement to allow non-heat pump systems to operate at different flow
         // rates (might require additional change to if block logic).
         EqSizing.CoolingAirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
-        if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
-            EqSizing.HeatingAirVolFlow = EqSizing.HeatingAirVolFlow;
-        } else {
-            EqSizing.HeatingAirVolFlow = EqSizing.CoolingAirVolFlow;
-        }
+        EqSizing.HeatingAirVolFlow = EqSizing.CoolingAirVolFlow;
 
         // STEP 4: set heat pump coil capacities equal to greater of cooling or heating capacity
         if (this->m_HeatPump) { // if a heat pump, use maximum values and set main air flow and capacity variables
