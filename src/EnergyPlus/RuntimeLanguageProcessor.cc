@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
@@ -92,7 +91,6 @@ namespace RuntimeLanguageProcessor {
     // METHODOLOGY EMPLOYED:
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataRuntimeLanguage;
 
     // Data
@@ -166,7 +164,6 @@ namespace RuntimeLanguageProcessor {
     int ActualTimeNum(0);
     int WarmUpFlagNum(0);
 
-    static ObjexxFCL::gio::Fmt fmtLD("*");
     static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     // SUBROUTINE SPECIFICATIONS:
@@ -780,7 +777,7 @@ namespace RuntimeLanguageProcessor {
         if (NestedIfDepth == 1) {
             AddError(StackNum, 0, "Missing an ENDIF instruction needed to terminate an earlier IF instruction.");
         } else if (NestedIfDepth > 1) {
-            AddError(StackNum, 0, "Missing " + IntegerToString(NestedIfDepth) + " ENDIF instructions needed to terminate earlier IF instructions.");
+            AddError(StackNum, 0, "Missing " + fmt::to_string(NestedIfDepth) + " ENDIF instructions needed to terminate earlier IF instructions.");
         }
 
         //  ALLOCATE(DummyError(ErlStack(StackNum)%NumErrors))
@@ -878,7 +875,7 @@ namespace RuntimeLanguageProcessor {
 
         ErrorNum = ErlStack(StackNum).NumErrors;
         if (LineNum > 0) {
-            ErlStack(StackNum).Error(ErrorNum) = "Line " + IntegerToString(LineNum) + ":  " + Error + " \"" + ErlStack(StackNum).Line(LineNum) + "\"";
+            ErlStack(StackNum).Error(ErrorNum) = "Line " + fmt::to_string(LineNum) + ":  " + Error + " \"" + ErlStack(StackNum).Line(LineNum) + "\"";
         } else {
             ErlStack(StackNum).Error(ErrorNum) = Error;
         }
@@ -1083,7 +1080,7 @@ namespace RuntimeLanguageProcessor {
 
         NameString = ErlStack(StackNum).Name;
         LineNum = ErlStack(StackNum).Instruction(InstructionNum).LineNum;
-        LineNumString = IntegerToString(LineNum);
+        LineNumString = fmt::to_string(LineNum);
         LineString = ErlStack(StackNum).Line(LineNum);
         cValueString = ValueToString(ReturnValue);
 
@@ -3060,7 +3057,7 @@ namespace RuntimeLanguageProcessor {
                             }
                         } else if (UnitsB == "" && UnitsA != "") {
                             UnitsB = UnitsA;
-                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " using deprecated units designation.");
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
                             ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                         }
                     }
@@ -3228,7 +3225,7 @@ namespace RuntimeLanguageProcessor {
                             }
                         } else if (UnitsB == "" && UnitsA != "") {
                             UnitsB = UnitsA;
-                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " using deprecated units designation.");
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
                             ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                         }
                     }
@@ -3508,49 +3505,6 @@ namespace RuntimeLanguageProcessor {
                 RuntimeReportVar(RuntimeReportVarNum).Value = 0.0;
             }
         }
-    }
-
-    std::string IntegerToString(int const Number)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         P Ellis
-        //       DATE WRITTEN   unknown
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // convert integer number to a string
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        std::string String;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        ObjexxFCL::gio::write(String, fmtLD) << Number; // Could add formatting here
-        strip(String);
-
-        return String;
     }
 
     ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue)

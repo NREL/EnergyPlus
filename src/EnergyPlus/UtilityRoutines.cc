@@ -83,6 +83,7 @@ extern "C" {
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -418,27 +419,6 @@ namespace UtilityRoutines {
         return false;
     }
 
-    std::string IPTrimSigDigits(int const IntegerValue)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string String; // Working string
-
-        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
-        return stripped(String);
-    }
-
     size_t case_insensitive_hasher::operator()(const std::string& key) const noexcept {
             std::string keyCopy = MakeUPPERCase(key);
             return std::hash<std::string>()(keyCopy);
@@ -490,7 +470,7 @@ namespace UtilityRoutines {
 
 } // namespace UtilityRoutines
 
-int AbortEnergyPlus()
+int AbortEnergyPlus(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -534,7 +514,7 @@ int AbortEnergyPlus()
     // SUBROUTINE PARAMETER DEFINITIONS:
     static ObjexxFCL::gio::Fmt fmtLD("*");
     static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
-    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
+
 
     // INTERFACE BLOCK SPECIFICATIONS
 
@@ -549,7 +529,6 @@ int AbortEnergyPlus()
     std::string NumSevereDuringWarmup;
     std::string NumWarningsDuringSizing;
     std::string NumSevereDuringSizing;
-    std::string Elapsed;
     int Hours;      // Elapsed Time Hour Reporting
     int Minutes;    // Elapsed Time Minute Reporting
     Real64 Seconds; // Elapsed Time Second Reporting
@@ -573,7 +552,7 @@ int AbortEnergyPlus()
         TerminalError = false;
         TestBranchIntegrity(outputFiles, ErrFound);
         if (ErrFound) TerminalError = true;
-        TestAirPathIntegrity(outputFiles, ErrFound);
+        TestAirPathIntegrity(state, outputFiles, ErrFound);
         if (ErrFound) TerminalError = true;
         CheckMarkedNodes(ErrFound);
         if (ErrFound) TerminalError = true;
@@ -601,18 +580,12 @@ int AbortEnergyPlus()
     ShowRecurringErrors();
     SummarizeErrors();
     CloseMiscOpenFiles();
-    NumWarnings = RoundSigDigits(TotalWarningErrors);
-    strip(NumWarnings);
-    NumSevere = RoundSigDigits(TotalSevereErrors);
-    strip(NumSevere);
-    NumWarningsDuringWarmup = RoundSigDigits(TotalWarningErrorsDuringWarmup);
-    strip(NumWarningsDuringWarmup);
-    NumSevereDuringWarmup = RoundSigDigits(TotalSevereErrorsDuringWarmup);
-    strip(NumSevereDuringWarmup);
-    NumWarningsDuringSizing = RoundSigDigits(TotalWarningErrorsDuringSizing);
-    strip(NumWarningsDuringSizing);
-    NumSevereDuringSizing = RoundSigDigits(TotalSevereErrorsDuringSizing);
-    strip(NumSevereDuringSizing);
+    NumWarnings = fmt::to_string(TotalWarningErrors);
+    NumSevere = fmt::to_string(TotalSevereErrors);
+    NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
+    NumSevereDuringWarmup = fmt::to_string(TotalSevereErrorsDuringWarmup);
+    NumWarningsDuringSizing = fmt::to_string(TotalWarningErrorsDuringSizing);
+    NumSevereDuringSizing = fmt::to_string(TotalSevereErrorsDuringSizing);
 
     // catch up with timings if in middle
     Time_Finish = epElapsedTime();
@@ -628,7 +601,8 @@ int AbortEnergyPlus()
     Elapsed_Time -= Minutes * 60.0;
     Seconds = Elapsed_Time;
     if (Seconds < 0.0) Seconds = 0.0;
-    ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
+    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
+    const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
     ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
@@ -720,7 +694,7 @@ void CloseMiscOpenFiles()
     //      INTEGER :: ios
 
     CloseReportIllumMaps();
-    CloseDFSFile();
+    CloseDFSFile(OutputFiles::getSingleton());
 
     if (DebugOutput || OutputFiles::getSingleton().debug.position() > 0) {
         OutputFiles::getSingleton().debug.close();

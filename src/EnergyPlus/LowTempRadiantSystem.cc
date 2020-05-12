@@ -52,8 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -65,17 +63,16 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
@@ -135,7 +132,6 @@ namespace LowTempRadiantSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
@@ -261,7 +257,7 @@ namespace LowTempRadiantSystem {
         GetInputFlag = true;
     }
 
-    void SimLowTempRadiantSystem(std::string const &CompName,   // name of the low temperature radiant system
+    void SimLowTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
                                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                  Real64 &LoadMet,               // load met by the radiant system, in Watts
                                  int &CompIndex)
@@ -319,7 +315,7 @@ namespace LowTempRadiantSystem {
             }
         }
 
-        InitLowTempRadiantSystem(FirstHVACIteration, RadSysTypes(RadSysNum).CompIndex, SystemType, InitErrorFound);
+        InitLowTempRadiantSystem(state, FirstHVACIteration, RadSysTypes(RadSysNum).CompIndex, SystemType, InitErrorFound);
         if (InitErrorFound) {
             ShowFatalError("InitLowTempRadiantSystem: Preceding error is not allowed to proceed with the simulation.  Correct this input problem.");
         }
@@ -1645,7 +1641,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    void InitLowTempRadiantSystem(bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+    void InitLowTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   int const RadSysNum,  // Index for the low temperature radiant system under consideration within the derived types
                                   int const SystemType, // Type of radiant system: hydronic, constant flow, or electric
                                   bool &InitErrorsFound)
@@ -1675,11 +1671,10 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ZeroTol(0.0000001); // Smallest non-zero value allowed
         static std::string const RoutineName("InitLowTempRadiantSystem");
-        static ObjexxFCL::gio::Fmt fmtF102("(F10.2)");
+
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CurrentFlowSchedule; // Schedule value for flow fraction in a constant flow radiant system
-        std::string Errout;         // Message for errors
         int RadNum;                 // Number of the radiant system (DO loop counter)
         int RadSurfNum;             // Number of the radiant system surface (DO loop counter)
         int SurfNum;                // Intermediate variable for keeping track of the surface number
@@ -1756,18 +1751,13 @@ namespace LowTempRadiantSystem {
                     (CFloRadSys(RadNum).WaterVolFlowMax != AutoSize)) {
                     TotalEffic = CFloRadSys(RadNum).WaterVolFlowMax * CFloRadSys(RadNum).NomPumpHead / CFloRadSys(RadNum).NomPowerUse;
                     CFloRadSys(RadNum).PumpEffic = TotalEffic / CFloRadSys(RadNum).MotorEffic;
+                    static constexpr auto fmt = "Check input.  Calc Pump Efficiency={:.5R}% {}, for pump in radiant system {}";
                     if (CFloRadSys(RadNum).PumpEffic < 0.50) {
-                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
-                        ShowWarningError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
-                                         "% which is less than 50%, for pump in radiant system " + CFloRadSys(RadNum).Name);
+                        ShowWarningError(format(fmt, CFloRadSys(RadNum).PumpEffic, "which is less than 50%", CFloRadSys(RadNum).Name));
                     } else if ((CFloRadSys(RadNum).PumpEffic > 0.95) && (CFloRadSys(RadNum).PumpEffic <= 1.0)) {
-                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
-                        ShowWarningError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
-                                         "% is approaching 100%, for pump in radiant system " + CFloRadSys(RadNum).Name);
+                        ShowWarningError(format(fmt, CFloRadSys(RadNum).PumpEffic, "is approaching 100%", CFloRadSys(RadNum).Name));
                     } else if (CFloRadSys(RadNum).PumpEffic > 1.0) {
-                        ObjexxFCL::gio::write(Errout, fmtF102) << CFloRadSys(RadNum).PumpEffic * 100.0;
-                        ShowSevereError("Check input.  Calc Pump Efficiency=" + RoundSigDigits(CFloRadSys(RadNum).PumpEffic, 5) +
-                                        "% which is bigger than 100%, for pump in radiant system " + CFloRadSys(RadNum).Name);
+                        ShowSevereError(format(fmt, CFloRadSys(RadNum).PumpEffic, "which is bigger than 100%", CFloRadSys(RadNum).Name));
                         InitErrorsFound = true;
                     }
                 } else {
@@ -1896,7 +1886,7 @@ namespace LowTempRadiantSystem {
         if (!SysSizingCalc && (SystemType == HydronicSystem)) {
             if (MySizeFlagHydr(RadSysNum) && !MyPlantScanFlagHydr(RadSysNum)) {
                 // for each radiant system do the sizing once.
-                SizeLowTempRadiantSystem(RadSysNum, SystemType);
+                SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
                 MySizeFlagHydr(RadSysNum) = false;
 
                 // Can this system actually do cooling?
@@ -1948,7 +1938,7 @@ namespace LowTempRadiantSystem {
         if (!SysSizingCalc && (SystemType == ConstantFlowSystem)) {
             if (MySizeFlagCFlo(RadSysNum) && !MyPlantScanFlagCFlo(RadSysNum)) {
                 // for each radiant system do the sizing once.
-                SizeLowTempRadiantSystem(RadSysNum, SystemType);
+                SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
 
                 // set design mass flow rates
                 if (CFloRadSys(RadSysNum).HotWaterInNode > 0) {
@@ -1988,7 +1978,7 @@ namespace LowTempRadiantSystem {
         if (!SysSizingCalc && (SystemType == ElectricSystem)) {
             if (MySizeFlagElec(RadSysNum)) {
                 // for each radiant system do the sizing once.
-                SizeLowTempRadiantSystem(RadSysNum, SystemType);
+                SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
                 MySizeFlagElec(RadSysNum) = false;
             }
         }
@@ -2249,7 +2239,7 @@ namespace LowTempRadiantSystem {
         OperatingMode = NotOperating; // System is not operating or can't operate; will be reset elsewhere, if necessary
     }
 
-    void SizeLowTempRadiantSystem(int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
+    void SizeLowTempRadiantSystem(EnergyPlusData &state, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
                                   int const SystemType // Type of radiant system: hydronic, constant flow, or electric
     )
     {
@@ -2346,12 +2336,12 @@ namespace LowTempRadiantSystem {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                     if (CapSizingMethod == HeatingDesignCapacity && ElecRadSys(RadSysNum).ScaledHeatingCapacity > 0.0) {
                         TempSize = ElecRadSys(RadSysNum).ScaledHeatingCapacity;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         DataScalableCapSizingON = true;
                         TempSize = ElecRadSys(RadSysNum).ScaledHeatingCapacity * Zone(ElecRadSys(RadSysNum).ZonePtr).FloorArea;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                         DataScalableCapSizingON = false;
                         ElecRadSys(RadSysNum).MaxElecPower = TempSize;
@@ -2394,7 +2384,7 @@ namespace LowTempRadiantSystem {
                         } else {
                             TempSize = ElecRadSys(RadSysNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         ElecRadSys(RadSysNum).MaxElecPower = TempSize;
                         DataConstantUsedForSizing = 0.0;
                         DataFractionUsedForSizing = 0.0;
@@ -2426,12 +2416,12 @@ namespace LowTempRadiantSystem {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                     if (CapSizingMethod == HeatingDesignCapacity && HydrRadSys(RadSysNum).ScaledHeatingCapacity > 0.0) {
                         TempSize = HydrRadSys(RadSysNum).ScaledHeatingCapacity;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         DataScalableCapSizingON = true;
                         TempSize = HydrRadSys(RadSysNum).ScaledHeatingCapacity * Zone(HydrRadSys(RadSysNum).ZonePtr).FloorArea;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                         DataScalableCapSizingON = false;
                     } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
@@ -2475,7 +2465,7 @@ namespace LowTempRadiantSystem {
                         } else {
                             TempSize = HydrRadSys(RadSysNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                         DataConstantUsedForSizing = 0.0;
                         DataFractionUsedForSizing = 0.0;
@@ -2577,12 +2567,12 @@ namespace LowTempRadiantSystem {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                     if (CapSizingMethod == CoolingDesignCapacity && HydrRadSys(RadSysNum).ScaledCoolingCapacity > 0.0) {
                         TempSize = HydrRadSys(RadSysNum).ScaledCoolingCapacity;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         DataScalableCapSizingON = true;
                         TempSize = HydrRadSys(RadSysNum).ScaledCoolingCapacity * Zone(HydrRadSys(RadSysNum).ZonePtr).FloorArea;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                         DataScalableCapSizingON = false;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
@@ -2627,7 +2617,7 @@ namespace LowTempRadiantSystem {
                         } else {
                             TempSize = HydrRadSys(RadSysNum).ScaledCoolingCapacity;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                         DataConstantUsedForSizing = 0.0;
                         DataFractionUsedForSizing = 0.0;
@@ -3061,7 +3051,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using namespace DataZoneEnergyDemands;
         using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataHeatBalance::MRT;
         using DataHeatBalance::Zone;
@@ -3757,7 +3746,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using namespace DataZoneEnergyDemands;
         using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
@@ -4828,7 +4816,6 @@ namespace LowTempRadiantSystem {
         using DataHeatBalance::ZoneData;
         using DataHeatBalFanSys::MAT;
         using DataHVACGlobals::SmallLoad;
-        using namespace DataZoneEnergyDemands;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

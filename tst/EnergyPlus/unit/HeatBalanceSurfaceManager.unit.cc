@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -1228,7 +1229,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(outputFiles(), ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles());
@@ -1332,7 +1333,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     EXPECT_DOUBLE_EQ(0.012611481326656135, DataLoopNode::Node(1).HumRat);
     EXPECT_DOUBLE_EQ(57247.660939392081, DataLoopNode::Node(1).Enthalpy);
 
-    InitSurfaceHeatBalance();
+    InitSurfaceHeatBalance(state);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, DataSurfaces::Surface(1).OutDryBulbTemp);
@@ -1807,7 +1808,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(outputFiles(), ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles());
@@ -1890,7 +1891,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     SolarShading::AllocateModuleArrays();
     SolarShading::DetermineShadowingCombinations();
 
-    InitSurfaceHeatBalance();
+    InitSurfaceHeatBalance(state);
 
     DataSurfaces::AirSkyRadSplit.allocate(6);
     ScheduleManager::Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
@@ -2370,7 +2371,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(outputFiles(), ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Clear schedule type warnings
@@ -2462,7 +2463,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     createFacilityElectricPowerServiceObject();
     SolarShading::AllocateModuleArrays();
     SolarShading::DetermineShadowingCombinations();
-    InitSurfaceHeatBalance();
+    InitSurfaceHeatBalance(state);
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
         DataSurfaces::Surface(SurfNum).ExtConvCoeff = -1;
     }

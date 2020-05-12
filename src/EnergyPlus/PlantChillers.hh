@@ -54,17 +54,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
 namespace PlantChillers {
-
-    // Parameters for use in Chillers
-    extern int const AirCooled;
-    extern int const WaterCooled;
-    extern int const EvapCooled;
-    extern Real64 const KJtoJ; // convert Kjoules to joules
 
     // chiller flow modes
     extern int const FlowModeNotSet;
@@ -77,10 +72,11 @@ namespace PlantChillers {
     extern int NumGTChillers;           // number of GT chillers specified in input
     extern int NumConstCOPChillers;
 
-    extern bool GetEngineDrivenInput; // then TRUE, calls subroutine to read input file.
-    extern bool GetElectricInput;     // then TRUE, calls subroutine to read input file.
-    extern bool GetGasTurbineInput;   // then TRUE, calls subroutine to read input file.
-    extern bool GetConstCOPInput;
+    enum class CondType{
+        WaterCooled,
+        AirCooled,
+        EvapCooled
+    };
 
     struct BaseChillerSpecs : PlantComponent // NOTE: This base class is abstract, derived classes must override pure virtual methods
     {
@@ -93,11 +89,11 @@ namespace PlantChillers {
         // temperature at the chiller condenser side inlet
         Real64 TempRiseCoef;              // (GT ADJTC(2)) correction factor for off ChillDesign oper.
         Real64 TempDesEvapOut;            // C - (GT ADJTC(3)The design primary loop fluid
-        int CondenserType;                // Type of Condenser - Air or Water Cooled
+        CondType CondenserType;                // Type of Condenser - Air or Water Cooled
         Real64 NomCap;                    // design nominal capacity of chiller
         bool NomCapWasAutoSized;          // true if NomCap was autosize on input
         Real64 COP;                       // COP
-        int FlowMode;                     // one of 3 modes for componet flow during operation
+        int FlowMode;                     // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         bool HRSPErrDone;                 // TRUE if set point warning issued for heat recovery loop
@@ -166,7 +162,7 @@ namespace PlantChillers {
         // Default Constructor
         BaseChillerSpecs()
             : MinPartLoadRat(0.0), MaxPartLoadRat(1.0), OptPartLoadRat(1.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
-              CondenserType(0), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
+              CondenserType(CondType::WaterCooled), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), HRSPErrDone(false), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
               EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
@@ -197,7 +193,7 @@ namespace PlantChillers {
 
         void getSizingFactor(Real64 &EP_UNUSED(SizFac)) override;
 
-        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut)) override;
 
@@ -254,7 +250,7 @@ namespace PlantChillers {
 
         static ElectricChillerSpecs *factory(std::string const &chillerName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void initialize(bool RunFlag, Real64 MyLoad) override;
 
@@ -271,7 +267,7 @@ namespace PlantChillers {
 
         void calcHeatRecovery(Real64 &QCond,         // current condenser load
                               Real64 CondMassFlow,   // current condenser Mass Flow
-                              Real64 _CondInletTemp, // current condenser Inlet Temp
+                              Real64 condInletTemp, // current condenser Inlet Temp
                               Real64 &QHeatRec       // amount of heat recovered
         );
     };
@@ -311,7 +307,7 @@ namespace PlantChillers {
 
         // engine driven:
         Real64 HeatRecInletTemp;    // Inlet Temperature of the heat recovery fluid
-        Real64 HeatRecMdotActual;   // reporting: Heat Recovery Loop Mass flow rate
+        Real64 HeatRecMdotActual;   // Heat Recovery Loop Mass flow rate
         Real64 QTotalHeatRecovered; // total heat recovered (W)
         Real64 QJacketRecovered;    // heat recovered from jacket (W)
         Real64 QLubeOilRecovered;   // heat recovered from lube (W)
@@ -325,9 +321,9 @@ namespace PlantChillers {
         Real64 FuelMdot;            // Fuel Amount used (Kg/s)
         Real64 ExhaustStackTemp;    // Exhaust Stack Temperature (C)
 
-        Real64 HeatRecOutletTemp; // reporting: Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;       // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-        Real64 FuelCOP;           // reporting: Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
+        Real64 HeatRecOutletTemp; // Heat Recovery Loop Outlet Temperature (C)
+        Real64 HeatRecMdot;       // Heat Recovery Loop Mass flow rate (kg/s)
+        Real64 FuelCOP;           // Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
 
         // Default Constructor
         EngineDrivenChillerSpecs()
@@ -349,7 +345,7 @@ namespace PlantChillers {
 
         static void getInput();
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 
@@ -403,7 +399,7 @@ namespace PlantChillers {
         int HeatRecOutletNodeNum;                  // Node number on the heat recovery outlet side of the condenser
         Real64 HeatRecInletTemp;                   // Inlet Temperature of the heat recovery fluid
         Real64 HeatRecOutletTemp;                  // Outlet Temperature of the heat recovery fluid
-        Real64 HeatRecMdot;                        // reporting: Heat Recovery Loop Mass flow rate
+        Real64 HeatRecMdot;                        // Heat Recovery Loop Mass flow rate
         Real64 DesignHeatRecVolFlowRate;           // m3/s, Design Water mass flow rate through heat recovery loop
         bool DesignHeatRecVolFlowRateWasAutoSized; // true if previous field was autosize on input
         Real64 DesignHeatRecMassFlowRate;          // kg/s, Design Water mass flow rate through heat recovery loop
@@ -417,11 +413,11 @@ namespace PlantChillers {
         int HRBranchNum;                           // heat recovery water plant loop branch index
         int HRCompNum;                             // heat recovery water plant loop component index
 
-        Real64 FuelEnergyUsed;     // reporting: Fuel Energy used
-        Real64 FuelEnergyUsedRate; // reporting: Fuel energy used rate (fuel consumption rate)
-        Real64 FuelMassUsed;       // reporting: Fuel Amount used
-        Real64 FuelMassUsedRate;   // reporting: Fuel amount used (fuel Mass consumption rate)
-        Real64 FuelCOP;            // reporting: Fuel coefficient of performance (Qevap/FuelEnergyUsedRate)
+        Real64 FuelEnergyUsed;     // Fuel Energy used
+        Real64 FuelEnergyUsedRate; // Fuel energy used rate (fuel consumption rate)
+        Real64 FuelMassUsed;       // Fuel Amount used
+        Real64 FuelMassUsedRate;   // Fuel amount used (fuel Mass consumption rate)
+        Real64 FuelCOP;            // Fuel coefficient of performance (Qevap/FuelEnergyUsedRate)
 
         // Default Constructor
         GTChillerSpecs()
@@ -441,7 +437,7 @@ namespace PlantChillers {
 
         static void getInput();
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 
@@ -473,7 +469,7 @@ namespace PlantChillers {
 
         static void getInput();
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 
@@ -481,21 +477,16 @@ namespace PlantChillers {
 
         void size() override;
 
-        void calculate(Real64 &MyLoad,
-                       bool RunFlag,
-                       int EquipFlowCtrl // Flow control mode for the equipment
-        );
+        void calculate(Real64 &MyLoad, bool RunFlag, int EquipFlowCtrl);
 
-        void update(Real64 MyLoad, // unused1208
-                    bool RunFlag   // unused1208
-        );
+        void update(Real64 MyLoad, bool RunFlag);
     };
 
     // Object Data
-    extern Array1D<ElectricChillerSpecs> ElectricChiller;         // dimension to number of machines
-    extern Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
-    extern Array1D<GTChillerSpecs> GTChiller;                     // dimension to number of machines
-    extern Array1D<ConstCOPChillerSpecs> ConstCOPChiller;         // dimension to number of machines
+    extern Array1D<ElectricChillerSpecs> ElectricChiller;
+    extern Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller;
+    extern Array1D<GTChillerSpecs> GTChiller;
+    extern Array1D<ConstCOPChillerSpecs> ConstCOPChiller;
 
     void clear_state();
 

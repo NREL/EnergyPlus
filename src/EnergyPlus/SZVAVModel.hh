@@ -61,7 +61,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
@@ -90,7 +92,7 @@ namespace SZVAVModel {
 
     // Functions
 
-    void calcSZVAVModel(PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state, PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,
@@ -104,7 +106,7 @@ namespace SZVAVModel {
 
     );
 
-    void calcSZVAVModel(FanCoilUnits::FanCoilData &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state, FanCoilUnits::FanCoilData &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,
@@ -118,7 +120,7 @@ namespace SZVAVModel {
 
     );
 
-    void calcSZVAVModel(UnitarySystems::UnitarySys &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state, UnitarySystems::UnitarySys &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,

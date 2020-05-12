@@ -68,6 +68,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -138,13 +139,13 @@ namespace PhotovoltaicThermalCollectors {
         return nullptr;
     }
 
-    void PVTCollectorStruct::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initialize(true);
         this->size();
     }
 
-    void PVTCollectorStruct::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PVTCollectorStruct::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                       bool const FirstHVACIteration,
                                       Real64 &EP_UNUSED(CurLoad),
                                       bool const EP_UNUSED(RunFlag))
@@ -1169,13 +1170,13 @@ namespace PhotovoltaicThermalCollectors {
         return 0; // Shutup compiler
     }
 
-    void simPVTfromOASys(int const index, bool const FirstHVACIteration)
+    void simPVTfromOASys(EnergyPlusData &state, int const index, bool const FirstHVACIteration)
     {
         PlantLocation dummyLoc(0, 0, 0, 0);
         Real64 dummyCurLoad(0.0);
         bool dummyRunFlag(true);
 
-        PVT(index).simulate(dummyLoc, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
+        PVT(index).simulate(state, dummyLoc, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
     }
 
 } // namespace PhotovoltaicThermalCollectors

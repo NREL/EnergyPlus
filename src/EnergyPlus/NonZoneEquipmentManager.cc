@@ -80,7 +80,7 @@ namespace NonZoneEquipmentManager {
 
     // Functions
 
-    void ManageNonZoneEquipment(bool const FirstHVACIteration,
+    void ManageNonZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration,
                                 bool &SimNonZoneEquipment // Simulation convergence flag
     )
     {
@@ -125,7 +125,7 @@ namespace NonZoneEquipmentManager {
 
         if (!ZoneSizingCalc) {
             for (WaterHeaterNum = 1; WaterHeaterNum <= NumOfWaterHeater; ++WaterHeaterNum) {
-                SimulateWaterHeaterStandAlone(WaterHeaterNum, FirstHVACIteration);
+                SimulateWaterHeaterStandAlone(state, WaterHeaterNum, FirstHVACIteration);
             }
         }
 

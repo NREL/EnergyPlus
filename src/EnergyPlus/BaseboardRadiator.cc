@@ -152,7 +152,7 @@ namespace BaseboardRadiator {
         BaseboardParamsNumericFields.deallocate();
     }
 
-    void SimBaseboard(std::string const &EquipName,
+    void SimBaseboard(EnergyPlusData &state, std::string const &EquipName,
                       int const ActualZoneNum,
                       int const ControlledZoneNum,
                       bool const FirstHVACIteration,
@@ -217,7 +217,7 @@ namespace BaseboardRadiator {
             }
         }
 
-        InitBaseboard(BaseboardNum, ControlledZoneNum);
+        InitBaseboard(state, BaseboardNum, ControlledZoneNum);
 
         QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
@@ -259,7 +259,7 @@ namespace BaseboardRadiator {
                 MinWaterFlow = Node(Baseboard(BaseboardNum).WaterInletNode).MassFlowRateMinAvail;
             }
 
-            ControlCompOutput(Baseboard(BaseboardNum).EquipID,
+            ControlCompOutput(state, Baseboard(BaseboardNum).EquipID,
                               cCMO_BBRadiator_Water,
                               BaseboardNum,
                               FirstHVACIteration,
@@ -556,7 +556,7 @@ namespace BaseboardRadiator {
         }
     }
 
-    void InitBaseboard(int const BaseboardNum, int const ControlledZoneNumSub)
+    void InitBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub)
     {
 
         // SUBROUTINE INFORMATION:
@@ -650,7 +650,7 @@ namespace BaseboardRadiator {
 
         if (!SysSizingCalc && MySizeFlag(BaseboardNum) && !SetLoopIndexFlag(BaseboardNum)) {
             // for each coil, do the sizing once.
-            SizeBaseboard(BaseboardNum);
+            SizeBaseboard(state, BaseboardNum);
 
             MySizeFlag(BaseboardNum) = false;
         }
@@ -702,7 +702,7 @@ namespace BaseboardRadiator {
         Baseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
     }
 
-    void SizeBaseboard(int const BaseboardNum)
+    void SizeBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -834,7 +834,7 @@ namespace BaseboardRadiator {
                         } else {
                             TempSize = Baseboard(BaseboardNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                         DataScalableCapSizingON = false;
                     } else {
@@ -952,7 +952,7 @@ namespace BaseboardRadiator {
                         } else {
                             TempSize = Baseboard(BaseboardNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                         DataScalableCapSizingON = false;
                     } else {

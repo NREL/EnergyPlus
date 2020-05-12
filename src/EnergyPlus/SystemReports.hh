@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -303,7 +304,7 @@ namespace SystemReports {
                              Real64 const CompLoad,
                              Real64 const CompEnergy);
 
-    void ReportMaxVentilationLoads();
+    void ReportMaxVentilationLoads(EnergyPlusData &state);
 
     void MatchPlantSys(int const AirLoopNum, // counter for zone air distribution inlets
                        int const BranchNum   // counter for zone air distribution inlets
