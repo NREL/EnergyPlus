@@ -59,6 +59,7 @@ namespace EnergyPlus {
 
     // Forward declarations
     struct EnergyPlusData;
+    struct BaseboardElectricData;
 
 namespace BaseboardElectric {
 
@@ -78,7 +79,7 @@ namespace BaseboardElectric {
         Real64 Energy;
         Real64 ElecUseLoad;
         Real64 ElecUseRate;
-        int ZonePtr;                  // point to teh zone where the basebaord is located
+        int ZonePtr;                  // point to the zone where the basebaord is located
         int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
                                       // FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
@@ -105,25 +106,15 @@ namespace BaseboardElectric {
         }
     };
 
-    // Object Data
-    extern Array1D<BaseboardParams> Baseboard;
-    extern Array1D<BaseboardNumericFieldData> BaseboardNumericFields;
+    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
 
-    // Functions
+    void GetBaseboardInput(BaseboardElectricData &baseboard);
 
-    void clear_state();
+    void InitBaseboard(EnergyPlusData &state, BaseboardElectricData &baseboard, int BaseboardNum, int ControlledZoneNum);
 
-    void SimElectricBaseboard(EnergyPlus::EnergyPlusData &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
+    void SizeElectricBaseboard(EnergyPlusData &state, BaseboardElectricData &baseboard, int BaseboardNum);
 
-    void GetBaseboardInput();
-
-    void InitBaseboard(EnergyPlus::EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum);
-
-    void SizeElectricBaseboard(EnergyPlus::EnergyPlusData &state, int const BaseboardNum);
-
-    void SimElectricConvective(int const BaseboardNum, Real64 const LoadMet);
-
-    void ReportBaseboard(int const BaseboardNum);
+    void SimElectricConvective(BaseboardElectricData &baseboard, int BaseboardNum, Real64 LoadMet);
 
 } // namespace BaseboardElectric
 

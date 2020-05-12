@@ -53,6 +53,7 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
@@ -78,6 +79,19 @@ namespace EnergyPlus {
 //    void clear_state() override {
 //    }
 //};
+
+    struct BaseboardElectricData : BaseGlobalStruct {
+        int NumBaseboards = 0;
+        Array1D<BaseboardElectric::BaseboardParams> Baseboard;
+        Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
+
+        void clear_state()
+        {
+            NumBaseboards = 0;
+            Baseboard.deallocate();
+            BaseboardNumericFields.deallocate();
+        }
+    };
 
     struct BoilersData : BaseGlobalStruct {
         int numBoilers = 0;
@@ -288,6 +302,7 @@ namespace EnergyPlus {
 
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
+        BaseboardElectricData dataBaseboardElectric;
         BoilersData dataBoilers;
         BoilerSteamData dataSteamBoilers;
         ChillerAbsorberData dataChillerAbsorbers;
@@ -305,6 +320,7 @@ namespace EnergyPlus {
 
         // all clear states
         void clear_state() override {
+            dataBaseboardElectric.clear_state();
             dataBoilers.clear_state();
             dataSteamBoilers.clear_state();
             dataChillerAbsorbers.clear_state();
