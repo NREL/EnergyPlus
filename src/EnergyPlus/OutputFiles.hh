@@ -117,6 +117,9 @@ public:
     OutputFile bnd{"eplusout.bnd"};
 
     OutputFile debug{"eplusout.dbg"};
+
+    OutputFile dfs{"eplusout.dfs"};
+
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 
@@ -136,8 +139,14 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
 // on the value being printed.
 // This is necessary for parity with the old "RoundSigDigits" utility function
 //
+// Defines a custom formatting type 'S' that behaves like Fortran's G type, but stripped of whitespace
+// 'S' was chosen for "Stripped". It is implemented in terms of 'N'
+//
 // Defines a custom formatting type 'N' that behaves like Fortran's G type.
 // 'N' was chosen for "Number"
+//
+// Defines a custom formatting type 'Z' that behaves like Fortran's E type.
+// 'Z' was chosen because Fortran's 'E' format always starts with a Zero
 //
 // Defines a custom formatting type 'T' that that truncates the value
 // to match the behavior of TrimSigDigits utility function

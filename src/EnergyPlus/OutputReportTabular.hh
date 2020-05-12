@@ -62,6 +62,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -782,7 +783,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports(OutputFiles &outputFiles);
+    void WriteTabularReports(EnergyPlus::EnergyPlusData &state, OutputFiles &outputFiles);
 
     void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 
@@ -792,7 +793,7 @@ namespace OutputReportTabular {
                                    int const colNum             // Column number
     );
 
-    void FillRemainingPredefinedEntries();
+    void FillRemainingPredefinedEntries(EnergyPlus::EnergyPlusData &state);
 
     void WriteMonthlyTables();
 

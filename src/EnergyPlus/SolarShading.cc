@@ -289,8 +289,6 @@ namespace SolarShading {
     Array1D<SurfaceErrorTracking> TrackTooManyVertices;
     Array1D<SurfaceErrorTracking> TrackBaseSubSurround;
 
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-
     // MODULE SUBROUTINES:
 
     // Functions
@@ -2605,7 +2603,6 @@ namespace SolarShading {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt ValFmt("(F20.4)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2618,8 +2615,6 @@ namespace SolarShading {
         int NVRS;             // Number of vertices of the receiving surface
         int NVBS;             // Number of vertices of the back surface
         Real64 DOTP;          // Dot product of C and D
-        std::string CharDotP; // for error messages
-        std::string VTString;
 
         // Object Data
         Vector AVec; // Vector from vertex 2 to vertex 1, both same surface
@@ -2643,13 +2638,9 @@ namespace SolarShading {
             if (DOTP > 0.0009) {
                 ShowSevereError("Problem in interior solar distribution calculation (CHKBKS)");
                 ShowContinueError("   Solar Distribution = FullInteriorExterior will not work in Zone=" + Surface(NRS).ZoneName);
-                ObjexxFCL::gio::write(VTString, "(I4)") << N;
-                strip(VTString);
-                ShowContinueError("   because vertex " + VTString + " of back surface=" + Surface(NBS).Name +
+                ShowContinueError("   because vertex " + std::to_string(N) + " of back surface=" + Surface(NBS).Name +
                                   " is in front of receiving surface=" + Surface(NRS).Name);
-                ObjexxFCL::gio::write(CharDotP, ValFmt) << DOTP;
-                strip(CharDotP);
-                ShowContinueError("   (Dot Product indicator=" + CharDotP + ')');
+                ShowContinueError(format("   (Dot Product indicator={:20.4F})", DOTP));
                 ShowContinueError("   Check surface geometry; if OK, use Solar Distribution = FullExterior instead.");
             }
         }
@@ -11601,7 +11592,6 @@ namespace SolarShading {
         int Loop2;
         int Count;
         int TotCount;
-        std::string CountOut;
         Array1D_bool SurfErrorReported;
         Array1D_bool SurfErrorReported2;
 
@@ -11629,12 +11619,11 @@ namespace SolarShading {
                         ++Count;
                     }
                 }
-                ObjexxFCL::gio::write(CountOut, fmtLD) << Count;
                 TotCount += Count;
                 TotalWarningErrors += Count - 1;
                 ShowWarningError("Base surface does not surround subsurface (CHKSBS), Overlap Status=" +
                                  cOverLapStatus(TrackBaseSubSurround(Loop1).MiscIndex));
-                ShowContinueError("  The base surround errors occurred " + stripped(CountOut) + " times.");
+                ShowContinueError("  The base surround errors occurred " + std::to_string(Count) + " times.");
                 for (Loop2 = 1; Loop2 <= NumBaseSubSurround; ++Loop2) {
                     if (TrackBaseSubSurround(Loop1).SurfIndex1 == TrackBaseSubSurround(Loop2).SurfIndex1 &&
                         TrackBaseSubSurround(Loop1).MiscIndex == TrackBaseSubSurround(Loop2).MiscIndex) {
@@ -11647,8 +11636,7 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage("");
-                ObjexxFCL::gio::write(CountOut, fmtLD) << TotCount;
-                ShowContinueError("  The base surround errors occurred " + stripped(CountOut) + " times (total).");
+                ShowContinueError("  The base surround errors occurred " + std::to_string(TotCount) + " times (total).");
                 ShowMessage("");
             }
 
@@ -11669,14 +11657,13 @@ namespace SolarShading {
                         ++Count;
                     }
                 }
-                ObjexxFCL::gio::write(CountOut, fmtLD) << Count;
                 TotCount += Count;
                 TotalWarningErrors += Count - 1;
                 ShowMessage("");
                 ShowWarningError("Too many vertices [>=" + RoundSigDigits(MaxHCV) + "] in a shadow overlap");
                 ShowContinueError("Overlapping figure=" + Surface(TrackTooManyVertices(Loop1).SurfIndex1).Name + ", Surface Class=[" +
                                   cSurfaceClass(Surface(TrackTooManyVertices(Loop1).SurfIndex1).Class) + ']');
-                ShowContinueError("  This error occurred " + stripped(CountOut) + " times.");
+                ShowContinueError("  This error occurred " + std::to_string(Count) + " times.");
                 for (Loop2 = 1; Loop2 <= NumTooManyVertices; ++Loop2) {
                     if (TrackTooManyVertices(Loop1).SurfIndex1 == TrackTooManyVertices(Loop2).SurfIndex1) {
                         if (SurfErrorReported2(TrackTooManyVertices(Loop2).SurfIndex2)) continue;
@@ -11689,8 +11676,7 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage("");
-                ObjexxFCL::gio::write(CountOut, fmtLD) << TotCount;
-                ShowContinueError("  The too many vertices errors occurred " + stripped(CountOut) + " times (total).");
+                ShowContinueError("  The too many vertices errors occurred " + std::to_string(TotCount) + " times (total).");
                 ShowMessage("");
             }
 
@@ -11710,14 +11696,13 @@ namespace SolarShading {
                         ++Count;
                     }
                 }
-                ObjexxFCL::gio::write(CountOut, fmtLD) << Count;
                 TotCount += Count;
                 TotalWarningErrors += Count - 1;
                 ShowMessage("");
                 ShowWarningError("Too many figures [>=" + RoundSigDigits(MaxHCS) + "] in a shadow overlap");
                 ShowContinueError("Overlapping figure=" + Surface(TrackTooManyFigures(Loop1).SurfIndex1).Name + ", Surface Class=[" +
                                   cSurfaceClass(Surface(TrackTooManyFigures(Loop1).SurfIndex1).Class) + ']');
-                ShowContinueError("  This error occurred " + stripped(CountOut) + " times.");
+                ShowContinueError("  This error occurred " + std::to_string(Count) + " times.");
                 for (Loop2 = 1; Loop2 <= NumTooManyFigures; ++Loop2) {
                     if (TrackTooManyFigures(Loop1).SurfIndex1 == TrackTooManyFigures(Loop2).SurfIndex1) {
                         if (SurfErrorReported2(TrackTooManyFigures(Loop2).SurfIndex2)) continue;
@@ -11730,8 +11715,7 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage("");
-                ObjexxFCL::gio::write(CountOut, fmtLD) << TotCount;
-                ShowContinueError("  The too many figures errors occurred " + stripped(CountOut) + " times (total).");
+                ShowContinueError("  The too many figures errors occurred " + std::to_string(TotCount) + " times (total).");
                 ShowMessage("");
             }
             SurfErrorReported.deallocate();
