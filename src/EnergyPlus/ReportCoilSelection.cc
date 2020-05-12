@@ -814,12 +814,12 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                     c->cpFluid * c->rhoFluid * DataSizing::PlantSizData(c->pltSizNum).DeltaT * DataSizing::PlantSizData(c->pltSizNum).DesVolFlowRate;
             } else {
                 // find boiler on this plant loop and get capacity from it
-                if (allocated(BoilerSteam::Boiler)) {
-                    for (int boilerIndex = 1; boilerIndex <= BoilerSteam::NumBoilers; ++boilerIndex) {
-                        if (BoilerSteam::Boiler(boilerIndex).LoopNum == c->waterLoopNum) { // steam boiler on this loop
-                            c->plantDesSupTemp = BoilerSteam::Boiler(boilerIndex).TempUpLimitBoilerOut;
-                            c->plantDesRetTemp = BoilerSteam::Boiler(boilerIndex).TempUpLimitBoilerOut - c->plantDesDeltaTemp;
-                            c->plantDesCapacity = BoilerSteam::Boiler(boilerIndex).NomCap;
+                if (allocated(state.dataSteamBoilers.Boiler)) {
+                    for (int boilerIndex = 1; boilerIndex <= state.dataSteamBoilers.numBoilers; ++boilerIndex) {
+                        if (state.dataSteamBoilers.Boiler(boilerIndex).LoopNum == c->waterLoopNum) { // steam boiler on this loop
+                            c->plantDesSupTemp = state.dataSteamBoilers.Boiler(boilerIndex).TempUpLimitBoilerOut;
+                            c->plantDesRetTemp = state.dataSteamBoilers.Boiler(boilerIndex).TempUpLimitBoilerOut - c->plantDesDeltaTemp;
+                            c->plantDesCapacity = state.dataSteamBoilers.Boiler(boilerIndex).NomCap;
                         }
                     }
                 }

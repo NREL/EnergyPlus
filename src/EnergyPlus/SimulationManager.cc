@@ -680,7 +680,7 @@ namespace SimulationManager {
 #ifdef EP_Detailed_Timings
         epStartTime("Closeout Reporting=");
 #endif
-        SimCostEstimate();
+        SimCostEstimate(state);
 
         ComputeTariff(); //     Compute the utility bills
 
@@ -2131,7 +2131,7 @@ namespace SimulationManager {
             SimulateGroundDomains(state.dataGlobals, outputFiles, true);
         }
 
-        if (!ErrorsFound) SimCostEstimate(); // basically will get and check input
+        if (!ErrorsFound) SimCostEstimate(state); // basically will get and check input
         if (ErrorsFound) ShowFatalError("Previous conditions cause program termination.");
     }
 

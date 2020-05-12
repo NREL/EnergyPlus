@@ -48,11 +48,22 @@
 #ifndef EnergyPlusData_hh_INCLUDED
 #define EnergyPlusData_hh_INCLUDED
 
-// EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
+// C++ Headers
 #include <unordered_map>
 #include <string>
+
+// EnergyPlus Headers
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerExhaustAbsorption.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/PlantChillers.hh>
 
 namespace EnergyPlus {
 
@@ -67,6 +78,107 @@ namespace EnergyPlus {
 //    void clear_state() override {
 //    }
 //};
+
+    struct BoilersData : BaseGlobalStruct {
+        int numBoilers = 0;
+        bool getBoilerInputFlag = true;
+        Array1D<Boilers::BoilerSpecs> Boiler;
+
+        void clear_state()
+        {
+            numBoilers = 0;
+            getBoilerInputFlag = true;
+            Boiler.deallocate();
+        }
+    };
+
+    struct BoilerSteamData : BaseGlobalStruct {
+        int numBoilers = 0;
+        bool getSteamBoilerInput = true;
+        Array1D<BoilerSteam::BoilerSpecs> Boiler;
+
+        void clear_state()
+        {
+            numBoilers = 0;
+            getSteamBoilerInput = true;
+            Boiler.deallocate();
+        }
+    };
+
+    struct ChillerAbsorberData : BaseGlobalStruct {
+        int numBlastAbsorbers = 0;
+        bool getInput = true;
+        Array1D<ChillerAbsorption::BLASTAbsorberSpecs> BLASTAbsorber;
+
+        void clear_state()
+        {
+            numBlastAbsorbers = 0;
+            getInput = true;
+            BLASTAbsorber.deallocate();
+        }
+    };
+
+    struct ChillerElectricEIRData : BaseGlobalStruct {
+        int NumElectricEIRChillers = 0;
+        bool getInputFlag = true;
+        Array1D<ChillerElectricEIR::ElectricEIRChillerSpecs> ElectricEIRChiller;
+
+        void clear_state()
+        {
+            NumElectricEIRChillers = 0;
+            getInputFlag = true;
+            ElectricEIRChiller.deallocate();
+        }
+    };
+
+    struct ChillerExhaustAbsorptionData : BaseGlobalStruct {
+        bool Sim_GetInput = true;
+        Array1D<ChillerExhaustAbsorption::ExhaustAbsorberSpecs> ExhaustAbsorber;
+
+        void clear_state()
+        {
+            Sim_GetInput = true;
+            ExhaustAbsorber.deallocate();
+        }
+    };
+
+    struct ChillerReformulatedEIRData : BaseGlobalStruct {
+        int NumElecReformEIRChillers = 0;
+        bool GetInputREIR = true;
+        Array1D<ChillerReformulatedEIR::ReformulatedEIRChillerSpecs> ElecReformEIRChiller;
+
+        void clear_state()
+        {
+            NumElecReformEIRChillers = 0;
+            GetInputREIR = true;
+            ElecReformEIRChiller.deallocate();
+        }
+    };
+
+    struct ChillerGasAbsorptionData : BaseGlobalStruct {
+        bool getGasAbsorberInputs = true;
+        Array1D<ChillerGasAbsorption::GasAbsorberSpecs> GasAbsorber;
+
+        void clear_state()
+        {
+            getGasAbsorberInputs = true;
+            GasAbsorber.deallocate();
+        }
+    };
+
+    struct ChillerIndirectAbsoprtionData :BaseGlobalStruct {
+        int NumIndirectAbsorbers = 0;
+        bool GetInput = true;
+        Array1D<ChillerIndirectAbsorption::IndirectAbsorberSpecs> IndirectAbsorber;
+
+
+        void clear_state()
+        {
+            NumIndirectAbsorbers = 0;
+            GetInput = true;
+            IndirectAbsorber.deallocate();
+        }
+    };
 
     struct DataGlobal : BaseGlobalStruct {
         // Data
@@ -140,21 +252,73 @@ namespace EnergyPlus {
         }
     };
 
+    struct PlantChillersData : BaseGlobalStruct {
+
+        int NumElectricChillers = 0;
+        int NumEngineDrivenChillers = 0;
+        int NumGTChillers = 0;
+        int NumConstCOPChillers = 0;
+
+        bool GetEngineDrivenInput = true;
+        bool GetElectricInput = true;
+        bool GetGasTurbineInput = true;
+        bool GetConstCOPInput = true;
+
+        Array1D<PlantChillers::ElectricChillerSpecs> ElectricChiller;
+        Array1D<PlantChillers::EngineDrivenChillerSpecs> EngineDrivenChiller;
+        Array1D<PlantChillers::GTChillerSpecs> GTChiller;
+        Array1D<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
+
+        void clear_state()
+        {
+            NumElectricChillers = 0;
+            NumEngineDrivenChillers = 0;
+            NumGTChillers = 0;
+            NumConstCOPChillers = 0;
+            GetEngineDrivenInput = true;
+            GetElectricInput = true;
+            GetGasTurbineInput = true;
+            GetConstCOPInput = true;
+            ElectricChiller.deallocate();
+            EngineDrivenChiller.deallocate();
+            GTChiller.deallocate();
+            ConstCOPChiller.deallocate();
+        }
+    };
+
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
+        BoilersData dataBoilers;
+        BoilerSteamData dataSteamBoilers;
+        ChillerAbsorberData dataChillerAbsorbers;
+        ChillerElectricEIRData dataChillerElectricEIR;
+        ChillerExhaustAbsorptionData dataChillerExhaustAbsorption;
+        ChillerIndirectAbsoprtionData dataChillerIndirectAbsorption;
+        ChillerGasAbsorptionData dataChillerGasAbsorption;
+        ChillerReformulatedEIRData dataChillerReformulatedEIR;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
         PipesData pipes;
+        PlantChillersData dataPlantChillers;
         //OutputReportTabular outputReportTabular;
 
         // all clear states
         void clear_state() override {
+            dataBoilers.clear_state();
+            dataSteamBoilers.clear_state();
+            dataChillerAbsorbers.clear_state();
+            dataChillerElectricEIR.clear_state();
+            dataChillerExhaustAbsorption.clear_state();
+            dataChillerGasAbsorption.clear_state();
+            dataChillerIndirectAbsorption.clear_state();
+            dataChillerReformulatedEIR.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();
             //outputReportTabular.clear_state();
             pipes.clear_state();
+            dataPlantChillers.clear_state();
         };
     };
 
