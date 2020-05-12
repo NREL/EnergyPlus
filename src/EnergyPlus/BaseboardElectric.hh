@@ -101,9 +101,7 @@ namespace BaseboardElectric {
         Array1D_string FieldNames;
 
         // Default Constructor
-        BaseboardNumericFieldData()
-        {
-        }
+        BaseboardNumericFieldData() = default;
     };
 
     void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);

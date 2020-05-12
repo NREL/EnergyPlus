@@ -94,18 +94,6 @@ namespace BaseboardRadiator {
     //       MODIFIED       Fred Buhl, October 1999
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-    // Needs description
-
-    // METHODOLOGY EMPLOYED:
-    // Needs description, as appropriate
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
@@ -121,22 +109,9 @@ namespace BaseboardRadiator {
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    Real64 const SimpConvAirFlowSpeed(0.5); // m/s
     static std::string const cCMO_BBRadiator_Water("ZoneHVAC:Baseboard:Convective:Water");
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
     int NumBaseboards(0);
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
-    Array1D_bool SetLoopIndexFlag; // get loop number flag
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
-
-    // Object Data
     Array1D<BaseboardParams> Baseboard;
     Array1D<BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
 
@@ -145,9 +120,6 @@ namespace BaseboardRadiator {
     void clear_state()
     {
         NumBaseboards = 0;
-        MySizeFlag.deallocate();
-        CheckEquipName.deallocate();
-        SetLoopIndexFlag.deallocate();
         Baseboard.deallocate();
         BaseboardParamsNumericFields.deallocate();
     }
@@ -168,12 +140,6 @@ namespace BaseboardRadiator {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the Baseboard Radiators.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using DataLoopNode::Node;
@@ -208,12 +174,12 @@ namespace BaseboardRadiator {
                 ShowFatalError("SimBaseboard:  Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) +
                                ", Number of Units=" + TrimSigDigits(NumBaseboards) + ", Entered Unit name=" + EquipName);
             }
-            if (CheckEquipName(BaseboardNum)) {
+            if (Baseboard(BaseboardNum).CheckEquipName) {
                 if (EquipName != Baseboard(BaseboardNum).EquipID) {
                     ShowFatalError("SimBaseboard: Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) + ", Unit name=" + EquipName +
                                    ", stored Unit Name for that index=" + Baseboard(BaseboardNum).EquipID);
                 }
-                CheckEquipName(BaseboardNum) = false;
+                Baseboard(BaseboardNum).CheckEquipName = false;
             }
         }
 
@@ -301,9 +267,6 @@ namespace BaseboardRadiator {
         // METHODOLOGY EMPLOYED:
         // Standard input processor calls.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using NodeInputManager::GetOnlySingleNode;
@@ -313,10 +276,6 @@ namespace BaseboardRadiator {
         using namespace DataSizing;
         using General::TrimSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetBaseboardInput: "); // include trailing blank space
         int const iHeatCAPMAlphaNum(5);             // get input index to water baseboard Radiator system heating capacity sizing method
@@ -325,12 +284,6 @@ namespace BaseboardRadiator {
             2); // get input index to water baseboard Radiator system electric heating capacity per floor area sizing
         int const iHeatFracOfAutosizedCapacityNumericNum(
             3); //  get input index to water baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum;
@@ -349,7 +302,6 @@ namespace BaseboardRadiator {
         NumBaseboards = NumConvHWBaseboards;
 
         Baseboard.allocate(NumBaseboards);
-        CheckEquipName.dimension(NumBaseboards, true);
         BaseboardParamsNumericFields.allocate(NumBaseboards);
 
         if (NumConvHWBaseboards > 0) { // Get the data for cooling schemes
@@ -568,12 +520,6 @@ namespace BaseboardRadiator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the Baseboard units during simulation.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -582,17 +528,8 @@ namespace BaseboardRadiator {
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("BaseboardRadiator:InitBaseboard");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
@@ -612,14 +549,10 @@ namespace BaseboardRadiator {
         if (MyOneTimeFlag) {
             // initialize the environment and sizing flags
             MyEnvrnFlag.allocate(NumBaseboards);
-            MySizeFlag.allocate(NumBaseboards);
-            SetLoopIndexFlag.allocate(NumBaseboards);
             MyEnvrnFlag = true;
-            MySizeFlag = true;
             MyOneTimeFlag = false;
-            SetLoopIndexFlag = true;
         }
-        if (SetLoopIndexFlag(BaseboardNum) && allocated(PlantLoop)) {
+        if (Baseboard(BaseboardNum).SetLoopIndexFlag && allocated(PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(Baseboard(BaseboardNum).EquipID,
                                     Baseboard(BaseboardNum).EquipType,
@@ -636,7 +569,7 @@ namespace BaseboardRadiator {
             if (errFlag) {
                 ShowFatalError("InitBaseboard: Program terminated for previous conditions.");
             }
-            SetLoopIndexFlag(BaseboardNum) = false;
+            Baseboard(BaseboardNum).SetLoopIndexFlag = false;
         }
         // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
@@ -648,15 +581,15 @@ namespace BaseboardRadiator {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(BaseboardNum) && !SetLoopIndexFlag(BaseboardNum)) {
+        if (!SysSizingCalc && Baseboard(BaseboardNum).MySizeFlag && !Baseboard(BaseboardNum).SetLoopIndexFlag) {
             // for each coil, do the sizing once.
             SizeBaseboard(state, BaseboardNum);
 
-            MySizeFlag(BaseboardNum) = false;
+            Baseboard(BaseboardNum).MySizeFlag = false;
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum) && !SetLoopIndexFlag(BaseboardNum)) {
+        if (BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum) && !Baseboard(BaseboardNum).SetLoopIndexFlag) {
             RhoAirStdInit = StdRhoAir;
             WaterInletNode = Baseboard(BaseboardNum).WaterInletNode;
             rho = GetDensityGlycol(PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidName,
@@ -720,9 +653,6 @@ namespace BaseboardRadiator {
         // Obtains flow rates from the zone sizing arrays and plant sizing data. UAs are
         // calculated by numerically inverting the baseboard calculation routine.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSizing;
         using DataHeatBalance::Zone;
@@ -734,19 +664,10 @@ namespace BaseboardRadiator {
         using ReportSizingManager::ReportSizingOutput;
         using ReportSizingManager::RequestSizing;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Acc(0.0001); // Accuracy of result
         int const MaxIte(500);    // Maximum number of iterations
         static std::string const RoutineName(cCMO_BBRadiator_Water + ":SizeBaseboard");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
@@ -932,7 +853,6 @@ namespace BaseboardRadiator {
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                             } else {
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = Baseboard(BaseboardNum).ScaledHeatingCapacity;
-                                ;
                             }
                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                             TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
@@ -1096,9 +1016,6 @@ namespace BaseboardRadiator {
         // method found in Icropera and DeWitt, Fundamentals of Heat and Mass Transfer,
         // Chapter 11.4, p. 523, eq. 11.33
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         // Icropera and DeWitt, Fundamentals of Heat and Mass Transfer,
         // Chapter 11.4, p. 523, eq. 11.33
@@ -1111,17 +1028,8 @@ namespace BaseboardRadiator {
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using PlantUtilities::SetActuatedBranchFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName(cCMO_BBRadiator_Water + ":SimHWConvective");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
@@ -1147,7 +1055,7 @@ namespace BaseboardRadiator {
 
         ZoneNum = Baseboard(BaseboardNum).ZonePtr;
         QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        if (MySizeFlag(BaseboardNum)) QZnReq = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad; // If in sizing, assign design condition
+        if (Baseboard(BaseboardNum).MySizeFlag) QZnReq = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad; // If in sizing, assign design condition
 
         WaterInletTemp = Baseboard(BaseboardNum).WaterInletTemp;
         WaterOutletTemp = WaterInletTemp;
@@ -1169,8 +1077,8 @@ namespace BaseboardRadiator {
         WaterMassFlowRate = Node(Baseboard(BaseboardNum).WaterInletNode).MassFlowRate;
         CapacitanceAir = CpAir * AirMassFlowRate;
 
-        if (QZnReq > SmallLoad && (!CurDeadBandOrSetback(ZoneNum) || MySizeFlag(BaseboardNum)) &&
-            (GetCurrentScheduleValue(Baseboard(BaseboardNum).SchedPtr) > 0 || MySizeFlag(BaseboardNum)) && (WaterMassFlowRate > 0.0)) {
+        if (QZnReq > SmallLoad && (!CurDeadBandOrSetback(ZoneNum) || Baseboard(BaseboardNum).MySizeFlag) &&
+            (GetCurrentScheduleValue(Baseboard(BaseboardNum).SchedPtr) > 0 || Baseboard(BaseboardNum).MySizeFlag) && (WaterMassFlowRate > 0.0)) {
             CapacitanceWater = CpWater * WaterMassFlowRate;
             CapacitanceMax = max(CapacitanceAir, CapacitanceWater);
             CapacitanceMin = min(CapacitanceAir, CapacitanceWater);
@@ -1233,29 +1141,9 @@ namespace BaseboardRadiator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataLoopNode::Node;
         using PlantUtilities::SafeCopyPlantNode;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
@@ -1270,17 +1158,6 @@ namespace BaseboardRadiator {
         //   Node(WaterOutletNode)%MassFlowRate = Baseboard(BaseboardNum)%WaterMassFlowRate
         Node(WaterOutletNode).Temp = Baseboard(BaseboardNum).WaterOutletTemp;
         Node(WaterOutletNode).Enthalpy = Baseboard(BaseboardNum).WaterOutletEnthalpy;
-
-        // Set the outlet nodes for properties that just pass through & not used
-
-        // Set the outlet nodes for properties that just pass through & not used
-        //   Node(WaterOutletNode)%Quality             = Node(WaterInletNode)%Quality
-        //   Node(WaterOutletNode)%Press               = Node(WaterInletNode)%Press
-        //   Node(WaterOutletNode)%HumRat              = Node(WaterInletNode)%HumRat
-        //   Node(WaterOutletNode)%MassFlowRateMin     = Node(WaterInletNode)%MassFlowRateMin
-        //   Node(WaterOutletNode)%MassFlowRateMax     = Node(WaterInletNode)%MassFlowRateMax
-        //   Node(WaterOutletNode)%MassFlowRateMinAvail= Node(WaterInletNode)%MassFlowRateMinAvail
-        //   Node(WaterOutletNode)%MassFlowRateMaxAvail= Node(WaterInletNode)%MassFlowRateMaxAvail
     }
 
     void ReportBaseboard(int const BaseboardNum)
@@ -1292,31 +1169,8 @@ namespace BaseboardRadiator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         Baseboard(BaseboardNum).Energy = Baseboard(BaseboardNum).Power * TimeStepSys * SecInHour;
     }
@@ -1340,27 +1194,8 @@ namespace BaseboardRadiator {
         // Puts UA into the baseboard data structure, calls SimHWConvective, and calculates
         // the residual as defined above.
 
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int BaseboardIndex;
@@ -1372,119 +1207,6 @@ namespace BaseboardRadiator {
         Residuum = (Par(1) - LoadMet) / Par(1);
 
         return Residuum;
-    }
-
-    void UpdateBaseboardPlantConnection(int const BaseboardTypeNum,         // type index
-                                        std::string const &BaseboardName,   // component name
-                                        int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
-                                        int const EP_UNUSED(LoopNum),       // Plant loop index for where called from
-                                        int const EP_UNUSED(LoopSide),      // Plant loop side index for where called from
-                                        int &CompIndex,                     // Chiller number pointer
-                                        bool const EP_UNUSED(FirstHVACIteration),
-                                        bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Chandan Sharma, FSEC
-        //       DATE WRITTEN   Sept. 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // update sim routine called from plant
-
-        // METHODOLOGY EMPLOYED:
-        // check input, provide comp index, call utility routines
-
-        // REFERENCES:
-        // Based on UpdateBaseboardPlantConnection from Brent Griffith, Sept 2010
-
-        // Using/Aliasing
-        using DataGlobals::KickOffSimulation;
-        using DataPlant::ccSimPlantEquipTypes;
-        using DataPlant::CriteriaType_HeatTransferRate;
-        using DataPlant::CriteriaType_MassFlowRate;
-        using DataPlant::CriteriaType_Temperature;
-        using DataPlant::TypeOf_Baseboard_Conv_Water;
-        using General::TrimSigDigits;
-        using PlantUtilities::PullCompInterconnectTrigger;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        int BaseboardNum;
-
-        // Find the correct baseboard
-        if (CompIndex == 0) {
-            BaseboardNum = UtilityRoutines::FindItemInList(BaseboardName, Baseboard, &BaseboardParams::EquipID);
-            if (BaseboardNum == 0) {
-                ShowFatalError("UpdateBaseboardPlantConnection: Invalid Unit Specified " + cCMO_BBRadiator_Water + "=\"" + BaseboardName + "\"");
-            }
-            CompIndex = BaseboardNum;
-        } else {
-            BaseboardNum = CompIndex;
-            if (BaseboardNum > NumBaseboards || BaseboardNum < 1) {
-                ShowFatalError("UpdateBaseboardPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) +
-                               ", Number of baseboards=" + TrimSigDigits(NumBaseboards) + ", Entered baseboard name=" + BaseboardName);
-            }
-            if (KickOffSimulation) {
-                if (BaseboardName != Baseboard(BaseboardNum).EquipID) {
-                    ShowFatalError("UpdateBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) +
-                                   ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + Baseboard(BaseboardNum).EquipID);
-                }
-                if (BaseboardTypeNum != TypeOf_Baseboard_Conv_Water) {
-                    ShowFatalError("UpdateBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) + ", baseboard name=" +
-                                   BaseboardName + ", stored baseboard Name for that index=" + ccSimPlantEquipTypes(BaseboardTypeNum));
-                }
-            }
-        }
-
-        if (InitLoopEquip) {
-            return;
-        }
-
-        PullCompInterconnectTrigger(Baseboard(BaseboardNum).LoopNum,
-                                    Baseboard(BaseboardNum).LoopSideNum,
-                                    Baseboard(BaseboardNum).BranchNum,
-                                    Baseboard(BaseboardNum).CompNum,
-                                    Baseboard(BaseboardNum).BBLoadReSimIndex,
-                                    Baseboard(BaseboardNum).LoopNum,
-                                    Baseboard(BaseboardNum).LoopSideNum,
-                                    CriteriaType_HeatTransferRate,
-                                    Baseboard(BaseboardNum).Power);
-
-        PullCompInterconnectTrigger(Baseboard(BaseboardNum).LoopNum,
-                                    Baseboard(BaseboardNum).LoopSideNum,
-                                    Baseboard(BaseboardNum).BranchNum,
-                                    Baseboard(BaseboardNum).CompNum,
-                                    Baseboard(BaseboardNum).BBLoadReSimIndex,
-                                    Baseboard(BaseboardNum).LoopNum,
-                                    Baseboard(BaseboardNum).LoopSideNum,
-                                    CriteriaType_MassFlowRate,
-                                    Baseboard(BaseboardNum).WaterMassFlowRate);
-
-        PullCompInterconnectTrigger(Baseboard(BaseboardNum).LoopNum,
-                                    Baseboard(BaseboardNum).LoopSideNum,
-                                    Baseboard(BaseboardNum).BranchNum,
-                                    Baseboard(BaseboardNum).CompNum,
-                                    Baseboard(BaseboardNum).BBLoadReSimIndex,
-                                    Baseboard(BaseboardNum).LoopNum,
-                                    Baseboard(BaseboardNum).LoopSideNum,
-                                    CriteriaType_Temperature,
-                                    Baseboard(BaseboardNum).WaterOutletTemp);
     }
 
 } // namespace BaseboardRadiator
