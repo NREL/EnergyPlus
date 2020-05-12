@@ -2254,7 +2254,6 @@ namespace ZoneEquipmentManager {
         Real64 TotHeatSizMult;   // combines user heating design flow input with zone sizing multiplier
         Real64 MinOAMass;        // zone minimum outside air mass flow rate kg/s
         Real64 MaxHeatVolFlow;   // max of user specified design heating max flow [m3/s]
-        std::string HrMinString; // store hour/minute string before assigning to peak string array
         Real64 SupplyTemp;       // supply air temperature [C]
         Real64 DeltaTemp;        // supply air delta temperature [deltaC]
 
@@ -2769,12 +2768,10 @@ namespace ZoneEquipmentManager {
                             for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
                                 if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                                 if (TimeStepIndex == CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax) {
-                                    ObjexxFCL::gio::write(HrMinString, PeakHrMinFmt) << HourPrint << Minutes;
-                                    HeatPeakDateHrMin(CtrlZoneNum) = CalcFinalZoneSizing(CtrlZoneNum).cHeatDDDate + ' ' + HrMinString;
+                                    HeatPeakDateHrMin(CtrlZoneNum) = CalcFinalZoneSizing(CtrlZoneNum).cHeatDDDate + ' ' + format(PeakHrMinFmt, HourPrint,Minutes);
                                 }
                                 if (TimeStepIndex == CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax) {
-                                    ObjexxFCL::gio::write(HrMinString, PeakHrMinFmt) << HourPrint << Minutes;
-                                    CoolPeakDateHrMin(CtrlZoneNum) = CalcFinalZoneSizing(CtrlZoneNum).cCoolDDDate + ' ' + HrMinString;
+                                    CoolPeakDateHrMin(CtrlZoneNum) = CalcFinalZoneSizing(CtrlZoneNum).cCoolDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
                                 }
                             }
 
