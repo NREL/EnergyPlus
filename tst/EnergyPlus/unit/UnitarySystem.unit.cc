@@ -496,8 +496,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     EXPECT_NEAR(coil1CoolingCoilRate, rhoRatio * WaterCoils::WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
     EXPECT_NEAR(coil1CoolingCoilRate, rhoRatio * mySys->m_DesignCoolingCapacity, 1.0);
     // the heating coils are sized differently since SysAirMinFlowRat is not accounted for
-    EXPECT_NE(coil2HeatingCoilRate, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate, 1.0);
-    EXPECT_NE(coil2HeatingCoilRate, mySys->m_DesignHeatingCapacity, 1.0);
+    EXPECT_NE(coil2HeatingCoilRate, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate);
+    EXPECT_NE(coil2HeatingCoilRate, mySys->m_DesignHeatingCapacity);
 }
 
 TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
