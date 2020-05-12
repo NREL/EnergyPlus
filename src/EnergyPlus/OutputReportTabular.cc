@@ -67,18 +67,15 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
-#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataCostEstimate.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -86,7 +83,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -98,7 +94,6 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -172,7 +167,6 @@ namespace OutputReportTabular {
     //                                      |--> MonthlyTable --> MonthlyColumns
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BigNumber;
     using DataGlobals::CurrentTime;
     using DataGlobals::DisplayExtraWarnings;
@@ -6545,7 +6539,7 @@ namespace OutputReportTabular {
         // Exterior Lighting
         consumptionTotal = 0.0;
         for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
-            if (state.exteriorEnergyUse.ExteriorLights(iLight).ControlMode == 1) { // photocell/schedule
+            if (state.exteriorEnergyUse.ExteriorLights(iLight).ControlMode == ExteriorEnergyUse::LightControlType::ScheduleOnly) { // photocell/schedule
                 PreDefTableEntry(pdchExLtAvgHrSchd,
                                  state.exteriorEnergyUse.ExteriorLights(iLight).Name,
                                  ScheduleAverageHoursPerWeek(state.exteriorEnergyUse.ExteriorLights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
@@ -15661,33 +15655,12 @@ namespace OutputReportTabular {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static Array1D<ObjexxFCL::gio::Fmt> formDigits({0, 9},
-                                                       {"(F12.0)",
-                                                        "(F12.1)",
-                                                        "(F12.2)",
-                                                        "(F12.3)",
-                                                        "(F12.4)",
-                                                        "(F12.5)",
-                                                        "(F12.6)",
-                                                        "(F12.7)",
-                                                        "(F12.8)",
-                                                        "(F12.9)"}); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) |
-                                                                     // formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) |
-                                                                     // formDigits(8) | formDigits(9)
-        static Array1D<Real64> const maxvalDigits({0, 9},
-                                                  {9999999999.0,
-                                                   999999999.0,
-                                                   99999999.0,
-                                                   9999999.0,
-                                                   999999.0,
-                                                   99999.0,
-                                                   9999.0,
-                                                   999.0,
-                                                   99.0,
-                                                   9.0}); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) |
-                                                          // maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) |
-                                                          // maxvalDigits(8) | maxvalDigits(9)
-        static ObjexxFCL::gio::Fmt fmtd("(E12.6)");
+        static constexpr std::array<const char *, 10> formDigitsA{
+            "{:#12.0F}", "{:12.1F}", "{:12.2F}", "{:12.3F}", "{:12.4F}", "{:12.5F}", "{:12.6F}", "{:12.7F}", "{:12.8F}", "{:12.9F}"};
+
+        static constexpr std::array<Real64, 10> maxvalDigitsA(
+            {9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0, 9.0});
+
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -15696,17 +15669,15 @@ namespace OutputReportTabular {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int nDigits;
-
-        nDigits = numDigits;
+        int nDigits = numDigits;
         if (RealIn < 0.0) --nDigits;
         if (nDigits > 9) nDigits = 9;
         if (nDigits < 0) nDigits = 0;
 
-        if (std::abs(RealIn) > maxvalDigits(nDigits)) {
-            ObjexxFCL::gio::write(StringOut, fmtd) << RealIn;
+        if (std::abs(RealIn) > maxvalDigitsA.at(nDigits)) {
+            return format("{:12.6Z}", RealIn);
         } else {
-            ObjexxFCL::gio::write(StringOut, formDigits(nDigits)) << RealIn;
+            return format(formDigitsA.at(nDigits), RealIn);
         }
         //  WRITE(FMT=, UNIT=stringOut) RealIn
         // check if it did not fit
@@ -15715,7 +15686,6 @@ namespace OutputReportTabular {
         //  END IF
 
         // WRITE(FMT="(F10.4)", UNIT=stringOut, IOSTAT=status ) RealIn
-        return StringOut;
     }
 
     Real64 StrToReal(std::string const &stringIn)
@@ -15760,7 +15730,6 @@ namespace OutputReportTabular {
 
         // Locals
         // ((month*100 + day)*100 + hour)*100 + minute
-        static ObjexxFCL::gio::Fmt DateFmt("(I2.2,'-',A3,'-',I2.2,':',I2.2)");
 
         int Month;  // month in integer format (1-12)
         int Day;    // day in integer format (1-31)
@@ -15802,7 +15771,7 @@ namespace OutputReportTabular {
             } else {
                 monthName = "***";
             }
-            ObjexxFCL::gio::write(StringOut, DateFmt) << Day << monthName << Hour << Minute;
+            StringOut = format("{:02}-{:3}-{:02}:{:02}", Day, monthName, Hour, Minute);
             if (has(StringOut, "*")) {
                 StringOut = "-";
             }
