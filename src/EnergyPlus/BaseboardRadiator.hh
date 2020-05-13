@@ -59,6 +59,7 @@ namespace EnergyPlus {
 
     // Forward declarations
     struct EnergyPlusData;
+    struct BaseboardRadiatorData;
 
 namespace BaseboardRadiator {
 
@@ -126,32 +127,26 @@ namespace BaseboardRadiator {
         // Default Constructor
         BaseboardParamsNumericFieldData() = default;
     };
-    // Object Data
-    extern Array1D<BaseboardParams> Baseboard;
-    extern Array1D<BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
 
-    void clear_state();
-
-    void SimBaseboard(EnergyPlus::EnergyPlusData &state, std::string const &EquipName,
+    void SimBaseboard(EnergyPlusData &state, std::string const &EquipName,
                       int ActualZoneNum,
                       int ControlledZoneNum,
                       bool FirstHVACIteration,
                       Real64 &PowerMet,
                       int &CompIndex);
 
-    void GetBaseboardInput();
+    void GetBaseboardInput(BaseboardRadiatorData &baseboard);
 
-    void InitBaseboard(EnergyPlus::EnergyPlusData &state, int BaseboardNum, int ControlledZoneNumSub);
+    void InitBaseboard(EnergyPlusData &state, int BaseboardNum, int ControlledZoneNumSub);
 
-    void SizeBaseboard(EnergyPlus::EnergyPlusData &state, int BaseboardNum);
+    void SizeBaseboard(EnergyPlusData &state, int BaseboardNum);
 
-    void SimHWConvective(int &BaseboardNum, Real64 &LoadMet);
+    void SimHWConvective(BaseboardRadiatorData &baseboard, int &BaseboardNum, Real64 &LoadMet);
 
-    void UpdateBaseboard(int &BaseboardNum);
+    void UpdateBaseboard(BaseboardRadiatorData &baseboard, int &BaseboardNum);
 
-    void ReportBaseboard(int BaseboardNum);
-
-    Real64 HWBaseboardUAResidual(Real64 UA,           // UA of coil
+    Real64 HWBaseboardUAResidual(EnergyPlusData &state,
+                                 Real64 UA,           // UA of coil
                                  Array1D<Real64> const &Par // par(1) = design coil load [W]
     );
 
