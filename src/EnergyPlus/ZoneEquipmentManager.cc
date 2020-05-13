@@ -1688,11 +1688,10 @@ namespace ZoneEquipmentManager {
 
             // save Voz for predefined outdoor air summary report
             Real64 MinEz = std::min(FinalZoneSizing(CtrlZoneNum).ZoneADEffCooling, FinalZoneSizing(CtrlZoneNum).ZoneADEffHeating);
-            if (MinEz != 0) {
-                DataHeatBalance::ZonePreDefRep(ZoneIndex).VozMin = (ZoneMinOccupancy * FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer + OAFromArea) / MinEz;
-            } else {
-                DataHeatBalance::ZonePreDefRep(ZoneIndex).VozMin = ZoneMinOccupancy * FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer + OAFromArea; //assume divide by 1 as air distribution effectiveness.
+            if (MinEz == 0) {
+                MinEz = 1.0; // if not calculated assume 1.0 ventilation effectiveness
             }
+            DataHeatBalance::ZonePreDefRep(ZoneIndex).VozMin = (ZoneMinOccupancy * FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer + OAFromArea) / MinEz;
 
             // Calculate the design min OA flow rate for this zone
             UseOccSchFlag = false;

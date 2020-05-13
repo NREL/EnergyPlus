@@ -2303,6 +2303,7 @@ namespace DataHeatBalance {
     {
         // Members
         bool isOccupied;        // occupied during the current time step
+        Real64 NumOcc;          // number of occupants - used in calculating Vbz
         Real64 NumOccAccum;     // number of occupants accumulating for entire simulation
         Real64 NumOccAccumTime; // time that the number of occupants is accumulating to compute average
         //  - zone time step
@@ -2394,7 +2395,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         ZonePreDefRepType()
-            : isOccupied(false), NumOccAccum(0.0), NumOccAccumTime(0.0), TotTimeOcc(0.0), MechVentVolTotal(0.0), MechVentVolTotalOcc(0.0), 
+            : isOccupied(false), NumOcc(0.0), NumOccAccum(0.0), NumOccAccumTime(0.0), TotTimeOcc(0.0), MechVentVolTotal(0.0), MechVentVolTotalOcc(0.0), 
               MechVentVolMin(9.9e9), InfilVolTotal(0.0), InfilVolTotalOcc(0.0), InfilVolMin(9.9e9), AFNInfilVolTotal(0.0), AFNInfilVolTotalOcc(0.0), 
               AFNInfilVolMin(9.9e9), SimpVentVolTotal(0.0), SimpVentVolTotalOcc(0.0), SimpVentVolMin(9.9e9), VozMin(0.0),
               SHGSAnHvacHt(0.0), SHGSAnHvacCl(0.0), SHGSAnHvacATUHt(0.0), SHGSAnHvacATUCl(0.0), SHGSAnSurfHt(0.0), SHGSAnSurfCl(0.0),

@@ -5267,6 +5267,10 @@ namespace InternalHeatGains {
             e.CO2Rate = 0.0;
         }
 
+        for (auto &e : DataHeatBalance::ZonePreDefRep) {
+            e.NumOcc = 0.0;
+        }
+
         //  QSA = 0.0
 
         // Process Internal Heat Gains, People done below
@@ -5313,11 +5317,12 @@ namespace InternalHeatGains {
                 if (SensiblePeopleGain < 0.0) SensiblePeopleGain = 0.0;
 
                 // For predefined tabular reports related to outside air ventilation
-                ZonePreDefRep(NZ).isOccupied = true; // set flag to occupied to be used in tabular reporting for ventilation
-                ZonePreDefRep(NZ).NumOccAccum += NumberOccupants * TimeStepZone;
-                ZonePreDefRep(NZ).NumOccAccumTime += TimeStepZone;
+                DataHeatBalance::ZonePreDefRep(NZ).isOccupied = true; // set flag to occupied to be used in tabular reporting for ventilation
+                DataHeatBalance::ZonePreDefRep(NZ).NumOcc += NumberOccupants;
+                DataHeatBalance::ZonePreDefRep(NZ).NumOccAccum += NumberOccupants * TimeStepZone;
+                DataHeatBalance::ZonePreDefRep(NZ).NumOccAccumTime += TimeStepZone;
             } else {
-                ZonePreDefRep(NZ).isOccupied = false; // set flag to occupied to be used in tabular reporting for ventilation
+                DataHeatBalance::ZonePreDefRep(NZ).isOccupied = false; // set flag to occupied to be used in tabular reporting for ventilation
             }
 
             People(Loop).NumOcc = NumberOccupants;

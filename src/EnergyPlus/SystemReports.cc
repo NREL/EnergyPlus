@@ -216,6 +216,7 @@ namespace SystemReports {
     Array1D<Real64> ZoneOAVolFlowCrntRho; // zone mech vent volume flow rate at current density {m3/s}
     Array1D<Real64> ZoneOAVolCrntRho;     // zone mech vent total volume OA at current density {m3/s}
     Array1D<Real64> ZoneMechACH;          // zone mech vent air changes per hour {ACH}
+    Array1D<Real64> ZoneTargetVentilationFlowVoz; // zone target ventilation ventilation flow based on 62.1 Voz {m3/s}
 
     bool AirLoopLoadsReportEnabled(true);
     bool VentLoadsReportEnabled(true);
@@ -1952,6 +1953,7 @@ namespace SystemReports {
         ZoneOAVolFlowCrntRho.allocate(NumOfZones);
         ZoneOAVolCrntRho.allocate(NumOfZones);
         ZoneMechACH.allocate(NumOfZones);
+        ZoneTargetVentilationFlowVoz.allocate(NumOfZones);
 
         SysTotZoneLoadHTNG.allocate(NumPrimaryAirSys);
         SysTotZoneLoadCLNG.allocate(NumPrimaryAirSys);
@@ -2026,6 +2028,7 @@ namespace SystemReports {
         ZoneOAVolFlowCrntRho = 0.0;
         ZoneOAVolCrntRho = 0.0;
         ZoneMechACH = 0.0;
+        ZoneTargetVentilationFlowVoz = 0.0;
 
         // SYSTEM LOADS REPORT
         SysTotZoneLoadHTNG = 0.0;
@@ -2394,6 +2397,14 @@ namespace SystemReports {
                                 "HVAC",
                                 "Average",
                                 ZoneEquipConfig(ZoneIndex).ZoneName);
+
+            SetupOutputVariable("Zone Target Voz Ventilation Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneTargetVentilationFlowVoz(ZoneIndex),
+                                "HVAC",
+                                "Sum",
+                                ZoneEquipConfig(ZoneIndex).ZoneName);
+
         }
     }
 
@@ -4444,6 +4455,7 @@ namespace SystemReports {
         ZoneOAVolFlowCrntRho = 0.0;
         ZoneOAVolCrntRho = 0.0;
         ZoneMechACH = 0.0;
+        ZoneTargetVentilationFlowVoz = 0.0;
         MaxCoolingLoadMetByVent = 0.0;
         MaxCoolingLoadAddedByVent = 0.0;
         MaxOvercoolingByVent = 0.0;
@@ -4460,7 +4472,7 @@ namespace SystemReports {
             // first clear out working variables from previous zone.
             ZFAUFlowRate = 0.0;
             ZFAUZoneVentLoad = 0.0;
-            ZFAUOutAirFlow = 0.0;
+            ZFAUOutAirFlow = 0.0; // kg/s
             OutAirFlow = 0.0;
             ZoneFlowFrac = 0.0;
 
@@ -4468,6 +4480,9 @@ namespace SystemReports {
             ActualZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
             ZoneLoad = ZoneSysEnergyDemand(ActualZoneNum).TotalOutputRequired;
             ZoneVolume = Zone(ActualZoneNum).Volume * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier; // CR 7170
+
+//GLAZER            ComputeTargetVentilationFlow(Zone(ActualZoneNum).TotOccupants, Zone(ActualZoneNum).FloorArea, Rp, Ra);
+
 
             // if system operating in deadband reset zone load
             if (DeadBandOrSetback(ActualZoneNum)) ZoneLoad = 0.0;
