@@ -248,73 +248,6 @@ namespace ConvectionCoefficients {
     Array1D<HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
     RoofGeoCharactisticsStruct RoofGeo;
 
-    std::unordered_map<std::string, int> HcInt_ConvectionTypesMap = {
-        {"VALUE", -999},
-        {"SCHEDULE", -999},
-        {"USERCURVE", HcInt_UserCurve},
-        {"ASHRAEVERTICALWALL", HcInt_ASHRAEVerticalWall},
-        {"WALTONUNSTABLEHORIZONTALORTILT", HcInt_WaltonUnstableHorizontalOrTilt},
-        {"WALTONSTABLEHORIZONTALORTILT", HcInt_WaltonStableHorizontalOrTilt},
-        {"FISHERPEDERSENCEILINGDIFFUSERWALLS", HcInt_FisherPedersenCeilDiffuserWalls},
-        {"FISHERPEDERSENCEILINGDIFFUSERCEILING", HcInt_FisherPedersenCeilDiffuserCeiling},
-        {"FISHERPEDERSENCEILINGDIFFUSERFLOOR", HcInt_FisherPedersenCeilDiffuserFloor},
-        {"ALAMDARIHAMMONDSTABLEHORIZONTAL", HcInt_AlamdariHammondStableHorizontal},
-        {"ALAMDARIHAMMONDUNSTABLEHORIZONTAL", HcInt_AlamdariHammondUnstableHorizontal},
-        {"ALAMDARIHAMMONDVERTICALWALL", HcInt_AlamdariHammondVerticalWall},
-        {"KHALIFAEQ3WALLAWAYFROMHEAT", HcInt_KhalifaEq3WallAwayFromHeat},
-        {"KHALIFAEQ4CEILINGAWAYFROMHEAT", HcInt_KhalifaEq4CeilingAwayFromHeat},
-        {"KHALIFAEQ5WALLNEARHEAT", HcInt_KhalifaEq5WallNearHeat},
-        {"KHALIFAEQ6NONHEATEDWALLS", HcInt_KhalifaEq6NonHeatedWalls},
-        {"KHALIFAEQ7CEILING", HcInt_KhalifaEq7Ceiling},
-        {"AWBIHATTONHEATEDFLOOR", HcInt_AwbiHattonHeatedFloor},
-        {"AWBIHATTONHEATEDWALL", HcInt_AwbiHattonHeatedWall},
-        {"BEAUSOLEILMORRISONMIXEDASSISTEDWALL", HcInt_BeausoleilMorrisonMixedAssistingWall},
-        {"BEAUSOLEILMORRISONMIXEDOPPOSINGWALL", HcInt_BeausoleilMorrisonMixedOppossingWall},
-        {"BEAUSOLEILMORRISONMIXEDSTABLEFLOOR", HcInt_BeausoleilMorrisonMixedStableFloor},
-        {"BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR", HcInt_BeausoleilMorrisonMixedUnstableFloor},
-        {"BEAUSOLEILMORRISONMIXEDSTABLECEILING", HcInt_BeausoleilMorrisonMixedStableCeiling},
-        {"BEAUSOLEILMORRISONMIXEDUNSTABLECEILING", HcInt_BeausoleilMorrisonMixedUnstableCeiling},
-        {"FOHANNOPOLIDORIVERTICALWALL", HcInt_FohannoPolidoriVerticalWall},
-        {"KARADAGCHILLEDCEILING", HcInt_KaradagChilledCeiling},
-        {"ISO15099WINDOWS", HcInt_ISO15099Windows},
-        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW", HcInt_GoldsteinNovoselacCeilingDiffuserWindow},
-        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS", HcInt_GoldsteinNovoselacCeilingDiffuserWalls},
-        {"GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR",HcInt_GoldsteinNovoselacCeilingDiffuserFloor},
-    };
-
-    std::unordered_map<std::string, int> HcExt_ConvectionTypesMap = {
-        {"VALUE", -999},
-        {"SCHEDULE", -999},
-        {"TARP", TarpHcOutside},
-        {"MOWITT", MoWiTTHcOutside},
-        {"DOE-2", DOE2HcOutside},
-        {"ADAPTIVECONVECTIONALGORITHM", AdaptiveConvectionAlgorithm},
-        {"USERCURVE", HcExt_UserCurve},
-        {"ASHRAEVERTICALWALL", HcExt_NaturalASHRAEVerticalWall},
-        {"WALTONUNSTABLEHORIZONTALORTILT", HcExt_NaturalWaltonUnstableHorizontalOrTilt},
-        {"WALTONSTABLEHORIZONTALORTILT", HcExt_NaturalWaltonStableHorizontalOrTilt},
-        {"NUSSELTJURGES", HcExt_NusseltJurges},
-        {"MCADAMS", HcExt_McAdams},
-        {"MITCHELL", HcExt_Mitchell},
-        {"CLEARROOF", HcExt_ClearRoof},
-        {"EMMELVERTICAL", HcExt_EmmelVertical},
-        {"EMMELROOF", HcExt_EmmelRoof},
-        {"ALAMDARIHAMMONDVERTICALWALL", HcExt_AlamdariHammondVerticalWall},
-        {"FOHANNOPOLIDORIVERTICALWALL", HcExt_FohannoPolidoriVerticalWall},
-        {"ISO15099WINDOWS", HcExt_ISO15099Windows},
-        {"ALAMDARIHAMMONDSTABLEHORIZONTAL", HcExt_AlamdariHammondStableHorizontal},
-        {"ALAMDARIHAMMONDUNSTABLEHORIZONTAL", HcExt_AlamdariHammondUnstableHorizontal},
-        {"SIMPLECOMBINED", HcExt_ASHRAESimpleCombined},
-        {"TARPWINDWARD", HcExt_SparrowWindward},
-        {"TARPLEEWARD", HcExt_SparrowLeeward},
-        {"MOWITTWINDWARD", HcExt_MoWiTTWindward},
-        {"MOWITTLEEWARD", HcExt_MoWiTTLeeward},
-        {"DOE2WINDWARD", HcExt_DOE2Windward},
-        {"DOE2LEEWARD", HcExt_DOE2Leeward},
-        {"BLOCKENWINDWARD", HcExt_BlockenWindward},
-    };
-
-
     void clear_state()
     {
         GetUserSuppliedConvectionCoeffs = true;
@@ -929,15 +862,15 @@ namespace ConvectionCoefficients {
         return AgainstWind;
     }
 
-    bool SetAdaptiveConvectionAlgoInsideCoefficient(int* const InsideFaceAdaptiveConvectionAlgoParam, const std::string equationName, const std::string curveName, const std::string sourceFieldName, const std::string curveFieldName){
+    bool SetAdaptiveConvectionAlgoInsideCoefficient(const std::unordered_map<std::string, int>& HcInt_ConvectionTypesMap, int* const InsideFaceAdaptiveConvectionAlgoParam, const std::string equationName, const std::string curveName, const std::string sourceFieldName, const std::string curveFieldName){
 
         static std::string const RoutineName("GetUserConvectionCoefficients");
         static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
         bool ErrorsFound = false;
 
         if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()){
-            *InsideFaceAdaptiveConvectionAlgoParam = HcInt_ConvectionTypesMap[equationName];
-            if (HcInt_ConvectionTypesMap[equationName] == HcInt_UserCurve) {
+            *InsideFaceAdaptiveConvectionAlgoParam = HcInt_ConvectionTypesMap.at(equationName);
+            if (HcInt_ConvectionTypesMap.at(equationName) == HcInt_UserCurve) {
                 *InsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, HcInsideUserCurve);
                 if (*InsideFaceAdaptiveConvectionAlgoParam == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
@@ -953,15 +886,15 @@ namespace ConvectionCoefficients {
         }
         return ErrorsFound;
     }
-    bool SetAdaptiveConvectionAlgoOutsideCoefficient(int* const OutsideFaceAdaptiveConvectionAlgoParam, const std::string equationName, const std::string curveName, const std::string sourceFieldName, const std::string curveFieldName){
+    bool SetAdaptiveConvectionAlgoOutsideCoefficient(const std::unordered_map<std::string, int>& HcExt_ConvectionTypesMap, int* const OutsideFaceAdaptiveConvectionAlgoParam, const std::string equationName, const std::string curveName, const std::string sourceFieldName, const std::string curveFieldName){
 
         static std::string const RoutineName("GetUserConvectionCoefficients");
         static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
         bool ErrorsFound = false;
 
         if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()){
-            *OutsideFaceAdaptiveConvectionAlgoParam = HcExt_ConvectionTypesMap[equationName];
-            if (HcInt_ConvectionTypesMap[equationName] == HcExt_UserCurve) {
+            *OutsideFaceAdaptiveConvectionAlgoParam = HcExt_ConvectionTypesMap.at(equationName);
+            if (HcExt_ConvectionTypesMap.at(equationName) == HcExt_UserCurve) {
                 *OutsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, HcInsideUserCurve);
                 if (*OutsideFaceAdaptiveConvectionAlgoParam == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
@@ -1088,7 +1021,7 @@ namespace ConvectionCoefficients {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetUserConvectionCoefficients");
-        std::unordered_set<std::string> ValidSurfaceTypes ={"ALLEXTERIORSURFACES",
+        const std::unordered_set<std::string> ValidSurfaceTypes ={"ALLEXTERIORSURFACES",
                                                "ALLEXTERIORWINDOWS",
                                                "ALLEXTERIORWALLS",
                                                "ALLEXTERIORROOFS",
@@ -1100,6 +1033,71 @@ namespace ConvectionCoefficients {
                                                "ALLINTERIORCEILINGS",
                                                "ALLINTERIORFLOORS"};
 
+        const std::unordered_map<std::string, int> HcInt_ConvectionTypesMap = {
+            {"VALUE", -999},
+            {"SCHEDULE", -999},
+            {"USERCURVE", HcInt_UserCurve},
+            {"ASHRAEVERTICALWALL", HcInt_ASHRAEVerticalWall},
+            {"WALTONUNSTABLEHORIZONTALORTILT", HcInt_WaltonUnstableHorizontalOrTilt},
+            {"WALTONSTABLEHORIZONTALORTILT", HcInt_WaltonStableHorizontalOrTilt},
+            {"FISHERPEDERSENCEILINGDIFFUSERWALLS", HcInt_FisherPedersenCeilDiffuserWalls},
+            {"FISHERPEDERSENCEILINGDIFFUSERCEILING", HcInt_FisherPedersenCeilDiffuserCeiling},
+            {"FISHERPEDERSENCEILINGDIFFUSERFLOOR", HcInt_FisherPedersenCeilDiffuserFloor},
+            {"ALAMDARIHAMMONDSTABLEHORIZONTAL", HcInt_AlamdariHammondStableHorizontal},
+            {"ALAMDARIHAMMONDUNSTABLEHORIZONTAL", HcInt_AlamdariHammondUnstableHorizontal},
+            {"ALAMDARIHAMMONDVERTICALWALL", HcInt_AlamdariHammondVerticalWall},
+            {"KHALIFAEQ3WALLAWAYFROMHEAT", HcInt_KhalifaEq3WallAwayFromHeat},
+            {"KHALIFAEQ4CEILINGAWAYFROMHEAT", HcInt_KhalifaEq4CeilingAwayFromHeat},
+            {"KHALIFAEQ5WALLNEARHEAT", HcInt_KhalifaEq5WallNearHeat},
+            {"KHALIFAEQ6NONHEATEDWALLS", HcInt_KhalifaEq6NonHeatedWalls},
+            {"KHALIFAEQ7CEILING", HcInt_KhalifaEq7Ceiling},
+            {"AWBIHATTONHEATEDFLOOR", HcInt_AwbiHattonHeatedFloor},
+            {"AWBIHATTONHEATEDWALL", HcInt_AwbiHattonHeatedWall},
+            {"BEAUSOLEILMORRISONMIXEDASSISTEDWALL", HcInt_BeausoleilMorrisonMixedAssistingWall},
+            {"BEAUSOLEILMORRISONMIXEDOPPOSINGWALL", HcInt_BeausoleilMorrisonMixedOppossingWall},
+            {"BEAUSOLEILMORRISONMIXEDSTABLEFLOOR", HcInt_BeausoleilMorrisonMixedStableFloor},
+            {"BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR", HcInt_BeausoleilMorrisonMixedUnstableFloor},
+            {"BEAUSOLEILMORRISONMIXEDSTABLECEILING", HcInt_BeausoleilMorrisonMixedStableCeiling},
+            {"BEAUSOLEILMORRISONMIXEDUNSTABLECEILING", HcInt_BeausoleilMorrisonMixedUnstableCeiling},
+            {"FOHANNOPOLIDORIVERTICALWALL", HcInt_FohannoPolidoriVerticalWall},
+            {"KARADAGCHILLEDCEILING", HcInt_KaradagChilledCeiling},
+            {"ISO15099WINDOWS", HcInt_ISO15099Windows},
+            {"GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW", HcInt_GoldsteinNovoselacCeilingDiffuserWindow},
+            {"GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS", HcInt_GoldsteinNovoselacCeilingDiffuserWalls},
+            {"GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR",HcInt_GoldsteinNovoselacCeilingDiffuserFloor},
+        };
+
+        std::unordered_map<std::string, int> HcExt_ConvectionTypesMap = {
+            {"VALUE", -999},
+            {"SCHEDULE", -999},
+            {"TARP", TarpHcOutside},
+            {"MOWITT", MoWiTTHcOutside},
+            {"DOE-2", DOE2HcOutside},
+            {"ADAPTIVECONVECTIONALGORITHM", AdaptiveConvectionAlgorithm},
+            {"USERCURVE", HcExt_UserCurve},
+            {"ASHRAEVERTICALWALL", HcExt_NaturalASHRAEVerticalWall},
+            {"WALTONUNSTABLEHORIZONTALORTILT", HcExt_NaturalWaltonUnstableHorizontalOrTilt},
+            {"WALTONSTABLEHORIZONTALORTILT", HcExt_NaturalWaltonStableHorizontalOrTilt},
+            {"NUSSELTJURGES", HcExt_NusseltJurges},
+            {"MCADAMS", HcExt_McAdams},
+            {"MITCHELL", HcExt_Mitchell},
+            {"CLEARROOF", HcExt_ClearRoof},
+            {"EMMELVERTICAL", HcExt_EmmelVertical},
+            {"EMMELROOF", HcExt_EmmelRoof},
+            {"ALAMDARIHAMMONDVERTICALWALL", HcExt_AlamdariHammondVerticalWall},
+            {"FOHANNOPOLIDORIVERTICALWALL", HcExt_FohannoPolidoriVerticalWall},
+            {"ISO15099WINDOWS", HcExt_ISO15099Windows},
+            {"ALAMDARIHAMMONDSTABLEHORIZONTAL", HcExt_AlamdariHammondStableHorizontal},
+            {"ALAMDARIHAMMONDUNSTABLEHORIZONTAL", HcExt_AlamdariHammondUnstableHorizontal},
+            {"SIMPLECOMBINED", HcExt_ASHRAESimpleCombined},
+            {"TARPWINDWARD", HcExt_SparrowWindward},
+            {"TARPLEEWARD", HcExt_SparrowLeeward},
+            {"MOWITTWINDWARD", HcExt_MoWiTTWindward},
+            {"MOWITTLEEWARD", HcExt_MoWiTTLeeward},
+            {"DOE2WINDWARD", HcExt_DOE2Windward},
+            {"DOE2LEEWARD", HcExt_DOE2Leeward},
+            {"BLOCKENWINDWARD", HcExt_BlockenWindward},
+        };
         // INTERFACE BLOCK SPECIFICATIONS
         // na
 
@@ -1464,7 +1462,7 @@ namespace ConvectionCoefficients {
                         PotentialAssignedValue = 0;
                         std::string equationName = Alphas(Ptr + 1);
                         if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()){
-                            ExtValue = HcExt_ConvectionTypesMap[equationName];
+                            ExtValue = HcExt_ConvectionTypesMap.at(equationName);
 
                             if ((equationName == "SIMPLECOMBINED") || (equationName == "TARP") || (equationName == "MOWITT") || (equationName == "DOE-2") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
                                 PotentialAssignedValue = -ExtValue;
@@ -1544,7 +1542,7 @@ namespace ConvectionCoefficients {
                         PotentialAssignedValue = 0;
                         std::string equationName = Alphas(Ptr + 1);
                         if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
-                            IntValue = HcInt_ConvectionTypesMap[equationName];
+                            IntValue = HcInt_ConvectionTypesMap.at(equationName);
                             if ((equationName == "SIMPLE") || (equationName == "TARP") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
                                 ApplyConvectionValue(Alphas(1), "INSIDE", -IntValue);
                             } else if (equationName == "VALUE") {
@@ -1674,7 +1672,7 @@ namespace ConvectionCoefficients {
                     if (SELECT_CASE_var == "OUTSIDE") {
                         std::string equationName = Alphas(Ptr + 1);
                         if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
-                            ExtValue = HcExt_ConvectionTypesMap[equationName];
+                            ExtValue = HcExt_ConvectionTypesMap.at(equationName);
                             if (equationName == "SIMPLE") {
                                 ApplyConvectionValue(Alphas(1), "OUTSIDE", -ExtValue);
                             } else if (equationName == "VALUE") {
@@ -1755,7 +1753,7 @@ namespace ConvectionCoefficients {
                     } else if (SELECT_CASE_var == "INSIDE") {
                         std::string equationName = Alphas(Ptr + 1);
                         if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()){
-                            IntValue = HcInt_ConvectionTypesMap[equationName];
+                            IntValue = HcInt_ConvectionTypesMap.at(equationName);
                             if ((equationName == "SIMPLE") || (equationName == "TARP") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
                                 ApplyConvectionValue(Alphas(1), "INSIDE", -IntValue);
                             } else if (equationName == "VALUE") {
@@ -1978,7 +1976,7 @@ namespace ConvectionCoefficients {
                 &InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum
             };
             for (int i = 2; i <= NumAlphas-1; i+=2){ //up to 45
-                ErrorsFound = SetAdaptiveConvectionAlgoInsideCoefficient( AdaptiveConvectionAlgoInsideDefaults[(i/2)-1], cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1));
+                ErrorsFound = SetAdaptiveConvectionAlgoInsideCoefficient(HcInt_ConvectionTypesMap, AdaptiveConvectionAlgoInsideDefaults[(i/2)-1], cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1));
             }
         } // end of 'SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections'
 
@@ -2010,7 +2008,7 @@ namespace ConvectionCoefficients {
                 };
 
             for (int i = 2; i <= NumAlphas-1; i+=2){
-                ErrorsFound = SetAdaptiveConvectionAlgoOutsideCoefficient( AdaptiveConvectionAlgoOutsideDefaults[(i/2)-1], cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1));
+                ErrorsFound = SetAdaptiveConvectionAlgoOutsideCoefficient(HcExt_ConvectionTypesMap, AdaptiveConvectionAlgoOutsideDefaults[(i/2)-1], cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1));
             }
         } // end of 'SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections'
 
