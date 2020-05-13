@@ -8460,7 +8460,7 @@ namespace UnitarySystems {
                     } else if (DataGlobals::DoCoilDirectSolutions && CoolingLoad &&
                                this->m_CoolingCoilSubType_Num == DataHVACGlobals::CoilDX_SubcoolReheat && this->m_NumOfSpeedCooling == 1) {
                         HeatPLR = 0.0;
-                        this->calcUnitarySystemToLoad(AirLoopNum,
+                        this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                       FirstHVACIteration,
                                                       1.0,
                                                       HeatPLR,
@@ -8472,7 +8472,7 @@ namespace UnitarySystems {
                                                       SupHeaterLoad,
                                                       CompressorONFlag);
                         CoolPLR = (ZoneLoad - SensOutputOff) / (SensOutputOn - SensOutputOff);
-                        this->calcUnitarySystemToLoad(AirLoopNum,
+                        this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                       FirstHVACIteration,
                                                       CoolPLR,
                                                       HeatPLR,
@@ -8488,7 +8488,7 @@ namespace UnitarySystems {
                                this->m_NumOfSpeedCooling == 1) {
                         CoolPLR = (ZoneLoad - SensOutputOff) / (SensOutputOn - SensOutputOff);
                         HeatPLR = 0.0;
-                        this->calcUnitarySystemToLoad(AirLoopNum,
+                        this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                       FirstHVACIteration,
                                                       CoolPLR,
                                                       HeatPLR,
@@ -8556,7 +8556,7 @@ namespace UnitarySystems {
                                                         (this->FullOutput[this->m_CoolingSpeedNum] - this->FullOutput[this->m_CoolingSpeedNum - 1]);
                             CoolPLR = this->m_CoolingSpeedRatio;
                         }
-                        this->calcUnitarySystemToLoad(AirLoopNum,
+                        this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                       FirstHVACIteration,
                                                       CoolPLR,
                                                       HeatPLR,
