@@ -75,9 +75,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -120,7 +118,6 @@ namespace AirflowNetworkBalanceManager {
     // volume supply fan.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
     using DataAirLoop::AirToZoneNodeInfo;
@@ -6316,8 +6313,7 @@ namespace AirflowNetworkBalanceManager {
         NumOfExtNodes = AirflowNetworkNumOfExtSurfaces;
         for (ExtNum = 1; ExtNum <= NumOfExtNodes; ++ExtNum) {
             MultizoneExternalNodeData(ExtNum).ExtNum = AirflowNetworkNumOfZones + ExtNum;
-            ObjexxFCL::gio::write(Name, "('ExtNode',I4)") << ExtNum;
-            MultizoneExternalNodeData(ExtNum).Name = stripped(Name);
+            MultizoneExternalNodeData(ExtNum).Name = format("ExtNode{:4}", ExtNum);
         }
 
         // Associate each external node with SurfaceData
@@ -10710,7 +10706,6 @@ namespace AirflowNetworkBalanceManager {
 
         // Using/Aliasing
         using namespace DataEnvironment;
-        using namespace DataIPShortCuts;
 
         // Locals
         int WindDirNum;
