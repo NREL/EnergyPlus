@@ -1257,7 +1257,6 @@ namespace PlantChillers {
 
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcElectricChillerModel");
-
         this->EvapMassFlowRate = 0.0;
         this->CondMassFlowRate = 0.0;
         this->Power = 0.0;
@@ -1376,12 +1375,13 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !DataGlobals::WarmupFlag) {
                 this->PrintMessage = true;
-                std::string OutputChar; // character string for warning messages
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
                 this->MsgBuffer1 =
-                    "CalcElectricChillerModel - Chiller:Electric \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
-                this->MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar + " C. Occurrence info = " + DataEnvironment::EnvironmentName +
-                                   ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
+                    format("CalcElectricChillerModel - Chiller:Electric \"{}\" - Air Cooled Condenser Inlet Temperature below 0C", this->Name);
+                this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
+                                          DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                          DataEnvironment::EnvironmentName,
+                                          DataEnvironment::CurMnDy,
+                                          General::CreateSysTimeIntervalString());
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -1393,12 +1393,13 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !DataGlobals::WarmupFlag) {
                 this->PrintMessage = true;
-                std::string OutputChar; // character string for warning messages
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
                 this->MsgBuffer1 =
-                    "CalcElectricChillerModel - Chiller:Electric \"" + this->Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
-                this->MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar + " C. Occurrence info = " + DataEnvironment::EnvironmentName +
-                                   ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
+                    format("CalcElectricChillerModel - Chiller:Electric \"{}\" - Evap Cooled Condenser Inlet Temperature below 10C", this->Name);
+                this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
+                                          DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                          DataEnvironment::EnvironmentName,
+                                          DataEnvironment::CurMnDy,
+                                          General::CreateSysTimeIntervalString());
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -3154,12 +3155,13 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !DataGlobals::WarmupFlag) {
                 this->PrintMessage = true;
-                std::string OutputChar;
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
                 this->MsgBuffer1 =
-                    "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
-                this->MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar + " C. Occurrence info = " + DataEnvironment::EnvironmentName +
-                                   ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
+                    format("CalcEngineDrivenChillerModel - Chiller:EngineDriven \"{}\" - Air Cooled Condenser Inlet Temperature below 0C", this->Name);
+                this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
+                                          DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                          DataEnvironment::EnvironmentName,
+                                          DataEnvironment::CurMnDy,
+                                          General::CreateSysTimeIntervalString());
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -3169,12 +3171,13 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !DataGlobals::WarmupFlag) {
                 this->PrintMessage = true;
-                std::string OutputChar;
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
                 this->MsgBuffer1 =
-                    "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" + this->Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
-                this->MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar + " C. Occurrence info = " + DataEnvironment::EnvironmentName +
-                                   ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
+                    format("CalcEngineDrivenChillerModel - Chiller:EngineDriven \"{}\" - Evap Cooled Condenser Inlet Temperature below 10C", this->Name);
+                this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
+                                          DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                          DataEnvironment::EnvironmentName,
+                                          DataEnvironment::CurMnDy,
+                                          General::CreateSysTimeIntervalString());
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -4955,12 +4958,13 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !DataGlobals::WarmupFlag) {
                 this->PrintMessage = true;
-                std::string OutputChar;
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
                 this->MsgBuffer1 =
                     "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
-                this->MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar + " C. Occurrence info = " + DataEnvironment::EnvironmentName +
-                                   ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
+                this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
+                                          DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                          DataEnvironment::EnvironmentName,
+                                          DataEnvironment::CurMnDy,
+                                          General::CreateSysTimeIntervalString());
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -4970,12 +4974,13 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !DataGlobals::WarmupFlag) {
                 this->PrintMessage = true;
-                std::string OutputChar;
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
                 this->MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" + this->Name +
                                    "\" - Evap Cooled Condenser Inlet Temperature below 10C";
-                this->MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar + " C. Occurrence info = " + DataEnvironment::EnvironmentName +
-                                   ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
+                this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
+                                          DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                          DataEnvironment::EnvironmentName,
+                                          DataEnvironment::CurMnDy,
+                                          General::CreateSysTimeIntervalString());
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -6298,7 +6303,6 @@ namespace PlantChillers {
         Real64 EvapDeltaTemp;
         Real64 TempEvapOutSetPoint(0.0); // C - evaporator outlet temperature setpoint
         Real64 CurrentEndTime;  // end time of time step for current simulation time step
-        std::string OutputChar; // character string for warning messages
         Real64 COP;             // coefficient of performance
         Real64 Cp;              // local for fluid specif heat, for evaporator
         Real64 CpCond;          // local for fluid specif heat, for condenser
@@ -6439,11 +6443,13 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && !DataGlobals::WarmupFlag) {
                 this->PrintMessage = true;
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
                 this->MsgBuffer1 =
                     "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
-                this->MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar + " C. Occurrence info = " + DataEnvironment::EnvironmentName +
-                                   ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
+                this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
+                                          DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                          DataEnvironment::EnvironmentName,
+                                          DataEnvironment::CurMnDy,
+                                          General::CreateSysTimeIntervalString());
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
@@ -6453,11 +6459,13 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && !DataGlobals::WarmupFlag) {
                 this->PrintMessage = true;
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
                 this->MsgBuffer1 =
                     "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" + this->Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
-                this->MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar + " C. Occurrence info = " + DataEnvironment::EnvironmentName +
-                                   ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
+                this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
+                                          DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                          DataEnvironment::EnvironmentName,
+                                          DataEnvironment::CurMnDy,
+                                          General::CreateSysTimeIntervalString());
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
                 this->PrintMessage = false;
