@@ -45,7 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/OutputFiles.hh>
 
 #include "DataStringGlobals.hh"
@@ -53,17 +52,16 @@
 
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 
 namespace EnergyPlus {
 
-OutputFile &OutputFile::ensure_open()
+OutputFile &OutputFile::ensure_open(const std::string &caller)
 {
     if (!good()) {
         open();
     }
     if (!good()) {
-        ShowFatalError("OpenOutputFiles: Could not open file " + fileName + " for output (write).");
+        ShowFatalError(fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
     }
     return *this;
 }
