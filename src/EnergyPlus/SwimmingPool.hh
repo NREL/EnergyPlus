@@ -191,6 +191,13 @@ namespace SwimmingPool {
 
     void GetSwimmingPool();
 
+    void ErrorCheckSetupPoolSurface(int const Item,
+                                    std::string const Alpha1,
+                                    std::string const Alpha2,
+                                    std::string const cAlphaField2,
+                                    bool &ErrorsFound
+    );
+
     void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration);
 
     void UpdatePoolSourceValAvg(bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
