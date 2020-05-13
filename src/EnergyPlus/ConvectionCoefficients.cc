@@ -1543,8 +1543,11 @@ namespace ConvectionCoefficients {
                         IntValue = 0;
                         PotentialAssignedValue = 0;
                         std::string equationName = Alphas(Ptr + 1);
-                        if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()){
-                            if(equationName == "VALUE") {
+                        if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
+                            IntValue = HcInt_ConvectionTypesMap[equationName];
+                            if ((equationName == "SIMPLE") || (equationName == "TARP") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
+                                ApplyConvectionValue(Alphas(1), "INSIDE", -IntValue);
+                            } else if (equationName == "VALUE") {
                                 ++TotIntConvCoeff;
                                 UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
                                 UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
@@ -1565,8 +1568,7 @@ namespace ConvectionCoefficients {
                                                       cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
                                 PotentialAssignedValue = TotIntConvCoeff;
-                            }
-                            else if (equationName == "SCHEDULE") {
+                            } else if (equationName == "SCHEDULE") {
                                 ++TotIntConvCoeff;
                                 UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
                                 UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
@@ -1580,59 +1582,54 @@ namespace ConvectionCoefficients {
                                     UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
                                 }
                                 PotentialAssignedValue = TotIntConvCoeff;
-                            }
-                            else{
-                                IntValue = HcInt_ConvectionTypesMap[equationName];
-                            }
-                        }
+                            } else if (IntValue == HcInt_UserCurve) {
+                                ++TotIntConvCoeff;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
+                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex =
+                                    UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcInsideUserCurve);
+                                if (UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex == 0) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
+                                    ErrorsFound = true;
+                                }
+                                PotentialAssignedValue = TotIntConvCoeff;
+                            } else if (IntValue > HcInt_UserCurve) {
+                                // specificmodel
+                                ++TotIntConvCoeff;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
+                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                UserIntConvectionCoeffs(TotIntConvCoeff).HcModelEq = IntValue;
+                                PotentialAssignedValue = TotIntConvCoeff;
 
-                        if (IntValue == HcInt_UserCurve) {
-                            ++TotIntConvCoeff;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                            UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex =
-                                UtilityRoutines::FindItemInList(Alphas(Ptr + 3), HcInsideUserCurve);
-                            if (UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex == 0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
-                                ErrorsFound = true;
-                            }
-                            PotentialAssignedValue = TotIntConvCoeff;
-                        } else if (IntValue > HcInt_UserCurve) {
-                            // specificmodel
-                            ++TotIntConvCoeff;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                            UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                            UserIntConvectionCoeffs(TotIntConvCoeff).HcModelEq = IntValue;
-                            PotentialAssignedValue = TotIntConvCoeff;
-
-                        } else {
-                            // treat CeilingDiffuser and TrombeWall special
-                            if (UtilityRoutines::SameString(Alphas(Ptr + 1), "CEILINGDIFFUSER") ||
-                                UtilityRoutines::SameString(Alphas(Ptr + 1), "TROMBEWALL")) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError("Invalid Value Entered, for " + cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
-                                ShowContinueError("invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1) +
-                                                  "\". This type is only applicable at a Zone level.");
-                                ErrorsFound = true;
-                            } else { // really invalid
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
-                                ShowContinueError("Invalid Value Entered, for " + cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
-                                ShowContinueError("invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1));
-                                ErrorsFound = true;
+                            } else {
+                                // treat CeilingDiffuser and TrombeWall special
+                                if (UtilityRoutines::SameString(Alphas(Ptr + 1), "CEILINGDIFFUSER") ||
+                                    UtilityRoutines::SameString(Alphas(Ptr + 1), "TROMBEWALL")) {
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError("Invalid Value Entered, for " + cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
+                                    ShowContinueError("invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1) +
+                                                      "\". This type is only applicable at a Zone level.");
+                                    ErrorsFound = true;
+                                } else { // really invalid
+                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
+                                    ShowContinueError("Invalid Value Entered, for " + cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr));
+                                    ShowContinueError("invalid value in " + cAlphaFieldNames(Ptr + 1) + '=' + Alphas(Ptr + 1));
+                                    ErrorsFound = true;
+                                }
                             }
                         }
                         if (Surface(Found).IntConvCoeff != 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate (inside)");
                             ShowContinueError("Duplicate (Inside) assignment attempt.");
                             ErrorsFound = true;
-                        } else if (SELECT_CASE_var == BlankString) { // Blank
-
                         } else {
                             Surface(Found).IntConvCoeff = PotentialAssignedValue;
                         }
+
+                    } else if (SELECT_CASE_var == BlankString) { // Blank
 
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
