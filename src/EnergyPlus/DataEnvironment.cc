@@ -171,6 +171,10 @@ namespace DataEnvironment {
     Real64 PDIFLW;                            // Luminous efficacy (lum/W) of sky diffuse solar radiation
     Real64 SkyClearness;                      // Sky clearness (see subr. DayltgLuminousEfficacy)
     Real64 SkyBrightness;                     // Sky brightness (see subr. DayltgLuminousEfficacy)
+
+    Real64 TotalCloudCover;  // Total Cloud Cover 
+    Real64 OpaqueCloudCover; // Opaque Cloud Cover 
+
     Real64 StdBaroPress(StdPressureSeaLevel); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
     Real64 StdRhoAir;                         // Standard "rho air" set in WeatherManager - based on StdBaroPress
     Real64 rhoAirSTP;                         // Standard density of dry air at 101325 Pa, 20.0C temperaure
@@ -305,6 +309,10 @@ namespace DataEnvironment {
         PDIFLW = Real64();
         SkyClearness = Real64();
         SkyBrightness = Real64();
+
+        TotalCloudCover = Real64();  // Total Cloud Cover
+        OpaqueCloudCover = Real64(); // Opaque Cloud Cover 
+
         StdBaroPress = 101325.0;
         StdRhoAir = Real64();
         TimeZoneNumber = Real64();

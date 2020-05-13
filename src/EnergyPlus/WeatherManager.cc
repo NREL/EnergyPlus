@@ -923,6 +923,11 @@ namespace WeatherManager {
             SetupOutputVariable("Site Daylighting Model Sky Clearness", OutputProcessor::Unit::None, SkyClearness, "Zone", "Average", "Environment");
             SetupOutputVariable(
                 "Site Daylighting Model Sky Brightness", OutputProcessor::Unit::None, SkyBrightness, "Zone", "Average", "Environment");
+            
+            SetupOutputVariable("Site Total Cloud Cover", OutputProcessor::Unit::None, TotalCloudCover, "Zone", "Average", "Environment");
+            SetupOutputVariable(
+                "Site Total Cloud Cover", OutputProcessor::Unit::None, OpaqueCloudCover, "Zone", "Average", "Environment");
+            
             SetupOutputVariable("Site Daylight Saving Time Status", OutputProcessor::Unit::None, DSTIndicator, "Zone", "State", "Environment");
             SetupOutputVariable("Site Day Type Index", OutputProcessor::Unit::None, RptDayType, "Zone", "State", "Environment");
             SetupOutputVariable("Site Mains Water Temperature", OutputProcessor::Unit::C, WaterMainsTemp, "Zone", "Average", "Environment");
