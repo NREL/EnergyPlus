@@ -115,6 +115,8 @@ namespace ConvectionCoefficients {
     Real64 constexpr AdaptiveHcInsideLowLimit{0.5};  // W/m2-K
     Real64 constexpr AdaptiveHcOutsideLowLimit{1.0}; // W/m2-K
 
+    static std::string const BlankString;
+
     Real64 constexpr OneThird{1.0 / 3.0};   // 1/3 in highest precision
     Real64 constexpr OneFourth{1.0 / 4.0};  // 1/4 in highest precision
     Real64 constexpr OneFifth{1.0 / 5.0};   // 1/5 in highest precision
@@ -1626,6 +1628,8 @@ namespace ConvectionCoefficients {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate (inside)");
                             ShowContinueError("Duplicate (Inside) assignment attempt.");
                             ErrorsFound = true;
+                        } else if (SELECT_CASE_var == BlankString) { // Blank
+
                         } else {
                             Surface(Found).IntConvCoeff = PotentialAssignedValue;
                         }
@@ -1672,7 +1676,7 @@ namespace ConvectionCoefficients {
                     auto const SELECT_CASE_var(Alphas(Ptr));
                     if (SELECT_CASE_var == "OUTSIDE") {
                         std::string equationName = Alphas(Ptr + 1);
-                        if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()){
+                        if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
                             ExtValue = HcExt_ConvectionTypesMap[equationName];
                             if (equationName == "SIMPLE") {
                                 ApplyConvectionValue(Alphas(1), "OUTSIDE", -ExtValue);
@@ -1694,8 +1698,8 @@ namespace ConvectionCoefficients {
                                 UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
-                                    ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
-                                                      '=' + Alphas(Ptr + 2) + " is ignored.");
+                                    ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " +
+                                                      cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
                                 ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
                             } else if (equationName == "SCHEDULE") {
@@ -1737,10 +1741,19 @@ namespace ConvectionCoefficients {
                                 PotentialAssignedValue = TotExtConvCoeff;
                                 ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
                             } else {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
-                                ShowContinueError("Check Input Entered :" + Alphas(Ptr + 1));
-                                ErrorsFound = true;
+                                ++TotExtConvCoeff;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                UserExtConvectionCoeffs(TotExtConvCoeff).HcModelEq = ExtValue;
+                                PotentialAssignedValue = TotExtConvCoeff;
+                                ApplyConvectionValue(Alphas(1), "OUTSIDE", TotExtConvCoeff);
                             }
+                        }
+                        else {
+                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
+                            ShowContinueError("Check Input Entered :" + Alphas(Ptr + 1));
+                            ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "INSIDE") {
                         std::string equationName = Alphas(Ptr + 1);
@@ -1748,7 +1761,7 @@ namespace ConvectionCoefficients {
                             IntValue = HcInt_ConvectionTypesMap[equationName];
                             if ((equationName == "SIMPLE") || (equationName == "TARP") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
                                 ApplyConvectionValue(Alphas(1), "INSIDE", -IntValue);
-                            } else if (equationName == "VALUE") { // Value
+                            } else if (equationName == "VALUE") {
                                 // SimpleValueAssignment via UserExtConvectionCoeffs array
                                 ++TotIntConvCoeff;
                                 UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
@@ -1759,9 +1772,6 @@ namespace ConvectionCoefficients {
                                                       RoundSigDigits(Numbers(NumField), 5) + "].");
                                     ShowContinueError("Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
                                                       ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
-                                    //            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
-                                    //                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
-                                    //                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
                                     ShowContinueError("Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
@@ -1773,7 +1783,7 @@ namespace ConvectionCoefficients {
                                                       '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
                                 ApplyConvectionValue(Alphas(1), "INSIDE", TotIntConvCoeff);
-                            } else if (equationName == "SCHEDULE") { // Schedule
+                            } else if (equationName == "SCHEDULE") {
                                 ++TotIntConvCoeff;
                                 UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
                                 UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
@@ -1828,6 +1838,8 @@ namespace ConvectionCoefficients {
                                 }
                             }
                         }
+                    } else if (SELECT_CASE_var == BlankString) { // Blank
+
                     } else { // Error Case
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                         ShowContinueError(" Invalid " + cAlphaFieldNames(Ptr) + " entered=" + Alphas(Ptr));
