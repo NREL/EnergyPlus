@@ -135,8 +135,6 @@ namespace BaseboardRadiator {
         using General::TrimSigDigits;
         using PlantUtilities::SetActuatedBranchFlowRate;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int BaseboardNum;               // index of unit in baseboard array
         static bool GetInputFlag(true); // one time get input flag
         Real64 QZnReq;                  // zone load not yet satisfied
@@ -529,7 +527,6 @@ namespace BaseboardRadiator {
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
         static Array1D_bool MyEnvrnFlag;
-        Real64 RhoAirStdInit;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
         bool errFlag;
@@ -583,7 +580,6 @@ namespace BaseboardRadiator {
 
         // Do the Begin Environment initializations
         if (BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum) && !baseboard.Baseboard(BaseboardNum).SetLoopIndexFlag) {
-            RhoAirStdInit = StdRhoAir;
             WaterInletNode = baseboard.Baseboard(BaseboardNum).WaterInletNode;
             rho = GetDensityGlycol(PlantLoop(baseboard.Baseboard(BaseboardNum).LoopNum).FluidName,
                                    DataGlobals::HWInitConvTemp,
@@ -1053,9 +1049,7 @@ namespace BaseboardRadiator {
         if (baseboard.Baseboard(BaseboardNum).MySizeFlag) QZnReq = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad; // If in sizing, assign design condition
 
         WaterInletTemp = baseboard.Baseboard(BaseboardNum).WaterInletTemp;
-        WaterOutletTemp = WaterInletTemp;
         AirInletTemp = baseboard.Baseboard(BaseboardNum).AirInletTemp;
-        AirOutletTemp = AirInletTemp;
 
         CpWater = GetSpecificHeatGlycol(
             PlantLoop(baseboard.Baseboard(BaseboardNum).LoopNum).FluidName, WaterInletTemp, PlantLoop(baseboard.Baseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
@@ -1190,11 +1184,5 @@ namespace BaseboardRadiator {
     }
 
 } // namespace BaseboardRadiator
-
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//******************************************************************************************************
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//******************************************************************************************************
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 } // namespace EnergyPlus
