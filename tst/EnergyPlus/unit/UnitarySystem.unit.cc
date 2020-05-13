@@ -400,7 +400,11 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 
     EXPECT_DOUBLE_EQ(0.159, WaterCoils::WaterCoil(CoilNum).DesAirVolFlowRate);
     EXPECT_NEAR(6779.0, WaterCoils::WaterCoil(CoilNum).DesWaterCoolingCoilRate, 1.0);
+    EXPECT_EQ(20.0, WaterCoils::WaterCoil(CoilNum).DesInletAirTemp); // coil inlet does not include fan heat
+    // save coil capacity for comparison to UnitarySyste
     Real64 coil1CoolingCoilRate = WaterCoils::WaterCoil(CoilNum).DesWaterCoolingCoilRate;
+    // save cooling coil air flow rate for use in fan heat calculation
+    Real64 coil1CoolingAirFlowRate = WaterCoils::WaterCoil(CoilNum).DesAirVolFlowRate;
 
     // reset coil sizing for next test
     WaterCoils::WaterCoil(CoilNum).DesAirVolFlowRate = DataSizing::AutoSize;
@@ -455,6 +459,37 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     WaterCoils::WaterCoil(CoilNum).DesOutletAirHumRat = DataSizing::AutoSize;
     WaterCoils::WaterCoil(CoilNum).MaxWaterVolFlowRate = DataSizing::AutoSize;
 
+    // resize cooling coil with fan on branch
+    CoilNum = 1;
+    Fans::Fan.allocate(1);
+    Fans::Fan(1).DeltaPress = 600.0;
+    Fans::Fan(1).FanEff = 0.9;
+    Fans::Fan(1).MotEff = 0.7;
+    Fans::Fan(1).MotInAirFrac = 1.0;
+
+    DataAirSystems::PrimaryAirSystem(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+    DataAirSystems::PrimaryAirSystem(1).supFanVecIndex = 1;
+    DataAirSystems::PrimaryAirSystem(1).SupFanNum = 1;
+    DataAirSystems::PrimaryAirSystem(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+    Real64 FanCoolLoad = Fans::FanDesHeatGain(state, DataAirSystems::PrimaryAirSystem(1).SupFanNum, coil1CoolingAirFlowRate);
+    WaterCoils::SizeWaterCoil(state, CoilNum);
+
+    EXPECT_NEAR(FanCoolLoad, 106.0, 1.0); // make sure there is enough fan heat to change results
+    EXPECT_NEAR(6779.0 + FanCoolLoad, WaterCoils::WaterCoil(CoilNum).DesWaterCoolingCoilRate, 1.0);
+    EXPECT_NEAR(20.541, WaterCoils::WaterCoil(CoilNum).DesInletAirTemp, 0.001); // coil inlet does include fan heat
+
+    // reset coil sizing for next test
+    WaterCoils::WaterCoil(CoilNum).DesAirVolFlowRate = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(CoilNum).DesInletAirTemp = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(CoilNum).DesOutletAirTemp = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(CoilNum).DesInletWaterTemp = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(CoilNum).DesInletAirHumRat = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(CoilNum).DesOutletAirHumRat = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(CoilNum).MaxWaterVolFlowRate = DataSizing::AutoSize;
+    // reset primary air system fan type and location as if is doesn't exist
+    DataAirSystems::PrimaryAirSystem(1).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+    DataAirSystems::PrimaryAirSystem(1).supFanLocation = DataAirSystems::fanPlacement::fanPlaceNotSet;
+
     // size same coils in UnitarySystem
     int AirLoopNum(1);
     bool FirstHVACIteration(true);
@@ -481,9 +516,16 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 
     mySys->sizeSystem(state, FirstHVACIteration, AirLoopNum);
 
-    // Show coil sizes in UnitarySystem
+    // Show coil sizes in UnitarySystem, cooling coil does not include fan heat
+    // Same sizes as coil on branch without fan heat
     EXPECT_NEAR(6672.0, WaterCoils::WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
+    EXPECT_EQ(20.0, WaterCoils::WaterCoil(CoilNum).DesInletAirTemp); // coil inlet does not include fan heat
+    // heating coil in UnitarySystem sized at higher air flow rate, i.e., not using SysAirMinFlowRat
     EXPECT_NEAR(3848.0, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate, 1.0);
+    // note size of heating coil on branch is smaller than heating coil in UnitarySystem minus 10 W 
+    EXPECT_LT(coil2HeatingCoilRate, 3838.0);
+    // heating flow rate of coil in UnitarySystem NOT adjusted by FinalSysSizing(1).SysAirMinFlowRat = 0.3
+    EXPECT_NEAR(0.159, WaterCoils::WaterCoil(CoilNum).DesAirVolFlowRate, 0.00001);
 
     // the water cooling coil sizes are only different by the air density used in capacity calculation
     // water coils use StdRhoAir and UnitarySystem coils use actual air density
@@ -496,8 +538,52 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     EXPECT_NEAR(coil1CoolingCoilRate, rhoRatio * WaterCoils::WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
     EXPECT_NEAR(coil1CoolingCoilRate, rhoRatio * mySys->m_DesignCoolingCapacity, 1.0);
     // the heating coils are sized differently since SysAirMinFlowRat is not accounted for
-    EXPECT_NE(coil2HeatingCoilRate, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate);
-    EXPECT_NE(coil2HeatingCoilRate, mySys->m_DesignHeatingCapacity);
+    EXPECT_LT(coil2HeatingCoilRate, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate);
+    EXPECT_LT(coil2HeatingCoilRate, mySys->m_DesignHeatingCapacity);
+
+    // add fan to UnitarySystem
+    mySys->m_FanExists = true;
+    mySys->m_FanIndex = 1;
+    mySys->m_FanPlace = UnitarySys::FanPlace::BlowThru;
+    // reset sizing information
+    mySys->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
+    mySys->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
+    mySys->m_CoolingSAFMethod = DataSizing::SupplyAirFlowRate;
+    mySys->m_HeatingSAFMethod = DataSizing::SupplyAirFlowRate;
+    mySys->m_DesignCoolingCapacity = DataSizing::AutoSize;
+    mySys->m_DesignHeatingCapacity = DataSizing::AutoSize;
+    // pretend this is first call and UnitarySystem doesn't know the coil index
+    mySys->m_CoolingCoilIndex = 0;
+    mySys->m_HeatingCoilIndex = 0;
+    WaterCoils::MySizeFlag = true;
+    WaterCoils::WaterCoil(1).DesAirVolFlowRate = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(1).DesInletAirTemp = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(1).DesOutletAirTemp = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(1).DesInletWaterTemp = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(1).DesInletAirHumRat = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(1).DesOutletAirHumRat = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(1).MaxWaterVolFlowRate = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(1).MaxWaterVolFlowRate = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(2).DesAirVolFlowRate = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(2).DesInletAirTemp = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(2).DesOutletAirTemp = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(2).DesInletWaterTemp = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(2).DesInletAirHumRat = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(2).DesOutletAirHumRat = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(2).MaxWaterVolFlowRate = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(2).MaxWaterVolFlowRate = DataSizing::AutoSize;
+    WaterCoils::WaterCoil(1).DesWaterCoolingCoilRate = 0.0; // reset these to be sure they get recalculated
+    WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate = 0.0;
+
+    mySys->sizeSystem(state, FirstHVACIteration, AirLoopNum);
+
+    // Show coil sizes in UnitarySystem, cooling coil now includes fan heat
+    // Same sizes as coil on branch with fan heat
+    EXPECT_NEAR(6672.0 + FanCoolLoad, WaterCoils::WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
+    EXPECT_NEAR(6672.0 + FanCoolLoad, mySys->m_DesignCoolingCapacity, 1.0);
+    EXPECT_NEAR(20.541, WaterCoils::WaterCoil(1).DesInletAirTemp, 0.001); // coil inlet does include fan heat
+    // the heating coils are sized differently since SysAirMinFlowRat is not accounted for
+    EXPECT_NEAR(3848.0, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate, 1.0);
 }
 
 TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
