@@ -56,30 +56,21 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/UnitHeater.hh>
-#include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/WindowAC.hh>
 
 namespace EnergyPlus {
 
@@ -1852,8 +1843,6 @@ std::string ReportCoilSelection::getTimeText(int const timeStepAtPeak)
     int minutes(0);
     int timeStepIndex(0);
     int hourPrint;
-    std::string hrMinString;
-    std::string dateString;
     for (int hourCounter = 1; hourCounter <= 24; ++hourCounter) {
         for (int timeStepCounter = 1; timeStepCounter <= DataGlobals::NumOfTimeStepInHour; ++timeStepCounter) {
             ++timeStepIndex;
@@ -1865,8 +1854,7 @@ std::string ReportCoilSelection::getTimeText(int const timeStepAtPeak)
                 hourPrint = hourCounter - 1;
             }
             if (timeStepIndex == timeStepAtPeak) {
-                ObjexxFCL::gio::write(hrMinString, DataSizing::PeakHrMinFmt) << hourPrint << minutes;
-                returnString = hrMinString;
+                returnString = format(DataSizing::PeakHrMinFmt, hourPrint, minutes);
             }
         }
     }

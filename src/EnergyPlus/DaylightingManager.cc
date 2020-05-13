@@ -63,7 +63,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataDaylighting.hh>
@@ -93,7 +92,6 @@
 #include <EnergyPlus/SolarReflectionManager.hh>
 #include <EnergyPlus/SurfaceOctree.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
 
 namespace EnergyPlus {
@@ -190,7 +188,6 @@ namespace DaylightingManager {
 
     // MODULE VARIABLE DECLARATIONS:
     int TotWindowsWithDayl(0);         // Total number of exterior windows in all daylit zones
-    int OutputFileDFS(0);              // Unit number for daylight factors
     Array1D<Real64> DaylIllum;         // Daylight illuminance at reference points (lux)
     int maxNumRefPtInAnyZone(0);       // The most number of reference points that any single zone has
     int maxNumRefPtInAnyEncl(0);       // The most number of reference points that any single enclosure has
@@ -269,7 +266,6 @@ namespace DaylightingManager {
         ReportIllumMap_firstTime = true;
         SQFirstTime = true;
         TotWindowsWithDayl = 0;
-        OutputFileDFS = 0;
         DaylIllum.deallocate();
         maxNumRefPtInAnyZone = 0;
         maxNumRefPtInAnyEncl = 0;
@@ -552,7 +548,6 @@ namespace DaylightingManager {
         Real64 DaylFac2; // sky daylight factor at ref pt 2
 
         // added for output all daylight factors
-        int write_stat;
         Real64 DFClrSky1;
         Real64 DFClrTbSky1;
         Real64 DFIntSky1;
@@ -817,24 +812,19 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-            OutputFileDFS = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("write");
-                ObjexxFCL::gio::open(OutputFileDFS, DataStringGlobals::outputDfsFileName, flags);
-                write_stat = flags.ios();
-            }
-            if (write_stat != 0) {
-                ShowFatalError("CalcDayltgCoefficients: Could not open file " + DataStringGlobals::outputDfsFileName + " for output (write).");
-            } else {
-                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "This file contains daylight factors for all exterior windows of daylight zones.";
-                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "If only one reference point the last 4 columns in the data will be zero.";
-                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "MonthAndDay,Zone Name,Window Name,Window State";
-                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at "
-                                                   "Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for "
-                                                   "Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight "
-                                                   "Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at "
-                                                   "Reference point 2,Daylight Factor for Overcast Sky at Reference point 2";
+            try {
+                OutputFile &dfs = outputFiles.dfs.ensure_open();
+                print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
+                print(dfs, "{}\n", "If only one reference point the last 4 columns in the data will be zero.");
+                print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
+                print(dfs, "{}\n",
+                       "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at "
+                       "Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for "
+                       "Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight "
+                       "Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at "
+                       "Reference point 2,Daylight Factor for Overcast Sky at Reference point 2");
+            } catch (const std::exception &) {
+                ShowFatalError("CalcDayltgCoefficients: Could not open file " + OutputFiles::getSingleton().dfs.fileName + " for output (write).");
             }
             CreateDFSReportFile = false;
         }
@@ -864,15 +854,14 @@ namespace DaylightingManager {
                     for (ISlatAngle = 1; ISlatAngle <= ISA; ++ISlatAngle) {
                         if (ISlatAngle == 1) {
                             // base window without shades, screens, or blinds
-                            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << CurMnDy + ',' + Zone(ZoneNum).Name + ',' + Surface(IWin).Name + ",Base Window";
+                            print(outputFiles.dfs, "{},{},{},Base Window\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else if (ISlatAngle == 2 && ISA == 2) {
                             // window shade or blind with fixed slat angle
-                            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << CurMnDy + ',' + Zone(ZoneNum).Name + ',' + Surface(IWin).Name + ", ";
+                            print(outputFiles.dfs, "{},{},{}, \n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else {
                             // blind with variable slat angle
                             SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
-                            ObjexxFCL::gio::write(OutputFileDFS, fmtA)
-                                << CurMnDy + ',' + Zone(ZoneNum).Name + ',' + Surface(IWin).Name + ',' + RoundSigDigits(SlatAngle, 1);
+                            print(outputFiles.dfs, "{},{},{},{:.1R}\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name, SlatAngle);
                         }
 
                         for (IHR = 1; IHR <= 24; ++IHR) {
@@ -896,10 +885,17 @@ namespace DaylightingManager {
                             }
 
                             // write daylight factors - 4 sky types for each daylight ref point
-                            ObjexxFCL::gio::write(OutputFileDFS, fmtA)
-                                << RoundSigDigits(IHR) + ',' + RoundSigDigits(DFClrSky1, 5) + ',' + RoundSigDigits(DFClrTbSky1, 5) + ',' +
-                                       RoundSigDigits(DFIntSky1, 5) + ',' + RoundSigDigits(DFOcSky1, 5) + ',' + RoundSigDigits(DFClrSky2, 5) + ',' +
-                                       RoundSigDigits(DFClrTbSky2, 5) + ',' + RoundSigDigits(DFIntSky2, 5) + ',' + RoundSigDigits(DFOcSky2, 5);
+                            print(outputFiles.dfs,
+                                  "{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}\n",
+                                  IHR,
+                                  DFClrSky1,
+                                  DFClrTbSky1,
+                                  DFIntSky1,
+                                  DFOcSky1,
+                                  DFClrSky2,
+                                  DFClrTbSky2,
+                                  DFIntSky2,
+                                  DFOcSky2);
                         } // hour loop
                     }
                 }
@@ -932,7 +928,6 @@ namespace DaylightingManager {
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
         using General::SafeDivide;
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1019,7 +1014,6 @@ namespace DaylightingManager {
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
         using General::SafeDivide;
-        using namespace Vectors;
         using DataEnvironment::SunIsUp;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
@@ -1414,7 +1408,6 @@ namespace DaylightingManager {
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
         using General::SafeDivide;
-        using namespace Vectors;
         using DataEnvironment::SunIsUp;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
@@ -1840,7 +1833,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
         using General::BlindBeamBeamTrans;
         using General::POLYF;
@@ -2295,7 +2287,6 @@ namespace DaylightingManager {
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
         using General::POLYF;
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2583,7 +2574,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2795,7 +2785,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3021,7 +3010,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3127,7 +3115,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3173,7 +3160,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3230,7 +3216,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using namespace Vectors;
         using WindowComplexManager::DaylghtAltAndAzimuth;
 
         // Locals
@@ -10039,7 +10024,7 @@ namespace DaylightingManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt FmtA("(A)");
-        static ObjexxFCL::gio::Fmt HrFmt("(I2.2)");
+
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -10061,9 +10046,7 @@ namespace DaylightingManager {
         static Array1D_string SavedMnDy;
         static Array2D_string RefPts;
         std::string MapNoString;
-        std::string HrString;
         int linelen;
-        std::string AddXorYString;
         // BSLLC Start
         static Array1D<Real64> XValue;
         static Array1D<Real64> YValue;
@@ -10153,13 +10136,14 @@ namespace DaylightingManager {
             if (TimeStep == NumOfTimeStepInHour) { // Report only hourly
 
                 // Write X scale column header
-                ObjexxFCL::gio::write(HrString, HrFmt) << HourOfDay;
-                mapLine = ' ' + SavedMnDy(MapNum) + ' ' + HrString + ":00";
+                mapLine = format(" {} {:02}:00", SavedMnDy(MapNum), HourOfDay);
                 if (IllumMap(MapNum).HeaderXLineLengthNeeded) linelen = int(len(mapLine));
                 RefPt = 1;
                 for (X = 1; X <= IllumMap(MapNum).Xnum; ++X) {
-                    AddXorYString = std::string(1, MapColSep) + '(' + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt), 2) + ';' +
-                                    RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt), 2) + ")=";
+                    const auto AddXorYString = format("{}({:.2R};{:.2R})=",
+                                                      MapColSep,
+                                                      IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt),
+                                                      IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt));
                     if (IllumMap(MapNum).HeaderXLineLengthNeeded) linelen += int(len(AddXorYString));
                     mapLine += AddXorYString;
                     ++RefPt;
@@ -10377,7 +10361,7 @@ namespace DaylightingManager {
         ShowFatalError("CloseReportIllumMaps: Could not open file " + DataStringGlobals::outputMapTxtFileName + " for output (write).");
     }
 
-    void CloseDFSFile()
+    void CloseDFSFile(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10414,7 +10398,7 @@ namespace DaylightingManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (OutputFileDFS > 0) ObjexxFCL::gio::close(OutputFileDFS);
+        outputFiles.dfs.close();
     }
 
     void DayltgSetupAdjZoneListsAndPointers(OutputFiles &outputFiles)
@@ -10898,7 +10882,6 @@ namespace DaylightingManager {
         // METHODOLOGY EMPLOYED:na
         // REFERENCES:na
         // Using/Aliasing
-        using namespace Vectors;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS: na
