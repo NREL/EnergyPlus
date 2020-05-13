@@ -263,11 +263,6 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     
     // Tests for InitSwimmingPoolPlantLoopIndex
     SwimmingPool::clear_state();
-    DataSurfaces::clear_state();
-    DataHeatBalance::clear_state();
-    
-    // Tests for InitSwimmingPoolPlantLoopIndex
-    SwimmingPool::clear_state();
     NumSwimmingPools = 1;
     Pool.allocate(NumSwimmingPools);
     DataSurfaces::Surface.allocate(1);
