@@ -106,15 +106,15 @@ namespace EnergyPlus {
     };
 
     struct ChillerAbsorberData : BaseGlobalStruct {
-        int numBlastAbsorbers = 0;
+        int numAbsorbers = 0;
         bool getInput = true;
-        Array1D<ChillerAbsorption::BLASTAbsorberSpecs> BLASTAbsorber;
+        Array1D<ChillerAbsorption::BLASTAbsorberSpecs> absorptionChillers;
 
         void clear_state()
         {
-            numBlastAbsorbers = 0;
+            numAbsorbers = 0;
             getInput = true;
-            BLASTAbsorber.deallocate();
+            absorptionChillers.deallocate();
         }
     };
 
