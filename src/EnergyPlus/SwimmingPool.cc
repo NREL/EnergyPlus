@@ -435,7 +435,7 @@ namespace SwimmingPool {
             ShowSevereError(RoutineName + "Invalid " + cAlphaField2 + " = " + Alpha2);
             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alpha1);
             ErrorsFound = true;
-        } else if (DataSurfaces::Surface(Pool(Item).SurfacePtr).PartOfVentSlabOrRadiantSurface) {
+        } else if (DataSurfaces::Surface(Pool(Item).SurfacePtr).IsRadSurfOrVentSlabOrPool) {
             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha1 + "\", Invalid Surface");
             ShowContinueError(cAlphaField2 + "=\"" + Alpha2 + "\" has been used in another radiant system, ventilated slab, or pool.");
             ShowContinueError(
@@ -461,7 +461,7 @@ namespace SwimmingPool {
                 " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");
             ErrorsFound = true;
         } else { // ( Pool( Item ).SurfacePtr > 0 )
-            DataSurfaces::Surface(Pool(Item).SurfacePtr).PartOfVentSlabOrRadiantSurface = true;
+            DataSurfaces::Surface(Pool(Item).SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
             DataSurfaces::Surface(Pool(Item).SurfacePtr).IsPool = true;
             Pool(Item).SurfaceToPoolIndex(Pool(Item).SurfacePtr) = Item;
             Pool(Item).ZonePtr = DataSurfaces::Surface(Pool(Item).SurfacePtr).Zone;
