@@ -54,11 +54,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct ChillerGasAbsorptionData;
 
 namespace ChillerGasAbsorption {
 
@@ -201,7 +204,7 @@ namespace ChillerGasAbsorption {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(ChillerGasAbsorptionData &chillers, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -232,12 +235,7 @@ namespace ChillerGasAbsorption {
         );
     };
 
-    // Object Data
-    extern Array1D<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
-
-    void GetGasAbsorberInput();
-
-    void clear_state();
+    void GetGasAbsorberInput(ChillerGasAbsorptionData &chillers);
 
 } // namespace ChillerGasAbsorption
 

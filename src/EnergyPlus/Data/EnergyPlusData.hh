@@ -48,15 +48,28 @@
 #ifndef EnergyPlusData_hh_INCLUDED
 #define EnergyPlusData_hh_INCLUDED
 
-// EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
-
+// C++ Headers
+#include <unordered_map>
 #include <string>
 
-struct BaseGlobalStruct
-{
-    virtual void clear_state() = 0;
-};
+// EnergyPlus Headers
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerExhaustAbsorption.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/PlantChillers.hh>
+
+namespace EnergyPlus {
+
+    struct BaseGlobalStruct {
+        virtual void clear_state() = 0;
+    };
 
 //struct OutputReportTabular : BaseGlobalStruct
 //{
@@ -66,119 +79,248 @@ struct BaseGlobalStruct
 //    }
 //};
 
-struct DataGlobal : BaseGlobalStruct
-{
-    // Data
-    bool AnnualSimulation = false;
+    struct BoilersData : BaseGlobalStruct {
+        int numBoilers = 0;
+        bool getBoilerInputFlag = true;
+        Array1D<Boilers::BoilerSpecs> Boiler;
 
-    // MODULE VARIABLE DECLARATIONS:
-    std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
-
-    // MODULE PARAMETER DEFINITIONS
-    static constexpr int EndZoneSizingCalc = 4;
-
-    void clear_state() override {
-        AnnualSimulation = false;
-        DayOfSimChr = "0";
-    }
-};
-
-struct ExteriorEnergyUseData : BaseGlobalStruct
-{
-    struct ExteriorLightUsage
-    {
-        // Members
-        std::string Name;          // Descriptive name -- will show on reporting
-        int SchedPtr;              // Can be scheduled
-        Real64 DesignLevel;        // Consumption in Watts
-        Real64 Power;              // Power = DesignLevel * ScheduleValue
-        Real64 CurrentUse;         // Use for this time step
-        int ControlMode;           // Control mode Schedule Only or Astronomical Clock plus schedule
-        bool ManageDemand;         // Flag to indicate whether to use demand limiting
-        Real64 DemandLimit;        // Demand limit set by demand manager [W]
-        bool PowerActuatorOn;      // EMS flag
-        Real64 PowerActuatorValue; // EMS value
-        Real64 SumConsumption;     // sum of electric consumption [J] for reporting
-        Real64 SumTimeNotZeroCons; // sum of time of positive electric consumption [hr]
-
-                                   // Default Constructor
-        ExteriorLightUsage()
-            : SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ControlMode(1), ManageDemand(false), DemandLimit(0.0),
-            PowerActuatorOn(false), SumConsumption(0.0), SumTimeNotZeroCons(0.0)
+        void clear_state()
         {
+            numBoilers = 0;
+            getBoilerInputFlag = true;
+            Boiler.deallocate();
         }
     };
 
-    int NumExteriorLights = 0; // Number of Exterior Light Inputs
-    int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+    struct BoilerSteamData : BaseGlobalStruct {
+        int numBoilers = 0;
+        bool getSteamBoilerInput = true;
+        Array1D<BoilerSteam::BoilerSpecs> Boiler;
 
-    // Object Data
-    Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
-
-    void clear_state() override {
-        NumExteriorLights = 0;
-        NumExteriorEqs = 0;
-        ExteriorLights.deallocate();
-    }
-};
-
-struct FansData : BaseGlobalStruct
-{
-    // constants
-    static constexpr int ExhaustFanCoupledToAvailManagers = 150;
-    static constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
-
-    // members
-    int NumFans;
-    int NumNightVentPerf;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
-    bool GetFanInputFlag;      // Flag set to make sure you get input once
-    bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-    bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
-
-    FansData() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false), LocalTurnFansOff(false)
-    {
-    }
-
-    void clear_state() override
-    {
-        NumFans = 0;
-        NumNightVentPerf = 0;
-        GetFanInputFlag = true;
-        LocalTurnFansOn = false;
-        LocalTurnFansOff = false;
-    }
-};
-
-struct PipesData : BaseGlobalStruct
-{
-    // MODULE VARIABLE DECLARATIONS
-    int NumLocalPipes = 0;
-    bool GetPipeInputFlag = true;
-
-    void clear_state() override {
-        NumLocalPipes = 0;
-        GetPipeInputFlag = true;
-    }
-};
-
-struct EnergyPlusData : BaseGlobalStruct
-{
-    // module globals
-    DataGlobal dataGlobals;
-    ExteriorEnergyUseData exteriorEnergyUse;
-    FansData fans;
-    PipesData pipes;
-    //OutputReportTabular outputReportTabular;
-
-    // all clear states
-    void clear_state() override
-    {
-        dataGlobals.clear_state();
-        exteriorEnergyUse.clear_state();
-        fans.clear_state();
-        //outputReportTabular.clear_state();
-        pipes.clear_state();
+        void clear_state()
+        {
+            numBoilers = 0;
+            getSteamBoilerInput = true;
+            Boiler.deallocate();
+        }
     };
-};
 
+    struct ChillerAbsorberData : BaseGlobalStruct {
+        int numAbsorbers = 0;
+        bool getInput = true;
+        Array1D<ChillerAbsorption::BLASTAbsorberSpecs> absorptionChillers;
+
+        void clear_state()
+        {
+            numAbsorbers = 0;
+            getInput = true;
+            absorptionChillers.deallocate();
+        }
+    };
+
+    struct ChillerElectricEIRData : BaseGlobalStruct {
+        int NumElectricEIRChillers = 0;
+        bool getInputFlag = true;
+        Array1D<ChillerElectricEIR::ElectricEIRChillerSpecs> ElectricEIRChiller;
+
+        void clear_state()
+        {
+            NumElectricEIRChillers = 0;
+            getInputFlag = true;
+            ElectricEIRChiller.deallocate();
+        }
+    };
+
+    struct ChillerExhaustAbsorptionData : BaseGlobalStruct {
+        bool Sim_GetInput = true;
+        Array1D<ChillerExhaustAbsorption::ExhaustAbsorberSpecs> ExhaustAbsorber;
+
+        void clear_state()
+        {
+            Sim_GetInput = true;
+            ExhaustAbsorber.deallocate();
+        }
+    };
+
+    struct ChillerReformulatedEIRData : BaseGlobalStruct {
+        int NumElecReformEIRChillers = 0;
+        bool GetInputREIR = true;
+        Array1D<ChillerReformulatedEIR::ReformulatedEIRChillerSpecs> ElecReformEIRChiller;
+
+        void clear_state()
+        {
+            NumElecReformEIRChillers = 0;
+            GetInputREIR = true;
+            ElecReformEIRChiller.deallocate();
+        }
+    };
+
+    struct ChillerGasAbsorptionData : BaseGlobalStruct {
+        bool getGasAbsorberInputs = true;
+        Array1D<ChillerGasAbsorption::GasAbsorberSpecs> GasAbsorber;
+
+        void clear_state()
+        {
+            getGasAbsorberInputs = true;
+            GasAbsorber.deallocate();
+        }
+    };
+
+    struct ChillerIndirectAbsoprtionData :BaseGlobalStruct {
+        int NumIndirectAbsorbers = 0;
+        bool GetInput = true;
+        Array1D<ChillerIndirectAbsorption::IndirectAbsorberSpecs> IndirectAbsorber;
+
+
+        void clear_state()
+        {
+            NumIndirectAbsorbers = 0;
+            GetInput = true;
+            IndirectAbsorber.deallocate();
+        }
+    };
+
+    struct DataGlobal : BaseGlobalStruct {
+        // Data
+        bool AnnualSimulation = false;
+
+        // MODULE VARIABLE DECLARATIONS:
+        std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
+
+        // MODULE PARAMETER DEFINITIONS
+        static constexpr int EndZoneSizingCalc = 4;
+
+        void clear_state() override {
+            AnnualSimulation = false;
+            DayOfSimChr = "0";
+        }
+    };
+
+    struct ExteriorEnergyUseData : BaseGlobalStruct {
+
+        int NumExteriorLights = 0; // Number of Exterior Light Inputs
+        int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+        Array1D<ExteriorEnergyUse::ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
+        Array1D<ExteriorEnergyUse::ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
+        std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
+        bool GetExteriorEnergyInputFlag = true; // First time, input is "gotten"
+        ExteriorEnergyUseData() : NumExteriorLights(0), NumExteriorEqs(0), GetExteriorEnergyInputFlag(true) {}
+
+        void clear_state() {
+            NumExteriorLights = 0;
+            NumExteriorEqs = 0;
+            ExteriorLights.deallocate();
+            ExteriorEquipment.deallocate();
+            UniqueExteriorEquipNames.clear();
+            GetExteriorEnergyInputFlag = true;
+        }
+    };
+
+    struct FansData : BaseGlobalStruct {
+        // constants
+        static constexpr int ExhaustFanCoupledToAvailManagers = 150;
+        static constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
+
+        // members
+        int NumFans;
+        int NumNightVentPerf;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
+        bool GetFanInputFlag;      // Flag set to make sure you get input once
+        bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
+        bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
+
+        FansData() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false),
+                     LocalTurnFansOff(false) {}
+
+        void clear_state() override {
+            NumFans = 0;
+            NumNightVentPerf = 0;
+            GetFanInputFlag = true;
+            LocalTurnFansOn = false;
+            LocalTurnFansOff = false;
+        }
+    };
+
+    struct PipesData : BaseGlobalStruct {
+        int NumLocalPipes;
+        bool GetPipeInputFlag;
+
+        PipesData() : NumLocalPipes(0), GetPipeInputFlag(true) {}
+
+        void clear_state() override {
+            NumLocalPipes = 0;
+            GetPipeInputFlag = true;
+        }
+    };
+
+    struct PlantChillersData : BaseGlobalStruct {
+
+        int NumElectricChillers = 0;
+        int NumEngineDrivenChillers = 0;
+        int NumGTChillers = 0;
+        int NumConstCOPChillers = 0;
+
+        bool GetEngineDrivenInput = true;
+        bool GetElectricInput = true;
+        bool GetGasTurbineInput = true;
+        bool GetConstCOPInput = true;
+
+        Array1D<PlantChillers::ElectricChillerSpecs> ElectricChiller;
+        Array1D<PlantChillers::EngineDrivenChillerSpecs> EngineDrivenChiller;
+        Array1D<PlantChillers::GTChillerSpecs> GTChiller;
+        Array1D<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
+
+        void clear_state()
+        {
+            NumElectricChillers = 0;
+            NumEngineDrivenChillers = 0;
+            NumGTChillers = 0;
+            NumConstCOPChillers = 0;
+            GetEngineDrivenInput = true;
+            GetElectricInput = true;
+            GetGasTurbineInput = true;
+            GetConstCOPInput = true;
+            ElectricChiller.deallocate();
+            EngineDrivenChiller.deallocate();
+            GTChiller.deallocate();
+            ConstCOPChiller.deallocate();
+        }
+    };
+
+    struct EnergyPlusData : BaseGlobalStruct {
+        // module globals
+        BoilersData dataBoilers;
+        BoilerSteamData dataSteamBoilers;
+        ChillerAbsorberData dataChillerAbsorbers;
+        ChillerElectricEIRData dataChillerElectricEIR;
+        ChillerExhaustAbsorptionData dataChillerExhaustAbsorption;
+        ChillerIndirectAbsoprtionData dataChillerIndirectAbsorption;
+        ChillerGasAbsorptionData dataChillerGasAbsorption;
+        ChillerReformulatedEIRData dataChillerReformulatedEIR;
+        DataGlobal dataGlobals;
+        ExteriorEnergyUseData exteriorEnergyUse;
+        FansData fans;
+        PipesData pipes;
+        PlantChillersData dataPlantChillers;
+        //OutputReportTabular outputReportTabular;
+
+        // all clear states
+        void clear_state() override {
+            dataBoilers.clear_state();
+            dataSteamBoilers.clear_state();
+            dataChillerAbsorbers.clear_state();
+            dataChillerElectricEIR.clear_state();
+            dataChillerExhaustAbsorption.clear_state();
+            dataChillerGasAbsorption.clear_state();
+            dataChillerIndirectAbsorption.clear_state();
+            dataChillerReformulatedEIR.clear_state();
+            dataGlobals.clear_state();
+            exteriorEnergyUse.clear_state();
+            fans.clear_state();
+            //outputReportTabular.clear_state();
+            pipes.clear_state();
+            dataPlantChillers.clear_state();
+        };
+    };
+
+}
 #endif
