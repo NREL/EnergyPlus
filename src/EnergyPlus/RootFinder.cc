@@ -1393,6 +1393,10 @@ namespace RootFinder {
         // FLOW:
 
         CheckIncrementRoundOff = false;
+        // If max and min have not been evaluated yet, return
+        if (!RootFinderData.MinPoint.DefinedFlag || !RootFinderData.MaxPoint.DefinedFlag) {
+            return CheckIncrementRoundOff;
+        }
         // Check for round-off error in X increments since last iterate
         if ((RootFinderData.CurrentPoint.DefinedFlag) && (X > 0.0)) {
             // TODO: Use typical value for X averaged over successive iterations
