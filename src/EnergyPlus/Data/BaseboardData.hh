@@ -45,77 +45,43 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef BaseboardElectric_hh_INCLUDED
-#define BaseboardElectric_hh_INCLUDED
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+#ifndef ENERGYPLUS_BASEBOARDDATA_HH
+#define ENERGYPLUS_BASEBOARDDATA_HH
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus{
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct BaseboardElectricData;
+    struct BaseboardElectricData : BaseGlobalStruct {
+        int NumBaseboards = 0;
+        Array1D<BaseboardElectric::BaseboardParams> Baseboard;
+        Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
 
-namespace BaseboardElectric {
-
-    struct BaseboardParams
-    {
-        // Members
-        std::string EquipName;
-        std::string EquipType;
-        std::string Schedule;
-        int SchedPtr;
-        Real64 NominalCapacity;
-        Real64 BaseboardEfficiency;
-        Real64 AirInletTemp;
-        Real64 AirInletHumRat;
-        Real64 AirOutletTemp;
-        Real64 Power;
-        Real64 Energy;
-        Real64 ElecUseLoad;
-        Real64 ElecUseRate;
-        int ZonePtr;                  // point to the zone where the basebaord is located
-        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
-                                      // FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-        bool MySizeFlag;
-        bool CheckEquipName;
-
-        // Default Constructor
-        BaseboardParams()
-            : SchedPtr(0), NominalCapacity(0.0), BaseboardEfficiency(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0),
-              Energy(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), ZonePtr(0), HeatingCapMethod(0.0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
-              CheckEquipName(true)
+        void clear_state()
         {
+            NumBaseboards = 0;
+            Baseboard.deallocate();
+            BaseboardNumericFields.deallocate();
         }
     };
 
-    struct BaseboardNumericFieldData
-    {
-        // Members
-        Array1D_string FieldNames;
+    struct BaseboardRadiatorData : BaseGlobalStruct {
 
-        // Default Constructor
-        BaseboardNumericFieldData() = default;
+        int NumBaseboards = 0;
+        Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
+        Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
+
+        void clear_state()
+        {
+            NumBaseboards = 0;
+            Baseboard.deallocate();
+            BaseboardParamsNumericFields.deallocate();
+        }
     };
 
-    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
+}  // namespace EnergyPlus
 
-    void GetBaseboardInput(BaseboardElectricData &baseboard);
-
-    void InitBaseboard(EnergyPlusData &state, BaseboardElectricData &baseboard, int BaseboardNum, int ControlledZoneNum);
-
-    void SizeElectricBaseboard(EnergyPlusData &state, BaseboardElectricData &baseboard, int BaseboardNum);
-
-    void SimElectricConvective(BaseboardElectricData &baseboard, int BaseboardNum, Real64 LoadMet);
-
-} // namespace BaseboardElectric
-
-} // namespace EnergyPlus
-
-#endif
+#endif // ENERGYPLUS_BASEBOARDDATA_HH
