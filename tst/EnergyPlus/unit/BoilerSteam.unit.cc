@@ -100,4 +100,8 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     EXPECT_EQ(Boiler(NumBoilers).FullLoadCoef(2), 0.1);
     EXPECT_EQ(Boiler(NumBoilers).FullLoadCoef(3), 0.1);
     EXPECT_EQ(Boiler(NumBoilers).SizFac, 1.0);
+
+    // Additional tests for fuel type input
+    EXPECT_EQ(DataGlobalConstants::FuelType, "Gas");
+    EXPECT_FALSE(DataGlobalConstants::FuelTypeErrorsFound);
 }

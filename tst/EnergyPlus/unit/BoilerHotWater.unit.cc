@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 
@@ -61,6 +62,7 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::Boilers;
 using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::DataGlobalConstants;
 
 TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
 {
@@ -182,4 +184,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
     EXPECT_EQ(1, Boilers::NumBoilers);
     EXPECT_EQ(AutoSize, Boiler(1).VolFlowRate);
 
+    // Additional tests for fuel type input
+    EXPECT_EQ(DataGlobalConstants::FuelType, "Gas");
+    EXPECT_FALSE(DataGlobalConstants::FuelTypeErrorsFound);
 }

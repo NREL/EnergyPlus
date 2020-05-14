@@ -243,7 +243,7 @@ namespace DataGlobalConstants {
     extern int const iEvapCoolerDirectResearchSpecial;
 
     extern std::string FuelTypeInput;
-    extern std::string FuelTypeForOutputVar;
+    extern std::string FuelType;
     extern int FuelTypeNum;
     extern bool FuelTypeErrorsFound;
 
@@ -261,7 +261,7 @@ namespace DataGlobalConstants {
 
     std::string GetResourceTypeChar(int const ResourceTypeNum);
 
-    void ValidateFuelTypesWithAssignResourceTypeNum(std::string FuelTypeInput);
+    void ValidateFuelTypeWithAssignResourceTypeNum(std::string FuelTypeInput);
 
 } // namespace DataGlobalConstants
 

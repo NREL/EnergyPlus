@@ -314,7 +314,7 @@ namespace DataGlobalConstants {
     int const iEvapCoolerDirectResearchSpecial(1005);
     
     std::string FuelTypeInput;
-    std::string FuelTypeForOutputVar;
+    std::string FuelType;
     int FuelTypeNum;
     bool FuelTypeErrorsFound;
 
@@ -658,7 +658,7 @@ namespace DataGlobalConstants {
         return ResourceTypeChar;
     }
 
-    void ValidateFuelTypesWithAssignResourceTypeNum(std::string FuelTypeInput)
+    void ValidateFuelTypeWithAssignResourceTypeNum(std::string FuelTypeInput)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dareum Nam
@@ -672,43 +672,43 @@ namespace DataGlobalConstants {
         auto const SELECT_CASE_var(FuelTypeInput);
 
         if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeForOutputVar = "Electric";
+            FuelType = "Electric";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
 
         } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeForOutputVar = "Gas";
+            FuelType = "Gas";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
 
         } else if (SELECT_CASE_var == "DIESEL") {
-            FuelTypeForOutputVar = "Diesel";
+            FuelType = "Diesel";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
 
         } else if (SELECT_CASE_var == "GASOLINE") {
-            FuelTypeForOutputVar = "Gasoline";
+            FuelType = "Gasoline";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
 
         } else if (SELECT_CASE_var == "COAL") {
-            FuelTypeForOutputVar = "Coal";
+            FuelType = "Coal";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeForOutputVar = "FuelOil#1";
+            FuelType = "FuelOil#1";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeForOutputVar = "FuelOil#2";
+            FuelType = "FuelOil#2";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
 
         } else if (SELECT_CASE_var == "PROPANE") {
-            FuelTypeForOutputVar = "Propane";
+            FuelType = "Propane";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
 
         } else if (SELECT_CASE_var == "OTHERFUEL1") {
-            FuelTypeForOutputVar = "OtherFuel1";
+            FuelType = "OtherFuel1";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
 
         } else if (SELECT_CASE_var == "OTHERFUEL2") {
-            FuelTypeForOutputVar = "OtherFuel2";
+            FuelType = "OtherFuel2";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
 
         } else {

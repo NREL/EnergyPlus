@@ -208,7 +208,7 @@ namespace BoilerSteam {
 
             // Validate fuel types input
             DataGlobalConstants::FuelTypeInput = DataIPShortCuts::cAlphaArgs(2);
-            DataGlobalConstants::ValidateFuelTypesWithAssignResourceTypeNum(DataGlobalConstants::FuelTypeInput);
+            DataGlobalConstants::ValidateFuelTypeWithAssignResourceTypeNum(DataGlobalConstants::FuelTypeInput);
             if (DataGlobalConstants::FuelTypeErrorsFound) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
@@ -216,7 +216,7 @@ namespace BoilerSteam {
                 Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
                 ErrorsFound = true;
             } else {
-                Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelTypeForOutputVar;
+                Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelType;
                 Boiler(BoilerNum).FuelType = DataGlobalConstants::FuelTypeNum;
             }
             
