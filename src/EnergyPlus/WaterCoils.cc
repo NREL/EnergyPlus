@@ -2209,9 +2209,20 @@ namespace WaterCoils {
                 CompName = WaterCoil(CoilNum).Name;
                 RequestSizing(state, CompType, CompName, CoolingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
                 WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * TempSize; // inlet air mass flow rate is the autosized value
-                DataAirFlowUsedForSizing = TempSize; // many autosized inputs use the design (autosized) air volume flow rate, save this value
-                DataFlowUsedForSizing = TempSize;
-
+                // Check if the air volume flow rate is defined in parent HVAC equipment and set water coil design air volume flow rate accordingly
+                if (CurZoneEqNum > 0) {
+                    if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent) {
+                        DataAirFlowUsedForSizing = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                        DataFlowUsedForSizing = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                        WaterCoil(CoilNum).DesAirVolFlowRate = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                    } else {
+                        DataAirFlowUsedForSizing = TempSize; // many autosized inputs use the design (autosized) air volume flow rate, save this value
+                        DataFlowUsedForSizing = TempSize;
+                    }
+                } else {
+                    DataAirFlowUsedForSizing = TempSize; // many autosized inputs use the design (autosized) air volume flow rate, save this value
+                    DataFlowUsedForSizing = TempSize;
+                }
                 if (CurSysNum > 0 && CurOASysNum == 0) {
                     Real64 DesCoilExitHumRat(0.0); // fix coil sizing inconsistency
                     GetCoilDesFlowT(CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
@@ -2233,9 +2244,19 @@ namespace WaterCoils {
                 TempSize = AutoSize;
                 RequestSizing(state, CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName);
                 DataCapacityUsedForSizing = TempSize;
-                TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
+                TempSize = AutoSize;
                 RequestSizing(state, CompType, CompName, CoolingWaterflowSizing, SizingString, TempSize, bPRINT, RoutineName);
-                DataWaterFlowUsedForSizing = TempSize;
+                // Check if the water flow rate is defined in parent HVAC equipment and set water coil design water flow rate accordingly
+                if (CurZoneEqNum > 0) {
+                    if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent) {
+                        DataWaterFlowUsedForSizing = ZoneEqSizing(CurZoneEqNum).MaxCWVolFlow;
+                        WaterCoil(CoilNum).MaxWaterVolFlowRate = ZoneEqSizing(CurZoneEqNum).MaxCWVolFlow;
+                    } else {
+                        DataWaterFlowUsedForSizing = TempSize;
+                    }
+                } else {
+                    DataWaterFlowUsedForSizing = TempSize;
+                }
                 // end pre-sizing data calculations
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
@@ -2360,7 +2381,7 @@ namespace WaterCoils {
                     bPRINT = true;
                     SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m3/s]";
                 }
-                TempSize = DataAirFlowUsedForSizing;
+                TempSize = WaterCoil(CoilNum).DesAirVolFlowRate;
                 RequestSizing(state, CompType, CompName, CoolingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
                 WaterCoil(CoilNum).DesAirVolFlowRate = TempSize;
                 WaterCoil(CoilNum).DesAirMassFlowRate = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
@@ -2579,7 +2600,7 @@ namespace WaterCoils {
 
                 FieldNum = 2; // N2 , \field Maximum Water Flow Rate
                 SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m3/s]";
-                TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
+                TempSize = AutoSize;
                 SizingMethod = HeatingWaterflowSizing;
 
                 if (WaterCoil(CoilNum).CoilPerfInpMeth == NomCap && NomCapUserInp) {
@@ -2594,8 +2615,19 @@ namespace WaterCoils {
                     DataFractionUsedForSizing = 1.0;
                 }
                 RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
-                WaterCoil(CoilNum).MaxWaterVolFlowRate = TempSize;
-                DataWaterFlowUsedForSizing = WaterCoil(CoilNum).MaxWaterVolFlowRate;
+                // Check if the water flow rate is defined in parent HVAC equipment and set water coil design water flow rate accordingly
+                if (CurZoneEqNum > 0) {
+                    if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent) {
+                        DataWaterFlowUsedForSizing = ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow;
+                        WaterCoil(CoilNum).MaxWaterVolFlowRate = ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow;
+                    } else {
+                        DataWaterFlowUsedForSizing = TempSize;
+                        WaterCoil(CoilNum).MaxWaterVolFlowRate = TempSize;
+                    }
+                } else {
+                    DataWaterFlowUsedForSizing = TempSize;
+                    WaterCoil(CoilNum).MaxWaterVolFlowRate = TempSize;
+                }
                 DataConstantUsedForSizing = 0.0; // reset these in case NomCapUserInp was true
                 DataFractionUsedForSizing = 0.0;
                 if (WaterCoil(CoilNum).MaxWaterVolFlowRate <= 0.0) {

@@ -2118,6 +2118,7 @@ namespace FanCoilUnits {
             ZoneEqSizing(CurZoneEqNum).AirVolFlow = FanCoil(FanCoilNum).MaxAirVolFlow;
             ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FanCoil(FanCoilNum).DesCoolingLoad;
             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FanCoil(FanCoilNum).DesHeatingLoad;
+            ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = true;
         }
 
         if (ErrorsFound) {
