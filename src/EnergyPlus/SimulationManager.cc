@@ -421,7 +421,7 @@ namespace SimulationManager {
         if (DoOutputReporting) {
             DisplayString("Reporting Surfaces");
 
-            ReportSurfaces();
+            ReportSurfaces(outputFiles);
 
             SetupNodeVarsForReporting(outputFiles);
             MetersHaveBeenInitialized = true;
@@ -680,7 +680,7 @@ namespace SimulationManager {
 #ifdef EP_Detailed_Timings
         epStartTime("Closeout Reporting=");
 #endif
-        SimCostEstimate();
+        SimCostEstimate(state);
 
         ComputeTariff(); //     Compute the utility bills
 
@@ -1790,19 +1790,19 @@ namespace SimulationManager {
 
         // FLOW:
         StdOutputRecordCount = 0;
-        OutputFiles::getSingleton().eso.ensure_open();
+        OutputFiles::getSingleton().eso.ensure_open("OpenOutputFiles");
         print(OutputFiles::getSingleton().eso, "Program Version,{}\n", VerString);
 
         // Open the Initialization Output File
-        OutputFiles::getSingleton().eio.ensure_open();
+        OutputFiles::getSingleton().eio.ensure_open("OpenOutputFiles");
         print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        OutputFiles::getSingleton().mtr.ensure_open();
+        OutputFiles::getSingleton().mtr.ensure_open("OpenOutputFiles");
         print(OutputFiles::getSingleton().mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
-        OutputFiles::getSingleton().bnd.ensure_open();
+        OutputFiles::getSingleton().bnd.ensure_open("OpenOutputFiles");
         print(OutputFiles::getSingleton().bnd, "Program Version,{}\n", VerString);
     }
 
@@ -1875,7 +1875,7 @@ namespace SimulationManager {
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
 
-        OutputFiles::getSingleton().audit.ensure_open();
+        OutputFiles::getSingleton().audit.ensure_open("CloseOutputFiles");
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
         print(outputFiles.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
@@ -2131,7 +2131,7 @@ namespace SimulationManager {
             SimulateGroundDomains(state.dataGlobals, outputFiles, true);
         }
 
-        if (!ErrorsFound) SimCostEstimate(); // basically will get and check input
+        if (!ErrorsFound) SimCostEstimate(state); // basically will get and check input
         if (ErrorsFound) ShowFatalError("Previous conditions cause program termination.");
     }
 
