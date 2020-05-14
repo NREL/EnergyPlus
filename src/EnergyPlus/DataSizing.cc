@@ -633,38 +633,35 @@ namespace DataSizing {
     void ZoneSizingData::zeroMemberData(int const numOfTimeStepInDay)
     {
         if (!allocated(this->DOASSupMassFlowSeq)) return;
-        for (int timeStepIndex = 1; timeStepIndex <= numOfTimeStepInDay; ++timeStepIndex) {
-            this->DOASSupMassFlowSeq(timeStepIndex) = 0.0;
-            this->DOASHeatLoadSeq(timeStepIndex) = 0.0;
-            this->DOASCoolLoadSeq(timeStepIndex) = 0.0;
-            this->DOASHeatAddSeq(timeStepIndex) = 0.0;
-            this->DOASLatAddSeq(timeStepIndex) = 0.0;
-            this->DOASSupTempSeq(timeStepIndex) = 0.0;
-            this->DOASSupHumRatSeq(timeStepIndex) = 0.0;
-            this->DOASTotCoolLoadSeq(timeStepIndex) = 0.0;
-            this->HeatFlowSeq(timeStepIndex) = 0.0;
-            this->HeatFlowSeqNoOA(timeStepIndex) = 0.0;
-            this->HeatLoadSeq(timeStepIndex) = 0.0;
-            // not used directly in output report
-            this->HeatZoneTempSeq(timeStepIndex) = 0.0;
-            this->DesHeatSetPtSeq(timeStepIndex) = 0.0;
-            this->HeatOutTempSeq(timeStepIndex) = 0.0;
-            this->HeatZoneRetTempSeq(timeStepIndex) = 0.0;
-            this->HeatTstatTempSeq(timeStepIndex) = 0.0;
-            this->HeatZoneHumRatSeq(timeStepIndex) = 0.0;
-            this->HeatOutHumRatSeq(timeStepIndex) = 0.0;
-            this->CoolFlowSeq(timeStepIndex) = 0.0;
-            this->CoolFlowSeqNoOA(timeStepIndex) = 0.0;
-            this->CoolLoadSeq(timeStepIndex) = 0.0;
-            // not used directly in output report
-            this->CoolZoneTempSeq(timeStepIndex) = 0.0;
-            this->DesCoolSetPtSeq(timeStepIndex) = 0.0;
-            this->CoolOutTempSeq(timeStepIndex) = 0.0;
-            this->CoolZoneRetTempSeq(timeStepIndex) = 0.0;
-            this->CoolTstatTempSeq(timeStepIndex) = 0.0;
-            this->CoolZoneHumRatSeq(timeStepIndex) = 0.0;
-            this->CoolOutHumRatSeq(timeStepIndex) = 0.0;
-        }
+        std::fill(this->DOASSupMassFlowSeq.begin(), this->DOASSupMassFlowSeq.end(), 0.0);
+        std::fill(this->DOASHeatLoadSeq.begin(), this->DOASHeatLoadSeq.end(), 0.0);
+        std::fill(this->DOASCoolLoadSeq.begin(), this->DOASCoolLoadSeq.end(), 0.0);
+        std::fill(this->DOASHeatAddSeq.begin(), this->DOASHeatAddSeq.end(), 0.0);
+        std::fill(this->DOASLatAddSeq.begin(), this->DOASLatAddSeq.end(), 0.0);
+        std::fill(this->DOASSupTempSeq.begin(), this->DOASSupTempSeq.end(), 0.0);
+        std::fill(this->DOASSupHumRatSeq.begin(), this->DOASSupHumRatSeq.end(), 0.0);
+        std::fill(this->DOASTotCoolLoadSeq.begin(), this->DOASTotCoolLoadSeq.end(), 0.0);
+        std::fill(this->HeatFlowSeq.begin(), this->HeatFlowSeq.end(), 0.0);
+        std::fill(this->HeatFlowSeqNoOA.begin(), this->HeatFlowSeqNoOA.end(), 0.0);
+        std::fill(this->HeatLoadSeq.begin(), this->HeatLoadSeq.end(), 0.0);
+        std::fill(this->HeatZoneTempSeq.begin(), this->HeatZoneTempSeq.end(), 0.0);
+        std::fill(this->DesHeatSetPtSeq.begin(), this->DesHeatSetPtSeq.end(), 0.0);
+        std::fill(this->HeatOutTempSeq.begin(), this->HeatOutTempSeq.end(), 0.0);
+        std::fill(this->HeatZoneRetTempSeq.begin(), this->HeatZoneRetTempSeq.end(), 0.0);
+        std::fill(this->HeatTstatTempSeq.begin(), this->HeatTstatTempSeq.end(), 0.0);
+        std::fill(this->HeatZoneHumRatSeq.begin(), this->HeatZoneHumRatSeq.end(), 0.0);
+        std::fill(this->HeatOutHumRatSeq.begin(), this->HeatOutHumRatSeq.end(), 0.0);
+        std::fill(this->CoolFlowSeq.begin(), this->CoolFlowSeq.end(), 0.0);
+        std::fill(this->CoolFlowSeqNoOA.begin(), this->CoolFlowSeqNoOA.end(), 0.0);
+        std::fill(this->CoolLoadSeq.begin(), this->CoolLoadSeq.end(), 0.0);
+        std::fill(this->CoolZoneTempSeq.begin(), this->CoolZoneTempSeq.end(), 0.0);
+        std::fill(this->DesCoolSetPtSeq.begin(), this->DesCoolSetPtSeq.end(), 0.0);
+        std::fill(this->CoolOutTempSeq.begin(), this->CoolOutTempSeq.end(), 0.0);
+        std::fill(this->CoolZoneRetTempSeq.begin(), this->CoolZoneRetTempSeq.end(), 0.0);
+        std::fill(this->CoolTstatTempSeq.begin(), this->CoolTstatTempSeq.end(), 0.0);
+        std::fill(this->CoolZoneHumRatSeq.begin(), this->CoolZoneHumRatSeq.end(), 0.0);
+        std::fill(this->CoolOutHumRatSeq.begin(), this->CoolOutHumRatSeq.end(), 0.0);
+
         this->CoolDesDay = ""; // name of a cooling design day
         this->HeatDesDay = ""; // name of a heating design day
 
@@ -727,64 +724,34 @@ namespace DataSizing {
     }
 
     void ZoneSizingData::allocateMemberArrays(int const numOfTimeStepInDay) {
-        this->HeatFlowSeq.allocate(numOfTimeStepInDay);
-        this->CoolFlowSeq.allocate(numOfTimeStepInDay);
-        this->HeatFlowSeqNoOA.allocate(numOfTimeStepInDay);
-        this->CoolFlowSeqNoOA.allocate(numOfTimeStepInDay);
-        this->HeatLoadSeq.allocate(numOfTimeStepInDay);
-        this->CoolLoadSeq.allocate(numOfTimeStepInDay);
-        this->HeatZoneTempSeq.allocate(numOfTimeStepInDay);
-        this->DesHeatSetPtSeq.allocate(numOfTimeStepInDay);
-        this->CoolZoneTempSeq.allocate(numOfTimeStepInDay);
-        this->DesCoolSetPtSeq.allocate(numOfTimeStepInDay);
-        this->HeatOutTempSeq.allocate(numOfTimeStepInDay);
-        this->CoolOutTempSeq.allocate(numOfTimeStepInDay);
-        this->HeatZoneRetTempSeq.allocate(numOfTimeStepInDay);
-        this->HeatTstatTempSeq.allocate(numOfTimeStepInDay);
-        this->CoolZoneRetTempSeq.allocate(numOfTimeStepInDay);
-        this->CoolTstatTempSeq.allocate(numOfTimeStepInDay);
-        this->HeatZoneHumRatSeq.allocate(numOfTimeStepInDay);
-        this->CoolZoneHumRatSeq.allocate(numOfTimeStepInDay);
-        this->HeatOutHumRatSeq.allocate(numOfTimeStepInDay);
-        this->CoolOutHumRatSeq.allocate(numOfTimeStepInDay);
-        this->DOASHeatLoadSeq.allocate(numOfTimeStepInDay);
-        this->DOASCoolLoadSeq.allocate(numOfTimeStepInDay);
-        this->DOASHeatAddSeq.allocate(numOfTimeStepInDay);
-        this->DOASLatAddSeq.allocate(numOfTimeStepInDay);
-        this->DOASSupMassFlowSeq.allocate(numOfTimeStepInDay);
-        this->DOASSupTempSeq.allocate(numOfTimeStepInDay);
-        this->DOASSupHumRatSeq.allocate(numOfTimeStepInDay);
-        this->DOASTotCoolLoadSeq.allocate(numOfTimeStepInDay);
-        for (int timeStepIndex = 1; timeStepIndex <= numOfTimeStepInDay; ++timeStepIndex) {
-            this->HeatFlowSeq(timeStepIndex) = 0.0;
-            this->CoolFlowSeq(timeStepIndex) = 0.0;
-            this->HeatFlowSeqNoOA(timeStepIndex) = 0.0;
-            this->CoolFlowSeqNoOA(timeStepIndex) = 0.0;
-            this->HeatLoadSeq(timeStepIndex) = 0.0;
-            this->CoolLoadSeq(timeStepIndex) = 0.0;
-            this->HeatZoneTempSeq(timeStepIndex) = 0.0;
-            this->DesHeatSetPtSeq(timeStepIndex) = 0.0;
-            this->CoolZoneTempSeq(timeStepIndex) = 0.0;
-            this->DesCoolSetPtSeq(timeStepIndex) = 0.0;
-            this->HeatOutTempSeq(timeStepIndex) = 0.0;
-            this->CoolOutTempSeq(timeStepIndex) = 0.0;
-            this->HeatZoneRetTempSeq(timeStepIndex) = 0.0;
-            this->HeatTstatTempSeq(timeStepIndex) = 0.0;
-            this->CoolZoneRetTempSeq(timeStepIndex) = 0.0;
-            this->CoolTstatTempSeq(timeStepIndex) = 0.0;
-            this->HeatZoneHumRatSeq(timeStepIndex) = 0.0;
-            this->CoolZoneHumRatSeq(timeStepIndex) = 0.0;
-            this->HeatOutHumRatSeq(timeStepIndex) = 0.0;
-            this->CoolOutHumRatSeq(timeStepIndex) = 0.0;
-            this->DOASHeatLoadSeq(timeStepIndex) = 0.0;
-            this->DOASCoolLoadSeq(timeStepIndex) = 0.0;
-            this->DOASHeatAddSeq(timeStepIndex) = 0.0;
-            this->DOASLatAddSeq(timeStepIndex) = 0.0;
-            this->DOASSupMassFlowSeq(timeStepIndex) = 0.0;
-            this->DOASSupTempSeq(timeStepIndex) = 0.0;
-            this->DOASSupHumRatSeq(timeStepIndex) = 0.0;
-            this->DOASTotCoolLoadSeq(timeStepIndex) = 0.0;
-        }
+        this->HeatFlowSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->CoolFlowSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->HeatFlowSeqNoOA.dimension(numOfTimeStepInDay, 0.0);
+        this->CoolFlowSeqNoOA.dimension(numOfTimeStepInDay, 0.0);
+        this->HeatLoadSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->CoolLoadSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->HeatZoneTempSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->DesHeatSetPtSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->CoolZoneTempSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->DesCoolSetPtSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->HeatOutTempSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->CoolOutTempSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->HeatZoneRetTempSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->HeatTstatTempSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->CoolZoneRetTempSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->CoolTstatTempSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->HeatZoneHumRatSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->CoolZoneHumRatSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->HeatOutHumRatSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->CoolOutHumRatSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->DOASHeatLoadSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->DOASCoolLoadSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->DOASHeatAddSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->DOASLatAddSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->DOASSupMassFlowSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->DOASSupTempSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->DOASSupHumRatSeq.dimension(numOfTimeStepInDay, 0.0);
+        this->DOASTotCoolLoadSeq.dimension(numOfTimeStepInDay, 0.0);
     }
 
     void resetHVACSizingGlobals(int const curZoneEqNum, int const curSysNum, bool &firstPassFlag) // called in zone equipment Report function
