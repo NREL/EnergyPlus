@@ -57,9 +57,7 @@
 
 namespace EnergyPlus {
 
-// Note: This file contains two modules:
-// Module BaseboardRadiator -- (ref: Object: ZoneHVAC:Baseboard:Convective:Water)
-// Module BaseboardElectric -- (ref: Object: ZoneHVAC:Baseboard:Convective:Electric)
+    struct EnergyPlusData;
 
 namespace BaseboardRadiator {
 
@@ -150,7 +148,7 @@ namespace BaseboardRadiator {
 
     void clear_state();
 
-    void SimBaseboard(std::string const &EquipName,
+    void SimBaseboard(EnergyPlus::EnergyPlusData &state, std::string const &EquipName,
                       int const ActualZoneNum,
                       int const ControlledZoneNum,
                       bool const FirstHVACIteration,
@@ -159,9 +157,9 @@ namespace BaseboardRadiator {
 
     void GetBaseboardInput();
 
-    void InitBaseboard(int const BaseboardNum, int const ControlledZoneNumSub);
+    void InitBaseboard(EnergyPlus::EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub);
 
-    void SizeBaseboard(int const BaseboardNum);
+    void SizeBaseboard(EnergyPlus::EnergyPlusData &state, int const BaseboardNum);
 
     void SimHWConvective(int &BaseboardNum, Real64 &LoadMet);
 
@@ -184,12 +182,6 @@ namespace BaseboardRadiator {
     );
 
 } // namespace BaseboardRadiator
-
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//******************************************************************************************************
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//******************************************************************************************************
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 } // namespace EnergyPlus
 

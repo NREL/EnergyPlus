@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -283,7 +284,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     MCPTV(1) = -3335.10; // Assign TempIndCoef
     OutBaroPress = 99166.67;
 
-    CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
+    CorrectZoneAirTemp(state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(15.13, Zone(1).ZoneVolCapMultpSensHM, 0.01);
 
     // Case 2: Hybrid model infiltration with measured temperature (free-floating)
@@ -308,7 +309,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     MCPTV(1) = 270.10; // Assign TempIndCoef
     OutBaroPress = 99250;
 
-    CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
+    CorrectZoneAirTemp(state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0.2444, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 3: Hybrid model infiltration with measured humidity ratio (free-floating)
@@ -365,7 +366,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr).CurrentValue = -2.923892218;
 
-    CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
+    CorrectZoneAirTemp(state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0, Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
 
     // Case 5: Hybrid model people count with measured humidity ratio (free-floating)
@@ -428,7 +429,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZoneSupplyAirTemperatureSchedulePtr).CurrentValue = 50;
     Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.7974274;
 
-    CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
+    CorrectZoneAirTemp(state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0.49, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 7: Hybrid model infiltration with measured humidity ratio (with HVAC)
@@ -498,7 +499,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZonePeopleSensibleFractionSchedulePtr).CurrentValue = 0.6;
     Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
 
-    CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
+    CorrectZoneAirTemp(state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0, Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
 
     // Case 9: Hybrid model people count with measured humidity ratio (with HVAC)

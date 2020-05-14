@@ -67,6 +67,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -172,7 +173,7 @@ namespace SteamCoils {
         CheckEquipName.deallocate();
     }
 
-    void SimulateSteamCoilComponents(std::string const &CompName,
+    void SimulateSteamCoilComponents(EnergyPlusData &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq, // coil load to be met
@@ -229,7 +230,7 @@ namespace SteamCoils {
         }
 
         // With the correct CoilNum Initialize
-        InitSteamCoil(CoilNum, FirstHVACIteration); // Initialize all SteamCoil related parameters
+        InitSteamCoil(state, CoilNum, FirstHVACIteration); // Initialize all SteamCoil related parameters
 
         if (present(FanOpMode)) {
             OpMode = FanOpMode;
@@ -475,7 +476,7 @@ namespace SteamCoils {
 
     // Beginning Initialization Section of the Module
 
-    void InitSteamCoil(int const CoilNum, bool const FirstHVACIteration)
+    void InitSteamCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
@@ -555,7 +556,7 @@ namespace SteamCoils {
 
         if (!SysSizingCalc && MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
-            SizeSteamCoil(CoilNum);
+            SizeSteamCoil(state, CoilNum);
             MySizeFlag(CoilNum) = false;
         }
 
@@ -670,7 +671,7 @@ namespace SteamCoils {
         //                                                   SteamCoil(CoilNum)%MaxSteamMassFlowRate)
     }
 
-    void SizeSteamCoil(int const CoilNum)
+    void SizeSteamCoil(EnergyPlusData &state, int const CoilNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
@@ -779,10 +780,10 @@ namespace SteamCoils {
                         SizingString = "";
                         bPRINT = false;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
+                        RequestSizing(state, CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
                         DataDesInletAirTemp = TempSize;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
+                        RequestSizing(state, CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
                         DataDesOutletAirTemp = TempSize;
                         if (CurOASysNum > 0) {
                             OASysEqSizing(CurOASysNum).AirFlow = true;
@@ -809,7 +810,7 @@ namespace SteamCoils {
                     if (DataDesicRegCoil) {
                         bPRINT = false;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
+                        RequestSizing(state, CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
                         DesVolFlow = TempSize;
                     }
                     DesMassFlow = RhoAirStd * DesVolFlow;
@@ -869,7 +870,7 @@ namespace SteamCoils {
                 case DataAirSystems::structArrayLegacyFanModels: {
                     int SupFanNum = DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum;
                     if (SupFanNum > 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(SteamCoil(CoilNum).Name,
+                        coilSelectionReportObj->setCoilSupplyFanInfo(state, SteamCoil(CoilNum).Name,
                                                                      "Coil:Heating:Steam",
                                                                      Fans::Fan(DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
                                                                      DataAirSystems::structArrayLegacyFanModels,
@@ -880,7 +881,7 @@ namespace SteamCoils {
                 }
                 case DataAirSystems::objectVectorOOFanSystemModel: {
                     if (DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(
+                        coilSelectionReportObj->setCoilSupplyFanInfo(state,
                             SteamCoil(CoilNum).Name,
                             "Coil:Heating:Steam",
                             HVACFan::fanObjs[DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,
@@ -2068,7 +2069,7 @@ namespace SteamCoils {
         return NodeNumber;
     }
 
-    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )

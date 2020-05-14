@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace PlantManager {
 
     // Using/Aliasing
@@ -79,7 +82,7 @@ namespace PlantManager {
 
     void clear_state();
 
-    void ManagePlantLoops(bool FirstHVACIteration,
+    void ManagePlantLoops(EnergyPlusData &state, bool FirstHVACIteration,
                           bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                           bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                           bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
@@ -87,13 +90,13 @@ namespace PlantManager {
                           bool &SimElecCircuits      // True when electic circuits need to be (re)simulated
     );
 
-    void GetPlantLoopData();
+    void GetPlantLoopData(EnergyPlusData &state);
 
-    void GetPlantInput();
+    void GetPlantInput(EnergyPlusData &state);
 
     void SetupReports();
 
-    void InitializeLoops(bool FirstHVACIteration); // true if first iteration of the simulation
+    void InitializeLoops(EnergyPlusData &state, bool FirstHVACIteration); // true if first iteration of the simulation
 
     void ReInitPlantLoopsAtFirstHVACIteration();
 
@@ -103,7 +106,7 @@ namespace PlantManager {
 
     void InitOneTimePlantSizingInfo(int LoopNum); // loop being initialized for sizing
 
-    void SizePlantLoop(int LoopNum, // Supply side loop being simulated
+    void SizePlantLoop(EnergyPlusData &state, int LoopNum, // Supply side loop being simulated
                        bool OkayToFinish);
 
     void ResizePlantLoopLevelSizes(int LoopNum);

@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -872,7 +873,7 @@ namespace MicroturbineElectricGenerator {
         }
     }
 
-    void MTGeneratorSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void MTGeneratorSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool EP_UNUSED(FirstHVACIteration),
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool EP_UNUSED(RunFlag))

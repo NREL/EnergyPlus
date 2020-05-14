@@ -66,6 +66,7 @@
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -448,7 +449,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     DualDuct::GetDualDuctInput();
 

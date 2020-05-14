@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -123,7 +124,7 @@ namespace ReturnAirPathManager {
         ErrorsFound = false;
     }
 
-    void SimReturnAirPath()
+    void SimReturnAirPath(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -152,7 +153,7 @@ namespace ReturnAirPathManager {
 
         for (ReturnAirPathNum = 1; ReturnAirPathNum <= NumReturnAirPaths; ++ReturnAirPathNum) {
 
-            CalcReturnAirPath(ReturnAirPathNum);
+            CalcReturnAirPath(state, ReturnAirPathNum);
         }
     }
 
@@ -263,7 +264,7 @@ namespace ReturnAirPathManager {
         // USE STATEMENTS:
     }
 
-    void CalcReturnAirPath(int &ReturnAirPathNum)
+    void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Russ Taylor
@@ -299,7 +300,7 @@ namespace ReturnAirPathManager {
 
                 } else if (SELECT_CASE_var == ZoneReturnPlenum_Type) { // 'AirLoopHVAC:ReturnPlenum'
 
-                    SimAirZonePlenum(ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                    SimAirZonePlenum(state, ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
                                      ZoneReturnPlenum_Type,
                                      ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
 
