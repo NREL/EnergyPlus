@@ -812,20 +812,16 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-            try {
-                OutputFile &dfs = outputFiles.dfs.ensure_open();
-                print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
-                print(dfs, "{}\n", "If only one reference point the last 4 columns in the data will be zero.");
-                print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
-                print(dfs, "{}\n",
-                       "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at "
-                       "Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for "
-                       "Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight "
-                       "Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at "
-                       "Reference point 2,Daylight Factor for Overcast Sky at Reference point 2");
-            } catch (const std::exception &) {
-                ShowFatalError("CalcDayltgCoefficients: Could not open file " + OutputFiles::getSingleton().dfs.fileName + " for output (write).");
-            }
+            OutputFile &dfs = outputFiles.dfs.ensure_open("CalcDayltgCoefficients");
+            print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
+            print(dfs, "{}\n", "If only one reference point the last 4 columns in the data will be zero.");
+            print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
+            print(dfs, "{}\n",
+                   "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at "
+                   "Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for "
+                   "Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight "
+                   "Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at "
+                   "Reference point 2,Daylight Factor for Overcast Sky at Reference point 2");
             CreateDFSReportFile = false;
         }
 

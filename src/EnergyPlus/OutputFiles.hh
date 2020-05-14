@@ -64,7 +64,7 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-    OutputFile &ensure_open();
+    OutputFile &ensure_open(const std::string &caller);
 
     std::string fileName;
     void open();
@@ -80,9 +80,20 @@ private:
     friend class OutputFiles;
 };
 
+
 class OutputFiles
 {
 public:
+
+    struct OutputFileName
+    {
+        std::string fileName;
+        OutputFile open(const std::string &caller) {
+            OutputFile of{fileName};
+            of.ensure_open(caller);
+            return of;
+        }
+    };
 
     class GIOOutputFile
     {
@@ -119,6 +130,11 @@ public:
     OutputFile debug{"eplusout.dbg"};
 
     OutputFile dfs{"eplusout.dfs"};
+
+    OutputFileName sln{"eplusout.sln"};
+    OutputFileName dxf{"eplusout.dxf"};
+    OutputFileName sci{"eplusout.sci"};
+    OutputFileName wrl{"eplusout.wrl"};
 
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
