@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -159,7 +160,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather) {
     thisModel->evapotransCoeff = 0.408;
 
     // No Weather file specified, so we expect it to fail
-    ASSERT_THROW(thisModel->getWeatherData(), std::runtime_error);
+    ASSERT_THROW(thisModel->getWeatherData(state.dataGlobals), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.",
@@ -288,7 +289,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     createFacilityElectricPowerServiceObject();
 
     bool ErrorsFound(false);
-    SimulationManager::SetupSimulation(outputFiles(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     EXPECT_EQ(WeatherManager::NumOfEnvrn, 3);
@@ -307,7 +308,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     thisModel->evapotransCoeff = 0.408;
 
     // Shouldn't throw
-    thisModel->getWeatherData();
+    thisModel->getWeatherData(state.dataGlobals);
 
     // It should have reverted the added period
     EXPECT_EQ(WeatherManager::NumOfEnvrn, 3);

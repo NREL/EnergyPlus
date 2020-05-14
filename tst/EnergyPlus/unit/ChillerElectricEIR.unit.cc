@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -66,8 +67,8 @@ using namespace EnergyPlus::DataLoopNode;
 
 TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
 {
-    ElectricEIRChiller.allocate(1);
-    auto &thisEIR = ChillerElectricEIR::ElectricEIRChiller(1);
+    state.dataChillerElectricEIR.ElectricEIRChiller.allocate(1);
+    auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     thisEIR.EvapInletNodeNum = 1;
     thisEIR.EvapOutletNodeNum = 2;
@@ -86,20 +87,19 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
     EXPECT_EQ(35, thisEIR.CondOutletTemp);
 
     Node.deallocate();
-    ElectricEIRChiller.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
 {
     // unit test for autosizing heat recovery in Chiller:Electric:EIR
-    ChillerElectricEIR::ElectricEIRChiller.allocate(1);
-    auto &thisEIR = ChillerElectricEIR::ElectricEIRChiller(1);
+    state.dataChillerElectricEIR.ElectricEIRChiller.allocate(1);
+    auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     thisEIR.SizFac = 1.0;
     thisEIR.DesignHeatRecVolFlowRateWasAutoSized = true;
     thisEIR.HeatRecCapacityFraction = 0.5;
     thisEIR.HeatRecActive = true;
-    thisEIR.CondenserType = ChillerElectricEIR::WaterCooled;
+    thisEIR.CondenserType = DataPlant::CondenserType::WATERCOOLED;
     thisEIR.CWLoopNum = 1;
     thisEIR.CDLoopNum = 2;
     thisEIR.EvapVolFlowRate = 1.0;
@@ -125,11 +125,10 @@ TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    thisEIR.size();
+    thisEIR.size(state);
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(thisEIR.DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
-    ChillerElectricEIR::ElectricEIRChiller.deallocate();
     DataSizing::PlantSizData.deallocate();
     DataPlant::PlantLoop.deallocate();
 }
@@ -206,8 +205,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricEIRChillerInput();
-    auto &thisEIR = ChillerElectricEIR::ElectricEIRChiller(1);
+    GetElectricEIRChillerInput(state.dataChillerElectricEIR);
+    auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
@@ -228,7 +227,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     DataPlant::PlantFinalSizesOkayToReport = true;
 
     thisEIR.initialize(RunFlag, MyLoad);
-    thisEIR.size();
+    thisEIR.size(state);
 
     // run through init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;

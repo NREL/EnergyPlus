@@ -58,6 +58,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -225,7 +226,7 @@ namespace ZoneTempPredictorCorrector {
     // Functions
     void clear_state();
 
-    void ManageZoneAirUpdates(int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+    void ManageZoneAirUpdates(EnergyPlusData &state, int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
                               Real64 &ZoneTempChange, // Temp change in zone air btw previous and current timestep
                               bool const ShortenTimeStepSys,
                               bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
@@ -236,7 +237,7 @@ namespace ZoneTempPredictorCorrector {
 
     void InitZoneAirSetPoints();
 
-    void PredictSystemLoads(bool const ShortenTimeStepSys,
+    void PredictSystemLoads(EnergyPlusData &state, bool const ShortenTimeStepSys,
                             bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
@@ -275,7 +276,7 @@ namespace ZoneTempPredictorCorrector {
                                         Real64 const ZoneMultiplierList
     );
 
-    void CorrectZoneAirTemp(Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
+    void CorrectZoneAirTemp(EnergyPlusData &state, Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
                             bool const ShortenTimeStepSys,
                             bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating

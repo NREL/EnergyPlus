@@ -54,10 +54,10 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -96,7 +96,6 @@ namespace FaultsManager {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::ScheduleAlwaysOn;
 
     // Data
@@ -245,7 +244,7 @@ namespace FaultsManager {
 
     // Functions
 
-    void CheckAndReadFaults()
+    void CheckAndReadFaults(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -544,16 +543,10 @@ namespace FaultsManager {
                 int ChillerNum;
 
                 if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric")) {
-                    // Read in chiller if not done yet
-                    if (PlantChillers::GetElectricInput) {
-                        PlantChillers::ElectricChillerSpecs::getInput();
-                        PlantChillers::GetElectricInput = false;
-                    }
-
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = 0;
                     int thisChil = 0;
-                    for (auto & ch : PlantChillers::ElectricChiller) {
+                    for (auto & ch : state.dataPlantChillers.ElectricChiller) {
                         thisChil++;
                         if (ch.Name == FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
                             ChillerNum = thisChil;
@@ -565,7 +558,7 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
 
-                        if (PlantChillers::ElectricChiller(ChillerNum).CondenserType != PlantChillers::WaterCooled) {
+                        if (state.dataPlantChillers.ElectricChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                              cAlphaArgs(5) +
@@ -573,28 +566,28 @@ namespace FaultsManager {
 
                         } else {
                             // Link the chiller with the fault model
-                            PlantChillers::ElectricChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            PlantChillers::ElectricChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                            state.dataPlantChillers.ElectricChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                            state.dataPlantChillers.ElectricChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
                         }
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:EIR")) {
                     // Read in chiller if not done yet
-                    if (ChillerElectricEIR::getInputFlag) {
-                        ChillerElectricEIR::GetElectricEIRChillerInput();
-                        ChillerElectricEIR::getInputFlag = false;
+                    if (state.dataChillerElectricEIR.getInputFlag) {
+                        ChillerElectricEIR::GetElectricEIRChillerInput(state.dataChillerElectricEIR);
+                        state.dataChillerElectricEIR.getInputFlag = false;
                     }
 
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = UtilityRoutines::FindItemInList(FaultsChillerFouling(jFault_ChillerFouling).ChillerName,
-                                                                 ChillerElectricEIR::ElectricEIRChiller);
+                                                                 state.dataChillerElectricEIR.ElectricEIRChiller);
                     if (ChillerNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         ErrorsFound = true;
                     } else {
 
-                        if (ChillerElectricEIR::ElectricEIRChiller(ChillerNum).CondenserType != ChillerElectricEIR::WaterCooled) {
+                        if (state.dataChillerElectricEIR.ElectricEIRChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                              cAlphaArgs(5) +
@@ -602,29 +595,29 @@ namespace FaultsManager {
 
                         } else {
                             // Link the chiller with the fault model
-                            ChillerElectricEIR::ElectricEIRChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            ChillerElectricEIR::ElectricEIRChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                            state.dataChillerElectricEIR.ElectricEIRChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                            state.dataChillerElectricEIR.ElectricEIRChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
                         }
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR")) {
 
                     // Read in chiller if not done yet
-                    if (ChillerReformulatedEIR::GetInputREIR) {
-                        ChillerReformulatedEIR::GetElecReformEIRChillerInput();
-                        ChillerReformulatedEIR::GetInputREIR = false;
+                    if (state.dataChillerReformulatedEIR.GetInputREIR) {
+                        ChillerReformulatedEIR::GetElecReformEIRChillerInput(state.dataChillerReformulatedEIR);
+                        state.dataChillerReformulatedEIR.GetInputREIR = false;
                     }
 
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = UtilityRoutines::FindItemInList(FaultsChillerFouling(jFault_ChillerFouling).ChillerName,
-                                                                 ChillerReformulatedEIR::ElecReformEIRChiller);
+                                                                 state.dataChillerReformulatedEIR.ElecReformEIRChiller);
                     if (ChillerNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         ErrorsFound = true;
                     } else {
 
-                        if (ChillerReformulatedEIR::ElecReformEIRChiller(ChillerNum).CondenserType != ChillerReformulatedEIR::WaterCooled) {
+                        if (state.dataChillerReformulatedEIR.ElecReformEIRChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                              cAlphaArgs(5) +
@@ -632,22 +625,16 @@ namespace FaultsManager {
 
                         } else {
                             // Link the chiller with the fault model
-                            ChillerReformulatedEIR::ElecReformEIRChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            ChillerReformulatedEIR::ElecReformEIRChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                            state.dataChillerReformulatedEIR.ElecReformEIRChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                            state.dataChillerReformulatedEIR.ElecReformEIRChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
                         }
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:ConstantCOP")) {
-                    // Read in chiller if not done yet
-                    if (PlantChillers::GetConstCOPInput) {
-                        PlantChillers::ConstCOPChillerSpecs::getInput();
-                        PlantChillers::GetConstCOPInput = false;
-                    }
-
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = 0;
                     int thisChil = 0;
-                    for (auto & ch : PlantChillers::ConstCOPChiller) {
+                    for (auto & ch : state.dataPlantChillers.ConstCOPChiller) {
                         thisChil++;
                         if (ch.Name == FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
                             ChillerNum = thisChil;
@@ -659,7 +646,7 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
 
-                        if (PlantChillers::ConstCOPChiller(ChillerNum).CondenserType != PlantChillers::WaterCooled) {
+                        if (state.dataPlantChillers.ConstCOPChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                              cAlphaArgs(5) +
@@ -667,22 +654,16 @@ namespace FaultsManager {
 
                         } else {
                             // Link the chiller with the fault model
-                            PlantChillers::ConstCOPChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            PlantChillers::ConstCOPChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                            state.dataPlantChillers.ConstCOPChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                            state.dataPlantChillers.ConstCOPChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
                         }
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:EngineDriven")) {
-                    // Read in chiller if not done yet
-                    if (PlantChillers::GetEngineDrivenInput) {
-                        PlantChillers::EngineDrivenChillerSpecs::getInput();
-                        PlantChillers::GetEngineDrivenInput = false;
-                    }
-
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = 0;
                     int thisChil = 0;
-                    for (auto & ch : PlantChillers::EngineDrivenChiller) {
+                    for (auto & ch : state.dataPlantChillers.EngineDrivenChiller) {
                         thisChil++;
                         if (ch.Name == FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
                             ChillerNum = thisChil;
@@ -694,7 +675,7 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
 
-                        if (PlantChillers::EngineDrivenChiller(ChillerNum).CondenserType != PlantChillers::WaterCooled) {
+                        if (state.dataPlantChillers.EngineDrivenChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                              cAlphaArgs(5) +
@@ -702,21 +683,16 @@ namespace FaultsManager {
 
                         } else {
                             // Link the fault model with the water cooled chiller
-                            PlantChillers::EngineDrivenChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            PlantChillers::EngineDrivenChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                            state.dataPlantChillers.EngineDrivenChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                            state.dataPlantChillers.EngineDrivenChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
                         }
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:CombustionTurbine")) {
-                    // Read in chiller if not done yet
-                    if (PlantChillers::GetGasTurbineInput) {
-                        PlantChillers::GTChillerSpecs::getInput();
-                        PlantChillers::GetGasTurbineInput = false;
-                    }
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = 0;
                     int thisChil = 0;
-                    for (auto & ch : PlantChillers::GTChiller) {
+                    for (auto & ch : state.dataPlantChillers.GTChiller) {
                         thisChil++;
                         if (ch.Name == FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
                             ChillerNum = thisChil;
@@ -728,7 +704,7 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
 
-                        if (PlantChillers::GTChiller(ChillerNum).CondenserType != PlantChillers::WaterCooled) {
+                        if (state.dataPlantChillers.GTChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                              cAlphaArgs(5) +
@@ -736,8 +712,8 @@ namespace FaultsManager {
 
                         } else {
                             // Link the fault model with the water cooled chiller
-                            PlantChillers::GTChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            PlantChillers::GTChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                            state.dataPlantChillers.GTChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                            state.dataPlantChillers.GTChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
                         }
                     }
                 }
@@ -811,20 +787,20 @@ namespace FaultsManager {
 
             // Boiler check and link
             {
-                if (Boilers::GetBoilerInputFlag) {
-                    Boilers::GetBoilerInput();
-                    Boilers::GetBoilerInputFlag = false;
+                if (state.dataBoilers.getBoilerInputFlag) {
+                    Boilers::GetBoilerInput(state.dataBoilers);
+                    state.dataBoilers.getBoilerInputFlag = false;
                 }
                 // Check the boiler name and boiler type
-                int BoilerNum = UtilityRoutines::FindItemInList(FaultsBoilerFouling(jFault_BoilerFouling).BoilerName, Boilers::Boiler);
+                int BoilerNum = UtilityRoutines::FindItemInList(FaultsBoilerFouling(jFault_BoilerFouling).BoilerName, state.dataBoilers.Boiler);
                 if (BoilerNum <= 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
                                     "\" not found.");
                     ErrorsFound = true;
                 } else {
                     // Link the boiler with the fault model
-                    Boilers::Boiler(BoilerNum).FaultyBoilerFoulingFlag = true;
-                    Boilers::Boiler(BoilerNum).FaultyBoilerFoulingIndex = jFault_BoilerFouling;
+                    state.dataBoilers.Boiler(BoilerNum).FaultyBoilerFoulingFlag = true;
+                    state.dataBoilers.Boiler(BoilerNum).FaultyBoilerFoulingIndex = jFault_BoilerFouling;
                 }
             }
         }
@@ -903,7 +879,7 @@ namespace FaultsManager {
                     UtilityRoutines::SameString(SELECT_CASE_VAR, "Coil:Heating:Desuperheater")) {
                     // Read in coil input if not done yet
                     if (HeatingCoils::GetCoilsInputFlag) {
-                        HeatingCoils::GetHeatingCoilInput();
+                        HeatingCoils::GetHeatingCoilInput(state);
                         HeatingCoils::GetCoilsInputFlag = false;
                     }
                     // Check the coil name and coil type
@@ -971,7 +947,7 @@ namespace FaultsManager {
                     }
                     // Read in controller input if not done yet
                     if (HVACControllers::GetControllerInputFlag) {
-                        HVACControllers::GetControllerInput();
+                        HVACControllers::GetControllerInput(state);
                         HVACControllers::GetControllerInputFlag = false;
                     }
                     // Check the controller name
@@ -997,7 +973,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Cooling:DX")) {
                     // Read in DXCoolingSystem input if not done yet
                     if (HVACDXSystem::GetInputFlag) {
-                        HVACDXSystem::GetDXCoolingSystemInput();
+                        HVACDXSystem::GetDXCoolingSystemInput(state);
                         HVACDXSystem::GetInputFlag = false;
                     }
 
@@ -1015,7 +991,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Heating:DX")) {
                     // Read in DXCoolingSystem input if not done yet
                     if (HVACDXHeatPumpSystem::GetInputFlag) {
-                        HVACDXHeatPumpSystem::GetDXHeatPumpSystemInput();
+                        HVACDXHeatPumpSystem::GetDXHeatPumpSystemInput(state);
                         HVACDXHeatPumpSystem::GetInputFlag = false;
                     }
 
@@ -1308,15 +1284,10 @@ namespace FaultsManager {
                 int ChillerNum;
 
                 if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric")) {
-                    // Read in chiller if not done yet
-                    if (PlantChillers::GetElectricInput) {
-                        PlantChillers::ElectricChillerSpecs::getInput();
-                        PlantChillers::GetElectricInput = false;
-                    }
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = 0;
                     int thisChil = 0;
-                    for (auto & ch : PlantChillers::ElectricChiller) {
+                    for (auto & ch : state.dataPlantChillers.ElectricChiller) {
                         thisChil++;
                         if (ch.Name == FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName) {
                             ChillerNum = thisChil;
@@ -1328,58 +1299,53 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
                         // Link the chiller with the fault model
-                        PlantChillers::ElectricChiller(ChillerNum).FaultyChillerSWTFlag = true;
-                        PlantChillers::ElectricChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
+                        state.dataPlantChillers.ElectricChiller(ChillerNum).FaultyChillerSWTFlag = true;
+                        state.dataPlantChillers.ElectricChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:EIR")) {
                     // Read in chiller if not done yet
-                    if (ChillerElectricEIR::getInputFlag) {
-                        ChillerElectricEIR::GetElectricEIRChillerInput();
-                        ChillerElectricEIR::getInputFlag = false;
+                    if (state.dataChillerElectricEIR.getInputFlag) {
+                        ChillerElectricEIR::GetElectricEIRChillerInput(state.dataChillerElectricEIR);
+                        state.dataChillerElectricEIR.getInputFlag = false;
                     }
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = UtilityRoutines::FindItemInList(FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName,
-                                                                 ChillerElectricEIR::ElectricEIRChiller);
+                                                                 state.dataChillerElectricEIR.ElectricEIRChiller);
                     if (ChillerNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         ErrorsFound = true;
                     } else {
                         // Link the chiller with the fault model
-                        ChillerElectricEIR::ElectricEIRChiller(ChillerNum).FaultyChillerSWTFlag = true;
-                        ChillerElectricEIR::ElectricEIRChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
+                        state.dataChillerElectricEIR.ElectricEIRChiller(ChillerNum).FaultyChillerSWTFlag = true;
+                        state.dataChillerElectricEIR.ElectricEIRChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR")) {
                     // Read in chiller if not done yet
-                    if (ChillerReformulatedEIR::GetInputREIR) {
-                        ChillerReformulatedEIR::GetElecReformEIRChillerInput();
-                        ChillerReformulatedEIR::GetInputREIR = false;
+                    if (state.dataChillerReformulatedEIR.GetInputREIR) {
+                        ChillerReformulatedEIR::GetElecReformEIRChillerInput(state.dataChillerReformulatedEIR);
+                        state.dataChillerReformulatedEIR.GetInputREIR = false;
                     }
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = UtilityRoutines::FindItemInList(FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName,
-                                                                 ChillerReformulatedEIR::ElecReformEIRChiller);
+                                                                 state.dataChillerReformulatedEIR.ElecReformEIRChiller);
                     if (ChillerNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         ErrorsFound = true;
                     } else {
                         // Link the chiller with the fault model
-                        ChillerReformulatedEIR::ElecReformEIRChiller(ChillerNum).FaultyChillerSWTFlag = true;
-                        ChillerReformulatedEIR::ElecReformEIRChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
+                        state.dataChillerReformulatedEIR.ElecReformEIRChiller(ChillerNum).FaultyChillerSWTFlag = true;
+                        state.dataChillerReformulatedEIR.ElecReformEIRChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:EngineDriven")) {
-                    // Read in chiller if not done yet
-                    if (PlantChillers::GetEngineDrivenInput) {
-                        PlantChillers::EngineDrivenChillerSpecs::getInput();
-                        PlantChillers::GetEngineDrivenInput = false;
-                    }
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = 0;
                     int thisChil = 0;
-                    for (auto & ch : PlantChillers::EngineDrivenChiller) {
+                    for (auto & ch : state.dataPlantChillers.EngineDrivenChiller) {
                         thisChil++;
                         if (ch.Name == FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName) {
                             ChillerNum = thisChil;
@@ -1391,19 +1357,14 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
                         // Link the chiller with the fault model
-                        PlantChillers::EngineDrivenChiller(ChillerNum).FaultyChillerSWTFlag = true;
-                        PlantChillers::EngineDrivenChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
+                        state.dataPlantChillers.EngineDrivenChiller(ChillerNum).FaultyChillerSWTFlag = true;
+                        state.dataPlantChillers.EngineDrivenChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:CombustionTurbine")) {
-                    // Read in chiller if not done yet
-                    if (PlantChillers::GetGasTurbineInput) {
-                        PlantChillers::GTChillerSpecs::getInput();
-                        PlantChillers::GetGasTurbineInput = false;
-                    }
                     ChillerNum = 0;
                     int thisChil = 0;
-                    for (auto & ch : PlantChillers::GTChiller) {
+                    for (auto & ch : state.dataPlantChillers.GTChiller) {
                         thisChil++;
                         if (ch.Name == FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName) {
                             ChillerNum = thisChil;
@@ -1415,19 +1376,14 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
                         // Link the chiller with the fault model
-                        PlantChillers::GTChiller(ChillerNum).FaultyChillerSWTFlag = true;
-                        PlantChillers::GTChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
+                        state.dataPlantChillers.GTChiller(ChillerNum).FaultyChillerSWTFlag = true;
+                        state.dataPlantChillers.GTChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:ConstantCOP")) {
-                    // Read in chiller if not done yet
-                    if (PlantChillers::GetConstCOPInput) {
-                        PlantChillers::ConstCOPChillerSpecs::getInput();
-                        PlantChillers::GetConstCOPInput = false;
-                    }
                     ChillerNum = 0;
                     int thisChil = 0;
-                    for (auto & ch : PlantChillers::ConstCOPChiller) {
+                    for (auto & ch : state.dataPlantChillers.ConstCOPChiller) {
                         thisChil++;
                         if (ch.Name == FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName) {
                             ChillerNum = thisChil;
@@ -1439,45 +1395,45 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
                         // Link the chiller with the fault model
-                        PlantChillers::ConstCOPChiller(ChillerNum).FaultyChillerSWTFlag = true;
-                        PlantChillers::ConstCOPChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
+                        state.dataPlantChillers.ConstCOPChiller(ChillerNum).FaultyChillerSWTFlag = true;
+                        state.dataPlantChillers.ConstCOPChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Absorption")) {
                     // Read in chiller if not done yet
-                    if (ChillerAbsorption::getInput) {
-                        ChillerAbsorption::GetBLASTAbsorberInput();
-                        ChillerAbsorption::getInput = false;
+                    if (state.dataChillerAbsorbers.getInput) {
+                        ChillerAbsorption::GetBLASTAbsorberInput(state.dataChillerAbsorbers);
+                        state.dataChillerAbsorbers.getInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum =
-                        UtilityRoutines::FindItemInList(FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName, ChillerAbsorption::BLASTAbsorber);
+                        UtilityRoutines::FindItemInList(FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName, state.dataChillerAbsorbers.absorptionChillers);
                     if (ChillerNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         ErrorsFound = true;
                     } else {
                         // Link the chiller with the fault model
-                        ChillerAbsorption::BLASTAbsorber(ChillerNum).FaultyChillerSWTFlag = true;
-                        ChillerAbsorption::BLASTAbsorber(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
+                        state.dataChillerAbsorbers.absorptionChillers(ChillerNum).FaultyChillerSWTFlag = true;
+                        state.dataChillerAbsorbers.absorptionChillers(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                     }
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Absorption:Indirect")) {
                     // Read in chiller if not done yet
-                    if (ChillerIndirectAbsorption::GetInput) {
-                        ChillerIndirectAbsorption::GetIndirectAbsorberInput();
-                        ChillerIndirectAbsorption::GetInput = false;
+                    if (state.dataChillerIndirectAbsorption.GetInput) {
+                        ChillerIndirectAbsorption::GetIndirectAbsorberInput(state.dataChillerIndirectAbsorption);
+                        state.dataChillerIndirectAbsorption.GetInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = UtilityRoutines::FindItemInList(FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName,
-                                                                 ChillerIndirectAbsorption::IndirectAbsorber);
+                                                                 state.dataChillerIndirectAbsorption.IndirectAbsorber);
                     if (ChillerNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         ErrorsFound = true;
                     } else {
-                        ChillerIndirectAbsorption::IndirectAbsorber(ChillerNum).FaultyChillerSWTFlag = true;
-                        ChillerIndirectAbsorption::IndirectAbsorber(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
+                        state.dataChillerIndirectAbsorption.IndirectAbsorber(ChillerNum).FaultyChillerSWTFlag = true;
+                        state.dataChillerIndirectAbsorption.IndirectAbsorber(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                     }
                 }
             }
@@ -1515,7 +1471,7 @@ namespace FaultsManager {
             }
 
             // Assign fault index to the fan object
-            for (int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum) {
+            for (int FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
                 if (UtilityRoutines::SameString(Fans::Fan(FanNum).FanName, cAlphaArgs(3))) {
                     Fans::Fan(FanNum).FaultyFilterFlag = true;
                     Fans::Fan(FanNum).FaultyFilterIndex = jFault_AirFilter;
@@ -1559,7 +1515,7 @@ namespace FaultsManager {
             }
 
             // Check whether the specified fan curve covers the design operational point of the fan
-            if (!FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve()) {
+            if (!FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
                 ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + cAlphaFieldNames(6) + " = \"" + cAlphaArgs(6) + "\" does not cover ");
                 ShowContinueError("the operational point of Fan " + FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanName);
@@ -1966,7 +1922,7 @@ namespace FaultsManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FaultFac(0.0);  // fault modification factor
-        Real64 OffsetAct(0.0); // actual offset after applying the modification factor
+        Real64 OffsetAct;      // actual offset after applying the modification factor
 
         // Check fault availability schedules
         if (GetCurrentScheduleValue(this->AvaiSchedPtr) > 0.0) {
@@ -2142,7 +2098,7 @@ namespace FaultsManager {
         QEvaporator = QEvaporator_f;
     }
 
-    bool FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve()
+    bool FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2171,7 +2127,7 @@ namespace FaultsManager {
 
         FanFound = false;
 
-        for (int FanNum = 1; FanNum <= NumFans; ++FanNum) {
+        for (int FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
             if (UtilityRoutines::SameString(Fan(FanNum).FanName, FanName)) {
                 FanMaxAirFlowRate = Fan(FanNum).MaxAirFlowRate;
                 FanDeltaPress = Fan(FanNum).DeltaPress;
