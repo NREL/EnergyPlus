@@ -45,29 +45,15 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CostEstimateManager_hh_INCLUDED
-#define CostEstimateManager_hh_INCLUDED
-
-// EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
+#ifndef ENERGYPLUS_BASEDATA_HH
+#define ENERGYPLUS_BASEDATA_HH
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct EnergyPlusData;
-
-namespace CostEstimateManager {
-
-    void SimCostEstimate(EnergyPlusData &state);
-
-    void GetCostEstimateInput(EnergyPlusData &state);
-
-    void CheckCostEstimateInput(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors in input, fatal at end of routine
-
-    void CalcCostEstimate(EnergyPlusData &state);
-
-} // namespace CostEstimateManager
+struct BaseGlobalStruct {
+    virtual void clear_state() = 0;
+};
 
 } // namespace EnergyPlus
 
-#endif
+#endif // ENERGYPLUS_BASEDATA_HH
