@@ -316,7 +316,7 @@ namespace DataGlobalConstants {
     std::string FuelTypeInput;
     std::string FuelTypeForOutputVar;
     int FuelTypeNum;
-    bool ErrorsFound;
+    bool FuelTypeErrorsFound;
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -658,10 +658,17 @@ namespace DataGlobalConstants {
         return ResourceTypeChar;
     }
 
-    void ValidateFuelTypesWithAssignResourceTypeNum(std::string FuelTypeInput,
-                               std::string FuelTypeForOutputVar,
-                               int FuelTypeNum)
+    void ValidateFuelTypesWithAssignResourceTypeNum(std::string FuelTypeInput)
     {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Dareum Nam
+        //       DATE WRITTEN   May 2020
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Validates fuel types and sets output strings with AssignResourceTypeNum()
+
         auto const SELECT_CASE_var(FuelTypeInput);
 
         if (SELECT_CASE_var == "ELECTRICITY") {
@@ -705,12 +712,7 @@ namespace DataGlobalConstants {
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
 
         } else {
-            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-            ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + FuelTypeInput);
-            // Set to Electric to avoid errors when setting up output variables
-            FuelTypeForOutputVar = "Electric";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
-            ErrorsFound = true;
+            FuelTypeErrorsFound = true;
         }
 
     }

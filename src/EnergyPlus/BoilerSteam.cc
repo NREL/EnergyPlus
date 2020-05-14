@@ -206,59 +206,20 @@ namespace BoilerSteam {
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
             Boiler(BoilerNum).Name = DataIPShortCuts::cAlphaArgs(1);
 
-            {
-                auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(2));
-
-                if (SELECT_CASE_var == "ELECTRICITY") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
-
-                } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gas";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Diesel";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gasoline";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
-
-                } else if (SELECT_CASE_var == "COAL") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Coal";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("COAL");
-
-                } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#1";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
-
-                } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#2";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Propane";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "OtherFuel1";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "OtherFuel2";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
-
-                } else {
-                    ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-                    ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
-
-                    // Set to Electric to avoid errors when setting up output variables
-                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
-                    ErrorsFound = true;
-                }
+            // Validate fuel types input
+            DataGlobalConstants::FuelTypeInput = DataIPShortCuts::cAlphaArgs(2);
+            DataGlobalConstants::ValidateFuelTypesWithAssignResourceTypeNum(DataGlobalConstants::FuelTypeInput);
+            if (DataGlobalConstants::FuelTypeErrorsFound) {
+                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
+                // Set to Electric to avoid errors when setting up output variables
+                Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
+                ErrorsFound = true;
+            } else {
+                Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelTypeForOutputVar;
+                Boiler(BoilerNum).FuelType = DataGlobalConstants::FuelTypeNum;
             }
-
+            
             // INPUTS from the IDF file
             Boiler(BoilerNum).BoilerMaxOperPress = DataIPShortCuts::rNumericArgs(1);
             if (Boiler(BoilerNum).BoilerMaxOperPress < 1e5) {

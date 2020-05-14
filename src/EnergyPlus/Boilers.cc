@@ -236,10 +236,20 @@ namespace Boilers {
             Boiler(BoilerNum).Name = DataIPShortCuts::cAlphaArgs(1);
             Boiler(BoilerNum).TypeNum = DataPlant::TypeOf_Boiler_Simple;
 
+            // Validate fuel types input
             DataGlobalConstants::FuelTypeInput = DataIPShortCuts::cAlphaArgs(2);
-            DataGlobalConstants::ValidateFuelTypesWithAssignResourceTypeNum(DataGlobalConstants::FuelTypeInput, DataGlobalConstants::FuelTypeForOutputVar, DataGlobalConstants::FuelTypeNum);
-            Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelTypeForOutputVar;
-            Boiler(BoilerNum).FuelType = DataGlobalConstants::FuelTypeNum;
+            DataGlobalConstants::ValidateFuelTypesWithAssignResourceTypeNum(DataGlobalConstants::FuelTypeInput);
+            if (DataGlobalConstants::FuelTypeErrorsFound) {
+                ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
+                // Set to Electric to avoid errors when setting up output variables
+                Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
+                Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
+                ErrorsFound = true;
+            } else {
+                Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelTypeForOutputVar;
+                Boiler(BoilerNum).FuelType = DataGlobalConstants::FuelTypeNum;          
+            }
 
             Boiler(BoilerNum).NomCap = DataIPShortCuts::rNumericArgs(1);
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
