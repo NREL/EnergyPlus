@@ -136,6 +136,7 @@ void OutputFile::open()
     os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc));
 }
 
+
 std::vector<std::string> OutputFile::getLines()
 {
     if (os) {

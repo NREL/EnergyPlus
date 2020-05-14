@@ -136,6 +136,8 @@ public:
     OutputFileName sci{"eplusout.sci"};
     OutputFileName wrl{"eplusout.wrl"};
 
+    OutputFileName delightIn{"eplusout.delightin"};
+
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 

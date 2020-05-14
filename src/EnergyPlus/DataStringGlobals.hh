@@ -109,7 +109,6 @@ namespace DataStringGlobals {
     extern std::string inputWeatherFileName;
     extern std::string outputAdsFileName;
     extern std::string outputGLHEFileName;
-    extern std::string outputDelightInFileName;
     extern std::string outputDelightOutFileName;
     extern std::string outputDelightEldmpFileName;
     extern std::string outputDelightDfdmpFileName;
