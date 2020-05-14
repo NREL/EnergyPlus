@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -293,7 +294,7 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     SurfaceGeometry::GetSurfaceData(outputFiles(), errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
     ElectricBaseboardRadiator::GetElectricBaseboardInput();
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
@@ -589,7 +590,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     SurfaceGeometry::GetSurfaceData(outputFiles(), errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
     // get electric baseboard inputs
     ElectricBaseboardRadiator::GetElectricBaseboardInput();
 
@@ -610,13 +611,13 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
         ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod;
     DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     // do electric baseboard sizing
-    ElectricBaseboardRadiator::SizeElectricBaseboard(BaseboardNum);
+    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
     // check user specified hardsized nominal capacity
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 1000.0);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 1000.0);
     // check nominal capacity autosize
     ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
-    ElectricBaseboardRadiator::SizeElectricBaseboard(BaseboardNum);
+    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 2000.0);
 
     BaseboardNum = 2;
@@ -629,14 +630,14 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     DataHeatBalance::Zone(CntrlZoneNum).FloorArea = 100.0;
     // do electric baseboard sizing
-    ElectricBaseboardRadiator::SizeElectricBaseboard(BaseboardNum);
+    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
     // check user specified hardsized nominal capacity
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 30.0);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 3000.0);
     // check nominal capacity autosize
     ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
     ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
-    ElectricBaseboardRadiator::SizeElectricBaseboard(BaseboardNum);
+    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 2000.0);
 
     BaseboardNum = 3;
@@ -649,14 +650,14 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
     DataHeatBalance::Zone(CntrlZoneNum).FloorArea = 100.0;
     // do electric baseboard sizing
-    ElectricBaseboardRadiator::SizeElectricBaseboard(BaseboardNum);
+    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
     // check user specified hardsized nominal capacity
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 0.50);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 1500.0);
     // check nominal capacity autosize
     ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
     ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
-    ElectricBaseboardRadiator::SizeElectricBaseboard(BaseboardNum);
+    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 3000.0);
 }
 

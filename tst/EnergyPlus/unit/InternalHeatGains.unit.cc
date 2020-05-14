@@ -59,7 +59,9 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -119,16 +121,16 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput(outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
 
     ASSERT_EQ(DataHeatBalance::ZoneOtherEq.size(), 2u);
 
     for (unsigned long i = 1; i <= DataHeatBalance::ZoneOtherEq.size(); ++i) {
         const DataHeatBalance::ZoneEquipData &equip = DataHeatBalance::ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
-            ASSERT_EQ(equip.OtherEquipFuelType, 0);
+            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::Unknown);
         } else if (equip.Name == "OTHEREQ2") {
-            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::PropaneUse);
+            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::PropaneUse);
         }
     }
 }
@@ -168,7 +170,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(outputFiles()), std::runtime_error);
+    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles()), std::runtime_error);
 
     std::string const error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
@@ -220,7 +222,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(outputFiles()), std::runtime_error);
+    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles()), std::runtime_error);
 
     error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
@@ -289,18 +291,18 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
 
     ScheduleManager::ScheduleInputProcessed = true;
     ScheduleManager::Schedule(1).Used = true;
-    ;
+
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
     ScheduleManager::Schedule(1).MinValue = 1.0;
     ScheduleManager::Schedule(1).MaxValue = 1.0;
     ScheduleManager::Schedule(1).MaxMinSet = true;
     ScheduleManager::Schedule(2).Used = true;
-    ;
+
     ScheduleManager::Schedule(2).CurrentValue = 131.8;
     ScheduleManager::Schedule(2).MinValue = 131.8;
     ScheduleManager::Schedule(2).MaxValue = 131.8;
     ScheduleManager::Schedule(2).MaxMinSet = true;
-    InternalHeatGains::GetInternalHeatGainsInput(outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
 
     EXPECT_FALSE(InternalHeatGains::ErrorsFound);
 }
@@ -426,7 +428,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
     InternalHeatGains::CalcZoneITEq();
     Real64 InitialPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
 
@@ -454,7 +456,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     bool ErrorsFound(false);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    InternalHeatGains::GetInternalHeatGainsInput(outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
 
     // Set up a simple convective gain for each gain type
     int zoneNum = 1;
@@ -642,7 +644,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
 
     DataLoopNode::Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq();
@@ -750,7 +752,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
     InternalHeatGains::CalcZoneITEq();
 
     // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such
@@ -828,4 +830,177 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
     FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
     EXPECT_EQ(ExpectedResult, FunctionCallResult);
 
+}
+TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,Zone 1;",
+
+        "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
+
+        "Schedule:Constant,Schedule1,,1.0;",
+
+        "  People,",
+        "    Zone 1 People,           !- Name",
+        "    Zone 1,                  !- Zone or ZoneList Name",
+        "    Schedule1,               !- Number of People Schedule Name",
+        "    people,                  !- Number of People Calculation Method",
+        "    3.000000,                !- Number of People",
+        "    ,                        !- People per Zone Floor Area{ person / m2 }",
+        "    ,                        !- Zone Floor Area per Person{ m2 / person }",
+        "    0.3000000,               !- Fraction Radiant",
+        "    0.5,                     !- Sensible Heat Fraction",
+        "    Schedule1,               !- Activity Level Schedule Name",
+        "    3.82E-8;                 !- Carbon Dioxide Generation Rate{ m3 / s - W }",
+
+        "  Lights,",
+        "    Zone 1 Lights,           !- Name",
+        "    Zone 1,                  !- Zone or ZoneList Name",
+        "    Schedule1,               !- Schedule Name",
+        "    LightingLevel,           !- Design Level Calculation Method",
+        "    100.0,                   !- Lighting Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0.0000,                  !- Return Air Fraction",
+        "    0.7000,                  !- Fraction Radiant",
+        "    0.2000,                  !- Fraction Visible",
+        "    1.0000,                  !- Fraction Replaceable",
+        "    General,                 !- End-Use Subcategory",
+        "    No;                      !- Return Air Fraction Calculated from Plenum Temperature",
+
+        "  ElectricEquipment,",
+        "    Zone 1 Electric Equipment,  !- Name",
+        "    Zone 1,                  !- Zone or ZoneList Name",
+        "    Schedule1,               !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    150.0,                   !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0.0000,                  !- Fraction Latent",
+        "    0.5000,                  !- Fraction Radiant",
+        "    0.0000;                  !- Fraction Lost",
+
+        "  GasEquipment,",
+        "    Zone 1 Gas Equipment,  !- Name",
+        "    Zone 1,                  !- Zone or ZoneList Name",
+        "    Schedule1,               !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    200.0,                   !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0.0000,                  !- Fraction Latent",
+        "    0.5000,                  !- Fraction Radiant",
+        "    0.0000,                  !- Fraction Lost",
+        "    1.0E-7;                  !- Carbon Dioxide Generation Rate {m3/s-W}",
+
+        "  HotWaterEquipment,",
+        "    Zone 1 Hot Water Equipment,  !- Name",
+        "    Zone 1,                  !- Zone or ZoneList Name",
+        "    Schedule1,               !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    250.0,                   !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0.0000,                  !- Fraction Latent",
+        "    0.5000,                  !- Fraction Radiant",
+        "    0.0000;                  !- Fraction Lost",
+
+        "  SteamEquipment,",
+        "    Zone 1 Steam Equipment,  !- Name",
+        "    Zone 1,                  !- Zone or ZoneList Name",
+        "    Schedule1,               !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    300.0,                   !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0.0000,                  !- Fraction Latent",
+        "    0.5000,                  !- Fraction Radiant",
+        "    0.0000;                  !- Fraction Lost",
+
+        "  OtherEquipment,",
+        "    Zone 1 Other Equipment,  !- Name",
+        "    OtherFuel1,              !- Fuel Type",
+        "    Zone 1,                  !- Zone or ZoneList Name",
+        "    Schedule1,               !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    350.0,                   !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0.0000,                  !- Fraction Latent",
+        "    0.5000,                  !- Fraction Radiant",
+        "    0.0000,                  !- Fraction Lost",
+        "    2.0E-7;                  !- Carbon Dioxide Generation Rate {m3/s-W}",
+
+        "  ZoneBaseboard:OutdoorTemperatureControlled,",
+        "    Zone 1 BBHeat,           !- Name",
+        "    Zone 1,                  !- Zone Name",
+        "    Schedule1,               !- Schedule Name",
+        "    1500,                    !- Capacity at Low Temperature {W}",
+        "    0,                       !- Low Temperature {C}",
+        "    500,                     !- Capacity at High Temperature {W}",
+        "    10,                      !- High Temperature {C}",
+        "    0.5,                     !- Fraction Radiant",
+        "    Baseboard Heat;          !- End - Use Subcategory",
+
+        "  ZoneContaminantSourceAndSink:CarbonDioxide,",
+        "    CO2people,               !- Name",
+        "    Zone 1,                  !- Zone Name",
+        "    0.0001125,               !- Design Generation Rate{ m3 / s }",
+        "    Schedule1;               !- Schedule Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
+
+    bool ErrorsFound(false);
+
+    DataGlobals::NumOfTimeStepInHour = 1;                 // must initialize this to get schedules initialized
+    DataGlobals::MinutesPerTimeStep = 60;                 // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    DataEnvironment::DayOfYear_Schedule = 1;
+    DataEnvironment::DayOfMonth = 1;
+    DataEnvironment::DayOfWeek = 1;
+    DataGlobals::HourOfDay = 1;
+    DataGlobals::TimeStep = 1;
+    ScheduleManager::UpdateScheduleValues();
+
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    HeatBalanceManager::AllocateHeatBalArrays();
+
+    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+
+    EXPECT_EQ(DataHeatBalance::TotPeople, 1);
+    EXPECT_EQ(DataHeatBalance::TotLights, 1);
+    EXPECT_EQ(DataHeatBalance::TotElecEquip, 1);
+    EXPECT_EQ(DataHeatBalance::TotGasEquip, 1);
+    EXPECT_EQ(DataHeatBalance::TotHWEquip, 1);
+    EXPECT_EQ(DataHeatBalance::TotStmEquip, 1);
+    EXPECT_EQ(DataHeatBalance::TotOthEquip, 1);
+    EXPECT_EQ(DataHeatBalance::TotBBHeat, 1);
+
+    EnergyPlus::createFacilityElectricPowerServiceObject(); // Needs to happen before InitInternalHeatGains
+
+    // First time should be all good, because ZnRpt values intialize to zero
+    InternalHeatGains::InitInternalHeatGains(state);
+
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).GasPower, 200.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).HWPower, 250.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).SteamPower, 300.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).BaseHeatPower, 1500.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).CO2Rate, 0.0001125);
+
+    // Second time should should give the same answers, because everything should reset before accumulating
+    InternalHeatGains::InitInternalHeatGains(state);
+
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).GasPower, 200.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).HWPower, 250.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).SteamPower, 300.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).BaseHeatPower, 1500.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(1).CO2Rate, 0.0001125);
 }

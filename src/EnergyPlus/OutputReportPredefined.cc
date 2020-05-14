@@ -47,9 +47,9 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 
@@ -2676,7 +2676,6 @@ namespace OutputReportPredefined {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtI1("(I1)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2686,10 +2685,7 @@ namespace OutputReportPredefined {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int sigDigitCount;
-        std::string digitString;
-        std::string formatConvert;
         std::string stringEntry;
-        int IOS;
 
         incrementTableEntry();
         // check for number of significant digits
@@ -2702,21 +2698,18 @@ namespace OutputReportPredefined {
         } else {
             sigDigitCount = 2;
         }
-        // convert the integer to a string for the number of digits
-        ObjexxFCL::gio::write(digitString, fmtI1) << sigDigitCount;
-        // build up the format string
+
         if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
-            formatConvert = "(F12." + digitString + ')';
+            tableEntry(numTableEntry).charEntry = format("{:#12.{}F}", tableEntryReal, sigDigitCount);
         } else {
-            formatConvert = "(E12." + digitString + ')';
+            tableEntry(numTableEntry).charEntry = format("{:12.{}Z}", tableEntryReal, sigDigitCount);
         }
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::write(stringEntry, formatConvert, flags) << tableEntryReal;
-            IOS = flags.ios();
+
+
+        if (tableEntry(numTableEntry).charEntry.size() > 12) {
+            tableEntry(numTableEntry).charEntry = "  Too Big";
         }
-        if (IOS != 0) stringEntry = "  Too Big";
-        tableEntry(numTableEntry).charEntry = stringEntry;
+
         tableEntry(numTableEntry).objectName = objName;
         tableEntry(numTableEntry).indexColumn = columnIndex;
         tableEntry(numTableEntry).origRealEntry = tableEntryReal;
@@ -2788,7 +2781,6 @@ namespace OutputReportPredefined {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2797,12 +2789,10 @@ namespace OutputReportPredefined {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string stringEntry;
 
         incrementTableEntry();
         // convert the integer to a string
-        ObjexxFCL::gio::write(stringEntry, fmtLD) << tableEntryInt;
-        tableEntry(numTableEntry).charEntry = stringEntry;
+        tableEntry(numTableEntry).charEntry = format("{:12}", tableEntryInt);
         tableEntry(numTableEntry).objectName = objName;
         tableEntry(numTableEntry).indexColumn = columnIndex;
     }

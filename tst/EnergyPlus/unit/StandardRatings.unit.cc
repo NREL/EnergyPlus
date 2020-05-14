@@ -249,14 +249,14 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     using CurveManager::NumCurves;
     using StandardRatings::CalcChillerIPLV;
     using DataPlant::TypeOf_Chiller_ElectricEIR;
-    
+
     // Setup an air-cooled Chiller:Electric:EIR chiller
-    ChillerElectricEIR::ElectricEIRChiller.allocate(1);
-    ChillerElectricEIR::ElectricEIRChiller(1).Name = "Air Cooled Chiller";
-    ChillerElectricEIR::ElectricEIRChiller(1).RefCap = 216000; // W
-    ChillerElectricEIR::ElectricEIRChiller(1).RefCOP = 2.81673861898309; // W/W
-    ChillerElectricEIR::ElectricEIRChiller(1).CondenserType = ChillerElectricEIR::AirCooled;
-    ChillerElectricEIR::ElectricEIRChiller(1).MinUnloadRat = 0.15;
+    state.dataChillerElectricEIR.ElectricEIRChiller.allocate(1);
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).Name = "Air Cooled Chiller";
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).RefCap = 216000; // W
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).RefCOP = 2.81673861898309; // W/W
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AIRCOOLED;
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).MinUnloadRat = 0.15;
 
     int CurveNum;
     NumCurves = 3;
@@ -279,7 +279,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).Var1Max = 10;
     PerfCurve(CurveNum).Var2Min = 23.89;
     PerfCurve(CurveNum).Var2Max = 46.11;
-    ChillerElectricEIR::ElectricEIRChiller(1).ChillerCapFTIndex = 1;
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
     CurveNum = 2;
@@ -298,7 +298,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).Var1Max = 10;
     PerfCurve(CurveNum).Var2Min = 10;
     PerfCurve(CurveNum).Var2Max = 46.11;
-    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
     CurveNum = 3;
@@ -313,19 +313,19 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).Coeff4 = 0.412199944;
     PerfCurve(CurveNum).Var1Min = 0;
     PerfCurve(CurveNum).Var1Max = 1;
-    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
     CalcChillerIPLV(outputFiles(),
-                    ChillerElectricEIR::ElectricEIRChiller(1).Name,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).Name,
                     TypeOf_Chiller_ElectricEIR,
-                    ChillerElectricEIR::ElectricEIRChiller(1).RefCap,
-                    ChillerElectricEIR::ElectricEIRChiller(1).RefCOP,
-                    ChillerElectricEIR::ElectricEIRChiller(1).CondenserType,
-                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerCapFTIndex,
-                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFTIndex,
-                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLRIndex,
-                    ChillerElectricEIR::ElectricEIRChiller(1).MinUnloadRat,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).RefCap,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).RefCOP,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).CondenserType,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerCapFTIndex,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFTIndex,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFPLRIndex,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).MinUnloadRat,
                     IPLV,
                     Optional<const Real64>(),
                     ObjexxFCL::Optional_int_const(),

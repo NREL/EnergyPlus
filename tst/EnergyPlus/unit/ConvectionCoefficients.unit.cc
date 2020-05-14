@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -448,14 +449,14 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(outputFiles(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -924,14 +925,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -981,14 +982,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1038,14 +1039,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1095,14 +1096,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1152,14 +1153,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1209,14 +1210,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
