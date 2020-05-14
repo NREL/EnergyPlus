@@ -77,6 +77,8 @@ namespace EnergyPlus {
 
 namespace PondGroundHeatExchanger {
 
+    std::ofstream file("pond.csv", std::ofstream::out);
+
     // Module containing the routines dealing with pond ground heat exchangers
 
     // MODULE INFORMATION:
@@ -131,7 +133,6 @@ namespace PondGroundHeatExchanger {
         this->InitPondGroundHeatExchanger(FirstHVACIteration);
         this->CalcPondGroundHeatExchanger();
         this->UpdatePondGroundHeatExchanger();
-        this->ReportPondGroundHeatExchanger();
     }
 
     PlantComponent *PondGroundHeatExchangerData::factory(std::string const &objectName)
@@ -449,7 +450,6 @@ namespace PondGroundHeatExchanger {
         }
 
         this->InletTemp = DataLoopNode::Node(InletNodeNum).Temp;
-        this->OutletTemp = DataLoopNode::Node(OutletNodeNum).Temp;
         this->PondTemp = this->BulkTemperature;
 
         // Hypothetical design flow rate
@@ -523,7 +523,6 @@ namespace PondGroundHeatExchanger {
     Real64 PondGroundHeatExchangerData::CalcTotalFLux(Real64 const PondBulkTemp // pond temp for this flux calculation
     )
     {
-
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002
         //       MODIFIED       na
@@ -604,10 +603,9 @@ namespace PondGroundHeatExchanger {
         // heat transfer with fluid - heat exchanger analogy.
 
         // convective flux
-        Real64 Qfluid = this->MassFlowRate * SpecHeat * this->CalcEffectiveness(this->InletTemp, PondBulkTemp, this->MassFlowRate) *
+        Real64 effectiveness = this->CalcEffectiveness(this->InletTemp, PondBulkTemp, this->MassFlowRate);
+        Real64 Qfluid = this->MassFlowRate * SpecHeat * effectiveness *
                         (this->InletTemp - PondBulkTemp);
-
-        this->HeatTransferRate = Qfluid;
 
         // evaporation flux
         // get air properties
@@ -635,7 +633,7 @@ namespace PondGroundHeatExchanger {
         return CalcTotalFLux;
     }
 
-    Real64 PondGroundHeatExchangerData::CalcSolarFlux()
+    Real64 PondGroundHeatExchangerData::CalcSolarFlux() const
     {
 
         // FUNCTION INFORMATION:
@@ -854,43 +852,31 @@ namespace PondGroundHeatExchanger {
 
         // Calculate the water side outlet conditions and set the
         // appropriate conditions on the correct HVAC node.
-        Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->LoopNum).FluidName, this->InletTemp, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
-        // check for flow
+        Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                                this->InletTemp,
+                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
         PlantUtilities::SafeCopyPlantNode(InletNodeNum, OutletNodeNum);
 
+        // update outlet temp
         if ((CpFluid > 0.0) && (this->MassFlowRate > 0.0)) {
-
-            DataLoopNode::Node(OutletNodeNum).Temp = this->InletTemp - this->HeatTransferRate / (this->MassFlowRate * CpFluid);
-            DataLoopNode::Node(OutletNodeNum).Enthalpy = DataLoopNode::Node(OutletNodeNum).Temp * CpFluid;
+            this->OutletTemp = this->InletTemp - this->HeatTransferRate / (this->MassFlowRate * CpFluid);
+        } else {
+            this->OutletTemp = this->InletTemp;
         }
+
+        // update node
+        DataLoopNode::Node(this->OutletNodeNum).Temp = this->OutletTemp;
+        DataLoopNode::Node(this->OutletNodeNum).MassFlowRate = this->MassFlowRate;
+
+        // update heat transfer rate
+        // compute pond heat transfer
+        Real64 effectiveness = this->CalcEffectiveness(this->InletTemp, this->PondTemp, this->MassFlowRate);
+        this->HeatTransferRate = this->MassFlowRate * CpFluid * effectiveness * (this->InletTemp - this->PondTemp);
+        this->Energy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // keep track of the bulk temperature
         this->BulkTemperature = this->PondTemp;
-    }
-
-    //==============================================================================
-
-    void PondGroundHeatExchangerData::ReportPondGroundHeatExchanger() // Index for the pond under consideration
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Simon Rees
-        //       DATE WRITTEN   August 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine simply produces output for Pond ground heat exchangers
-
-        // update flows and temps from node data
-        this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
-        this->OutletTemp = DataLoopNode::Node(this->OutletNodeNum).Temp;
-        this->MassFlowRate = DataLoopNode::Node(this->InletNodeNum).MassFlowRate;
-
-        // update other variables from module variables
-        this->Energy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
     }
 
 } // namespace PondGroundHeatExchanger
