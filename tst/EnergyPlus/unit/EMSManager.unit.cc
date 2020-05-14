@@ -53,14 +53,13 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -70,6 +69,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
@@ -1575,15 +1575,18 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
     EXPECT_FALSE(Node(2).IsLocalNode);
     EXPECT_TRUE(Node(3).IsLocalNode);
 }
-TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOption2b)
+TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOption)
 {
     // #7586
     DataSurfaces::Surface.allocate(2);
     DataSurfaces::SurfaceWindow.allocate(2);
     DataHeatBalance::Construct.allocate(1);
     DataSurfaces::WindowShadingControl.allocate(2);
+    DataDaylighting::ZoneDaylight.allocate(1);
     DataSurfaces::Surface(1).Name = "Surface1";
     DataSurfaces::Surface(2).Name = "Surface2";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(2).Zone = 1;
     DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Window;
     DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
     DataSurfaces::Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
@@ -1608,5 +1611,11 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     SetupWindowShadingControlActuators();
 
     EXPECT_FALSE(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn);
-    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue,0);
+    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue, 0);
+
+    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn = true;
+    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue = 1.0;
+    SolarShading::WindowShadingManager();
+    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlag, DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue);
+
 }
