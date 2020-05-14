@@ -46,13 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -61,9 +59,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -98,7 +93,6 @@ namespace BranchInputManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::DisplayExtraWarnings;
     using namespace DataLoopNode;
     using namespace DataBranchAirLoopPlant;
@@ -2907,7 +2901,6 @@ namespace BranchInputManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr auto fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2927,8 +2920,6 @@ namespace BranchInputManager {
         Array1D_bool BranchReported;
         int BCount;
         int Found;
-        std::string ChrOut;
-        std::string ChrOut1;
         //  LOGICAL UniqueNodeError
         int NodeNum;
         int Loop2;
@@ -2968,8 +2959,7 @@ namespace BranchInputManager {
         print(outputFiles.bnd, "{}\n", "! ===============================================================");
         static constexpr auto Format_700("! <#Branch Lists>,<Number of Branch Lists>");
         print(outputFiles.bnd, "{}\n", Format_700);
-        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumOfBranchLists;
-        print(outputFiles.bnd, "{}\n", " #Branch Lists," + stripped(ChrOut));
+        print(outputFiles.bnd, " #Branch Lists,{}\n", NumOfBranchLists);
         static constexpr auto Format_702("! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>");
         print(outputFiles.bnd, "{}\n", Format_702);
         static constexpr auto Format_704(

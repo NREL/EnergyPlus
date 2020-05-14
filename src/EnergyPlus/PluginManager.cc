@@ -407,6 +407,17 @@ namespace PluginManagement {
         callbacks[iCalledFrom].push_back(f);
     }
 
+    void onBeginEnvironment() {
+        // reset vars and trends -- sensors and actuators are reset by EMS
+        for (auto & v : globalVariableValues) {
+            v = 0;
+        }
+        // reinitialize trend variables so old data are purged
+        for (auto & tr : trends) {
+            tr.reset();
+        }
+    }
+
     int PluginManager::numActiveCallbacks()
     {
         return (int)callbacks.size();
@@ -422,8 +433,8 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
         for (auto &plugin : plugins) {
             if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) {
-                plugin.run(iCalledFrom);
-                anyRan = true;
+                bool const didOneRun = plugin.run(iCalledFrom);
+                if (didOneRun) anyRan = true;
             }
         }
 #endif
@@ -1191,8 +1202,9 @@ namespace PluginManagement {
     }
 
 #if LINK_WITH_PYTHON == 1
-    void PluginInstance::run(int iCalledFrom) const
+    bool PluginInstance::run(int iCalledFrom) const
     {
+        // returns true if a plugin actually ran
         const char *functionName = nullptr;
         if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
             if (this->bHasBeginNewEnvironment) {
@@ -1266,7 +1278,7 @@ namespace PluginManagement {
 
         // leave if we didn't find a match
         if (!functionName) {
-            return;
+            return false;
         }
 
         // then call the main function
@@ -1297,10 +1309,12 @@ namespace PluginManagement {
         if (EnergyPlus::PluginManagement::apiErrorFlag) {
             EnergyPlus::ShowFatalError("API problems encountered while running plugin cause program termination.");
         }
+        return true;
     }
 #else
-    void PluginInstance::run(int EP_UNUSED(iCalledFrom)) const
+    bool PluginInstance::run(int EP_UNUSED(iCalledFrom)) const
     {
+        return false;
     }
 #endif
 
