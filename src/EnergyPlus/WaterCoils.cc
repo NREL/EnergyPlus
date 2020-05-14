@@ -2233,7 +2233,7 @@ namespace WaterCoils {
                 TempSize = AutoSize;
                 RequestSizing(state, CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName);
                 DataCapacityUsedForSizing = TempSize;
-                TempSize = AutoSize;
+                TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
                 RequestSizing(state, CompType, CompName, CoolingWaterflowSizing, SizingString, TempSize, bPRINT, RoutineName);
                 DataWaterFlowUsedForSizing = TempSize;
                 // end pre-sizing data calculations
@@ -2346,7 +2346,7 @@ namespace WaterCoils {
                 bPRINT = true;
                 FieldNum = 1; //  CoilModel_Detailed: N1 , \field Maximum Water Flow Rate, else: N1 , \field Design Water Flow Rate
                 SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m3/s]";
-                TempSize = DataWaterFlowUsedForSizing;
+                TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
                 RequestSizing(state, CompType, CompName, CoolingWaterflowSizing, SizingString, TempSize, bPRINT, RoutineName);
                 WaterCoil(CoilNum).MaxWaterVolFlowRate = TempSize;
                 DataWaterFlowUsedForSizing = TempSize;
