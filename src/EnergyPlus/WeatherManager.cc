@@ -2889,13 +2889,13 @@ namespace WeatherManager {
             Array1D<Real64> LiquidPrecip;    // Liquid Precipitation
 
             Array1D<Real64> TotalSkyCover; // Total Sky Cover
-            Array1D<Real64> TotalOpaqueCover; // Total Sky Cover            
+            Array1D<Real64> OpaqueSkyCover; // Total Sky Cover            
 
             // Default Constructor
             HourlyWeatherData()
                 : IsRain(24, false), IsSnow(24, false), OutDryBulbTemp(24, 0.0), OutDewPointTemp(24, 0.0), OutBaroPress(24, 0.0), OutRelHum(24, 0.0),
                   WindSpeed(24, 0.0), WindDir(24, 0.0), SkyTemp(24, 0.0), HorizIRSky(24, 0.0), BeamSolarRad(24, 0.0), DifSolarRad(24, 0.0),
-                  Albedo(24, 0.0), LiquidPrecip(24, 0.0), TotalSkyCover(24, 0.0), TotalOpaqueCover(24, 0.0)
+                  Albedo(24, 0.0), LiquidPrecip(24, 0.0), TotalSkyCover(24, 0.0), OpaqueSkyCover(24, 0.0)
             {
             }
         };
@@ -3632,6 +3632,9 @@ namespace WeatherManager {
                 Wthr.IsSnow(Hour) = TomorrowIsSnow(1, Hour);
                 Wthr.Albedo(Hour) = TomorrowAlbedo(1, Hour);
                 Wthr.LiquidPrecip(Hour) = TomorrowLiquidPrecip(1, Hour);
+
+                Wthr.TotalSkyCover(Hour) = TomorrowTotalSkyCover(1, Hour);
+                Wthr.OpaqueSkyCover(Hour) = TomorrowOpaqueSkyCover(1, Hour);
             }
 
             if (!LastHourSet) {
