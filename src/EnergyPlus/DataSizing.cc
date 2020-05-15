@@ -630,7 +630,7 @@ namespace DataSizing {
         this->HeatLoadSeq = this->HeatLoadSeq * ratio;
     }
 
-    void ZoneSizingData::zeroMemberData(int const numOfTimeStepInDay)
+    void ZoneSizingData::zeroMemberData()
     {
         if (!allocated(this->DOASSupMassFlowSeq)) return;
         std::fill(this->DOASSupMassFlowSeq.begin(), this->DOASSupMassFlowSeq.end(), 0.0);

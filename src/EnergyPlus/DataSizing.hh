@@ -614,7 +614,7 @@ namespace DataSizing {
         );
         void scaleZoneHeating(Real64 const ratio // Scaling ratio
         );
-        void zeroMemberData(int const numOfTimeStepInDay);
+        void zeroMemberData();
         void allocateMemberArrays(int const numOfTimeStepInDay);
     };
 

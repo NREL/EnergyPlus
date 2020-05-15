@@ -1552,11 +1552,11 @@ namespace ZoneEquipmentManager {
 
         for (int ctrlZoneNum = 1; ctrlZoneNum <= NumOfZones; ++ctrlZoneNum) {
             for (int desDayNum = 1; desDayNum <= TotDesDays + TotRunDesPersDays; ++desDayNum) {
-                ZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
-                CalcZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
+                ZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData();
+                CalcZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData();
             }
-            CalcFinalZoneSizing(ctrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
-            FinalZoneSizing(ctrlZoneNum).zeroMemberData(ZoneEquipmentManager::NumOfTimeStepInDay);
+            CalcFinalZoneSizing(ctrlZoneNum).zeroMemberData();
+            FinalZoneSizing(ctrlZoneNum).zeroMemberData();
         }
     }
 
