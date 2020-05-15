@@ -223,7 +223,7 @@ namespace AirflowNetworkBalanceManager {
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
 
-    void AssignSystemAirLoopNum();
+    void AssignFanAirLoopNum();
 
     void ValidateDistributionSystem();
 
