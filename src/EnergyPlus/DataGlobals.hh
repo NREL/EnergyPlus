@@ -238,8 +238,6 @@ namespace DataGlobals {
     extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int OutputFileShadingFrac;                // Unit number for shading output
     extern int StdMeterRecordCount;                  // Count of Meter output records
-    extern int OutputDElightIn;                      // Unit number for the DElight In file
-    extern std::ostream *delightin_stream;           // Internal stream used for DElight In file
     extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation
     extern bool SysSizingCalc;                       // TRUE if system sizing calculation
     extern bool DoZoneSizing;                        // User input in SimulationControl object

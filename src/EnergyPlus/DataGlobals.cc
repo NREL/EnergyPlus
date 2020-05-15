@@ -203,8 +203,6 @@ namespace DataGlobals {
     int OutputFilePerfLog(0);                        // Unit number for performance log outputs
     int OutputFileShadingFrac(0);                    // Unit number for shading output
     int StdMeterRecordCount(0);                      // Count of Meter output records
-    int OutputDElightIn(0);                          // Unit number for the DElight In file
-    std::ostream *delightin_stream(nullptr);         // Internal stream used for DElight In file
     bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
     bool SysSizingCalc(false);                       // TRUE if system sizing calculation
     bool DoZoneSizing(false);                        // User input in SimulationControl object
@@ -362,7 +360,6 @@ namespace DataGlobals {
         errorCallback = nullptr;
         OutputFiles::getSingleton().mtr.close();
         err_stream = nullptr;
-        delightin_stream = nullptr;
         eplusRunningViaAPI = false;
     }
 

@@ -142,7 +142,6 @@ namespace OutputProcessor {
     extern int MaxIVariable;
     extern bool OutputInitialized;
     extern int ProduceReportVDD;
-    extern int OutputFileMeterDetails; // Unit number for Meter Details file (output)
     extern int NumHoursInDay;
     extern int NumHoursInMonth;
     extern int NumHoursInSim;
@@ -655,7 +654,7 @@ namespace OutputProcessor {
     // The following routines implement Energy Meters in EnergyPlus.
     // *****************************************************************************
 
-    void InitializeMeters();
+    void InitializeMeters(OutputFiles &outputFiles);
 
     void GetCustomMeterInput(bool &ErrorsFound);
 
@@ -749,7 +748,7 @@ namespace OutputProcessor {
 
     std::string DateToStringWithMonth(int const codedDate); // word containing encoded month, day, hour, minute
 
-    void ReportMeterDetails();
+    void ReportMeterDetails(OutputFiles &outputFiles);
 
     // *****************************************************************************
     // End of routines for Energy Meters implementation in EnergyPlus.

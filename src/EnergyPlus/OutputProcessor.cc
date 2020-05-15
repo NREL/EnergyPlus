@@ -228,7 +228,6 @@ namespace OutputProcessor {
     int MaxIVariable(0);
     bool OutputInitialized(false);
     int ProduceReportVDD(ReportVDD_No);
-    int OutputFileMeterDetails(0); // Unit number for Meter Details file (output)
     int NumHoursInDay(24);
     int NumHoursInMonth(0);
     int NumHoursInSim(0);
@@ -350,7 +349,6 @@ namespace OutputProcessor {
         OutputInitialized = false;
         GetOutputInputFlag = true;
         ProduceReportVDD = ReportVDD_No;
-        OutputFileMeterDetails = 0;
         NumHoursInDay = 24;
         NumHoursInMonth = 0;
         NumHoursInSim = 0;
@@ -497,7 +495,7 @@ namespace OutputProcessor {
 
         TimeStepZoneSec = double(MinutesPerTimeStep) * 60.0;
 
-        InitializeMeters();
+        InitializeMeters(OutputFiles::getSingleton());
     }
 
     void SetupTimePointers(std::string const &TimeStepTypeKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
@@ -520,7 +518,6 @@ namespace OutputProcessor {
         // attributes in the derived types.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string cValue;
         // ValidateTimeStepType will throw a Fatal if not valid
         TimeStepType timeStepType = ValidateTimeStepType(TimeStepTypeKey, "SetupTimePointers");
 
@@ -1292,7 +1289,7 @@ namespace OutputProcessor {
     // The following routines implement Energy Meters in EnergyPlus.
     // *****************************************************************************
 
-    void InitializeMeters()
+    void InitializeMeters(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1329,18 +1326,8 @@ namespace OutputProcessor {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int write_stat;
 
-        OutputFileMeterDetails = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(OutputFileMeterDetails, DataStringGlobals::outputMtdFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-            ShowFatalError("InitializeMeters: Could not open file " + DataStringGlobals::outputMtdFileName + " for output (write).");
-        }
+        outputFiles.mtd.ensure_open("InitializeMeters");
     }
 
     void GetCustomMeterInput(bool &ErrorsFound)
@@ -3780,7 +3767,7 @@ namespace OutputProcessor {
         return StringOut;
     }
 
-    void ReportMeterDetails()
+    void ReportMeterDetails(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3816,86 +3803,62 @@ namespace OutputProcessor {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int VarMeter;
-        int VarMeter1;
-        int Meter;
-        int I;
-        std::string String;
-        std::string Multipliers;
-        int ZoneMult;     // Zone Multiplier
-        int ZoneListMult; // Zone List Multiplier
-        bool CustDecWritten;
 
-        for (VarMeter = 1; VarMeter <= NumVarMeterArrays; ++VarMeter) {
+        for (int VarMeter = 1; VarMeter <= NumVarMeterArrays; ++VarMeter) {
 
-            std::string mtrUnitString = unitEnumToStringBrackets(RVariableTypes(VarMeterArrays(VarMeter).RepVariable).units);
+            const std::string mtrUnitString = unitEnumToStringBrackets(RVariableTypes(VarMeterArrays(VarMeter).RepVariable).units);
 
-            Multipliers = "";
-            ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
-            ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
+            std::string Multipliers = "";
+            const auto ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+            const auto ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
             if (ZoneMult > 1 || ZoneListMult > 1) {
                 Multipliers = format(" * {}  (Zone Multiplier = {}, Zone List Multiplier = {})", ZoneMult * ZoneListMult, ZoneMult, ZoneListMult);
             }
 
-            ObjexxFCL::gio::write(OutputFileMeterDetails, "(/,A)")
-                << " Meters for " + RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ReportIDChr + ',' +
-                       RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName + mtrUnitString + Multipliers;
+            print(outputFiles.mtd, "\n Meters for {},{}{}{}\n", RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ReportIDChr,
+                       RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName, mtrUnitString, Multipliers);
 
-            for (I = 1; I <= VarMeterArrays(VarMeter).NumOnMeters; ++I) {
-                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
-                    << "  OnMeter=" + EnergyMeters(VarMeterArrays(VarMeter).OnMeters(I)).Name + mtrUnitString;
+            for (int I = 1; I <= VarMeterArrays(VarMeter).NumOnMeters; ++I) {
+                print(outputFiles.mtd, "  OnMeter={}{}\n", EnergyMeters(VarMeterArrays(VarMeter).OnMeters(I)).Name, mtrUnitString);
             }
 
-            for (I = 1; I <= VarMeterArrays(VarMeter).NumOnCustomMeters; ++I) {
-                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
-                    << "  OnCustomMeter=" + EnergyMeters(VarMeterArrays(VarMeter).OnCustomMeters(I)).Name + mtrUnitString;
+            for (int I = 1; I <= VarMeterArrays(VarMeter).NumOnCustomMeters; ++I) {
+                print(outputFiles.mtd, "  OnCustomMeter={}{}\n", EnergyMeters(VarMeterArrays(VarMeter).OnCustomMeters(I)).Name, mtrUnitString);
             }
         }
 
-        for (Meter = 1; Meter <= NumEnergyMeters; ++Meter) {
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileMeterDetails, "(/,A)", flags)
-                    << " For Meter=" + EnergyMeters(Meter).Name + unitEnumToStringBrackets(EnergyMeters(Meter).Units);
-            }
+        for (int Meter = 1; Meter <= NumEnergyMeters; ++Meter) {
+            print(outputFiles.mtd, "\n For Meter={}{}", EnergyMeters(Meter).Name, unitEnumToStringBrackets(EnergyMeters(Meter).Units));
             if (EnergyMeters(Meter).ResourceType != "") {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA, flags) << ", ResourceType=" + EnergyMeters(Meter).ResourceType;
-            };
+                print(outputFiles.mtd, ", ResourceType={}", EnergyMeters(Meter).ResourceType);
+            }
             if (EnergyMeters(Meter).EndUse != "") {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA, flags) << ", EndUse=" + EnergyMeters(Meter).EndUse;
-            };
+                print(outputFiles.mtd, ", EndUse={}", EnergyMeters(Meter).EndUse);
+            }
             if (EnergyMeters(Meter).Group != "") {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA, flags) << ", Group=" + EnergyMeters(Meter).Group;
-            };
-            ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA) << ", contents are:";
+                print(outputFiles.mtd, ", Group={}", EnergyMeters(Meter).Group);
+            }
+            print(outputFiles.mtd, ", contents are:\n");
 
-            CustDecWritten = false;
+            bool CustDecWritten = false;
 
-            for (VarMeter = 1; VarMeter <= NumVarMeterArrays; ++VarMeter) {
+            for (int VarMeter = 1; VarMeter <= NumVarMeterArrays; ++VarMeter) {
                 if (EnergyMeters(Meter).TypeOfMeter == MeterType_Normal) {
                     if (any_eq(VarMeterArrays(VarMeter).OnMeters, Meter)) {
-                        for (VarMeter1 = 1; VarMeter1 <= VarMeterArrays(VarMeter).NumOnMeters; ++VarMeter1) {
+                        for (int VarMeter1 = 1; VarMeter1 <= VarMeterArrays(VarMeter).NumOnMeters; ++VarMeter1) {
                             if (VarMeterArrays(VarMeter).OnMeters(VarMeter1) != Meter) continue;
 
-                            Multipliers = "";
-                            ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
-                            ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
+                            std::string Multipliers = "";
+                            const auto ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+                            const auto ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
                             if (ZoneMult > 1 || ZoneListMult > 1) {
                                 Multipliers = format(
                                     " * {}  (Zone Multiplier = {}, Zone List Multiplier = {})", ZoneMult * ZoneListMult, ZoneMult, ZoneListMult);
                             }
 
-                            ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
-                                << "  " + RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName + Multipliers;
+                            print(outputFiles.mtd, "  {}{}\n", RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName, Multipliers);
                         }
                     }
                 }
@@ -3903,25 +3866,22 @@ namespace OutputProcessor {
                     if (VarMeterArrays(VarMeter).NumOnCustomMeters > 0) {
                         if (any_eq(VarMeterArrays(VarMeter).OnCustomMeters, Meter)) {
                             if (!CustDecWritten && EnergyMeters(Meter).TypeOfMeter == MeterType_CustomDec) {
-                                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
-                                    << " Values for this meter will be Source Meter=" + EnergyMeters(EnergyMeters(Meter).SourceMeter).Name +
-                                           "; but will be decremented by:";
+                                print(outputFiles.mtd,  " Values for this meter will be Source Meter={}; but will be decremented by:\n", EnergyMeters(EnergyMeters(Meter).SourceMeter).Name);
                                 CustDecWritten = true;
                             }
-                            for (VarMeter1 = 1; VarMeter1 <= VarMeterArrays(VarMeter).NumOnCustomMeters; ++VarMeter1) {
+                            for (int VarMeter1 = 1; VarMeter1 <= VarMeterArrays(VarMeter).NumOnCustomMeters; ++VarMeter1) {
                                 if (VarMeterArrays(VarMeter).OnCustomMeters(VarMeter1) != Meter) continue;
 
-                                Multipliers = "";
-                                ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
-                                ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
+                                std::string Multipliers;
+                                const auto ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+                                const auto ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
                                 if (ZoneMult > 1 || ZoneListMult > 1) {
                                     Multipliers = format(
                                         " * {}  (Zone Multiplier = {}, Zone List Multiplier = {})", ZoneMult * ZoneListMult, ZoneMult, ZoneListMult);
                                 }
 
-                                ObjexxFCL::gio::write(OutputFileMeterDetails, fmtA)
-                                    << "  " + RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName + Multipliers;
+                                print(outputFiles.mtd, "  {}{}\n", RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName, Multipliers);
                             }
                         }
                     }
@@ -4668,46 +4628,6 @@ namespace OutputProcessor {
                 ++StdOutputRecordCount;
             }
         }
-    }
-
-    void strip_number(char *str)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Stuart Mentzer
-        //       DATE WRITTEN   Nov 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Remove trailing spaces and fractional zeros from floating point representation C-string in place for fast output
-
-        assert(!std::strpbrk(str, "ed")); // Pre Not using lowercase exponent letter
-
-        std::size_t l(std::strlen(str)); // String length
-        assert(l >= 2);
-        while ((l > 0u) && (str[l - 1] == ' '))
-            --l;                                                     // Strip space from right
-        if ((std::strchr(str, '.')) && (!std::strpbrk(str, "ED"))) { // Remove trailing fractional zeros
-            while ((l > 0u) && (str[l - 1] == '0'))
-                --l; // Strip trailing 0
-            if (l > 0u) {
-                switch (l) {
-                case 1u: // .0* -> 0.
-                    std::strcpy(str, "0.");
-                    return;
-                case 2u:
-                    if (str[1] == '.') {
-                        char const c0(str[0]);
-                        if ((c0 == '+') || (c0 == '-')) {
-                            std::strcpy(str, "0.");
-                            return;
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-        str[l] = '\0'; // Shorten string
     }
 
     void WriteNumericData(int const reportID,           // The variable's reporting ID
@@ -7019,7 +6939,7 @@ void UpdateMeterReporting(OutputFiles &outputFiles)
         }
     }
 
-    ReportMeterDetails();
+    ReportMeterDetails(outputFiles);
 
     if (ErrorsLogged) {
         ShowFatalError("UpdateMeterReporting: Previous Meter Specification errors cause program termination.");

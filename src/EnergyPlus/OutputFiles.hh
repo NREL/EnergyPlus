@@ -138,6 +138,8 @@ public:
 
     OutputFileName delightIn{"eplusout.delightin"};
 
+    OutputFile mtd{"eplusout.mtd"};
+
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 

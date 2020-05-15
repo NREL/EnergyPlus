@@ -119,7 +119,6 @@ namespace DataStringGlobals {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    std::string outputBndFileName("eplusout.bnd");
     std::string outputEndFileName("eplusout.end");
     std::string outputErrFileName("eplusout.err");
     std::string outputJsonFileName("eplusout.json");
@@ -149,7 +148,6 @@ namespace DataStringGlobals {
     std::string outputDYMsgPackFileName("eplusout_daily.msgpack");
     std::string outputHRMsgPackFileName("eplusout_hourly.msgpack");
     std::string outputSMMsgPackFileName("eplusout_runperiod.msgpack");
-    std::string outputMtdFileName("eplusout.mtd");
     std::string outputMddFileName("eplusout.mdd");
     std::string outputRddFileName("eplusout.rdd");
     std::string outputShdFileName("eplusout.shd");

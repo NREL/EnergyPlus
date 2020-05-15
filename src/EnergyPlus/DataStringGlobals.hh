@@ -93,7 +93,6 @@ namespace DataStringGlobals {
     extern std::string outputHRMsgPackFileName;
     extern std::string outputSMMsgPackFileName;
 
-    extern std::string outputMtdFileName;
     extern std::string outputMddFileName;
     extern std::string outputRddFileName;
     extern std::string outputShdFileName;

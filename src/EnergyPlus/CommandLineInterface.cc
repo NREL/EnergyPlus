@@ -421,7 +421,7 @@ namespace CommandLineInterface {
         outputHRMsgPackFileName = outputFilePrefix + normalSuffix + "_hourly.msgpack";
         outputSMMsgPackFileName = outputFilePrefix + normalSuffix + "_runperiod.msgpack";
 
-        outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
+        OutputFiles::getSingleton().mtd.fileName = outputFilePrefix + normalSuffix + ".mtd";
         outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
         OutputFiles::getSingleton().mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
         outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
