@@ -223,7 +223,6 @@ namespace DataRuntimeLanguage {
 
     //######################################################################################################################################
 
-    int OutputEMSFileUnitNum(0);             // file lun handle for open EMS output file
     bool OutputEDDFile(false);               // set to true if user requests EDD output file be written
     bool OutputFullEMSTrace(false);          // how much to write out to trace, if true do verbose for each line
     bool OutputEMSErrors(false);             // how much to write out to trace, if true include Erl error messages
@@ -284,7 +283,6 @@ namespace DataRuntimeLanguage {
         NumExternalInterfaceActuatorsUsed = 0;
         NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = 0;
         NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = 0;
-        OutputEMSFileUnitNum = 0;
         OutputEDDFile = false;
         OutputFullEMSTrace = false;
         OutputEMSErrors = false;

@@ -158,14 +158,12 @@ namespace DataStringGlobals {
     std::string outputTblXmlFileName("eplustbl.xml");
     std::string outputAdsFileName("eplusADS.out");
     std::string outputGLHEFileName("eplusout.glhe");
-    std::string outputDelightInFileName("eplusout.delightin");
     std::string outputDelightOutFileName("eplusout.delightout");
     std::string outputDelightEldmpFileName("eplusout.delighteldmp");
     std::string outputDelightDfdmpFileName("eplusout.delightdfdmp");
     std::string outputMapTabFileName("eplusmap.tab");
     std::string outputMapCsvFileName("eplusmap.csv");
     std::string outputMapTxtFileName("eplusmap.txt");
-    std::string outputEddFileName("eplusout.edd");
     std::string outputIperrFileName("eplusout.iperr");
     std::string outputPerfLogFileName("eplusout_perflog.csv");
     std::string outputScreenCsvFileName("eplusscreen.csv");

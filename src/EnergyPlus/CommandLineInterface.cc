@@ -428,7 +428,7 @@ namespace CommandLineInterface {
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         OutputFiles::getSingleton().dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
         outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
-        outputEddFileName = outputFilePrefix + normalSuffix + ".edd";
+        OutputFiles::getSingleton().edd.fileName = outputFilePrefix + normalSuffix + ".edd";
         outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
         OutputFiles::getSingleton().sln.fileName = outputFilePrefix + normalSuffix + ".sln";
         OutputFiles::getSingleton().sci.fileName = outputFilePrefix + normalSuffix + ".sci";

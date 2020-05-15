@@ -95,6 +95,7 @@ void EnergyPlusFixture::SetUp()
     outputFiles().bnd.open_as_stringstream();
     outputFiles().debug.open_as_stringstream();
     outputFiles().mtd.open_as_stringstream();
+    outputFiles().edd.open_as_stringstream();
 
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
