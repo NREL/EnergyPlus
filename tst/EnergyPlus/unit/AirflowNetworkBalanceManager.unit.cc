@@ -19717,7 +19717,7 @@ std::string const idf_objects = delimited_string({
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
     DataEnvironment::OutDryBulbTemp = -17.29025;
@@ -19767,12 +19767,12 @@ std::string const idf_objects = delimited_string({
     DataHeatBalFanSys::ZoneAirHumRat(4) = 0.001;
     DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
 
-    DataZoneEquipment::GetZoneEquipmentData();
+    DataZoneEquipment::GetZoneEquipmentData(state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
-    SimAirServingZones::GetAirPathData();
+    SimAirServingZones::GetAirPathData(state);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     AirflowNetworkGetInputFlag = false;
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
@@ -19780,7 +19780,7 @@ std::string const idf_objects = delimited_string({
     DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1) = 1;
     DataZoneEquipment::ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
     AirflowNetwork::DisSysNodeData(9).EPlusNodeNum = 50;
-    ManageAirflowNetworkBalance(true);
+    ManageAirflowNetworkBalance(state, true);
     EXPECT_EQ(AirflowNetwork::DisSysCompCVFData(1).AirLoopNum,1);
 
 }

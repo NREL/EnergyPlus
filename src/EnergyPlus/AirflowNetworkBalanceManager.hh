@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -165,12 +166,13 @@ namespace AirflowNetworkBalanceManager {
 
     void clear_state();
 
-    void ManageAirflowNetworkBalance(Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
+    void ManageAirflowNetworkBalance(EnergyPlusData &state,
+                                     Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
                                      Optional_int_const Iter = _,                // Iteration number
                                      Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
     );
 
-    void GetAirflowNetworkInput(EnergyPlus::OutputFiles &outputFiles);
+    void GetAirflowNetworkInput(EnergyPlusData &state, EnergyPlus::OutputFiles &outputFiles);
 
     void InitAirflowNetwork();
 
@@ -237,7 +239,7 @@ namespace AirflowNetworkBalanceManager {
 
     Real64 GetZoneInfilAirChangeRate(int const ZoneNum); // hybrid ventilation system controlled zone number
 
-    int GetAirLoopNumber(int const NodeNumber); // Get air loop number for each distribution node and linkage
+    int GetAirLoopNumber(EnergyPlusData &state, int const NodeNumber); // Get air loop number for each distribution node and linkage
 
     Real64 AFNPressureResidual(Real64 const ExFanMassFlowRate,
                                Array1D<Real64> const &Par); // Residual function using Regula Falsi
