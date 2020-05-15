@@ -2474,6 +2474,9 @@ namespace WeatherManager {
         TodayDifSolarRad = TomorrowDifSolarRad;
         TodayLiquidPrecip = TomorrowLiquidPrecip;
 
+        TodayTotalSkyCover = TomorrowTotalSkyCover;
+        TodayOpaqueSkyCover = TomorrowOpaqueSkyCover;
+
         // Update Global Data
 
         DayOfYear = TodayVariables.DayOfYear;
