@@ -1360,5 +1360,22 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
 
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+}
 
+TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependence)
+{
+    Real64 ConvectionCoefficient;
+    Real64 ExpectedCoefficient = 3.076;
+
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).CosTilt = 0;
+
+    //HConvIn.allocate(NumOfSurfaces);
+    DataHeatBalance::HConvIn.allocate(1);
+
+    CalcASHRAESimpleIntConvCoeff(1, 20.0, 30.0);
+
+    ConvectionCoefficient = DataHeatBalance::HConvIn(1);
+
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 }
