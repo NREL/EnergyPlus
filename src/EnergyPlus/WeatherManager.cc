@@ -3197,6 +3197,10 @@ namespace WeatherManager {
             TomorrowDifSolarRad = 0.0;
             TomorrowAlbedo = 0.0;
             TomorrowLiquidPrecip = 0.0;
+
+            TomorrowTotalSkyCover = 0.0;
+            TomorrowOpaqueSkyCover = 0.0; 
+
             TomorrowIsRain = false;
             TomorrowIsSnow = false;
 
