@@ -2661,6 +2661,9 @@ namespace WeatherManager {
         if (EMSBeamSolarRadOverrideOn) BeamSolarRad = EMSBeamSolarRadOverrideValue;
         LiquidPrecipitation = TodayLiquidPrecip(TimeStep, HourOfDay) / 1000.0; // convert from mm to m
 
+        TotalCloudCover = TodayTotalSkyCover(TimeStep, HourOfDay);
+        OpaqueCloudCover = TodayOpaqueSkyCover(TimeStep, HourOfDay);
+
         if (UseRainValues) {
             IsRain = TodayIsRain(TimeStep, HourOfDay); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
         } else {
