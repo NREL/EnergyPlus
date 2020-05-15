@@ -4942,6 +4942,11 @@ namespace WeatherManager {
         TodayLiquidPrecip.allocate(NumOfTimeStepInHour, 24);
         TodayLiquidPrecip = 0.0;
 
+        TodayTotalSkyCover.allocate(NumOfTimeStepInHour, 24);
+        TodayTotalSkyCover = 0.0;
+        TodayOpaqueSkyCover.allocate(NumOfTimeStepInHour, 24);
+        TodayOpaqueSkyCover = 0.0;
+
         TomorrowIsRain.allocate(NumOfTimeStepInHour, 24);
         TomorrowIsRain = false;
         TomorrowIsSnow.allocate(NumOfTimeStepInHour, 24);
@@ -4970,6 +4975,11 @@ namespace WeatherManager {
         TomorrowAlbedo = 0.0;
         TomorrowLiquidPrecip.allocate(NumOfTimeStepInHour, 24);
         TomorrowLiquidPrecip = 0.0;
+
+        TomorrowTotalSkyCover.allocate(NumOfTimeStepInHour, 24);
+        TomorrowTotalSkyCover = 0.0;
+        TomorrowOpaqueSkyCover.allocate(NumOfTimeStepInHour, 24);
+        TomorrowOpaqueSkyCover = 0.0;
     }
 
     void CalculateDailySolarCoeffs(int const DayOfYear,           // Day of year (1 - 366)
