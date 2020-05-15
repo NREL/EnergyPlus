@@ -2861,6 +2861,10 @@ namespace WeatherManager {
         static Real64 LastHrDifSolarRad;
         static Real64 LastHrAlbedo;
         static Real64 LastHrLiquidPrecip;
+
+        static Real64 LastHrTotalSkyCover;
+        static Real64 LastHrOpaqueSkyCover;
+
         static Real64 NextHrBeamSolarRad;
         static Real64 NextHrDifSolarRad;
         static Real64 NextHrLiquidPrecip;
@@ -2884,11 +2888,14 @@ namespace WeatherManager {
             Array1D<Real64> Albedo;          // Albedo
             Array1D<Real64> LiquidPrecip;    // Liquid Precipitation
 
+            Array1D<Real64> TotalSkyCover; // Total Sky Cover
+            Array1D<Real64> TotalOpaqueCover; // Total Sky Cover            
+
             // Default Constructor
             HourlyWeatherData()
                 : IsRain(24, false), IsSnow(24, false), OutDryBulbTemp(24, 0.0), OutDewPointTemp(24, 0.0), OutBaroPress(24, 0.0), OutRelHum(24, 0.0),
                   WindSpeed(24, 0.0), WindDir(24, 0.0), SkyTemp(24, 0.0), HorizIRSky(24, 0.0), BeamSolarRad(24, 0.0), DifSolarRad(24, 0.0),
-                  Albedo(24, 0.0), LiquidPrecip(24, 0.0)
+                  Albedo(24, 0.0), LiquidPrecip(24, 0.0), TotalSkyCover(24, 0.0), TotalOpaqueCover(24, 0.0)
             {
             }
         };
