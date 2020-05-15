@@ -49,23 +49,15 @@
 #include <cmath>
 #include <string>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirTerminalUnit.hh>
-#include <EnergyPlus/CommandLineInterface.hh>
-#include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -75,7 +67,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
-#include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -87,7 +78,6 @@
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
-#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -116,7 +106,6 @@ namespace SizingManager {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace HeatBalanceManager;
     using namespace WeatherManager;
@@ -191,7 +180,6 @@ namespace SizingManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ManageSizing: ");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool Available(false); // an environment is available to process
@@ -293,7 +281,7 @@ namespace SizingManager {
                 outputFiles.zsz.fileName = outputFiles.outputZszTxtFileName;
             }
 
-            outputFiles.zsz.ensure_open();
+            outputFiles.zsz.ensure_open("ManageSizing");
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
@@ -354,8 +342,7 @@ namespace SizingManager {
                             ++CurEnvirNumSimDay;
                         }
 
-                        ObjexxFCL::gio::write(state.dataGlobals.DayOfSimChr, fmtLD) << DayOfSim;
-                        strip(state.dataGlobals.DayOfSimChr);
+                        state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
                         BeginDayFlag = true;
                         EndDayFlag = false;
 
@@ -493,7 +480,7 @@ namespace SizingManager {
             } else {
                 outputFiles.ssz.fileName = outputFiles.outputSszTxtFileName;
             }
-            outputFiles.ssz.ensure_open();
+            outputFiles.ssz.ensure_open("ManageSizing");
 
             SimAir = true;
             SimZoneEquip = true;
@@ -542,8 +529,7 @@ namespace SizingManager {
                     if (!WarmupFlag && DayOfSim > 1) {
                         ++CurEnvirNumSimDay;
                     }
-                    ObjexxFCL::gio::write(state.dataGlobals.DayOfSimChr, fmtLD) << DayOfSim;
-                    strip(state.dataGlobals.DayOfSimChr);
+                    state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
                     BeginDayFlag = true;
                     EndDayFlag = false;
 
@@ -1989,9 +1975,6 @@ namespace SizingManager {
                                 int Month(0);
                                 int DayOfMonth(0);
                                 General::InvOrdinalDay(DayLoop, Month, DayOfMonth, 1);
-                                std::string MonthDayString;
-                                static ObjexxFCL::gio::Fmt MnDyFmt("(I2.2,'/',I2.2)");
-                                ObjexxFCL::gio::write(MonthDayString, MnDyFmt) << Month << DayOfMonth;
                                 Real64 TimeHrsFraction = (double(hrOfDay) - 1.0) + double(TS) * TSfraction;
                                 int TimeHrsInt = int(TimeHrsFraction);
                                 int TimeMinsInt = nint((TimeHrsFraction - TimeHrsInt) * 60.0);
@@ -1999,10 +1982,7 @@ namespace SizingManager {
                                     ++TimeHrsInt;
                                     TimeMinsInt = 0;
                                 }
-                                static ObjexxFCL::gio::Fmt TStmpFmti("(I2.2,':',I2.2)");
-                                std::string timeStamp;
-                                ObjexxFCL::gio::write(timeStamp, TStmpFmti) << TimeHrsInt << TimeMinsInt;
-                                DataSizing::PeakPsOccurrenceDateTimeStringBySys(AirLoopNum) = MonthDayString + ' ' + timeStamp;
+                                DataSizing::PeakPsOccurrenceDateTimeStringBySys(AirLoopNum) = format("{:02}/{:02} {:02}:{:02}", Month, DayOfMonth, TimeHrsInt, TimeMinsInt);
                                 DataSizing::PeakPsOccurrenceEnvironmentStringBySys(AirLoopNum) = "Full Year Schedule";
                             }
                         } // if autosizied and VRP
@@ -3891,7 +3871,6 @@ namespace SizingManager {
         // global flag is used in other parts of simulation to terminate quickly.
 
         // Using/Aliasing
-        using CostEstimateManager::SimCostEstimate;
         using DataEnvironment::EndMonthFlag;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3998,7 +3977,6 @@ namespace SizingManager {
         // na
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using DataStringGlobals::VerString;
         using General::RoundSigDigits;
 
@@ -4074,7 +4052,6 @@ namespace SizingManager {
                          int const &TimeStepIndex         // time step of the peak
     )
     {
-        using namespace DataPrecisionGlobals;
         using General::RoundSigDigits;
 
         static bool MyOneTimeFlag(true);
@@ -4106,12 +4083,10 @@ namespace SizingManager {
     // convert an index for the timestep of the day into a hour minute string in the format 00:00
     std::string TimeIndexToHrMinString(int timeIndex)
     {
-        std::string hrMinString = "";
         int tMinOfDay = timeIndex * MinutesPerTimeStep;
         int tHr = int(tMinOfDay / 60.);
         int tMin = tMinOfDay - tHr * 60;
-        ObjexxFCL::gio::write(hrMinString, PeakHrMinFmt) << tHr << tMin;
-        return hrMinString;
+        return format(PeakHrMinFmt, tHr, tMin);
     }
 
     void GetZoneHVACSizing()
