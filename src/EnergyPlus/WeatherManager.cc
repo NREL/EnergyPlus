@@ -3652,6 +3652,10 @@ namespace WeatherManager {
                 LastHrDifSolarRad = Wthr.DifSolarRad(24);
                 LastHrAlbedo = Wthr.Albedo(24);
                 LastHrLiquidPrecip = Wthr.LiquidPrecip(24);
+
+                LastHrTotalSkyCover = Wthr.TotalSkyCover(24);
+                LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(24);
+
                 LastHourSet = true;
             }
 
@@ -3709,6 +3713,9 @@ namespace WeatherManager {
                     TomorrowLiquidPrecip(TS, Hour) = LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip(Hour) * WtNow;
                     TomorrowLiquidPrecip(TS, Hour) /= double(NumOfTimeStepInHour);
 
+                    TomorrowTotalSkyCover(TS, Hour) = LastHrTotalSkyCover * WtPrevHour + Wthr.TotalSkyCover(Hour) * WtNow;
+                    TomorrowOpaqueSkyCover(TS, Hour) = LastHrOpaqueSkyCover * WtPrevHour + Wthr.OpaqueSkyCover(Hour) * WtNow;
+
                     TomorrowIsRain(TS, Hour) = TomorrowLiquidPrecip(TS, Hour) >= (0.8 / double(NumOfTimeStepInHour)); // Wthr%IsRain(Hour)
                     TomorrowIsSnow(TS, Hour) = Wthr.IsSnow(Hour);
                 } // End of TS Loop
@@ -3726,6 +3733,8 @@ namespace WeatherManager {
                 LastHrAlbedo = Wthr.Albedo(Hour);
                 LastHrLiquidPrecip = Wthr.LiquidPrecip(Hour);
 
+                LastHrTotalSkyCover = Wthr.TotalSkyCover(Hour);
+                LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(Hour);
             } // End of Hour Loop
         }
 
