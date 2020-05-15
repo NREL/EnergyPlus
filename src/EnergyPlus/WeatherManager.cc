@@ -3532,6 +3532,9 @@ namespace WeatherManager {
                     TomorrowWindDir(CurTimeStep, Hour) = WindDir;
                     TomorrowLiquidPrecip(CurTimeStep, Hour) = LiquidPrecip;
 
+                    TomorrowTotalSkyCover(CurTimeStep, Hour) = TotalSkyCover;
+                    TomorrowOpaqueSkyCover(CurTimeStep, Hour) = OpaqueSkyCover;
+
                     ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
                     if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
                         TomorrowHorizIRSky(CurTimeStep, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
