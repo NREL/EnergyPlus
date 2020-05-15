@@ -226,10 +226,6 @@ namespace SwimmingPool {
         CheckEquipName = true;
 
         Pool.allocate(NumSwimmingPools);
-        for (Item = 1; Item <= NumSwimmingPools; ++Item) {
-            Pool(Item).SurfaceToPoolIndex.allocate(DataSurfaces::TotSurfaces);
-            Pool(Item).SurfaceToPoolIndex = 0;
-        }
 
         // Obtain all of the user data related to indoor swimming pools...
         CurrentModuleObject = "SwimmingPool:Indoor";
@@ -258,7 +254,7 @@ namespace SwimmingPool {
                 }
             }
 
-            ErrorCheckSetupPoolSurface(Item,Alphas(1),Alphas(2),cAlphaFields(2),ErrorsFound);
+            Pool(Item).ErrorCheckSetupPoolSurface(Alphas(1),Alphas(2),cAlphaFields(2),ErrorsFound);
             
             Pool(Item).AvgDepth = Numbers(1);
             if (Pool(Item).AvgDepth < MinDepth) {
@@ -420,53 +416,51 @@ namespace SwimmingPool {
         }
     }
 
-    void ErrorCheckSetupPoolSurface(int const Item,
-                                    std::string const Alpha1,
-                                    std::string const Alpha2,
-                                    std::string const cAlphaField2,
-                                    bool &ErrorsFound
+    void SwimmingPoolData::ErrorCheckSetupPoolSurface(std::string const Alpha1,
+                                                      std::string const Alpha2,
+                                                      std::string const cAlphaField2,
+                                                      bool &ErrorsFound
     )
     {
     
         static std::string const RoutineName("ErrorCheckSetupPoolSurface: "); // include trailing blank space
         static std::string const CurrentModuleObject("SwimmingPool:Indoor");
         
-        if (Pool(Item).SurfacePtr <= 0) {
+        if (this->SurfacePtr <= 0) {
             ShowSevereError(RoutineName + "Invalid " + cAlphaField2 + " = " + Alpha2);
             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alpha1);
             ErrorsFound = true;
-        } else if (DataSurfaces::Surface(Pool(Item).SurfacePtr).IsRadSurfOrVentSlabOrPool) {
+        } else if (DataSurfaces::Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool) {
             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha1 + "\", Invalid Surface");
             ShowContinueError(cAlphaField2 + "=\"" + Alpha2 + "\" has been used in another radiant system, ventilated slab, or pool.");
             ShowContinueError(
                 "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
             ErrorsFound = true;
             // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
-        } else if (DataSurfaces::Surface(Pool(Item).SurfacePtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel_CTF) {
-            ShowSevereError(DataSurfaces::Surface(Pool(Item).SurfacePtr).Name +
+        } else if (DataSurfaces::Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel_CTF) {
+            ShowSevereError(DataSurfaces::Surface(this->SurfacePtr).Name +
                             " is a pool and is attempting to use a non-CTF solution algorithm.  This is "
                             "not allowed.  Use the CTF solution algorithm for this surface.");
             ErrorsFound = true;
-        } else if (DataSurfaces::Surface(Pool(Item).SurfacePtr).Class == DataSurfaces::SurfaceClass_Window) {
-            ShowSevereError(DataSurfaces::Surface(Pool(Item).SurfacePtr).Name +
+        } else if (DataSurfaces::Surface(this->SurfacePtr).Class == DataSurfaces::SurfaceClass_Window) {
+            ShowSevereError(DataSurfaces::Surface(this->SurfacePtr).Name +
                             " is a pool and is defined as a window.  This is not allowed.  A pool must be a floor that is NOT a window.");
             ErrorsFound = true;
-        } else if (DataSurfaces::Surface(Pool(Item).SurfacePtr).MaterialMovInsulInt > 0) {
-            ShowSevereError(DataSurfaces::Surface(Pool(Item).SurfacePtr).Name +
+        } else if (DataSurfaces::Surface(this->SurfacePtr).MaterialMovInsulInt > 0) {
+            ShowSevereError(DataSurfaces::Surface(this->SurfacePtr).Name +
                             " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface.");
             ErrorsFound = true;
-        } else if (DataHeatBalance::Construct(DataSurfaces::Surface(Pool(Item).SurfacePtr).Construction).SourceSinkPresent) {
+        } else if (DataHeatBalance::Construct(DataSurfaces::Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
             ShowSevereError(
-                DataSurfaces::Surface(Pool(Item).SurfacePtr).Name +
+                DataSurfaces::Surface(this->SurfacePtr).Name +
                 " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");
             ErrorsFound = true;
         } else { // ( Pool( Item ).SurfacePtr > 0 )
-            DataSurfaces::Surface(Pool(Item).SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
-            DataSurfaces::Surface(Pool(Item).SurfacePtr).IsPool = true;
-            Pool(Item).SurfaceToPoolIndex(Pool(Item).SurfacePtr) = Item;
-            Pool(Item).ZonePtr = DataSurfaces::Surface(Pool(Item).SurfacePtr).Zone;
+            DataSurfaces::Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
+            DataSurfaces::Surface(this->SurfacePtr).IsPool = true;
+            this->ZonePtr = DataSurfaces::Surface(this->SurfacePtr).Zone;
             // Check to make sure pool surface is a floor
-            if (DataSurfaces::Surface(Pool(Item).SurfacePtr).Class != DataSurfaces::SurfaceClass_Floor) {
+            if (DataSurfaces::Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass_Floor) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha1 + " contains a surface name that is NOT a floor.");
                 ShowContinueError(
                     "A swimming pool must be associated with a surface that is a FLOOR.  Association with other surface types is not permitted.");
