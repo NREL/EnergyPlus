@@ -56,21 +56,21 @@
 #include "Fixtures/SQLiteFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -2273,10 +2273,11 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     const std::string compName = DXCoils::DXCoil(1).Name;
     EXPECT_EQ(compName, "MAIN COOLING COIL 1");
 
-    struct TestQuery {
+    struct TestQuery
+    {
         TestQuery(std::string t_description, std::string t_units, Real64 t_value)
             : description(t_description), units(t_units), expectedValue(t_value),
-              displayString("Description='" + description + "'; Units='" + units + "'") {};
+              displayString("Description='" + description + "'; Units='" + units + "'"){};
 
         const std::string description;
         const std::string units;
@@ -2292,13 +2293,17 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
         TestQuery("Design Size Low Speed Evaporative Condenser Pump Rated Power Consumption", "W", lowSpeedCondPumpPower),
     });
 
-    for (auto& testQuery : testQueries) {
+    for (auto &testQuery : testQueries) {
 
         std::string query("SELECT Value From ComponentSizes"
-                          "  WHERE CompType = '" + compType + "'"
-                          "  AND CompName = '" + compName + "'"
-                          "  AND Description = '" + testQuery.description + "'" +
-                          "  AND Units = '" + testQuery.units + "'");
+                          "  WHERE CompType = '" +
+                          compType +
+                          "'"
+                          "  AND CompName = '" +
+                          compName +
+                          "'"
+                          "  AND Description = '" +
+                          testQuery.description + "'" + "  AND Units = '" + testQuery.units + "'");
 
         // execAndReturnFirstDouble returns -10000.0 if not found
         Real64 return_val = SQLiteFixture::execAndReturnFirstDouble(query);
@@ -2487,10 +2492,11 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     const std::string compName = DXCoils::DXCoil(1).Name;
     EXPECT_EQ(compName, "FURNACE ACDXCOIL 1");
 
-    struct TestQuery {
+    struct TestQuery
+    {
         TestQuery(std::string t_description, std::string t_units, Real64 t_value)
             : description(t_description), units(t_units), expectedValue(t_value),
-              displayString("Description='" + description + "'; Units='" + units + "'") {};
+              displayString("Description='" + description + "'; Units='" + units + "'"){};
 
         const std::string description;
         const std::string units;
@@ -2504,13 +2510,17 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
         TestQuery("Design Size Evaporative Condenser Pump Rated Power Consumption", "W", condPumpPower),
     });
 
-    for (auto& testQuery : testQueries) {
+    for (auto &testQuery : testQueries) {
 
         std::string query("SELECT Value From ComponentSizes"
-                          "  WHERE CompType = '" + compType + "'"
-                          "  AND CompName = '" + compName + "'"
-                          "  AND Description = '" + testQuery.description + "'" +
-                          "  AND Units = '" + testQuery.units + "'");
+                          "  WHERE CompType = '" +
+                          compType +
+                          "'"
+                          "  AND CompName = '" +
+                          compName +
+                          "'"
+                          "  AND Description = '" +
+                          testQuery.description + "'" + "  AND Units = '" + testQuery.units + "'");
 
         // execAndReturnFirstDouble returns -10000.0 if not found
         Real64 return_val = SQLiteFixture::execAndReturnFirstDouble(query);
@@ -3514,7 +3524,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
         "   1,                                      !- Maximum Value of x {BasedOnField A2}",
         "   0.7,                                    !- Minimum Curve Output {BasedOnField A3}",
         "   1;                                      !- Maximum Curve Output {BasedOnField A3}",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -3561,12 +3571,12 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     // Design Capacity at speed 2 and speed 1
     EXPECT_NEAR(31888.0, DXCoil(1).MSRatedTotCap(2), 0.01);
     EXPECT_NEAR(15944.0, DXCoil(1).MSRatedTotCap(1), 0.01);
-    
+
     // check multi-speed DX heating coil
     EXPECT_EQ("ASHP HTG COIL", DXCoil(2).Name);
     EXPECT_EQ("Coil:Heating:DX:MultiSpeed", DXCoil(2).DXCoilType);
     // set companion dx cooling coil
-    DXCoil( 2 ).CompanionUpstreamDXCoil = 1;
+    DXCoil(2).CompanionUpstreamDXCoil = 1;
     SizeDXCoil(state, 2);
     EXPECT_EQ(1.75, DXCoil(2).MSRatedAirVolFlowRate(2));
     EXPECT_EQ(0.875, DXCoil(2).MSRatedAirVolFlowRate(2) * 0.5);
@@ -3766,7 +3776,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
         "   0.7,                                    !- Minimum Curve Output {BasedOnField A3}",
         "   1;                                      !- Maximum Curve Output {BasedOnField A3}",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -3850,7 +3860,6 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     DXCoil(1).DXCoilType = "Coil:Cooling:DX:MultiSpeed";
     DXCoil(2).DXCoilType_Num = CoilDX_MultiSpeedHeating;
     DXCoil(2).DXCoilType = "Coil:Heating:DX:MultiSpeed";
-
 
     for (DXCoilNum = 1; DXCoilNum <= 2; ++DXCoilNum) {
         DXCoil(DXCoilNum).NumOfSpeeds = 2;
@@ -3940,7 +3949,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     // dx cooling coil
     int CoilIndex = 1;
     EXPECT_EQ(DXCoil(CoilIndex).DXCoilType, "Coil:Cooling:DX:MultiSpeed");
-    DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex( CoilIndex, ErrorsFound );
+    DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(CoilIndex, ErrorsFound);
     EXPECT_EQ(2, DataTotCapCurveIndex);
     // evaluate dx cooling coil curves to show impacts of incorrect curve index
     Real64 TotCapTempModFac_lowestSpeed = CurveValue(1, 19.4, 30.0);
@@ -3957,7 +3966,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     // dx heating coil
     CoilIndex = 2;
     EXPECT_EQ(DXCoil(CoilIndex).DXCoilType, "Coil:Heating:DX:MultiSpeed");
-    DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex( CoilIndex, ErrorsFound );
+    DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(CoilIndex, ErrorsFound);
     EXPECT_EQ(4, DataTotCapCurveIndex);
     // evaluate dx heating coil curves to show impacts of incorrect curve index
     TotCapTempModFac_lowestSpeed = CurveValue(3, 5.0, 10.0);
@@ -3970,6 +3979,14 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     Real64 NominalHeatingDesignCapacity_designSpeed = PeakCoilHeatingLoad / TotCapTempModFac_designSpeed;
     EXPECT_DOUBLE_EQ(8763.2701224550547, NominalHeatingDesignCapacity_lowestSpeed);
     EXPECT_DOUBLE_EQ(8945.5439208717980, NominalHeatingDesignCapacity_designSpeed);
+}
+TEST_F(EnergyPlusFixture, DXCoils_RatedInletAirWTest)
+{
+
+    Real64 Tdb = 26.6667;
+    Real64 Twet = 19.4444;
+    Real64 RatedW = Psychrometrics::PsyWFnTdbTwbPb(Tdb, Twet, 101325.0);
+    EXPECT_NEAR(RatedInletAirHumRat, RatedW, 0.000001);
 }
 
 } // namespace EnergyPlus
