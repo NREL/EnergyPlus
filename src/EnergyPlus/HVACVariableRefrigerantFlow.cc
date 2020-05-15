@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -2334,31 +2335,17 @@ namespace HVACVariableRefrigerantFlow {
 
             VRF(VRFNum).FuelType = FuelTypeElectric;
             if (!lAlphaFieldBlanks(39)) {
-                // A39; \field Fuel type
-                if (UtilityRoutines::SameString(cAlphaArgs(39), "ELECTRICITY")) {
-                    VRF(VRFNum).FuelType = FuelTypeElectric;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "NATURALGAS")) {
-                    VRF(VRFNum).FuelType = FuelTypeNaturalGas;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "PROPANE")) {
-                    VRF(VRFNum).FuelType = FuelTypePropaneGas;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "DIESEL")) {
-                    VRF(VRFNum).FuelType = FuelTypeDiesel;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "GASOLINE")) {
-                    VRF(VRFNum).FuelType = FuelTypeGasoline;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOILNO1")) {
-                    VRF(VRFNum).FuelType = FuelTypeFuelOil1;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOILNO2")) {
-                    VRF(VRFNum).FuelType = FuelTypeFuelOil2;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "OtherFuel1")) {
-                    VRF(VRFNum).FuelType = FuelTypeOtherFuel1;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "OtherFuel2")) {
-                    VRF(VRFNum).FuelType = FuelTypeOtherFuel2;
-                } else {
+                // A39; \field Fuel type, Validate fuel type input
+                DataGlobalConstants::FuelTypeInput = cAlphaArgs(39);
+                DataGlobalConstants::ValidateFuelTypeWithFuelTypeNum(DataGlobalConstants::FuelTypeInput);
+                if (DataGlobalConstants::FuelTypeErrorsFound) {
                     ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\", " + cAlphaFieldNames(39) +
                                     " not found = " + cAlphaArgs(39));
                     ShowContinueError(
                         "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                     ErrorsFound = true;
+                } else {
+                    VRF(VRFNum).FuelType = DataGlobalConstants::FuelTypeNum;
                 }
             }
 
