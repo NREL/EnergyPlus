@@ -472,6 +472,10 @@ namespace WeatherManager {
         TodayDifSolarRad.deallocate();        // Sky diffuse horizontal solar irradiance
         TodayAlbedo.deallocate();             // Albedo
         TodayLiquidPrecip.deallocate();       // Liquid Precipitation Depth (mm)
+
+        TodayTotalSkyCover.deallocate();       // Total Sky Cover
+        TodayOpaqueSkyCover.deallocate();      // Opaque Sky Cover
+
         TomorrowIsRain.deallocate();          // Rain indicator, true=rain
         TomorrowIsSnow.deallocate();          // Snow indicator, true=snow
         TomorrowRainAmount.deallocate();      // ficitious indicator of Rain
@@ -488,6 +492,10 @@ namespace WeatherManager {
         TomorrowDifSolarRad.deallocate();     // Sky diffuse horizontal solar irradiance
         TomorrowAlbedo.deallocate();          // Albedo
         TomorrowLiquidPrecip.deallocate();    // Liquid Precipitation Depth
+
+        TomorrowTotalSkyCover.deallocate();      // Total Sky Cover
+        TomorrowOpaqueSkyCover.deallocate();     // Opaque Sky Cover
+
         DDDBRngModifier.deallocate();         // Design Day Dry-bulb Temperature Range Modifier
         DDHumIndModifier.deallocate();        // Design Day relative humidity values
         DDBeamSolarValues.deallocate();       // Design Day Beam Solar Values
