@@ -217,7 +217,8 @@ namespace Boilers {
                 ErrorsFound = true;
             } else {
                 thisBoiler.BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelType;
-                thisBoiler.FuelType = DataGlobalConstants::FuelTypeNum;         
+                thisBoiler.FuelType = DataGlobalConstants::FuelTypeNum;
+            }
 
             thisBoiler.NomCap = DataIPShortCuts::rNumericArgs(1);
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {

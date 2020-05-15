@@ -207,6 +207,7 @@ namespace BoilerSteam {
             } else {
                 thisBoiler.BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelType;
                 thisBoiler.FuelType = DataGlobalConstants::FuelTypeNum;
+            }
              
             // INPUTS from the IDF file
             thisBoiler.BoilerMaxOperPress = DataIPShortCuts::rNumericArgs(1);
