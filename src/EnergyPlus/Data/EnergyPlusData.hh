@@ -53,6 +53,8 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/Data/BaseboardData.hh>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
@@ -66,10 +68,6 @@
 #include <EnergyPlus/PlantChillers.hh>
 
 namespace EnergyPlus {
-
-    struct BaseGlobalStruct {
-        virtual void clear_state() = 0;
-    };
 
 //struct OutputReportTabular : BaseGlobalStruct
 //{
@@ -288,6 +286,8 @@ namespace EnergyPlus {
 
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
+        BaseboardRadiatorData dataBaseboardRadiator;
+        BaseboardElectricData dataBaseboardElectric;
         BoilersData dataBoilers;
         BoilerSteamData dataSteamBoilers;
         ChillerAbsorberData dataChillerAbsorbers;
@@ -305,6 +305,8 @@ namespace EnergyPlus {
 
         // all clear states
         void clear_state() override {
+            dataBaseboardElectric.clear_state();
+            dataBaseboardRadiator.clear_state();
             dataBoilers.clear_state();
             dataSteamBoilers.clear_state();
             dataChillerAbsorbers.clear_state();
