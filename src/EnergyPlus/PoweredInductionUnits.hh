@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -170,14 +171,14 @@ namespace PoweredInductionUnits {
 
     void clear_state();
 
-    void SimPIU(std::string const &CompName,   // name of the PIU
+    void SimPIU(EnergyPlusData &state, std::string const &CompName,   // name of the PIU
                 bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                 int const ZoneNum,             // index of zone served by PIU
                 int const ZoneNodeNum,         // zone node number of zone served by PIU
                 int &CompIndex                 // PIU Index in PIU names
     );
 
-    void GetPIUs();
+    void GetPIUs(EnergyPlusData &state);
 
     void InitPIU(int const PIUNum,             // number of the current fan coil unit being simulated
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
@@ -185,13 +186,13 @@ namespace PoweredInductionUnits {
 
     void SizePIU(int const PIUNum);
 
-    void CalcSeriesPIU(int const PIUNum,             // number of the current PIU being simulated
+    void CalcSeriesPIU(EnergyPlusData &state, int const PIUNum,             // number of the current PIU being simulated
                        int const ZoneNum,            // number of zone being served
                        int const ZoneNode,           // zone node number
                        bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void CalcParallelPIU(int const PIUNum,             // number of the current PIU being simulated
+    void CalcParallelPIU(EnergyPlusData &state, int const PIUNum,             // number of the current PIU being simulated
                          int const ZoneNum,            // number of zone being served
                          int const ZoneNode,           // zone node number
                          bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
@@ -201,9 +202,9 @@ namespace PoweredInductionUnits {
 
     // ===================== Utilities =====================================
 
-    bool PIUnitHasMixer(std::string const &CompName); // component (mixer) name
+    bool PIUnitHasMixer(EnergyPlusData &state, std::string const &CompName); // component (mixer) name
 
-    void PIUInducesPlenumAir(int const NodeNum); // induced air node number
+    void PIUInducesPlenumAir(EnergyPlusData &state, int const NodeNum); // induced air node number
 
 } // namespace PoweredInductionUnits
 

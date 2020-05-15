@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -199,7 +200,7 @@ namespace CoolingPanelSimple {
 
     void clear_state();
 
-    void SimCoolingPanel(std::string const &EquipName,
+    void SimCoolingPanel(EnergyPlusData &state, std::string const &EquipName,
                          int const ActualZoneNum,
                          int const ControlledZoneNum,
                          bool const FirstHVACIteration,
@@ -208,9 +209,9 @@ namespace CoolingPanelSimple {
 
     void GetCoolingPanelInput();
 
-    void InitCoolingPanel(int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
-    void SizeCoolingPanel(int const CoolingPanelNum);
+    void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum);
 
     void UpdateCoolingPanel(int const CoolingPanelNum);
 

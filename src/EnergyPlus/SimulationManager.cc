@@ -105,6 +105,7 @@ extern "C" {
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
@@ -216,7 +217,7 @@ namespace SimulationManager {
         PreP_Fatal = false;
     }
 
-    void ManageSimulation(OutputFiles &outputFiles)
+    void ManageSimulation(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -352,7 +353,7 @@ namespace SimulationManager {
         CheckIfAnyEMS();
         CheckIfAnyPlant();
         CheckIfAnySlabs();
-        CheckIfAnyBasements();
+        CheckIfAnyBasements(state);
         CheckIfAnyIdealCondEntSetPoint();
         createFacilityElectricPowerServiceObject();
         createCoilSelectionReportObj();
@@ -375,7 +376,7 @@ namespace SimulationManager {
         }
 
         DoingSizing = true;
-        ManageSizing(OutputFiles::getSingleton());
+        ManageSizing(state, OutputFiles::getSingleton());
 
         BeginFullSimFlag = true;
         SimsDone = false;
@@ -395,7 +396,7 @@ namespace SimulationManager {
         }
 
         DisplayString("Adjusting Air System Sizing");
-        SizingManager::ManageSystemSizingAdjustments();
+        SizingManager::ManageSystemSizingAdjustments(state);
 
         DisplayString("Adjusting Standard 62.1 Ventilation Sizing");
         SizingManager::ManageSystemVentilationAdjustments();
@@ -404,9 +405,9 @@ namespace SimulationManager {
         KickOffSimulation = true;
 
         ResetEnvironmentCounter();
-        SetupSimulation(outputFiles, ErrorsFound);
+        SetupSimulation(state, outputFiles, ErrorsFound);
 
-        CheckAndReadFaults();
+        CheckAndReadFaults(state);
 
         InitCurveReporting();
 
@@ -420,7 +421,7 @@ namespace SimulationManager {
         if (DoOutputReporting) {
             DisplayString("Reporting Surfaces");
 
-            ReportSurfaces();
+            ReportSurfaces(outputFiles);
 
             SetupNodeVarsForReporting(outputFiles);
             MetersHaveBeenInitialized = true;
@@ -433,10 +434,10 @@ namespace SimulationManager {
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
-            InitDemandManagers();
+            InitDemandManagers(state);
             TestBranchIntegrity(outputFiles, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(outputFiles, ErrFound);
+            TestAirPathIntegrity(state, outputFiles, ErrFound);
             if (ErrFound) TerminalError = true;
             CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;
@@ -444,7 +445,7 @@ namespace SimulationManager {
             if (ErrFound) TerminalError = true;
             TestCompSetInletOutletNodes(ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckControllerLists(ErrFound);
+            CheckControllerLists(state, ErrFound);
             if (ErrFound) TerminalError = true;
 
             if (DoDesDaySim || DoWeathSim) {
@@ -482,7 +483,7 @@ namespace SimulationManager {
 
         // if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
         if (DoHVACSizingSimulation) {
-            ManageHVACSizingSimulation(OutputFiles::getSingleton(), ErrorsFound);
+            ManageHVACSizingSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
         }
 
         ShowMessage("Beginning Simulation");
@@ -495,7 +496,7 @@ namespace SimulationManager {
 
         while (Available) {
 
-            GetNextEnvironment(outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state.dataGlobals, outputFiles, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -530,7 +531,7 @@ namespace SimulationManager {
             EndMonthFlag = false;
             WarmupFlag = true;
             DayOfSim = 0;
-            DayOfSimChr = "0";
+            state.dataGlobals.DayOfSimChr = "0";
             NumOfWarmupDays = 0;
             if (CurrentYearIsLeapYear) {
                 if (NumOfDayInEnvrn <= 366) {
@@ -545,20 +546,19 @@ namespace SimulationManager {
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
-            ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
                 ++DayOfSim;
-                ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
-                strip(DayOfSimChr);
+                state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
-                    DayOfSimChr = "0";
+                    state.dataGlobals.DayOfSimChr = "0";
                 }
                 BeginDayFlag = true;
                 EndDayFlag = false;
@@ -586,7 +586,7 @@ namespace SimulationManager {
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
-                    DisplayString("Starting last  year of environment at:  " + DayOfSimChr);
+                    DisplayString("Starting last  year of environment at:  " + state.dataGlobals.DayOfSimChr);
                     ResetTabularReports();
                 }
 
@@ -597,7 +597,7 @@ namespace SimulationManager {
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(OutputFiles::getSingleton(), false);
+                            SimulateGroundDomains(state.dataGlobals, OutputFiles::getSingleton(), false);
                         }
 
                         if (AnyUnderwaterBoundaries) {
@@ -631,9 +631,9 @@ namespace SimulationManager {
 
                         ManageWeather();
 
-                        ManageExteriorEnergyUse();
+                        ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-                        ManageHeatBalance(outputFiles);
+                        ManageHeatBalance(state, outputFiles);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
                             AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
@@ -680,7 +680,7 @@ namespace SimulationManager {
 #ifdef EP_Detailed_Timings
         epStartTime("Closeout Reporting=");
 #endif
-        SimCostEstimate();
+        SimCostEstimate(state);
 
         ComputeTariff(); //     Compute the utility bills
 
@@ -690,7 +690,7 @@ namespace SimulationManager {
 
         OpenOutputTabularFile();
 
-        WriteTabularReports(outputFiles); //     Create the tabular reports at completion of each
+        WriteTabularReports(state, outputFiles); //     Create the tabular reports at completion of each
 
         WriteTabularTariffReports();
 
@@ -1790,19 +1790,19 @@ namespace SimulationManager {
 
         // FLOW:
         StdOutputRecordCount = 0;
-        OutputFiles::getSingleton().eso.ensure_open();
+        OutputFiles::getSingleton().eso.ensure_open("OpenOutputFiles");
         print(OutputFiles::getSingleton().eso, "Program Version,{}\n", VerString);
 
         // Open the Initialization Output File
-        OutputFiles::getSingleton().eio.ensure_open();
+        OutputFiles::getSingleton().eio.ensure_open("OpenOutputFiles");
         print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        OutputFiles::getSingleton().mtr.ensure_open();
+        OutputFiles::getSingleton().mtr.ensure_open("OpenOutputFiles");
         print(OutputFiles::getSingleton().mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
-        OutputFiles::getSingleton().bnd.ensure_open();
+        OutputFiles::getSingleton().bnd.ensure_open("OpenOutputFiles");
         print(OutputFiles::getSingleton().bnd, "Program Version,{}\n", VerString);
     }
 
@@ -1875,7 +1875,7 @@ namespace SimulationManager {
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
 
-        OutputFiles::getSingleton().audit.ensure_open();
+        OutputFiles::getSingleton().audit.ensure_open("CloseOutputFiles");
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
         print(outputFiles.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
@@ -2025,7 +2025,7 @@ namespace SimulationManager {
         }
     }
 
-    void SetupSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupSimulation(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2065,7 +2065,7 @@ namespace SimulationManager {
 
         while (Available) { // do for each environment
 
-            GetNextEnvironment(outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state.dataGlobals, outputFiles, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -2093,9 +2093,9 @@ namespace SimulationManager {
 
             ManageWeather();
 
-            ManageExteriorEnergyUse();
+            ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state, outputFiles);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -2108,9 +2108,9 @@ namespace SimulationManager {
 
             ManageWeather();
 
-            ManageExteriorEnergyUse();
+            ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state, outputFiles);
 
             //         do an end of day, end of environment time step
 
@@ -2121,17 +2121,17 @@ namespace SimulationManager {
             if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
             ManageWeather();
 
-            ManageExteriorEnergyUse();
+            ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state, outputFiles);
 
         } // ... End environment loop.
 
         if (AnySlabsInModel || AnyBasementsInModel) {
-            SimulateGroundDomains(outputFiles, true);
+            SimulateGroundDomains(state.dataGlobals, outputFiles, true);
         }
 
-        if (!ErrorsFound) SimCostEstimate(); // basically will get and check input
+        if (!ErrorsFound) SimCostEstimate(state); // basically will get and check input
         if (ErrorsFound) ShowFatalError("Previous conditions cause program termination.");
     }
 
@@ -3038,7 +3038,7 @@ namespace SimulationManager {
 
 // EXTERNAL SUBROUTINES:
 
-void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use simulation
+void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                 bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                 bool &ResimHVAC // Flag to resimulate the HVAC simulation
 )
@@ -3122,20 +3122,20 @@ void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use si
 
     // FLOW:
     if (ResimExt) {
-        ManageExteriorEnergyUse();
+        ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
         ++DemandManagerExtIterations;
     }
 
     if (ResimHB) {
         // Surface simulation
-        InitSurfaceHeatBalance();
+        InitSurfaceHeatBalance(state);
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
         // Air simulation
         InitAirHeatBalance();
-        ManageRefrigeratedCaseRacks();
+        ManageRefrigeratedCaseRacks(state);
 
         ++DemandManagerHBIterations;
         ResimHVAC = true; // Make sure HVAC is resimulated too
@@ -3143,12 +3143,12 @@ void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use si
 
     if (ResimHVAC) {
         // HVAC simulation
-        ManageZoneAirUpdates(iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
+        ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
         if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
-        CalcAirFlowSimple(0, ZoneAirMassFlow.EnforceZoneMassBalance);
-        ManageZoneAirUpdates(iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
+        CalcAirFlowSimple(state, 0, ZoneAirMassFlow.EnforceZoneMassBalance);
+        ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
         if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(iPredictStep, false, UseZoneTimeStepHistory, 0.0);
-        SimHVAC();
+        SimHVAC(state);
 
         ++DemandManagerHVACIterations;
     }
