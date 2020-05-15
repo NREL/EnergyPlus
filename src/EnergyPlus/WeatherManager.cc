@@ -285,6 +285,9 @@ namespace WeatherManager {
     Array2D<Real64> TodayAlbedo;          // Albedo
     Array2D<Real64> TodayLiquidPrecip;    // Liquid Precipitation Depth (mm)
 
+    Array2D<Real64> TodayTotalSkyCover; // Total Sky Cover
+    Array2D<Real64> TodayOpaqueSkyCover; // Opaque Sky Cover
+
     Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain
     Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow
     Array2D<Real64> TomorrowRainAmount;      // ficitious indicator of Rain
@@ -301,6 +304,9 @@ namespace WeatherManager {
     Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance
     Array2D<Real64> TomorrowAlbedo;          // Albedo
     Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth
+
+    Array2D<Real64> TomorrowTotalSkyCover;  // Total Sky Cover
+    Array2D<Real64> TomorrowOpaqueSkyCover; // Opaque Sky Cover
 
     Array3D<Real64> DDDBRngModifier;  // Design Day Dry-bulb Temperature Range Modifier
     Array3D<Real64> DDHumIndModifier; // Design Day relative humidity values
