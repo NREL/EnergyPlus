@@ -1370,7 +1370,6 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependen
     DataSurfaces::Surface.allocate(1);
     DataSurfaces::Surface(1).CosTilt = 0;
 
-    //HConvIn.allocate(NumOfSurfaces);
     DataHeatBalance::HConvIn.allocate(1);
 
     CalcASHRAESimpleIntConvCoeff(1, 20.0, 30.0);
