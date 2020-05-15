@@ -2087,6 +2087,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     UpdateScheduleValues();
 
     ZoneEqSizing.allocate(1);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(16);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod(16) = 0;
     CurDeadBandOrSetback.allocate(1);
     CurDeadBandOrSetback(1) = false;
     TempControlType.allocate(1);
@@ -2795,6 +2797,8 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     UpdateScheduleValues();
 
     ZoneEqSizing.allocate(1);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(16);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod(16) = 0;
     CurDeadBandOrSetback.allocate(1);
     CurDeadBandOrSetback(1) = false;
     TempControlType.allocate(1);
@@ -3206,6 +3210,8 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     UpdateScheduleValues();
 
     ZoneEqSizing.allocate(1);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(16);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod(16) = 0;
     CurDeadBandOrSetback.allocate(1);
     CurDeadBandOrSetback(1) = false;
     TempControlType.allocate(1);
