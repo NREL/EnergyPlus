@@ -1456,6 +1456,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
+    EnergyPlusData state;
 
     ManageSimulation(state, outputFiles()); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -1470,7 +1471,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
 
     DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
     DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
-    UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
+    UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
     // zone equipment should report single zone magnitude, multipliers do not apply, should be > 0 or what's the point
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleRadGain, DataHeatBalance::ZnRpt(2).PeopleRadGain);
@@ -2494,6 +2495,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 
     // OutputProcessor::TimeValue.allocate(2);
     // DataGlobals::DDOnlySimulation = true;
+    EnergyPlusData state;
 
     ManageSimulation(state, outputFiles()); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -2501,7 +2503,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 
     DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
     DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
-    UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
+    UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
     EXPECT_NEAR(1.86168, DataSizing::FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
 }
@@ -3765,7 +3767,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     Real64 reliefEnergy = 2.0 * TimeStepSysSec;
     Real64 condenserReject = 1.0 * TimeStepSysSec + 50.0;
 
-    GatherHeatEmissionReport(OutputProcessor::TimeStepType::TimeStepSystem);
+    EnergyPlusData state;
+    GatherHeatEmissionReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
     EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(reliefEnergy * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
@@ -3790,8 +3793,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     DXCoils::DXCoil(2).CrankcaseHeaterConsumption = 0.0;
 
     Real64 coilReject = 1.0 * TimeStepSysSec + 200.0 + 10.0;
-
-    GatherHeatEmissionReport(OutputProcessor::TimeStepType::TimeStepSystem);
+    GatherHeatEmissionReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
     EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(2 * reliefEnergy * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
     EXPECT_EQ(condenserReject + coilReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
@@ -7889,7 +7891,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
         ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
     }
-   
+
     // Specifically get the electricity usage for End Use = Exterior Lighting, and End Use Subcat = AnotherEndUseSubCat,
     // and make sure it's the right number that's returned
     std::string query("SELECT Value From TabularDataWithStrings"
@@ -7936,7 +7938,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
         Real64 return_val1 = execAndReturnFirstDouble(query);
-        
+
         ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
         EXPECT_NEAR(CoalHeating * 3 / 3.6e6, return_val1, 0.01) << "Failed for query: " << query;
     }
@@ -7949,7 +7951,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
         Real64 return_val2 = execAndReturnFirstDouble(query);
-        
+
         ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
         EXPECT_NEAR(GasolineHeating * 3 / 3.6e6, return_val2, 0.01) << "Failed for query: " << query;
     }
@@ -7978,7 +7980,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
         ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
     }
-    
+
     {
         std::string query("SELECT Value From TabularDataWithStrings"
                           "  WHERE TableName = 'End Uses'"
