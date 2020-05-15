@@ -236,7 +236,7 @@ namespace Boilers {
             Boiler(BoilerNum).Name = DataIPShortCuts::cAlphaArgs(1);
             Boiler(BoilerNum).TypeNum = DataPlant::TypeOf_Boiler_Simple;
 
-            // Validate fuel types input
+            // Validate fuel type input
             DataGlobalConstants::FuelTypeInput = DataIPShortCuts::cAlphaArgs(2);
             DataGlobalConstants::ValidateFuelTypeWithAssignResourceTypeNum(DataGlobalConstants::FuelTypeInput);
             if (DataGlobalConstants::FuelTypeErrorsFound) {

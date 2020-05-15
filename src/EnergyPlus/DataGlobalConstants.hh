@@ -261,6 +261,10 @@ namespace DataGlobalConstants {
 
     std::string GetResourceTypeChar(int const ResourceTypeNum);
 
+    void ValidateFuelType(std::string FuelTypeInput);
+
+    void ValidateFuelTypeWithFuelTypeNum(std::string FuelTypeInput);
+
     void ValidateFuelTypeWithAssignResourceTypeNum(std::string FuelTypeInput);
 
 } // namespace DataGlobalConstants

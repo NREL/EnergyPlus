@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -3928,31 +3929,17 @@ namespace DXCoils {
                 }
             }
 
-            // A12; \field Fuel type
-            if (UtilityRoutines::SameString(Alphas(12), "Electricity")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeElectricity;
-            } else if (UtilityRoutines::SameString(Alphas(12), "NaturalGas")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeNaturalGas;
-            } else if (UtilityRoutines::SameString(Alphas(12), "Propane")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypePropaneGas;
-            } else if (UtilityRoutines::SameString(Alphas(12), "Diesel")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeDiesel;
-            } else if (UtilityRoutines::SameString(Alphas(12), "Gasoline")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeGasoline;
-            } else if (UtilityRoutines::SameString(Alphas(12), "FuelOilNo1")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil1;
-            } else if (UtilityRoutines::SameString(Alphas(12), "FuelOilNo2")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil2;
-            } else if (UtilityRoutines::SameString(Alphas(12), "OtherFuel1")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeOtherFuel1;
-            } else if (UtilityRoutines::SameString(Alphas(12), "OtherFuel2")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeOtherFuel2;
-            } else {
+            // A12; \field Fuel type, Validate fuel type input
+            DataGlobalConstants::FuelTypeInput = Alphas(12);
+            DataGlobalConstants::ValidateFuelTypeWithFuelTypeNum(DataGlobalConstants::FuelTypeInput);
+            if (DataGlobalConstants::FuelTypeErrorsFound) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(12) + ".  Entered choice = " + Alphas(12));
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
+            } else {
+                DXCoil(DXCoilNum).FuelType = DataGlobalConstants::FuelTypeNum;
             }
 
             DXCoil(DXCoilNum).NumOfSpeeds = Numbers(6); // Number of speeds
@@ -4421,31 +4408,17 @@ namespace DXCoils {
                 ErrorsFound = true;
             }
 
-            // A10; \field Fuel type
-            if (UtilityRoutines::SameString(Alphas(9), "Electricity")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeElectricity;
-            } else if (UtilityRoutines::SameString(Alphas(9), "NaturalGas")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeNaturalGas;
-            } else if (UtilityRoutines::SameString(Alphas(9), "Propane")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypePropaneGas;
-            } else if (UtilityRoutines::SameString(Alphas(9), "Diesel")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeDiesel;
-            } else if (UtilityRoutines::SameString(Alphas(9), "Gasoline")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeGasoline;
-            } else if (UtilityRoutines::SameString(Alphas(9), "FuelOilNo1")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil1;
-            } else if (UtilityRoutines::SameString(Alphas(9), "FuelOilNo2")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil2;
-            } else if (UtilityRoutines::SameString(Alphas(9), "OtherFuel1")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeOtherFuel1;
-            } else if (UtilityRoutines::SameString(Alphas(9), "OtherFuel2")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeOtherFuel2;
-            } else {
+            // A10; \field Fuel type, Validate fuel type input
+            DataGlobalConstants::FuelTypeInput = Alphas(9);
+            DataGlobalConstants::ValidateFuelTypeWithFuelTypeNum(DataGlobalConstants::FuelTypeInput);
+            if (DataGlobalConstants::FuelTypeErrorsFound) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(9) + ".  Entered choice = " + Alphas(9));
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
+            } else {
+                DXCoil(DXCoilNum).FuelType = DataGlobalConstants::FuelTypeNum;
             }
 
             DXCoil(DXCoilNum).RegionNum = Numbers(8);   // Region Number for HSPF Calc

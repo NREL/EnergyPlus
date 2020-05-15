@@ -206,7 +206,7 @@ namespace BoilerSteam {
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
             Boiler(BoilerNum).Name = DataIPShortCuts::cAlphaArgs(1);
 
-            // Validate fuel types input
+            // Validate fuel type input
             DataGlobalConstants::FuelTypeInput = DataIPShortCuts::cAlphaArgs(2);
             DataGlobalConstants::ValidateFuelTypeWithAssignResourceTypeNum(DataGlobalConstants::FuelTypeInput);
             if (DataGlobalConstants::FuelTypeErrorsFound) {
