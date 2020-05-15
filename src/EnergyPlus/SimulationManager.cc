@@ -184,7 +184,6 @@ namespace SimulationManager {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
-    static constexpr auto fmtLD("*");
 
     // DERIVED TYPE DEFINITIONS:
     // na
