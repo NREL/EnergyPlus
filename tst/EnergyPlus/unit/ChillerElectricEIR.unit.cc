@@ -67,8 +67,8 @@ using namespace EnergyPlus::DataLoopNode;
 
 TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
 {
-    ElectricEIRChiller.allocate(1);
-    auto &thisEIR = ChillerElectricEIR::ElectricEIRChiller(1);
+    state.dataChillerElectricEIR.ElectricEIRChiller.allocate(1);
+    auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     thisEIR.EvapInletNodeNum = 1;
     thisEIR.EvapOutletNodeNum = 2;
@@ -87,20 +87,19 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
     EXPECT_EQ(35, thisEIR.CondOutletTemp);
 
     Node.deallocate();
-    ElectricEIRChiller.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
 {
     // unit test for autosizing heat recovery in Chiller:Electric:EIR
-    ChillerElectricEIR::ElectricEIRChiller.allocate(1);
-    auto &thisEIR = ChillerElectricEIR::ElectricEIRChiller(1);
+    state.dataChillerElectricEIR.ElectricEIRChiller.allocate(1);
+    auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     thisEIR.SizFac = 1.0;
     thisEIR.DesignHeatRecVolFlowRateWasAutoSized = true;
     thisEIR.HeatRecCapacityFraction = 0.5;
     thisEIR.HeatRecActive = true;
-    thisEIR.CondenserType = ChillerElectricEIR::WaterCooled;
+    thisEIR.CondenserType = DataPlant::CondenserType::WATERCOOLED;
     thisEIR.CWLoopNum = 1;
     thisEIR.CDLoopNum = 2;
     thisEIR.EvapVolFlowRate = 1.0;
@@ -130,7 +129,6 @@ TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(thisEIR.DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
-    ChillerElectricEIR::ElectricEIRChiller.deallocate();
     DataSizing::PlantSizData.deallocate();
     DataPlant::PlantLoop.deallocate();
 }
@@ -207,8 +205,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricEIRChillerInput();
-    auto &thisEIR = ChillerElectricEIR::ElectricEIRChiller(1);
+    GetElectricEIRChillerInput(state.dataChillerElectricEIR);
+    auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
@@ -314,8 +312,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricEIRChillerInput();
-    auto &thisEIRChiller = ChillerElectricEIR::ElectricEIRChiller(1);
+    GetElectricEIRChillerInput(state.dataChillerElectricEIR);
+    auto &thisEIRChiller = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
@@ -364,7 +362,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     EXPECT_EQ(resultCondVolFlowRate, thisEIRChiller.CondVolFlowRate);
     EXPECT_NEAR(thisEIRChiller.CondVolFlowRate, 2.3925760323498, 0.0000001);
     EXPECT_NEAR(thisEIRChiller.CondMassFlowRateMax, 2.7918772761695, 0.0000001);
-    // run chiller 
+    // run chiller
     thisEIRChiller.calculate(MyLoad, RunFlag);
     // calc evap-cooler water consumption rate
     Real64 EvapCondWaterVolFlowRate = thisEIRChiller.CondMassFlowRate * (thisEIRChiller.CondOutletHumRat - DataEnvironment::OutHumRat) /

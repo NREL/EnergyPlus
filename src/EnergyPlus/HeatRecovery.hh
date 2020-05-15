@@ -215,6 +215,9 @@ namespace HeatRecovery {
         int UnBalancedErrCount;   // Counter for recurring warning message
         int UnBalancedErrIndex;   // Index to recurring warning message
         bool myEnvrnFlag;         // one-time-init flag
+        bool SensEffectivenessFlag; // flag for error message when sensible effectiveness is negative
+        bool LatEffectivenessFlag; // flag for error message when latent effectiveness is negative
+
 
         // Default Constructor
         HeatExchCond()
@@ -230,7 +233,8 @@ namespace HeatRecovery {
               SensHeatingEnergy(0.0), LatHeatingRate(0.0), LatHeatingEnergy(0.0), TotHeatingRate(0.0), TotHeatingEnergy(0.0), SensCoolingRate(0.0),
               SensCoolingEnergy(0.0), LatCoolingRate(0.0), LatCoolingEnergy(0.0), TotCoolingRate(0.0), TotCoolingEnergy(0.0), ElecUseEnergy(0.0),
               ElecUseRate(0.0), SensEffectiveness(0.0), LatEffectiveness(0.0), SupBypassMassFlow(0.0), SecBypassMassFlow(0.0), LowFlowErrCount(0),
-              LowFlowErrIndex(0), UnBalancedErrCount(0), UnBalancedErrIndex(0), myEnvrnFlag(true)
+              LowFlowErrIndex(0), UnBalancedErrCount(0), UnBalancedErrIndex(0), myEnvrnFlag(true), SensEffectivenessFlag(false),
+              LatEffectivenessFlag(false)
         {
         }
     };

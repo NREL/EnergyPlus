@@ -52,10 +52,8 @@
 
 // EnergyPlus Headers
 #include "OutputFiles.hh"
-#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -86,7 +84,6 @@ namespace DataSystemVariables {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataStringGlobals::altpathChar;
     using DataStringGlobals::CurrentWorkingFolder;
     using DataStringGlobals::pathChar;
@@ -102,7 +99,6 @@ namespace DataSystemVariables {
     int const iUnicode_end(0); // endline value when Unicode file
     char const tabchar('\t');
     int const GoodIOStatValue(0);         // good value for IOStat during reads/writes
-    int const MaxTimingStringLength(250); // string length for timing string array
 
     std::string const DDOnlyEnvVar("DDONLY");       // Only run design days
     std::string const ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
@@ -252,7 +248,7 @@ namespace DataSystemVariables {
         OutputFiles &outputFiles = OutputFiles::getSingleton();
 
         if (firstTime) {
-            outputFiles.audit.ensure_open();
+            outputFiles.audit.ensure_open("CheckForActualFileName");
             get_environment_variable(cInputPath1, envinputpath1);
             if (envinputpath1 != blank) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
