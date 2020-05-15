@@ -9623,7 +9623,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void ValidateDistributionSystem()
+    void ValidateDistributionSystem(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

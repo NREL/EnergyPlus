@@ -57,8 +57,10 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -792,7 +794,7 @@ TEST_F(EnergyPlusFixture, TestAnyRanArgument)
     ASSERT_TRUE(process_idf(idf_objects));
 
     OutAirNodeManager::SetOutAirNodes();
-    NodeInputManager::SetupNodeVarsForReporting();
+    NodeInputManager::SetupNodeVarsForReporting(outputFiles());
     EMSManager::CheckIfAnyEMS();
 
     EMSManager::FinishProcessingUserInput = true;

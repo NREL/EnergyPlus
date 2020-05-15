@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -166,7 +167,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, outputFiles());
 
     EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
@@ -264,7 +265,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, outputFiles());
 
     EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 

@@ -155,7 +155,7 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     // EXPECT_EQ(format("{:.5R}", 0.059576949999999996577), "5.95769E-002");
 
     // N formatting simulates the 'G' from Fortran
-    // Always has a leading 0 if printing in fixed notation
+    // Always has a leading 0 if printing in fixed notation < 1
     EXPECT_EQ(format("{:20.8N}", -0.23111252E-04), "     -0.23111252E-04");
     EXPECT_EQ(format("{:20.8N}", -0.0), "      -0.0000000    ");
     EXPECT_EQ(format("{:20.8N}", 0.0), "       0.0000000    ");
@@ -164,6 +164,10 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(format("{:20.8N}", 213608139.6), "      213608140.    ");
     EXPECT_EQ(format("{:20.8N}", 0.213608134), "      0.21360813    ");
     EXPECT_EQ(format("{:13.6N}", 0.803434E+09), " 0.803434E+09");
+    EXPECT_EQ(format("{:N}", 2.06944444444444), "2.06944444444444    ");
+//    EXPECT_EQ(format("{:N}", 999.9), "           999.9    ");
+    EXPECT_EQ(format("{:N}", 61677162.0987027), "61677162.0987027    ");
+    
     //    EXPECT_EQ(format("{:20.8N}", -0.23111252), "     -0.23111252    ");
     //    EXPECT_EQ(format("{:20.8N}", -0.23111252), "     -0.23111252    ");
 

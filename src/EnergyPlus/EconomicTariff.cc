@@ -2411,8 +2411,6 @@ namespace EconomicTariff {
         //    depends on and a list of entries that are dependant on that
         //    line.
 
-        using OutputReportTabular::IntToStr;
-
         int iTariff;
         int iVar;
         int jVar;
@@ -3260,8 +3258,6 @@ namespace EconomicTariff {
         //    to the variable and the twelve monthly values.
         //    This routine puts an item on the top of the stack.
 
-        using OutputReportTabular::IntToStr;
-
         monthlyArray.dim(MaxNumMonths);
 
         Array1D<Real64> curMonthlyArray(MaxNumMonths);
@@ -3305,7 +3301,7 @@ namespace EconomicTariff {
                         // do nothing
                     } else {
                         ShowWarningError("UtilityCost Debugging issue. Invalid kind of variable used (pushStack). " +
-                                         IntToStr(econVar(variablePointer).kindOfObj) +
+                                         std::to_string(econVar(variablePointer).kindOfObj) +
                                          " in tariff: " + tariff(econVar(variablePointer).tariffIndx).tariffName);
                     }
                 }

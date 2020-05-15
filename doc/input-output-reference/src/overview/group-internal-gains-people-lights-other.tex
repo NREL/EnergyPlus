@@ -2787,17 +2787,18 @@ ZoneContaminantSourceAndSink:CarbonDioxide,
 
 \subsubsection{Outputs}\label{outputs-6-004}
 
-HVAC,Average, Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}
-
-HVAC,Average, Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}
+\begin{lstlisting}
+HVAC,Average, Contaminant Source or Sink CO2 Gain Volume Flow Rate [m3/s]
+HVAC,Average, Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate [m3/s]
+\end{lstlisting}
 
 \paragraph{Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}}\label{contaminant-source-or-sink-co2-gain-volume-flow-rate-m3s}
 
-This output is the net carbon dioxide internal gain/loss in m3/s for an individual ZoneContaminantSourceAndSink:CarbonDioxide object.
+This output is the net carbon dioxide internal gain/loss in \si{\volumeFlowRate} for an individual ZoneContaminantSourceAndSink:CarbonDioxide object.
 
 \paragraph{Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}}\label{zone-contaminant-source-or-sink-co2-gain-volume-flow-rate-m3s}
 
-This output variable reports the total (net) carbon dioxide internal gains/losses in cubic meters per second for a zone, including impacts from three objects: ZoneContaminantSourceAndSink:CarbonDioxide, People, and GasEquipment. Positive values denote carbon dioxide generation (gain or source), while negative values denote carbon dioxide removal (loss or sink).
+This output is the net carbon dioxide internal gain/loss in \si{\volumeFlowRate} for all ZoneContaminantSourceAndSink:CarbonDioxide objects in a zone.
 
 \subsection{ZoneContaminantSourceAndSink:Generic:Constant}\label{zonecontaminantsourceandsinkgenericconstant}
 

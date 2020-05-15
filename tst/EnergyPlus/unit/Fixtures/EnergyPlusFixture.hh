@@ -54,12 +54,15 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
 #include <ostream>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 // This is a helper struct to redirect std::cout. This makes sure std::cout is redirected back and
 // everything is cleaned up properly
@@ -254,6 +257,13 @@ protected:
                      std::vector<Real64> const &numbers,
                      std::vector<bool> const &numbers_blank);
 
+    OutputFiles &outputFiles() {
+        return m_outputFiles.get();
+    }
+
+public:
+    EnergyPlusData state;
+
 private:
     friend class InputProcessorFixture;
 
@@ -268,14 +278,13 @@ private:
     static bool process_idd(std::string const &idd, bool &errors_found);
 
     std::unique_ptr<std::ostringstream> json_stream;
-    std::unique_ptr<std::ostringstream> eso_stream;
-    std::unique_ptr<std::ostringstream> mtr_stream;
     std::unique_ptr<std::ostringstream> err_stream;
     std::unique_ptr<std::ostringstream> m_cout_buffer;
     std::unique_ptr<std::ostringstream> m_cerr_buffer;
     std::unique_ptr<std::ostringstream> m_delightin_stream;
     std::unique_ptr<RedirectCout> m_redirect_cout;
     std::unique_ptr<RedirectCerr> m_redirect_cerr;
+    std::reference_wrapper<OutputFiles> m_outputFiles{OutputFiles::getSingleton()};
 };
 
 } // namespace EnergyPlus

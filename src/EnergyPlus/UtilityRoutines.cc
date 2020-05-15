@@ -66,6 +66,7 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -82,14 +83,15 @@ extern "C" {
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SystemReports.hh>
-#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/Timer.h>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -417,27 +419,6 @@ namespace UtilityRoutines {
         return false;
     }
 
-    std::string IPTrimSigDigits(int const IntegerValue)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string String; // Working string
-
-        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
-        return stripped(String);
-    }
-
     size_t case_insensitive_hasher::operator()(const std::string& key) const noexcept {
             std::string keyCopy = MakeUPPERCase(key);
             return std::hash<std::string>()(keyCopy);
@@ -489,7 +470,7 @@ namespace UtilityRoutines {
 
 } // namespace UtilityRoutines
 
-int AbortEnergyPlus()
+int AbortEnergyPlus(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -533,7 +514,7 @@ int AbortEnergyPlus()
     // SUBROUTINE PARAMETER DEFINITIONS:
     static ObjexxFCL::gio::Fmt fmtLD("*");
     static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
-    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
+
 
     // INTERFACE BLOCK SPECIFICATIONS
 
@@ -548,7 +529,6 @@ int AbortEnergyPlus()
     std::string NumSevereDuringWarmup;
     std::string NumWarningsDuringSizing;
     std::string NumSevereDuringSizing;
-    std::string Elapsed;
     int Hours;      // Elapsed Time Hour Reporting
     int Minutes;    // Elapsed Time Minute Reporting
     Real64 Seconds; // Elapsed Time Second Reporting
@@ -562,16 +542,17 @@ int AbortEnergyPlus()
 
     AbortProcessing = true;
     if (AskForConnectionsReport) {
+        OutputFiles &outputFiles = OutputFiles::getSingleton();
         AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
 
         ShowMessage("Fatal error -- final processing.  More error messages may appear.");
-        SetupNodeVarsForReporting();
+        SetupNodeVarsForReporting(outputFiles);
 
         ErrFound = false;
         TerminalError = false;
-        TestBranchIntegrity(ErrFound);
+        TestBranchIntegrity(outputFiles, ErrFound);
         if (ErrFound) TerminalError = true;
-        TestAirPathIntegrity(ErrFound);
+        TestAirPathIntegrity(state, outputFiles, ErrFound);
         if (ErrFound) TerminalError = true;
         CheckMarkedNodes(ErrFound);
         if (ErrFound) TerminalError = true;
@@ -581,8 +562,8 @@ int AbortEnergyPlus()
         if (ErrFound) TerminalError = true;
 
         if (!TerminalError) {
-            ReportAirLoopConnections();
-            ReportLoopConnections();
+            ReportAirLoopConnections(outputFiles);
+            ReportLoopConnections(outputFiles);
         }
 
     } else if (!ExitDuringSimulations) {
@@ -591,7 +572,7 @@ int AbortEnergyPlus()
     }
 
     if (AskForSurfacesReport) {
-        ReportSurfaces();
+        ReportSurfaces(OutputFiles::getSingleton());
     }
 
     ReportSurfaceErrors();
@@ -599,18 +580,12 @@ int AbortEnergyPlus()
     ShowRecurringErrors();
     SummarizeErrors();
     CloseMiscOpenFiles();
-    NumWarnings = RoundSigDigits(TotalWarningErrors);
-    strip(NumWarnings);
-    NumSevere = RoundSigDigits(TotalSevereErrors);
-    strip(NumSevere);
-    NumWarningsDuringWarmup = RoundSigDigits(TotalWarningErrorsDuringWarmup);
-    strip(NumWarningsDuringWarmup);
-    NumSevereDuringWarmup = RoundSigDigits(TotalSevereErrorsDuringWarmup);
-    strip(NumSevereDuringWarmup);
-    NumWarningsDuringSizing = RoundSigDigits(TotalWarningErrorsDuringSizing);
-    strip(NumWarningsDuringSizing);
-    NumSevereDuringSizing = RoundSigDigits(TotalSevereErrorsDuringSizing);
-    strip(NumSevereDuringSizing);
+    NumWarnings = fmt::to_string(TotalWarningErrors);
+    NumSevere = fmt::to_string(TotalSevereErrors);
+    NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
+    NumSevereDuringWarmup = fmt::to_string(TotalSevereErrorsDuringWarmup);
+    NumWarningsDuringSizing = fmt::to_string(TotalWarningErrorsDuringSizing);
+    NumSevereDuringSizing = fmt::to_string(TotalSevereErrorsDuringSizing);
 
     // catch up with timings if in middle
     Time_Finish = epElapsedTime();
@@ -626,7 +601,8 @@ int AbortEnergyPlus()
     Elapsed_Time -= Minutes * 60.0;
     Seconds = Elapsed_Time;
     if (Seconds < 0.0) Seconds = 0.0;
-    ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
+    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
+    const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
     ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
@@ -697,7 +673,6 @@ void CloseMiscOpenFiles()
     // na
 
     // Using/Aliasing
-    using DataGlobals::OutputFileDebug;
     using DataReportingFlags::DebugOutput;
     using DaylightingManager::CloseDFSFile;
     using DaylightingManager::CloseReportIllumMaps;
@@ -714,36 +689,17 @@ void CloseMiscOpenFiles()
     // DERIVED TYPE DEFINITIONS
     // na
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string DebugPosition;
-
     //      LOGICAL :: exists, opened
     //      INTEGER :: UnitNumber
     //      INTEGER :: ios
 
     CloseReportIllumMaps();
-    CloseDFSFile();
+    CloseDFSFile(OutputFiles::getSingleton());
 
-    //  In case some debug output was produced, it appears that the
-    //  position on the INQUIRE will not be 'ASIS' (3 compilers tested)
-    //  So, will want to keep....
-
-    {
-        IOFlags flags;
-        ObjexxFCL::gio::inquire(OutputFileDebug, flags);
-        DebugPosition = flags.POSITION();
-    }
-    if (DebugPosition != "ASIS") {
-        DebugOutput = true;
-    }
-    if (DebugOutput) {
-        ObjexxFCL::gio::close(OutputFileDebug);
+    if (DebugOutput || OutputFiles::getSingleton().debug.position() > 0) {
+        OutputFiles::getSingleton().debug.close();
     } else {
-        {
-            IOFlags flags;
-            flags.DISPOSE("DELETE");
-            ObjexxFCL::gio::close(OutputFileDebug, flags);
-        }
+        OutputFiles::getSingleton().debug.del();
     }
 }
 
@@ -1288,7 +1244,7 @@ bool env_var_on(std::string const &env_var_str)
     return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
 }
 
-void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1340,7 +1296,7 @@ void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1, Opti
     throw FatalError(ErrorMessage);
 }
 
-void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowSevereError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1397,7 +1353,7 @@ void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1, Opt
     }
 }
 
-void ShowSevereMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1450,7 +1406,7 @@ void ShowSevereMessage(std::string const &ErrorMessage, Optional_int OutUnit1, O
     }
 }
 
-void ShowContinueError(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1490,7 +1446,7 @@ void ShowContinueError(std::string const &Message, Optional_int OutUnit1, Option
     }
 }
 
-void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowContinueErrorTimeStamp(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1564,7 +1520,7 @@ void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit
     }
 }
 
-void ShowMessage(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowMessage(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1608,7 +1564,7 @@ void ShowMessage(std::string const &Message, Optional_int OutUnit1, Optional_int
     }
 }
 
-void ShowWarningError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowWarningError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1662,7 +1618,7 @@ void ShowWarningError(std::string const &ErrorMessage, Optional_int OutUnit1, Op
     }
 }
 
-void ShowWarningMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1940,7 +1896,7 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Mess
     }
 }
 
-void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowErrorMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1972,7 +1928,6 @@ void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Op
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static ObjexxFCL::gio::Fmt ErrorFormat("(2X,A)");
     static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     // INTERFACE BLOCK SPECIFICATIONS
@@ -1994,10 +1949,10 @@ void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Op
         ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
     }
     if (present(OutUnit1)) {
-        ObjexxFCL::gio::write(OutUnit1, ErrorFormat) << ErrorMessage;
+        print(OutUnit1(), "  {}", ErrorMessage);
     }
     if (present(OutUnit2)) {
-        ObjexxFCL::gio::write(OutUnit2, ErrorFormat) << ErrorMessage;
+        print(OutUnit2(), "  {}", ErrorMessage);
     }
     std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
     if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());

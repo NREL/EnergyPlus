@@ -225,7 +225,7 @@ namespace AirflowNetworkBalanceManager {
 
     void AssignFanAirLoopNum();
 
-    void ValidateDistributionSystem();
+    void ValidateDistributionSystem(EnergyPlusData &state);
 
     void ValidateFanFlowRate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
 

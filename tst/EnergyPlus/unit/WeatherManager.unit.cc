@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -330,7 +331,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::GetOSCMData(outputFiles(), errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -354,7 +355,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::GetOSCMData(outputFiles(), errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -693,7 +694,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     bool Available{false};
     bool ErrorsFound{false};
-    ASSERT_THROW(WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound), std::runtime_error);
+    ASSERT_THROW(WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound), std::runtime_error);
     ASSERT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
@@ -762,7 +763,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     SimulationManager::OpenOutputFiles();
     // reset eio stream
-    compare_eio_stream("", true);
+    has_eio_output(true);
 
     bool ErrorsFound(false);
     DataEnvironment::TotDesDays = 1;
@@ -783,7 +784,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     WeatherManager::GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    WeatherManager::SetUpDesignDay(OutputFiles::getSingleton(), 1);
+    WeatherManager::SetUpDesignDay(outputFiles(), 1);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType_Enthalpy);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndValue, 90500.0);
 
@@ -810,11 +811,11 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, false));
 
-    OutputReportTabular::WriteEioTables(OutputFiles::getSingleton());
+    OutputReportTabular::WriteEioTables(outputFiles());
 
 
     // Close output files *after* the EIO has been written to
-    SimulationManager::CloseOutputFiles(OutputFiles::getSingleton());
+    SimulationManager::CloseOutputFiles(outputFiles());
 
     EnergyPlus::sqlite->sqliteCommit();
 
