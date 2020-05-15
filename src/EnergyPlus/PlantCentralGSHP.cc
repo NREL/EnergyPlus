@@ -52,7 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -1071,7 +1070,6 @@ namespace PlantCentralGSHP {
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will get the input required by the ChillerHeaterPerformance:Electric:EIR model.
 
-        std::string StringVar;             // Used for EIRFPLR warning messages
         bool CHErrorsFound(false);         // True when input errors are found
         bool FoundNegValue(false);         // Used to evaluate PLFFPLR curve objects
         int NumAlphas;                     // Number of elements in the alpha array
@@ -1079,8 +1077,6 @@ namespace PlantCentralGSHP {
         int IOStat;                        // IO Status when calling get input subroutine
         Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
 
-        static ObjexxFCL::gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
-        static ObjexxFCL::gio::Fmt Format_550("('Curve Output = ',11(F7.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
         numChillerHeaters = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
@@ -1319,12 +1315,9 @@ namespace PlantCentralGSHP {
                     ShowContinueError("for " + DataIPShortCuts::cCurrentModuleObject + "= " + DataIPShortCuts::cAlphaArgs(1));
                     ShowContinueError("EIR as a function of PLR curve output at various part-load ratios shown below:");
                     ShowContinueError("PLR   =  0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-                    ObjexxFCL::gio::write(StringVar, "'Curve Output = '");
-                    for (int CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        ObjexxFCL::gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
-                    }
-                    ObjexxFCL::gio::write(StringVar);
-                    ShowContinueError(StringVar);
+
+                    ShowContinueError(format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ",")));
+
                     CHErrorsFound = true;
                 }
             }
@@ -1377,12 +1370,11 @@ namespace PlantCentralGSHP {
                     ShowContinueError("for " + DataIPShortCuts::cCurrentModuleObject + "= " + DataIPShortCuts::cAlphaArgs(1));
                     ShowContinueError("EIR as a function of PLR curve output at various part-load ratios shown below:");
                     ShowContinueError("PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-                    ObjexxFCL::gio::write(StringVar, "'Curve Output = '");
-                    for (int CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        ObjexxFCL::gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
-                    }
-                    ObjexxFCL::gio::write(StringVar);
-                    ShowContinueError(StringVar);
+
+                    const auto curve_output = format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ","));
+                    std::cout << curve_output << '\n';
+                    ShowContinueError(curve_output);
+
                     CHErrorsFound = true;
                 }
             }

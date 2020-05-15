@@ -5476,7 +5476,6 @@ namespace PackagedTerminalHeatPump {
         Real64 ErrorToler;             // error tolerance
         int SolFla;                    // Flag of RegulaFalsi solver
         static Array1D<Real64> Par(8); // Parameters passed to RegulaFalsi
-        std::string IterNum;           // Max number of iterations for warning message
         Real64 CpAir;                  // air specific heat
         Real64 OutsideDryBulbTemp;     // Outside air temperature at external node height
         // unused1208  REAL(r64)          :: UpperLimitPLR ! used when RegulaFalsi exceeds iteration limit
@@ -5614,14 +5613,11 @@ namespace PackagedTerminalHeatPump {
                         if (!FirstHVACIteration && !WarmupFlag) {
                             CalcPTUnit(state, PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
                             if (PTUnit(PTUnitNum).IterErrIndex == 0) {
-                                ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                                strip(IterNum);
                                 ShowWarningError(PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
-                                ShowContinueError(
-                                    " Iteration limit exceeded calculating packaged terminal unit part-load ratio, maximum iterations = " + IterNum);
-                                ShowContinueErrorTimeStamp(" Part-load ratio returned = " + RoundSigDigits(PartLoadFrac, 3));
-                                ShowContinueError(" Load requested = " + TrimSigDigits(QZnReq, 5) +
-                                                  ", Load delivered = " + TrimSigDigits(TempOutput, 5));
+                                ShowContinueError(format(
+                                    " Iteration limit exceeded calculating packaged terminal unit part-load ratio, maximum iterations = {}", MaxIte));
+                                ShowContinueErrorTimeStamp(format(" Part-load ratio returned = {:.3R}", PartLoadFrac));
+                                ShowContinueError(format(" Load requested = {:.5T}, Load delivered = {:.5T}", QZnReq, TempOutput));
                             }
                             ShowRecurringWarningErrorAtEnd(PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name +
                                                                "\" - Iteration limit exceeded error continues...",

@@ -45,29 +45,43 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CostEstimateManager_hh_INCLUDED
-#define CostEstimateManager_hh_INCLUDED
+#ifndef ENERGYPLUS_BASEBOARDDATA_HH
+#define ENERGYPLUS_BASEBOARDDATA_HH
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus{
 
-// Forward declarations
-struct EnergyPlusData;
+    struct BaseboardElectricData : BaseGlobalStruct {
+        int NumBaseboards = 0;
+        Array1D<BaseboardElectric::BaseboardParams> Baseboard;
+        Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
 
-namespace CostEstimateManager {
+        void clear_state()
+        {
+            NumBaseboards = 0;
+            Baseboard.deallocate();
+            BaseboardNumericFields.deallocate();
+        }
+    };
 
-    void SimCostEstimate(EnergyPlusData &state);
+    struct BaseboardRadiatorData : BaseGlobalStruct {
 
-    void GetCostEstimateInput(EnergyPlusData &state);
+        int NumBaseboards = 0;
+        Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
+        Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
 
-    void CheckCostEstimateInput(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors in input, fatal at end of routine
+        void clear_state()
+        {
+            NumBaseboards = 0;
+            Baseboard.deallocate();
+            BaseboardParamsNumericFields.deallocate();
+        }
+    };
 
-    void CalcCostEstimate(EnergyPlusData &state);
+}  // namespace EnergyPlus
 
-} // namespace CostEstimateManager
-
-} // namespace EnergyPlus
-
-#endif
+#endif // ENERGYPLUS_BASEBOARDDATA_HH

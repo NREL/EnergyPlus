@@ -53,8 +53,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -8181,7 +8179,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 TempOutput = 0.0;      // unit output when iteration limit exceeded [W]
         int SolFla = 0;             // Flag of RegulaFalsi solver
         Array1D<Real64> Par(6); // Parameters passed to RegulaFalsi
-        std::string IterNum;    // Max number of iterations for warning message
         Real64 TempMinPLR = 0.0;      // min PLR used in Regula Falsi call
         Real64 TempMaxPLR = 0.0;      // max PLR used in Regula Falsi call
         bool ContinueIter;      // used when convergence is an issue
@@ -8375,10 +8372,8 @@ namespace HVACVariableRefrigerantFlow {
                 if (SolFla == -1) {
                     if (!FirstHVACIteration && !WarmupFlag) {
                         if (this->IterLimitExceeded == 0) {
-                            ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                            strip(IterNum);
                             ShowWarningMessage(DataHVACGlobals::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name + "\"");
-                            ShowContinueError(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum);
+                            ShowContinueError(format(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = {}", MaxIte));
                             ShowContinueErrorTimeStamp(" Part-load ratio returned = " + General::RoundSigDigits(PartLoadRatio, 3));
 
                             if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
@@ -11323,7 +11318,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 NoCompOutput;    // output when no active compressor [W]
         int SolFla;             // Flag of RegulaFalsi solver
         Array1D<Real64> Par(6); // Parameters passed to RegulaFalsi
-        std::string IterNum;    // Max number of iterations for warning message
         Real64 TempMinPLR;      // min PLR used in Regula Falsi call
         Real64 TempMaxPLR;      // max PLR used in Regula Falsi call
         bool ContinueIter;      // used when convergence is an issue
@@ -11518,10 +11512,8 @@ namespace HVACVariableRefrigerantFlow {
                 if (SolFla == -1) {
                     if (!FirstHVACIteration && !WarmupFlag) {
                         if (this->IterLimitExceeded == 0) {
-                            ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                            strip(IterNum);
                             ShowWarningMessage(DataHVACGlobals::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name + "\"");
-                            ShowContinueError(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum);
+                            ShowContinueError(format(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = {}", MaxIte));
                             ShowContinueErrorTimeStamp(" Part-load ratio returned = " + RoundSigDigits(PartLoadRatio, 3));
 
                             this->CalcVRF_FluidTCtrl(state, VRFTUNum, FirstHVACIteration, TempMinPLR, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
@@ -12234,7 +12226,7 @@ namespace HVACVariableRefrigerantFlow {
                                                  Real64 const Q_coil,     // absolute value of OU coil heat release or heat extract [W]
                                                  Real64 const T_coil_in,  // Temperature of air at OU coil inlet [C]
                                                  Real64 const W_coil_in   // Humidity ratio of air at OU coil inlet [kg/kg]
-    )
+    ) const
     {
 
         // SUBROUTINE INFORMATION:
@@ -12311,7 +12303,7 @@ namespace HVACVariableRefrigerantFlow {
                                              Real64 const T_coil_in,  // Temperature of air at OU coil inlet [C]
                                              Real64 const W_coil_in,  // Humidity ratio of air at OU coil inlet [kg/kg]
                                              Real64 const OutdoorPressure // Outdoor air pressure [Pa]
-    )
+    ) const
     {
 
         // SUBROUTINE INFORMATION:
@@ -13982,7 +13974,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 &Pipe_Q,              // unit part load ratio
         Real64 &Pipe_DeltP,          // ratio of compressor ON airflow to AVERAGE airflow over timestep
         Real64 &Pipe_h_comp_out      // Piping Loss Algorithm Parameter: Enthalpy before piping loss (compressor outlet) [kJ/kg]
-    )
+    ) const
     {
 
         // SUBROUTINE INFORMATION:

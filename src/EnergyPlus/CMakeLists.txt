@@ -83,6 +83,8 @@ SET( SRC
   DXCoils.hh
   DXFEarClipping.cc
   DXFEarClipping.hh
+  Data/BaseboardData.hh
+  Data/BaseData.hh
   Data/EnergyPlusData.hh
   DataAirLoop.cc
   DataAirLoop.hh
@@ -743,8 +745,7 @@ SET( API_CORE_SRC
   api/func.cc
   api/runtime.cc
   api/datatransfer.cc
-  api/EnergyPlusPgm.cc
-)
+  api/EnergyPlusPgm.cc)
 
 if(APPLE OR UNIX)
   add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} ${API_HEADERS})
