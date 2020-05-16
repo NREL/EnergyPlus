@@ -181,15 +181,8 @@ namespace SimulationManager {
     using namespace WeatherManager;
     using namespace ExternalInterface;
 
-    // Data
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
 
     // MODULE VARIABLE DECLARATIONS:
     bool RunPeriodsInInput(false);
@@ -203,10 +196,6 @@ namespace SimulationManager {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool PreP_Fatal(false);
     } // namespace
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
-
-    // MODULE SUBROUTINES:
 
     // Functions
     void clear_state()
