@@ -51,6 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <unordered_map>
 #include <string>
 
@@ -146,7 +147,12 @@ namespace EnergyPlus {
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
         PipesData pipes;
-        //OutputReportTabular outputReportTabular;
+        // OutputReportTabular outputReportTabular;
+
+        // todo: move this from a reference to an object value
+        // after we have eliminated all calls to getSingleton
+        // after we've plumbed enough of the functions to allow
+        OutputFiles &outputFiles = OutputFiles::getSingleton();
 
         // all clear states
         void clear_state() override {

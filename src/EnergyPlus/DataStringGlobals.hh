@@ -111,9 +111,6 @@ namespace DataStringGlobals {
     extern std::string outputDelightOutFileName;
     extern std::string outputDelightEldmpFileName;
     extern std::string outputDelightDfdmpFileName;
-    extern std::string outputMapTabFileName;
-    extern std::string outputMapCsvFileName;
-    extern std::string outputMapTxtFileName;
     extern std::string outputIperrFileName;
     extern std::string outputPerfLogFileName;
     extern std::string outputSqlFileName;

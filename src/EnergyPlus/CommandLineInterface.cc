@@ -441,9 +441,9 @@ namespace CommandLineInterface {
         outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
         outputTblTxtFileName = outputFilePrefix + tableSuffix + ".txt";
         outputTblXmlFileName = outputFilePrefix + tableSuffix + ".xml";
-        outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
-        outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
-        outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
+        OutputFiles::getSingleton().outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
+        OutputFiles::getSingleton().outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
+        OutputFiles::getSingleton().outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
         OutputFiles::getSingleton().outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
         OutputFiles::getSingleton().outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
         OutputFiles::getSingleton().outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";

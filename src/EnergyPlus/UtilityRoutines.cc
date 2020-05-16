@@ -579,7 +579,7 @@ int AbortEnergyPlus(EnergyPlusData &state)
     CheckPlantOnAbort();
     ShowRecurringErrors();
     SummarizeErrors();
-    CloseMiscOpenFiles();
+    CloseMiscOpenFiles(state.outputFiles);
     NumWarnings = fmt::to_string(TotalWarningErrors);
     NumSevere = fmt::to_string(TotalSevereErrors);
     NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
@@ -653,7 +653,7 @@ int AbortEnergyPlus(EnergyPlusData &state)
     return EXIT_FAILURE;
 }
 
-void CloseMiscOpenFiles()
+void CloseMiscOpenFiles(OutputFiles &outputFiles)
 {
 
     // SUBROUTINE INFORMATION:
@@ -693,13 +693,13 @@ void CloseMiscOpenFiles()
     //      INTEGER :: UnitNumber
     //      INTEGER :: ios
 
-    CloseReportIllumMaps();
-    CloseDFSFile(OutputFiles::getSingleton());
+    CloseReportIllumMaps(outputFiles);
+    CloseDFSFile(outputFiles);
 
-    if (DebugOutput || OutputFiles::getSingleton().debug.position() > 0) {
-        OutputFiles::getSingleton().debug.close();
+    if (DebugOutput || outputFiles.debug.position() > 0) {
+        outputFiles.debug.close();
     } else {
-        OutputFiles::getSingleton().debug.del();
+        outputFiles.debug.del();
     }
 }
 
@@ -768,7 +768,7 @@ void CloseOutOpenFiles()
     }
 }
 
-int EndEnergyPlus()
+int EndEnergyPlus(OutputFiles &outputFiles)
 {
 
     // SUBROUTINE INFORMATION:
@@ -833,7 +833,7 @@ int EndEnergyPlus()
     ReportSurfaceErrors();
     ShowRecurringErrors();
     SummarizeErrors();
-    CloseMiscOpenFiles();
+    CloseMiscOpenFiles(outputFiles);
     NumWarnings = RoundSigDigits(TotalWarningErrors);
     strip(NumWarnings);
     NumSevere = RoundSigDigits(TotalSevereErrors);

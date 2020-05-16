@@ -298,7 +298,7 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
         EnergyPlus::inputProcessor->processInput();
         if (DataGlobals::outputEpJSONConversionOnly) {
             DisplayString("Converted input file format. Exiting.");
-            return EndEnergyPlus();
+            return EndEnergyPlus(state.outputFiles);
         }
         ResultsFramework::OutputSchema->setupOutputOptions();
     } catch (const FatalError &e) {
@@ -397,7 +397,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         return AbortEnergyPlus(state);
     }
 
-    return EndEnergyPlus();
+    return EndEnergyPlus(state.outputFiles);
 }
 
 int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath)

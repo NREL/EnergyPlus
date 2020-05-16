@@ -390,7 +390,7 @@ namespace DaylightingManager {
 
     void DayltgInteriorTDDIllum();
 
-    void DayltgElecLightingControl(int &ZoneNum); // Zone number
+    void DayltgElecLightingControl(OutputFiles &outputFiles, int &ZoneNum); // Zone number
 
     Real64 DayltgGlarePositionFactor(Real64 &X, // Lateral and vertical distance of luminous window element from
                                      Real64 &Y);
@@ -463,9 +463,9 @@ namespace DaylightingManager {
 
     void DayltgInteriorMapIllum(int &ZoneNum); // Zone number
 
-    void ReportIllumMap(int const MapNum);
+    void ReportIllumMap(OutputFiles &outputFiles, int const MapNum);
 
-    void CloseReportIllumMaps();
+    void CloseReportIllumMaps(OutputFiles &outputFiles);
 
     void CloseDFSFile(OutputFiles &outputFiles);
 

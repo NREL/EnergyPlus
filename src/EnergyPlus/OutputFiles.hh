@@ -124,6 +124,12 @@ public:
     std::string outputSszTabFileName{"eplusssz.tab"};
     std::string outputSszTxtFileName{"eplusssz.txt"};
 
+    OutputFile map{""};
+    std::string outputMapCsvFileName{"eplusmap.csv"};
+    std::string outputMapTabFileName{"eplusmap.tab"};
+    std::string outputMapTxtFileName{"eplusmap.txt"};
+
+
     OutputFile mtr{"eplusout.mtr"};
     OutputFile bnd{"eplusout.bnd"};
 
