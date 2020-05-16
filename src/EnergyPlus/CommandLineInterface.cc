@@ -457,7 +457,7 @@ namespace CommandLineInterface {
         } else {
             outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
         }
-        outputScreenCsvFileName = outputFilePrefix + screenSuffix + ".csv";
+        OutputFiles::getSingleton().screenCsv.fileName = outputFilePrefix + screenSuffix + ".csv";
         OutputFiles::getSingleton().delightIn.fileName = "eplusout.delightin";
         outputDelightOutFileName = "eplusout.delightout";
         outputDelightEldmpFileName = "eplusout.delighteldmp";

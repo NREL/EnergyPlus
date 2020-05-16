@@ -166,7 +166,6 @@ namespace DataStringGlobals {
     std::string outputMapTxtFileName("eplusmap.txt");
     std::string outputIperrFileName("eplusout.iperr");
     std::string outputPerfLogFileName("eplusout_perflog.csv");
-    std::string outputScreenCsvFileName("eplusscreen.csv");
     std::string outputSqlFileName("eplusout.sql");
     std::string outputSqliteErrFileName("eplussqlite.err");
     std::string TarcogIterationsFileName("TarcogIterations.dbg");

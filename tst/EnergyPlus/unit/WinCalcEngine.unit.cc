@@ -53,13 +53,9 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <WCEMultiLayerOptics.hpp>
@@ -104,7 +100,7 @@ TEST_F(EnergyPlusFixture, WCEClear)
     HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     WindowManager::initWindowModel();
-    WindowManager::InitWindowOpticalCalculations();
+    WindowManager::InitWindowOpticalCalculations(outputFiles());
     HeatBalanceManager::InitHeatBalance(outputFiles());
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
@@ -197,7 +193,7 @@ TEST_F(EnergyPlusFixture, WCEVenetian)
     HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     WindowManager::initWindowModel();
-    WindowManager::InitWindowOpticalCalculations();
+    WindowManager::InitWindowOpticalCalculations(outputFiles());
     HeatBalanceManager::InitHeatBalance(outputFiles());
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
@@ -276,7 +272,7 @@ TEST_F(EnergyPlusFixture, WCEShade)
     HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     WindowManager::initWindowModel();
-    WindowManager::InitWindowOpticalCalculations();
+    WindowManager::InitWindowOpticalCalculations(outputFiles());
     HeatBalanceManager::InitHeatBalance(outputFiles());
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();

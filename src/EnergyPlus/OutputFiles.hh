@@ -142,6 +142,8 @@ public:
     OutputFile edd{"eplusout.edd"};
     OutputFile shade{"eplusshading.csv"};
 
+    OutputFileName screenCsv{"eplusscreen.csv"};
+
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 

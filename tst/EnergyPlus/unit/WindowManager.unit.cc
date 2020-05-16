@@ -2500,7 +2500,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SurfaceGeometry::GetSurfaceData(outputFiles(), FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
-    WindowManager::InitGlassOpticalCalculations();
+    WindowManager::InitGlassOpticalCalculations(outputFiles());
 
     int NumAngles = 10; // Number of incident angles
     Real64 sum;
