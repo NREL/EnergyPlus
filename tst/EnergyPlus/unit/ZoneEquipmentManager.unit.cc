@@ -2919,12 +2919,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
                 EXPECT_EQ(thisSizingType2.HeatOutTempSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.HeatZoneRetTempSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.HeatTstatTempSeq(TimeStepIndex), 0.0);
-                //EXPECT_EQ(thisSizingType2.DesHeatSetPtSeq(TimeStepIndex), 0.0);
+                EXPECT_EQ(thisSizingType2.DesHeatSetPtSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.CoolZoneTempSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.CoolOutTempSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.CoolZoneRetTempSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.CoolTstatTempSeq(TimeStepIndex), 0.0);
-                //EXPECT_EQ(thisSizingType2.DesCoolSetPtSeq(TimeStepIndex), 0.0);
+                EXPECT_EQ(thisSizingType2.DesCoolSetPtSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.HeatZoneHumRatSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.CoolZoneHumRatSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.HeatOutHumRatSeq(TimeStepIndex), 0.0);
