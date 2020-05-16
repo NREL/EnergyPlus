@@ -201,7 +201,6 @@ namespace DataGlobals {
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
     int OutputFilePerfLog(0);                        // Unit number for performance log outputs
-    int OutputFileShadingFrac(0);                    // Unit number for shading output
     int StdMeterRecordCount(0);                      // Count of Meter output records
     bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
     bool SysSizingCalc(false);                       // TRUE if system sizing calculation
@@ -304,7 +303,7 @@ namespace DataGlobals {
         OutputFiles::getSingleton().ssz.close();
         OutputFiles::getSingleton().mtr.close();
         OutputFilePerfLog = 0;
-        OutputFileShadingFrac = 0;
+        OutputFiles::getSingleton().shade.close();
         StdMeterRecordCount = 0;
         ZoneSizingCalc = false;
         SysSizingCalc = false;

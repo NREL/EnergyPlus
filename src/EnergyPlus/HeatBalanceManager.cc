@@ -358,7 +358,7 @@ namespace HeatBalanceManager {
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance();                                                                // Initialize all heat balance related parameters
+        InitHeatBalance(outputFiles);                                                                // Initialize all heat balance related parameters
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -5155,7 +5155,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance()
+    void InitHeatBalance(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5206,8 +5206,6 @@ namespace HeatBalanceManager {
         int SurfNum;     // Surface number
         int ZoneNum;
         static bool ChangeSet(true); // Toggle for checking storm windows
-        static ObjexxFCL::gio::Fmt ShdFracFmt1("(' ',I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
-        static ObjexxFCL::gio::Fmt ShdFracFmt2("(f10.8,',')");
 
         // FLOW:
 
@@ -5276,7 +5274,7 @@ namespace HeatBalanceManager {
         }
 
         if (BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
-            OpenShadingFile();
+            OpenShadingFile(outputFiles);
         }
 
         if (BeginDayFlag) {
@@ -5300,26 +5298,17 @@ namespace HeatBalanceManager {
         if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
+                    static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                         if (TS == NumOfTimeStepInHour) {
-                            ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour << 0;
+                            print(outputFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
                         } else {
-                            ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt1, flags)
-                                << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * TS;
+                            print(outputFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / NumOfTimeStepInHour) * TS);
                         }
-                    }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt2, flags) << SunlitFrac(TS, iHour, SurfNum);
+                        static constexpr auto ShdFracFmt2("{:10.8F},");
+                        print(outputFiles.shade, ShdFracFmt2, SunlitFrac(TS, iHour, SurfNum));
                     }
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("YES");
-                        ObjexxFCL::gio::write(OutputFileShadingFrac, "()", flags);
-                    }
+                    print(outputFiles.shade, "\n");
                 }
             }
         }
@@ -6022,7 +6011,7 @@ namespace HeatBalanceManager {
 
     //        End of Reporting subroutines for the HB Module
 
-    void OpenShadingFile()
+    void OpenShadingFile(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6038,38 +6027,14 @@ namespace HeatBalanceManager {
         using DataSurfaces::Surface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int write_stat;
         int SurfNum;
-        static ObjexxFCL::gio::Fmt ShdFracFmtName("(A, A)");
 
-        OutputFileShadingFrac = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileShadingFrac, DataStringGlobals::outputExtShdFracFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write).");
-        }
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(OutputFileShadingFrac, fmtA, flags) << "Surface Name,";
-        }
+        outputFiles.shade.ensure_open("OpenOutputFiles");
+        print(outputFiles.shade, "Surface Name,");
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmtName, flags) << Surface(SurfNum).Name << ",";
-            }
+            print(outputFiles.shade, "{},", Surface(SurfNum).Name);
         }
-        {
-            IOFlags flags;
-            flags.ADVANCE("YES");
-            ObjexxFCL::gio::write(OutputFileShadingFrac, "()", flags);
-        }
+        print(outputFiles.shade, "()\n");
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input
     {

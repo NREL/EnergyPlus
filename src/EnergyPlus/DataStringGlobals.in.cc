@@ -173,7 +173,6 @@ namespace DataStringGlobals {
     std::string outputCsvFileName("eplusout.csv");
     std::string outputMtrCsvFileName("eplusmtr.csv");
     std::string outputRvauditFileName("eplusout.rvaudit");
-    std::string outputExtShdFracFileName("eplusshading.csv");
 
     std::string EnergyPlusIniFileName;
     std::string inStatFileName;

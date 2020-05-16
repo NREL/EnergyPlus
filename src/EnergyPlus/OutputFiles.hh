@@ -140,6 +140,7 @@ public:
 
     OutputFile mtd{"eplusout.mtd"};
     OutputFile edd{"eplusout.edd"};
+    OutputFile shade{"eplusshading.csv"};
 
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();

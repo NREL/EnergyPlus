@@ -105,7 +105,7 @@ TEST_F(EnergyPlusFixture, WCEClear)
     HeatBalanceManager::GetConstructData(ErrorsFound);
     WindowManager::initWindowModel();
     WindowManager::InitWindowOpticalCalculations();
-    HeatBalanceManager::InitHeatBalance();
+    HeatBalanceManager::InitHeatBalance(outputFiles());
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(FenestrationCommon::WavelengthRange::Solar, 1);
@@ -198,7 +198,7 @@ TEST_F(EnergyPlusFixture, WCEVenetian)
     HeatBalanceManager::GetConstructData(ErrorsFound);
     WindowManager::initWindowModel();
     WindowManager::InitWindowOpticalCalculations();
-    HeatBalanceManager::InitHeatBalance();
+    HeatBalanceManager::InitHeatBalance(outputFiles());
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(FenestrationCommon::WavelengthRange::Solar, 1);
@@ -277,7 +277,7 @@ TEST_F(EnergyPlusFixture, WCEShade)
     HeatBalanceManager::GetConstructData(ErrorsFound);
     WindowManager::initWindowModel();
     WindowManager::InitWindowOpticalCalculations();
-    HeatBalanceManager::InitHeatBalance();
+    HeatBalanceManager::InitHeatBalance(outputFiles());
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(FenestrationCommon::WavelengthRange::Solar, 1);

@@ -1273,7 +1273,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_DOUBLE_EQ(0.012611481326656135, DataLoopNode::Node(1).HumRat);
     EXPECT_DOUBLE_EQ(57247.660939392081, DataLoopNode::Node(1).Enthalpy);
 
-    InitHeatBalance();
+    InitHeatBalance(outputFiles());
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1291,7 +1291,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataEnvironment::WindSpeed = 1.5;
     DataEnvironment::WindDir = 90.0;
 
-    InitHeatBalance();
+    InitHeatBalance(outputFiles());
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);

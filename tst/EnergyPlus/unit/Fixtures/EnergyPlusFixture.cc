@@ -133,7 +133,7 @@ void EnergyPlusFixture::TearDown()
         outputFiles().mtr.del();
         outputFiles().bnd.del();
         ObjexxFCL::gio::close(DataGlobals::OutputFileZonePulse, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileShadingFrac, flags);
+        outputFiles().shade.del();
     }
 
     clearThisState(this->state);

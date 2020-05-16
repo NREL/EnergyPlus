@@ -2019,10 +2019,7 @@ namespace SimulationManager {
         }
 
         // Close the External Shading Output File
-
-        if (OutputFileShadingFrac > 0) {
-            ObjexxFCL::gio::close(OutputFileShadingFrac);
-        }
+        outputFiles.shade.close();
     }
 
     void SetupSimulation(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound)

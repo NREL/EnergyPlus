@@ -451,7 +451,7 @@ namespace CommandLineInterface {
         OutputFiles::getSingleton().outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
         OutputFiles::getSingleton().outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
         outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
-        outputExtShdFracFileName = outputFilePrefix + shdSuffix + ".csv";
+        OutputFiles::getSingleton().shade.fileName = outputFilePrefix + shdSuffix + ".csv";
         if (suffixType == "L" || suffixType == "l") {
             outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
         } else {
