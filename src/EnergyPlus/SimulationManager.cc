@@ -181,16 +181,8 @@ namespace SimulationManager {
     using namespace WeatherManager;
     using namespace ExternalInterface;
 
-    // Data
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
-    static constexpr auto fmtLD("*");
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
 
     // MODULE VARIABLE DECLARATIONS:
     bool RunPeriodsInInput(false);
@@ -204,10 +196,6 @@ namespace SimulationManager {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool PreP_Fatal(false);
     } // namespace
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
-
-    // MODULE SUBROUTINES:
 
     // Functions
     void clear_state()
@@ -680,7 +668,7 @@ namespace SimulationManager {
 #ifdef EP_Detailed_Timings
         epStartTime("Closeout Reporting=");
 #endif
-        SimCostEstimate();
+        SimCostEstimate(state);
 
         ComputeTariff(); //     Compute the utility bills
 
@@ -2128,7 +2116,7 @@ namespace SimulationManager {
             SimulateGroundDomains(state.dataGlobals, state.outputFiles, true);
         }
 
-        if (!ErrorsFound) SimCostEstimate(); // basically will get and check input
+        if (!ErrorsFound) SimCostEstimate(state); // basically will get and check input
         if (ErrorsFound) ShowFatalError("Previous conditions cause program termination.");
     }
 

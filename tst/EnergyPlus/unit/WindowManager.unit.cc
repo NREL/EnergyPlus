@@ -592,8 +592,6 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.3;",
-
         "  Building,",
         "    Small Office with AirflowNetwork model,  !- Name",
         "    0,                       !- North Axis {deg}",
@@ -2801,7 +2799,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 {
 
    std::string const idf_objects =
-        delimited_string({ 
+        delimited_string({
    "WindowMaterial:ComplexShade,",
     "Shade_14_Layer,          !- Name",
     "VenetianHorizontal,      !- Layer Type",
@@ -2823,7 +2821,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     "0.0000;                  !- Slat Curve {m}" });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    bool errors_found = false; 
+    bool errors_found = false;
     HeatBalanceManager::GetMaterialData(outputFiles(), errors_found);
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(DataHeatBalance::ComplexShade(1).Name, "SHADE_14_LAYER");

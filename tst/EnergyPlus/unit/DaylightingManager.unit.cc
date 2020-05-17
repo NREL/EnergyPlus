@@ -48,6 +48,9 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// C++ Headers
+#include <array>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
@@ -1394,4 +1397,275 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     DaylightingManager::DayltgInteriorIllum(ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
+}
+
+
+// Test for #7809: Daylighting:Controls has 10 ref points with fraction that do sum exactly to 1,
+// yet with double rounding errors it throws a severe about sum of fraction > 1.0
+TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_RoundingError)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  West Zone,               !- Name",
+        "  0.0000000E+00,           !- Direction of Relative North {deg}",
+        "  0.0000000E+00,           !- X Origin {m}",
+        "  0.0000000E+00,           !- Y Origin {m}",
+        "  0.0000000E+00,           !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  autocalculate,           !- Ceiling Height {m}",
+        "  autocalculate;           !- Volume {m3}",
+
+        "Daylighting:Controls,",
+        "  West Zone_DaylCtrl,      !- Name",
+        "  West Zone,               !- Zone Name",
+        "  SplitFlux,               !- Daylighting Method",
+        "  ,                        !- Availability Schedule Name",
+        "  Continuous,              !- Lighting Control Type",
+        "  0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control",
+        "  0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control",
+        "  ,                        !- Number of Stepped Control Steps",
+        "  1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control",
+        "  West Zone_DaylRefPt1,    !- Glare Calculation Daylighting Reference Point Name",
+        "  180.0,                   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}",
+        "  20.0,                    !- Maximum Allowable Discomfort Glare Index",
+        "  ,                        !- DElight Gridding Resolution {m2}",
+        "  West Zone_DaylRefPt1,    !- Daylighting Reference Point 1 Name",
+        "  0.1053,                  !- Fraction of Zone Controlled by Reference Point 1",
+        "  200.0,                   !- Illuminance Setpoint at Reference Point 1",
+        "  West Zone_DaylRefPt2,    !- Daylighting Reference Point 2 Name",
+        "  0.0936,                  !- Fraction of Zone Controlled by Reference Point 2",
+        "  200.0,                   !- Illuminance Setpoint at Reference Point 2",
+        "  West Zone_DaylRefPt3,    !- Daylighting Reference Point 3 Name",
+        "  0.1213,                  !- Fraction of Zone Controlled by Reference Point 3",
+        "  200.0,                   !- Illuminance Setpoint at Reference Point 3",
+        "  West Zone_DaylRefPt4,    !- Daylighting Reference Point 4 Name",
+        "  0.1018,                  !- Fraction of Zone Controlled by Reference Point 4",
+        "  200.0,                   !- Illuminance Setpoint at Reference Point 4",
+        "  West Zone_DaylRefPt5,    !- Daylighting Reference Point 5 Name",
+        "  0.0893,                  !- Fraction of Zone Controlled by Reference Point 5",
+        "  200.0,                   !- Illuminance Setpoint at Reference Point 5",
+        "  West Zone_DaylRefPt6,    !- Daylighting Reference Point 6 Name",
+        "  0.0842,                  !- Fraction of Zone Controlled by Reference Point 6",
+        "  200.0,                   !- Illuminance Setpoint at Reference Point 6",
+        "  West Zone_DaylRefPt7,    !- Daylighting Reference Point 7 Name",
+        "  0.0882,                  !- Fraction of Zone Controlled by Reference Point 7",
+        "  200.0,                   !- Illuminance Setpoint at Reference Point 7",
+        "  West Zone_DaylRefPt8,    !- Daylighting Reference Point 8 Name",
+        "  0.1026,                  !- Fraction of Zone Controlled by Reference Point 8",
+        "  200.0,                   !- Illuminance Setpoint at Reference Point 8",
+        "  West Zone_DaylRefPt9,    !- Daylighting Reference Point 9 Name",
+        "  0.1134,                  !- Fraction of Zone Controlled by Reference Point 9",
+        "  200.0,                   !- Illuminance Setpoint at Reference Point 9",
+        "  West Zone_DaylRefPt10,    !- Daylighting Reference Point 10 Name",
+        "  0.1003,                  !- Fraction of Zone Controlled by Reference Point 10",
+        "  200.0;                   !- Illuminance Setpoint at Reference Point 10",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt1,    !- Name",
+        "  West Zone,               !- Zone Name",
+        "  0.5,                     !- X-Coordinate of Reference Point {m}",
+        "  0.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt2,    !- Name",
+        "  West Zone,               !- Zone Name",
+        "  0.5,                     !- X-Coordinate of Reference Point {m}",
+        "  1.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt3,    !- Name",
+        "  West Zone,               !- Zone Name",
+        "  0.5,                     !- X-Coordinate of Reference Point {m}",
+        "  2.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt4,    !- Name",
+        "  West Zone,               !- Zone Name",
+        "  1.5,                     !- X-Coordinate of Reference Point {m}",
+        "  0.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt5,    !- Name",
+        "  West Zone,               !- Zone Name",
+        "  1.5,                     !- X-Coordinate of Reference Point {m}",
+        "  1.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt6,    !- Name",
+        "  West Zone,               !- Zone Name",
+        "  1.5,                     !- X-Coordinate of Reference Point {m}",
+        "  2.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt7,    !- Name",
+        "  West Zone,               !- Zone Name",
+        "  2.5,                     !- X-Coordinate of Reference Point {m}",
+        "  0.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt8,    !- Name",
+        "  West Zone,               !- Zone Name",
+        "  2.5,                     !- X-Coordinate of Reference Point {m}",
+        "  1.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt9,    !- Name",
+        "  West Zone,               !- Zone Name",
+        "  2.5,                     !- X-Coordinate of Reference Point {m}",
+        "  2.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt10,   !- Name",
+        "  West Zone,               !- Zone Name",
+        "  3.0,                     !- X-Coordinate of Reference Point {m}",
+        "  2.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors = false;
+    HeatBalanceManager::GetZoneData(foundErrors);
+    ASSERT_FALSE(foundErrors);
+
+    int numObjs = inputProcessor->getNumObjectsFound("Daylighting:Controls");
+    EXPECT_EQ(1, numObjs);
+
+    DaylightingManager::GetInputDayliteRefPt(foundErrors);
+    compare_err_stream("");
+    EXPECT_FALSE(foundErrors);
+    EXPECT_EQ(10, DataDaylighting::TotRefPoints);
+
+    DaylightingManager::GetDaylightingControls(numObjs, foundErrors);
+    // Used to throw
+    //    ** Severe  ** GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.
+    //    **   ~~~   ** ..discovered in \"Daylighting:Controls\" for Zone=\"WEST ZONE\", trying to control 1.00 of the zone.\n
+    compare_err_stream("");
+    EXPECT_FALSE(foundErrors);
+
+    EXPECT_EQ("WEST ZONE_DAYLCTRL", DataDaylighting::ZoneDaylight(1).Name);
+    EXPECT_EQ("WEST ZONE", DataDaylighting::ZoneDaylight(1).ZoneName);
+    EXPECT_EQ(DataDaylighting::SplitFluxDaylighting, DataDaylighting::ZoneDaylight(1).DaylightMethod);
+    EXPECT_EQ(DataDaylighting::Continuous, DataDaylighting::ZoneDaylight(1).LightControlType);
+
+    EXPECT_EQ(0.3, DataDaylighting::ZoneDaylight(1).MinPowerFraction);
+    EXPECT_EQ(0.2, DataDaylighting::ZoneDaylight(1).MinLightFraction);
+    EXPECT_EQ(1, DataDaylighting::ZoneDaylight(1).LightControlSteps);
+    EXPECT_EQ(1.0, DataDaylighting::ZoneDaylight(1).LightControlProbability);
+
+    EXPECT_EQ(1, DataDaylighting::ZoneDaylight(1).glareRefPtNumber);
+    EXPECT_EQ(180., DataDaylighting::ZoneDaylight(1).ViewAzimuthForGlare);
+    EXPECT_EQ(20., DataDaylighting::ZoneDaylight(1).MaxGlareallowed);
+    EXPECT_EQ(0, DataDaylighting::ZoneDaylight(1).DElightGriddingResolution);
+
+    EXPECT_EQ(10, DataDaylighting::ZoneDaylight(1).TotalDaylRefPoints);
+
+    std::vector<Real64> fractions({0.1053, 0.0936, 0.1213, 0.1018, 0.0893, 0.0842, 0.0882, 0.1026, 0.1134, 0.1003});
+    Real64 sum(0.0);
+    int i = 1;
+    for (auto frac: fractions) {
+        sum += frac;
+        EXPECT_EQ(i, DataDaylighting::ZoneDaylight(1).DaylRefPtNum(i));
+        EXPECT_EQ("WEST ZONE_DAYLREFPT" + std::to_string(i),
+                  DataDaylighting::DaylRefPt(DataDaylighting::ZoneDaylight(1).DaylRefPtNum(i)).Name);
+        EXPECT_EQ(frac, DataDaylighting::ZoneDaylight(1).FracZoneDaylit(i));
+        EXPECT_EQ(200., DataDaylighting::ZoneDaylight(1).IllumSetPoint(i));
+        ++i;
+    }
+
+    // It does sum up to 1.0
+    EXPECT_DOUBLE_EQ(1.0, sum);
+    EXPECT_FALSE(std::abs(sum - 1.0) > std::numeric_limits<double>::epsilon());
+    // Yet, if you are being very litteral, then it's slightly more
+    EXPECT_TRUE(sum > 1.0);
+    EXPECT_FALSE(sum < 1.0);
+
+}
+
+TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotAroundOne)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  West Zone,               !- Name",
+        "  0.0000000E+00,           !- Direction of Relative North {deg}",
+        "  0.0000000E+00,           !- X Origin {m}",
+        "  0.0000000E+00,           !- Y Origin {m}",
+        "  0.0000000E+00,           !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  autocalculate,           !- Ceiling Height {m}",
+        "  autocalculate;           !- Volume {m3}",
+
+        "Daylighting:Controls,",
+        "  West Zone_DaylCtrl,      !- Name",
+        "  West Zone,               !- Zone Name",
+        "  SplitFlux,               !- Daylighting Method",
+        "  ,                        !- Availability Schedule Name",
+        "  Continuous,              !- Lighting Control Type",
+        "  0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control",
+        "  0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control",
+        "  ,                        !- Number of Stepped Control Steps",
+        "  1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control",
+        "  West Zone_DaylRefPt1,    !- Glare Calculation Daylighting Reference Point Name",
+        "  180.0,                   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}",
+        "  20.0,                    !- Maximum Allowable Discomfort Glare Index",
+        "  ,                        !- DElight Gridding Resolution {m2}",
+        "  West Zone_DaylRefPt1,    !- Daylighting Reference Point 1 Name",
+        "  0.5011,                  !- Fraction of Zone Controlled by Reference Point 1",
+        "  200.0,                   !- Illuminance Setpoint at Reference Point 1",
+        "  West Zone_DaylRefPt1,    !- Daylighting Reference Point 2 Name",
+        "  0.5,                     !- Fraction of Zone Controlled by Reference Point 2",
+        "  200.0;                   !- Illuminance Setpoint at Reference Point 2",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt1,    !- Name",
+        "  West Zone,               !- Zone Name",
+        "  0.5,                     !- X-Coordinate of Reference Point {m}",
+        "  0.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+        "Daylighting:ReferencePoint,",
+        "  West Zone_DaylRefPt2,    !- Name",
+        "  West Zone,               !- Zone Name",
+        "  1.5,                     !- X-Coordinate of Reference Point {m}",
+        "  0.5,                     !- Y-Coordinate of Reference Point {m}",
+        "  0.8;                     !- Z-Coordinate of Reference Point {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors = false;
+    HeatBalanceManager::GetZoneData(foundErrors);
+    ASSERT_FALSE(foundErrors);
+
+    int numObjs = inputProcessor->getNumObjectsFound("Daylighting:Controls");
+    EXPECT_EQ(1, numObjs);
+
+    DaylightingManager::GetInputDayliteRefPt(foundErrors);
+    compare_err_stream("");
+    EXPECT_FALSE(foundErrors);
+    EXPECT_EQ(2, DataDaylighting::TotRefPoints);
+
+    DaylightingManager::GetDaylightingControls(numObjs, foundErrors);
+
+    std::string const error_string = delimited_string({
+      "   ** Severe  ** GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.",
+      "   **   ~~~   ** ..discovered in \"Daylighting:Controls\" for Zone=\"WEST ZONE\", trying to control 1.001 of the zone.",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+    EXPECT_TRUE(foundErrors);
 }

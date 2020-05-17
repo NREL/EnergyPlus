@@ -92,8 +92,6 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 {
     // unit test for a new feature to model a central DOAS to serve multiple AirLoops
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
-
         "  SimulationControl,",
         "    YES,                     !- Do Zone Sizing Calculation",
         "    YES,                     !- Do System Sizing Calculation",
@@ -4032,7 +4030,6 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
 {
     // 7686
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
         "  AirLoopHVAC:DedicatedOutdoorAirSystem,",
         "    AirLoopHVAC DOAS,        !- Name",
         "    AirLoopDOAS OA system,   !- AirLoopHVAC:OutdoorAirSystem Name",

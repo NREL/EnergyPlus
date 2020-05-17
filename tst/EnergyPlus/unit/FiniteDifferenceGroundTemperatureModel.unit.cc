@@ -182,8 +182,6 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     // so it'll end up calling >WeatherManager::ReadUserWeatherInput which calls the inputProcessor to set the NumOfEnvrn in particular.
     std::string const idf_objects = delimited_string({
 
-  "Version,9.1;",
-
   "Timestep,4;"
 
   "SimulationControl,",
