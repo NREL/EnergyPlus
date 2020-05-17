@@ -53,36 +53,28 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct ChillerElectricEIRData;
+
 namespace ChillerElectricEIR {
-
-    // Chiller type parameters
-    extern int const AirCooled;
-    extern int const WaterCooled;
-
-    // chiller flow modes
-    extern int const FlowModeNotSet;
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumElectricEIRChillers; // Number of electric EIR chillers specified in input
-
-    extern bool getInputFlag; // When TRUE, calls subroutine to read input file.
 
     struct ElectricEIRChillerSpecs : PlantComponent
     {
         // Members
         std::string Name;                 // User identifier
         int TypeNum;                      // plant loop type identifier
-        int CondenserType;                // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
+        DataPlant::CondenserType CondenserType;  // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
         Real64 RefCap;                    // Reference capacity of chiller [W]
         bool RefCapWasAutoSized;          // reference capacity was autosized on input
         Real64 RefCOP;                    // Reference coefficient of performance [W/W]
-        int FlowMode;                     // one of 3 modes for component flow during operation
+        DataPlant::FlowMode FlowMode;     // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         bool HRSPErrDone;                 // TRUE if set point warning issued for heat recovery loop
@@ -208,7 +200,7 @@ namespace ChillerElectricEIR {
 
         // Default Constructor
         ElectricEIRChillerSpecs()
-            : TypeNum(0), CondenserType(0), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(FlowModeNotSet),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::NOTSET), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(DataPlant::FlowMode::NOTSET),
               ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), EvapMassFlowRate(0.0), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRate(0.0), CondMassFlowRateMax(0.0), CondenserFanPowerRatio(0.0),
@@ -233,7 +225,7 @@ namespace ChillerElectricEIR {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(ChillerElectricEIRData &state, std::string const &objectName);
 
         void setupOutputVars();
 
@@ -262,13 +254,7 @@ namespace ChillerElectricEIR {
         void update(Real64 MyLoad, bool RunFlag);
     };
 
-    // Object Data
-    extern Array1D<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
-
-    // Functions
-    void clear_state();
-
-    void GetElectricEIRChillerInput();
+    void GetElectricEIRChillerInput(ChillerElectricEIRData &chillers);
 
 } // namespace ChillerElectricEIR
 
