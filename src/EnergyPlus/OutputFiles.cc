@@ -66,24 +66,6 @@ OutputFile &OutputFile::ensure_open(const std::string &caller)
     return *this;
 }
 
-std::ostream &open_out_stream(int const fileID, const std::string &fileName)
-{
-    IOFlags flags;
-    flags.ACTION("write");
-    flags.STATUS("UNKNOWN");
-    flags.POSITION("APPEND");
-    ObjexxFCL::gio::open(fileID, fileName, flags);
-    return *ObjexxFCL::gio::out_stream(fileID);
-}
-
-std::ostream &get_out_stream(int const FileID, const std::string &fileName)
-{
-    if (!ObjexxFCL::gio::out_stream(FileID)) {
-        return open_out_stream(FileID, fileName);
-    } else {
-        return *ObjexxFCL::gio::out_stream(FileID);
-    }
-}
 
 bool OutputFile::good() const
 {
@@ -157,21 +139,6 @@ std::vector<std::string> OutputFile::getLines()
         return lines;
     }
     return std::vector<std::string>();
-}
-
-OutputFiles::GIOOutputFile::GIOOutputFile(int const FileID, std::string FileName)
-    : fileID{FileID}, fileName{std::move(FileName)}, os{get_out_stream(FileID, FileName)}
-{
-}
-
-void OutputFiles::GIOOutputFile::close()
-{
-    ObjexxFCL::gio::close(fileID);
-}
-
-void OutputFiles::GIOOutputFile::open_at_end()
-{
-    os = open_out_stream(fileID, fileName);
 }
 
 OutputFiles OutputFiles::makeOutputFiles()

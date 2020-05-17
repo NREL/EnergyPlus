@@ -1130,7 +1130,7 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     GetSurfaceListsInputs();
 
     ErrorsFound = false;
-    SetupZoneGeometry(state, outputFiles(), ErrorsFound);
+    SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetLowTempRadiantSystem();

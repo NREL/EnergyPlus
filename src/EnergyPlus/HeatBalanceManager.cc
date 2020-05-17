@@ -4636,7 +4636,7 @@ namespace HeatBalanceManager {
 
         GetZoneData(ErrorsFound); // Read Zone data from input file
 
-        SetupZoneGeometry(state, OutputFiles::getSingleton(), ErrorsFound);
+        SetupZoneGeometry(state, ErrorsFound);
     }
 
     void GetZoneData(bool &ErrorsFound) // If errors found in input

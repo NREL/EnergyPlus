@@ -542,17 +542,16 @@ int AbortEnergyPlus(EnergyPlusData &state)
 
     AbortProcessing = true;
     if (AskForConnectionsReport) {
-        OutputFiles &outputFiles = OutputFiles::getSingleton();
         AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
 
         ShowMessage("Fatal error -- final processing.  More error messages may appear.");
-        SetupNodeVarsForReporting(outputFiles);
+        SetupNodeVarsForReporting(state.outputFiles);
 
         ErrFound = false;
         TerminalError = false;
-        TestBranchIntegrity(outputFiles, ErrFound);
+        TestBranchIntegrity(state.outputFiles, ErrFound);
         if (ErrFound) TerminalError = true;
-        TestAirPathIntegrity(state, outputFiles, ErrFound);
+        TestAirPathIntegrity(state, state.outputFiles, ErrFound);
         if (ErrFound) TerminalError = true;
         CheckMarkedNodes(ErrFound);
         if (ErrFound) TerminalError = true;
@@ -562,8 +561,8 @@ int AbortEnergyPlus(EnergyPlusData &state)
         if (ErrFound) TerminalError = true;
 
         if (!TerminalError) {
-            ReportAirLoopConnections(outputFiles);
-            ReportLoopConnections(outputFiles);
+            ReportAirLoopConnections(state.outputFiles);
+            ReportLoopConnections(state.outputFiles);
         }
 
     } else if (!ExitDuringSimulations) {
@@ -572,7 +571,7 @@ int AbortEnergyPlus(EnergyPlusData &state)
     }
 
     if (AskForSurfacesReport) {
-        ReportSurfaces(OutputFiles::getSingleton());
+        ReportSurfaces(state.outputFiles);
     }
 
     ReportSurfaceErrors();

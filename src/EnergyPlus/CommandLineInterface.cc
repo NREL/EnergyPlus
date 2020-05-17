@@ -385,13 +385,13 @@ namespace CommandLineInterface {
         }
 
         // EnergyPlus files
-        OutputFiles::getSingleton().audit.fileName = outputFilePrefix + normalSuffix + ".audit";
-        OutputFiles::getSingleton().bnd.fileName = outputFilePrefix + normalSuffix + ".bnd";
-        OutputFiles::getSingleton().dxf.fileName = outputFilePrefix + normalSuffix + ".dxf";
-        OutputFiles::getSingleton().eio.fileName = outputFilePrefix + normalSuffix + ".eio";
+        state.outputFiles.audit.fileName = outputFilePrefix + normalSuffix + ".audit";
+        state.outputFiles.bnd.fileName = outputFilePrefix + normalSuffix + ".bnd";
+        state.outputFiles.dxf.fileName = outputFilePrefix + normalSuffix + ".dxf";
+        state.outputFiles.eio.fileName = outputFilePrefix + normalSuffix + ".eio";
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
-        OutputFiles::getSingleton().eso.fileName = outputFilePrefix + normalSuffix + ".eso";
+        state.outputFiles.eso.fileName = outputFilePrefix + normalSuffix + ".eso";
 
         outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
         outputTSZoneJsonFileName = outputFilePrefix + normalSuffix + "_detailed_zone.json";
@@ -421,44 +421,44 @@ namespace CommandLineInterface {
         outputHRMsgPackFileName = outputFilePrefix + normalSuffix + "_hourly.msgpack";
         outputSMMsgPackFileName = outputFilePrefix + normalSuffix + "_runperiod.msgpack";
 
-        OutputFiles::getSingleton().mtd.fileName = outputFilePrefix + normalSuffix + ".mtd";
+        state.outputFiles.mtd.fileName = outputFilePrefix + normalSuffix + ".mtd";
         outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
-        OutputFiles::getSingleton().mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
+        state.outputFiles.mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
         outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
-        OutputFiles::getSingleton().dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
+        state.outputFiles.dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
         outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
-        OutputFiles::getSingleton().edd.fileName = outputFilePrefix + normalSuffix + ".edd";
+        state.outputFiles.edd.fileName = outputFilePrefix + normalSuffix + ".edd";
         outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
-        OutputFiles::getSingleton().sln.fileName = outputFilePrefix + normalSuffix + ".sln";
-        OutputFiles::getSingleton().sci.fileName = outputFilePrefix + normalSuffix + ".sci";
-        OutputFiles::getSingleton().wrl.fileName = outputFilePrefix + normalSuffix + ".wrl";
+        state.outputFiles.sln.fileName = outputFilePrefix + normalSuffix + ".sln";
+        state.outputFiles.sci.fileName = outputFilePrefix + normalSuffix + ".sci";
+        state.outputFiles.wrl.fileName = outputFilePrefix + normalSuffix + ".wrl";
         outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
-        OutputFiles::getSingleton().debug.fileName = outputFilePrefix + normalSuffix + ".dbg";
+        state.outputFiles.debug.fileName = outputFilePrefix + normalSuffix + ".dbg";
         outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
         outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
         outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
         outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
         outputTblTxtFileName = outputFilePrefix + tableSuffix + ".txt";
         outputTblXmlFileName = outputFilePrefix + tableSuffix + ".xml";
-        OutputFiles::getSingleton().outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
-        OutputFiles::getSingleton().outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
-        OutputFiles::getSingleton().outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
-        OutputFiles::getSingleton().outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
-        OutputFiles::getSingleton().outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
-        OutputFiles::getSingleton().outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
-        OutputFiles::getSingleton().outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
-        OutputFiles::getSingleton().outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
-        OutputFiles::getSingleton().outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
+        state.outputFiles.outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
+        state.outputFiles.outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
+        state.outputFiles.outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
+        state.outputFiles.outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
+        state.outputFiles.outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
+        state.outputFiles.outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
+        state.outputFiles.outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
+        state.outputFiles.outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
+        state.outputFiles.outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
         outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
-        OutputFiles::getSingleton().shade.fileName = outputFilePrefix + shdSuffix + ".csv";
+        state.outputFiles.shade.fileName = outputFilePrefix + shdSuffix + ".csv";
         if (suffixType == "L" || suffixType == "l") {
             outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
         } else {
             outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
         }
-        OutputFiles::getSingleton().screenCsv.fileName = outputFilePrefix + screenSuffix + ".csv";
-        OutputFiles::getSingleton().delightIn.fileName = "eplusout.delightin";
+        state.outputFiles.screenCsv.fileName = outputFilePrefix + screenSuffix + ".csv";
+        state.outputFiles.delightIn.fileName = "eplusout.delightin";
         outputDelightOutFileName = "eplusout.delightout";
         outputDelightEldmpFileName = "eplusout.delighteldmp";
         outputDelightDfdmpFileName = "eplusout.delightdfdmp";

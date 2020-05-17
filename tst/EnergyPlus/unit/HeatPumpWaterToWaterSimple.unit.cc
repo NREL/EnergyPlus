@@ -1472,7 +1472,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     PlantManager::CheckIfAnyPlant();
 
     BranchInputManager::ManageBranchInput(); // just gets input and
-    SizingManager::ManageSizing(state, outputFiles());
+    SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 

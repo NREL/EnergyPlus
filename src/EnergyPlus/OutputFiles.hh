@@ -95,20 +95,6 @@ public:
         }
     };
 
-    class GIOOutputFile
-    {
-    public:
-        void close();
-        void open_at_end();
-
-    private:
-        explicit GIOOutputFile(int const FileID, std::string FileName);
-        int fileID;
-        std::string fileName;
-        std::reference_wrapper<std::ostream> os;
-        template <typename... Args> friend void print(OutputFiles::GIOOutputFile &of, fmt::string_view format_str, const Args &... args);
-        friend class OutputFiles;
-    };
 
     OutputFile audit{"eplusout.audit"};
     OutputFile eio{"eplusout.eio"};
@@ -184,11 +170,6 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
 template <typename... Args> void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
 {
     EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
-}
-
-template <typename... Args> void print(OutputFiles::GIOOutputFile &outputFile, fmt::string_view format_str, const Args &... args)
-{
-    EnergyPlus::vprint(outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
 template <typename... Args> void print(OutputFile &outputFile, fmt::string_view format_str, const Args &... args)

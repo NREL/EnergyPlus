@@ -92,7 +92,7 @@ namespace SizingManager {
     // Functions
     void clear_state();
 
-    void ManageSizing(EnergyPlusData &state, OutputFiles &outputFiles);
+    void ManageSizing(EnergyPlusData &state);
 
     bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
                                      bool const WarmupFlag,

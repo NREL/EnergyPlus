@@ -376,7 +376,7 @@ namespace SimulationManager {
         }
 
         DoingSizing = true;
-        ManageSizing(state, OutputFiles::getSingleton());
+        ManageSizing(state);
 
         BeginFullSimFlag = true;
         SimsDone = false;

@@ -686,7 +686,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     GetConstructData(FoundError);
     GetZoneData(FoundError); // Read Zone data from input file
     DataHeatBalance::AnyCTF = true;
-    SetupZoneGeometry(state, outputFiles(), FoundError); // this calls GetSurfaceData()
+    SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
 
     EXPECT_FALSE(FoundError);
 
@@ -4826,7 +4826,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(state, outputFiles(), ErrorsFound);
+    SetupZoneGeometry(state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -4964,7 +4964,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(state, outputFiles(), ErrorsFound);
+    SetupZoneGeometry(state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -5105,7 +5105,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(state, outputFiles(), ErrorsFound);
+    SetupZoneGeometry(state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -5353,7 +5353,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(state, OutputFiles::getSingleton(), ErrorsFound);
+    SetupZoneGeometry(state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries

@@ -198,7 +198,7 @@ namespace WaterThermalTanks {
     {
         // Process the input data
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(state, OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -254,7 +254,7 @@ namespace WaterThermalTanks {
     int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
     {
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(state, OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -287,7 +287,7 @@ namespace WaterThermalTanks {
     int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
     {
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(state, OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -368,7 +368,7 @@ namespace WaterThermalTanks {
     {
         // Process the input data
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(state, OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -508,7 +508,7 @@ namespace WaterThermalTanks {
         Real64 MyLoad;
 
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(state, OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -568,7 +568,7 @@ namespace WaterThermalTanks {
 
         // FLOW:
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(state, OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -636,7 +636,7 @@ namespace WaterThermalTanks {
                 return;
             } else {
                 if (getWaterThermalTankInputFlag) {
-                    GetWaterThermalTankInput(state, OutputFiles::getSingleton());
+                    GetWaterThermalTankInput(state);
                     getWaterThermalTankInputFlag = false;
                 }
                 if (numWaterThermalTank == 0) return;
@@ -4034,7 +4034,7 @@ namespace WaterThermalTanks {
         return ErrorsFound;
     }
 
-    bool GetWaterThermalTankInput(EnergyPlusData &state, OutputFiles &outputFiles)
+    bool GetWaterThermalTankInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4084,11 +4084,11 @@ namespace WaterThermalTanks {
                     "Inlets,Number Of Outlets\n");
 
                 // Write water heater header for EIO
-                if ((numWaterHeaterMixed > 0) || (numWaterHeaterStratified > 0)) print(outputFiles.eio, Format_720);
-                if (numHeatPumpWaterHeater > 0) print(outputFiles.eio, Format_721);
-                if (numWaterHeaterStratified > 0) print(outputFiles.eio, Format_722);
-                if (numChilledWaterMixed > 0) print(outputFiles.eio, Format_725);
-                if (numChilledWaterStratified > 0) print(outputFiles.eio, Format_726);
+                if ((numWaterHeaterMixed > 0) || (numWaterHeaterStratified > 0)) print(state.outputFiles.eio, Format_720);
+                if (numHeatPumpWaterHeater > 0) print(state.outputFiles.eio, Format_721);
+                if (numWaterHeaterStratified > 0) print(state.outputFiles.eio, Format_722);
+                if (numChilledWaterMixed > 0) print(state.outputFiles.eio, Format_725);
+                if (numChilledWaterStratified > 0) print(state.outputFiles.eio, Format_726);
             }
 
             if (numWaterThermalTank > 0) {
