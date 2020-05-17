@@ -157,8 +157,6 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
 TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
 {
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
-
         "Boiler:HotWater,",
         "  Boiler 1,                !- Name",
         "  NaturalGas,              !- Fuel Type",
