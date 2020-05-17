@@ -136,7 +136,6 @@ namespace SwimmingPool {
         bool MyOneTimeFlag;
         bool MyEnvrnFlagGeneral;
         bool MyPlantScanFlagPool;
-        Array1D_int SurfaceToPoolIndex;
         Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular radiant surface
         Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
         Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
@@ -162,6 +161,12 @@ namespace SwimmingPool {
         }
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        
+        void ErrorCheckSetupPoolSurface(std::string const Alpha1,
+                                        std::string const Alpha2,
+                                        std::string const cAlphaField2,
+                                        bool &ErrorsFound
+        );
 
         void initialize(bool FirstHVACIteration // true during the first HVAC iteration
         );
