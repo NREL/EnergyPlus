@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -95,8 +96,6 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     int UTSCNum(1);
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Zone,",
         "    ZN1_S_Space_1,           !- Name",
@@ -211,7 +210,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneData(ErrorsFound);
-    GetZoneEquipmentData();
+    GetZoneEquipmentData(state);
 
     GetMaterialData(outputFiles(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors

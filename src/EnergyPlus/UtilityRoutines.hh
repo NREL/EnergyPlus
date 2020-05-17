@@ -57,14 +57,14 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include <functional>
 
 namespace EnergyPlus {
 class OutputFile;
 
-
-int AbortEnergyPlus();
+int AbortEnergyPlus(EnergyPlusData &state);
 
 void CloseMiscOpenFiles();
 
@@ -554,10 +554,6 @@ namespace UtilityRoutines {
     }
 
     bool IsNameEmpty(std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound);
-
-    std::string IPTrimSigDigits(int const IntegerValue);
-
-
 
     // Two structs for case insensitive containers.
     // Eg: for unordered_map, we need to have a case insenstive hasher and a case insensitive comparator
