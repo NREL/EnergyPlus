@@ -77,8 +77,6 @@ TEST_F(EnergyPlusFixture, CheckThreading)
 TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
-
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",
@@ -96,14 +94,13 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
 
     // no error message from PerformancePrecisionTradeoffs objects
     EXPECT_TRUE(compare_err_stream("", true));
-  
+
 }
 
 TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Message)
 {
     // issue 7646
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
         "  PerformancePrecisionTradeoffs,",
         "     Yes; ! - Use Coil Direct Solutions",
 
@@ -130,7 +127,7 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
 {
     DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
 
-    // start with no file 
+    // start with no file
     std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
 
     // make sure the static variables are cleared
