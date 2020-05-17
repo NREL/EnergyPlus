@@ -688,7 +688,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     int InletNode = 1;
     int ControlNode = 2; // same as outlet node number
 
-    HVACDXSystem::GetDXCoolingSystemInput();
+    HVACDXSystem::GetDXCoolingSystemInput(state);
 
     // set up outdoor environment
     DataEnvironment::OutDryBulbTemp = 35.0;
@@ -708,12 +708,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     DataLoopNode::Node(ControlNode).TempSetPoint = HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
 
     // test sensible control
-    HVACDXSystem::ControlDXSystem(DXSystemNum, FirstHVACIteration, HXUnitOn);
+    HVACDXSystem::ControlDXSystem(state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     Real64 SHR = VariableSpeedCoils::VarSpeedCoil(1).QSensible / VariableSpeedCoils::VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.811509, 0.0001);
     VariableSpeedCoils::VarSpeedCoil(1).Twet_Rated = 1000.0;
     VariableSpeedCoils::VarSpeedCoil(1).Gamma_Rated = 1.5;
-    HVACDXSystem::ControlDXSystem(DXSystemNum, FirstHVACIteration, HXUnitOn);
+    HVACDXSystem::ControlDXSystem(state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     SHR = VariableSpeedCoils::VarSpeedCoil(1).QSensible / VariableSpeedCoils::VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.878975, 0.0001);
 }
