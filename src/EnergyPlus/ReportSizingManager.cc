@@ -2631,10 +2631,10 @@ namespace ReportSizingManager {
                 } else if (SizingType == SystemAirflowSizing) {
                     if (HRFlowSizingFlag) { // HX sizing
                         if (CurOASysNum) {
+                            // size to supply air duct flow rate
                             if (FinalSysSizing(CurSysNum).DesOutAirVolFlow > 0.0) {
                                 AutosizeDes = FinalSysSizing(CurSysNum).DesOutAirVolFlow;
                             } else {
-                                // ELSE size to supply air duct flow rate
                                 {
                                     auto const SELECT_CASE_var(CurDuctType);
                                     if (SELECT_CASE_var == Main) {
@@ -2650,7 +2650,6 @@ namespace ReportSizingManager {
                                     }
                                 }
                             }
-
                         } else {
                             {
                                 auto const SELECT_CASE_var(CurDuctType);
