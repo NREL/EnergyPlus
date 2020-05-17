@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
@@ -82,18 +83,21 @@ void EnergyPlusFixture::SetUpTestCase()
 
 void EnergyPlusFixture::SetUp()
 {
+    EnergyPlus::clearThisState(state);
     EnergyPlus::clearAllStates();
 
     show_message();
 
     OutputFiles::getSingleton().eio.open_as_stringstream();
     OutputFiles::getSingleton().mtr.open_as_stringstream();
+    OutputFiles::getSingleton().eso.open_as_stringstream();
+    OutputFiles::getSingleton().audit.open_as_stringstream();
+    OutputFiles::getSingleton().bnd.open_as_stringstream();
+    OutputFiles::getSingleton().debug.open_as_stringstream();
 
-    this->eso_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
 
-    DataGlobals::eso_stream = this->eso_stream.get();
     DataGlobals::err_stream = this->err_stream.get();
     DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
 
@@ -117,22 +121,22 @@ void EnergyPlusFixture::TearDown()
         IOFlags flags;
         flags.DISPOSE("DELETE");
         ObjexxFCL::gio::close(OutputProcessor::OutputFileMeterDetails, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileStandard, flags);
+        OutputFiles::getSingleton().eso.del();
         ObjexxFCL::gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputStandardError, flags);
         OutputFiles::getSingleton().eio.del();
-        ObjexxFCL::gio::close(DataGlobals::OutputFileDebug, flags);
+        OutputFiles::getSingleton().debug.del();
         OutputFiles::getSingleton().zsz.del();
         OutputFiles::getSingleton().ssz.del();
         OutputFiles::getSingleton().mtr.del();
-        ObjexxFCL::gio::close(DataGlobals::OutputFileBNDetails, flags);
+        OutputFiles::getSingleton().bnd.del();
         ObjexxFCL::gio::close(DataGlobals::OutputFileZonePulse, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputDElightIn, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileShadingFrac, flags);
     }
 
+    clearThisState(this->state);
     clearAllStates();
-
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)
@@ -166,10 +170,10 @@ bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, 
 
 bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = this->eso_stream->str();
+    auto const stream_str = OutputFiles::getSingleton().eso.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) this->eso_stream->str(std::string());
+    if (reset_stream) OutputFiles::getSingleton().eso.open_as_stringstream();
     return are_equal;
 }
 
@@ -227,8 +231,8 @@ bool EnergyPlusFixture::has_json_output(bool reset_stream)
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 {
-    auto const has_output = this->eso_stream->str().size() > 0;
-    if (reset_stream) this->eso_stream->str(std::string());
+    auto const has_output = !OutputFiles::getSingleton().eso.get_output().empty();
+    if (reset_stream) OutputFiles::getSingleton().eso.open_as_stringstream();
     return has_output;
 }
 
@@ -272,6 +276,12 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     bool success = true;
     inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
+    // Add common objects that will trigger a warning if not present
+    if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {
+        inputProcessor->epJSON["Version"] = {{"",
+                                               {{"idf_order", 0},
+                                                {"version_identifier", DataStringGlobals::MatchVersion}}}};
+    }
     if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
         inputProcessor->epJSON["Building"] = {{"Bldg",
                                                {{"idf_order", 0},

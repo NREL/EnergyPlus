@@ -109,7 +109,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     NONE,                    !- Name
@@ -1840,6 +1840,14 @@
 
   Output:Variable,*,Generic Air Contaminant Deposition Rate Removal Volume Flow Rate,TimeStep;
 
+  Output:Variable,*,Contaminant Source or Sink CO2 Gain Volume Flow Rate,TimeStep; !- Zone Average [m3/s]
+
+  Output:Variable,*,Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate,TimeStep; !- Zone Average [m3/s]
+
+  Output:Variable,*,Zone Generic Air Contaminant Generation Volume Flow Rate,TimeStep; !- Zone Average [m3/s]
+
+  Output:Variable,*,Zone Air CO2 Internal Gain Volume Flow Rate,Timestep; !- HVAC Average [m3/s]
+
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Building,monthly;
@@ -1864,7 +1872,7 @@
 
   Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
 
-  Output:VariableDictionary,Regular;
+  Output:VariableDictionary,IDF;
 
   Output:Surfaces:Drawing,dxf;
 

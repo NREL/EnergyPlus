@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -348,7 +349,7 @@ namespace BranchInputManager {
                        Optional_string_const CompName = _  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     );
 
-    void TestBranchIntegrity(bool &ErrFound);              // ErrFound is a return value, true or false
+    void TestBranchIntegrity(EnergyPlus::OutputFiles &outputFiles, bool &ErrFound);              // ErrFound is a return value, true or false
 
 } // namespace BranchInputManager
 

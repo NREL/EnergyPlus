@@ -51,14 +51,13 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/DXFEarClipping.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -90,7 +89,6 @@ namespace DXFEarClipping {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
-    using DataGlobals::OutputFileDebug;
     using DataGlobals::Pi;
     using DataGlobals::RadToDeg;
     using DataGlobals::TwoPi;
@@ -217,7 +215,6 @@ namespace DXFEarClipping {
         using DataSurfaces::SurfaceClass_Floor;
         using DataSurfaces::SurfaceClass_Overhang;
         using DataSurfaces::SurfaceClass_Roof;
-        using General::RoundSigDigits;
 
         // Return value
         int Triangulate;
@@ -230,7 +227,6 @@ namespace DXFEarClipping {
 
         // Subroutine parameter definitions:
         Real64 const point_tolerance(0.00001);
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // Interface block specifications:
         // na
@@ -253,9 +249,6 @@ namespace DXFEarClipping {
         Array1D<Real64> yvt(nsides);
         Array1D<Real64> zvt(nsides);
 
-        //'General Variables
-        int i;
-        int j;
         // unused  integer k
         int ntri;
         // unused  logical inpoly
@@ -328,21 +321,14 @@ namespace DXFEarClipping {
                     ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
                 if (DisplayExtraWarnings) {
-                    ObjexxFCL::gio::write(line, fmtLD) << "surface=" << surfname << " class=" << cSurfaceClass(surfclass);
-                    ShowMessage(line);
-                    for (j = 1; j <= nsides; ++j) {
-                        //          write(line,"(' side=',i2,' (',2(f6.1,','),f6.1,')')") j,polygon(j)
-                        line = " side=" + RoundSigDigits(j) + " (" + RoundSigDigits(polygon(j).x, 1) + ',' + RoundSigDigits(polygon(j).y, 1) + ',' +
-                               RoundSigDigits(polygon(j).z, 1) + ')';
-                        ShowMessage(line);
+                    ShowMessage(format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
+
+                    for (int j = 1; j <= nsides; ++j) {
+                        ShowMessage(format(" side={} ({:.1R},{:.1R},{:.1R})",j,polygon(j).x,polygon(j).y, polygon(j).z));
                     }
-                    ObjexxFCL::gio::write(line, fmtLD) << "number of triangles found=" << ncount;
-                    ShowMessage(line);
-                    for (j = 1; j <= nrangles; ++j) {
-                        //          write(line,"(' r angle=',i2,' vert=',i2,' deg=',f6.1)") j,r_angles(j),rangles(j)*RadToDeg
-                        line = " r angle=" + RoundSigDigits(j) + " vert=" + RoundSigDigits(r_angles(j)) +
-                               " deg=" + RoundSigDigits(rangles(j) * RadToDeg, 1);
-                        ShowMessage(line);
+                    ShowMessage(format(" number of triangles found={:12}", ncount));
+                    for (int j = 1; j <= nrangles; ++j) {
+                        ShowMessage(format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * RadToDeg));
                     }
                 }
                 break; // while loop
@@ -360,9 +346,9 @@ namespace DXFEarClipping {
                 --nvertcur;
             }
             if (nvertcur == 3) {
-                j = 1;
+                int j = 1;
                 ++ncount;
-                for (i = 1; i <= nsides; ++i) {
+                for (int i = 1; i <= nsides; ++i) {
                     if (removed(i)) continue;
                     earvert(ncount, j) = i;
                     ++j;
@@ -372,14 +358,14 @@ namespace DXFEarClipping {
 
         ntri = ncount;
 
-        for (i = 1; i <= ntri; ++i) {
+        for (int i = 1; i <= ntri; ++i) {
             Triangle(i).vv0 = earvert(i, 1);
             Triangle(i).vv1 = earvert(i, 2);
             Triangle(i).vv2 = earvert(i, 3);
         }
 
         outtriangles.allocate(ntri);
-        for (i = 1; i <= ntri; ++i) {
+        for (int i = 1; i <= ntri; ++i) {
             outtriangles(i) = Triangle(i);
         }
 
@@ -579,7 +565,6 @@ namespace DXFEarClipping {
         // Subroutine argument definitions:
 
         // Subroutine parameter definitions:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // Interface block specifications:
         // na
@@ -678,7 +663,7 @@ namespace DXFEarClipping {
                     earvert(3) = evert;
                 }
                 if (trackit) {
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "ear=" << nears << " triangle=" << svert << mvert << evert;
+                    print(OutputFiles::getSingleton().debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
                 }
             }
         }
