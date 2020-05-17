@@ -421,7 +421,7 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepat
     int status = initializeEnergyPlus(state, filepath);
     if (status) return status;
     try {
-        EnergyPlus::SimulationManager::ManageSimulation(state,EnergyPlus::OutputFiles::getSingleton());
+        EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
@@ -459,7 +459,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     int status = initializeAsLibrary(state);
     if (status) return status;
     try {
-        EnergyPlus::SimulationManager::ManageSimulation(state, EnergyPlus::OutputFiles::getSingleton());
+        EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {

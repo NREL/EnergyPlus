@@ -1738,7 +1738,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
 
     WeatherManager::ResetEnvironmentCounter();
     TestAirPathIntegrity(state, outputFiles(), ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
-    SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     DataHVACGlobals::SimZoneEquipmentFlag = true;
@@ -3312,7 +3312,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
 
     WeatherManager::ResetEnvironmentCounter();
 
-    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound));
+    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(state, ErrorsFound));
 }
 
 } // namespace EnergyPlus

@@ -453,7 +453,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
 
     SizingManager::ManageSizing(state, outputFiles());
 
-    SimulationManager::SetupSimulation(state, outputFiles(), errorsFound);
+    SimulationManager::SetupSimulation(state, errorsFound);
     //
 
     Real64 qDotMet(0.0);    // Watts total cap

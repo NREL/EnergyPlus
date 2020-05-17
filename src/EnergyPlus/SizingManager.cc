@@ -403,7 +403,7 @@ namespace SizingManager {
                                     DesDayWeath(CurOverallSimDay).Press(TimeStepInDay) = OutBaroPress;
                                 }
 
-                                ManageHeatBalance(state, outputFiles);
+                                ManageHeatBalance(state);
 
                                 BeginHourFlag = false;
                                 BeginDayFlag = false;
@@ -3917,7 +3917,7 @@ namespace SizingManager {
 
             ManageWeather();
 
-            ManageHeatBalance(state, outputFiles);
+            ManageHeatBalance(state);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -3928,7 +3928,7 @@ namespace SizingManager {
             //          ! do another timestep=1
             ManageWeather();
 
-            ManageHeatBalance(state, outputFiles);
+            ManageHeatBalance(state);
 
             //         do an end of day, end of environment time step
 
@@ -3938,7 +3938,7 @@ namespace SizingManager {
 
             ManageWeather();
 
-            ManageHeatBalance(state, outputFiles);
+            ManageHeatBalance(state);
 
         } // ... End environment loop.
     }

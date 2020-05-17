@@ -10530,7 +10530,7 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(state);
 
     int VRFCond(1);
     int ZoneNum(1);

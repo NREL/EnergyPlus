@@ -200,7 +200,7 @@ void HVACSizingSimulationManager::RedoKickOffAndResize(EnergyPlusData &state)
     RedoSizesHVACSimulation = true;
 
     ResetEnvironmentCounter();
-    SetupSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
+    SetupSimulation(state, ErrorsFound);
 
     KickOffSimulation = false;
     RedoSizesHVACSimulation = false;
@@ -368,7 +368,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, OutputFiles &outputFiles,
 
                         ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-                        ManageHeatBalance(state, outputFiles);
+                        ManageHeatBalance(state);
 
                         BeginHourFlag = false;
                         BeginDayFlag = false;

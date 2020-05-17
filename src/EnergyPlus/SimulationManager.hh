@@ -76,7 +76,7 @@ namespace SimulationManager {
     // Functions
     void clear_state();
 
-    void ManageSimulation(EnergyPlusData &state, OutputFiles &outputFiles);
+    void ManageSimulation(EnergyPlusData &state);
 
     void GetProjectData(OutputFiles &outputFiles);
 
@@ -96,7 +96,7 @@ namespace SimulationManager {
 
     void CloseOutputFiles(OutputFiles &outputFiles);
 
-    void SetupSimulation(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound);
+    void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
     void ReportNodeConnections(OutputFiles &outputFiles);
 

@@ -289,7 +289,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     createFacilityElectricPowerServiceObject();
 
     bool ErrorsFound(false);
-    SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     EXPECT_EQ(WeatherManager::NumOfEnvrn, 3);

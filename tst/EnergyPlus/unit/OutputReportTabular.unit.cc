@@ -1457,7 +1457,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
 
     // OutputProcessor::TimeValue.allocate(2);
 
-    ManageSimulation(state, outputFiles()); // run the design day over the warmup period (24 hrs, 25 days)
+    ManageSimulation(state); // run the design day over the warmup period (24 hrs, 25 days)
 
     EXPECT_EQ(10.0, (Zone(2).Volume * Zone(2).Multiplier * Zone(2).ListMultiplier) / (Zone(1).Volume * Zone(1).Multiplier * Zone(1).ListMultiplier));
     // leaving a little wiggle room on these
@@ -2495,7 +2495,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
     // OutputProcessor::TimeValue.allocate(2);
     // DataGlobals::DDOnlySimulation = true;
 
-    ManageSimulation(state, outputFiles()); // run the design day over the warmup period (24 hrs, 25 days)
+    ManageSimulation(state); // run the design day over the warmup period (24 hrs, 25 days)
 
     EXPECT_EQ(10.0, (Zone(2).Volume * Zone(2).Multiplier * Zone(2).ListMultiplier) / (Zone(1).Volume * Zone(1).Multiplier * Zone(1).ListMultiplier));
 

@@ -284,7 +284,7 @@ namespace HeatBalanceManager {
         UniqueConstructNames.clear();
     }
 
-    void ManageHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles)
+    void ManageHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -337,7 +337,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(state); // Obtains heat balance related parameters from input file
-            HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles);
+            HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -358,7 +358,7 @@ namespace HeatBalanceManager {
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(outputFiles);                                                                // Initialize all heat balance related parameters
+        InitHeatBalance(state.outputFiles);                                                                // Initialize all heat balance related parameters
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -370,13 +370,13 @@ namespace HeatBalanceManager {
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance(state);
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
-        RecKeepHeatBalance(outputFiles);                                             // Do any heat balance related record keeping
+        RecKeepHeatBalance(state.outputFiles);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
         // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
-        ReportHeatBalance(state, outputFiles); // Manage heat balance reporting until the new reporting is in place
+        ReportHeatBalance(state, state.outputFiles); // Manage heat balance reporting until the new reporting is in place
 
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
@@ -395,7 +395,7 @@ namespace HeatBalanceManager {
         }
 
         if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
-            ReportWarmupConvergence(outputFiles);
+            ReportWarmupConvergence(state.outputFiles);
         }
     }
 
