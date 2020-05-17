@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -525,7 +526,6 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
 TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
 
         "  SizingPeriod:DesignDay,",
         "    Atlanta Jan 21 cooling,  !- Name",
@@ -654,7 +654,6 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     // GetNextEnvironment Will call ReadUserWeatherInput which calls inputProcessor, so let's use process_idf to create one Environment (Design Day)
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
 
         "  SizingPeriod:DesignDay,",
         "    Atlanta Jan 21 cooling,  !- Name",
@@ -693,7 +692,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     bool Available{false};
     bool ErrorsFound{false};
-    ASSERT_THROW(WeatherManager::GetNextEnvironment(outputFiles(), Available, ErrorsFound), std::runtime_error);
+    ASSERT_THROW(WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound), std::runtime_error);
     ASSERT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
@@ -721,7 +720,6 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     OutputReportTabular::displayEioSummary = true;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
 
         "Site:Location,",
         "  Changsha_Hunan_CHN Design_Conditions,   !- Location Name",

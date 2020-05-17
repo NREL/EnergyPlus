@@ -70,6 +70,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneratorDynamicsManager.hh>
 #include <EnergyPlus/GeneratorFuelSupply.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MicroCHPElectricGenerator.hh>
@@ -531,7 +532,7 @@ namespace MicroCHPElectricGenerator {
         }
     }
 
-    void MicroCHPDataStruct::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+    void MicroCHPDataStruct::simulate(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
                                       bool FirstHVACIteration,
                                       Real64 &EP_UNUSED(CurLoad),
                                       bool EP_UNUSED(RunFlag))
@@ -552,7 +553,7 @@ namespace MicroCHPElectricGenerator {
                                                         FirstHVACIteration);
     }
 
-    void MicroCHPDataStruct::onInitLoopEquip(const EnergyPlus::PlantLocation &)
+    void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &)
     {
         static std::string const RoutineName("MicroCHPDataStruct::onInitLoopEquip");
 

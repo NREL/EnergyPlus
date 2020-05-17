@@ -120,7 +120,6 @@ namespace DataStringGlobals {
 
     // MODULE VARIABLE DECLARATIONS:
     std::string outputBndFileName("eplusout.bnd");
-    std::string outputDxfFileName("eplusout.dxf");
     std::string outputEndFileName("eplusout.end");
     std::string outputErrFileName("eplusout.err");
     std::string outputJsonFileName("eplusout.json");
@@ -160,7 +159,6 @@ namespace DataStringGlobals {
     std::string outputTblTxtFileName("eplustbl.txt");
     std::string outputTblXmlFileName("eplustbl.xml");
     std::string outputAdsFileName("eplusADS.out");
-    std::string outputDfsFileName("eplusout.dfs");
     std::string outputGLHEFileName("eplusout.glhe");
     std::string outputDelightInFileName("eplusout.delightin");
     std::string outputDelightOutFileName("eplusout.delightout");
@@ -171,11 +169,7 @@ namespace DataStringGlobals {
     std::string outputMapTxtFileName("eplusmap.txt");
     std::string outputEddFileName("eplusout.edd");
     std::string outputIperrFileName("eplusout.iperr");
-    std::string outputDbgFileName("eplusout.dbg");
     std::string outputPerfLogFileName("eplusout_perflog.csv");
-    std::string outputSlnFileName("eplusout.sln");
-    std::string outputSciFileName("eplusout.sci");
-    std::string outputWrlFileName("eplusout.wrl");
     std::string outputScreenCsvFileName("eplusscreen.csv");
     std::string outputSqlFileName("eplusout.sql");
     std::string outputSqliteErrFileName("eplussqlite.err");

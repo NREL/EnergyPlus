@@ -74,7 +74,7 @@
 ! HVAC:                       single duct VAV with hot water reheat, single boiler, chiller and
 !                             cooling tower, supply air temperature = 19C
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name

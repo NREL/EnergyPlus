@@ -38,7 +38,7 @@
 !
 ! Number of Zones: 19
 
-  Version,9.3;
+  Version,9.4;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -9600,16 +9600,16 @@
 !    ENDIF;                   !- <none>
 
   PythonPlugin:Variables,
-    MyGlobalVariables,       !- Name
-    OutdoorTempCopy;     !- Variable Name 1
+    MyGlobalVariables,            !- Name
+    CurntFacilityElectDemand;     !- Variable Name 1
 
   PythonPlugin:TrendVariable,
-    ThisTrendVariable,
-    OutdoorTempCopy,
-    5;
+    CurntFacilityElectDemandTrend,  !- Name
+    CurntFacilityElectDemand,       !- Variable Name
+    1008;                           !- Number of Timesteps to be Logged
 
   PythonPlugin:Instance,
     Test Out Trends,  !- Name
     Yes,                     !- Run During Warmup Days
     PythonPluginLrgOff_GridStorageSmoothing,  !- Python Module Name
-    TestOutTrends;         !- Plugin Class Name
+    BatteryControlDemandDemo;         !- Plugin Class Name

@@ -68,6 +68,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -291,7 +292,7 @@ namespace VariableSpeedCoils {
     {
     }
 
-    void SimVariableSpeedCoils(std::string const &CompName,   // Coil Name
+    void SimVariableSpeedCoils(EnergyPlusData &state, std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                int const CyclingScheme,       // Continuous fan OR cycling compressor
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -366,7 +367,7 @@ namespace VariableSpeedCoils {
         if ((VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
             (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed)) {
             // Cooling mode
-            InitVarSpeedCoil(DXCoilNum,
+            InitVarSpeedCoil(state, DXCoilNum,
                              MaxONOFFCyclesperHour,
                              HPTimeConstant,
                              FanDelayTime,
@@ -382,7 +383,7 @@ namespace VariableSpeedCoils {
         } else if ((VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) ||
                    (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed)) {
             // Heating mode
-            InitVarSpeedCoil(DXCoilNum,
+            InitVarSpeedCoil(state, DXCoilNum,
                              MaxONOFFCyclesperHour,
                              HPTimeConstant,
                              FanDelayTime,
@@ -396,7 +397,7 @@ namespace VariableSpeedCoils {
             UpdateVarSpeedCoil(DXCoilNum);
         } else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
             // Heating mode
-            InitVarSpeedCoil(DXCoilNum,
+            InitVarSpeedCoil(state, DXCoilNum,
                              MaxONOFFCyclesperHour,
                              HPTimeConstant,
                              FanDelayTime,
@@ -3177,7 +3178,7 @@ namespace VariableSpeedCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitVarSpeedCoil(int const DXCoilNum,                       // Current DXCoilNum under simulation
+    void InitVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum,                       // Current DXCoilNum under simulation
                           Real64 const MaxONOFFCyclesperHour,        // Maximum cycling rate of heat pump [cycles/hr]
                           Real64 const HPTimeConstant,               // Heat pump time constant [s]
                           Real64 const FanDelayTime,                 // Fan delay time, time delay for the HP's fan to
@@ -3264,7 +3265,7 @@ namespace VariableSpeedCoils {
         // variable-speed heat pump water heating, begin
         if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed && MySizeFlag(DXCoilNum)) {
 
-            SizeVarSpeedCoil(DXCoilNum);
+            SizeVarSpeedCoil(state, DXCoilNum);
 
             //   get rated coil bypass factor excluding fan heat
 
@@ -3307,7 +3308,7 @@ namespace VariableSpeedCoils {
 
         if (!SysSizingCalc && MySizeFlag(DXCoilNum) && !MyPlantScanFlag(DXCoilNum)) {
             // for each furnace, do the sizing once.
-            SizeVarSpeedCoil(DXCoilNum);
+            SizeVarSpeedCoil(state, DXCoilNum);
 
             MySizeFlag(DXCoilNum) = false;
 
@@ -3537,7 +3538,7 @@ namespace VariableSpeedCoils {
             // store fan info for coil
             if (VarSpeedCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 if (VarSpeedCoil(DXCoilNum).SupplyFanIndex > -1) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(VarSpeedCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state, VarSpeedCoil(DXCoilNum).Name,
                                                                  VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                                  VarSpeedCoil(DXCoilNum).SupplyFanName,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
@@ -3546,7 +3547,7 @@ namespace VariableSpeedCoils {
 
             } else {
                 if (VarSpeedCoil(DXCoilNum).SupplyFanIndex > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(VarSpeedCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state, VarSpeedCoil(DXCoilNum).Name,
                                                                  VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                                  VarSpeedCoil(DXCoilNum).SupplyFanName,
                                                                  DataAirSystems::structArrayLegacyFanModels,
@@ -3779,7 +3780,7 @@ namespace VariableSpeedCoils {
         DataHeatBalance::HeatReclaimVS_DXCoil(DXCoilNum).AvailCapacity = 0.0;
     }
 
-    void SizeVarSpeedCoil(int const DXCoilNum)
+    void SizeVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4070,7 +4071,7 @@ namespace VariableSpeedCoils {
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
 
                     // design fan heat will be added to coil load
-                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, VolFlowRate);
+                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, VolFlowRate);
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                     Real64 CpAir = PsyCpAirFnW(MixHumRat);
                     if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
@@ -4140,7 +4141,7 @@ namespace VariableSpeedCoils {
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
 
                     // design fan heat will be added to coil load
-                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, VolFlowRate);
+                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, VolFlowRate);
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                     Real64 CpAir = PsyCpAirFnW(MixHumRat);
 
