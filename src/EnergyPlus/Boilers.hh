@@ -52,38 +52,26 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BoilersData;
+
 namespace Boilers {
 
-    // Boiler normalized efficiency curve types
-    extern int const Linear;
-    extern int const BiLinear;
-    extern int const Quadratic;
-    extern int const BiQuadratic;
-    extern int const Cubic;
-    extern int const QuadraticLinear;
-    extern int const BiCubic;
-
     // water temperature evaluation method
-    extern int const BoilerTempModeNotSet;
-    extern int const EnteringBoilerTemp;
-    extern int const LeavingBoilerTemp;
-
-    // Boiler flow modes
-    extern int const FlowModeNotSet;
-    extern int const ConstantFlow;
-    extern int const NotModulated;
-    extern int const LeavingSetPointModulated;
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumBoilers;          // Number of boilers
-    extern bool GetBoilerInputFlag; // Boiler input flag, false if input is processed
+    enum class TempMode
+    {
+        NOTSET,
+        ENTERINGBOILERTEMP,
+        LEAVINGBOILERTEMP
+    };
 
     struct BoilerSpecs : PlantComponent
     {
@@ -101,7 +89,7 @@ namespace Boilers {
         bool NomCapWasAutoSized;      // true if previous was set to autosize input
         Real64 Effic;                 // boiler efficiency at design conditions
         Real64 TempDesBoilerOut;      // C - Boiler design outlet temperature
-        int FlowMode;                 // one of 3 modes for componet flow during operation
+        DataPlant::FlowMode FlowMode;       // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;  // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;    // true if setpoint warning issued
         Real64 VolFlowRate;           // m3/s - Boiler water design volumetric flow rate
@@ -115,7 +103,7 @@ namespace Boilers {
         Real64 MaxPartLoadRat;        // Maximum allowed operating part load ratio
         Real64 OptPartLoadRat;        // Optimal operating part load ratio
         Real64 OperPartLoadRat;       // Actual operating part load ratio
-        int CurveTempMode;            // water temp to use in curve, switch between entering and leaving
+        TempMode CurveTempMode;  // water temp to use in curve, switch between entering and leaving
         int EfficiencyCurvePtr;       // Index to efficiency curve
         Real64 TempUpLimitBoilerOut;  // C - Boiler outlet maximum temperature limit
         Real64 ParasiticElecLoad;     // W - Parasitic electric power (e.g. forced draft fan)
@@ -149,10 +137,10 @@ namespace Boilers {
         // Default Constructor
         BoilerSpecs()
             : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0),
-              NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
+              NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0),
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
-              CurveTempMode(BoilerTempModeNotSet), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0),
+              CurveTempMode(TempMode::NOTSET), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0),
               EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false), FaultyBoilerFoulingFlag(false),
               FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true), MyFlag(true), FuelUsed(0.0), ParasiticElecPower(0.0),
               BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0), BoilerEnergy(0.0), FuelConsumed(0.0),
@@ -183,14 +171,10 @@ namespace Boilers {
                                  bool RunFlag   // boiler on when TRUE
         );
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(BoilersData &boilers, std::string const &objectName);
     };
 
-    extern Array1D<BoilerSpecs> Boiler; // boiler data - dimension to number of machines
-
-    void clear_state();
-
-    void GetBoilerInput();
+    void GetBoilerInput(BoilersData &boilers);
 
 } // namespace Boilers
 
