@@ -240,6 +240,7 @@ protected:
     // This more or less replicates inputProcessor->processInput() but in a more usable fashion for unit testing
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
     // if it makes sense for the unit test to continue after returning from function.
+    // This will add the required objects if not specified: Version, Building, GlobalGeometryRules
     // Will return false if no errors found and true if errors found
     bool process_idf(std::string const &idf_snippet, bool use_assertions = true);
 
@@ -248,7 +249,7 @@ protected:
     // if it makes sense for the unit test to continue after returning from function.
     // Will return true if data structures match and false if they do not.
     // Usage (assuming "Version,8.3;" was parsed as an idf snippet):
-    // 		EXPECT_TRUE( compare_idf( "VERSION", 1, 0, 1, { "8.3" }, { false }, {}, {} ) );
+    //       EXPECT_TRUE( compare_idf( "VERSION", 1, 0, 1, { "8.3" }, { false }, {}, {} ) );
     bool compare_idf(std::string const &name,
                      int const num_alphas,
                      int const num_numbers,
