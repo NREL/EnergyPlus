@@ -261,7 +261,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 
     OutputProcessor::NumEnergyMeters = 2;
     OutputProcessor::EnergyMeters.allocate(OutputProcessor::NumEnergyMeters);
-    OutputProcessor::EnergyMeters(1).Name = "HEATING:MYTH:VARIABLE"; 
+    OutputProcessor::EnergyMeters(1).Name = "HEATING:MYTH:VARIABLE";
     OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:MYTH";
 
 
@@ -371,7 +371,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
 {
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
         "Output:Table:Annual,",
         "Test Report, !- Name",
         ", !- Filter",

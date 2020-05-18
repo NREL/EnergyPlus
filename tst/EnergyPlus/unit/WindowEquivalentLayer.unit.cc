@@ -98,8 +98,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
-
         "  Construction:WindowEquivalentLayer,",
         "  CLR CLR VB,                !- Name",
         "  GLZCLR,                    !- Outside Layer",
@@ -209,8 +207,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     static Array2D<Real64> AbsSolBeam(2, CFSMAXNL + 1);
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Timestep,1;",
 
@@ -567,8 +563,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.3;",
-
         "  Timestep,1;",
 
         "  Building,",
@@ -924,8 +918,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.3;",
-
         "   WindowMaterial:SimpleGlazingSystem,",
         "     Simple Glazing System Layer,   !- Name",
         "     2.8,                           !- U-Factor {W/m2-K}",
@@ -955,8 +947,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
 {
     // GitHub issue 7345
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Timestep,1;",
 
@@ -1280,8 +1270,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
     // GitHub issue 7345
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.3;",
-
         "  Timestep,1;",
 
         "  Building,",
@@ -1603,8 +1591,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
 {
     // GitHub issue 7345
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Timestep,1;",
 

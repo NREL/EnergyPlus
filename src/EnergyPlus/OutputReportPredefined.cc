@@ -47,9 +47,9 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 
@@ -136,7 +136,8 @@ namespace OutputReportPredefined {
 
     int pdchDXCoolCoilNetCapSI; // Standard Rated (Net) Cooling Capacity [W]
     int pdchDXCoolCoilCOP;      // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
-    int pdchDXCoolCoilSEERIP;   // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
+    int pdchDXCoolCoilSEERUserIP;   // SEER value in IP unit at AHRI std. 210/240 conditions and user PLF curve [Btu/W-hr]
+    int pdchDXCoolCoilSEERStandardIP;   // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
     int pdchDXCoolCoilEERIP;    // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
     int pdchDXCoolCoilIEERIP;   // IEER value in IP unit at AHRI std. 340/360 conditions
 
@@ -964,7 +965,8 @@ namespace OutputReportPredefined {
         pdchDXCoolCoilType = 0;     // DX cooling coil type
         pdchDXCoolCoilNetCapSI = 0; // Standard Rated (Net) Cooling Capacity [W]
         pdchDXCoolCoilCOP = 0;      // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
-        pdchDXCoolCoilSEERIP = 0;   // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
+        pdchDXCoolCoilSEERUserIP = 0;   // SEER value in IP unit at AHRI std. 210/240 conditions and user PLF curve [Btu/W-hr]
+        pdchDXCoolCoilSEERStandardIP = 0;   // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
         pdchDXCoolCoilEERIP = 0;    // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
         pdchDXCoolCoilIEERIP = 0;   // IEER value in IP unit at AHRI std. 340/360 conditions
         pdstDXCoolCoil2 = 0;
@@ -1869,7 +1871,8 @@ namespace OutputReportPredefined {
 
         pdchDXCoolCoilCOP = newPreDefColumn(pdstDXCoolCoil, "Standard Rated Net COP [W/W]");
         pdchDXCoolCoilEERIP = newPreDefColumn(pdstDXCoolCoil, "EER [Btu/W-h]");
-        pdchDXCoolCoilSEERIP = newPreDefColumn(pdstDXCoolCoil, "SEER [Btu/W-h]");
+        pdchDXCoolCoilSEERUserIP = newPreDefColumn(pdstDXCoolCoil, "SEER User [Btu/W-h]");
+        pdchDXCoolCoilSEERStandardIP = newPreDefColumn(pdstDXCoolCoil, "SEER Standard [Btu/W-h]");
         pdchDXCoolCoilIEERIP = newPreDefColumn(pdstDXCoolCoil, "IEER [Btu/W-h]");
 
         // for DX Cooling Coil ASHRAE 127-12 Report
@@ -2673,7 +2676,6 @@ namespace OutputReportPredefined {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtI1("(I1)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2683,10 +2685,7 @@ namespace OutputReportPredefined {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int sigDigitCount;
-        std::string digitString;
-        std::string formatConvert;
         std::string stringEntry;
-        int IOS;
 
         incrementTableEntry();
         // check for number of significant digits
@@ -2699,21 +2698,18 @@ namespace OutputReportPredefined {
         } else {
             sigDigitCount = 2;
         }
-        // convert the integer to a string for the number of digits
-        ObjexxFCL::gio::write(digitString, fmtI1) << sigDigitCount;
-        // build up the format string
+
         if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
-            formatConvert = "(F12." + digitString + ')';
+            tableEntry(numTableEntry).charEntry = format("{:#12.{}F}", tableEntryReal, sigDigitCount);
         } else {
-            formatConvert = "(E12." + digitString + ')';
+            tableEntry(numTableEntry).charEntry = format("{:12.{}Z}", tableEntryReal, sigDigitCount);
         }
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::write(stringEntry, formatConvert, flags) << tableEntryReal;
-            IOS = flags.ios();
+
+
+        if (tableEntry(numTableEntry).charEntry.size() > 12) {
+            tableEntry(numTableEntry).charEntry = "  Too Big";
         }
-        if (IOS != 0) stringEntry = "  Too Big";
-        tableEntry(numTableEntry).charEntry = stringEntry;
+
         tableEntry(numTableEntry).objectName = objName;
         tableEntry(numTableEntry).indexColumn = columnIndex;
         tableEntry(numTableEntry).origRealEntry = tableEntryReal;
@@ -2785,7 +2781,6 @@ namespace OutputReportPredefined {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2794,12 +2789,10 @@ namespace OutputReportPredefined {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string stringEntry;
 
         incrementTableEntry();
         // convert the integer to a string
-        ObjexxFCL::gio::write(stringEntry, fmtLD) << tableEntryInt;
-        tableEntry(numTableEntry).charEntry = stringEntry;
+        tableEntry(numTableEntry).charEntry = format("{:12}", tableEntryInt);
         tableEntry(numTableEntry).objectName = objName;
         tableEntry(numTableEntry).indexColumn = columnIndex;
     }
