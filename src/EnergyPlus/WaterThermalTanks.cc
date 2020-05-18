@@ -166,7 +166,6 @@ namespace WaterThermalTanks {
     Array1D<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
     std::unordered_map<std::string, std::string> UniqueWaterThermalTankNames;
 
-    static ObjexxFCL::gio::Fmt fmtLD("*");
 
     bool getWaterThermalTankInputFlag(true); // Calls to Water Heater from multiple places in code
     bool calcWaterThermalTankZoneGainsMyEnvrnFlag(true);
@@ -4045,7 +4044,7 @@ namespace WaterThermalTanks {
         //                      B. Griffith, Oct. 2007 extensions for indirect water heaters
         //                      B. Griffith, Feb. 2008 extensions for autosizing water heaters
         //                      BG Mar 2009.  Trap for bad heater height input for stratified water heater CR7718
-        //						B. Shen 12/2014, add air-source variable-speed heat pump water heating
+        //                      B. Shen 12/2014, add air-source variable-speed heat pump water heating
 
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the water heater, HPWH, and/or desuperheater heating coil input from the input file.
@@ -4240,8 +4239,8 @@ namespace WaterThermalTanks {
                         BranchNodeConnections::SetUpCompSets(
                             HPWH.Type, HPWH.Name, HPWH.TankType, HPWH.TankName, HPWH.OutletNodeName1, HPWH.InletNodeName1, "HPWH To Tank");
 
-                        // do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
-                        if (Tank.ControlType == ControlTypeEnum::Modulate) {
+                        // If WaterHeaterMixed: do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
+                        if ((Tank.TypeNum == DataPlant::TypeOf_WtrHeaterMixed) && (Tank.ControlType == ControlTypeEnum::Modulate)) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + HPWH.Name + ':');
                             ShowContinueError("Heater Control Type for " + Tank.Type + " = " + Tank.Name + " must be CYCLE.");
                             ErrorsFound = true;
@@ -8256,8 +8255,7 @@ namespace WaterThermalTanks {
                                 std::string IterNum;
                                 General::SolveRoot(Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
                                 if (SolFla == -1) {
-                                    ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                                    strip(IterNum);
+                                    IterNum = fmt::to_string(MaxIte);
                                     if (!DataGlobals::WarmupFlag) {
                                         ++DesupHtr.IterLimitExceededNum1;
                                         if (DesupHtr.IterLimitExceededNum1 == 1) {
@@ -8374,8 +8372,7 @@ namespace WaterThermalTanks {
                                     std::string IterNum;
                                     General::SolveRoot(Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
                                     if (SolFla == -1) {
-                                        ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                                        strip(IterNum);
+                                        IterNum = fmt::to_string(MaxIte);
                                         if (!DataGlobals::WarmupFlag) {
                                             ++DesupHtr.IterLimitExceededNum2;
                                             if (DesupHtr.IterLimitExceededNum2 == 1) {
@@ -8721,8 +8718,7 @@ namespace WaterThermalTanks {
             if (!DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
                 if ((HPSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp) {
                     Real64 HPMinTemp = HPSetPointTemp - DeadBandTempDiff;
-                    std::string HPMinTempChar;
-                    ObjexxFCL::gio::write(HPMinTempChar, fmtLD) << HPMinTemp;
+                    const auto HPMinTempChar = fmt::to_string(HPMinTemp);
                     ++HeatPump.HPSetPointError;
                     //  add logic for warmup, DataGlobals::KickOffSimulation and doing sizing here
                     if (HeatPump.HPSetPointError == 1) {
@@ -9046,8 +9042,7 @@ namespace WaterThermalTanks {
                     General::SolveRoot(Acc, MaxIte, SolFla, hpPartLoadRatio, boundPLRFunc, 0.0, 1.0, Par);
                     if (SolFla == -1) {
                         std::string IterNum;
-                        ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                        strip(IterNum);
+                        IterNum = fmt::to_string(MaxIte);
                         if (!DataGlobals::WarmupFlag) {
                             ++HeatPump.IterLimitExceededNum2;
                             if (HeatPump.IterLimitExceededNum2 == 1) {
@@ -9231,8 +9226,7 @@ namespace WaterThermalTanks {
                         TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, boundPLRFunc, 1.0e-10, 1.0, ParVS);
 
                         if (SolFla == -1) {
-                            ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                            strip(IterNum);
+                            IterNum = fmt::to_string(MaxIte);
                             if (!DataGlobals::WarmupFlag) {
                                 ++HeatPump.IterLimitExceededNum1;
                                 if (HeatPump.IterLimitExceededNum1 == 1) {

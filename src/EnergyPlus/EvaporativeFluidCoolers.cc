@@ -51,8 +51,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -2434,7 +2432,7 @@ namespace EvaporativeFluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for passing results to the outlet water node.
 
-        ObjexxFCL::gio::Fmt LowTempFmt("(' ',F6.2)");
+
         Real64 const TempAllowance(0.02); // Minimum difference b/w fluid cooler water outlet temp and
         std::string CharErrOut;
         std::string CharLowOutletTemp;
@@ -2469,13 +2467,9 @@ namespace EvaporativeFluidCoolers {
         Real64 TempDifference = DataPlant::PlantLoop(this->LoopNum).MinTemp - this->OutletWaterTemp;
         if (TempDifference > TempAllowance && this->WaterMassFlowRate > 0.0) {
             ++this->OutletWaterTempErrorCount;
-            ObjexxFCL::gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
-            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << this->OutletWaterTemp;
-            strip(CharErrOut);
             if (this->OutletWaterTempErrorCount < 2) {
                 ShowWarningError(this->EvapFluidCoolerType + " \"" + this->Name + "\"");
-                ShowContinueError("Evaporative fluid cooler water outlet temperature (" + CharErrOut +
-                                  " C) is below the specified minimum condenser loop temp of " + stripped(CharLowOutletTemp) + " C");
+                ShowContinueError(format("Evaporative fluid cooler water outlet temperature ({:6.2F} C) is below the specified minimum condenser loop temp of {:6.2F} C", this->OutletWaterTemp, LoopMinTemp));
                 ShowContinueErrorTimeStamp("");
             } else {
                 ShowRecurringWarningErrorAtEnd(

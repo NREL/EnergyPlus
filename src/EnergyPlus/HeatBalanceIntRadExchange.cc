@@ -53,17 +53,13 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
@@ -71,7 +67,6 @@
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputFiles.hh>
-#include <EnergyPlus/Timer.h>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 
@@ -108,19 +103,14 @@ namespace HeatBalanceIntRadExchange {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
-    using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace DataSystemVariables;
     using namespace DataViewFactorInformation;
-    using namespace DataTimings;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     // DERIVED TYPE DEFINITIONS
     // na
@@ -173,12 +163,10 @@ namespace HeatBalanceIntRadExchange {
 
         // Using/Aliasing
         using General::InterpSlatAng; // Function for slat angle interpolation
-        using namespace DataTimings;
         using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
         using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
 
         Real64 const StefanBoltzmannConst(5.6697e-8); // Stefan-Boltzmann constant in W/(m2*K4)
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         bool IntShadeOrBlindStatusChanged; // True if status of interior shade or blind on at least
         // one window in a zone has changed from previous time step
@@ -202,9 +190,7 @@ namespace HeatBalanceIntRadExchange {
             SurfaceEmiss.allocate(MaxNumOfRadEnclosureSurfs);
             CalcInteriorRadExchangefirstTime = false;
             if (DeveloperFlag) {
-                std::string tdstring;
-                ObjexxFCL::gio::write(tdstring, fmtLD) << " OMP turned off, HBIRE loop executed in serial";
-                DisplayString(tdstring);
+                DisplayString(" OMP turned off, HBIRE loop executed in serial");
             }
         }
 

@@ -601,7 +601,6 @@ namespace HeatPumpWaterToWaterCOOLING {
         static std::string const RoutineNameCompressInletTemp("CalcGSHPModel:CompressInletTemp");
         static std::string const RoutineNameSuctionPr("CalcGSHPModel:SuctionPr");
         static std::string const RoutineNameCompSuctionTemp("CalcGSHPModel:CompSuctionTemp");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SourceSideEffect;      // Source Side effectiveness
@@ -894,20 +893,13 @@ namespace HeatPumpWaterToWaterCOOLING {
                     ShowWarningError("HeatPump:WaterToWater:ParameterEstimation, Cooling did not converge");
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Heatpump Name = " + this->Name);
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << std::abs(100.0 * (this->QSource - initialQSource) / (initialQSource + SmallNum));
-                    ShowContinueError("Heat Inbalance (%)             = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->QLoad;
-                    ShowContinueError("Load-side heat transfer rate   = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->QSource;
-                    ShowContinueError("Source-side heat transfer rate = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->SourceSideWaterMassFlowRate;
-                    ShowContinueError("Source-side mass flow rate     = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->LoadSideWaterMassFlowRate;
-                    ShowContinueError("Load-side mass flow rate       = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->SourceSideWaterInletTemp;
-                    ShowContinueError("Source-side inlet temperature  = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->LoadSideWaterInletTemp;
-                    ShowContinueError("Load-side inlet temperature    = " + stripped(ErrString));
+                    ShowContinueError(format("Heat Inbalance (%)             = {}", std::abs(100.0 * (this->QSource - initialQSource) / (initialQSource + SmallNum))));
+                    ShowContinueError(format("Load-side heat transfer rate   = {}", this->QLoad));
+                    ShowContinueError(format("Source-side heat transfer rate = {}", this->QSource));
+                    ShowContinueError(format("Source-side mass flow rate     = {}", this->SourceSideWaterMassFlowRate));
+                    ShowContinueError(format("Load-side mass flow rate       = {}", this->LoadSideWaterMassFlowRate));
+                    ShowContinueError(format("Source-side inlet temperature  = {}", this->SourceSideWaterInletTemp));
+                    ShowContinueError(format("Load-side inlet temperature    = {}", this->LoadSideWaterInletTemp));
                 }
                 goto LOOPSourceEnth_exit;
 

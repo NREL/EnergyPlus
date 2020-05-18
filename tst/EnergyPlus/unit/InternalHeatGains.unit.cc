@@ -128,9 +128,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
     for (unsigned long i = 1; i <= DataHeatBalance::ZoneOtherEq.size(); ++i) {
         const DataHeatBalance::ZoneEquipData &equip = DataHeatBalance::ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
-            ASSERT_EQ(equip.OtherEquipFuelType, 0);
+            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::Unknown);
         } else if (equip.Name == "OTHEREQ2") {
-            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::PropaneUse);
+            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::PropaneUse);
         }
     }
 }
@@ -291,13 +291,13 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
 
     ScheduleManager::ScheduleInputProcessed = true;
     ScheduleManager::Schedule(1).Used = true;
-    ;
+
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
     ScheduleManager::Schedule(1).MinValue = 1.0;
     ScheduleManager::Schedule(1).MaxValue = 1.0;
     ScheduleManager::Schedule(1).MaxMinSet = true;
     ScheduleManager::Schedule(2).Used = true;
-    ;
+
     ScheduleManager::Schedule(2).CurrentValue = 131.8;
     ScheduleManager::Schedule(2).MinValue = 131.8;
     ScheduleManager::Schedule(2).MaxValue = 131.8;
