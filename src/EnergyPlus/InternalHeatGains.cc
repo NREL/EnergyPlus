@@ -3879,12 +3879,22 @@ namespace InternalHeatGains {
                         ShowContinueError("For " + cAlphaFieldNames(3) + "= FlowControlWithApproachTemperatures, " + cAlphaFieldNames(14) +
                                           " is required, but this field is blank.");
                         ErrorsFound = true;
-                    } else {
-                        ZoneITEq(Loop).SupplyAirNodeNum = 0;
                     }
                 } else {
                     ZoneITEq(Loop).SupplyAirNodeNum = GetOnlySingleNode(
                         AlphaName(14), ErrorsFound, CurrentModuleObject, AlphaName(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                }
+
+                if (ZoneITEq(Loop).SupplyAirNodeNum == 0) {
+                    if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
+                        ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
+                        ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                        ErrorsFound = true;
+                    } else if (ZoneITEq(Loop).AirConnectionType == ITEInletAdjustedSupply) {
+                        ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
+                        ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                        ErrorsFound = true;
+                    }
                 }
 
                 // End-Use subcategories
@@ -5695,8 +5705,6 @@ namespace InternalHeatGains {
 
         std::map<int, std::vector<int>> ZoneITEMap;
 
-        // int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
-
         //  Zero out time step variables
         // Object report variables
         for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
@@ -5784,14 +5792,8 @@ namespace InternalHeatGains {
             RecircFrac = 0.0;
             SupplyNodeNum = ZoneITEq(Loop).SupplyAirNodeNum;
             if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                if (SupplyNodeNum != 0) {
-                    TSupply = Node(SupplyNodeNum).Temp;
-                    WSupply = Node(SupplyNodeNum).HumRat;
-                } else {
-                    ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
-                    ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                    ShowFatalError("Program terminates due to above conditions.");
-                }
+                TSupply = Node(SupplyNodeNum).Temp;
+                WSupply = Node(SupplyNodeNum).HumRat;
                 if (ZoneITEq(Loop).SupplyApproachTempSch != 0) {
                     TAirIn = TSupply + GetCurrentScheduleValue(ZoneITEq(Loop).SupplyApproachTempSch);
                 } else {
@@ -5800,14 +5802,8 @@ namespace InternalHeatGains {
                 WAirIn = Node(SupplyNodeNum).HumRat;
             } else {
                 if (AirConnection == ITEInletAdjustedSupply) {
-                    if (SupplyNodeNum != 0) {
-                        TSupply = Node(SupplyNodeNum).Temp;
-                        WSupply = Node(SupplyNodeNum).HumRat;
-                    } else {
-                        ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
-                        ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                        ShowFatalError("Program terminates due to above conditions.");
-                    }
+                    TSupply = Node(SupplyNodeNum).Temp;
+                    WSupply = Node(SupplyNodeNum).HumRat;
                     if (ZoneITEq(Loop).RecircFLTCurve != 0) {
                         RecircFrac = ZoneITEq(Loop).DesignRecircFrac * CurveValue(ZoneITEq(Loop).RecircFLTCurve, CPULoadSchedFrac, TSupply);
                     } else {
@@ -6012,9 +6008,10 @@ namespace InternalHeatGains {
         } // ZoneITEq calc loop
 
         // Zone-level sensible heat index
-        for (Loop = 1; Loop <= NumOfZones; ++Loop) {
-            if (ZoneSumToutMinusTSup(Loop) != 0.0) {
-                ZnRpt(Loop).ITEqSHI = ZoneSumTinMinusTSup(Loop) / ZoneSumToutMinusTSup(Loop);
+        for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
+            int ZN = ZoneITEq(Loop).ZonePtr;
+            if (ZoneSumToutMinusTSup(ZN) != 0.0) {
+                ZnRpt(ZN).ITEqSHI = ZoneSumTinMinusTSup(ZN) / ZoneSumToutMinusTSup(ZN);
             }
         }
 
