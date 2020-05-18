@@ -479,14 +479,14 @@ namespace VentilatedSlab {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(4) + "=\"" + cAlphaArgs(4) +
                                     "\" not found.");
                     ErrorsFound = true;
-                } else if (Surface(VentSlab(Item).SurfacePtr(1)).PartOfVentSlabOrRadiantSurface) {
+                } else if (Surface(VentSlab(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid Surface");
                     ShowContinueError(cAlphaFields(4) + "=\"" + cAlphaArgs(4) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
                 if (VentSlab(Item).SurfacePtr(1) != 0) {
                     Surface(VentSlab(Item).SurfacePtr(1)).IntConvSurfHasActiveInIt = true;
-                    Surface(VentSlab(Item).SurfacePtr(1)).PartOfVentSlabOrRadiantSurface = true;
+                    Surface(VentSlab(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
                 }
             }
 

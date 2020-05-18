@@ -223,7 +223,7 @@ namespace DataSurfaceLists {
                                         " statement not found = " + SurfList(Item).SurfName(SurfNum));
                         ErrorsFound = true;
                     } else { // Make sure that all of the surfaces are located in the same zone
-                        Surface(SurfList(Item).SurfPtr(SurfNum)).PartOfVentSlabOrRadiantSurface = true;
+                        Surface(SurfList(Item).SurfPtr(SurfNum)).IsRadSurfOrVentSlabOrPool = true;
                         if (SurfNum == 1) {
                             ZoneForSurface = Surface(SurfList(Item).SurfPtr(SurfNum)).Zone;
                         }
@@ -340,7 +340,7 @@ namespace DataSurfaceLists {
                             ErrorsFound = true;
                         }
                     }
-                    Surface(SlabList(Item).SurfPtr(SurfNum)).PartOfVentSlabOrRadiantSurface = true;
+                    Surface(SlabList(Item).SurfPtr(SurfNum)).IsRadSurfOrVentSlabOrPool = true;
 
                     SlabList(Item).CoreDiameter(SurfNum) = Numbers(NumArray);
                     SlabList(Item).CoreLength(SurfNum) = Numbers(NumArray + 1);
