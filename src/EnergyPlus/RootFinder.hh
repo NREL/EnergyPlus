@@ -130,7 +130,8 @@ namespace RootFinder {
     );
 
     bool CheckIncrementRoundOff(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                                Real64 const X                            // X value for current iterate
+                                Real64 const X,                           // X value for current iterate
+                                Real64 const Y                            // Y value for current iterate
     );
 
     bool CheckBracketRoundOff(RootFinderDataType const &RootFinderData); // Data used by root finding algorithm

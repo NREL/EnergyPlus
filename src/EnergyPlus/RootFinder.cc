@@ -647,16 +647,17 @@ namespace RootFinder {
         //   tolerance for the X variables.
         // - the distance between the lower and upper bounds is smaller than the user-specified
         //   tolerance for the X variables. (USING brackets from previous iteration)
-        if (CheckIncrementRoundOff(RootFinderData, X)) {
+        if (CheckIncrementRoundOff(RootFinderData, X, Y)) {
             RootFinderData.StatusFlag = iStatusOKRoundOff;
+            RootFinderData.XCandidate = X;
+
+            // Solution found: No need to continue iterating
+            IsDoneFlag = true;
             return;
         }
         if (CheckBracketRoundOff(RootFinderData)) {
             RootFinderData.StatusFlag = iStatusOKRoundOff;
             RootFinderData.XCandidate = X;
-
-            // Update root finder internal data with current iterate (X,Y)
-            UpdateRootFinder(RootFinderData, X, Y);
 
             // Solution found: No need to continue iterating
             IsDoneFlag = true;
@@ -1375,7 +1376,8 @@ namespace RootFinder {
     }
 
     bool CheckIncrementRoundOff(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                                Real64 const X                            // X value for current iterate
+                                Real64 const X,                           // X value for current iterate
+                                Real64 const Y                            // Y value for current iterate
     )
     {
         // FUNCTION INFORMATION:
@@ -1383,13 +1385,11 @@ namespace RootFinder {
         //       DATE WRITTEN   February 2006
 
         // PURPOSE OF THIS FUNCTION:
-        // This function checks whether the current iterate X satisfies the
+        // This function checks whether the current iterate X and Y satisfy the
         // round-off criterion or not.
 
         bool CheckIncrementRoundOff;
 
-        Real64 DeltaX; // Increment in X since last iterate
-        Real64 TolX;   // Tolerance to satisfy for X increment
         // FLOW:
 
         CheckIncrementRoundOff = false;
@@ -1400,10 +1400,23 @@ namespace RootFinder {
         // Check for round-off error in X increments since last iterate
         if ((RootFinderData.CurrentPoint.DefinedFlag) && (X > 0.0)) {
             // TODO: Use typical value for X averaged over successive iterations
-            TolX = RootFinderData.Controls.TolX * std::abs(X) + RootFinderData.Controls.ATolX;
-            DeltaX = X - RootFinderData.CurrentPoint.X;
+            Real64 TolX = RootFinderData.Controls.TolX * std::abs(X) + RootFinderData.Controls.ATolX;
+            Real64 DeltaX = X - RootFinderData.CurrentPoint.X;
 
             if (std::abs(DeltaX) <= std::abs(TolX)) {
+                CheckIncrementRoundOff = true;
+                return CheckIncrementRoundOff;
+            }
+        }
+
+        // Check for round-off error in Y increments since last iterate
+        if ((RootFinderData.CurrentPoint.DefinedFlag)) {
+            // Use same tolerance as CheckNonSingularity
+            Real64 const SafetyFactor = 0.1;
+            Real64 ATolY = SafetyFactor * RootFinderData.Controls.ATolY;
+            Real64 DeltaY = Y - RootFinderData.CurrentPoint.Y;
+
+            if (std::abs(DeltaY) <= std::abs(ATolY)) {
                 CheckIncrementRoundOff = true;
                 return CheckIncrementRoundOff;
             }
