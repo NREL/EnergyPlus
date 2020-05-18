@@ -1374,7 +1374,7 @@ namespace RootFinder {
     }
 
     bool CheckIncrementRoundOff(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                                Real64 const X                           // X value for current iterate
+                                Real64 const X                            // X value for current iterate
     )
     {
         // FUNCTION INFORMATION:
@@ -1382,7 +1382,7 @@ namespace RootFinder {
         //       DATE WRITTEN   February 2006
 
         // PURPOSE OF THIS FUNCTION:
-        // This function checks whether the current iterate X and Y satisfy the
+        // This function checks whether the current iterate X satisfies the
         // round-off criterion or not.
 
         bool CheckIncrementRoundOff;
