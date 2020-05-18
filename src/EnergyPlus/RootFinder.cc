@@ -649,7 +649,6 @@ namespace RootFinder {
         //   tolerance for the X variables. (USING brackets from previous iteration)
         if (CheckIncrementRoundOff(RootFinderData, X, Y)) {
             RootFinderData.StatusFlag = iStatusOKRoundOff;
-            RootFinderData.XCandidate = X;
 
             // Solution found: No need to continue iterating
             IsDoneFlag = true;
@@ -657,7 +656,6 @@ namespace RootFinder {
         }
         if (CheckBracketRoundOff(RootFinderData)) {
             RootFinderData.StatusFlag = iStatusOKRoundOff;
-            RootFinderData.XCandidate = X;
 
             // Solution found: No need to continue iterating
             IsDoneFlag = true;
