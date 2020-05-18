@@ -8272,8 +8272,6 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
 
     std::string const idf_objects = delimited_string({
 
-        "   Version,9.1;",
-
         " !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========",
 
         " Building,",
