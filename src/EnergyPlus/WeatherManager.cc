@@ -2892,7 +2892,7 @@ namespace WeatherManager {
             Array1D<Real64> LiquidPrecip;    // Liquid Precipitation
 
             Array1D<Real64> TotalSkyCover; // Total Sky Cover
-            Array1D<Real64> OpaqueSkyCover; // Total Sky Cover            
+            Array1D<Real64> OpaqueSkyCover; // Opaque Sky Cover            
 
             // Default Constructor
             HourlyWeatherData()
