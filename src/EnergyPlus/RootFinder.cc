@@ -647,7 +647,7 @@ namespace RootFinder {
         //   tolerance for the X variables.
         // - the distance between the lower and upper bounds is smaller than the user-specified
         //   tolerance for the X variables. (USING brackets from previous iteration)
-        if (CheckIncrementRoundOff(RootFinderData, X, Y)) {
+        if (CheckIncrementRoundOff(RootFinderData, X)) {
             RootFinderData.StatusFlag = iStatusOKRoundOff;
 
             // Solution found: No need to continue iterating
@@ -1374,8 +1374,7 @@ namespace RootFinder {
     }
 
     bool CheckIncrementRoundOff(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                                Real64 const X,                           // X value for current iterate
-                                Real64 const Y                            // Y value for current iterate
+                                Real64 const X                           // X value for current iterate
     )
     {
         // FUNCTION INFORMATION:
@@ -1402,19 +1401,6 @@ namespace RootFinder {
             Real64 DeltaX = X - RootFinderData.CurrentPoint.X;
 
             if (std::abs(DeltaX) <= std::abs(TolX)) {
-                CheckIncrementRoundOff = true;
-                return CheckIncrementRoundOff;
-            }
-        }
-
-        // Check for round-off error in Y increments since last iterate
-        if ((RootFinderData.CurrentPoint.DefinedFlag)) {
-            // Use same tolerance as CheckNonSingularity
-            Real64 const SafetyFactor = 0.1;
-            Real64 ATolY = SafetyFactor * RootFinderData.Controls.ATolY;
-            Real64 DeltaY = Y - RootFinderData.CurrentPoint.Y;
-
-            if (std::abs(DeltaY) <= std::abs(ATolY)) {
                 CheckIncrementRoundOff = true;
                 return CheckIncrementRoundOff;
             }
