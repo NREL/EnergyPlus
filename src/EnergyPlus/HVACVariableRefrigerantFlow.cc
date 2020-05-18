@@ -3580,7 +3580,7 @@ namespace HVACVariableRefrigerantFlow {
                             SetDXCoolingCoilData(state, VRFTU(VRFTUNum).CoolCoilIndex, ErrorsFound, _, VRF(VRFTU(VRFTUNum).VRFSysNum).CondenserType);
                             SetDXCoolingCoilData(state, VRFTU(VRFTUNum).CoolCoilIndex, ErrorsFound, _, _, VRF(VRFTU(VRFTUNum).VRFSysNum).CondenserNodeNum);
                             SetDXCoolingCoilData(state, VRFTU(VRFTUNum).CoolCoilIndex, ErrorsFound, _, _, _, VRF(VRFTU(VRFTUNum).VRFSysNum).MaxOATCCHeater);
-                            SetDXCoolingCoilData(state, 
+                            SetDXCoolingCoilData(state,
                                 VRFTU(VRFTUNum).CoolCoilIndex, ErrorsFound, _, _, _, _, VRF(VRFTU(VRFTUNum).VRFSysNum).MinOATCooling);
                             SetDXCoolingCoilData(state,
                                 VRFTU(VRFTUNum).CoolCoilIndex, ErrorsFound, _, _, _, _, _, VRF(VRFTU(VRFTUNum).VRFSysNum).MaxOATCooling);
@@ -3851,7 +3851,7 @@ namespace HVACVariableRefrigerantFlow {
                             SetDXCoolingCoilData(state, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound, _, VRF(VRFTU(VRFTUNum).VRFSysNum).CondenserType);
                             SetDXCoolingCoilData(state, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound, _, _, VRF(VRFTU(VRFTUNum).VRFSysNum).CondenserNodeNum);
                             SetDXCoolingCoilData(state, VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound, _, _, _, VRF(VRFTU(VRFTUNum).VRFSysNum).MaxOATCCHeater);
-                            SetDXCoolingCoilData(state, 
+                            SetDXCoolingCoilData(state,
                                 VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, VRF(VRFTU(VRFTUNum).VRFSysNum).MinOATHeating);
                             SetDXCoolingCoilData(state,
                                 VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound, _, _, _, _, _, _, _, VRF(VRFTU(VRFTUNum).VRFSysNum).MaxOATHeating);
@@ -5542,8 +5542,7 @@ namespace HVACVariableRefrigerantFlow {
                         }
                     }
 
-                    if (VRFTU(TUIndex).isInAirLoop || VRFTU(TUIndex).isInOASys ||
-                        CheckZoneEquipmentList(DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num), VRFTU(TUIndex).Name))
+                    if (VRFTU(TUIndex).isInAirLoop || VRFTU(TUIndex).isInOASys || VRFTU(TUIndex).isInZone)
                         continue;
                     if (!DataAirLoop::AirLoopInputsFilled) continue;
                     ShowSevereError("InitVRF: VRF Terminal Unit = [" +DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num) + ',' + VRFTU(TUIndex).Name +
@@ -5868,7 +5867,7 @@ namespace HVACVariableRefrigerantFlow {
             if (VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode > 0) {
                 if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                     if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow == DataSizing::AutoSize) {
-                        WaterCoils::SimulateWaterCoilComponents(state, 
+                        WaterCoils::SimulateWaterCoilComponents(state,
                             VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex);
                         // design hot water volume flow rate
                         Real64 CoilMaxVolFlowRate =
@@ -5885,7 +5884,7 @@ namespace HVACVariableRefrigerantFlow {
 
                 if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
                     if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow == DataSizing::AutoSize) {
-                        SteamCoils::SimulateSteamCoilComponents(state, 
+                        SteamCoils::SimulateSteamCoilComponents(state,
                             VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, 1.0);
                         // design steam volume flow rate
                         Real64 CoilMaxVolFlowRate = SteamCoils::GetCoilMaxSteamFlowRate(VRFTU(VRFTUNum).SuppHeatCoilIndex, ErrorsFound);
@@ -6749,7 +6748,7 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         SetAverageAirFlow(VRFTUNum, 0.0, OnOffAirFlowRatio);
-    
+
         if (ErrorsFound) {
             ShowFatalError(RoutineName +
                 ": Errors found in getting ZoneHVAC:TerminalUnit:VariableRefrigerantFlow system input. Preceding condition(s) causes termination.");
@@ -14209,14 +14208,14 @@ namespace HVACVariableRefrigerantFlow {
                                                          this->SuppHeatCoilCompNum);
                 }
                 //     simulate water heating coil
-                WaterCoils::SimulateWaterCoilComponents(state, 
+                WaterCoils::SimulateWaterCoilComponents(state,
                     this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, this->OpMode, this->SuppHeatPartLoadRatio);
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
                 //     simulate steam heating coil
                 Real64 mdot = this->SuppHeatCoilFluidMaxFlow * PartLoadRatio;
                 DataLoopNode::Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
-                SteamCoils::SimulateSteamCoilComponents(state, 
+                SteamCoils::SimulateSteamCoilComponents(state,
                     this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, QActual, this->OpMode, PartLoadRatio);
                 SuppHeatCoilLoad = QActual;
             }
@@ -14252,7 +14251,7 @@ namespace HVACVariableRefrigerantFlow {
 
         Real64 mdot = HVACVariableRefrigerantFlow::VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac;
         DataLoopNode::Node(VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
-        WaterCoils::SimulateWaterCoilComponents(state, 
+        WaterCoils::SimulateWaterCoilComponents(state,
             VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, QActual, VRFTU(VRFTUNum).OpMode, PartLoadFrac);
 
         if (std::abs(SuppHeatCoilLoad) == 0.0) {
