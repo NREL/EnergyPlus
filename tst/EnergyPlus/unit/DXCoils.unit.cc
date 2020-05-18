@@ -1875,8 +1875,6 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.3;",
-
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",
         "    Fraction,                !- Schedule Type Limits Name",
@@ -1977,8 +1975,6 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
     // tests minimum limits of Minimum Outdoor Drybulb Temperature for Compressor Operation #6507
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",
@@ -2088,8 +2084,6 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({
-
-        "Version,9.3;",
 
         "Schedule:Compact,",
         "  FanAvailSched,           !- Name",
@@ -2324,8 +2318,6 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({
-
-        "Version, 9.2;",
 
         "Schedule:Compact,",
         "  FanAndCoilAvailSched, !- Name",
