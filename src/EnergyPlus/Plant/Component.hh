@@ -48,13 +48,15 @@
 #ifndef PlantTopologyComponent_hh_INCLUDED
 #define PlantTopologyComponent_hh_INCLUDED
 
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/EquipAndOperations.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
+
+    struct EnergyPlusData;
+
 namespace DataPlant {
 
     struct CompData

@@ -557,14 +557,14 @@ namespace LowTempRadiantSystem {
                     ShowSevereError(RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
-                } else if (Surface(HydrRadSys(Item).SurfacePtr(1)).PartOfVentSlabOrRadiantSurface) {
+                } else if (Surface(HydrRadSys(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
                 if (HydrRadSys(Item).SurfacePtr(1) != 0) {
                     Surface(HydrRadSys(Item).SurfacePtr(1)).IntConvSurfHasActiveInIt = true;
-                    Surface(HydrRadSys(Item).SurfacePtr(1)).PartOfVentSlabOrRadiantSurface = true;
+                    Surface(HydrRadSys(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
                 }
             }
 
@@ -904,14 +904,14 @@ namespace LowTempRadiantSystem {
                     ShowSevereError(RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
-                } else if (Surface(CFloRadSys(Item).SurfacePtr(1)).PartOfVentSlabOrRadiantSurface) {
+                } else if (Surface(CFloRadSys(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
                 if (CFloRadSys(Item).SurfacePtr(1) != 0) {
                     Surface(CFloRadSys(Item).SurfacePtr(1)).IntConvSurfHasActiveInIt = true;
-                    Surface(CFloRadSys(Item).SurfacePtr(1)).PartOfVentSlabOrRadiantSurface = true;
+                    Surface(CFloRadSys(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
                 }
             }
 
@@ -1154,13 +1154,13 @@ namespace LowTempRadiantSystem {
                     ShowSevereError(RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
-                } else if (Surface(ElecRadSys(Item).SurfacePtr(1)).PartOfVentSlabOrRadiantSurface) {
+                } else if (Surface(ElecRadSys(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
                 if (ElecRadSys(Item).SurfacePtr(1) != 0) {
-                    Surface(ElecRadSys(Item).SurfacePtr(1)).PartOfVentSlabOrRadiantSurface = true;
+                    Surface(ElecRadSys(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
                 }
             }
 
