@@ -120,7 +120,7 @@ namespace DataSurfaces {
     int const GroundFCfactorMethod(-5);
     int const KivaFoundation(-6);
 
-    Array1D_string const cExtBoundCondition({-5, 0}, {"FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
+    Array1D_string const cExtBoundCondition({-6, 0}, {"KivaFoundation", "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
 
     // Parameters to indicate the first "corner" of a surface
     // Currently, these are used only during input of surfaces

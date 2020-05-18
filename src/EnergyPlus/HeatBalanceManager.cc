@@ -5938,25 +5938,6 @@ namespace HeatBalanceManager {
         using DataGlobals::KindOfSim;
         using DataGlobals::ksHVACSizeDesignDay;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  LOGICAL, SAVE :: PrintEnvrnStamp=.FALSE.
-        // FLOW:
-
-        // Time step level reporting:
-
         ReportScheduleValues();
 
         if (!WarmupFlag && DoOutputReporting) {
@@ -5966,7 +5947,7 @@ namespace HeatBalanceManager {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
-            UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills();
         } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
             if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {

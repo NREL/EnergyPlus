@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
@@ -1476,7 +1477,7 @@ namespace DataHeatBalance {
         Real64 LostEnergy;             // Lost energy (converted to work) [J]
         Real64 TotGainEnergy;          // Total heat gain [J]
         std::string EndUseSubcategory; // user defined name for the end use category
-        int OtherEquipFuelType;        // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
+        ExteriorEnergyUse::ExteriorFuelUsage OtherEquipFuelType;        // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
 
         // Default Constructor
         ZoneEquipData()
@@ -1484,7 +1485,7 @@ namespace DataHeatBalance {
               FractionLost(0.0), FractionConvected(0.0), CO2DesignRate(0.0), CO2RateFactor(0.0), NomMinDesignLevel(0.0), NomMaxDesignLevel(0.0),
               ManageDemand(false), DemandLimit(0.0), Power(0.0), RadGainRate(0.0), ConGainRate(0.0), LatGainRate(0.0), LostRate(0.0),
               TotGainRate(0.0), CO2GainRate(0.0), Consumption(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), LatGainEnergy(0.0), LostEnergy(0.0),
-              TotGainEnergy(0.0), EndUseSubcategory(""), OtherEquipFuelType(0)
+              TotGainEnergy(0.0), EndUseSubcategory(""), OtherEquipFuelType(ExteriorEnergyUse::ExteriorFuelUsage::Unknown)
         {
         }
     };
