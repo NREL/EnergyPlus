@@ -59,6 +59,7 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -451,40 +452,17 @@ namespace ChillerGasAbsorption {
             thisChiller.FuelHeatingValue = rNumericArgs(16);
             thisChiller.SizFac = rNumericArgs(17);
 
-            // Fuel Type Case Statement
-            {
-                auto const SELECT_CASE_var(cAlphaArgs(17));
-                if (SELECT_CASE_var == "NATURALGAS") {
-                    thisChiller.FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    thisChiller.FuelType = "Diesel";
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    thisChiller.FuelType = "Gasoline";
-
-                } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    thisChiller.FuelType = "FuelOil#1";
-
-                } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    thisChiller.FuelType = "FuelOil#2";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    thisChiller.FuelType = "Propane";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    thisChiller.FuelType = "OtherFuel1";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    thisChiller.FuelType = "OtherFuel2";
-
-                } else {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(17) + '=' + cAlphaArgs(17));
-                    ShowContinueError(
-                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
-                    Get_ErrorsFound = true;
-                }
+            // Validate fuel type input
+            DataGlobalConstants::FuelTypeInput = cAlphaArgs(17);
+            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
+            if (DataGlobalConstants::FuelTypeErrorsFound) {
+                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value");
+                ShowContinueError("Invalid " + cAlphaFieldNames(17) + '=' + cAlphaArgs(17));
+                ShowContinueError(
+                    "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
+                Get_ErrorsFound = true;
+            } else {
+                thisChiller.FuelType = DataGlobalConstants::FuelType;
             }
         }
 

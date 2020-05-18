@@ -4408,7 +4408,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             }
 
-            // A10; \field Fuel type, Validate fuel type input
+            // A9; \field Fuel type, Validate fuel type input 
             DataGlobalConstants::FuelTypeInput = Alphas(9);
             DataGlobalConstants::ValidateFuelTypeWithFuelTypeNum(DataGlobalConstants::FuelTypeInput);
             if (DataGlobalConstants::FuelTypeErrorsFound) {
