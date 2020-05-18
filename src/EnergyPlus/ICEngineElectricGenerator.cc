@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -287,41 +288,15 @@ namespace ICEngineElectricGenerator {
                 }
             }
 
-            // Fuel Type Case Statement
-            {
-                auto const SELECT_CASE_var(AlphArray(10));
-                if (is_blank(SELECT_CASE_var)) { // If blank then the default is Diesel
-                    ICEngineGenerator(genNum).FuelType = "Diesel";
-
-                } else if (SELECT_CASE_var == "NATURALGAS") {
-                    ICEngineGenerator(genNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    ICEngineGenerator(genNum).FuelType = "Diesel";
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    ICEngineGenerator(genNum).FuelType = "Gasoline";
-
-                } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    ICEngineGenerator(genNum).FuelType = "FuelOil#1";
-
-                } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    ICEngineGenerator(genNum).FuelType = "FuelOil#2";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    ICEngineGenerator(genNum).FuelType = "Propane";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    ICEngineGenerator(genNum).FuelType = "OtherFuel1";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    ICEngineGenerator(genNum).FuelType = "OtherFuel2";
-
-                } else {
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + AlphArray(10));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                    ErrorsFound = true;
-                }
+            // Validate fuel type input
+            DataGlobalConstants::FuelTypeInput = AlphArray(10);
+            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
+            if (DataGlobalConstants::FuelTypeErrorsFound) {
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + AlphArray(10));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+                ErrorsFound = true;
+            } else {
+                ICEngineGenerator(genNum).FuelType = DataGlobalConstants::FuelType;
             }
 
             ICEngineGenerator(genNum).HeatRecMaxTemp = NumArray(11);

@@ -56,6 +56,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -318,23 +319,15 @@ namespace MicroturbineElectricGenerator {
                 }
             }
 
-            // Fuel Type case statement
-            {
-                auto const SELECT_CASE_var(AlphArray(5));
-                if (is_blank(SELECT_CASE_var)) { // If blank, then the default is Natural Gas
-                    MTGenerator(GeneratorNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "NATURALGAS") {
-                    MTGenerator(GeneratorNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    MTGenerator(GeneratorNum).FuelType = "Propane";
-
-                } else {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
-                    ErrorsFound = true;
-                }
+            // Validate fuel type input
+            DataGlobalConstants::FuelTypeInput = AlphArray(5);
+            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
+            if (DataGlobalConstants::FuelTypeErrorsFound) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
+                ErrorsFound = true;
+            } else {
+                MTGenerator(GeneratorNum).FuelType = DataGlobalConstants::FuelType;
             }
 
             MTGenerator(GeneratorNum).FuelHigherHeatingValue = NumArray(8);

@@ -57,6 +57,7 @@
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -309,41 +310,15 @@ namespace CTElectricGenerator {
                 }
             }
 
-            // Fuel Type Case Statement
-            {
-                auto const SELECT_CASE_var(AlphArray(11));
-                if (is_blank(SELECT_CASE_var)) { // If blank then the default is Natural Gas
-                    CTGenerator(genNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "NATURALGAS") {
-                    CTGenerator(genNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    CTGenerator(genNum).FuelType = "Diesel";
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    CTGenerator(genNum).FuelType = "Gasoline";
-
-                } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    CTGenerator(genNum).FuelType = "FuelOil#1";
-
-                } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    CTGenerator(genNum).FuelType = "FuelOil#2";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    CTGenerator(genNum).FuelType = "Propane";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    CTGenerator(genNum).FuelType = "OtherFuel1";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    CTGenerator(genNum).FuelType = "OtherFuel2";
-
-                } else {
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + AlphArray(11));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
-                    ErrorsFound = true;
-                }
+            // Validate fuel type input
+            DataGlobalConstants::FuelTypeInput = AlphArray(11);
+            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
+            if (DataGlobalConstants::FuelTypeErrorsFound) {
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + AlphArray(11));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+                ErrorsFound = true;
+            } else {
+                CTGenerator(genNum).FuelType = DataGlobalConstants::FuelType;
             }
 
             CTGenerator(genNum).HeatRecMaxTemp = NumArray(12);
