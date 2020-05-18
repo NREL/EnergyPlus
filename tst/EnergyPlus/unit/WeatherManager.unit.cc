@@ -956,7 +956,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherZeroIRHoriz) {
 
 TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
-    DataStringGlobals::inputWeatherFileName = configured_source_directory() + "/tst/EnergyPlus/unit/WeatherManagerIROutputTest.epw";
+    DataStringGlobals::inputWeatherFileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
 
     std::string const idf_objects = delimited_string({
                                                          "  Version,9.3;",
