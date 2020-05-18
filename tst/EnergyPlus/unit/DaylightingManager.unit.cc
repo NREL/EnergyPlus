@@ -1572,7 +1572,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
 
     EXPECT_EQ(10, DataDaylighting::ZoneDaylight(1).TotalDaylRefPoints);
 
-    std::array<Real64, 10> fractions({0.1053, 0.0936, 0.1213, 0.1018, 0.0893, 0.0842, 0.0882, 0.1026, 0.1134, 0.1003});
+    std::vector<Real64> fractions({0.1053, 0.0936, 0.1213, 0.1018, 0.0893, 0.0842, 0.0882, 0.1026, 0.1134, 0.1003});
     Real64 sum(0.0);
     int i = 1;
     for (auto frac: fractions) {

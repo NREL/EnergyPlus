@@ -2154,11 +2154,10 @@ namespace ChillerElectricEIR {
             }
 
             if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
-                Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(
-                    DataEnvironment::StdBaroPress, condInletTemp, DataLoopNode::Node(this->CondInletNodeNum).HumRat, RoutineName);
+                Real64 const RhoWater = Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
                 // CondMassFlowRate is already multiplied by PLR, convert to water use rate
                 this->EvapWaterConsumpRate =
-                    ((this->CondOutletHumRat - DataLoopNode::Node(this->CondInletNodeNum).HumRat) * this->CondMassFlowRate) / RhoAir;
+                    ((this->CondOutletHumRat - DataLoopNode::Node(this->CondInletNodeNum).HumRat) * this->CondMassFlowRate) / RhoWater;
             }
         }
 

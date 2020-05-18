@@ -614,6 +614,8 @@ namespace DataSizing {
         );
         void scaleZoneHeating(Real64 const ratio // Scaling ratio
         );
+        void zeroMemberData();
+        void allocateMemberArrays(int const numOfTimeStepInDay);
     };
 
     struct TermUnitSizingData
