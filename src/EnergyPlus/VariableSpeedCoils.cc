@@ -4332,7 +4332,7 @@ namespace VariableSpeedCoils {
             }
         }
 
-        // FORCE BACK TO THE RATED AIR FLOW RATE WITH THE SAME RATIO DEFINED BY THE CATLOG DATA
+        // FORCE BACK TO THE RATED AIR FLOW RATE WITH THE SAME RATIO DEFINED BY THE CATALOG DATA
         if (!HardSizeNoDesRunAirFlow) {
             if ((RatedCapCoolTotalAutoSized) && (RatedAirFlowAutoSized)) {
                 RatedAirVolFlowRateDes =
@@ -4653,18 +4653,17 @@ namespace VariableSpeedCoils {
         if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ||
             VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit) {
 
-            RatedSourceTempCool = RatedInletWaterTemp;
+            if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit) {
+                RatedSourceTempCool = RatedInletWaterTemp;
+            } else {
+                RatedSourceTempCool = RatedInletWaterTempHeat;
+            }
 
             if (PltSizNum > 0) {
                 rhoW = rho;
-            } else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit) {
-                rhoW = GetDensityGlycol(PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
-                                        RatedInletWaterTemp,
-                                        PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
-                                        RoutineName);
             } else {
                 rhoW = GetDensityGlycol(PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
-                                        RatedInletWaterTempHeat,
+                                        RatedSourceTempCool,
                                         PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                         RoutineName);
             }
