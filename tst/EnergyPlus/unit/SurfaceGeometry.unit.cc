@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(4).y = 0.0;
     Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(outoutFiles(), ThisSurf, dummy1, dummy2, ErrorsFound);
+    ProcessSurfaceVertices(outputFiles(), ThisSurf, dummy1, dummy2, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Rectangle, Surface(ThisSurf).Shape);
 
