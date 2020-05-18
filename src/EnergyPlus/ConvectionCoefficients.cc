@@ -862,10 +862,8 @@ namespace ConvectionCoefficients {
         return AgainstWind;
     }
 
-    bool SetAdaptiveConvectionAlgoInsideCoefficient(const std::unordered_map<std::string, int>& HcInt_ConvectionTypesMap, int* const InsideFaceAdaptiveConvectionAlgoParam, const std::string equationName, const std::string curveName, const std::string sourceFieldName, const std::string curveFieldName){
+    bool SetAdaptiveConvectionAlgoCoefficient(const std::unordered_map<std::string, int>& HcInt_ConvectionTypesMap, int* const InsideFaceAdaptiveConvectionAlgoParam, const std::string equationName, const std::string curveName, const std::string sourceFieldName, const std::string curveFieldName, const std::string RoutineName, const std::string CurrentModuleObject){
 
-        static std::string const RoutineName("GetUserConvectionCoefficients");
-        static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
         bool ErrorsFound = false;
 
         if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()){
@@ -886,30 +884,7 @@ namespace ConvectionCoefficients {
         }
         return ErrorsFound;
     }
-    bool SetAdaptiveConvectionAlgoOutsideCoefficient(const std::unordered_map<std::string, int>& HcExt_ConvectionTypesMap, int* const OutsideFaceAdaptiveConvectionAlgoParam, const std::string equationName, const std::string curveName, const std::string sourceFieldName, const std::string curveFieldName){
 
-        static std::string const RoutineName("GetUserConvectionCoefficients");
-        static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
-        bool ErrorsFound = false;
-
-        if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()){
-            *OutsideFaceAdaptiveConvectionAlgoParam = HcExt_ConvectionTypesMap.at(equationName);
-            if (HcExt_ConvectionTypesMap.at(equationName) == HcExt_UserCurve) {
-                *OutsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, HcInsideUserCurve);
-                if (*OutsideFaceAdaptiveConvectionAlgoParam == 0) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
-                    ShowContinueError("Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
-                    ErrorsFound = true;
-                }
-            }
-        }
-        else {
-            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
-            ShowContinueError("Invalid Key choice Entered, for " + sourceFieldName + '=' + equationName);
-            ErrorsFound = true;
-        }
-        return ErrorsFound;
-    }
     void GetUserConvectionCoefficients()
     {
 
@@ -1976,7 +1951,9 @@ namespace ConvectionCoefficients {
                 &InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum
             };
             for (int i = 2; i <= NumAlphas-1; i+=2){ //up to 45
-                ErrorsFound = SetAdaptiveConvectionAlgoInsideCoefficient(HcInt_ConvectionTypesMap, AdaptiveConvectionAlgoInsideDefaults[(i/2)-1], cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1));
+                static std::string const RoutineName ="GetUserConvectionCoefficients";
+                static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
+                ErrorsFound = SetAdaptiveConvectionAlgoCoefficient(HcInt_ConvectionTypesMap, AdaptiveConvectionAlgoInsideDefaults[(i/2)-1], cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1), RoutineName, CurrentModuleObject);
             }
         } // end of 'SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections'
 
@@ -2008,7 +1985,9 @@ namespace ConvectionCoefficients {
                 };
 
             for (int i = 2; i <= NumAlphas-1; i+=2){
-                ErrorsFound = SetAdaptiveConvectionAlgoOutsideCoefficient(HcExt_ConvectionTypesMap, AdaptiveConvectionAlgoOutsideDefaults[(i/2)-1], cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1));
+                static std::string const RoutineName = "GetUserConvectionCoefficients";
+                static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
+                ErrorsFound = SetAdaptiveConvectionAlgoCoefficient(HcExt_ConvectionTypesMap, AdaptiveConvectionAlgoOutsideDefaults[(i/2)-1], cAlphaArgs(i), cAlphaArgs(i+1), cAlphaFieldNames(i), cAlphaFieldNames(i+1), RoutineName, CurrentModuleObject);
             }
         } // end of 'SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections'
 
