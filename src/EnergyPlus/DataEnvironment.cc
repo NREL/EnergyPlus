@@ -172,8 +172,8 @@ namespace DataEnvironment {
     Real64 SkyClearness;                      // Sky clearness (see subr. DayltgLuminousEfficacy)
     Real64 SkyBrightness;                     // Sky brightness (see subr. DayltgLuminousEfficacy)
 
-    Real64 TotalCloudCover(0.0);  // Total Cloud Cover 
-    Real64 OpaqueCloudCover(0.0); // Opaque Cloud Cover 
+    Real64 TotalCloudCover(0.0);              // Total Sky Cover 
+    Real64 OpaqueCloudCover(0.0);             // Opaque Sky Cover 
 
     Real64 StdBaroPress(StdPressureSeaLevel); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
     Real64 StdRhoAir;                         // Standard "rho air" set in WeatherManager - based on StdBaroPress
