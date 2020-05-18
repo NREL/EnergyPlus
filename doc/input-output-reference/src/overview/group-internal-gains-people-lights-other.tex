@@ -1571,6 +1571,15 @@ The Indoor Swimming Pool object is used to describe the indoor swimming pools th
 
 As pools attempt to achieve a particular water temperature and have a variety of heat losses, heating equipment is necessary to maintain the proper setpoint temperature. In EnergyPlus, the pool itself becomes part of the demand side of a plant loop with heating equipment on the supply side providing whatever heating is needed to maintain the desired temperature. This heating equipment as well as the loop connections must be entered separately and the input shown in this section only details what is needed to specify the pool itself.
 
+There are a variety of rules that limit the application of indoor swimming pools in EnergyPlus.  The following are a list of these rules:
+
+\begin{itemize}
+  \item The pool must reference a valid surface in the input file.  This surface must be a floor and cannot be other surface types like ceilings, walls, windows, etc.
+  \item The pool cannot refer to a surface that is also a radiant system, ventilated slab, or another pool.
+  \item The surface that the pool references must be modeled using conduction transfer functions (CTF).
+  \item The pool cannot utilize movable insulation or have a heat source or sink associated with it (something used to model low temperature radiant systems).
+\end{itemize}
+
 The following information is useful for defining and modeling an indoor pool in EnergyPlus. For more information on the algorithm used for this model or details on some of the input parameters, please reference the indoor pool section of the EnergyPlus Engineering Reference document.
 
 \subsubsection{Inputs}\label{inputs-7-012}
@@ -1581,7 +1590,7 @@ This is a unique name associated with the indoor swimming pool.
 
 \paragraph{Field: Surface Name}\label{field-surface-name-1-000}
 
-This is the name of the surface (floor) where the pool is located. Pools are not allowed on any surfaces other than a floor.
+This is the name of the surface (floor) where the pool is located. Pools are not allowed on any surfaces other than a floor.  For more rules on surfaces that can be used for pools, please see the information in this section on indoor pools above.
 
 \paragraph{Field: Average Depth}\label{field-average-depth}
 
