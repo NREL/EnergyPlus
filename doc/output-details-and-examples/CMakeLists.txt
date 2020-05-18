@@ -14,6 +14,7 @@ SET( INCLUDED_TEX
   ${PROJECT_SOURCE_DIR}/output-details-and-examples/src/output-files/eplusout-dxf.tex
   ${PROJECT_SOURCE_DIR}/output-details-and-examples/src/output-files/eplusout-edd.tex
   ${PROJECT_SOURCE_DIR}/output-details-and-examples/src/output-files/eplusout-eio.tex
+  ${PROJECT_SOURCE_DIR}/output-details-and-examples/src/output-files/eplusout-perflogcsv.tex
   ${PROJECT_SOURCE_DIR}/output-details-and-examples/src/output-files/eplusssz-lt-ext-gt.tex
   ${PROJECT_SOURCE_DIR}/output-details-and-examples/src/output-files/epluszsz-lt-ext-gt.tex
   ${PROJECT_SOURCE_DIR}/output-details-and-examples/src/output-files/eplusout-lt-ext-gt.tex

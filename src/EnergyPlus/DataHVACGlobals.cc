@@ -241,6 +241,7 @@ namespace DataHVACGlobals {
     int const CoilVRF_FluidTCtrl_Heating(34);
 
     int const CoilDX_Cooling(35);
+    int const CoilDX_SubcoolReheat(36);
 
     Array1D_string const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",

@@ -65,7 +65,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,6;
 
@@ -6109,6 +6109,8 @@
     Maximum;                 !- Aggregation Type for Variable or Meter 8
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;
+
+  Output:Variable,*,Site Rain Status,hourly;
 
   PythonPlugin:Instance,
     Average Zone Temp Calculation,  !- Name

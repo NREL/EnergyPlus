@@ -85,14 +85,12 @@ namespace HybridEvapCoolingModel {
     class CModeSolutionSpace
     {
     public:
-        std::vector<Real64> PointX;
-        std::vector<Real64> PointY;
-        std::vector<Real64> PointMeta;
-        void AddItem(Real64 X, Real64 Y, Real64 M)
+        std::vector<Real64> MassFlowRatio;
+        std::vector<Real64> OutdoorAirFraction;
+        void AddItem(Real64 X, Real64 Y)
         {
-            PointX.push_back(X);
-            PointY.push_back(Y);
-            PointMeta.push_back(M);
+            MassFlowRatio.push_back(X);
+            OutdoorAirFraction.push_back(Y);
         }
     };
 
@@ -130,8 +128,7 @@ namespace HybridEvapCoolingModel {
         Real64 Maximum_Return_Air_Humidity_Ratio;
         Real64 Minimum_Return_Air_Relative_Humidity;
         Real64 Maximum_Return_Air_Relative_Humidity;
-        Real64 NormalizationReference;
-        Real64 Correction;
+        Real64 ModelScalingFactor;
         int MODE_BLOCK_OFFSET_Alpha;
         int BLOCK_HEADER_OFFSET_Alpha;
         int MODE1_BLOCK_OFFSET_Number;
@@ -145,7 +142,7 @@ namespace HybridEvapCoolingModel {
                             std::string cCurrentModuleObject);
         bool ParseMode(int ModeCounter,
                        std::vector<CMode> *OperatingModes,
-                       Real64 correction,
+                       Real64 ScalingFactor,
                        Array1D_string Alphas,
                        Array1D_string cAlphaFields,
                        Array1D<Real64> Numbers,
@@ -153,7 +150,7 @@ namespace HybridEvapCoolingModel {
                        Array1D<bool> lAlphaBlanks,
                        std::string cCurrentModuleObject);
         void InitializeCurve(int curveType, int CurveID);
-        Real64 CalculateCurveVal(Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curve_ID);
+        Real64 CalculateCurveVal(Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra, Real64 Msa, Real64 OSAF, int curveType);
         bool InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF);
         bool InitializeMsaRatioConstraints(Real64 minMsa, Real64 maxMsa);
         bool InitializeOutdoorAirTemperatureConstraints(Real64 min, Real64 max);
@@ -164,7 +161,6 @@ namespace HybridEvapCoolingModel {
         bool InitializeReturnAirRelativeHumidityConstraints(Real64 min, Real64 max);
         bool GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA);
         bool MeetsOAEnvConstraints(Real64 Tosa, Real64 Wosa, Real64 RHos);
-        bool CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject);
 
     private:
     };
@@ -345,7 +341,6 @@ namespace HybridEvapCoolingModel {
         Real64 Wsa;
         Real64 SupplyVentilationAir;
         Real64 SupplyVentilationVolume;
-        Real64 ModelNormalizationReference;
 
         bool OutdoorAir;
         Real64 MinOA_Msa;

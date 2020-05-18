@@ -47,12 +47,15 @@
 
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/StateManagement.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 void cClearAllStates() {
+    EnergyPlus::EnergyPlusData state;   //THIS IS TEMPORARY
+    EnergyPlus::clearThisState(state);
     EnergyPlus::clearAllStates();
 }
 
@@ -65,7 +68,9 @@ int energyplus(int argc, const char *argv[]) {
 //    argv[5] = "-i";
 //    argv[6] = epcomp->iddPath.c_str();
 //    argv[7] = epcomp->idfInputPath.c_str();
-    return runEnergyPlusAsLibrary(argc, argv);
+
+    EnergyPlus::EnergyPlusData state;
+    return runEnergyPlusAsLibrary(state, argc, argv);
 }
 
 void issueWarning(const char * message) {
@@ -206,13 +211,13 @@ void callbackEndOfAfterComponentGetInput(void (*f)()) {
     callbackEndOfAfterComponentGetInput(std::function<void ()>(f));
 }
 
-void callbackUserDefinedComponentModel(std::function<void ()> f) {
-    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUserDefinedComponentModel, f);
-}
-
-void callbackUserDefinedComponentModel(void (*f)()) {
-    callbackUserDefinedComponentModel(std::function<void ()>(f));
-}
+//void callbackUserDefinedComponentModel(std::function<void ()> f) {
+//    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUserDefinedComponentModel, f);
+//}
+//
+//void callbackUserDefinedComponentModel(void (*f)()) {
+//    callbackUserDefinedComponentModel(std::function<void ()>(f));
+//}
 
 void callbackUnitarySystemSizing(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing, f);

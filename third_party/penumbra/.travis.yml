@@ -21,7 +21,7 @@ matrix:
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    sudo apt-get -y install xorg-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev;
+    sudo apt-get -y install xorg-dev libgl1-mesa-dev;
   fi
 
 script:

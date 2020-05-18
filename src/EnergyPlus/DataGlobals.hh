@@ -65,7 +65,6 @@ namespace DataGlobals {
 
     extern bool runReadVars;
     extern bool DDOnlySimulation;
-    extern bool AnnualSimulation;
     extern bool outputEpJSONConversion;
     extern bool outputEpJSONConversionOnly;
     extern bool isEpJSON;
@@ -79,7 +78,6 @@ namespace DataGlobals {
     extern int const BeginDay;
     extern int const DuringDay;
     extern int const EndDay;
-    extern int const EndZoneSizingCalc;
     extern int const EndSysSizingCalc;
 
     // Parameters for KindOfSim
@@ -216,7 +214,6 @@ namespace DataGlobals {
     extern bool BeginFullSimFlag;       // True until full simulation has begun, False after first time step
     extern bool BeginTimeStepFlag;      // True at the start of each time step, False after first subtime step of time step
     extern int DayOfSim;                // Counter for days (during the simulation)
-    extern std::string DayOfSimChr;     // Counter for days (during the simulation) (character -- for reporting)
     extern int CalendarYear;            // Calendar year of the current day of simulation
     extern std::string CalendarYearChr; // Calendar year of the current day of simulation (character -- for reporting)
     extern bool EndEnvrnFlag;           // True at the end of each environment (last time step of last hour of last day of environ)
@@ -234,17 +231,13 @@ namespace DataGlobals {
     extern int TimeStep;                             // Counter for time steps (fractional hours)
     extern Real64 TimeStepZone;                      // Zone time step in fractional hours
     extern bool WarmupFlag;                          // True during the warmup portion of a simulation
-    extern int OutputFileStandard;                   // Unit number for the standard output file (hourly data only)
-    extern std::ostream *eso_stream;                 // Internal stream used for eso output (used for performance)
     extern JsonOutputStreams jsonOutputStreams;      // Internal streams used for json outputs
     extern int OutputStandardError;                  // Unit number for the standard error output file
     extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern int OutputFileDebug;                      // Unit number for debug outputs
     extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int OutputFileShadingFrac;                // Unit number for shading output
     extern int StdMeterRecordCount;                  // Count of Meter output records
-    extern int OutputFileBNDetails;                  // Unit number for Branch-Node Details
     extern int OutputDElightIn;                      // Unit number for the DElight In file
     extern std::ostream *delightin_stream;           // Internal stream used for DElight In file
     extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation
@@ -294,7 +287,7 @@ namespace DataGlobals {
     extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
     extern bool AnyBasementsInModel;     // true if there are any basements in the input file
     extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
-    extern bool createProfLog; //true if the _proflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
+    extern bool createPerfLog; //true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
     extern int Progress;
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);

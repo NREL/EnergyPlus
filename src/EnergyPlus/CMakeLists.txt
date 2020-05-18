@@ -9,7 +9,6 @@ configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringG
 configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 
-option( LINK_WITH_PYTHON "Build package" OFF )
 if(LINK_WITH_PYTHON)
   add_definitions("-DLINK_WITH_PYTHON=1")
 else()
@@ -84,6 +83,9 @@ SET( SRC
   DXCoils.hh
   DXFEarClipping.cc
   DXFEarClipping.hh
+  Data/BaseboardData.hh
+  Data/BaseData.hh
+  Data/EnergyPlusData.hh
   DataAirLoop.cc
   DataAirLoop.hh
   DataAirSystems.cc
@@ -256,6 +258,18 @@ SET( SRC
   GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh
   GroundTemperatureModeling/GroundTemperatureModelManager.cc
   GroundTemperatureModeling/GroundTemperatureModelManager.hh
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
+  GroundTemperatureModeling/XingGroundTemperatureModel.cc
+  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
@@ -328,18 +342,6 @@ SET( SRC
   HybridEvapCoolingModel.hh
   HybridModel.cc
   HybridModel.hh
-  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
-  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
-  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
-  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
-  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
-  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
-  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
-  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
-  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
-  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
-  GroundTemperatureModeling/XingGroundTemperatureModel.cc
-  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
@@ -450,6 +452,8 @@ SET( SRC
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
+  PlantLoopHeatPumpEIR.cc
+  PlantLoopHeatPumpEIR.hh
   Plant/PlantLocation.hh
   Plant/PlantManager.cc
   Plant/PlantManager.hh
@@ -462,6 +466,8 @@ SET( SRC
   PlantValves.cc
   PlantValves.hh
   Platform.hh
+  PluginManager.cc
+  PluginManager.hh
   PollutionModule.cc
   PollutionModule.hh
   PondGroundHeatExchanger.cc
@@ -527,6 +533,8 @@ SET( SRC
   SplitterComponent.hh
   StandardRatings.cc
   StandardRatings.hh
+  StateManagement.cc
+  StateManagement.hh
   SteamBaseboardRadiator.cc
   SteamBaseboardRadiator.hh
   SteamCoils.cc
@@ -563,6 +571,8 @@ SET( SRC
   TARCOGParams.hh
   TarcogShading.cc
   TarcogShading.hh
+  TempSolveRoot.cc
+  TempSolveRoot.hh
   ThermalChimney.cc
   ThermalChimney.hh
   ThermalComfort.cc
@@ -602,8 +612,6 @@ SET( SRC
   WaterToAirHeatPump.hh
   WaterToAirHeatPumpSimple.cc
   WaterToAirHeatPumpSimple.hh
-  PlantLoopHeatPumpEIR.cc
-  PlantLoopHeatPumpEIR.hh
   WaterToWaterHeatPumps.hh
   WaterUse.cc
   WaterUse.hh
@@ -638,11 +646,7 @@ SET( SRC
   ZonePlenum.cc
   ZonePlenum.hh
   ZoneTempPredictorCorrector.cc
-  ZoneTempPredictorCorrector.hh
-  StateManagement.cc
-  StateManagement.hh
-  PluginManager.cc
-  PluginManager.hh)
+  ZoneTempPredictorCorrector.hh)
 
 CREATE_SRC_GROUPS( "${SRC}" )
 
@@ -727,24 +731,24 @@ endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )
 endif()
-if(LINK_WITH_PYTHON)
-  target_link_libraries( energypluslib ${PYTHON_LIBRARIES} )
-endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
-SET( API_CORE_SRC
+SET( API_HEADERS
   api/func.h
-  api/func.cc
   api/runtime.h
-  api/runtime.cc
   api/datatransfer.h
-  api/datatransfer.cc
   api/EnergyPlusPgm.hh
-  api/EnergyPlusPgm.cc
+  api/EnergyPlusAPI.h
+  api/TypeDefs.h
 )
+SET( API_CORE_SRC
+  api/func.cc
+  api/runtime.cc
+  api/datatransfer.cc
+  api/EnergyPlusPgm.cc)
 
 if(APPLE OR UNIX)
-  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC})
+  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} ${API_HEADERS})
 else()  # windows
   add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
@@ -761,6 +765,22 @@ install( TARGETS energyplusapi
   ARCHIVE DESTINATION ./
 )
 
+# we will build the intermediate wrapper DLL that hard links to Python DLL here
+if(LINK_WITH_PYTHON)
+  add_library( pythonwrapper SHARED
+          PythonLibWrapper.cc
+          PythonLibWrapper.hh
+          )
+  target_link_libraries( pythonwrapper ${PYTHON_LIBRARIES} )
+  add_dependencies( energyplusapi pythonwrapper)
+  install( TARGETS pythonwrapper
+          RUNTIME DESTINATION ./
+          LIBRARY DESTINATION ./
+          ARCHIVE DESTINATION ./
+          )
+endif()
+
+# now the actual E+ executable
 if (APPLE OR UNIX)
   add_executable( energyplus main.cc )
 else()  # windows
@@ -773,11 +793,11 @@ set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 
 # bring in the Python API layer right next to the executable
 add_custom_command(
-        TARGET energyplus
+        TARGET energyplusapi
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
         -DREPO_ROOT=${PROJECT_SOURCE_DIR}
-        -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
+        -DEXECUTABLE_PATH=$<TARGET_FILE:energyplusapi>
         -DCMAKE_VERSION_MAJOR="${CMAKE_VERSION_MAJOR}"
         -DCMAKE_VERSION_MINOR="${CMAKE_VERSION_MINOR}"
         -DCMAKE_VERSION_PATCH="${CMAKE_VERSION_PATCH}"
@@ -796,11 +816,11 @@ if(LINK_WITH_PYTHON)
     # Windows is being ugly and linking against the Python DLL but not running unless it's close by
     # Force it here.
     add_custom_command(
-        TARGET energyplus
+        TARGET energyplusapi
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
           -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
-          -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
+          -DEXECUTABLE_PATH=$<TARGET_FILE:energyplusapi>
           -P ${PROJECT_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
     )
   endif()
@@ -826,17 +846,27 @@ if(LINK_WITH_PYTHON)
   endif()
   # along with the python standard lib
   add_custom_command(
-          TARGET energyplus
-          POST_BUILD
-          COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplus>" "python_standard_lib"
+          TARGET energyplusapi
+          POST_BUILD  # TODO: I don't think we want to quote the generator expression here
+          COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_standard_lib"
   )
 endif()
 
 if(BUILD_PACKAGE)
+  # if we are building package, we need to drop in some API/Plugin stuff
   if(LINK_WITH_PYTHON)
+    # we'll want to grab the standard lib for python plugins
+    # TODO: I don't think we want to quote the generator expression
     install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/python_standard_lib/"
             DESTINATION "./python_standard_lib")
   endif()
+  # we'll want to always provide the C API headers
+  foreach(HEADER ${API_HEADERS})
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}"
+            DESTINATION "./include/EnergyPlus/api")
+  endforeach()
+  # we'll want to always grab the python API wrapper
+  # TODO: I don't think we want to quote the generator expression
   install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/pyenergyplus/"
           DESTINATION "./pyenergyplus")
 endif()

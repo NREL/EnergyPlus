@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -258,7 +259,15 @@ namespace WaterCoils {
         // end variables for water system interactions
         // COIL:Water:SimpleHeating Coil Performance Input Method
         int CoilPerfInpMeth;            // 1 = UA and Design Water Flow Rate; 2 = Nominal Capacity
-        Real64 FoulingFactor;           // Coil fouling factor [m2K/W]
+
+        // Operational fault parameters
+        bool FaultyCoilFoulingFlag;     // True if the coil has fouling fault
+        int FaultyCoilFoulingIndex;     // Index of the fault object corresponding to the coil
+        Real64 FaultyCoilFoulingFactor; // Coil fouling factor [m2K/W]
+        Real64 OriginalUACoilVariable;
+        Real64 OriginalUACoilExternal;
+        Real64 OriginalUACoilInternal;
+
         bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
         int DesiccantDehumNum;          // index to desiccant dehumidifier object
         Real64 DesignWaterDeltaTemp;    // water deltaT for coil sizing [K]
@@ -289,7 +298,8 @@ namespace WaterCoils {
               SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0), RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0),
               LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
               WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0), WaterLoopCompNum(0), CondensateCollectMode(CondensateDiscarded),
-              CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FoulingFactor(0.0),
+              CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0),
+              FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),
               DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
               ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false)
         {
@@ -314,7 +324,7 @@ namespace WaterCoils {
     // Functions
     void clear_state();
 
-    void SimulateWaterCoilComponents(std::string const &CompName,
+    void SimulateWaterCoilComponents(EnergyPlusData &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64> QActual = _,
@@ -332,7 +342,7 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(OutputFiles &outputFiles,
+    void InitWaterCoil(EnergyPlusData &state, OutputFiles &outputFiles,
                        int const CoilNum,
                        bool const FirstHVACIteration // unused1208
     );
@@ -340,7 +350,7 @@ namespace WaterCoils {
     void                                   // refactor for coil report
     CalcAdjustedCoilUA(int const CoilNum); // refactor for coil report
 
-    void SizeWaterCoil(int const CoilNum);
+    void SizeWaterCoil(EnergyPlusData &state, int const CoilNum);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -511,12 +521,12 @@ namespace WaterCoils {
                                    bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
@@ -547,7 +557,7 @@ namespace WaterCoils {
                            bool &NodeNotFound         // true if matching water inlet node not found
     );
 
-    void CheckForSensorAndSetPointNode(int const SensorNodeNum, // controller sensor node number
+    void CheckForSensorAndSetPointNode(EnergyPlusData &state, int const SensorNodeNum, // controller sensor node number
                                        int const ControlledVar, // controlled variable type
                                        bool &NodeNotFound       // true if matching air outlet node not found
     );

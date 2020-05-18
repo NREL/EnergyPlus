@@ -54,12 +54,15 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
 #include <ostream>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 // This is a helper struct to redirect std::cout. This makes sure std::cout is redirected back and
 // everything is cleaned up properly
@@ -237,6 +240,7 @@ protected:
     // This more or less replicates inputProcessor->processInput() but in a more usable fashion for unit testing
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
     // if it makes sense for the unit test to continue after returning from function.
+    // This will add the required objects if not specified: Version, Building, GlobalGeometryRules
     // Will return false if no errors found and true if errors found
     bool process_idf(std::string const &idf_snippet, bool use_assertions = true);
 
@@ -245,7 +249,7 @@ protected:
     // if it makes sense for the unit test to continue after returning from function.
     // Will return true if data structures match and false if they do not.
     // Usage (assuming "Version,8.3;" was parsed as an idf snippet):
-    // 		EXPECT_TRUE( compare_idf( "VERSION", 1, 0, 1, { "8.3" }, { false }, {}, {} ) );
+    //       EXPECT_TRUE( compare_idf( "VERSION", 1, 0, 1, { "8.3" }, { false }, {}, {} ) );
     bool compare_idf(std::string const &name,
                      int const num_alphas,
                      int const num_numbers,
@@ -253,6 +257,13 @@ protected:
                      std::vector<bool> const &alphas_blank,
                      std::vector<Real64> const &numbers,
                      std::vector<bool> const &numbers_blank);
+
+    OutputFiles &outputFiles() {
+        return m_outputFiles.get();
+    }
+
+public:
+    EnergyPlusData state;
 
 private:
     friend class InputProcessorFixture;
@@ -268,14 +279,13 @@ private:
     static bool process_idd(std::string const &idd, bool &errors_found);
 
     std::unique_ptr<std::ostringstream> json_stream;
-    std::unique_ptr<std::ostringstream> eso_stream;
-    std::unique_ptr<std::ostringstream> mtr_stream;
     std::unique_ptr<std::ostringstream> err_stream;
     std::unique_ptr<std::ostringstream> m_cout_buffer;
     std::unique_ptr<std::ostringstream> m_cerr_buffer;
     std::unique_ptr<std::ostringstream> m_delightin_stream;
     std::unique_ptr<RedirectCout> m_redirect_cout;
     std::unique_ptr<RedirectCerr> m_redirect_cerr;
+    std::reference_wrapper<OutputFiles> m_outputFiles{OutputFiles::getSingleton()};
 };
 
 } // namespace EnergyPlus

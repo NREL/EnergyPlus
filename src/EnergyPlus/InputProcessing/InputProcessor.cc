@@ -769,7 +769,7 @@ void InputProcessor::getObjectItem(std::string const &Object,
     auto key = legacy_idd.find("extension");
     std::string extension_key;
     if (key != legacy_idd.end()) {
-        extension_key = key.value();
+        extension_key = key.value().get<std::string>();
     }
 
     auto const &obj = epJSON_it;
@@ -1142,7 +1142,7 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
         const json &legacy_idd = schema_properties.at(object.key()).at("legacy_idd");
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
 
         size_t max_size = 0;
@@ -1225,7 +1225,7 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
     std::string extension_key;
     auto key = legacy_idd.find("extension");
     if (key != legacy_idd.end()) {
-        extension_key = key.value();
+        extension_key = key.value().get<std::string>();
     }
 
     for (auto const obj : *objects) {
@@ -1507,7 +1507,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][MeterCustom]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1528,7 +1528,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][MeterCustomDecrement]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1588,7 +1588,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableMonthly]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1608,7 +1608,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableAnnual]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1628,7 +1628,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableSummaries]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();

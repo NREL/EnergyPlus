@@ -28,7 +28,7 @@
 ! Floor Area:              232.25 m2
 ! Number of Stories:       1
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2215,7 +2215,7 @@
     Mode1_ESP_lookup,        !- Name
     Mode1_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -3442,7 +3442,7 @@
     Mode1_TSA_lookup,        !- Name
     Mode1_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -4670,7 +4670,7 @@
     Mode1_wSA_lookup,        !- Name
     Mode1_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -9682,7 +9682,7 @@
     Mode2_ESP_lookup,        !- Name
     Mode2_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -10910,7 +10910,7 @@
     Mode2_TSA_lookup,        !- Name
     Mode2_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -12138,7 +12138,7 @@
     Mode2_wSA_lookup,        !- Name
     Mode2_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -17149,7 +17149,7 @@
     Mode3_ESP_lookup,        !- Name
     Mode3_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -18134,7 +18134,7 @@
     Mode3_TSA_lookup,        !- Name
     Mode3_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -19118,7 +19118,7 @@
     Mode3_wSA_lookup,        !- Name
     Mode3_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -23159,7 +23159,7 @@
     Mode4_ESP_lookup,        !- Name
     Mode4_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -24630,7 +24630,7 @@
     Mode4_TSA_lookup,        !- Name
     Mode4_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -26101,7 +26101,7 @@
     Mode4_wSA_lookup,        !- Name
     Mode4_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -30616,7 +30616,7 @@
     Mode5_ESP_lookup,        !- Name
     Mode5_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -32087,7 +32087,7 @@
     Mode5_TSA_lookup,        !- Name
     Mode5_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -33558,7 +33558,7 @@
     Mode5_wSA_lookup,        !- Name
     Mode5_IndependentVariableList,  !- Independent Variable List Name
     DivisorOnly,             !- Normalization Method
-    3.0176,                  !- Normalization Divisor
+    ,                        !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type

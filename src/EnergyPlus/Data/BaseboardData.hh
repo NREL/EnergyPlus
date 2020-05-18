@@ -45,17 +45,43 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ENERGYPLUS_LIB_ENERGYPLUSAPI_HPP
-#define ENERGYPLUS_LIB_ENERGYPLUSAPI_HPP
+#ifndef ENERGYPLUS_BASEBOARDDATA_HH
+#define ENERGYPLUS_BASEBOARDDATA_HH
 
-#if _WIN32 || _MSC_VER
-#if defined(energypluslib_EXPORTS) || defined(energyplusapi_EXPORTS) || defined(energypluslib2_EXPORTS)
-#define ENERGYPLUSLIB_API __declspec(dllexport)
-#else
-#define ENERGYPLUSLIB_API __declspec(dllimport)
-#endif
-#else
-#define ENERGYPLUSLIB_API
-#endif
+// EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
 
-#endif
+namespace EnergyPlus{
+
+    struct BaseboardElectricData : BaseGlobalStruct {
+        int NumBaseboards = 0;
+        Array1D<BaseboardElectric::BaseboardParams> Baseboard;
+        Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
+
+        void clear_state()
+        {
+            NumBaseboards = 0;
+            Baseboard.deallocate();
+            BaseboardNumericFields.deallocate();
+        }
+    };
+
+    struct BaseboardRadiatorData : BaseGlobalStruct {
+
+        int NumBaseboards = 0;
+        Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
+        Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
+
+        void clear_state()
+        {
+            NumBaseboards = 0;
+            Baseboard.deallocate();
+            BaseboardParamsNumericFields.deallocate();
+        }
+    };
+
+}  // namespace EnergyPlus
+
+#endif // ENERGYPLUS_BASEBOARDDATA_HH

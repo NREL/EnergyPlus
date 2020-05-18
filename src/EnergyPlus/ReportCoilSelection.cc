@@ -56,30 +56,21 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/UnitHeater.hh>
-#include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/WindowAC.hh>
 
 namespace EnergyPlus {
 
@@ -141,9 +132,9 @@ CoilSelectionData::CoilSelectionData( // constructor
     fanTypeName = "unknown";
 }
 
-void ReportCoilSelection::finishCoilSummaryReportTable()
+void ReportCoilSelection::finishCoilSummaryReportTable(EnergyPlusData &state)
 {
-    doFinalProcessingOfCoilData();
+    doFinalProcessingOfCoilData(state);
     writeCoilSelectionOutput();
     writeCoilSelectionOutput2();
 }
@@ -495,7 +486,7 @@ void ReportCoilSelection::doAirLoopSetup(int const coilVecIndex)
     }
 }
 
-void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
+void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVecIndex)
 {
     auto &c(coilSelectionDataObjs[coilVecIndex]);
     c->coilLocation = "Zone";
@@ -526,7 +517,7 @@ void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
         switch (DataAirSystems::PrimaryAirSystem(c->airloopNum).supFanModelTypeEnum) {
         case DataAirSystems::structArrayLegacyFanModels: {
 
-            coilSelectionReportObj->setCoilSupplyFanInfo(c->coilName_,
+            coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
                                                          c->coilObjName,
                                                          Fans::Fan(DataAirSystems::PrimaryAirSystem(c->airloopNum).SupFanNum).FanName,
                                                          DataAirSystems::structArrayLegacyFanModels,
@@ -535,7 +526,7 @@ void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {
 
-            coilSelectionReportObj->setCoilSupplyFanInfo(c->coilName_,
+            coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
                                                          c->coilObjName,
                                                          HVACFan::fanObjs[DataAirSystems::PrimaryAirSystem(c->airloopNum).supFanVecIndex]->name,
                                                          DataAirSystems::objectVectorOOFanSystemModel,
@@ -599,7 +590,7 @@ void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
     }
 }
 
-void ReportCoilSelection::doFinalProcessingOfCoilData()
+void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
 {
     // this routine does some final processing in preparation for writing out results
     for (auto &c : coilSelectionDataObjs) {
@@ -771,7 +762,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData()
         case DataAirSystems::structArrayLegacyFanModels: {
             int locFanTypeNum(0);
             bool errorsFound(false);
-            Fans::GetFanType(c->fanAssociatedWithCoilName, locFanTypeNum, errorsFound);
+            Fans::GetFanType(state.fans, c->fanAssociatedWithCoilName, locFanTypeNum, errorsFound);
             if (locFanTypeNum == DataHVACGlobals::FanType_SimpleConstVolume) {
                 c->fanTypeName = "Fan:ConstantVolume";
             } else if (locFanTypeNum == DataHVACGlobals::FanType_SimpleVAV) {
@@ -784,9 +775,9 @@ void ReportCoilSelection::doFinalProcessingOfCoilData()
                 c->fanTypeName = "Fan:ComponentModel";
             }
             if (c->supFanNum <= 0) {
-                Fans::GetFanIndex(c->fanAssociatedWithCoilName, c->supFanNum, errorsFound, c->fanTypeName);
+                Fans::GetFanIndex(state.fans, c->fanAssociatedWithCoilName, c->supFanNum, errorsFound, c->fanTypeName);
             }
-            c->fanSizeMaxAirVolumeFlow = Fans::GetFanDesignVolumeFlowRate(c->fanTypeName, c->fanAssociatedWithCoilName, errorsFound, c->supFanNum);
+            c->fanSizeMaxAirVolumeFlow = Fans::GetFanDesignVolumeFlowRate(state.fans, c->fanTypeName, c->fanAssociatedWithCoilName, errorsFound, c->supFanNum);
             c->fanSizeMaxAirMassFlow = Fans::Fan(c->supFanNum).MaxAirMassFlowRate;
             break;
         }
@@ -823,12 +814,12 @@ void ReportCoilSelection::doFinalProcessingOfCoilData()
                     c->cpFluid * c->rhoFluid * DataSizing::PlantSizData(c->pltSizNum).DeltaT * DataSizing::PlantSizData(c->pltSizNum).DesVolFlowRate;
             } else {
                 // find boiler on this plant loop and get capacity from it
-                if (allocated(BoilerSteam::Boiler)) {
-                    for (int boilerIndex = 1; boilerIndex <= BoilerSteam::NumBoilers; ++boilerIndex) {
-                        if (BoilerSteam::Boiler(boilerIndex).LoopNum == c->waterLoopNum) { // steam boiler on this loop
-                            c->plantDesSupTemp = BoilerSteam::Boiler(boilerIndex).TempUpLimitBoilerOut;
-                            c->plantDesRetTemp = BoilerSteam::Boiler(boilerIndex).TempUpLimitBoilerOut - c->plantDesDeltaTemp;
-                            c->plantDesCapacity = BoilerSteam::Boiler(boilerIndex).NomCap;
+                if (allocated(state.dataSteamBoilers.Boiler)) {
+                    for (int boilerIndex = 1; boilerIndex <= state.dataSteamBoilers.numBoilers; ++boilerIndex) {
+                        if (state.dataSteamBoilers.Boiler(boilerIndex).LoopNum == c->waterLoopNum) { // steam boiler on this loop
+                            c->plantDesSupTemp = state.dataSteamBoilers.Boiler(boilerIndex).TempUpLimitBoilerOut;
+                            c->plantDesRetTemp = state.dataSteamBoilers.Boiler(boilerIndex).TempUpLimitBoilerOut - c->plantDesDeltaTemp;
+                            c->plantDesCapacity = state.dataSteamBoilers.Boiler(boilerIndex).NomCap;
                         }
                     }
                 }
@@ -1808,7 +1799,7 @@ void ReportCoilSelection::setCoilReheatMultiplier(std::string const &coilName, /
     c->reheatLoadMult = multiplierReheatLoad;
 }
 
-void ReportCoilSelection::setCoilSupplyFanInfo(std::string const &coilName, // user-defined name of the coil
+void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state, std::string const &coilName, // user-defined name of the coil
                                                std::string const &coilType, // idf input object class name of coil
                                                std::string const &fanName,
                                                DataAirSystems::fanModelTypeEnum const &fanEnumType,
@@ -1825,7 +1816,7 @@ void ReportCoilSelection::setCoilSupplyFanInfo(std::string const &coilName, // u
     if (fanEnumType == DataAirSystems::structArrayLegacyFanModels) {
         if (fanIndex <= 0) {
             bool errorsFound(false);
-            Fans::GetFanIndex(fanName, locFanIndex, errorsFound);
+            Fans::GetFanIndex(state.fans, fanName, locFanIndex, errorsFound);
         } else {
             locFanIndex = fanIndex;
         }
@@ -1852,8 +1843,6 @@ std::string ReportCoilSelection::getTimeText(int const timeStepAtPeak)
     int minutes(0);
     int timeStepIndex(0);
     int hourPrint;
-    std::string hrMinString;
-    std::string dateString;
     for (int hourCounter = 1; hourCounter <= 24; ++hourCounter) {
         for (int timeStepCounter = 1; timeStepCounter <= DataGlobals::NumOfTimeStepInHour; ++timeStepCounter) {
             ++timeStepIndex;
@@ -1865,8 +1854,7 @@ std::string ReportCoilSelection::getTimeText(int const timeStepAtPeak)
                 hourPrint = hourCounter - 1;
             }
             if (timeStepIndex == timeStepAtPeak) {
-                ObjexxFCL::gio::write(hrMinString, DataSizing::PeakHrMinFmt) << hourPrint << minutes;
-                returnString = hrMinString;
+                returnString = format(DataSizing::PeakHrMinFmt, hourPrint, minutes);
             }
         }
     }

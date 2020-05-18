@@ -93,20 +93,20 @@
 namespace EnergyPlus {
 
 namespace HybridUnitaryAirConditioners {
-    // Using/Aliasing
-    using General::TrimSigDigits;
-    using HybridEvapCoolingModel::Model;
-
-    using CurveManager::CurveValue;
-    using CurveManager::GetCurveIndex;
-    using CurveManager::GetCurveMinMaxValues;
-    using HybridEvapCoolingModel::CMode;
 
     Array1D<Model> ZoneHybridUnitaryAirConditioner;
     int NumZoneHybridEvap(0);
     Array1D_bool CheckZoneHybridEvapName;
     bool GetInputZoneHybridEvap(true);
     bool ZoneEquipmentListChecked(false);
+
+    void clear_state() {
+        ZoneHybridUnitaryAirConditioner.deallocate();
+        NumZoneHybridEvap = 0;
+        CheckZoneHybridEvapName.deallocate();
+        GetInputZoneHybridEvap = true;
+        ZoneEquipmentListChecked = false;
+    }
 
     // Begin routines for zone HVAC Hybrid Evaporative cooler unit
     //_______________________________________________________________________________________________________________________
@@ -493,8 +493,6 @@ namespace HybridUnitaryAirConditioners {
         Array1D_bool lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas;                    // Number of Alphas for each GetObjectItem call
         int NumNumbers;                   // Number of Numbers for each GetObjectItem call
-        int MaxAlphas;                    // Maximum number of alpha fields in all objects
-        int MaxNumbers;                   // Maximum number of numeric fields in all objects
         int NumFields;                    // Total number of fields in object
         int IOStatus;                     // Used in GetObjectItem
         static bool ErrorsFound(false);   // Set to true if errors in input, fatal at end of routine
@@ -504,13 +502,11 @@ namespace HybridUnitaryAirConditioners {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
-        MaxNumbers = 0;
-        MaxAlphas = 0;
         CurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
         NumZoneHybridEvap = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
-        MaxNumbers = max(MaxNumbers, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        int MaxNumbers = max(0, NumNumbers);    // Maximum number of numeric fields in all objects
+        int MaxAlphas = max(0, NumAlphas);      // Maximum number of alpha fields in all objects
         Alphas.allocate(MaxAlphas);
         Numbers.dimension(MaxNumbers, 0.0);
         cAlphaFields.allocate(MaxAlphas);

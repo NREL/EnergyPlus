@@ -92,6 +92,7 @@ int main() {
     //    Real64 thisEnth = 303;
     //    Real64 supPress = refrigerantSuperHeatedPressure(refrig, temperature, thisEnth);
     //    Real64 supDensity = refrigerantSuperHeatedDensity(refrig, temperature, thisPress);
+    refrigerantDelete(refrig);
 
     // PSYCHROMETRICS
     // test point is:
@@ -125,7 +126,7 @@ int main() {
     printf("C API Test: Expected Psat ~ 2985 Pa; Calculated: %8.4f\n", pSat);
     Real64 h = psyHFnTdbW(24, 0.009);
     Real64 h2 = psyHFnTdbRhPb(24, 0.5, 101325);
-    printf("C API Test: Expected Enth ~ 0.48000 J/kg; Calculated: %8.4f, %8.4f\n", h, h2);
+    printf("C API Test: Expected Enth ~ 48000 J/kg; Calculated: %8.4f, %8.4f\n", h, h2);
     Real64 volume = psyVFnTdbWPb(24, 0.009, 101325);
     printf("C API Test: Expected v ~ 0.855 m3/kg; Calculated: %8.4f\n", volume);
     Real64 density = psyRhoFnPbTdbW(101325, 24, 0.009);
@@ -141,7 +142,7 @@ int main() {
     Real64 cp = psyCpAirFnW(0.009);
     printf("C API Test: Expected Cp ~ 1007 J/kgK; Calculated: %8.4f\n", cp);
     Real64 energy = psyHfgAirFnWTdb(24);
-    printf("C API Test: Calculated energy?: %8.4f\n", energy);
+    printf("C API Test: Calculated energy: %8.4f\n", energy);
     Real64 moisture_energy = psyHgAirFnWTdb(24);
     printf("C API Test: Calculated energy of moisture: %8.4f\n", moisture_energy);
 

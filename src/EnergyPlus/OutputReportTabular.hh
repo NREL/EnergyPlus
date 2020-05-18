@@ -62,6 +62,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -391,8 +392,35 @@ namespace OutputReportTabular {
     extern std::string activeForName;
     extern std::string prevReportName;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
-    // PRIVATE      DateToStr
+    // LineTypes for reading the stat file
+    enum class StatLineType {
+        Initialized, // used as a dummy placeholder
+        StatisticsLine,
+        LocationLine,
+        LatLongLine,
+        ElevationLine,
+        StdPressureLine,
+        DataSourceLine,
+        WMOStationLine,
+        DesignConditionsLine,
+        heatingConditionsLine,
+        coolingConditionsLine,
+        stdHDDLine,
+        stdCDDLine,
+        maxDryBulbLine,
+        minDryBulbLine,
+        maxDewPointLine,
+        minDewPointLine,
+        wthHDDLine,
+        wthCDDLine,
+        KoppenLine,
+        KoppenDes1Line,
+        KoppenDes2Line,
+        AshStdLine,
+        AshStdDes1Line,
+        AshStdDes2Line,
+        AshStdDes3Line,
+    };
 
     // Types
 
@@ -669,7 +697,7 @@ namespace OutputReportTabular {
     // Functions
     void clear_state();
 
-    void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     //======================================================================================================================
     //======================================================================================================================
@@ -743,7 +771,9 @@ namespace OutputReportTabular {
 
     void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType);
+    void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType);
+
+    void CalcHeatEmissionReport(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -753,7 +783,9 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports();
+    void WriteTabularReports(EnergyPlus::EnergyPlusData &state, OutputFiles &outputFiles);
+
+    void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 
     void FillWeatherPredefinedEntries();
 
@@ -761,7 +793,7 @@ namespace OutputReportTabular {
                                    int const colNum             // Column number
     );
 
-    void FillRemainingPredefinedEntries();
+    void FillRemainingPredefinedEntries(EnergyPlus::EnergyPlusData &state);
 
     void WriteMonthlyTables();
 
@@ -779,7 +811,7 @@ namespace OutputReportTabular {
 
     void WriteCompCostTable();
 
-    void WriteVeriSumTable();
+    void WriteVeriSumTable(OutputFiles &outputFiles);
 
     void WriteAdaptiveComfortTable();
 
@@ -951,8 +983,6 @@ namespace OutputReportTabular {
     //======================================================================================================================
 
     std::string RealToStr(Real64 const RealIn, int const numDigits);
-
-    std::string IntToStr(int const intIn);
 
     Real64 StrToReal(std::string const &stringIn);
 

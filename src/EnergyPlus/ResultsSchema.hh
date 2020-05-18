@@ -194,7 +194,7 @@ namespace ResultsFramework {
         bool rVariablesScanned() const;
         bool iVariablesScanned() const;
 
-        void newRow(const int month, const int dayOfMonth, const int hourOfDay, const int curMin);
+        void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin);
         void newRow(const std::string &ts);
         void pushVariableValue(const int reportID, double value);
 
@@ -212,7 +212,7 @@ namespace ResultsFramework {
         bool IVariablesScanned = false;
         std::string ReportFrequency;
         std::vector<std::string> TS;
-        std::unordered_map<int, Variable> variableMap; // for O(1) lookup when adding to data structure
+        std::map<int, Variable> variableMap;
         int lastVarID;
     };
 
@@ -276,6 +276,7 @@ namespace ResultsFramework {
     class ResultsSchema : public BaseResultObject
     {
     public:
+
         ResultsSchema() = default;
         virtual ~ResultsSchema() = default;
 

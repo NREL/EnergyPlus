@@ -67,6 +67,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -148,7 +149,7 @@ namespace UserDefinedComponents {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void UserPlantComponentStruct::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    void UserPlantComponentStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
     {
         bool anyEMSRan;
         Real64 myLoad = 0.0;
@@ -165,6 +166,8 @@ namespace UserDefinedComponents {
         if (thisLoop > 0) {
             if (this->Loop(thisLoop).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
+            } else if (this->Loop(thisLoop).initPluginLocation > -1) {
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(this->Loop(thisLoop).initPluginLocation);
             }
 
             PlantUtilities::InitComponentNodes(this->Loop(thisLoop).MassFlowRateMin,
@@ -200,7 +203,7 @@ namespace UserDefinedComponents {
         OptLoad = this->Loop(thisLoop).OptLoad;
     }
 
-    void UserPlantComponentStruct::UserPlantComponentStruct::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
+    void UserPlantComponentStruct::UserPlantComponentStruct::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation,
                                                                       bool EP_UNUSED(FirstHVACIteration),
                                                                       Real64 &CurLoad,
                                                                       bool EP_UNUSED(RunFlag))
@@ -215,7 +218,7 @@ namespace UserDefinedComponents {
         // User Defined plant generic component
 
         if (DataGlobals::BeginEnvrnFlag) {
-            this->onInitLoopEquip(calledFromLocation);
+            this->onInitLoopEquip(state, calledFromLocation);
         }
 
         bool anyEMSRan;
@@ -522,7 +525,6 @@ namespace UserDefinedComponents {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        std::string LoopStr;
         static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
 
         cCurrentModuleObject = "PlantComponent:UserDefined";
@@ -569,7 +571,7 @@ namespace UserDefinedComponents {
                     UserPlantComp(CompLoop).Loop.allocate(NumPlantConnections);
                     UserPlantComp(CompLoop).NumPlantConnections = NumPlantConnections;
                     for (int ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
-                        LoopStr = General::RoundSigDigits(ConnectionLoop);
+                        const auto LoopStr = fmt::to_string(ConnectionLoop);
                         int aArgCount = (ConnectionLoop - 1) * 6 + 3;
                         UserPlantComp(CompLoop).Loop(ConnectionLoop).InletNodeNum =
                             NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount),
@@ -984,7 +986,7 @@ namespace UserDefinedComponents {
                                                                 1,
                                                                 DataLoopNode::ObjectIsNotParent);
 
-                        LoopStr = General::RoundSigDigits(ConnectionLoop);
+                        const auto LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables
                         SetupEMSInternalVariable("Inlet Temperature for Air Connection " + LoopStr,
                                                  UserCoil(CompLoop).Name,
@@ -1250,7 +1252,6 @@ namespace UserDefinedComponents {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        std::string LoopStr;
         static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
 
         if (GetPlantCompInput) {
@@ -1481,8 +1482,7 @@ namespace UserDefinedComponents {
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
-                        ObjexxFCL::gio::write(LoopStr, fmtLD) << ConnectionLoop;
-                        strip(LoopStr);
+                        const auto LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables
                         SetupEMSInternalVariable("Inlet Temperature for Plant Connection " + LoopStr,
                                                  UserZoneAirHVAC(CompLoop).Name,
@@ -1909,7 +1909,7 @@ namespace UserDefinedComponents {
                         UserAirTerminal(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
                         UserAirTerminal(CompLoop).Loop(ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
-                        LoopStr = General::RoundSigDigits(ConnectionLoop);
+                        const auto LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables
                         SetupEMSInternalVariable("Inlet Temperature for Plant Connection " + LoopStr,
                                                  UserAirTerminal(CompLoop).Name,

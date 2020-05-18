@@ -54,6 +54,9 @@
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
+
+    struct EnergyPlusData;
+
 namespace DataPlant {
 
     struct CompData
@@ -109,7 +112,7 @@ namespace DataPlant {
         {
         }
 
-        void simulate(bool FirstHVACIteration, bool &InitLoopEquip, bool GetCompSizFac);
+        void simulate(EnergyPlusData &state, bool FirstHVACIteration, bool &InitLoopEquip, bool GetCompSizFac);
 
         bool isPump();
     };

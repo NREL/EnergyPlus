@@ -46,13 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -61,9 +59,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -98,9 +93,7 @@ namespace BranchInputManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::OutputFileBNDetails;
     using namespace DataLoopNode;
     using namespace DataBranchAirLoopPlant;
     using namespace NodeInputManager;
@@ -527,9 +520,10 @@ namespace BranchInputManager {
         return GetAirBranchIndex;
     }
 
-    void GetBranchFanTypeName(int const BranchNum, std::string &FanType,
+    void GetBranchFanTypeName(int const BranchNum,
+                              std::string &FanType,
                               std::string &FanName,
-                              bool &ErrFound               // Set to true if error found, false otherwise
+                              bool &ErrFound // Set to true if error found, false otherwise
     )
     {
 
@@ -2881,7 +2875,7 @@ namespace BranchInputManager {
         }
     }
 
-    void TestBranchIntegrity(bool &ErrFound)
+    void TestBranchIntegrity(OutputFiles &outputFiles, bool &ErrFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2907,7 +2901,6 @@ namespace BranchInputManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2927,8 +2920,6 @@ namespace BranchInputManager {
         Array1D_bool BranchReported;
         int BCount;
         int Found;
-        std::string ChrOut;
-        std::string ChrOut1;
         //  LOGICAL UniqueNodeError
         int NodeNum;
         int Loop2;
@@ -2948,26 +2939,14 @@ namespace BranchInputManager {
 
         struct BranchUniqueNodes
         {
-            // Members
-            int NumNodes;
+            int NumNodes{0};
             Array1D_string UniqueNodeNames;
-
-            // Default Constructor
-            BranchUniqueNodes() : NumNodes(0)
-            {
-            }
         };
 
         // Object Data
         Array1D<BranchUniqueNodes> BranchNodes;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700("('! <#Branch Lists>,<Number of Branch Lists>')");
-        static ObjexxFCL::gio::Fmt Format_701("(A)");
-        static ObjexxFCL::gio::Fmt Format_702("('! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>')");
-        static ObjexxFCL::gio::Fmt Format_704(
-            "('! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>')");
-        static ObjexxFCL::gio::Fmt Format_706("('! <# Orphaned Branches>,<Number of Branches not on Branch Lists>')");
 
         BranchReported.dimension(NumOfBranches, false);
 
@@ -2977,20 +2956,24 @@ namespace BranchInputManager {
 
         BranchNodes.allocate(NumOfBranches);
 
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_700);
-        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumOfBranchLists;
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " #Branch Lists," + stripped(ChrOut);
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_702);
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_704);
+        print(outputFiles.bnd, "{}\n", "! ===============================================================");
+        static constexpr auto Format_700("! <#Branch Lists>,<Number of Branch Lists>");
+        print(outputFiles.bnd, "{}\n", Format_700);
+        print(outputFiles.bnd, " #Branch Lists,{}\n", NumOfBranchLists);
+        static constexpr auto Format_702("! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>");
+        print(outputFiles.bnd, "{}\n", Format_702);
+        static constexpr auto Format_704(
+            "! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>");
+        print(outputFiles.bnd, "{}\n", Format_704);
 
         for (BCount = 1; BCount <= NumOfBranchLists; ++BCount) {
-
-            ObjexxFCL::gio::write(ChrOut, fmtLD) << BCount;
-            ObjexxFCL::gio::write(ChrOut1, fmtLD) << BranchList(BCount).NumOfBranchNames;
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " Branch List," + stripped(ChrOut) + ',' + BranchList(BCount).Name + ',' +
-                                                               BranchList(BCount).LoopName + ',' + BranchList(BCount).LoopType + ',' +
-                                                               stripped(ChrOut1);
+            print(outputFiles.bnd,
+                  " Branch List,{},{},{},{},{}\n",
+                  BCount,
+                  BranchList(BCount).Name,
+                  BranchList(BCount).LoopName,
+                  BranchList(BCount).LoopType,
+                  BranchList(BCount).NumOfBranchNames);
 
             IsAirBranch = false;
             BranchFluidType = NodeType_Unknown;
@@ -3016,15 +2999,12 @@ namespace BranchInputManager {
             OriginalBranchFluidType = BlankString;
             NumFluidNodes = 0;
             for (Count = 1; Count <= BranchList(BCount).NumOfBranchNames; ++Count) {
-
-                ChrOut = RoundSigDigits(Count);
-                //      WRITE(ChrOut,*) Count
-                //      ChrOut=ADJUSTL(ChrOut)
-
                 Found = FoundBranches(Count);
                 if (Found == 0) {
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Branch," + ChrOut + ',' + BranchList(BCount).BranchNames(Count) +
-                                                                       "(not found),**Unknown**,**Unknown**,**Unknown**,**Unknown**";
+                    print(outputFiles.bnd,
+                          "   Branch,{},{},(not found),**Unknown**,**Unknown**,**Unknown**,**Unknown**\n",
+                          Count,
+                          BranchList(BCount).BranchNames(Count));
                     continue;
                 }
                 BranchReported(Found) = true;
@@ -3097,8 +3077,14 @@ namespace BranchInputManager {
                     BranchLoopName = Branch(Found).AssignedLoopName;
                     BranchLoopType = "**Unknown**";
                 }
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Branch," + ChrOut + ',' + Branch(Found).Name + ',' + BranchLoopName + ',' +
-                                                                   BranchLoopType + ',' + BranchInletNodeName + ',' + BranchOutletNodeName;
+                print(outputFiles.bnd,
+                      "   Branch,{},{},{},{},{},{}\n",
+                      Count,
+                      Branch(Found).Name,
+                      BranchLoopName,
+                      BranchLoopType,
+                      BranchInletNodeName,
+                      BranchOutletNodeName);
             }
             if (MixedFluidTypesOnBranchList) {
                 ShowSevereError("BranchList=" + BranchList(BCount).Name + " has mixed fluid types in its nodes.");
@@ -3174,10 +3160,9 @@ namespace BranchInputManager {
             ++BCount;
         }
         if (BCount > 0) {
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_706);
-            ChrOut = RoundSigDigits(BCount);
-            //    WRITE(ChrOut,*) BCount
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " #Orphaned Branches," + ChrOut;
+            static constexpr auto Format_706("! <# Orphaned Branches>,<Number of Branches not on Branch Lists>");
+            print(outputFiles.bnd, "{}\n", Format_706);
+            print(outputFiles.bnd, " #Orphaned Branches,{}\n", BCount);
             ShowWarningError("There are orphaned Branches in input. See .bnd file for details.");
 
             BCount = 0;
@@ -3187,9 +3172,6 @@ namespace BranchInputManager {
                 ++BCount;
                 ShowWarningError("Orphan Branch=\"" + Branch(Count).Name + "\".");
 
-                //        WRITE(ChrOut,*) BCount
-                //        ChrOut=ADJUSTL(ChrOut)
-                ChrOut = RoundSigDigits(BCount);
                 if (Branch(Count).NumOfComponents > 0) {
                     MatchNode = Branch(Count).Component(1).InletNode;
                     MatchNodeName = Branch(Count).Component(1).InletNodeName;
@@ -3218,8 +3200,14 @@ namespace BranchInputManager {
                     BranchLoopName = Branch(Count).AssignedLoopName;
                     BranchLoopType = "**Unknown**";
                 }
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " Branch," + ChrOut + ',' + Branch(Count).Name + ',' + BranchLoopName + ',' +
-                                                                   BranchLoopType + ',' + BranchInletNodeName + ',' + BranchOutletNodeName;
+                print(outputFiles.bnd,
+                      " Branch,{},{},{},{},{},{}\n",
+                      BCount,
+                      Branch(Count).Name,
+                      BranchLoopName,
+                      BranchLoopType,
+                      BranchInletNodeName,
+                      BranchOutletNodeName);
             }
         }
 

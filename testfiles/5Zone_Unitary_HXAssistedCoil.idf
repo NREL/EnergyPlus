@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -2903,6 +2903,10 @@
 
   Output:Variable,*,Zone Air Temperature,hourly;
 
+  Output:Variable,*,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate,hourly;
+
+  Output:Variable,*,Zone Predicted Moisture Load Moisture Transfer Rate,hourly;
+
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
@@ -3076,4 +3080,18 @@
   Output:Variable,*,Heat Exchanger Exhaust Air Bypass Mass Flow Rate,hourly;
 
   Output:Variable,*,Heat Exchanger Defrost Time Fraction,hourly;
+
+  Output:Variable,Main Cooling Coil 1 Inlet Node,System Node Temperature,hourly;
+
+  Output:Variable,Heat Recovery Supply Outlet,System Node Temperature,hourly;
+
+  Output:Variable,Heat Recovery Exhuast Inlet Node,System Node Temperature,hourly;
+
+  Output:Variable,MAIN HEATING COIL 1 INLET NODE,System Node Temperature,hourly;
+
+  Output:Variable,VAV Sys 1 Outlet Node,System Node Temperature,hourly;
+
+  Output:Variable,VAV Sys 1 Outlet Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,VAV Sys 1 Outlet Node,System Node Current Density Volume Flow Rate,hourly;
 

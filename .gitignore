@@ -26,6 +26,10 @@ doc/title.tex
 # ignore Energy+.schema.epJSON while it is auto-generated from IDD
 Energy+.schema.epJSON.in
 
+# ignore the doxygen built API docs
+src/EnergyPlus/api/docs/c/_build
+src/EnergyPlus/api/docs/python/_build
+
 # now that we have python, ignore some things
 *.pyc
 venv
