@@ -4081,8 +4081,13 @@ namespace VariableSpeedCoils {
                     }
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
                     // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
+                    if (VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
+                        RatedSourceTempCool = RatedInletWaterTemp;
+                    } else {
+                        RatedSourceTempCool = OutTemp;
+                    }
                     TotCapTempModFac =
-                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
+                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedSourceTempCool);
 
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
@@ -4153,8 +4158,13 @@ namespace VariableSpeedCoils {
 
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
                     // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
+                    if (VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
+                        RatedSourceTempCool = RatedInletWaterTemp;
+                    } else {
+                        RatedSourceTempCool = OutTemp;
+                    }
                     TotCapTempModFac =
-                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
+                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedSourceTempCool);
 
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
