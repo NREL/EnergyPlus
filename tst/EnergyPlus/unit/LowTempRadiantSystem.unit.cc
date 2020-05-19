@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -188,7 +189,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantElectric)
     ElecRadSys(RadSysNum).HeatingCapMethod = HeatingDesignCapacity;
     ElecRadSys(RadSysNum).ScaledHeatingCapacity = AutoSize;
     FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad = 1200.0;
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(1200.0, ElecRadSys(RadSysNum).MaxElecPower, 0.1);
 
     // Electric - CapacityPerFloorArea method - hold until scalable sizing issue is resolved
@@ -196,7 +197,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantElectric)
     ElecRadSys(RadSysNum).HeatingCapMethod = CapacityPerFloorArea;
     ElecRadSys(RadSysNum).ScaledHeatingCapacity = 1.5;
     Zone(1).FloorArea = 500.0;
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(750.0, ElecRadSys(RadSysNum).MaxElecPower, 0.1);
 
     // Electric - FractionOfAutosizedHeatingCapacity method - hold until scalable sizing issue is resolved
@@ -204,7 +205,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantElectric)
     ElecRadSys(RadSysNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
     ElecRadSys(RadSysNum).ScaledHeatingCapacity = 10.0;
     FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad = 880.0;
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(8800.0, ElecRadSys(RadSysNum).MaxElecPower, 0.1);
 }
 
@@ -254,7 +255,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
     Construct.allocate(1);
     Construct(1).ThicknessPerpend = 0.075;
 
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, HydrRadSys(RadSysNum).WaterVolFlowMaxHeat, 0.1);
     EXPECT_NEAR(ExpectedResult2, HydrRadSys(RadSysNum).WaterVolFlowMaxCool, 0.1);
     EXPECT_NEAR(ExpectedResult3, HydrRadSys(RadSysNum).TubeLength, 0.1);
@@ -273,7 +274,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
     ExpectedResult2 = HydrRadSys(RadSysNum).ScaledCoolingCapacity * Zone(1).FloorArea;
     ExpectedResult2 = ExpectedResult2 / (PlantSizData(2).DeltaT * RhoWater * CpWater);
 
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, HydrRadSys(RadSysNum).WaterVolFlowMaxHeat, 0.1);
     EXPECT_NEAR(ExpectedResult2, HydrRadSys(RadSysNum).WaterVolFlowMaxCool, 0.1);
 
@@ -292,7 +293,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
     ExpectedResult2 = HydrRadSys(RadSysNum).ScaledCoolingCapacity * FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
     ExpectedResult2 = ExpectedResult2 / (PlantSizData(2).DeltaT * RhoWater * CpWater);
 
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, HydrRadSys(RadSysNum).WaterVolFlowMaxHeat, 0.1);
     EXPECT_NEAR(ExpectedResult2, HydrRadSys(RadSysNum).WaterVolFlowMaxCool, 0.1);
 }
@@ -335,7 +336,7 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
     Construct.allocate(1);
     Construct(1).ThicknessPerpend = 0.075;
 
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, HydrRadSys(RadSysNum).ScaledHeatingCapacity, 0.1);
     EXPECT_NEAR(ExpectedResult2, HydrRadSys(RadSysNum).ScaledCoolingCapacity, 0.1);
 
@@ -349,7 +350,7 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
     HydrRadSys(RadSysNum).ScaledCoolingCapacity = 250.0;
     ExpectedResult2 = HydrRadSys(RadSysNum).ScaledCoolingCapacity * Zone(1).FloorArea;
 
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, HydrRadSys(RadSysNum).ScaledHeatingCapacity, 0.1);
     EXPECT_NEAR(ExpectedResult2, HydrRadSys(RadSysNum).ScaledCoolingCapacity, 0.1);
 
@@ -364,7 +365,7 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
     FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad = 1200.0;
     ExpectedResult2 = HydrRadSys(RadSysNum).ScaledCoolingCapacity * FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
 
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, HydrRadSys(RadSysNum).ScaledHeatingCapacity, 0.1);
     EXPECT_NEAR(ExpectedResult2, HydrRadSys(RadSysNum).ScaledCoolingCapacity, 0.1);
 }
@@ -403,7 +404,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
     Construct.allocate(1);
     Construct(1).ThicknessPerpend = 0.075;
 
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, CFloRadSys(RadSysNum).WaterVolFlowMax, 0.001);
 
     // Hydronic - cold water volume flow rate autosize
@@ -416,7 +417,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
     ExpectedResult2 = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
     ExpectedResult2 = ExpectedResult2 / (PlantSizData(2).DeltaT * RhoWater * CpWater);
 
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult2, CFloRadSys(RadSysNum).WaterVolFlowMax, 0.001);
 
     // Hydronic - maximum water volume flow rate autosize
@@ -433,7 +434,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
     CFloRadSys(RadSysNum).TotalSurfaceArea = 150.0;
     ExpectedResult3 = CFloRadSys(RadSysNum).TotalSurfaceArea / 0.15;
 
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(std::max(ExpectedResult1, ExpectedResult2), CFloRadSys(RadSysNum).WaterVolFlowMax, 0.001);
     EXPECT_NEAR(ExpectedResult3, CFloRadSys(RadSysNum).TubeLength, 0.1);
 }
@@ -1102,34 +1103,34 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
+    GetProjectControlData(outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
 
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
+    GetMaterialData(outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetPlantSizingInput();
-    GetPlantLoopData();
-    GetPlantInput();
+    GetPlantLoopData(state);
+    GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
     DataSurfaces::WorldCoordSystem = true;
     GetSurfaceListsInputs();
 
     ErrorsFound = false;
-    SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
+    SetupZoneGeometry(state, outputFiles(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetLowTempRadiantSystem();
@@ -1206,7 +1207,7 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     TubeLengthDes = HydrRadSys(RadSysNum).TotalSurfaceArea / 0.1524; // tube length uses the construction perpendicular spacing
 
     // do autosize calculations
-    SizeLowTempRadiantSystem(RadSysNum, RadSysTypes(1).SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, RadSysTypes(1).SystemType);
     // Test autosized heat/cool capacity
     EXPECT_EQ(HeatingCapacity, HydrRadSys(RadSysNum).ScaledHeatingCapacity);
     EXPECT_EQ(CoolingCapacity, HydrRadSys(RadSysNum).ScaledCoolingCapacity);
@@ -1245,13 +1246,13 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystem)
 
     CFloRadSys(RadSysNum).CoolingSystem = true;
     CFloRadSys(RadSysNum).HeatingSystem = false;
-    InitLowTempRadiantSystem(false, RadSysNum, SystemType, InitErrorFound);
+    InitLowTempRadiantSystem(state, false, RadSysNum, SystemType, InitErrorFound);
     EXPECT_EQ(3.0, CFloRadSys(RadSysNum).ChWaterMassFlowRate);
     EXPECT_EQ(0.0, CFloRadSys(RadSysNum).WaterMassFlowRate);
 
     CFloRadSys(RadSysNum).CoolingSystem = false;
     CFloRadSys(RadSysNum).HeatingSystem = true;
-    InitLowTempRadiantSystem(false, RadSysNum, SystemType, InitErrorFound);
+    InitLowTempRadiantSystem(state, false, RadSysNum, SystemType, InitErrorFound);
     EXPECT_EQ(2.0, CFloRadSys(RadSysNum).HotWaterMassFlowRate);
     EXPECT_EQ(0.0, CFloRadSys(RadSysNum).WaterMassFlowRate);
 }
@@ -1290,7 +1291,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).HeatingSystem = false;
 
     CFloRadSys(RadSysNum).WaterVolFlowMax = AutoSize;
-    InitLowTempRadiantSystem(false, RadSysNum, SystemType, InitErrorFound);
+    InitLowTempRadiantSystem(state, false, RadSysNum, SystemType, InitErrorFound);
     EXPECT_EQ(CFloRadSys(RadSysNum).PumpEffic, 0.0);
     EXPECT_EQ(InitErrorFound, false);
 
@@ -1323,7 +1324,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).HeatingSystem = false;
 
     CFloRadSys(RadSysNum).WaterVolFlowMax = 0.4; // because of how other parameters are set, this value is equal to the pump efficiency
-    InitLowTempRadiantSystem(false, RadSysNum, SystemType, InitErrorFound);
+    InitLowTempRadiantSystem(state, false, RadSysNum, SystemType, InitErrorFound);
     std::string const error_string02 =
         delimited_string({"   ** Warning ** Check input.  Calc Pump Efficiency=" + General::RoundSigDigits(CFloRadSys(RadSysNum).PumpEffic, 5) +
                           "% which is less than 50%, for pump in radiant system " + CFloRadSys(RadSysNum).Name});
@@ -1360,7 +1361,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).HeatingSystem = false;
 
     CFloRadSys(RadSysNum).WaterVolFlowMax = 0.98; // because of how other parameters are set, this value is equal to the pump efficiency
-    InitLowTempRadiantSystem(false, RadSysNum, SystemType, InitErrorFound);
+    InitLowTempRadiantSystem(state, false, RadSysNum, SystemType, InitErrorFound);
     std::string const error_string03 =
         delimited_string({"   ** Warning ** Check input.  Calc Pump Efficiency=" + General::RoundSigDigits(CFloRadSys(RadSysNum).PumpEffic, 5) +
                           "% is approaching 100%, for pump in radiant system " + CFloRadSys(RadSysNum).Name});
@@ -1397,7 +1398,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).HeatingSystem = false;
 
     CFloRadSys(RadSysNum).WaterVolFlowMax = 1.23; // because of how other parameters are set, this value is equal to the pump efficiency
-    InitLowTempRadiantSystem(false, RadSysNum, SystemType, InitErrorFound);
+    InitLowTempRadiantSystem(state, false, RadSysNum, SystemType, InitErrorFound);
     std::string const error_string04 =
         delimited_string({"   ** Severe  ** Check input.  Calc Pump Efficiency=" + General::RoundSigDigits(CFloRadSys(RadSysNum).PumpEffic, 5) +
                           "% which is bigger than 100%, for pump in radiant system " + CFloRadSys(RadSysNum).Name});
@@ -1769,7 +1770,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
     Real64 HeatingLoad = FinalZoneSizing(1).NonAirSysDesHeatLoad;
     Real64 DesHotWaterVolFlowRate = HeatingLoad / (PlantSizData(1).DeltaT * Density * Cp);
 
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     // check hot water design flow rate calculated here and autosized flow are identical
     EXPECT_DOUBLE_EQ(DesHotWaterVolFlowRate, CFloRadSys(RadSysNum).WaterVolFlowMax);
 
@@ -1792,7 +1793,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
     Real64 CoolingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
     Real64 DesChilledWaterVolFlowRate = CoolingLoad / (PlantSizData(2).DeltaT * Density * Cp);
 
-    SizeLowTempRadiantSystem(RadSysNum, SystemType);
+    SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     // check chilled water design flow rate calculated here and autosized flow are identical
     EXPECT_DOUBLE_EQ(DesChilledWaterVolFlowRate, CFloRadSys(RadSysNum).WaterVolFlowMax);
 }
