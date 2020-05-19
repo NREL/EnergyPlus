@@ -61,20 +61,8 @@ namespace EnergyPlus {
 
 namespace InternalHeatGains {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
     extern bool GetInternalHeatGainsInputFlag; // Controls the GET routine calling (limited to first time)
     extern bool ErrorsFound;                   // if errors were found in the input
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE InternalHeatGains
-    // PUBLIC  SumInternalConvectionGainsByIndices
-    // PUBLIC SumReturnAirConvectionGainsByIndices
-    // PUBLIC  SumInternalRadiationGainsByIndices
-    // PUBLIC  SumInternalLatentGainsByIndices
-    // PUBLIC
-    // PUBLIC  SumInternalCO2GainsByIndices
-    // PUBLIC  GetInternalGainDeviceIndex
 
     // Functions
     void clear_state();
@@ -92,7 +80,7 @@ namespace InternalHeatGains {
     void ReportInternalHeatGains();
 
     Real64 GetDesignLightingLevelForZone(int const WhichZone); // name of zone
-    
+
     bool CheckThermalComfortSchedules(bool const WorkEffSch,  // Blank work efficiency schedule = true
                                       bool const CloInsSch,   // Blank clothing insulation schedule = true
                                       bool const AirVeloSch); // Blank air velocity schedule = true
@@ -153,7 +141,7 @@ namespace InternalHeatGains {
 
     void SumAllInternalLatentGains(int const ZoneNum, // zone index pointer for which zone to sum gains for
                                    Real64 &SumLatentGainRate);
-    
+
     // Added for hybrid model -- calculate the latent gain from all sources except for people
     void SumAllInternalLatentGainsExceptPeople(int const ZoneNum, // zone index pointer for which zone to sum gains for
                                                Real64 &SumLatentGainRateExceptPeople);
