@@ -213,6 +213,10 @@ namespace PhotovoltaicThermalCollectors {
 
        void solve_lin_sys_back_sub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
 
+       Real64 calc_k_taoalpha(Real64 theta, Real64 glass_thickness, Real64 refrac_index_glass, Real64 k_glass);
+
+       Real64 calc_taoalpha(Real64 theta, Real64 glass_thickness, Real64 refrac_index_glass, Real64 k_glass);
+	
        void update();
     };
 

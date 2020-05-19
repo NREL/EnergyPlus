@@ -1289,7 +1289,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 &tpv)
     {
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         K. Haddad
+        //       AUTHOR         K. Haddad & S. Brideau
         //       DATE WRITTEN   March 2020
         //       MODIFIED       na
         //       RE-ENGINEERED  na
@@ -1300,6 +1300,8 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // ???
 
+
+		const Real64 pi(3.14159);
         // BIPVT system parameters
         Real64 rpvg_pv = this->BIPVT.PVRTop;       // thermal resistance of glass (m2-K/W)
         Real64 rpv_1 = this->BIPVT.PVRBot;         // thermal resistance of backing layer (m2-K/W)
@@ -1308,6 +1310,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 emiss_b = this->BIPVT.BackMatEmiss; // emissivity of backing surface
         Real64 emiss_2(0.85);                      // emissivity of bldg surface
         Real64 emiss_pvg = this->BIPVT.PVGEmiss;   // emissivity of glass surface
+
 
         // BIPVT model parameters
         Real64 tsurr, tsurrK;                  // surrouding temperature (DegC, DegK)
@@ -1326,6 +1329,10 @@ namespace PhotovoltaicThermalCollectors {
         Real64 IAM_bs, b0_bs(0.1), b1_bs(0.0); // back surface incidence angle modifier parameters
         const Real64 small_num(1.0e-10);       // small real number
         const Real64 sigma(5.67e-8);           // stephan bolzmann constant
+        Real64 eff_pv(0.0);                     // efficiency pv panel
+
+
+
 
         // other parameters
         Real64 a, b, c, d;                                                    // constants
@@ -1355,10 +1362,39 @@ namespace PhotovoltaicThermalCollectors {
         Real64 mdot = this->MassFlowRate;                                     // fluid mass flow rate (kg/s)
         Real64 mdot_bipvt(mdot), mdot_bipvt_new(mdot);                        // mass flow rate through the bipvt duct (kg/s)
         Real64 s(0.0);                                                        // solar radiation gain at pv surface (W/m2)
-        Real64 s1(0.0);                                                       // solar radiation gain at pv backing surface (W/m2)
+        Real64 s1(0.0);   
+		Real64 k_taoalpha_beam(0.0);
+		Real64 k_taoalpha_sky(0.0);
+		Real64 k_taoalpha_ground(0.0);		                                    // solar radiation gain at pv backing surface (W/m2)
+        Real64 iam_pv_beam(1.0);                                                // incident angle modifier pv cells
+        Real64 iam_back_beam(1.0);                                              // incident angle modifier back
+        Real64 iam_pv_sky(1.0);
+        Real64 iam_back_sky(1.0);
+        Real64 iam_pv_ground(1.0);
+        Real64 iam_back_ground(1.0);
+        Real64 theta_sky(0.0 * pi / 180.0);                                     // incident angle sky
+        Real64 theta_ground(0.0 * pi / 180.0);                                  // incident angle ground
+        Real64 theta_beam = std::acos(DataHeatBalance::CosIncidenceAngle(this->SurfNum)); // incident angle beam in rad
+
+        Real64 glass_thickness(0.002);                                          // typical pv glass thickness
+        Real64 refrac_index_glass(1.526);                                       // glass refractive index
+        Real64 k_glass(4.0);                                                    // typical extinction coefficient pv glass
+        Real64 slope = (pi/180.0)*DataSurfaces::Surface(this->SurfNum).Tilt;    // surface tilt in rad
+        Real64 taoaplha_back(0.9);                                                // tao-alpha product normal back of PV panel (hard coded for now)
+        Real64 taoalpha_pv(0.957);                                              // tao-aplha product normal PV cells (hard coded for now)
+        Real64 taoaplha_cladding(0.85);                                           // tao-alpha product normal cladding (hard coded for now)
+        Real64 g(0.0);                                                            // Solar incident on surface
+        Real64 fcell(0.9);                                                       // area fraction of cells on pv module (hard coded for now)
+        Real64 area_pv(10.0);                                                     // total area of pv modules (hard coded for now)
+        Real64 area_wall_total(10.5);                                              // total area of wall (hard coded for now)
+
 
         ConvectionCoefficients::InitExteriorConvectionCoeff(
             this->SurfNum, 0.0, DataHeatBalance::VerySmooth, emiss_pvg, this->BIPVT.LastCollectorTemp, HcExt, HrSky, HrGround, HrAir);
+        
+        g = DataHeatBalance::QRadSWOutIncident(this->SurfNum);
+		theta_ground = (pi / 180) * (90 - 0.5788 * (slope * 180 / pi) + 0.002693 * std::pow((slope * 180 / pi), 2)); //incidence angle ground rad
+		theta_sky = (pi / 180) * (59.7 - 0.1388 * (slope * 180 / pi) + 0.001497 * std::pow((slope * 180 / pi), 2));	// incidence angle sky rad
         t1 = (tamb + t2) / 2.0;
         tpv = (tamb + t2) / 2.0;
         tpvg = (tamb + t2) / 2.0;
@@ -1366,14 +1402,29 @@ namespace PhotovoltaicThermalCollectors {
         hpv_1 = 1.0 / rpv_1;
         tsurr = (tamb * HrGround + tamb * HrAir + tsky * HrSky) / (HrGround + HrAir + HrSky + small_num);
         hrad_surr = HrGround + HrAir + HrSky;
-        IAM_pv = 1 - b0_pv * (1.0 / (DataHeatBalance::CosIncidenceAngle(this->SurfNum) + small_num) - 1.0) -
-                 b1_pv * pow((1.0 / (DataHeatBalance::CosIncidenceAngle(this->SurfNum) + small_num) - 1), 2.0);
-        IAM_pv = max(0.0, IAM_pv);
-        s = DataHeatBalance::QRadSWOutIncident(this->SurfNum) * this->BIPVT.PVAreaFract * IAM_pv;
-        IAM_bs = 1 - b0_bs * (1.0 / (DataHeatBalance::CosIncidenceAngle(this->SurfNum) + small_num) - 1.0) -
-                 b1_bs * pow((1.0 / (DataHeatBalance::CosIncidenceAngle(this->SurfNum) + small_num) - 1), 2.0);
-        IAM_bs = max(0.0, IAM_bs);
-        s1 = DataHeatBalance::QRadSWOutIncident(this->SurfNum) * (1.0 - this->BIPVT.PVAreaFract) * IAM_bs;
+        	
+		k_taoalpha_beam = calc_k_taoalpha(theta_beam, glass_thickness, refrac_index_glass, k_glass);
+		iam_back_beam = k_taoalpha_beam;
+		iam_pv_beam = k_taoalpha_beam;
+
+
+		k_taoalpha_sky = calc_k_taoalpha(theta_sky, glass_thickness, refrac_index_glass, k_glass);
+		iam_back_sky = k_taoalpha_sky;
+		iam_pv_sky = k_taoalpha_sky;
+
+        
+
+		k_taoalpha_ground = calc_k_taoalpha(theta_ground, glass_thickness, refrac_index_glass, k_glass);
+		iam_back_ground = k_taoalpha_sky;
+		iam_pv_ground = k_taoalpha_sky;
+
+       eff_pv = DataPhotovoltaics::PVarray(this->PVnum).SNLPVCalc.EffMax;
+		
+        //s1 = DataHeatBalance::QRadSWOutIncident(this->SurfNum) * (1.0 - this->BIPVT.PVAreaFract) * IAM_bs;
+       s = g * taoalpha_pv * fcell * area_pv / area_wall_total - g * eff_pv * area_pv / area_wall_total;
+
+        s1 = taoaplha_back * g * (1.0 - fcell) * (area_pv / area_wall_total) + taoaplha_cladding * g * (1 - area_pv / area_wall_total);
+
         while ((err_t1 > tol) || (err_tpv > tol) || (err_tpvg > tol) || (err_mdot_bipvt > tol)) {
             a = -(w / (mdot_bipvt * cp_in)) * (hconvf1 + hconvf2);
             b = (w / (mdot_bipvt * cp_in)) * (hconvf1 * t1 + hconvf2 * t2);
@@ -1492,6 +1543,63 @@ namespace PhotovoltaicThermalCollectors {
             y[ii] = (f[ii] - sum) / jj[ii * m + ii];
             sum = 0.0;
         }
+    }
+	
+	
+    Real64 PVTCollectorStruct::calc_taoalpha(Real64 theta,
+                                           Real64 glass_thickness,
+                                           Real64 refrac_index_glass,
+                                           Real64 k_glass) // typ refrac_index_glass is 1.526, k_glass typ 4 m^-1, glass_thickness typ 0.002 m
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         S.Brideau
+        //       DATE WRITTEN   May 2020
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // calculates the transmissivity absorptance of a glass/air interface, assuming all transmitted is absorbed
+
+        Real64 theta_r(0.0);
+        Real64 taoalpha(0.0);
+	
+        if (theta == 0.0) // if theta is zero, set to very small positive, otehrwise, taoalpha calculation causes division by zero
+        {
+        theta = 0.000000001;
+        }
+
+        theta_r = std::asin(std::sin(theta) / refrac_index_glass);
+
+        taoalpha = std::exp(-k_glass * glass_thickness / (std::cos(theta_r))) * (1 - 0.5 * ((std::pow(std::sin(theta_r - theta), 2) / std::pow(std::sin(theta_r + theta), 2)) + (std::pow(std::tan(theta_r - theta), 2) / std::pow(std::tan(theta_r + theta), 2))));
+
+
+        return taoalpha;
+
+    }
+
+    Real64 PVTCollectorStruct::calc_k_taoalpha(Real64 theta,
+                                             Real64 glass_thickness,
+                                             Real64 refrac_index_glass,
+                                             Real64 k_glass) // typ refrac_index_glass is 1.526, k_glass typ 4 m^-1, glass_thickness typ 0.002 m
+    {
+		    // SUBROUTINE INFORMATION:
+            //       AUTHOR         S.Brideau
+            //       DATE WRITTEN   May 2020
+            //       MODIFIED       na
+            //       RE-ENGINEERED  na
+
+            // PURPOSE OF THIS SUBROUTINE:
+		    // calculates the off-normal angle factor K for the tao-alpha product
+	    Real64 taoalpha(0.0);
+	    Real64 taoalpha_zero(0.0);
+	    Real64 k_taoalpha(0.0);
+
+	    taoalpha = calc_taoalpha(theta, glass_thickness, refrac_index_glass, k_glass);
+	    taoalpha_zero = calc_taoalpha(0.0, glass_thickness, refrac_index_glass, k_glass);
+	    k_taoalpha = taoalpha / taoalpha_zero;
+
+	    return k_taoalpha;
+
     }
 
     void PVTCollectorStruct::update()
