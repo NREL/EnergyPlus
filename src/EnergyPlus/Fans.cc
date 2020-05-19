@@ -1507,6 +1507,22 @@ namespace Fans {
             }
         }
 
+        // Now that sizing is done, do check if the design point of fan is covered in the fault Fan Curve
+        if (Fan(FanNum).FaultyFilterFlag) {
+            int jFault_AirFilter = Fan(FanNum).FaultyFilterIndex;
+
+            // Check fault availability schedules
+            if (!FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
+                ShowSevereError("FaultModel:Fouling:AirFilter = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).Name  + "\"");
+                ShowContinueError("Invalid Fan Curve Name = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve + "\" does not cover ");
+                ShowContinueError("the operational point of Fan " + Fan(FanNum).FanName);
+                // Could just  + ". Disabling AirFilter fouling.", set FaultyFilterFlag to false and FaultyFilterIndex to zero...
+                // Fan(FanNum).FaultyFilterFlag = false;
+                // Fan(FanNum).FaultyFilterIndex = 0; // Just to be safe, in case the index is checked before the flag is (they are redundant...)
+                ShowFatalError("SizeFan: Invalid FaultModel:Fouling:AirFilter=" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).Name);
+            }
+        }
+
         if (++NumFansSized == state.fans.NumFans) FanNumericFields.deallocate(); // remove temporary array for field names at end of sizing
     }
 
