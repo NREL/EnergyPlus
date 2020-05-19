@@ -5700,8 +5700,6 @@ namespace InternalHeatGains {
         Real64 UPSPartLoadRatio;                          // UPS part load ratio (current total power input / design total power input)
         Real64 UPSHeatGain;                               // UPS convective heat gain to zone [W]
         int EnvClass;                                     // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6)
-        Array1D<Real64> ZoneSumTinMinusTSup(NumOfZones);  // Numerator for zone-level sensible heat index (SHI)
-        Array1D<Real64> ZoneSumToutMinusTSup(NumOfZones); // Denominator for zone-level sensible heat index (SHI)
 
         std::map<int, std::vector<int>> ZoneITEMap;
 
@@ -5777,8 +5775,8 @@ namespace InternalHeatGains {
             ZnRpt(Loop).ITEqTimeAboveRH = 0.0;
             ZnRpt(Loop).ITEqTimeBelowRH = 0.0;
 
-            ZoneSumTinMinusTSup(Loop) = 0.0;
-            ZoneSumToutMinusTSup(Loop) = 0.0;
+            ZnRpt(Loop).SumTinMinusTSup = 0.0;
+            ZnRpt(Loop).SumToutMinusTSup = 0.0;
         } // Zone init loop
 
         for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
@@ -5954,8 +5952,8 @@ namespace InternalHeatGains {
 
             ZnRpt(NZ).ITEqAirVolFlowStdDensity += ZoneITEq(Loop).AirVolFlowStdDensity;
             ZnRpt(NZ).ITEqAirMassFlow += ZoneITEq(Loop).AirMassFlow;
-            ZoneSumTinMinusTSup(NZ) += (TAirIn - TSupply) * AirVolFlowRate;
-            ZoneSumToutMinusTSup(NZ) += (TAirOut - TSupply) * AirVolFlowRate;
+            ZnRpt(NZ).SumTinMinusTSup += (TAirIn - TSupply) * AirVolFlowRate;
+            ZnRpt(NZ).SumToutMinusTSup += (TAirOut - TSupply) * AirVolFlowRate;
 
             // Check environmental class operating range limits (defined as parameters in this subroutine)
             EnvClass = ZoneITEq(Loop).Class;
@@ -6010,8 +6008,8 @@ namespace InternalHeatGains {
         // Zone-level sensible heat index
         for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
             int ZN = ZoneITEq(Loop).ZonePtr;
-            if (ZoneSumToutMinusTSup(ZN) != 0.0) {
-                ZnRpt(ZN).ITEqSHI = ZoneSumTinMinusTSup(ZN) / ZoneSumToutMinusTSup(ZN);
+            if (ZnRpt(NZ).SumToutMinusTSup != 0.0) {
+                ZnRpt(ZN).ITEqSHI = ZnRpt(NZ).SumTinMinusTSup / ZnRpt(NZ).SumToutMinusTSup;
             }
         }
 
