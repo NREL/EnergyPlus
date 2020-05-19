@@ -62,6 +62,8 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -146,6 +148,86 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // Clean up
     PerfCurve.deallocate();
     Fan.deallocate();
+}
+
+TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve_AutosizedFan)
+{
+    // #7896 - Cannot check check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
+    // covers the rated operational point of the corresponding fan before the Fan is sized
+
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,",
+        "  Fraction,                !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Continuous;              !- Numeric Type",
+
+        "ScheduleTypeLimits,",
+        "  OnOff,                   !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Discrete;                !- Numeric Type",
+
+        "Schedule:Constant,Always On Discrete,OnOff,1;",
+
+        "Schedule:Compact,",
+        "  AvailSched,              !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.00;       !- Field 3",
+
+        "Schedule:Compact,",
+        "  Pressure Fraction Schedule,  !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.25;       !- Field 3",
+
+        "Fan:ConstantVolume,",
+        "  Fan CV,                  !- Name",
+        "  Always On Discrete,      !- Availability Schedule Name",
+        "  0.7,                     !- Fan Total Efficiency",
+        "  150,                     !- Pressure Rise {Pa}",
+        "  AutoSize,                !- Maximum Flow Rate {m3/s}",
+        "  0.93,                    !- Motor Efficiency",
+        "  1,                       !- Motor In Airstream Fraction",
+        "  Node 21,                 !- Air Inlet Node Name",
+        "  Node 38;                 !- Air Outlet Node Name",
+
+        "FaultModel:Fouling:AirFilter,",
+        "  Fan CV Fouling Air Filter,  !- Name",
+        "  Fan:ConstantVolume,      !- Fan Object Type",
+        "  Fan CV,                  !- Fan Name",
+        "  AvailSched,              !- Availability Schedule Name",
+        "  Pressure Fraction Schedule,  !- Pressure Fraction Schedule Name",
+        "  Fouled Fan Curve;        !- Fan Curve Name",
+
+        "Curve:Cubic,",
+        "  Fouled Fan Curve,        !- Name",
+        "  1015,                    !- Coefficient1 Constant",
+        "  -1750,                   !- Coefficient2 x",
+        "  59050,                   !- Coefficient3 x**2",
+        "  -1624000,                !- Coefficient4 x**3",
+        "  0,                       !- Minimum Value of x",
+        "  0.09,                    !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+    });
+
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_NO_THROW(GetFanInput(state.fans));
+    compare_err_stream("", true);
+
+    // Run
+    EXPECT_NO_THROW(CheckAndReadFaults(state));
+    compare_err_stream("", true);
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFlowReduction)
