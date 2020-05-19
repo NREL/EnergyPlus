@@ -62,6 +62,7 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -69,6 +70,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -145,7 +147,7 @@ namespace HVACDXHeatPumpSystem {
         DXHeatPumpSystem.deallocate();
     }
 
-    void SimDXHeatPumpSystem(std::string const &DXHeatPumpSystemName, // Name of DXSystem:Airloop object
+    void SimDXHeatPumpSystem(EnergyPlusData &state, std::string const &DXHeatPumpSystemName, // Name of DXSystem:Airloop object
                              bool const FirstHVACIteration,           // True when first HVAC iteration
                              int const AirLoopNum,                    // Primary air loop number
                              int &CompIndex,                          // Index to CoilSystem:Heating:DX object
@@ -189,7 +191,7 @@ namespace HVACDXHeatPumpSystem {
         // Obtains and Allocates DX Cooling System related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
             // Get the DXCoolingSystem input
-            GetDXHeatPumpSystemInput();
+            GetDXHeatPumpSystemInput(state);
             GetInputFlag = false;
         }
 
@@ -223,7 +225,7 @@ namespace HVACDXHeatPumpSystem {
 
         // Call the series of components that simulate a DX Heating System
         // Control the DX Heating System
-        ControlDXHeatingSystem(DXSystemNum, FirstHVACIteration);
+        ControlDXHeatingSystem(state, DXSystemNum, FirstHVACIteration);
 
         // simulate DX Heating System
         CompName = DXHeatPumpSystem(DXSystemNum).HeatPumpCoilName;
@@ -233,7 +235,7 @@ namespace HVACDXHeatPumpSystem {
 
             if (SELECT_CASE_var == CoilDX_HeatingEmpirical) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
 
-                SimDXCoil(CompName,
+                SimDXCoil(state, CompName,
                           On,
                           FirstHVACIteration,
                           DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
@@ -241,7 +243,7 @@ namespace HVACDXHeatPumpSystem {
                           DXHeatPumpSystem(DXSystemNum).PartLoadFrac);
 
             } else if (SELECT_CASE_var == Coil_HeatingAirToAirVariableSpeed) { // Coil:Heating:DX:VariableSpeed
-                SimVariableSpeedCoils(CompName,
+                SimVariableSpeedCoils(state, CompName,
                                       DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
                                       DXHeatPumpSystem(DXSystemNum).FanOpMode,
                                       MaxONOFFCyclesperHour,
@@ -281,7 +283,7 @@ namespace HVACDXHeatPumpSystem {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDXHeatPumpSystemInput()
+    void GetDXHeatPumpSystemInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -400,10 +402,10 @@ namespace HVACDXHeatPumpSystem {
                     DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
             } else {
                 DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum =
-                    GetCoilInletNode(DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
+                    GetCoilInletNode(state, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
 
                 DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum =
-                    GetCoilOutletNode(DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
+                    GetCoilOutletNode(state, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
             }
 
             // Coil air-side outlet node is the control node
@@ -571,7 +573,7 @@ namespace HVACDXHeatPumpSystem {
     // Beginning of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlDXHeatingSystem(int const DXSystemNum,        // index to DXSystem
+    void ControlDXHeatingSystem(EnergyPlusData &state, int const DXSystemNum,        // index to DXSystem
                                 bool const FirstHVACIteration // First HVAC iteration flag
     )
     {
@@ -602,6 +604,7 @@ namespace HVACDXHeatPumpSystem {
         using FaultsManager::FaultsCoilSATSensor;
         using General::RoundSigDigits;
         using General::SolveRoot;
+        using TempSolveRoot::SolveRoot;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyTdpFnWPb;
         using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -698,13 +701,13 @@ namespace HVACDXHeatPumpSystem {
 
                         // Get no load result
                         PartLoadFrac = 0.0;
-                        SimDXCoil(CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
+                        SimDXCoil(state, CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
                         NoOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                    PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
 
                         // Get full load result
                         PartLoadFrac = 1.0;
-                        SimDXCoil(CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
+                        SimDXCoil(state, CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
 
                         FullOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) -
                                                                      PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
@@ -730,7 +733,7 @@ namespace HVACDXHeatPumpSystem {
                             } else {
                                 if (DataGlobals::DoCoilDirectSolutions) {
                                     PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempOut1 - Node(InletNode).Temp);
-                                    SimDXCoil(
+                                    SimDXCoil(state, 
                                         CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
                                 } else {
                                     Par(1) = double(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex);
@@ -805,7 +808,7 @@ namespace HVACDXHeatPumpSystem {
                         OnOffAirFlowRatio = 1.0;
                         SpeedRatio = 0.0;
 
-                        SimVariableSpeedCoils(CompName,
+                        SimVariableSpeedCoils(state, CompName,
                                               DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
                                               FanOpMode,
                                               MaxONOFFCyclesperHour,
@@ -831,7 +834,7 @@ namespace HVACDXHeatPumpSystem {
                         SpeedNum = NumOfSpeeds;
                         SpeedRatio = 1.0;
                         QZnReq = 0.001; // to indicate the coil is running
-                        SimVariableSpeedCoils(CompName,
+                        SimVariableSpeedCoils(state, CompName,
                                               VSCoilIndex,
                                               FanOpMode,
                                               MaxONOFFCyclesperHour,
@@ -876,7 +879,7 @@ namespace HVACDXHeatPumpSystem {
                                 SpeedNum = 1;
                                 SpeedRatio = 1.0;
                                 QZnReq = 0.001; // to indicate the coil is running
-                                SimVariableSpeedCoils(CompName,
+                                SimVariableSpeedCoils(state, CompName,
                                                       VSCoilIndex,
                                                       FanOpMode,
                                                       MaxONOFFCyclesperHour,
@@ -899,7 +902,7 @@ namespace HVACDXHeatPumpSystem {
                                     TempOut1 = TempSpeedOut;
                                     for (I = 2; I <= NumOfSpeeds; ++I) {
                                         SpeedNum = I;
-                                        SimVariableSpeedCoils(CompName,
+                                        SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
                                                               MaxONOFFCyclesperHour,
@@ -923,7 +926,7 @@ namespace HVACDXHeatPumpSystem {
                                     }
                                     if (DataGlobals::DoCoilDirectSolutions) {
                                         SpeedRatio = (DesOutTemp - TempOut1) / (TempSpeedOut - TempOut1);
-                                        SimVariableSpeedCoils(CompName,
+                                        SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
                                                               MaxONOFFCyclesperHour,
@@ -941,7 +944,7 @@ namespace HVACDXHeatPumpSystem {
                                         Par(2) = DesOutTemp;
                                         Par(5) = double(FanOpMode);
                                         Par(3) = double(SpeedNum);
-                                        SolveRoot(Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
+                                        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
 
                                         if (SolFla == -1) {
                                             if (!WarmupFlag) {
@@ -992,7 +995,7 @@ namespace HVACDXHeatPumpSystem {
                                 } else {
                                     if (DataGlobals::DoCoilDirectSolutions) {
                                         PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempSpeedOut - Node(InletNode).Temp);
-                                        SimVariableSpeedCoils(CompName,
+                                        SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
                                                               MaxONOFFCyclesperHour,
@@ -1009,7 +1012,7 @@ namespace HVACDXHeatPumpSystem {
                                         Par(1) = double(VSCoilIndex);
                                         Par(2) = DesOutTemp;
                                         Par(5) = double(FanOpMode);
-                                        SolveRoot(Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
+                                        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
                                         if (SolFla == -1) {
                                             if (!WarmupFlag) {
                                                 if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
@@ -1140,7 +1143,7 @@ namespace HVACDXHeatPumpSystem {
 
     //******************************************************************************
 
-    Real64 VSCoilCyclingResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilCyclingResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1D<Real64> const &Par  // Par(1) = DX coil number
     )
     {
@@ -1197,7 +1200,7 @@ namespace HVACDXHeatPumpSystem {
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
 
-        SimVariableSpeedCoils("",
+        SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
                               MaxONOFFCyclesperHour,
@@ -1219,7 +1222,7 @@ namespace HVACDXHeatPumpSystem {
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedResidual(Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1D<Real64> const &Par // Par(1) = DX coil number
     )
     {
@@ -1277,7 +1280,7 @@ namespace HVACDXHeatPumpSystem {
         FanOpMode = int(Par(5));
         SpeedNum = int(Par(3));
 
-        SimVariableSpeedCoils("",
+        SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
                               MaxONOFFCyclesperHour,
@@ -1297,7 +1300,7 @@ namespace HVACDXHeatPumpSystem {
         return Residuum;
     }
 
-    int GetHeatingCoilInletNodeNum(std::string const &DXHeatCoilSysName, bool &InletNodeErrFlag)
+    int GetHeatingCoilInletNodeNum(EnergyPlusData &state, std::string const &DXHeatCoilSysName, bool &InletNodeErrFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
@@ -1310,7 +1313,7 @@ namespace HVACDXHeatPumpSystem {
         int DXHeatSysNum;
 
         if (GetInputFlag) { // First time subroutine has been entered
-            GetDXHeatPumpSystemInput();
+            GetDXHeatPumpSystemInput(state);
             GetInputFlag = false;
         }
 
@@ -1326,7 +1329,7 @@ namespace HVACDXHeatPumpSystem {
         return NodeNum;
     }
 
-    int GetHeatingCoilOutletNodeNum(std::string const &DXHeatCoilSysName, bool &OutletNodeErrFlag)
+    int GetHeatingCoilOutletNodeNum(EnergyPlusData &state, std::string const &DXHeatCoilSysName, bool &OutletNodeErrFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
@@ -1339,7 +1342,7 @@ namespace HVACDXHeatPumpSystem {
         int DXHeatSysNum;
 
         if (GetInputFlag) { // First time subroutine has been entered
-            GetDXHeatPumpSystemInput();
+            GetDXHeatPumpSystemInput(state);
             GetInputFlag = false;
         }
 

@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -175,7 +176,7 @@ namespace ZonePlenum {
 
     void clear_state();
 
-    void SimAirZonePlenum(std::string const &CompName,
+    void SimAirZonePlenum(EnergyPlusData &state, std::string const &CompName,
                           int const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
@@ -186,7 +187,7 @@ namespace ZonePlenum {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetZonePlenumInput();
+    void GetZonePlenumInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
@@ -234,11 +235,11 @@ namespace ZonePlenum {
     // Beginning of mining functions for the ZonePlenum Module
     // *****************************************************************************
 
-    int GetReturnPlenumIndex(int const &ExNodeNum);
+    int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum);
 
-    void GetReturnPlenumName(int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
+    void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
 
-    int getReturnPlenumIndexFromInletNode(int const &InNodeNum);
+    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
 
     //        End of mining functions for the ZonePlenum Module
     // *****************************************************************************

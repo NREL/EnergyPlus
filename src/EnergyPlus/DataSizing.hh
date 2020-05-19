@@ -130,7 +130,7 @@ namespace DataSizing {
     extern Real64 const AutoSize;
 
     // parameter for (time-of-peak) sizing format
-    extern ObjexxFCL::gio::Fmt PeakHrMinFmt;
+    static constexpr auto PeakHrMinFmt("{:02}:{:02}:00");
 
     // Zone Outdoor Air Method
     extern int const ZOAM_FlowPerPerson; // set the outdoor air flow rate based on number of people in the zone
@@ -614,6 +614,8 @@ namespace DataSizing {
         );
         void scaleZoneHeating(Real64 const ratio // Scaling ratio
         );
+        void zeroMemberData();
+        void allocateMemberArrays(int const numOfTimeStepInDay);
     };
 
     struct TermUnitSizingData

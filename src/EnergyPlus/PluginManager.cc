@@ -45,6 +45,12 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
 #include <map>
 
 #include <EnergyPlus/DataGlobals.hh>
@@ -55,25 +61,11 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-#if LINK_WITH_PYTHON == 1
-#ifdef _DEBUG
-// We don't want to try to import a debug build of Python here
-// so if we are building a Debug build of the C++ code, we need
-// to undefine _DEBUG during the #include command for Python.h.
-// Otherwise it will fail
-#undef _DEBUG
-#include <Python.h>
-#define _DEBUG
-#else
-#include <Python.h>
-#endif
-#endif
-
 namespace EnergyPlus {
 namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
 
-    std::map<int, std::vector<std::function<void ()> > > callbacks;
+    std::map<int, std::vector<std::function<void()>>> callbacks;
     std::vector<PluginInstance> plugins;
     std::vector<PluginTrendVariable> trends;
     std::vector<std::string> globalVariableNames;
@@ -81,15 +73,354 @@ namespace PluginManagement {
 
     // some flags
     bool fullyReady = false;
-    bool shouldIssueFatalAfterPluginCompletes = false;
+    bool apiErrorFlag = false;
 
-    void registerNewCallback(int iCalledFrom, std::function<void ()> f)
+    // function pointers into the PythonWrapper DLL
+    void *wrapperDLLHandle = nullptr;
+    void (*EP_Py_SetPath)(wchar_t *) = nullptr;
+    char *(*EP_Py_GetVersion)() = nullptr;
+    wchar_t *(*EP_Py_DecodeLocale)(const char *, unsigned long *) = nullptr;
+    void (*EP_Py_InitializeEx)(int) = nullptr;
+    int (*EP_PyRun_SimpleString)(const char *) = nullptr;
+    int (*EP_Py_FinalizeEx)() = nullptr;
+    void (*EP_PyErr_Fetch)(PyObjectWrap **, PyObjectWrap **, PyObjectWrap **) = nullptr;
+    PyObjectWrap (*EP_PyObject_Repr)(PyObjectWrap) = nullptr;
+    PyObjectWrap (*EP_PyUnicode_AsEncodedString)(PyObjectWrap, const char *, const char *) = nullptr;
+    char *(*EP_PyBytes_AsString)(PyObjectWrap) = nullptr;
+    PyObjectWrap (*EP_PyUnicode_DecodeFSDefault)(const char *) = nullptr;
+    PyObjectWrap (*EP_PyImport_Import)(PyObjectWrap) = nullptr;
+    void (*EP_Py_DECREF)(PyObjectWrap) = nullptr;
+    PyObjectWrap (*EP_PyErr_Occurred)() = nullptr;
+    PyObjectWrap (*EP_PyModule_GetDict)(PyObjectWrap) = nullptr;
+    PyObjectWrap (*EP_PyDict_GetItemString)(PyObjectWrap, const char *) = nullptr;
+    const char *(*EP_PyUnicode_AsUTF8)(PyObjectWrap) = nullptr;
+    PyObjectWrap (*EP_PyUnicode_AsUTF8String)(PyObjectWrap) = nullptr;
+    int (*EP_PyCallable_Check)(PyObjectWrap) = nullptr;
+    PyObjectWrap (*EP_PyObject_CallObject)(PyObjectWrap, PyObjectWrap) = nullptr;
+    PyObjectWrap (*EP_PyObject_GetAttrString)(PyObjectWrap, const char *) = nullptr;
+    PyObjectWrap (*EP_PyObject_CallFunction)(PyObjectWrap, const char *) = nullptr;
+    PyObjectWrap (*EP_PyObject_CallMethod)(PyObjectWrap, const char *, const char *) = nullptr;
+    int (*EP_PyList_Check)(PyObjectWrap) = nullptr;
+    unsigned long (*EP_PyList_Size)(PyObjectWrap) = nullptr;
+    PyObjectWrap (*EP_PyList_GetItem)(PyObjectWrap, size_t) = nullptr;
+    int (*EP_PyUnicode_Check)(PyObjectWrap) = nullptr;
+    int (*EP_PyLong_Check)(PyObjectWrap) = nullptr;
+    long (*EP_PyLong_AsLong)(PyObjectWrap) = nullptr;
+    void (*EP_Py_SetPythonHome)(const wchar_t *) = nullptr;
+
+    void checkWrapperDLLFunction(const char *err, std::string const &pyFuncName, bool &errFlag)
+    {
+        if (err) {
+            std::string c = "Problem processing function \"" + pyFuncName + "\" in Python wrapper shared library";
+            ShowSevereError(c);
+            ShowContinueError(err);
+            errFlag = true;
+        }
+    }
+
+    void loadWrapperDLL()
+    {
+#if LINK_WITH_PYTHON == 1
+        // There are two ways to call E+: as an executable and as a library
+        // When calling E+ as a library, the plugin system is not available
+        // So when calling for plugins, the user must be calling as energyplus.exe
+        // In this case, the current executable path will be the E+ install root
+        // Which is where we find the Python Wrapper Shared Library
+        if (wrapperDLLHandle) return; // already found
+        std::string programPath = FileSystem::getProgramPath();
+        std::string programDir = FileSystem::getParentDirectoryPath(programPath);
+        std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
+        // set the path to the python library
+#ifdef _WIN32
+        std::string pythonLibPath = programDir + DataStringGlobals::pathChar + "pythonwrapper.dll";
+#elif __linux__
+        std::string pythonLibPath = programDir + DataStringGlobals::pathChar + "libpythonwrapper.so";
+#else // Apple
+        std::string pythonLibPath = programDir + DataStringGlobals::pathChar + "libpythonwrapper.dylib";
+#endif
+        std::string pythonWrapper = PluginManager::sanitizedPath(pythonLibPath);
+        bool dll_errors = false;
+        char *err = nullptr;
+        // now actually open the library and assign the functions
+#ifdef _WIN32
+        wrapperDLLHandle = (void*)LoadLibrary(pythonWrapper.c_str());
+        if (!wrapperDLLHandle) {
+            ShowFatalError("Could not load python library at: " + pythonWrapper);
+        }
+        *(void **)(&EP_Py_SetPath) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_Py_SetPath");
+        if (!EP_Py_SetPath) {
+            ShowSevereError("Could not load Python function: EP_Wrap_Py_SetPath");
+            dll_errors = true;
+        }
+        *(void **)(&EP_Py_GetVersion) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_Py_GetVersion");
+        if (!EP_Py_GetVersion) {
+            ShowSevereError("Could not load Python function: EP_Wrap_Py_GetVersion");
+            dll_errors = true;
+        }
+        *(void **)(&EP_Py_DecodeLocale) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_Py_DecodeLocale");
+        if (!EP_Py_DecodeLocale) {
+            ShowSevereError("Could not load Python function: EP_Wrap_Py_DecodeLocale");
+            dll_errors = true;
+        }
+        *(void **)(&EP_Py_InitializeEx) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_Py_InitializeEx");
+        if (!EP_Py_InitializeEx) {
+            ShowSevereError("Could not load Python function: EP_Wrap_Py_InitializeEx");
+            dll_errors = true;
+        }
+        *(void **)(&EP_Py_FinalizeEx) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_Py_FinalizeEx");
+        if (!EP_Py_FinalizeEx) {
+            ShowSevereError("Could not load Python function: EP_Wrap_Py_FinalizeEx");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyRun_SimpleString) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyRun_SimpleString");
+        if (!EP_PyRun_SimpleString) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyRun_SimpleString");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyErr_Fetch) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyErr_Fetch");
+        if (!EP_PyErr_Fetch) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyErr_Fetch");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyObject_Repr) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_Repr");
+        if (!EP_PyObject_Repr) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyObject_Repr");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyUnicode_AsEncodedString) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyUnicode_AsEncodedString");
+        if (!EP_PyUnicode_AsEncodedString) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyUnicode_AsEncodedString");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyBytes_AsString) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyBytes_AsString");
+        if (!EP_PyBytes_AsString) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyBytes_AsString");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyUnicode_DecodeFSDefault) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyUnicode_DecodeFSDefault");
+        if (!EP_PyUnicode_DecodeFSDefault) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyUnicode_DecodeFSDefault");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyImport_Import) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyImport_Import");
+        if (!EP_PyImport_Import) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyImport_Import");
+            dll_errors = true;
+        }
+        *(void **)(&EP_Py_DECREF) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_Py_DECREF");
+        if (!EP_Py_DECREF) {
+            ShowSevereError("Could not load Python function: EP_Wrap_Py_DECREF");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyErr_Occurred) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyErr_Occurred");
+        if (!EP_PyErr_Occurred) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyErr_Occurred");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyModule_GetDict) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyModule_GetDict");
+        if (!EP_PyModule_GetDict) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyModule_GetDict");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyDict_GetItemString) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyDict_GetItemString");
+        if (!EP_PyDict_GetItemString) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyDict_GetItemString");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyUnicode_AsUTF8) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyUnicode_AsUTF8");
+        if (!EP_PyUnicode_AsUTF8) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyUnicode_AsUTF8");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyUnicode_AsUTF8String) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyUnicode_AsUTF8String");
+        if (!EP_PyUnicode_AsUTF8String) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyUnicode_AsUTF8String");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyCallable_Check) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyCallable_Check");
+        if (!EP_PyCallable_Check) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyCallable_Check");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyObject_CallObject) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_CallObject");
+        if (!EP_PyObject_CallObject) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallObject");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyObject_GetAttrString) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_GetAttrString");
+        if (!EP_PyObject_GetAttrString) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyObject_GetAttrString");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyObject_CallFunction) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_CallFunction");
+        if (!EP_PyObject_CallFunction) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallFunction");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyObject_CallMethod) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod");
+        if (!EP_PyObject_CallMethod) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallMethod");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyList_Check) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyList_Check");
+        if (!EP_PyList_Check) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyList_Check");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyList_Size) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyList_Size");
+        if (!EP_PyList_Size) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyList_Size");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyList_GetItem) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyList_GetItem");
+        if (!EP_PyList_GetItem) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyList_GetItem");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyUnicode_Check) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyUnicode_Check");
+        if (!EP_PyUnicode_Check) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyUnicode_Check");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyLong_Check) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyLong_Check");
+        if (!EP_PyLong_Check) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyLong_Check");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyLong_AsLong) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyLong_AsLong");
+        if (!EP_PyLong_AsLong) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyLong_AsLong");
+            dll_errors = true;
+        }
+        *(void **)(&EP_Py_SetPythonHome) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_Py_SetPythonHome");
+        if (!EP_Py_SetPythonHome) {
+            ShowSevereError("Could not load Python function: EP_Wrap_Py_SetPythonHome");
+            dll_errors = true;
+        }
+#else
+        wrapperDLLHandle = dlopen(pythonWrapper.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+        if (!wrapperDLLHandle) {
+            err = dlerror();
+            ShowSevereError("Could not load Python library at: " + pythonWrapper);
+            ShowContinueError(err);
+            ShowFatalError("DLL problem cause program termination");
+        }
+        *(void **)(&EP_Py_SetPath) = dlsym(wrapperDLLHandle, "EP_Wrap_Py_SetPath");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_Py_SetPath", dll_errors);
+        *(void **)(&EP_Py_GetVersion) = dlsym(wrapperDLLHandle, "EP_Wrap_Py_GetVersion");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_Py_GetVersion", dll_errors);
+        *(void **)(&EP_Py_DecodeLocale) = dlsym(wrapperDLLHandle, "EP_Wrap_Py_DecodeLocale");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_Py_DecodeLocale", dll_errors);
+        *(void **)(&EP_Py_InitializeEx) = dlsym(wrapperDLLHandle, "EP_Wrap_Py_InitializeEx");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_Py_InitializeEx", dll_errors);
+        *(void **)(&EP_Py_FinalizeEx) = dlsym(wrapperDLLHandle, "EP_Wrap_Py_FinalizeEx");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_Py_FinalizeEx", dll_errors);
+        *(void **)(&EP_PyRun_SimpleString) = dlsym(wrapperDLLHandle, "EP_Wrap_PyRun_SimpleString");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyRun_SimpleString", dll_errors);
+        *(void **)(&EP_PyErr_Fetch) = dlsym(wrapperDLLHandle, "EP_Wrap_PyErr_Fetch");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyErr_Fetch", dll_errors);
+        *(void **)(&EP_PyObject_Repr) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_Repr");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyObject_Repr", dll_errors);
+        *(void **)(&EP_PyUnicode_AsEncodedString) = dlsym(wrapperDLLHandle, "EP_Wrap_PyUnicode_AsEncodedString");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyUnicode_AsEncodedString", dll_errors);
+        *(void **)(&EP_PyBytes_AsString) = dlsym(wrapperDLLHandle, "EP_Wrap_PyBytes_AsString");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyBytes_AsString", dll_errors);
+        *(void **)(&EP_PyUnicode_DecodeFSDefault) = dlsym(wrapperDLLHandle, "EP_Wrap_PyUnicode_DecodeFSDefault");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyUnicode_DecodeFSDefault", dll_errors);
+        *(void **)(&EP_PyImport_Import) = dlsym(wrapperDLLHandle, "EP_Wrap_PyImport_Import");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyImport_Import", dll_errors);
+        *(void **)(&EP_Py_DECREF) = dlsym(wrapperDLLHandle, "EP_Wrap_Py_DECREF");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_Py_DECREF", dll_errors);
+        *(void **)(&EP_PyErr_Occurred) = dlsym(wrapperDLLHandle, "EP_Wrap_PyErr_Occurred");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyErr_Occurred", dll_errors);
+        *(void **)(&EP_PyModule_GetDict) = dlsym(wrapperDLLHandle, "EP_Wrap_PyModule_GetDict");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyModule_GetDict", dll_errors);
+        *(void **)(&EP_PyDict_GetItemString) = dlsym(wrapperDLLHandle, "EP_Wrap_PyDict_GetItemString");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyDict_GetItemString", dll_errors);
+        *(void **)(&EP_PyUnicode_AsUTF8) = dlsym(wrapperDLLHandle, "EP_Wrap_PyUnicode_AsUTF8");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyUnicode_AsUTF8", dll_errors);
+        *(void **)(&EP_PyUnicode_AsUTF8String) = dlsym(wrapperDLLHandle, "EP_Wrap_PyUnicode_AsUTF8String");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyUnicode_AsUTF8String", dll_errors);
+        *(void **)(&EP_PyCallable_Check) = dlsym(wrapperDLLHandle, "EP_Wrap_PyCallable_Check");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyCallable_Check", dll_errors);
+        *(void **)(&EP_PyObject_CallObject) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallObject");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallObject", dll_errors);
+        *(void **)(&EP_PyObject_GetAttrString) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_GetAttrString");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyObject_GetAttrString", dll_errors);
+        *(void **)(&EP_PyObject_CallFunction) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallFunction");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallFunction", dll_errors);
+        *(void **)(&EP_PyObject_CallMethod) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallMethod", dll_errors);
+        *(void **)(&EP_PyList_Check) = dlsym(wrapperDLLHandle, "EP_Wrap_PyList_Check");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyList_Check", dll_errors);
+        *(void **)(&EP_PyList_Size) = dlsym(wrapperDLLHandle, "EP_Wrap_PyList_Size");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyList_Size", dll_errors);
+        *(void **)(&EP_PyList_GetItem) = dlsym(wrapperDLLHandle, "EP_Wrap_PyList_GetItem");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyList_GetItem", dll_errors);
+        *(void **)(&EP_PyUnicode_Check) = dlsym(wrapperDLLHandle, "EP_Wrap_PyUnicode_Check");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyUnicode_Check", dll_errors);
+        *(void **)(&EP_PyLong_Check) = dlsym(wrapperDLLHandle, "EP_Wrap_PyLong_Check");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyLong_Check", dll_errors);
+        *(void **)(&EP_PyLong_AsLong) = dlsym(wrapperDLLHandle, "EP_Wrap_PyLong_AsLong");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyLong_AsLong", dll_errors);
+        *(void **)(&EP_Py_SetPythonHome) = dlsym(wrapperDLLHandle, "EP_Wrap_Py_SetPythonHome");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_Py_SetPythonHome", dll_errors);
+#endif
+        if (dll_errors) {
+            ShowFatalError("Python DLL problem causes program termination");
+        }
+#endif
+    }
+
+    void registerNewCallback(int iCalledFrom, const std::function<void()> &f)
     {
         callbacks[iCalledFrom].push_back(f);
     }
 
-    int PluginManager::numActiveCallbacks() {
-        return (int) callbacks.size();
+    void onBeginEnvironment() {
+        // reset vars and trends -- sensors and actuators are reset by EMS
+        for (auto & v : globalVariableValues) {
+            v = 0;
+        }
+        // reinitialize trend variables so old data are purged
+        for (auto & tr : trends) {
+            tr.reset();
+        }
+    }
+
+    int PluginManager::numActiveCallbacks()
+    {
+        return (int)callbacks.size();
     }
 
     void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan)
@@ -102,25 +433,32 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
         for (auto &plugin : plugins) {
             if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) {
-                plugin.run(iCalledFrom);
-                anyRan = true;
+                bool const didOneRun = plugin.run(iCalledFrom);
+                if (didOneRun) anyRan = true;
             }
         }
 #endif
     }
 
 #if LINK_WITH_PYTHON == 1
-    std::string pythonStringForUsage() {
-        std::string sVersion = Py_GetVersion();
+    std::string pythonStringForUsage()
+    {
+        if (DataGlobals::eplusRunningViaAPI) {
+            return "Python Version not accessible during API calls";
+        }
+        loadWrapperDLL();
+        std::string sVersion = (*EP_Py_GetVersion)();
         return "Linked to Python Version: \"" + sVersion + "\"";
     }
 #else
-    std::string pythonStringForUsage() {
+    std::string pythonStringForUsage()
+    {
         return "This version of EnergyPlus not linked to Python library.";
     }
 #endif
 
-    void PluginManager::setupOutputVariables() {
+    void PluginManager::setupOutputVariables()
+    {
 #if LINK_WITH_PYTHON == 1
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
         std::string const sOutputVariable = "PythonPlugin:OutputVariable";
@@ -176,7 +514,12 @@ namespace PluginManagement {
                 if (!isMetered) {
                     // regular output variable, ignore the meter/resource stuff and register the variable
                     if (thisUnit != OutputProcessor::Unit::customEMS) {
-                        SetupOutputVariable(sOutputVariable, thisUnit, PluginManagement::globalVariableValues[variableHandle], sUpdateFreq, sAvgOrSum, thisObjectName);
+                        SetupOutputVariable(sOutputVariable,
+                                            thisUnit,
+                                            PluginManagement::globalVariableValues[variableHandle],
+                                            sUpdateFreq,
+                                            sAvgOrSum,
+                                            thisObjectName);
                     } else {
                         SetupOutputVariable(sOutputVariable,
                                             thisUnit,
@@ -331,19 +674,14 @@ namespace PluginManagement {
                     } else if (endUse == "HEATRECOVERYFORHEATING") {
                         sEndUse = "HeatRecoveryForHeating";
                     } else {
-                        ShowSevereError(
-                            "Invalid input for PythonPlugin:OutputVariable, unexpected End-use Subcategory = " +
-                            groupType);
+                        ShowSevereError("Invalid input for PythonPlugin:OutputVariable, unexpected End-use Subcategory = " + groupType);
                         ShowFatalError("Python plugin output variable input problem causes program termination");
                     }
 
                     // Additional End Use Types Only Used for EnergyTransfer
                     if ((sResourceType != "EnergyTransfer") &&
-                        (sEndUse == "HeatingCoils" || sEndUse == "CoolingCoils" ||
-                         sEndUse == "Chillers" ||
-                         sEndUse == "Boilers" || sEndUse == "Baseboard" ||
-                         sEndUse == "HeatRecoveryForCooling" ||
-                         sEndUse == "HeatRecoveryForHeating")) {
+                        (sEndUse == "HeatingCoils" || sEndUse == "CoolingCoils" || sEndUse == "Chillers" || sEndUse == "Boilers" ||
+                         sEndUse == "Baseboard" || sEndUse == "HeatRecoveryForCooling" || sEndUse == "HeatRecoveryForHeating")) {
                         ShowWarningError("Inconsistent resource type input for PythonPlugin:OutputVariable = " + thisObjectName);
                         ShowContinueError("For end use subcategory = " + sEndUse + ", resource type must be EnergyTransfer");
                         ShowContinueError("Resource type is being reset to EnergyTransfer and the simulation continues...");
@@ -390,16 +728,48 @@ namespace PluginManagement {
     {
         callbacks.clear();
 #if LINK_WITH_PYTHON == 1
-        for (auto & plugin: plugins) {
+        for (auto &plugin : plugins) {
             plugin.shutdown(); // clear unmanaged memory first
         }
         trends.clear();
         globalVariableNames.clear();
         globalVariableValues.clear();
         plugins.clear();
-        pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
         PluginManagement::fullyReady = false;
-        PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+        PluginManagement::apiErrorFlag = false;
+        PluginManager * p = PluginManagement::pluginManager.release();
+        delete p;
+        wrapperDLLHandle = nullptr;
+        EP_Py_SetPath = nullptr;
+        EP_Py_GetVersion = nullptr;
+        EP_Py_DecodeLocale = nullptr;
+        EP_Py_InitializeEx = nullptr;
+        EP_PyRun_SimpleString = nullptr;
+        EP_Py_FinalizeEx = nullptr;
+        EP_PyErr_Fetch = nullptr;
+        EP_PyObject_Repr = nullptr;
+        EP_PyUnicode_AsEncodedString = nullptr;
+        EP_PyBytes_AsString = nullptr;
+        EP_PyUnicode_DecodeFSDefault = nullptr;
+        EP_PyImport_Import = nullptr;
+        EP_Py_DECREF = nullptr;
+        EP_PyErr_Occurred = nullptr;
+        EP_PyModule_GetDict = nullptr;
+        EP_PyDict_GetItemString = nullptr;
+        EP_PyUnicode_AsUTF8 = nullptr;
+        EP_PyUnicode_AsUTF8String = nullptr;
+        EP_PyCallable_Check = nullptr;
+        EP_PyObject_CallObject = nullptr;
+        EP_PyObject_GetAttrString = nullptr;
+        EP_PyObject_CallFunction = nullptr;
+        EP_PyObject_CallMethod = nullptr;
+        EP_PyList_Check = nullptr;
+        EP_PyList_Size = nullptr;
+        EP_PyList_GetItem = nullptr;
+        EP_PyUnicode_Check = nullptr;
+        EP_PyLong_Check = nullptr;
+        EP_PyLong_AsLong = nullptr;
+        EP_Py_SetPythonHome = nullptr;
 #endif
     }
 
@@ -411,23 +781,26 @@ namespace PluginManagement {
         std::string programDir = FileSystem::getParentDirectoryPath(programPath);
         std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
 
+        // so first things first is we need to link up with the Python DLL file and get refs to the functions in there
+        loadWrapperDLL();
+
         // I think we need to set the python path before initializing the library
         // make this relative to the binary
-        std::string pathToPythonPackages = sanitizedProgramDir + "/python_standard_lib";
+        std::string pathToPythonPackages = sanitizedProgramDir + DataStringGlobals::pathChar + "python_standard_lib";
         FileSystem::makeNativePath(pathToPythonPackages);
-        auto a = Py_DecodeLocale(pathToPythonPackages.c_str(), nullptr);
-        Py_SetPath(a);
-        Py_SetPythonHome(a);
+        wchar_t *a = (*EP_Py_DecodeLocale)(pathToPythonPackages.c_str(), nullptr);
+        (*EP_Py_SetPath)(a);
+        (*EP_Py_SetPythonHome)(a);
 
         // now that we have set the path, we can initialize python
         // from https://docs.python.org/3/c-api/init.html
         // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
-        Py_InitializeEx(0);
+        (*EP_Py_InitializeEx)(0);
 
-        PyRun_SimpleString("import sys"); // allows us to report sys.path later
+        (*EP_PyRun_SimpleString)("import sys"); // allows us to report sys.path later
 
         // we also need to set an extra import path to find some dynamic library loading stuff, again make it relative to the binary
-        std::string pathToDynLoad = sanitizedProgramDir + "/python_standard_lib/lib-dynload";
+        std::string pathToDynLoad = sanitizedProgramDir + "python_standard_lib/lib-dynload";
         FileSystem::makeNativePath(pathToDynLoad);
         std::string libDirDynLoad = PluginManager::sanitizedPath(pathToDynLoad);
         PluginManager::addToPythonPath(libDirDynLoad, false);
@@ -516,7 +889,7 @@ namespace PluginManagement {
         }
 
         // IMPORTANT - CALL setup() HERE ONCE ALL INSTANCES ARE CONSTRUCTED TO AVOID DESTRUCTOR/MEMORY ISSUES DURING VECTOR RESIZING
-        for (auto & plugin : plugins) {
+        for (auto &plugin : plugins) {
             plugin.setup();
         }
 
@@ -596,6 +969,18 @@ namespace PluginManagement {
 #endif
     }
 
+    PluginManager::~PluginManager()
+    {
+#if LINK_WITH_PYTHON
+        if (EP_Py_FinalizeEx) (*EP_Py_FinalizeEx)();
+#ifdef _WIN32
+        if (wrapperDLLHandle) FreeLibrary((HINSTANCE)wrapperDLLHandle);
+#else
+        if (wrapperDLLHandle) dlclose(wrapperDLLHandle);
+#endif  // PLATFORM
+#endif  // LINK_WITH_PYTHON
+    }
+
 #if LINK_WITH_PYTHON == 1
     std::string PluginManager::sanitizedPath(std::string path)
     {
@@ -622,16 +1007,22 @@ namespace PluginManagement {
         return sanitizedDir;
     }
 #else
-    std::string PluginManager::sanitizedPath(std::string EP_UNUSED(path)) {return "";}
+    std::string PluginManager::sanitizedPath(std::string EP_UNUSED(path))
+    {
+        return "";
+    }
 #endif
 
-    void PluginInstance::reportPythonError() {
+    void PluginInstance::reportPythonError()
+    {
 #if LINK_WITH_PYTHON == 1
-        PyObject *exc_type = nullptr, *exc_value = nullptr, *exc_tb = nullptr;
-        PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
-        PyObject* str_exc_value = PyObject_Repr(exc_value); //Now a unicode object
-        PyObject* pyStr2 = PyUnicode_AsEncodedString(str_exc_value, "utf-8", "Error ~");
-        char *strExcValue =  PyBytes_AS_STRING(pyStr2); // NOLINT(hicpp-signed-bitwise)
+        PyObjectWrap *exc_type = nullptr;
+        PyObjectWrap *exc_value = nullptr;
+        PyObjectWrap *exc_tb = nullptr;
+        (*EP_PyErr_Fetch)(&exc_type, &exc_value, &exc_tb);
+        PyObjectWrap str_exc_value = (*EP_PyObject_Repr)(exc_value); // Now a unicode object
+        PyObjectWrap pyStr2 = (*EP_PyUnicode_AsEncodedString)(str_exc_value, "utf-8", "Error ~");
+        char *strExcValue = (*EP_PyBytes_AsString)(pyStr2); // NOLINT(hicpp-signed-bitwise)
         EnergyPlus::ShowContinueError("Python error description follows: ");
         EnergyPlus::ShowContinueError(strExcValue);
 #endif
@@ -643,27 +1034,26 @@ namespace PluginManagement {
         // this first section is really all about just ultimately getting a full Python class instance
         // this answer helped with a few things: https://ru.stackoverflow.com/a/785927
 
-        PyObject *pModuleName = PyUnicode_DecodeFSDefault(this->moduleName.c_str());
-        this->pModule = PyImport_Import(pModuleName);
+        PyObjectWrap pModuleName = (*EP_PyUnicode_DecodeFSDefault)(this->moduleName.c_str());
+        this->pModule = (*EP_PyImport_Import)(pModuleName);
         // PyUnicode_DecodeFSDefault documentation does not explicitly say whether it returns a new or borrowed reference,
         // but other functions in that section say they return a new reference, and that makes sense to me, so I think we
         // should decrement it.
-        Py_DECREF(pModuleName);
+        (*EP_Py_DECREF)(pModuleName);
         if (!this->pModule) {
             EnergyPlus::ShowSevereError("Failed to import module \"" + this->moduleName + "\"");
             // ONLY call PyErr_Print if PyErr has occurred, otherwise it will cause other problems
-            if (PyErr_Occurred()) {
+            if ((*EP_PyErr_Occurred)()) {
                 PluginInstance::reportPythonError();
             } else {
-                EnergyPlus::ShowContinueError(
-                        "It could be that the module could not be found, or that there was an error in importing");
+                EnergyPlus::ShowContinueError("It could be that the module could not be found, or that there was an error in importing");
             }
             EnergyPlus::ShowFatalError("Python import error causes program termination");
         }
-        PyObject *pModuleDict = PyModule_GetDict(this->pModule);
+        PyObjectWrap pModuleDict = (*EP_PyModule_GetDict)(this->pModule);
         if (!pModuleDict) {
             EnergyPlus::ShowSevereError("Failed to read module dictionary from module \"" + this->moduleName + "\"");
-            if (PyErr_Occurred()) {
+            if ((*EP_PyErr_Occurred)()) {
                 PluginInstance::reportPythonError();
             } else {
                 EnergyPlus::ShowContinueError("It could be that the module was empty");
@@ -671,43 +1061,43 @@ namespace PluginManagement {
             EnergyPlus::ShowFatalError("Python module error causes program termination");
         }
         std::string fileVarName = "__file__";
-        PyObject *pFullPath = PyDict_GetItemString(pModuleDict, fileVarName.c_str());
+        PyObjectWrap pFullPath = (*EP_PyDict_GetItemString)(pModuleDict, fileVarName.c_str());
         if (!pFullPath) {
             // something went really wrong, this should only happen if you do some *weird* python stuff like
             // import from database or something
             ShowFatalError("Could not get full path");
         } else {
-            PyObject* pStrObj = PyUnicode_AsUTF8String(pFullPath);
-            char* zStr = PyBytes_AsString(pStrObj);
+            PyObjectWrap pStrObj = (*EP_PyUnicode_AsUTF8String)(pFullPath);
+            char *zStr = (*EP_PyBytes_AsString)(pStrObj);
             std::string s(zStr);
-            Py_DECREF(pStrObj); // PyUnicode_AsUTF8String returns a new reference, decrement it
+            (*EP_Py_DECREF)(pStrObj); // PyUnicode_AsUTF8String returns a new reference, decrement it
             ShowMessage("PythonPlugin: Class " + className + " imported from: " + s);
         }
-        PyObject *pClass = PyDict_GetItemString(pModuleDict, className.c_str());
+        PyObjectWrap pClass = (*EP_PyDict_GetItemString)(pModuleDict, className.c_str());
         // Py_DECREF(pModuleDict);  // PyModule_GetDict returns a borrowed reference, DO NOT decrement
         if (!pClass) {
             EnergyPlus::ShowSevereError("Failed to get class type \"" + className + "\" from module \"" + moduleName + "\"");
-            if (PyErr_Occurred()) {
+            if ((*EP_PyErr_Occurred)()) {
                 PluginInstance::reportPythonError();
             } else {
                 EnergyPlus::ShowContinueError("It could be the class name is misspelled or missing.");
             }
             EnergyPlus::ShowFatalError("Python class import error causes program termination");
         }
-        if (!PyCallable_Check(pClass)) {
+        if (!(*EP_PyCallable_Check)(pClass)) {
             EnergyPlus::ShowSevereError("Got class type \"" + className + "\", but it cannot be called/instantiated");
-            if (PyErr_Occurred()) {
+            if ((*EP_PyErr_Occurred)()) {
                 PluginInstance::reportPythonError();
             } else {
                 EnergyPlus::ShowContinueError("Is it possible the class name is actually just a variable?");
             }
             EnergyPlus::ShowFatalError("Python class check error causes program termination");
         }
-        this->pClassInstance = PyObject_CallObject(pClass, nullptr);
+        this->pClassInstance = (*EP_PyObject_CallObject)(pClass, nullptr);
         // Py_DECREF(pClass);  // PyDict_GetItemString returns a borrowed reference, DO NOT decrement
         if (!this->pClassInstance) {
             EnergyPlus::ShowSevereError("Something went awry calling class constructor for class \"" + className + "\"");
-            if (PyErr_Occurred()) {
+            if ((*EP_PyErr_Occurred)()) {
                 PluginInstance::reportPythonError();
             } else {
                 EnergyPlus::ShowContinueError("It is possible the plugin class constructor takes extra arguments - it shouldn't.");
@@ -721,40 +1111,42 @@ namespace PluginManagement {
 
         // check which methods are overridden in the derived class
         std::string const detectOverriddenFunctionName = "_detect_overridden";
-        PyObject *detectFunction = PyObject_GetAttrString(this->pClassInstance, detectOverriddenFunctionName.c_str());
-        if (!detectFunction || !PyCallable_Check(detectFunction)) {
-            EnergyPlus::ShowSevereError("Could not find or call function \"" + detectOverriddenFunctionName + "\" on class \"" + this->moduleName + "." + this->className + "\"");
-            if (PyErr_Occurred()) {
+        PyObjectWrap detectFunction = (*EP_PyObject_GetAttrString)(this->pClassInstance, detectOverriddenFunctionName.c_str());
+        if (!detectFunction || !(*EP_PyCallable_Check)(detectFunction)) {
+            EnergyPlus::ShowSevereError("Could not find or call function \"" + detectOverriddenFunctionName + "\" on class \"" + this->moduleName +
+                                        "." + this->className + "\"");
+            if ((*EP_PyErr_Occurred)()) {
                 PluginInstance::reportPythonError();
             } else {
                 EnergyPlus::ShowContinueError("This function should be available on the base class, so this is strange.");
             }
             EnergyPlus::ShowFatalError("Python _detect_overridden() function error causes program termination");
         }
-        PyObject *pFunctionResponse = PyObject_CallFunction(detectFunction, nullptr);
-        Py_DECREF(detectFunction);  // PyObject_GetAttrString returns a new reference, decrement it
+        PyObjectWrap pFunctionResponse = (*EP_PyObject_CallFunction)(detectFunction, nullptr);
+        (*EP_Py_DECREF)(detectFunction); // PyObject_GetAttrString returns a new reference, decrement it
         if (!pFunctionResponse) {
             EnergyPlus::ShowSevereError("Call to _detect_overridden() on " + this->stringIdentifier + " failed!");
-            if (PyErr_Occurred()) {
+            if ((*EP_PyErr_Occurred)()) {
                 PluginInstance::reportPythonError();
             } else {
                 EnergyPlus::ShowContinueError("This is available on the base class and should not be overridden...strange.");
             }
             EnergyPlus::ShowFatalError("Program terminates after call to _detect_overridden() on " + this->stringIdentifier + " failed!");
         }
-        if (!PyList_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
+        if (!(*EP_PyList_Check)(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
             EnergyPlus::ShowFatalError("Invalid return from _detect_overridden() on class \"" + this->stringIdentifier + ", this is weird");
         }
-        int numVals = PyList_Size(pFunctionResponse);
+        unsigned long numVals = (*EP_PyList_Size)(pFunctionResponse);
         // at this point we know which base class methods are being overridden by the derived class
         // we can loop over them and based on the name check the appropriate flag and assign the function pointer
         if (numVals == 0) {
-            EnergyPlus::ShowFatalError("Python plugin \"" + this->stringIdentifier + "\" did not override any base class methods; must override at least one");
+            EnergyPlus::ShowFatalError("Python plugin \"" + this->stringIdentifier +
+                                       "\" did not override any base class methods; must override at least one");
         }
-        for (int itemNum = 0; itemNum < numVals; itemNum++) {
-            PyObject *item = PyList_GetItem(pFunctionResponse, itemNum);
-            if (PyUnicode_Check(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
-                std::string functionName = PyUnicode_AsUTF8(item);
+        for (unsigned long itemNum = 0; itemNum < numVals; itemNum++) {
+            PyObjectWrap item = (*EP_PyList_GetItem)(pFunctionResponse, itemNum);
+            if ((*EP_PyUnicode_Check)(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
+                std::string functionName = (*EP_PyUnicode_AsUTF8)(item);
                 if (functionName == this->sHookBeginNewEnvironment) {
                     this->bHasBeginNewEnvironment = true;
                 } else if (functionName == this->sHookAfterNewEnvironmentWarmUpIsComplete) {
@@ -797,20 +1189,22 @@ namespace PluginManagement {
             // PyList_GetItem returns a borrowed reference, do not decrement
         }
         // PyList_Size returns a borrowed reference, do not decrement
-        Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
+        (*EP_Py_DECREF)(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
 #endif
     }
 
-    void PluginInstance::shutdown() {
-#if LINK_WITH_PYTHON == 1
-        Py_DECREF(this->pClassInstance);
-        Py_DECREF(this->pModule); // PyImport_Import returns a new reference, decrement it
-#endif
-    }
-
-#if LINK_WITH_PYTHON == 1
-    void PluginInstance::run(int iCalledFrom)
+    void PluginInstance::shutdown() const
     {
+#if LINK_WITH_PYTHON == 1
+        (*EP_Py_DECREF)(this->pClassInstance);
+        (*EP_Py_DECREF)(this->pModule); // PyImport_Import returns a new reference, decrement it
+#endif
+    }
+
+#if LINK_WITH_PYTHON == 1
+    bool PluginInstance::run(int iCalledFrom) const
+    {
+        // returns true if a plugin actually ran
         const char *functionName = nullptr;
         if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
             if (this->bHasBeginNewEnvironment) {
@@ -884,72 +1278,82 @@ namespace PluginManagement {
 
         // leave if we didn't find a match
         if (!functionName) {
-            return;
+            return false;
         }
 
         // then call the main function
-        PyObject *pFunctionResponse = PyObject_CallMethod(this->pClassInstance, functionName, nullptr);
+        PyObjectWrap pFunctionResponse = (*EP_PyObject_CallMethod)(this->pClassInstance, functionName, nullptr);
         if (!pFunctionResponse) {
-            std::string const functionNameAsString(functionName);  // only convert to string if an error occurs
+            std::string const functionNameAsString(functionName); // only convert to string if an error occurs
             EnergyPlus::ShowSevereError("Call to " + functionNameAsString + "() on " + this->stringIdentifier + " failed!");
-            if (PyErr_Occurred()) {
+            if ((*EP_PyErr_Occurred)()) {
                 PluginInstance::reportPythonError();
             } else {
                 EnergyPlus::ShowContinueError("This could happen for any number of reasons, check the plugin code.");
             }
             EnergyPlus::ShowFatalError("Program terminates after call to " + functionNameAsString + "() on " + this->stringIdentifier + " failed!");
         }
-        if (PyLong_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
-            auto exitCode = PyLong_AsLong(pFunctionResponse);
+        if ((*EP_PyLong_Check)(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
+            auto exitCode = (*EP_PyLong_AsLong)(pFunctionResponse);
             if (exitCode == 0) {
                 // success
             } else if (exitCode == 1) {
                 EnergyPlus::ShowFatalError("Python Plugin \"" + this->stringIdentifier + "\" returned 1 to indicate EnergyPlus should abort");
             }
         } else {
-            std::string const functionNameAsString(functionName);  // only convert to string if an error occurs
+            std::string const functionNameAsString(functionName); // only convert to string if an error occurs
             EnergyPlus::ShowFatalError("Invalid return from " + functionNameAsString + "() on class \"" + this->stringIdentifier +
                                        ", make sure it returns an integer exit code, either zero (success) or one (failure)");
         }
-        Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
-        if (EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes) {
+        (*EP_Py_DECREF)(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
+        if (EnergyPlus::PluginManagement::apiErrorFlag) {
             EnergyPlus::ShowFatalError("API problems encountered while running plugin cause program termination.");
         }
+        return true;
     }
 #else
-    void PluginInstance::run(int EP_UNUSED(iCalledFrom)) {}
+    bool PluginInstance::run(int EP_UNUSED(iCalledFrom)) const
+    {
+        return false;
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
     void PluginManager::addToPythonPath(const std::string &path, bool userDefinedPath)
     {
         std::string command = "sys.path.insert(0, \"" + path + "\")";
-        if (PyRun_SimpleString(command.c_str()) == 0) {
+        if ((*EP_PyRun_SimpleString)(command.c_str()) == 0) {
             if (userDefinedPath) {
                 EnergyPlus::ShowMessage("Successfully added path \"" + path + "\" to the sys.path in Python");
             }
-            // DEBUGGING PATHS: PyRun_SimpleString("print(' EPS : ' + str(sys.path))");
+            //(*EP_PyRun_SimpleString)("print(' EPS : ' + str(sys.path))");
         } else {
             EnergyPlus::ShowFatalError("ERROR adding \"" + path + "\" to the sys.path in Python");
         }
     }
 #else
-    void PluginManager::addToPythonPath(const std::string &EP_UNUSED(path), bool EP_UNUSED(userDefinedPath)) {}
+    void PluginManager::addToPythonPath(const std::string &EP_UNUSED(path), bool EP_UNUSED(userDefinedPath))
+    {
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    void PluginManager:: addGlobalVariable(const std::string &name) {
+    void PluginManager::addGlobalVariable(const std::string &name)
+    {
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         PluginManagement::globalVariableNames.push_back(varNameUC);
         PluginManagement::globalVariableValues.push_back(Real64());
         this->maxGlobalVariableIndex++;
     }
 #else
-    void PluginManager::addGlobalVariable(const std::string &EP_UNUSED(name)) {}
+    void PluginManager::addGlobalVariable(const std::string &EP_UNUSED(name))
+    {
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    int PluginManager::getGlobalVariableHandle(const std::string& name, bool const suppress_warning) { // note zero is a valid handle
+    int PluginManager::getGlobalVariableHandle(const std::string &name, bool const suppress_warning)
+    { // note zero is a valid handle
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         auto const it = std::find(PluginManagement::globalVariableNames.begin(), PluginManagement::globalVariableNames.end(), varNameUC);
         if (it != PluginManagement::globalVariableNames.end()) {
@@ -969,14 +1373,18 @@ namespace PluginManagement {
         }
     }
 #else
-    int PluginManager::getGlobalVariableHandle(const std::string& EP_UNUSED(name), bool const EP_UNUSED(suppress_warning)) {return -1;}
+    int PluginManager::getGlobalVariableHandle(const std::string &EP_UNUSED(name), bool const EP_UNUSED(suppress_warning))
+    {
+        return -1;
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    int PluginManager::getTrendVariableHandle(const std::string& name) {
+    int PluginManager::getTrendVariableHandle(const std::string &name)
+    {
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         for (size_t i = 0; i < trends.size(); i++) {
-            auto & thisTrend = trends[i];
+            auto &thisTrend = trends[i];
             if (thisTrend.name == varNameUC) {
                 return i;
             }
@@ -984,19 +1392,27 @@ namespace PluginManagement {
         return -1;
     }
 #else
-    int PluginManager::getTrendVariableHandle(const std::string& EP_UNUSED(name)) {return -1;}
+    int PluginManager::getTrendVariableHandle(const std::string &EP_UNUSED(name))
+    {
+        return -1;
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableValue(int handle, int timeIndex) {
+    Real64 PluginManager::getTrendVariableValue(int handle, int timeIndex)
+    {
         return trends[handle].values[timeIndex];
     }
 #else
-    Real64 PluginManager::getTrendVariableValue(int EP_UNUSED(handle), int EP_UNUSED(timeIndex)) {return 0.0;}
+    Real64 PluginManager::getTrendVariableValue(int EP_UNUSED(handle), int EP_UNUSED(timeIndex))
+    {
+        return 0.0;
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableAverage(int handle, int count) {
+    Real64 PluginManager::getTrendVariableAverage(int handle, int count)
+    {
         Real64 sum = 0;
         for (int i = 0; i < count; i++) {
             sum += trends[handle].values[i];
@@ -1004,11 +1420,15 @@ namespace PluginManagement {
         return sum / count;
     }
 #else
-    Real64 PluginManager::getTrendVariableAverage(int EP_UNUSED(handle), int EP_UNUSED(count)) {return 0.0;}
+    Real64 PluginManager::getTrendVariableAverage(int EP_UNUSED(handle), int EP_UNUSED(count))
+    {
+        return 0.0;
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableMin(int handle, int count) {
+    Real64 PluginManager::getTrendVariableMin(int handle, int count)
+    {
         Real64 minimumValue = 9999999999999;
         for (int i = 0; i < count; i++) {
             if (trends[handle].values[i] < minimumValue) {
@@ -1018,11 +1438,15 @@ namespace PluginManagement {
         return minimumValue;
     }
 #else
-    Real64 PluginManager::getTrendVariableMin(int EP_UNUSED(handle), int EP_UNUSED(count)) {return 0.0;}
+    Real64 PluginManager::getTrendVariableMin(int EP_UNUSED(handle), int EP_UNUSED(count))
+    {
+        return 0.0;
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableMax(int handle, int count) {
+    Real64 PluginManager::getTrendVariableMax(int handle, int count)
+    {
         Real64 maximumValue = -9999999999999;
         for (int i = 0; i < count; i++) {
             if (trends[handle].values[i] > maximumValue) {
@@ -1032,11 +1456,15 @@ namespace PluginManagement {
         return maximumValue;
     }
 #else
-    Real64 PluginManager::getTrendVariableMax(int EP_UNUSED(handle), int EP_UNUSED(count)) {return 0.0;}
+    Real64 PluginManager::getTrendVariableMax(int EP_UNUSED(handle), int EP_UNUSED(count))
+    {
+        return 0.0;
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableSum(int handle, int count) {
+    Real64 PluginManager::getTrendVariableSum(int handle, int count)
+    {
         Real64 sum = 0.0;
         for (int i = 0; i < count; i++) {
             sum += trends[handle].values[i];
@@ -1044,11 +1472,15 @@ namespace PluginManagement {
         return sum;
     }
 #else
-    Real64 PluginManager::getTrendVariableSum(int EP_UNUSED(handle), int EP_UNUSED(count)) {return 0.0;}
+    Real64 PluginManager::getTrendVariableSum(int EP_UNUSED(handle), int EP_UNUSED(count))
+    {
+        return 0.0;
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableDirection(int handle, int count) {
+    Real64 PluginManager::getTrendVariableDirection(int handle, int count)
+    {
         auto &trend = trends[handle];
         Real64 timeSum = 0.0;
         Real64 valueSum = 0.0;
@@ -1065,21 +1497,29 @@ namespace PluginManagement {
         return numerator / denominator;
     }
 #else
-    Real64 PluginManager::getTrendVariableDirection(int EP_UNUSED(handle), int EP_UNUSED(count)) {return 0.0;}
+    Real64 PluginManager::getTrendVariableDirection(int EP_UNUSED(handle), int EP_UNUSED(count))
+    {
+        return 0.0;
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    size_t PluginManager::getTrendVariableHistorySize(int handle) {
+    size_t PluginManager::getTrendVariableHistorySize(int handle)
+    {
         return trends[handle].values.size();
     }
 #else
-    size_t PluginManager::getTrendVariableHistorySize(int EP_UNUSED(handle)) {return 0;}
+    size_t PluginManager::getTrendVariableHistorySize(int EP_UNUSED(handle))
+    {
+        return 0;
+    }
 #endif
 
-    void PluginManager::updatePluginValues() {
+    void PluginManager::updatePluginValues()
+    {
 #if LINK_WITH_PYTHON == 1
-        for (auto & trend : trends) {
-            Real64 newVarValue = this->getGlobalVariableValue(trend.indexOfPluginVariable);
+        for (auto &trend : trends) {
+            Real64 newVarValue = PluginManager::getGlobalVariableValue(trend.indexOfPluginVariable);
             trend.values.push_front(newVarValue);
             trend.values.pop_back();
         }
@@ -1087,42 +1527,52 @@ namespace PluginManagement {
     }
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getGlobalVariableValue(int handle) {
+    Real64 PluginManager::getGlobalVariableValue(int handle)
+    {
         if (PluginManagement::globalVariableValues.empty()) {
-            EnergyPlus::ShowFatalError("Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:Variables object to declare them.");
+            EnergyPlus::ShowFatalError(
+                "Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:Variables object to declare them.");
         }
         try {
             return PluginManagement::globalVariableValues[handle];
         } catch (...) {
             EnergyPlus::ShowSevereError("Tried to access plugin global variable value at index " + std::to_string(handle));
-            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size()-1));
+            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size() - 1));
             EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
         return 0.0;
     }
 #else
-    Real64 PluginManager::getGlobalVariableValue(int EP_UNUSED(handle)) {return 0.0;}
+    Real64 PluginManager::getGlobalVariableValue(int EP_UNUSED(handle))
+    {
+        return 0.0;
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    void PluginManager::setGlobalVariableValue(int handle, Real64 value) {
+    void PluginManager::setGlobalVariableValue(int handle, Real64 value)
+    {
         if (PluginManagement::globalVariableValues.empty()) {
-            EnergyPlus::ShowFatalError("Tried to set plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
+            EnergyPlus::ShowFatalError("Tried to set plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables "
+                                       "object to declare them.");
         }
         try {
             PluginManagement::globalVariableValues[handle] = value;
         } catch (...) {
             EnergyPlus::ShowSevereError("Tried to set plugin global variable value at index " + std::to_string(handle));
-            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size()-1));
+            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size() - 1));
             EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
     }
 #else
-    void PluginManager::setGlobalVariableValue(int EP_UNUSED(handle), Real64 EP_UNUSED(value)) {}
+    void PluginManager::setGlobalVariableValue(int EP_UNUSED(handle), Real64 EP_UNUSED(value))
+    {
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    int PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName) {
+    int PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName)
+    {
         for (size_t handle = 0; handle < plugins.size(); handle++) {
             auto const thisPlugin = plugins[handle];
             if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(programName)) {
@@ -1132,26 +1582,31 @@ namespace PluginManagement {
         return -1;
     }
 #else
-    int PluginManager::getLocationOfUserDefinedPlugin(std::string const &EP_UNUSED(programName)) {return -1;}
+    int PluginManager::getLocationOfUserDefinedPlugin(std::string const &EP_UNUSED(programName))
+    {
+        return -1;
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    void PluginManager::runSingleUserDefinedPlugin(int index) {
+    void PluginManager::runSingleUserDefinedPlugin(int index)
+    {
         plugins[index].run(DataGlobals::emsCallFromUserDefinedComponentModel);
     }
 #else
-    void PluginManager::runSingleUserDefinedPlugin(int EP_UNUSED(index)) {}
+    void PluginManager::runSingleUserDefinedPlugin(int EP_UNUSED(index))
+    {
+    }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    bool PluginManager::anyUnexpectedPluginObjects() {
-        static std::vector<std::string> objectsToFind = {
-            "PythonPlugin:OutputVariable",
-            "PythonPlugin:SearchPaths",
-            "PythonPlugin:Instance",
-            "PythonPlugin:Variables",
-            "PythonPlugin:TrendVariable"
-        };
+    bool PluginManager::anyUnexpectedPluginObjects()
+    {
+        static std::vector<std::string> objectsToFind = {"PythonPlugin:OutputVariable",
+                                                         "PythonPlugin:SearchPaths",
+                                                         "PythonPlugin:Instance",
+                                                         "PythonPlugin:Variables",
+                                                         "PythonPlugin:TrendVariable"};
         int numTotalThings = 0;
         for (auto const &objToFind : objectsToFind) {
             int instances = inputProcessor->getNumObjectsFound(objToFind);
@@ -1166,7 +1621,10 @@ namespace PluginManagement {
         return numTotalThings > 0;
     }
 #else
-    bool PluginManager::anyUnexpectedPluginObjects() {return false;}
+    bool PluginManager::anyUnexpectedPluginObjects()
+    {
+        return false;
+    }
 #endif
 
 } // namespace PluginManagement

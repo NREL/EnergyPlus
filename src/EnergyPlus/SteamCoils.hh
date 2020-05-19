@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -183,7 +184,7 @@ namespace SteamCoils {
 
     // Functions
 
-    void SimulateSteamCoilComponents(std::string const &CompName,
+    void SimulateSteamCoilComponents(EnergyPlusData &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq = _, // coil load to be met
@@ -199,9 +200,9 @@ namespace SteamCoils {
 
     // Beginning Initialization Section of the Module
 
-    void InitSteamCoil(int const CoilNum, bool const FirstHVACIteration);
+    void InitSteamCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 
-    void SizeSteamCoil(int const CoilNum);
+    void SizeSteamCoil(EnergyPlusData &state, int const CoilNum);
 
     // End Initialization Section of the Module
 
@@ -279,7 +280,7 @@ namespace SteamCoils {
                                bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );

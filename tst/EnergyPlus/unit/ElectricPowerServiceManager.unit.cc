@@ -63,6 +63,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -694,7 +695,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting)
     createFacilityElectricPowerServiceObject();
     bool SimElecCircuitsFlag = false;
     // GetInput and other code will be executed and SimElectricCircuits will be true
-    facilityElectricServiceObj->manageElectricPowerService(true, SimElecCircuitsFlag, false);
+    facilityElectricServiceObj->manageElectricPowerService(state, true, SimElecCircuitsFlag, false);
     EXPECT_TRUE(SimElecCircuitsFlag);
     EXPECT_EQ(facilityElectricServiceObj->elecLoadCenterObjs[0]->numGenerators,
               0); // dummy generator has been added and report variables are available
