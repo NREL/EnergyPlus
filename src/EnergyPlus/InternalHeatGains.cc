@@ -3885,6 +3885,7 @@ namespace InternalHeatGains {
                         AlphaName(14), ErrorsFound, CurrentModuleObject, AlphaName(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
                 }
 
+                // Post-assign-SupplyAirNode-check. may be redundant
                 if (ZoneITEq(Loop).SupplyAirNodeNum == 0) {
                     if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
                         ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
