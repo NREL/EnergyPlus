@@ -45,3 +45,6 @@ As of [nlhohmann/json](https://github.com/nlohmann/json) version 3.7.3, the only
  #endif
 ```
 
+## valijson
+
+The `validation_visitor.hpp` was modified to include better error messages and use RE2 instead of std::regex.
