@@ -1895,6 +1895,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowFromSystemMethod)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
