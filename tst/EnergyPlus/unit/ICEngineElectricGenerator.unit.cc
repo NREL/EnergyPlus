@@ -51,54 +51,87 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/ICEngineElectgricGenerator.hh>
+#include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-using namespace EnergyPlus;
-using namespace EnergyPlus::ICEngineElectgricGenerator;
+using namespace EnergyPlus::ICEngineElectricGenerator;
 using namespace EnergyPlus::DataGlobalConstants;
 
-TEST_F(EnergyPlusFixture, ICEngineElectgricGenerator_FueltypeInput)
-{
+namespace EnergyPlus {
 
+TEST_F(EnergyPlusFixture, ICEngineElectricGenerator_Fueltype)
+{
     std::string const idf_objects = delimited_string({
-        "  Boiler:Steam,                                                                                            ",
-        "    Steam Boiler Plant Boiler,  !- Name                                                                    ",
-        "    NaturalGas,                !- Fuel Type                                                                ",
-        "    160000,                    !- Maximum Operating Pressure{ Pa }                                         ",
-        "    0.8,                       !- Theoretical Efficiency                                                   ",
-        "    115,                       !- Design Outlet Steam Temperature{ C }                                     ",
-        "    autosize,                  !- Nominal Capacity{ W }                                                    ",
-        "    0.00001,                   !- Minimum Part Load Ratio                                                  ",
-        "    1.0,                       !- Maximum Part Load Ratio                                                  ",
-        "    0.2,                       !- Optimum Part Load Ratio                                                  ",
-        "    0.8,                       !- Coefficient 1 of Fuel Use Function of Part Load Ratio Curve              ",
-        "    0.1,                       !- Coefficient 2 of Fuel Use Function of Part Load Ratio Curve              ",
-        "    0.1,                       !- Coefficient 3 of Fuel Use Function of Part Load Ratio Curve              ",
-        "    Steam Boiler Plant Boiler Inlet Node,  !- Water Inlet Node Name                                        ",
-        "    Steam Boiler Plant Boiler Outlet Node;  !- Steam Outlet Node Name                                      ",
+        "Generator:InternalCombustionEngine,",
+        "  Cat Diesel,              !- Name",
+        "  50000,                   !- Rated Power Output {W}",
+        "  Generator Diesel Electric Node,  !- Electric Circuit Node Name",
+        "  0.15,                    !- Minimum Part Load Ratio",
+        "  1.0,                     !- Maximum Part Load Ratio",
+        "  0.65,                    !- Optimum Part Load Ratio",
+        "  BG Shaft Power Curve,    !- Shaft Power Curve Name",
+        "  BG Recovery Jacket Heat Curve,  !- Jacket Heat Recovery Curve Name",
+        "  BG Recovery Lube Heat Curve,  !- Lube Heat Recovery Curve Name",
+        "  BG Total Exhaust Energy Curve,  !- Total Exhaust Energy Curve Name",
+        "  BG Exhaust Temperature Curve,  !- Exhaust Temperature Curve Name",
+        "  0.00952329,              !- Coefficient 1 of U-Factor Times Area Curve",
+        "  0.9,                     !- Coefficient 2 of U-Factor Times Area Curve",
+        "  0.00000063,              !- Maximum Exhaust Flow per Unit of Power Output {(kg/s)/W}",
+        "  150,                     !- Design Minimum Exhaust Temperature {C}",
+        "  45500,                   !- Fuel Higher Heating Value {kJ/kg}",
+        "  0.0,                     !- Design Heat Recovery Water Flow Rate {m3/s}",
+        "  ,                        !- Heat Recovery Inlet Node Name",
+        "  ,                        !- Heat Recovery Outlet Node Name",
+        "  Diesel;                  !- Fuel Type",
+
+        "Curve:Quadratic,",
+        "  BG Shaft Power Curve,    !- Name",
+        "  0.09755,                 !- Coefficient1 Constant",
+        "  0.6318,                  !- Coefficient2 x",
+        "  -0.4165,                 !- Coefficient3 x**2",
+        "  0,                       !- Minimum Value of x",
+        "  1;                       !- Maximum Value of x",
+
+        "Curve:Quadratic,",
+        "  BG Recovery Jacket Heat Curve,  !- Name",
+        "  0.25,                    !- Coefficient1 Constant",
+        "  0,                       !- Coefficient2 x",
+        "  0,                       !- Coefficient3 x**2",
+        "  0,                       !- Minimum Value of x",
+        "  1;                       !- Maximum Value of x",
+
+        "Curve:Quadratic,",
+        "  BG Recovery Lube Heat Curve,  !- Name",
+        "  0.15,                    !- Coefficient1 Constant",
+        "  0,                       !- Coefficient2 x",
+        "  0,                       !- Coefficient3 x**2",
+        "  0,                       !- Minimum Value of x",
+        "  1;                       !- Maximum Value of x",
+
+        "Curve:Quadratic,",
+        "  BG Total Exhaust Energy Curve,  !- Name",
+        "  0.1,                     !- Coefficient1 Constant",
+        "  0,                       !- Coefficient2 x",
+        "  0,                       !- Coefficient3 x**2",
+        "  0,                       !- Minimum Value of x",
+        "  1;                       !- Maximum Value of x",
+
+        "Curve:Quadratic,",
+        "  BG Exhaust Temperature Curve,  !- Name",
+        "  425,                     !- Coefficient1 Constant",
+        "  0,                       !- Coefficient2 x",
+        "  0,                       !- Coefficient3 x**2",
+        "  0,                       !- Minimum Value of x",
+        "  1;                       !- Maximum Value of x",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects, false));
-    GetBoilerInput(state.dataSteamBoilers);
-    auto &thisBoiler = state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers);
-    EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
-    EXPECT_EQ(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS"));
-    EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
-    EXPECT_EQ(thisBoiler.Effic, 0.8);
-    EXPECT_EQ(thisBoiler.TempUpLimitBoilerOut, 115);
-    EXPECT_EQ(thisBoiler.NomCap, AutoSize);
-    EXPECT_EQ(thisBoiler.MinPartLoadRat, 0.00001);
-    EXPECT_EQ(thisBoiler.MaxPartLoadRat, 1.0);
-    EXPECT_EQ(thisBoiler.OptPartLoadRat, 0.2);
-    EXPECT_EQ(thisBoiler.FullLoadCoef(1), 0.8);
-    EXPECT_EQ(thisBoiler.FullLoadCoef(2), 0.1);
-    EXPECT_EQ(thisBoiler.FullLoadCoef(3), 0.1);
-    EXPECT_EQ(thisBoiler.SizFac, 1.0);
+    ASSERT_TRUE(process_idf(idf_objects));
+    GetICEngineGeneratorInput();
 
-    // Additional tests for fuel type input
-    EXPECT_EQ(DataGlobalConstants::FuelType, "Gas");
+    EXPECT_EQ(DataGlobalConstants::FuelType, "Diesel");
     EXPECT_FALSE(DataGlobalConstants::FuelTypeErrorsFound);
 }
+
+} // namespace EnergyPlus

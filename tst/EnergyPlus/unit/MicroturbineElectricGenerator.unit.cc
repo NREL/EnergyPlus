@@ -51,54 +51,88 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/MicroturbineElectricGenerator.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-using namespace EnergyPlus;
 using namespace EnergyPlus::MicroturbineElectricGenerator;
 using namespace EnergyPlus::DataGlobalConstants;
 
-TEST_F(EnergyPlusFixture, MicroturbineElectricGenerator_FueltypeInput)
-{
+namespace EnergyPlus {
 
+TEST_F(EnergyPlusFixture, MicroturbineElectricGenerator_Fueltype)
+{
     std::string const idf_objects = delimited_string({
-        "  Boiler:Steam,                                                                                            ",
-        "    Steam Boiler Plant Boiler,  !- Name                                                                    ",
-        "    NaturalGas,                !- Fuel Type                                                                ",
-        "    160000,                    !- Maximum Operating Pressure{ Pa }                                         ",
-        "    0.8,                       !- Theoretical Efficiency                                                   ",
-        "    115,                       !- Design Outlet Steam Temperature{ C }                                     ",
-        "    autosize,                  !- Nominal Capacity{ W }                                                    ",
-        "    0.00001,                   !- Minimum Part Load Ratio                                                  ",
-        "    1.0,                       !- Maximum Part Load Ratio                                                  ",
-        "    0.2,                       !- Optimum Part Load Ratio                                                  ",
-        "    0.8,                       !- Coefficient 1 of Fuel Use Function of Part Load Ratio Curve              ",
-        "    0.1,                       !- Coefficient 2 of Fuel Use Function of Part Load Ratio Curve              ",
-        "    0.1,                       !- Coefficient 3 of Fuel Use Function of Part Load Ratio Curve              ",
-        "    Steam Boiler Plant Boiler Inlet Node,  !- Water Inlet Node Name                                        ",
-        "    Steam Boiler Plant Boiler Outlet Node;  !- Steam Outlet Node Name                                      ",
+        "Generator:MicroTurbine,",
+        "  Capstone C65,            !- Name",
+        "  65000,                   !- Reference Electrical Power Output {W}",
+        "  29900,                   !- Minimum Full Load Electrical Power Output {W}",
+        "  65000,                   !- Maximum Full Load Electrical Power Output {W}",
+        "  0.29,                    !- Reference Electrical Efficiency Using Lower Heating Value",
+        "  15.0,                    !- Reference Combustion Air Inlet Temperature {C}",
+        "  0.00638,                 !- Reference Combustion Air Inlet Humidity Ratio {kgWater/kgDryAir}",
+        "  0.0,                     !- Reference Elevation {m}",
+        "  Capstone C65 Power_vs_Temp_Elev,  !- Electrical Power Function of Temperature and Elevation Curve Name",
+        "  Capstone C65 Efficiency_vs_Temp,  !- Electrical Efficiency Function of Temperature Curve Name",
+        "  Capstone C65 Efficiency_vs_PLR,  !- Electrical Efficiency Function of Part Load Ratio Curve Name",
+        "  NaturalGas,              !- Fuel Type",
+        "  50000,                   !- Fuel Higher Heating Value {kJ/kg}",
+        "  45450,                   !- Fuel Lower Heating Value {kJ/kg}",
+        "  300,                     !- Standby Power {W}",
+        "  4500;                    !- Ancillary Power {W}",
+
+        "Curve:Biquadratic,",
+        "  Capstone C65 Power_vs_Temp_Elev,  !- Name",
+        "  1.2027697,               !- Coefficient1 Constant",
+        "  -9.671305E-03,           !- Coefficient2 x",
+        "  -4.860793E-06,           !- Coefficient3 x**2",
+        "  -1.542394E-04,           !- Coefficient4 y",
+        "  9.111418E-09,            !- Coefficient5 y**2",
+        "  8.797885E-07,            !- Coefficient6 x*y",
+        "  -17.8,                   !- Minimum Value of x",
+        "  50.0,                    !- Maximum Value of x",
+        "  0.0,                     !- Minimum Value of y",
+        "  3050.,                   !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Distance,                !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  Capstone C65 Efficiency_vs_Temp,  !- Name",
+        "  1.0402217,               !- Coefficient1 Constant",
+        "  -0.0017314,              !- Coefficient2 x",
+        "  -6.497040E-05,           !- Coefficient3 x**2",
+        "  5.133175E-07,            !- Coefficient4 x**3",
+        "  -20.0,                   !- Minimum Value of x",
+        "  50.0,                    !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  Capstone C65 Efficiency_vs_PLR,  !- Name",
+        "  0.215290,                !- Coefficient1 Constant",
+        "  2.561463,                !- Coefficient2 x",
+        "  -3.24613,                !- Coefficient3 x**2",
+        "  1.497306,                !- Coefficient4 x**3",
+        "  0.03,                    !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
     });
 
-    ASSERT_TRUE(process_idf(idf_objects, false));
-    GetBoilerInput(state.dataSteamBoilers);
-    auto &thisBoiler = state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers);
-    EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
-    EXPECT_EQ(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS"));
-    EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
-    EXPECT_EQ(thisBoiler.Effic, 0.8);
-    EXPECT_EQ(thisBoiler.TempUpLimitBoilerOut, 115);
-    EXPECT_EQ(thisBoiler.NomCap, AutoSize);
-    EXPECT_EQ(thisBoiler.MinPartLoadRat, 0.00001);
-    EXPECT_EQ(thisBoiler.MaxPartLoadRat, 1.0);
-    EXPECT_EQ(thisBoiler.OptPartLoadRat, 0.2);
-    EXPECT_EQ(thisBoiler.FullLoadCoef(1), 0.8);
-    EXPECT_EQ(thisBoiler.FullLoadCoef(2), 0.1);
-    EXPECT_EQ(thisBoiler.FullLoadCoef(3), 0.1);
-    EXPECT_EQ(thisBoiler.SizFac, 1.0);
+    ASSERT_TRUE(process_idf(idf_objects));
+    DataIPShortCuts::cAlphaArgs(1) = "Capstone C65";
+    DataIPShortCuts::cCurrentModuleObject = "Generator:MicroTurbine";
+    bool ErrorsFound(false);
 
-    // Additional tests for fuel type input
+    GetMTGeneratorInput();
+
     EXPECT_EQ(DataGlobalConstants::FuelType, "Gas");
     EXPECT_FALSE(DataGlobalConstants::FuelTypeErrorsFound);
 }
+
+} // namespace EnergyPlus
