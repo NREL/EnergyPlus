@@ -178,7 +178,7 @@ namespace LowTempRadiantSystem {
     int const CondCtrlVariedOff(2); // Condensation control--variable off, system modulates to keep running if possible
     // Number of Circuits per Surface Calculation Method
     int const OneCircuit(1);          // there is 1 circuit per surface
-    int const CalculateFromLength(2); // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
+    int const CalculateFromLength(2); // The number of circuits is TubeLength*SurfaceFrac / CircuitLength
     std::string const OnePerSurf("OnePerSurface");
     std::string const CalcFromLength("CalculateFromCircuitLength");
     // Limit temperatures to indicate that a system cannot heat or cannot cool
@@ -216,7 +216,7 @@ namespace LowTempRadiantSystem {
     Array1D_bool CheckEquipName;
 
     // Object Data
-    Array1D<HydronicRadiantSystemData> HydrRadSys;
+    Array1D<VariableFlowRadiantSystemData> HydrRadSys;
     Array1D<ConstantFlowRadiantSystemData> CFloRadSys;
     Array1D<ElectricRadiantSystemData> ElecRadSys;
     Array1D<RadSysTypeData> RadSysTypes;
@@ -536,12 +536,12 @@ namespace LowTempRadiantSystem {
                 HydrRadSys(Item).NumOfSurfaces = SurfList(SurfListNum).NumOfSurfaces;
                 HydrRadSys(Item).SurfacePtr.allocate(HydrRadSys(Item).NumOfSurfaces);
                 HydrRadSys(Item).SurfaceName.allocate(HydrRadSys(Item).NumOfSurfaces);
-                HydrRadSys(Item).SurfaceFlowFrac.allocate(HydrRadSys(Item).NumOfSurfaces);
+                HydrRadSys(Item).SurfaceFrac.allocate(HydrRadSys(Item).NumOfSurfaces);
                 HydrRadSys(Item).NumCircuits.allocate(HydrRadSys(Item).NumOfSurfaces);
                 for (SurfNum = 1; SurfNum <= SurfList(SurfListNum).NumOfSurfaces; ++SurfNum) {
                     HydrRadSys(Item).SurfacePtr(SurfNum) = SurfList(SurfListNum).SurfPtr(SurfNum);
                     HydrRadSys(Item).SurfaceName(SurfNum) = SurfList(SurfListNum).SurfName(SurfNum);
-                    HydrRadSys(Item).SurfaceFlowFrac(SurfNum) = SurfList(SurfListNum).SurfFlowFrac(SurfNum);
+                    HydrRadSys(Item).SurfaceFrac(SurfNum) = SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     if (HydrRadSys(Item).SurfacePtr(SurfNum) > 0) {
                         Surface(HydrRadSys(Item).SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
                     }
@@ -550,11 +550,11 @@ namespace LowTempRadiantSystem {
                 HydrRadSys(Item).NumOfSurfaces = 1;
                 HydrRadSys(Item).SurfacePtr.allocate(HydrRadSys(Item).NumOfSurfaces);
                 HydrRadSys(Item).SurfaceName.allocate(HydrRadSys(Item).NumOfSurfaces);
-                HydrRadSys(Item).SurfaceFlowFrac.allocate(HydrRadSys(Item).NumOfSurfaces);
+                HydrRadSys(Item).SurfaceFrac.allocate(HydrRadSys(Item).NumOfSurfaces);
                 HydrRadSys(Item).NumCircuits.allocate(HydrRadSys(Item).NumOfSurfaces);
                 HydrRadSys(Item).SurfaceName(1) = HydrRadSys(Item).SurfListName;
                 HydrRadSys(Item).SurfacePtr(1) = UtilityRoutines::FindItemInList(HydrRadSys(Item).SurfaceName(1), Surface);
-                HydrRadSys(Item).SurfaceFlowFrac(1) = 1.0;
+                HydrRadSys(Item).SurfaceFrac(1) = 1.0;
                 HydrRadSys(Item).NumCircuits(1) = 0.0;
                 // Error checking for single surfaces
                 if (HydrRadSys(Item).SurfacePtr(1) == 0) {
@@ -865,13 +865,13 @@ namespace LowTempRadiantSystem {
                 CFloRadSys(Item).NumOfSurfaces = SurfList(SurfListNum).NumOfSurfaces;
                 CFloRadSys(Item).SurfacePtr.allocate(CFloRadSys(Item).NumOfSurfaces);
                 CFloRadSys(Item).SurfaceName.allocate(CFloRadSys(Item).NumOfSurfaces);
-                CFloRadSys(Item).SurfaceFlowFrac.allocate(CFloRadSys(Item).NumOfSurfaces);
+                CFloRadSys(Item).SurfaceFrac.allocate(CFloRadSys(Item).NumOfSurfaces);
                 CFloRadSys(Item).NumCircuits.allocate(CFloRadSys(Item).NumOfSurfaces);
                 MaxCloNumOfSurfaces = max(MaxCloNumOfSurfaces, CFloRadSys(Item).NumOfSurfaces);
                 for (SurfNum = 1; SurfNum <= SurfList(SurfListNum).NumOfSurfaces; ++SurfNum) {
                     CFloRadSys(Item).SurfacePtr(SurfNum) = SurfList(SurfListNum).SurfPtr(SurfNum);
                     CFloRadSys(Item).SurfaceName(SurfNum) = SurfList(SurfListNum).SurfName(SurfNum);
-                    CFloRadSys(Item).SurfaceFlowFrac(SurfNum) = SurfList(SurfListNum).SurfFlowFrac(SurfNum);
+                    CFloRadSys(Item).SurfaceFrac(SurfNum) = SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     CFloRadSys(Item).NumCircuits(SurfNum) = 0.0;
                     if (CFloRadSys(Item).SurfacePtr(SurfNum) != 0) {
                         Surface(CFloRadSys(Item).SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
@@ -881,12 +881,12 @@ namespace LowTempRadiantSystem {
                 CFloRadSys(Item).NumOfSurfaces = 1;
                 CFloRadSys(Item).SurfacePtr.allocate(CFloRadSys(Item).NumOfSurfaces);
                 CFloRadSys(Item).SurfaceName.allocate(CFloRadSys(Item).NumOfSurfaces);
-                CFloRadSys(Item).SurfaceFlowFrac.allocate(CFloRadSys(Item).NumOfSurfaces);
+                CFloRadSys(Item).SurfaceFrac.allocate(CFloRadSys(Item).NumOfSurfaces);
                 CFloRadSys(Item).NumCircuits.allocate(CFloRadSys(Item).NumOfSurfaces);
                 MaxCloNumOfSurfaces = max(MaxCloNumOfSurfaces, CFloRadSys(Item).NumOfSurfaces);
                 CFloRadSys(Item).SurfaceName(1) = CFloRadSys(Item).SurfListName;
                 CFloRadSys(Item).SurfacePtr(1) = UtilityRoutines::FindItemInList(CFloRadSys(Item).SurfaceName(1), Surface);
-                CFloRadSys(Item).SurfaceFlowFrac(1) = 1.0;
+                CFloRadSys(Item).SurfaceFrac(1) = 1.0;
                 CFloRadSys(Item).NumCircuits(1) = 0.0;
                 // Error checking for single surfaces
                 if (CFloRadSys(Item).SurfacePtr(1) == 0) {
@@ -1109,20 +1109,20 @@ namespace LowTempRadiantSystem {
                 ElecRadSys(Item).NumOfSurfaces = SurfList(SurfListNum).NumOfSurfaces;
                 ElecRadSys(Item).SurfacePtr.allocate(ElecRadSys(Item).NumOfSurfaces);
                 ElecRadSys(Item).SurfaceName.allocate(ElecRadSys(Item).NumOfSurfaces);
-                ElecRadSys(Item).SurfacePowerFrac.allocate(ElecRadSys(Item).NumOfSurfaces);
+                ElecRadSys(Item).SurfaceFrac.allocate(ElecRadSys(Item).NumOfSurfaces);
                 for (SurfNum = 1; SurfNum <= SurfList(SurfListNum).NumOfSurfaces; ++SurfNum) {
                     ElecRadSys(Item).SurfacePtr(SurfNum) = SurfList(SurfListNum).SurfPtr(SurfNum);
                     ElecRadSys(Item).SurfaceName(SurfNum) = SurfList(SurfListNum).SurfName(SurfNum);
-                    ElecRadSys(Item).SurfacePowerFrac(SurfNum) = SurfList(SurfListNum).SurfFlowFrac(SurfNum);
+                    ElecRadSys(Item).SurfaceFrac(SurfNum) = SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                 }
             } else { // User entered a single surface name rather than a surface list
                 ElecRadSys(Item).NumOfSurfaces = 1;
                 ElecRadSys(Item).SurfacePtr.allocate(ElecRadSys(Item).NumOfSurfaces);
                 ElecRadSys(Item).SurfaceName.allocate(ElecRadSys(Item).NumOfSurfaces);
-                ElecRadSys(Item).SurfacePowerFrac.allocate(ElecRadSys(Item).NumOfSurfaces);
+                ElecRadSys(Item).SurfaceFrac.allocate(ElecRadSys(Item).NumOfSurfaces);
                 ElecRadSys(Item).SurfaceName(1) = ElecRadSys(Item).SurfListName;
                 ElecRadSys(Item).SurfacePtr(1) = UtilityRoutines::FindItemInList(ElecRadSys(Item).SurfaceName(1), Surface);
-                ElecRadSys(Item).SurfacePowerFrac(1) = 1.0;
+                ElecRadSys(Item).SurfaceFrac(1) = 1.0;
                 // Error checking for single surfaces
                 if (ElecRadSys(Item).SurfacePtr(1) == 0) {
                     ShowSevereError(RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
@@ -2745,7 +2745,7 @@ namespace LowTempRadiantSystem {
             for (SurfNum = 1; SurfNum <= HydrRadSys(RadSysNum).NumOfSurfaces; ++SurfNum) {
                 if (HydrRadSys(RadSysNum).NumCircCalcMethod == CalculateFromLength) {
                     HydrRadSys(RadSysNum).NumCircuits(SurfNum) =
-                        (HydrRadSys(RadSysNum).SurfaceFlowFrac(SurfNum) * HydrRadSys(RadSysNum).TubeLength) / HydrRadSys(RadSysNum).CircLength;
+                        (HydrRadSys(RadSysNum).SurfaceFrac(SurfNum) * HydrRadSys(RadSysNum).TubeLength) / HydrRadSys(RadSysNum).CircLength;
                     HydrRadSys(RadSysNum).NumCircuits(SurfNum) = max(HydrRadSys(RadSysNum).NumCircuits(SurfNum), 1.0);
                 } else {
                     HydrRadSys(RadSysNum).NumCircuits(SurfNum) = 1.0;
@@ -2940,7 +2940,7 @@ namespace LowTempRadiantSystem {
             for (SurfNum = 1; SurfNum <= CFloRadSys(RadSysNum).NumOfSurfaces; ++SurfNum) {
                 if (CFloRadSys(RadSysNum).NumCircCalcMethod == CalculateFromLength) {
                     CFloRadSys(RadSysNum).NumCircuits(SurfNum) =
-                        (CFloRadSys(RadSysNum).SurfaceFlowFrac(SurfNum) * CFloRadSys(RadSysNum).TubeLength) / CFloRadSys(RadSysNum).CircLength;
+                        (CFloRadSys(RadSysNum).SurfaceFrac(SurfNum) * CFloRadSys(RadSysNum).TubeLength) / CFloRadSys(RadSysNum).CircLength;
                     CFloRadSys(RadSysNum).NumCircuits(SurfNum) = max(CFloRadSys(RadSysNum).NumCircuits(SurfNum), 1.0);
                 } else {
                     CFloRadSys(RadSysNum).NumCircuits(SurfNum) = 1.0;
@@ -3315,7 +3315,7 @@ namespace LowTempRadiantSystem {
                                                    HydronicSystem,
                                                    WaterTempIn,
                                                    WaterMassFlow,
-                                                   HydrRadSys(RadSysNum).SurfaceFlowFrac(RadSurfNum),
+                                                   HydrRadSys(RadSysNum).SurfaceFrac(RadSurfNum),
                                                    HydrRadSys(RadSysNum).NumCircuits(RadSurfNum),
                                                    HydrRadSys(RadSysNum).TubeLength,
                                                    HydrRadSys(RadSysNum).TubeDiameter,
@@ -3594,7 +3594,7 @@ namespace LowTempRadiantSystem {
                                                                HydronicSystem,
                                                                WaterTempIn,
                                                                WaterMassFlow,
-                                                               HydrRadSys(RadSysNum).SurfaceFlowFrac(RadSurfNum3),
+                                                               HydrRadSys(RadSysNum).SurfaceFrac(RadSurfNum3),
                                                                HydrRadSys(RadSysNum).NumCircuits(RadSurfNum3),
                                                                HydrRadSys(RadSysNum).TubeLength,
                                                                HydrRadSys(RadSysNum).TubeDiameter,
@@ -4376,7 +4376,7 @@ namespace LowTempRadiantSystem {
                                                    ConstantFlowSystem,
                                                    WaterTempIn,
                                                    WaterMassFlow,
-                                                   CFloRadSys(RadSysNum).SurfaceFlowFrac(RadSurfNum),
+                                                   CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum),
                                                    CFloRadSys(RadSysNum).NumCircuits(RadSurfNum),
                                                    CFloRadSys(RadSysNum).TubeLength,
                                                    CFloRadSys(RadSysNum).TubeDiameter,
@@ -4459,7 +4459,7 @@ namespace LowTempRadiantSystem {
                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
 
-                Mdot = WaterMassFlow * CFloRadSys(RadSysNum).SurfaceFlowFrac(RadSurfNum);
+                Mdot = WaterMassFlow * CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum);
                 Cp = GetSpecificHeatGlycol(fluidNameWater, WaterTempIn, CFloRadSys(RadSysNum).GlycolIndex, RoutineName);
 
                 if (!Iteration) {
@@ -4519,8 +4519,8 @@ namespace LowTempRadiantSystem {
                         SumFlowFracCkCm = 0.0;
                         SumFlowFracOneMinusCm = 0.0;
                         for (RadSurfNum2 = 1; RadSurfNum2 <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                            SumFlowFracCkCm += (CFloRadSys(RadSysNum).SurfaceFlowFrac(RadSurfNum2) * Ckj(RadSurfNum) * Cmj(RadSurfNum2));
-                            SumFlowFracOneMinusCm += (CFloRadSys(RadSysNum).SurfaceFlowFrac(RadSurfNum2) * (1.0 - Cmj(RadSurfNum2)));
+                            SumFlowFracCkCm += (CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum2) * Ckj(RadSurfNum) * Cmj(RadSurfNum2));
+                            SumFlowFracOneMinusCm += (CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum2) * (1.0 - Cmj(RadSurfNum2)));
                         }
 
                         LoopTerm = (CFloRadSys(RadSysNum).WaterInjectionRate / CFloRadSys(RadSysNum).WaterMassFlowRate) * Node(MainLoopNodeIn).Temp +
@@ -4536,7 +4536,7 @@ namespace LowTempRadiantSystem {
 
                         for (RadSurfNum2 = 1; RadSurfNum2 <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
                             WaterTempOut(RadSurfNum2) = WaterTempIn * (1.0 - Cmj(RadSurfNum2)) + (Ckj(RadSurfNum2) * Cmj(RadSurfNum2));
-                            Mdot = WaterMassFlow * CFloRadSys(RadSysNum).SurfaceFlowFrac(RadSurfNum2);
+                            Mdot = WaterMassFlow * CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum2);
                             SurfNum = CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum2);
                             QRadSysSource(SurfNum) = Mdot * Cp * (WaterTempIn - WaterTempOut(RadSurfNum2));
                             if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
@@ -4714,7 +4714,7 @@ namespace LowTempRadiantSystem {
             for (RadSurfNum = 1; RadSurfNum <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                 SurfNum = CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum);
                 TotalRadSysPower += QRadSysSource(SurfNum);
-                WaterOutletTempCheck += (CFloRadSys(RadSysNum).SurfaceFlowFrac(RadSurfNum) * WaterTempOut(RadSurfNum));
+                WaterOutletTempCheck += (CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum) * WaterTempOut(RadSurfNum));
             }
             TotalRadSysPower *= ZoneMult;
 
@@ -4827,7 +4827,7 @@ namespace LowTempRadiantSystem {
                 // Set the heat source for the low temperature electric radiant system
                 for (RadSurfNum = 1; RadSurfNum <= ElecRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                     SurfNum = ElecRadSys(RadSysNum).SurfacePtr(RadSurfNum);
-                    QRadSysSource(SurfNum) = HeatFrac * ElecRadSys(RadSysNum).MaxElecPower * ElecRadSys(RadSysNum).SurfacePowerFrac(RadSurfNum);
+                    QRadSysSource(SurfNum) = HeatFrac * ElecRadSys(RadSysNum).MaxElecPower * ElecRadSys(RadSysNum).SurfaceFrac(RadSurfNum);
                     if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
                         QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
                 }
