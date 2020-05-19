@@ -4721,7 +4721,7 @@ TEST_F(EnergyPlusFixture, HPWH_Wrapped_Stratified_Simultaneous)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // This returns true if ErrorsFound
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state, outputFiles()));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
 
     // Previous warning before fix
     //std::string const error_string = delimited_string({
@@ -4995,7 +4995,7 @@ TEST_F(EnergyPlusFixture, HPWH_Pumped_Stratified_Simultaneous)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // This returns true if ErrorsFound
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state, outputFiles()));
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
 
     // Previous warning before fix
     //std::string const error_string = delimited_string({
