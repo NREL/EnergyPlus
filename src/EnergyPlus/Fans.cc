@@ -3197,7 +3197,7 @@ namespace Fans {
         // Check whether the fan curve covers the design operational point of the fan
         FanCalDeltaPress = CurveValue(FanCurvePtr, FanDesignAirFlowRate);
         if ((FanCalDeltaPress < 0.9 * FanDesignDeltaPress) || (FanCalDeltaPress > 1.1 * FanDesignDeltaPress)) {
-            ShowWarningError("The design operatinal point of the fan " + FanName + " does not fall ");
+            ShowWarningError("The design operational point of the fan " + FanName + " does not fall ");
             ShowContinueError("on the fan curve provided in the FaultModel:Fouling:AirFilter object. ");
             return 0.0;
         }
@@ -3212,8 +3212,8 @@ namespace Fans {
             FanCalDeltaPresstemp = CurveValue(FanCurvePtr, FanFaultyAirFlowRate);
 
             if ((FanCalDeltaPresstemp <= FanCalDeltaPress) || (FanFaultyAirFlowRate <= PerfCurve(FanCurvePtr).Var1Min)) {
-                // The new operatinal point of the fan go beyond the fan selection range
-                ShowWarningError("The operatinal point of the fan " + FanName + " may go beyond the fan selection ");
+                // The new operational point of the fan go beyond the fan selection range
+                ShowWarningError("The operational point of the fan " + FanName + " may go beyond the fan selection ");
                 ShowContinueError("range in the faulty fouling air filter cases");
                 break;
             }
