@@ -1776,120 +1776,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowFromSystemMethod)
         "    Through: 12/31,          !- Field 45",
         "    For: AllDays,            !- Field 46",
         "    Until: 24:00,1.00;       !- Field 47",
-
-        "  EnergyManagementSystem:Sensor,",
-        "    Qdot_DXCoil_Sens,        !- Name",
-        "    Main Cooling Coil 1,     !- Output:Variable or Output:Meter Index Key Name",
-        "    Cooling Coil Sensible Cooling Rate;  !- Output:Variable or Output:Meter Name",
-
-        "  EnergyManagementSystem:Sensor,",
-        "    Power_DX_Coil_Elec,      !- Name",
-        "    Main Cooling Coil 1,     !- Output:Variable or Output:Meter Index Key Name",
-        "    Cooling Coil Electric Power;  !- Output:Variable or Output:Meter Name",
-
-        "  EnergyManagementSystem:Sensor,",
-        "    Power_SupplyFan_Elec,    !- Name",
-        "    EC Plug Fan 1,           !- Output:Variable or Output:Meter Index Key Name",
-        "    Fan Electric Power;      !- Output:Variable or Output:Meter Name",
-
-        "  EnergyManagementSystem:Sensor,",
-        "    DeltaT_SupplyFan,        !- Name",
-        "    EC Plug Fan 1,           !- Output:Variable or Output:Meter Index Key Name",
-        "    Fan Rise in Air Temperature;  !- Output:Variable or Output:Meter Name",
-
-        "  EnergyManagementSystem:Sensor,",
-        "    Mdot_SupplyFan,          !- Name",
-        "    Supply Outlet Node,      !- Output:Variable or Output:Meter Index Key Name",
-        "    System Node Mass Flow Rate;  !- Output:Variable or Output:Meter Name",
-
-        "  EnergyManagementSystem:Sensor,",
-        "    Tout_SupplyFan,          !- Name",
-        "    Supply Outlet Node,      !- Output:Variable or Output:Meter Index Key Name",
-        "    System Node Temperature; !- Output:Variable or Output:Meter Name",
-
-        "  EnergyManagementSystem:Sensor,",
-        "    Wout_SupplyFan,          !- Name",
-        "    Supply Outlet Node,      !- Output:Variable or Output:Meter Index Key Name",
-        "    System Node Humidity Ratio;  !- Output:Variable or Output:Meter Name",
-
-        "  EnergyManagementSystem:OutputVariable,",
-        "    CRAC total system Power, !- Name",
-        "    PowerCRAC,               !- EMS Variable Name",
-        "    Averaged,                !- Type of Data in Variable",
-        "    SystemTimeStep,          !- Update Frequency",
-        "    ,                        !- EMS Program or Subroutine Name",
-        "    W;                       !- Units",
-
-        "  EnergyManagementSystem:OutputVariable,",
-        "    CRAC Net Sensible Capacity,  !- Name",
-        "    QdotNetSens,             !- EMS Variable Name",
-        "    Averaged,                !- Type of Data in Variable",
-        "    SystemTimeStep,          !- Update Frequency",
-        "    ,                        !- EMS Program or Subroutine Name",
-        "    W;                       !- Units",
-
-        "  EnergyManagementSystem:OutputVariable,",
-        "    CRAC SCOP,               !- Name",
-        "    SCOP,                    !- EMS Variable Name",
-        "    Averaged,                !- Type of Data in Variable",
-        "    SystemTimeStep,          !- Update Frequency",
-        "    ,                        !- EMS Program or Subroutine Name",
-        "    ;                        !- Units",
-
-        "  EnergyManagementSystem:GlobalVariable,",
-        "    SCOP,                    !- Erl Variable 1 Name",
-        "    QdotNetSens,             !- Erl Variable 2 Name",
-        "    PowerCRAC;               !- Erl Variable 3 Name",
-
-        "  EnergyManagementSystem:ProgramCallingManager,",
-        "    Calculate Sensible Coefficient of Performance,  !- Name",
-        "    EndOfZoneTimestepBeforeZoneReporting,  !- EnergyPlus Model Calling Point",
-        "    CalcSCOP,                !- Program Name 1",
-        "    CalcPUE;                 !- Program Name 2",
-
-        "  EnergyManagementSystem:Program,",
-        "    CalcSCOP,                !- Name",
-        "    set cpair = @CpAirFnW Wout_SupplyFan,  !- Program Line 1",
-        "    set FanSensHeat = (Mdot_SupplyFan * cpair ) * DeltaT_SupplyFan,  !- Program Line 2",
-        "    set numerator = Qdot_DXCoil_Sens - FanSensHeat,  !- <none>",
-        "    set denominator = Power_DX_Coil_Elec + Power_SupplyFan_Elec,  !- <none>",
-        "    Set SCOP = numerator / denominator,  !- <none>",
-        "    Set QdotNetSens = numerator,  !- <none>",
-        "    Set PowerCRAC = denominator;  !- <none>",
-
-        "  Output:EnergyManagementSystem,",
-        "    Verbose,                 !- Actuator Availability Dictionary Reporting",
-        "    Verbose,                 !- Internal Variable Availability Dictionary Reporting",
-        "    Verbose;                 !- EMS Runtime Language Debug Output Level",
-
-        "  EnergyManagementSystem:Sensor,",
-        "    IT_Equip_power,          !- Name",
-        "    Whole Building,          !- Output:Variable or Output:Meter Index Key Name",
-        "    Facility Total Building Electric Demand Power;  !- Output:Variable or Output:Meter Name",
-
-        "  EnergyManagementSystem:Sensor,",
-        "    whole_building_power,    !- Name",
-        "    Whole Building,          !- Output:Variable or Output:Meter Index Key Name",
-        "    Facility Total Electric Demand Power;  !- Output:Variable or Output:Meter Name",
-
-        "  EnergyManagementSystem:OutputVariable,",
-        "    PUE,                     !- Name",
-        "    PUE,                     !- EMS Variable Name",
-        "    Averaged,                !- Type of Data in Variable",
-        "    SystemTimeStep,          !- Update Frequency",
-        "    ,                        !- EMS Program or Subroutine Name",
-        "    ;                        !- Units",
-
-        "  EnergyManagementSystem:GlobalVariable,",
-        "    PUE;                     !- Erl Variable 1 Name",
-
-        "  EnergyManagementSystem:Program,",
-        "    CalcPUE,                 !- Name",
-        "    IF IT_Equip_power > 0.0, !- Program Line 1",
-        "    set PUE = whole_building_power / IT_Equip_power,  !- Program Line 2",
-        "    ELSE,                    !- <none>",
-        "    set PUE = 0.0,           !- <none>",
-        "    ENDIF;                   !- <none>",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1909,4 +1795,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowFromSystemMethod)
     InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
     DataZoneEquipment::GetZoneEquipmentData1(state);
     InternalHeatGains::CalcZoneITEq();
+
+    int ZoneNum = DataHeatBalance::ZoneITEq(1).ZonePtr;
+    EXPECT_EQ(DataHeatBalance::ZnRpt(ZoneNum).SumTinMinusTSup, 0.0);
+    EXPECT_EQ(DataHeatBalance::ZnRpt(ZoneNum).SumToutMinusTSup, 0.0);
 }
