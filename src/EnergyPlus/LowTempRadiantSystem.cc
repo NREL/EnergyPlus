@@ -170,6 +170,8 @@ namespace LowTempRadiantSystem {
     int const OperativeControl(3); // Controls system using operative temperature
     int const ODBControl(4);       // Controls system using outside air dry-bulb temperature
     int const OWBControl(5);       // Controls system using outside air wet-bulb temperature
+    int const SurfFaceTempControl(6);   // Controls system using the surface inside face temperature
+    int const SurfIntTempControl(7);    // Controls system using a temperature inside the radiant system construction as defined by the Construction:InternalSource input
     // Condensation control types:
     int const CondCtrlNone(0);      // Condensation control--none, so system never shuts down
     int const CondCtrlSimpleOff(1); // Condensation control--simple off, system shuts off when condensation predicted
@@ -377,6 +379,8 @@ namespace LowTempRadiantSystem {
         static std::string const OperativeTemperature("OperativeTemperature");
         static std::string const OutsideAirDryBulbTemperature("OutdoorDryBulbTemperature");
         static std::string const OutsideAirWetBulbTemperature("OutdoorWetBulbTemperature");
+        static std::string const SurfaceFaceTemperature("SurfaceFaceTemperature");
+        static std::string const SurfaceInteriorTemperature("SurfaceInteriorTemperature");
         static std::string const RoutineName("GetLowTempRadiantSystem: "); // include trailing blank space
         static std::string const Off("Off");
         static std::string const SimpleOff("SimpleOff");
@@ -593,22 +597,7 @@ namespace LowTempRadiantSystem {
             HydrRadSys(Item).TubeLength = Numbers(2);
 
             // Process the temperature control type
-            if (UtilityRoutines::SameString(Alphas(5), MeanAirTemperature)) {
-                HydrRadSys(Item).ControlType = MATControl;
-            } else if (UtilityRoutines::SameString(Alphas(5), MeanRadiantTemperature)) {
-                HydrRadSys(Item).ControlType = MRTControl;
-            } else if (UtilityRoutines::SameString(Alphas(5), OperativeTemperature)) {
-                HydrRadSys(Item).ControlType = OperativeControl;
-            } else if (UtilityRoutines::SameString(Alphas(5), OutsideAirDryBulbTemperature)) {
-                HydrRadSys(Item).ControlType = ODBControl;
-            } else if (UtilityRoutines::SameString(Alphas(5), OutsideAirWetBulbTemperature)) {
-                HydrRadSys(Item).ControlType = OWBControl;
-            } else {
-                ShowWarningError("Invalid " + cAlphaFields(5) + " =" + Alphas(5));
-                ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError("Control reset to MAT control for this Hydronic Radiant System.");
-                HydrRadSys(Item).ControlType = MATControl;
-            }
+            HydrRadSys(Item).ControlType = ProcessRadiantSystemControlInput(Alphas(5),cAlphaFields(5),Alphas(1));
 
             // Determine Low Temp Radiant heating design capacity sizing method
             if (UtilityRoutines::SameString(Alphas(6), "HeatingDesignCapacity")) {
@@ -940,22 +929,7 @@ namespace LowTempRadiantSystem {
             CFloRadSys(Item).TubeLength = Numbers(2);
 
             // Process the temperature control type
-            if (UtilityRoutines::SameString(Alphas(5), MeanAirTemperature)) {
-                CFloRadSys(Item).ControlType = MATControl;
-            } else if (UtilityRoutines::SameString(Alphas(5), MeanRadiantTemperature)) {
-                CFloRadSys(Item).ControlType = MRTControl;
-            } else if (UtilityRoutines::SameString(Alphas(5), OperativeTemperature)) {
-                CFloRadSys(Item).ControlType = OperativeControl;
-            } else if (UtilityRoutines::SameString(Alphas(5), OutsideAirDryBulbTemperature)) {
-                CFloRadSys(Item).ControlType = ODBControl;
-            } else if (UtilityRoutines::SameString(Alphas(5), OutsideAirWetBulbTemperature)) {
-                CFloRadSys(Item).ControlType = OWBControl;
-            } else {
-                ShowWarningError("Invalid " + cAlphaFields(5) + " =" + Alphas(5));
-                ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError("Control reset to MAT control for this Constant Flow Radiant System.");
-                CFloRadSys(Item).ControlType = MATControl;
-            }
+            CFloRadSys(Item).ControlType = ProcessRadiantSystemControlInput(Alphas(5),cAlphaFields(5),Alphas(1));
 
             // Process pump input for constant flow (hydronic) radiant system
             CFloRadSys(Item).WaterVolFlowMax = Numbers(3);
@@ -1251,22 +1225,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Process the temperature control type
-            if (UtilityRoutines::SameString(Alphas(6), MeanAirTemperature)) {
-                ElecRadSys(Item).ControlType = MATControl;
-            } else if (UtilityRoutines::SameString(Alphas(6), MeanRadiantTemperature)) {
-                ElecRadSys(Item).ControlType = MRTControl;
-            } else if (UtilityRoutines::SameString(Alphas(6), OperativeTemperature)) {
-                ElecRadSys(Item).ControlType = OperativeControl;
-            } else if (UtilityRoutines::SameString(Alphas(6), OutsideAirDryBulbTemperature)) {
-                ElecRadSys(Item).ControlType = ODBControl;
-            } else if (UtilityRoutines::SameString(Alphas(6), OutsideAirWetBulbTemperature)) {
-                ElecRadSys(Item).ControlType = OWBControl;
-            } else {
-                ShowWarningError("Invalid " + cAlphaFields(6) + " = " + Alphas(6));
-                ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError("Control reset to MAT control for this Electric Radiant System.");
-                ElecRadSys(Item).ControlType = MATControl;
-            }
+            ElecRadSys(Item).ControlType = ProcessRadiantSystemControlInput(Alphas(6),cAlphaFields(6),Alphas(1));
 
             ElecRadSys(Item).ThrottlRange = Numbers(4);
             if (ElecRadSys(Item).ThrottlRange < MinThrottlingRange) {
@@ -1639,6 +1598,45 @@ namespace LowTempRadiantSystem {
                                 _,
                                 "System");
         }
+    }
+
+    int ProcessRadiantSystemControlInput(std::string const ControlInput,
+                                         std::string const ControlInputField,
+                                         std::string const RadSysName)
+    {
+        static std::string const MeanAirTemperature("MeanAirTemperature");
+        static std::string const MeanRadiantTemperature("MeanRadiantTemperature");
+        static std::string const OperativeTemperature("OperativeTemperature");
+        static std::string const OutsideAirDryBulbTemperature("OutdoorDryBulbTemperature");
+        static std::string const OutsideAirWetBulbTemperature("OutdoorWetBulbTemperature");
+        static std::string const SurfaceFaceTemperature("SurfaceFaceTemperature");
+        static std::string const SurfaceInteriorTemperature("SurfaceInteriorTemperature");
+        
+        // Return value
+        int RadSysCtrlType;
+
+        if (UtilityRoutines::SameString(ControlInput, MeanAirTemperature)) {
+            RadSysCtrlType = MATControl;
+        } else if (UtilityRoutines::SameString(ControlInput, MeanRadiantTemperature)) {
+            RadSysCtrlType = MRTControl;
+        } else if (UtilityRoutines::SameString(ControlInput, OperativeTemperature)) {
+            RadSysCtrlType = OperativeControl;
+        } else if (UtilityRoutines::SameString(ControlInput, OutsideAirDryBulbTemperature)) {
+            RadSysCtrlType = ODBControl;
+        } else if (UtilityRoutines::SameString(ControlInput, OutsideAirWetBulbTemperature)) {
+            RadSysCtrlType = OWBControl;
+        } else if (UtilityRoutines::SameString(ControlInput, SurfaceFaceTemperature)) {
+            RadSysCtrlType = SurfFaceTempControl;
+        } else if (UtilityRoutines::SameString(ControlInput, SurfaceInteriorTemperature)) {
+             RadSysCtrlType = SurfIntTempControl;
+        } else {
+            ShowWarningError("Invalid " + ControlInputField + " = " + ControlInput);
+            ShowContinueError("Occurs in Low Temperature Radiant System = " + RadSysName);
+            ShowContinueError("Control reset to MAT control for this Low Temperature Radiant System.");
+            RadSysCtrlType = MATControl;
+        }
+
+        return RadSysCtrlType;
     }
 
     void InitLowTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -3052,10 +3050,8 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataHeatBalance::MRT;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneData;
-        using DataHeatBalFanSys::MAT;
         using DataHVACGlobals::SmallLoad;
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -3114,25 +3110,9 @@ namespace LowTempRadiantSystem {
             }
         } else { // Unit might be on-->this section is intended to control the water mass flow rate being
             // sent to the radiant system
-            {
-                auto const SELECT_CASE_var(HydrRadSys(RadSysNum).ControlType);
-                if (SELECT_CASE_var == MATControl) {
-                    ControlTemp = MAT(ZoneNum);
-                } else if (SELECT_CASE_var == MRTControl) {
-                    ControlTemp = MRT(ZoneNum);
-                } else if (SELECT_CASE_var == OperativeControl) {
-                    ControlTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
-                } else if (SELECT_CASE_var == ODBControl) {
-                    ControlTemp = Zone(ZoneNum).OutDryBulbTemp;
-                } else if (SELECT_CASE_var == OWBControl) {
-                    ControlTemp = Zone(ZoneNum).OutWetBulbTemp;
-                } else { // Should never get here
-                    ControlTemp = MAT(ZoneNum);
-                    ShowSevereError("Illegal control type in low temperature radiant system: " + HydrRadSys(RadSysNum).Name);
-                    ShowFatalError("Preceding condition causes termination.");
-                }
-            }
-
+            
+            ControlTemp = SetRadSysControlTemp(HydrRadSys(RadSysNum).ControlType,ZoneNum,HydrRadSys(RadSysNum).Name);
+            
             if (HydrRadSys(RadSysNum).HotSetptSchedPtr > 0) {
                 SetPointTemp = GetCurrentScheduleValue(HydrRadSys(RadSysNum).HotSetptSchedPtr);
                 OffTempHeat = SetPointTemp + 0.5 * HydrRadSys(RadSysNum).HotThrottlRange;
@@ -3798,24 +3778,8 @@ namespace LowTempRadiantSystem {
             // mass flow rate being sent to the radiant system
 
             // Set the current setpoint temperature (same procedure for either heating or cooling)
-            {
-                auto const SELECT_CASE_var(CFloRadSys(RadSysNum).ControlType);
-                if (SELECT_CASE_var == MATControl) {
-                    SetPointTemp = MAT(ZoneNum);
-                } else if (SELECT_CASE_var == MRTControl) {
-                    SetPointTemp = MRT(ZoneNum);
-                } else if (SELECT_CASE_var == OperativeControl) {
-                    SetPointTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
-                } else if (SELECT_CASE_var == ODBControl) {
-                    SetPointTemp = Zone(ZoneNum).OutDryBulbTemp;
-                } else if (SELECT_CASE_var == OWBControl) {
-                    SetPointTemp = Zone(ZoneNum).OutWetBulbTemp;
-                } else {                // Should never get here
-                    SetPointTemp = 0.0; // Suppress uninitialized warning
-                    ShowSevereError("Illegal control type in low temperature radiant system: " + CFloRadSys(RadSysNum).Name);
-                    ShowFatalError("Preceding condition causes termination.");
-                }
-            }
+            
+            SetPointTemp = SetRadSysControlTemp(CFloRadSys(RadSysNum).ControlType,ZoneNum,CFloRadSys(RadSysNum).Name);
 
             // Avoid problems when there is no heating or cooling control because the system only cools or heats
             if (CFloRadSys(RadSysNum).HotCtrlHiTempSchedPtr > 0) {
@@ -4849,24 +4813,8 @@ namespace LowTempRadiantSystem {
             OffTemp = SetPtTemp + 0.5 * ElecRadSys(RadSysNum).ThrottlRange;
 
             // Determine the control temperature--what the setpoint/offtemp is being compared to for unit operation
-            {
-                auto const SELECT_CASE_var(ElecRadSys(RadSysNum).ControlType);
-                if (SELECT_CASE_var == MATControl) {
-                    ControlTemp = MAT(ZoneNum);
-                } else if (SELECT_CASE_var == MRTControl) {
-                    ControlTemp = MRT(ZoneNum);
-                } else if (SELECT_CASE_var == OperativeControl) {
-                    ControlTemp = (MAT(ZoneNum) + MRT(ZoneNum)) / 2.0;
-                } else if (SELECT_CASE_var == ODBControl) {
-                    ControlTemp = Zone(ZoneNum).OutDryBulbTemp;
-                } else if (SELECT_CASE_var == OWBControl) {
-                    ControlTemp = Zone(ZoneNum).OutWetBulbTemp;
-                } else { // Should never get here
-                    ControlTemp = MAT(ZoneNum);
-                    ShowSevereError("Illegal control type in low temperature radiant system: " + ElecRadSys(RadSysNum).Name);
-                    ShowFatalError("Preceding condition causes termination.");
-                }
-            }
+            
+            ControlTemp = SetRadSysControlTemp(ElecRadSys(RadSysNum).ControlType,ZoneNum,ElecRadSys(RadSysNum).Name);
 
             if (ControlTemp < OffTemp) { // HEATING MODE
 
@@ -5254,6 +5202,44 @@ namespace LowTempRadiantSystem {
             }
         }
     }
+
+    Real64 SetRadSysControlTemp(int const RadSysCtrlType,       // Radiant system control type (set by user input)
+                                int const ZoneNum,              // Zone number for this low temperature radiant system
+                                std::string const RadSysName    // User input for radiant system name)
+    )
+    {
+        using DataHeatBalance::MRT;
+        using DataHeatBalance::Zone;
+        using DataHeatBalFanSys::MAT;
+        
+        // Return value
+        Real64 ControlTemp;
+        
+        if (RadSysCtrlType == MATControl) {
+            ControlTemp = MAT(ZoneNum);
+        } else if (RadSysCtrlType == MRTControl) {
+            ControlTemp = MRT(ZoneNum);
+        } else if (RadSysCtrlType == OperativeControl) {
+            ControlTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
+        } else if (RadSysCtrlType == ODBControl) {
+            ControlTemp = Zone(ZoneNum).OutDryBulbTemp;
+        } else if (RadSysCtrlType == OWBControl) {
+            ControlTemp = Zone(ZoneNum).OutWetBulbTemp;
+        } else if (RadSysCtrlType == SurfFaceTempControl) {
+            ControlTemp = MAT(ZoneNum);     // THIS IS A TEMPORARY PLACEHOLDER
+        } else if (RadSysCtrlType == SurfIntTempControl) {
+            ControlTemp = MAT(ZoneNum);     // THIS IS A TEMPORARY PLACEHOLDER
+        } else { // Should never get here
+            ControlTemp = MAT(ZoneNum);
+            ShowSevereError("Illegal control type in low temperature radiant system: " + RadSysName);
+            ShowFatalError("Preceding condition causes termination.");
+        }
+
+        return ControlTemp;
+        
+    }
+
+
 
     Real64 CalcRadSysHXEffectTerm(int const RadSysNum,        // Index number of radiant system under consideration !unused1208
                                   int const SystemType,       // Type of radiant system: hydronic, constant flow, or electric

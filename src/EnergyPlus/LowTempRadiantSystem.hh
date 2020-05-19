@@ -423,6 +423,11 @@ namespace LowTempRadiantSystem {
 
     void GetLowTempRadiantSystem();
 
+    int ProcessRadiantSystemControlInput(std::string const ControlInput,        // User input for radiant system control type
+                                         std::string const ControlInputField,   // Field name for this user input
+                                         std::string const RadSysName           // User input for radiant system name
+    );
+
     void InitLowTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   int const RadSysNum,  // Index for the low temperature radiant system under consideration within the derived types
                                   int const SystemType, // Type of radiant system: hydronic, constant flow, or electric
@@ -465,6 +470,11 @@ namespace LowTempRadiantSystem {
     );
 
     void CheckForOutOfRangeTempResult(int const SystemType, int const RadSysNum, Real64 const outletTemp, Real64 const inletTemp, Real64 const mdot);
+
+    Real64 SetRadSysControlTemp(int const RadSysCtrlType,       // Radiant system control type (set by user input)
+                                int const ZoneNum,              // Zone number for this low temperature radiant system
+                                std::string const RadSysName    // User input for radiant system name)
+    );
 
     Real64 CalcRadSysHXEffectTerm(int const RadSysNum,        // Index number of radiant system under consideration !unused1208
                                   int const SystemType,       // Type of radiant system: hydronic, constant flow, or electric
