@@ -182,6 +182,7 @@ set( test_src
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
   SZVAVModel.unit.cc
+  ThermalChimney.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc

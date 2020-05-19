@@ -214,6 +214,7 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
@@ -401,6 +402,7 @@ void EnergyPlus::clearAllStates()
     SurfaceGeometry::clear_state();
     SystemAvailabilityManager::clear_state();
     SwimmingPool::clear_state();
+    ThermalChimney::clear_state();
     ThermalComfort::clear_state();
     UnitarySystems::clear_state();
     UnitHeater::clear_state();
