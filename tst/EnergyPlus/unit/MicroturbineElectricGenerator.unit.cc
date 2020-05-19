@@ -51,18 +51,16 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataSizing.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::BoilerSteam;
-using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::MicroturbineElectricGenerator;
 using namespace EnergyPlus::DataGlobalConstants;
 
-TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
+TEST_F(EnergyPlusFixture, MicroturbineElectricGenerator_FueltypeInput)
 {
 
     std::string const idf_objects = delimited_string({
