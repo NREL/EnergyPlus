@@ -1460,7 +1460,13 @@ private:
             // Recursively validate all matching properties
             typedef const typename AdapterType::ObjectMember ObjectMember;
             for (const ObjectMember m : object) {
+                bool thisMatchFound = false;
                 if (RE2::FullMatch(m.first, *r)) {
+                    thisMatchFound = true;
+                } else if (RE2::FullMatch(m.first, RE2(patternPropertyStr, RE2::Latin1))) {
+                    thisMatchFound = true;
+                }
+                if (thisMatchFound) {
                     matchFound = true;
                     if (propertiesMatched) {
                         propertiesMatched->insert(m.first);
