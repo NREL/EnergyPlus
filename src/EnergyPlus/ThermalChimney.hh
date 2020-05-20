@@ -65,6 +65,7 @@ namespace ThermalChimney {
     // Data
     // DERIVED TYPE DEFINITIONS
 
+    extern bool ThermalChimneyGetInputFlag;
     extern int TotThermalChimney; // Total ThermalChimney Statements in input
 
     // Subroutine Specifications for the Heat Balance Module

@@ -108,6 +108,7 @@ namespace ThermalChimney {
     // Data
     // DERIVED TYPE DEFINITIONS
 
+    bool ThermalChimneyGetInputFlag(true);
     int TotThermalChimney(0); // Total ThermalChimney Statements in input
 
     static std::string const BlankString;
@@ -131,6 +132,7 @@ namespace ThermalChimney {
 
     void clear_state()
     {
+        ThermalChimneyGetInputFlag = true;
         ZnRptThermChim.deallocate();
         ThermalChimneySys.deallocate();
         ThermalChimneyReport.deallocate();
@@ -173,13 +175,12 @@ namespace ThermalChimney {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true);
         static bool ErrorsFound(false);
 
         // Obtains and Allocates heat balance related parameters from input file
-        if (GetInputFlag) {
+        if (ThermalChimneyGetInputFlag) {
             GetThermalChimney(ErrorsFound);
-            GetInputFlag = false;
+            ThermalChimneyGetInputFlag = false;
         }
 
         if (TotThermalChimney == 0) return;
