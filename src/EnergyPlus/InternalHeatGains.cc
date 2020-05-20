@@ -3850,17 +3850,29 @@ namespace InternalHeatGains {
                         AlphaName(14), ErrorsFound, CurrentModuleObject, AlphaName(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
                 }
 
-                // Post-assign-SupplyAirNode-check. may be redundant
-                if (ZoneITEq(Loop).SupplyAirNodeNum == 0) {
-                    if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                        ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
-                        ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                        ErrorsFound = true;
-                    } else if (ZoneITEq(Loop).AirConnectionType == ITEInletAdjustedSupply) {
-                        ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
-                        ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                        ErrorsFound = true;
-                    }
+                // check supply air node for matches with zone equipment supply air node
+                int zoneEqIndex = DataZoneEquipment::GetControlledZoneIndex(state, Zone(ZoneITEq(Loop).ZonePtr).Name);
+                auto itStart = DataZoneEquipment::ZoneEquipConfig(zoneEqIndex).InletNode.begin();
+                auto itEnd = DataZoneEquipment::ZoneEquipConfig(zoneEqIndex).InletNode.end();
+                auto key = ZoneITEq(Loop).SupplyAirNodeNum;
+                bool supplyNodeFound = false;
+                if (std::find(itStart, itEnd, key) != itEnd) {
+                    supplyNodeFound = true;
+                }
+
+                if (ZoneITEq(Loop).AirConnectionType == ITEInletAdjustedSupply && !supplyNodeFound) {
+                    // supply air node must match zone equipment supply air node for these conditions
+                    ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
+                    ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                    ErrorsFound = true;
+                } else if (ZoneITEq(Loop).FlowControlWithApproachTemps && !supplyNodeFound) {
+                    // supply air node must match zone equipment supply air node for these conditions
+                    ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
+                    ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                    ErrorsFound = true;
+                } else if (ZoneITEq(Loop).SupplyAirNodeNum != 0 && !supplyNodeFound) {
+                    // the given supply air node does not match any zone equipment supply air nodes
+                    ShowWarningError(CurrentModuleObject + "name: '" + AlphaName(1) + ". " + "Supply Air Node Name '" + AlphaName(14) + "' does not match any ZoneHVAC:EquipmentConnections objects.");
                 }
 
                 // End-Use subcategories
