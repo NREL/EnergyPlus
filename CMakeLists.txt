@@ -255,7 +255,7 @@ endif()
 
 if (BUILD_DOCS)
   option(BUILD_DOCS_ONLY_WITH_PACKAGE "Build DOCS only explicitly via `make docs` or when `make package`" OFF)
-  # mark_as_advanced(BUILD_DOCS_ONLY_WITH_PACKAGE)
+  mark_as_advanced(BUILD_DOCS_ONLY_WITH_PACKAGE)
   add_subdirectory(doc)
 endif()
 
