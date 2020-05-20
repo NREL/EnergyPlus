@@ -715,7 +715,7 @@ namespace DataGlobalConstants {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types with fuel type number and sets output strings (DXCoils.cc and HVACVariableRefrigerantFlow.cc)
+        // Validates fuel types and sets output strings with fuel type number (DXCoils.cc and HVACVariableRefrigerantFlow.cc)
 
         if (UtilityRoutines::SameString(FuelTypeInput, "Electricity")) {
             FuelTypeNum = 1; // FuelTypeElectricity
@@ -749,7 +749,7 @@ namespace DataGlobalConstants {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types and sets output strings with AssignResourceTypeNum() (Boilers.cc and BoilerSteam.cc)
+        // Validates fuel types and sets output strings with AssignResourceTypeNum(std::string const &ResourceTypeChar) (Boilers.cc and BoilerSteam.cc)
 
         auto const SELECT_CASE_var(FuelTypeInput);
 
