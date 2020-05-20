@@ -27,6 +27,7 @@ The heat index (HI) is an index that combines air temperature and relative humid
 Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA) is used to look up the heat index by temperature (°C) and relative humidity (%). The HI effects on human health are categorized at four levels: Caution, Extreme caution, Danger and Extreme danger, defined in Table 2 and color coded in Table 1.
 
 **Table 1. Heat Index lookup table**
+
 ![Diagram](resilience-metric-1.png)
 
 **Table 2. Definition of four levels of Heat Index**
@@ -40,7 +41,7 @@ Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA)
 
 We adopt the formula derived by Anderson et al. to approximate the original tables by Steadman [3,4]. It is the result of a multivariate fit to a model of the human body. This equation reproduces Table 1 (except the values at 90 °F (32 °C) and 45%/70% relative humidity vary unrounded by less than ±1, respectively) [5].
 
-HI = c<sub>1</sub> + c<sub>2</sub>T + c<sub>3</sub>R + c<sub>4</sub>TR + c<sub>5</sub>T^2 + c<sub>6</sub>R^2 + c<sub>7</sub>T^2R + c<sub>8</sub>TR^2 + c<sub>9</sub>T^2R^2 &nbsp;&nbsp; Eq. (1)
+HI = c<sub>1</sub> + c<sub>2</sub>T + c<sub>3</sub>R + c<sub>4</sub>TR + c<sub>5</sub>T<sup>2</sup> + c<sub>6</sub>R<sup>2</sup> + c<sub>7</sub>T<sup>2</sup>R + c<sub>8</sub>TR<sup>2</sup> + c<sub>9</sub>T<sup>2</sup>R<sup>2</sup> &nbsp;&nbsp; Eq. (1)
 
 where
 
@@ -115,9 +116,9 @@ Standard Effective Temperature (SET) is a model of human response to the thermal
 LEED Pilot Credit IPpc100 - Passive Survivability and Back-up Power During Disruptions - defines “Livable conditions” as SET between 54°F and 86°F. The credit requires buildings to maintain safe thermal conditions in the event of an extended power outage or loss of heating fuel, or provide backup power to satisfy critical loads. Accumulated SET-days and SET-hours are metrics to measure thermal safety and temperatures. The SET-days and SET-hours are degree-days and degree-hours in Celsius/Fahrenheit degrees based on the indoor SET.
 LEED Passive Survivability defines the Thermal Safety Temperatures for Path 2 using the SET:
 
-•	Cooling: Not to exceed 9 °F SET-days (216 °F SET-hours) above 86°F SET for residential buildings. (Metric: Not to exceed 5°C SET-days (120 °C SET-hours) above 30°C SET for residential buildings.)
-•	Cooling: Not to exceed 18 °F SET-days (432°F SET-hours) above 86°F SET for non-residential buildings. (Metric: Not to exceed 10°C SET-days (240 °C SET-hours) above 30°C SET for non-residential buildings.)
-•	Heating: Not to exceed 9 °F SET-days (216 °F SET-hours) below 54° SET for all buildings. (Metric: Not to exceed 5°C SET-days (120 °C SET-hours) below 12°C SET for all buildings.)
+- Cooling: Not to exceed 9 °F SET-days (216 °F SET-hours) above 86°F SET for residential buildings. (Metric: Not to exceed 5°C SET-days (120 °C SET-hours) above 30°C SET for residential buildings.)
+- Cooling: Not to exceed 18 °F SET-days (432°F SET-hours) above 86°F SET for non-residential buildings. (Metric: Not to exceed 10°C SET-days (240 °C SET-hours) above 30°C SET for non-residential buildings.)
+- Heating: Not to exceed 9 °F SET-days (216 °F SET-hours) below 54° SET for all buildings. (Metric: Not to exceed 5°C SET-days (120 °C SET-hours) below 12°C SET for all buildings.)
 
 EnergyPlus calculates and reports SET as a time-step report variable. We propose to calculate the aggregated the SET-Hours and the SET-OccupantHours (at zone level) for both cooling and heating as one of the tabular reports for thermal resilience.
 
@@ -140,7 +141,7 @@ To activate the CO<sub>2</sub> concentration calculation in EnergyPlus, the Zone
 
 3. Illuminance Level
 
-Adequate indoor lighting level is crucial for occupant safety, health and productivity. The 10<sup>2</sup> edition of The Lighting Handbook published by IESNA recommends illuminance levels for various types of spaces in a building. The US General Services Administration provides lighting levels for US Government buildings (Table 5), which can be used as a guide for other types of buildings. The required light levels are indicated in a range because different tasks, even in the same space, require different amounts of light. In general, low contrast and detailed tasks require more light while high contrast and less detailed tasks require less light.
+Adequate indoor lighting level is crucial for occupant safety, health and productivity. The 10<sup>th</sup> edition of The Lighting Handbook published by IESNA recommends illuminance levels for various types of spaces in a building. The US General Services Administration provides lighting levels for US Government buildings (Table 5), which can be used as a guide for other types of buildings. The required light levels are indicated in a range because different tasks, even in the same space, require different amounts of light. In general, low contrast and detailed tasks require more light while high contrast and less detailed tasks require less light.
 
 **Table 5. GSA recommended lighting levels**
 |Room Type                     |Light Level (Foot Candles)|Light Level (Lux)|
@@ -192,7 +193,7 @@ For: **Entire Facility**
 
 **Heat Index Hours**
 
-|          |Safe (≤ 80°F)[Hours] |Caution (80, 90°F][Hours] |Extreme Caution (90, 105°F][Hours] |Danger (105, 130°F][Hours] |Extreme Danger (> 130°F) [Hours]|
+|          |Safe (≤ 80°F) [Hours] |Caution (80, 90°F] [Hours] |Extreme Caution (90, 105°F] [Hours] |Danger (105, 130°F] [Hours] |Extreme Danger (> 130°F) [Hours]|
 |----------|------|------|------|------|------|
 |Space_1   |      |      |      |      |      |
 |…         |      |      |      |      |      |
@@ -204,7 +205,7 @@ For: **Entire Facility**
 
 **Heat Index OccupantHours**
 
-|          |Safe (≤ 80°F)[OccupantHours] |Caution (80, 90°F][OccupantHours] |Extreme Caution (90, 105°F][OccupantHours] |Danger (105, 130°F][OccupantHours] |Extreme Danger (> 130°F) [OccupantHours]|
+|          |Safe (≤ 80°F) [OccupantHours] |Caution (80, 90°F] [OccupantHours] |Extreme Caution (90, 105°F] [OccupantHours] |Danger (105, 130°F] [OccupantHours] |Extreme Danger (> 130°F) [OccupantHours]|
 |----------|------|------|------|------|------|
 |Space_1   |      |      |      |      |      |
 |…         |      |      |      |      |      |
@@ -217,7 +218,7 @@ For: **Entire Facility**
 
 **Humidex Hours**
 
-|          |Little to no discomfort (≤ 29)[Hours] |Some discomfort (29, 40][Hours] |Great discomfort; avoid exertion (40, 45][Hours] |Dangerous; heat stroke quite possible (> 45) [Hours] |
+|          |Little to no discomfort (≤ 29) [Hours] |Some discomfort (29, 40] [Hours] |Great discomfort; avoid exertion (40, 45] [Hours] |Dangerous; heat stroke quite possible (> 45) [Hours] |
 |----------|------|------|------|------|
 |Space_1   |      |      |      |      |
 |…         |      |      |      |      |
@@ -229,7 +230,7 @@ For: **Entire Facility**
 
 **Humidex OccupantHours**
 
-|          |Little to no discomfort (≤ 29)[OccupantHours] |Some discomfort (29, 40][OccupantHours] |Great discomfort; avoid exertion (40, 45][OccupantHours] |Dangerous; heat stroke quite possible (> 45) [OccupantHours] |
+|          |Little to no discomfort (≤ 29) [OccupantHours] |Some discomfort (29, 40] [OccupantHours] |Great discomfort; avoid exertion (40, 45] [OccupantHours] |Dangerous; heat stroke quite possible (> 45) [OccupantHours] |
 |----------|------|------|------|------|
 |Space_1   |      |      |      |      |
 |…         |      |      |      |      |
@@ -251,7 +252,7 @@ For: **Entire Facility**
 |Sum       |      |      |      |      |      |      |
 
 **SET-OccupantHours**
-|          |SET (≤ 12°C) OccupantHours |SET (12, 30°C] OccupantHours |SET (>30°C) Hours |SET (≤ 54°F) OccupantHours |SET (54, 86°F] Hours |SET (>86°F) OccupantHours |
+|          |SET (≤ 12°C) OccupantHours |SET (12, 30°C] OccupantHours |SET (>30°C) OccupantHours |SET (≤ 54°F) OccupantHours |SET (54, 86°F] OccupantHours |SET (>86°F) OccupantHours |
 |----------|------|------|------|------|------|------|
 |Space_1   |      |      |      |      |      |      |
 |…         |      |      |      |      |      |      |
@@ -269,7 +270,7 @@ For: **Entire Facility**
 
 **CO<sub>2</sub> Level Hours**
 
-|          |Safe (<= 1000 ppm) [Hours] |Caution (1000, 5000 ppm][Hours] |Hazard (> 5000 ppm)[Hours] |
+|          |Safe (<= 1000 ppm) [Hours] |Caution (1000, 5000 ppm] [Hours] |Hazard (> 5000 ppm) [Hours] |
 |----------|------|------|------|
 |Space_1   |      |      |      |
 |…         |      |      |      |
@@ -281,7 +282,7 @@ For: **Entire Facility**
 
 **CO<sub>2</sub> Level OccupantHours**
 
-|          |Safe (<= 1000 ppm) [OccupantHours] |Caution (1000, 5000 ppm][OccupantHours] |Hazard (> 5000 ppm)[OccupantHours] |
+|          |Safe (<= 1000 ppm) [OccupantHours] |Caution (1000, 5000 ppm] [OccupantHours] |Hazard (> 5000 ppm) [OccupantHours] |
 |----------|------|------|------|
 |Space_1   |      |      |      |
 |…         |      |      |      |
@@ -297,7 +298,7 @@ For: **Entire Facility**
 
 **Illuminance Level Hours**
 
-|          |A bit Dark (<= 100 lux) (≤ 29)[Hours] |Dim (100, 300 lux][Hours] |Adequate (300, 500 lux][Hours] |Bright (>500 lux)[Hours] |
+|          |A bit Dark (<= 100 lux) (≤ 29) [Hours] |Dim (100, 300 lux] [Hours] |Adequate (300, 500 lux][Hours] |Bright (>500 lux) [Hours] |
 |----------|------|------|------|------|
 |Space_1   |      |      |      |      |
 |…         |      |      |      |      |
@@ -309,7 +310,7 @@ For: **Entire Facility**
 
 **Illuminance Level OccupantHours**
 
-|          |A bit Dark (<= 100 lux) (≤ 29)[OccupantHours] |Dim (100, 300 lux][OccupantHours] |Adequate (300, 500 lux][OccupantHours] |Bright (>500 lux)[OccupantHours] |
+|          |A bit Dark (<= 100 lux) (≤ 29) [OccupantHours] |Dim (100, 300 lux] [OccupantHours] |Adequate (300, 500 lux] [OccupantHours] |Bright (>500 lux) [OccupantHours] |
 |----------|------|------|------|------|
 |Space_1   |      |      |      |      |
 |…         |      |      |      |      |
