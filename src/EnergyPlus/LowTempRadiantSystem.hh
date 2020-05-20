@@ -127,26 +127,34 @@ namespace LowTempRadiantSystem {
     struct RadiantSystemBaseData
     {
     // Members
-    std::string Name;                // name of hydronic radiant system
-    std::string SchedName;           // availability schedule
-    int SchedPtr;                    // index to schedule
-    std::string ZoneName;            // Name of zone the system is serving
-    int ZonePtr;                     // Point to this zone in the Zone derived type
-    std::string SurfListName;        // Name of surface/surface list that is the radiant system
-    int NumOfSurfaces;               // Number of surfaces included in this radiant system (coordinated control)
-    Array1D_int SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
-    Array1D_string SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
-    Array1D<Real64> SurfaceFrac;     // Fraction of flow/pipe length or electric power for a particular surface
-    Real64 TotalSurfaceArea;         // Total surface area for all surfaces that are part of this radiant system
-    int ControlType;                 // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
-    Real64 HeatPower;             // heating sent to panel in Watts
-    Real64 HeatEnergy;            // heating sent to panel in Joules
+        std::string Name;                // name of hydronic radiant system
+        std::string SchedName;           // availability schedule
+        int SchedPtr;                    // index to schedule
+        std::string ZoneName;            // Name of zone the system is serving
+        int ZonePtr;                     // Point to this zone in the Zone derived type
+        std::string SurfListName;        // Name of surface/surface list that is the radiant system
+        int NumOfSurfaces;               // Number of surfaces included in this radiant system (coordinated control)
+        Array1D_int SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
+        Array1D_string SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
+        Array1D<Real64> SurfaceFrac;     // Fraction of flow/pipe length or electric power for a particular surface
+        Real64 TotalSurfaceArea;         // Total surface area for all surfaces that are part of this radiant system
+        int ControlType;                 // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
+        Real64 HeatPower;             // heating sent to panel in Watts
+        Real64 HeatEnergy;            // heating sent to panel in Joules
 
         // Default Constructor
             RadiantSystemBaseData()
                 : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), ControlType(0)
             {
             }
+        
+        int ProcessRadiantSystemControlInput(std::string const ControlInput,
+                                             std::string const ControlInputField,
+                                             std::string const RadSysName
+        );
+        
+        Real64 SetRadSysControlTemp();
+
     };
 
     struct HydronicSystemBaseData : RadiantSystemBaseData
@@ -197,6 +205,17 @@ namespace LowTempRadiantSystem {
               WaterInletTemp(0.0), WaterOutletTemp(0.0), CoolPower(0.0), CoolEnergy(0.0), OutRangeHiErrorCount(0), OutRangeLoErrorCount(0)
         {
         }
+        
+        Real64 CalcRadSysHXEffectTerm(Real64 const Temperature,   // Temperature of water entering the radiant system, in C
+                                      Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
+                                      Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
+                                      Real64 const NumCircs      // Number of fluid circuits in this surface
+        );
+
+        Real64 SizeRadSysTubeLength();
+        
+        void CheckForOutOfRangeTempResult(Real64 const outletTemp, Real64 const inletTemp);
+
     };
 
     struct VariableFlowRadiantSystemData : HydronicSystemBaseData
@@ -229,7 +248,12 @@ namespace LowTempRadiantSystem {
                   ScaledHeatingCapacity(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0)
             {
             }
-        };
+        
+        void CalcLowTempHydrRadiantSystem(Real64 &LoadMet); // load met by the radiant system, in Watts
+
+        void CalcLowTempHydrRadSysComps(Real64 &LoadMet);   // Load met by the low temperature radiant system, in Watts
+
+    };
 
     struct ConstantFlowRadiantSystemData : HydronicSystemBaseData
     {
@@ -290,6 +314,14 @@ namespace LowTempRadiantSystem {
               PumpMassFlowRate(0.0), PumpHeattoFluid(0.0), PumpHeattoFluidEnergy(0.0), PumpInletTemp(0.0)
         {
         }
+
+        void CalcLowTempCFloRadiantSystem(Real64 &LoadMet); // load met by the radiant system, in Watts
+
+        void CalcLowTempCFloRadSysComps(int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
+                                        bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
+                                        Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
+        );
+
     };
 
     struct ElectricRadiantSystemData : RadiantSystemBaseData
@@ -314,6 +346,9 @@ namespace LowTempRadiantSystem {
             : MaxElecPower(0.0), ThrottlRange(0.0), SetptSchedPtr(0), ElecPower(0.0), ElecEnergy(0.0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
         {
         }
+        
+        void CalcLowTempElecRadiantSystem(Real64 &LoadMet); // load met by the radiant system, in Watts
+
     };
 
     struct RadSysTypeData
@@ -371,11 +406,6 @@ namespace LowTempRadiantSystem {
 
     void GetLowTempRadiantSystem();
 
-    int ProcessRadiantSystemControlInput(std::string const ControlInput,        // User input for radiant system control type
-                                         std::string const ControlInputField,   // Field name for this user input
-                                         std::string const RadSysName           // User input for radiant system name
-    );
-
     void InitLowTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   int const RadSysNum,  // Index for the low temperature radiant system under consideration within the derived types
                                   int const SystemType, // Type of radiant system: hydronic, constant flow, or electric
@@ -386,53 +416,9 @@ namespace LowTempRadiantSystem {
                                   int const SystemType // Type of radiant system: hydronic, constant flow, or electric
     );
 
-    Real64 SizeRadSysTubeLength(int const RadSysType, // type of system (hydronic or constant flow)
-                                int const RadSysNum   // index number for radiant system
-    );
-
-    void CalcLowTempHydrRadiantSystem(int const RadSysNum, // name of the low temperature radiant system
-                                      Real64 &LoadMet      // load met by the radiant system, in Watts
-    );
-
-    void CalcLowTempHydrRadSysComps(int const RadSysNum, // Index for the low temperature radiant system under consideration
-                                    Real64 &LoadMet      // Load met by the low temperature radiant system, in Watts
-    );
-
-    void CalcLowTempCFloRadiantSystem(int const RadSysNum, // name of the low temperature radiant system
-                                      Real64 &LoadMet      // load met by the radiant system, in Watts
-    );
-
-    void CalcLowTempCFloRadSysComps(int const RadSysNum,      // Index for the low temperature radiant system under consideration
-                                    int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
-                                    bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
-                                    Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
-    );
-
-    void CalcLowTempElecRadiantSystem(int const RadSysNum, // name of the low temperature radiant system
-                                      Real64 &LoadMet      // load met by the radiant system, in Watts
-    );
-
     void UpdateLowTempRadiantSystem(bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                     int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
                                     int const SystemType // Type of radiant system: hydronic, constant flow, or electric
-    );
-
-    void CheckForOutOfRangeTempResult(int const SystemType, int const RadSysNum, Real64 const outletTemp, Real64 const inletTemp, Real64 const mdot);
-
-    Real64 SetRadSysControlTemp(int const RadSysCtrlType,       // Radiant system control type (set by user input)
-                                int const ZoneNum,              // Zone number for this low temperature radiant system
-                                std::string const RadSysName    // User input for radiant system name)
-    );
-
-    Real64 CalcRadSysHXEffectTerm(int const RadSysNum,        // Index number of radiant system under consideration !unused1208
-                                  int const SystemType,       // Type of radiant system: hydronic, constant flow, or electric
-                                  Real64 const Temperature,   // Temperature of water entering the radiant system, in C
-                                  Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
-                                  Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
-                                  Real64 const NumCircs,      // Number of fluid circuits in this surface
-                                  Real64 const TubeLength,    // Length of tubing in the radiant system, in m
-                                  Real64 const TubeDiameter,  // Inside diameter of the tubing in the radiant system, in m
-                                  int &GlycolIndex            // Index for the fluid used in this radiant system
     );
 
     void UpdateRadSysSourceValAvg(bool &LowTempRadSysOn); // .TRUE. if the radiant system has run this zone time step

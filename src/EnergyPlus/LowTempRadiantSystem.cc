@@ -283,7 +283,7 @@ namespace LowTempRadiantSystem {
             GetInputFlag = false;
         }
 
-        // Find the correct High Temp Radiant System
+        // Find the correct Low Temp Radiant System
         if (CompIndex == 0) {
             RadSysNum = UtilityRoutines::FindItemInList(CompName, RadSysTypes);
             if (RadSysNum == 0) {
@@ -325,11 +325,11 @@ namespace LowTempRadiantSystem {
         {
             auto const SELECT_CASE_var(SystemType);
             if (SELECT_CASE_var == HydronicSystem) {
-                CalcLowTempHydrRadiantSystem(RadSysTypes(RadSysNum).CompIndex, LoadMet);
+                HydrRadSys(RadSysTypes(RadSysNum).CompIndex).CalcLowTempHydrRadiantSystem(LoadMet);
             } else if (SELECT_CASE_var == ConstantFlowSystem) {
-                CalcLowTempCFloRadiantSystem(RadSysTypes(RadSysNum).CompIndex, LoadMet);
+                CFloRadSys(RadSysTypes(RadSysNum).CompIndex).CalcLowTempCFloRadiantSystem(LoadMet);
             } else if (SELECT_CASE_var == ElectricSystem) {
-                CalcLowTempElecRadiantSystem(RadSysTypes(RadSysNum).CompIndex, LoadMet);
+                ElecRadSys(RadSysTypes(RadSysNum).CompIndex).CalcLowTempElecRadiantSystem(LoadMet);
             } else {
                 ShowFatalError("SimLowTempRadiantSystem: Illegal system type for system " + CompName);
             }
@@ -597,7 +597,7 @@ namespace LowTempRadiantSystem {
             HydrRadSys(Item).TubeLength = Numbers(2);
 
             // Process the temperature control type
-            HydrRadSys(Item).ControlType = ProcessRadiantSystemControlInput(Alphas(5),cAlphaFields(5),Alphas(1));
+            HydrRadSys(Item).ControlType = HydrRadSys(Item).ProcessRadiantSystemControlInput(Alphas(5),cAlphaFields(5),Alphas(1));
 
             // Determine Low Temp Radiant heating design capacity sizing method
             if (UtilityRoutines::SameString(Alphas(6), "HeatingDesignCapacity")) {
@@ -929,7 +929,7 @@ namespace LowTempRadiantSystem {
             CFloRadSys(Item).TubeLength = Numbers(2);
 
             // Process the temperature control type
-            CFloRadSys(Item).ControlType = ProcessRadiantSystemControlInput(Alphas(5),cAlphaFields(5),Alphas(1));
+            CFloRadSys(Item).ControlType = CFloRadSys(Item).ProcessRadiantSystemControlInput(Alphas(5),cAlphaFields(5),Alphas(1));
 
             // Process pump input for constant flow (hydronic) radiant system
             CFloRadSys(Item).WaterVolFlowMax = Numbers(3);
@@ -1225,7 +1225,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Process the temperature control type
-            ElecRadSys(Item).ControlType = ProcessRadiantSystemControlInput(Alphas(6),cAlphaFields(6),Alphas(1));
+            ElecRadSys(Item).ControlType = ElecRadSys(Item).ProcessRadiantSystemControlInput(Alphas(6),cAlphaFields(6),Alphas(1));
 
             ElecRadSys(Item).ThrottlRange = Numbers(4);
             if (ElecRadSys(Item).ThrottlRange < MinThrottlingRange) {
@@ -1600,7 +1600,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    int ProcessRadiantSystemControlInput(std::string const ControlInput,
+    int RadiantSystemBaseData::ProcessRadiantSystemControlInput(std::string const ControlInput,
                                          std::string const ControlInputField,
                                          std::string const RadSysName)
     {
@@ -2712,7 +2712,7 @@ namespace LowTempRadiantSystem {
                     }
                 } else { // Autosize or hard-size with sizing run
                     // CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
-                    TubeLengthDes = SizeRadSysTubeLength(SystemType, RadSysNum);
+                    TubeLengthDes = HydrRadSys(RadSysNum).SizeRadSysTubeLength();
                     if (IsAutoSize) {
                         HydrRadSys(RadSysNum).TubeLength = TubeLengthDes;
                         ReportSizingOutput(CompType, HydrRadSys(RadSysNum).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes);
@@ -2904,7 +2904,7 @@ namespace LowTempRadiantSystem {
                     }
                 } else { // Autosize or hard-size with sizing run
                     // CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
-                    TubeLengthDes = SizeRadSysTubeLength(SystemType, RadSysNum);
+                    TubeLengthDes = CFloRadSys(RadSysNum).SizeRadSysTubeLength();
                     if (IsAutoSize) {
                         CFloRadSys(RadSysNum).TubeLength = TubeLengthDes;
                         ReportSizingOutput("ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
@@ -2959,9 +2959,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    Real64 SizeRadSysTubeLength(int const RadSysType, // type of system (hydronic or constant flow)
-                                int const RadSysNum   // index number for radiant system
-    )
+    Real64 HydronicSystemBaseData::SizeRadSysTubeLength()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2986,41 +2984,22 @@ namespace LowTempRadiantSystem {
         // }
 
         TubeLength = 0.0;
-        if (RadSysType == HydronicSystem) {
-            auto &thisHydrSys(HydrRadSys(RadSysNum));
-            for (SurfNum = 1; SurfNum <= thisHydrSys.NumOfSurfaces; ++SurfNum) {
-                auto &thisHydrSysSurf(Surface(thisHydrSys.SurfacePtr(SurfNum)));
-                auto &thisHydrSpacing(Construct(thisHydrSysSurf.Construction).ThicknessPerpend);
-                if ((thisHydrSpacing > 0.005) && (thisHydrSpacing < 0.5)) { // limit allowable spacing to between 1cm and 1m
-                    TubeLength += thisHydrSysSurf.Area / (2.0 * thisHydrSpacing);
-                } else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
-                    TubeLength += thisHydrSysSurf.Area / 0.15;
-                }
+        
+        for (SurfNum = 1; SurfNum <= this->NumOfSurfaces; ++SurfNum) {
+            auto &thisHydrSysSurf(Surface(this->SurfacePtr(SurfNum)));
+            auto &thisHydrSpacing(Construct(thisHydrSysSurf.Construction).ThicknessPerpend);
+            if ((thisHydrSpacing > 0.005) && (thisHydrSpacing < 0.5)) { // limit allowable spacing to between 1cm and 1m
+                TubeLength += thisHydrSysSurf.Area / (2.0 * thisHydrSpacing);
+            } else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
+                TubeLength += thisHydrSysSurf.Area / 0.15;
             }
-        } else if (RadSysType == ConstantFlowSystem) {
-            auto &thisCFloSys(CFloRadSys(RadSysNum));
-            for (SurfNum = 1; SurfNum <= thisCFloSys.NumOfSurfaces; ++SurfNum) {
-                auto &thisCFloSysSurf(Surface(thisCFloSys.SurfacePtr(SurfNum)));
-                auto &thisCFloSpacing(Construct(thisCFloSysSurf.Construction).ThicknessPerpend);
-                if ((thisCFloSpacing > 0.005) && (thisCFloSpacing < 0.5)) { // limit allowable spacing to between 1cm and 1m
-                    TubeLength += thisCFloSysSurf.Area / (2.0 * thisCFloSpacing);
-                } else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
-                    TubeLength += thisCFloSysSurf.Area / 0.15;
-                }
-            }
-        } else {
-            // Return value
-            ShowWarningError("SizeRadSysTubeLength: Illegal system type passed into this routine.  This should never happen.");
-            TubeLength = 60.0; // Assign a length to avoid any divide by zero errors. This length is a 3m by 3m room with 0.15m spacing.
         }
 
         SizeRadSysTubeLength = TubeLength;
         return SizeRadSysTubeLength;
     }
 
-    void CalcLowTempHydrRadiantSystem(int const RadSysNum, // name of the low temperature radiant system
-                                      Real64 &LoadMet      // load met by the radiant system, in Watts
-    )
+    void VariableFlowRadiantSystemData::CalcLowTempHydrRadiantSystem(Real64 &LoadMet)   // load met by the radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -3074,54 +3053,54 @@ namespace LowTempRadiantSystem {
         ControlNode = 0;
         MaxWaterFlow = 0.0;
         ActWaterFlow = 0.0;
-        ZoneNum = HydrRadSys(RadSysNum).ZonePtr;
+        ZoneNum = this->ZonePtr;
         OperatingMode = NotOperating;
         SysRunning = true;
 
-        if (GetCurrentScheduleValue(HydrRadSys(RadSysNum).SchedPtr) <= 0) {
+        if (GetCurrentScheduleValue(this->SchedPtr) <= 0) {
 
             // Unit is off or has no load upon it; set the flow rates to zero and then
             // simulate the components with the no flow conditions
-            for (SurfNum = 1; SurfNum <= HydrRadSys(RadSysNum).NumOfSurfaces; ++SurfNum) {
-                SurfNum2 = HydrRadSys(RadSysNum).SurfacePtr(SurfNum);
+            for (SurfNum = 1; SurfNum <= this->NumOfSurfaces; ++SurfNum) {
+                SurfNum2 = this->SurfacePtr(SurfNum);
                 QRadSysSource(SurfNum2) = 0.0;
                 if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                     QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
             }
-            if (HydrRadSys(RadSysNum).HeatingSystem) {
+            if (this->HeatingSystem) {
                 mdot = 0.0;
                 SetComponentFlowRate(mdot,
-                                     HydrRadSys(RadSysNum).HotWaterInNode,
-                                     HydrRadSys(RadSysNum).HotWaterOutNode,
-                                     HydrRadSys(RadSysNum).HWLoopNum,
-                                     HydrRadSys(RadSysNum).HWLoopSide,
-                                     HydrRadSys(RadSysNum).HWBranchNum,
-                                     HydrRadSys(RadSysNum).HWCompNum);
+                                     this->HotWaterInNode,
+                                     this->HotWaterOutNode,
+                                     this->HWLoopNum,
+                                     this->HWLoopSide,
+                                     this->HWBranchNum,
+                                     this->HWCompNum);
             }
-            if (HydrRadSys(RadSysNum).CoolingSystem) {
+            if (this->CoolingSystem) {
                 mdot = 0.0;
                 SetComponentFlowRate(mdot,
-                                     HydrRadSys(RadSysNum).ColdWaterInNode,
-                                     HydrRadSys(RadSysNum).ColdWaterOutNode,
-                                     HydrRadSys(RadSysNum).CWLoopNum,
-                                     HydrRadSys(RadSysNum).CWLoopSide,
-                                     HydrRadSys(RadSysNum).CWBranchNum,
-                                     HydrRadSys(RadSysNum).CWCompNum);
+                                     this->ColdWaterInNode,
+                                     this->ColdWaterOutNode,
+                                     this->CWLoopNum,
+                                     this->CWLoopSide,
+                                     this->CWBranchNum,
+                                     this->CWCompNum);
             }
         } else { // Unit might be on-->this section is intended to control the water mass flow rate being
             // sent to the radiant system
             
-            ControlTemp = SetRadSysControlTemp(HydrRadSys(RadSysNum).ControlType,ZoneNum,HydrRadSys(RadSysNum).Name);
+            ControlTemp = this->SetRadSysControlTemp();
             
-            if (HydrRadSys(RadSysNum).HotSetptSchedPtr > 0) {
-                SetPointTemp = GetCurrentScheduleValue(HydrRadSys(RadSysNum).HotSetptSchedPtr);
-                OffTempHeat = SetPointTemp + 0.5 * HydrRadSys(RadSysNum).HotThrottlRange;
+            if (this->HotSetptSchedPtr > 0) {
+                SetPointTemp = GetCurrentScheduleValue(this->HotSetptSchedPtr);
+                OffTempHeat = SetPointTemp + 0.5 * this->HotThrottlRange;
             } else { // This system is not capable of heating, set OffTempHeat to something really low
                 OffTempHeat = LowTempHeating;
             }
-            if (HydrRadSys(RadSysNum).ColdSetptSchedPtr > 0) {
-                SetPointTemp = GetCurrentScheduleValue(HydrRadSys(RadSysNum).ColdSetptSchedPtr);
-                OffTempCool = SetPointTemp - 0.5 * HydrRadSys(RadSysNum).ColdThrottlRange;
+            if (this->ColdSetptSchedPtr > 0) {
+                SetPointTemp = GetCurrentScheduleValue(this->ColdSetptSchedPtr);
+                OffTempCool = SetPointTemp - 0.5 * this->ColdThrottlRange;
             } else { // This system is not capable of cooling, set OffTempCool to something really high
                 OffTempCool = HighTempCooling;
             }
@@ -3130,21 +3109,21 @@ namespace LowTempRadiantSystem {
             // potentially be heating or cooling at a particular control temperature
             if (OffTempHeat > OffTempCool) {
                 MassFlowFrac = 0.0;
-                ShowSevereError("Overlapping heating and cooling control temps in radiant system: " + HydrRadSys(RadSysNum).Name);
+                ShowSevereError("Overlapping heating and cooling control temps in radiant system: " + this->Name);
                 ShowFatalError("Preceding condition causes termination.");
 
             } else { // Temperatures for heating and cooling do not overlap--calculate the mass flow fraction
 
-                if (ControlTemp < OffTempHeat && HydrRadSys(RadSysNum).HeatingSystem) { // Heating mode
+                if (ControlTemp < OffTempHeat && this->HeatingSystem) { // Heating mode
                     OperatingMode = HeatingMode;
-                    ControlNode = HydrRadSys(RadSysNum).HotWaterInNode;
-                    MaxWaterFlow = HydrRadSys(RadSysNum).WaterFlowMaxHeat;
-                    MassFlowFrac = (OffTempHeat - ControlTemp) / HydrRadSys(RadSysNum).HotThrottlRange;
-                } else if (ControlTemp > OffTempCool && HydrRadSys(RadSysNum).CoolingSystem) { // Cooling mode
+                    ControlNode = this->HotWaterInNode;
+                    MaxWaterFlow = this->WaterFlowMaxHeat;
+                    MassFlowFrac = (OffTempHeat - ControlTemp) / this->HotThrottlRange;
+                } else if (ControlTemp > OffTempCool && this->CoolingSystem) { // Cooling mode
                     OperatingMode = CoolingMode;
-                    ControlNode = HydrRadSys(RadSysNum).ColdWaterInNode;
-                    MaxWaterFlow = HydrRadSys(RadSysNum).WaterFlowMaxCool;
-                    MassFlowFrac = (ControlTemp - OffTempCool) / HydrRadSys(RadSysNum).ColdThrottlRange;
+                    ControlNode = this->ColdWaterInNode;
+                    MaxWaterFlow = this->WaterFlowMaxCool;
+                    MassFlowFrac = (ControlTemp - OffTempCool) / this->ColdThrottlRange;
                 } else { // ControlTemp is between OffTempHeat and OffTempCool--unit should not run
                     MassFlowFrac = 0.0;
                 }
@@ -3153,42 +3132,40 @@ namespace LowTempRadiantSystem {
             // Calculate and limit the water flow rate
             ActWaterFlow = MassFlowFrac * MaxWaterFlow;
             if (ActWaterFlow < MassFlowTolerance) ActWaterFlow = 0.0;
-            if (HydrRadSys(RadSysNum).EMSOverrideOnWaterMdot) ActWaterFlow = HydrRadSys(RadSysNum).EMSWaterMdotOverrideValue;
+            if (this->EMSOverrideOnWaterMdot) ActWaterFlow = this->EMSWaterMdotOverrideValue;
 
             if (OperatingMode == HeatingMode) {
-                if (HydrRadSys(RadSysNum).HeatingSystem) {
+                if (this->HeatingSystem) {
                     SetComponentFlowRate(ActWaterFlow,
-                                         HydrRadSys(RadSysNum).HotWaterInNode,
-                                         HydrRadSys(RadSysNum).HotWaterOutNode,
-                                         HydrRadSys(RadSysNum).HWLoopNum,
-                                         HydrRadSys(RadSysNum).HWLoopSide,
-                                         HydrRadSys(RadSysNum).HWBranchNum,
-                                         HydrRadSys(RadSysNum).HWCompNum);
+                                         this->HotWaterInNode,
+                                         this->HotWaterOutNode,
+                                         this->HWLoopNum,
+                                         this->HWLoopSide,
+                                         this->HWBranchNum,
+                                         this->HWCompNum);
                 } else { // not heating system
                     SysRunning = false;
                 }
             } else if (OperatingMode == CoolingMode) {
-                if (HydrRadSys(RadSysNum).CoolingSystem) {
+                if (this->CoolingSystem) {
                     SetComponentFlowRate(ActWaterFlow,
-                                         HydrRadSys(RadSysNum).ColdWaterInNode,
-                                         HydrRadSys(RadSysNum).ColdWaterOutNode,
-                                         HydrRadSys(RadSysNum).CWLoopNum,
-                                         HydrRadSys(RadSysNum).CWLoopSide,
-                                         HydrRadSys(RadSysNum).CWBranchNum,
-                                         HydrRadSys(RadSysNum).CWCompNum);
+                                         this->ColdWaterInNode,
+                                         this->ColdWaterOutNode,
+                                         this->CWLoopNum,
+                                         this->CWLoopSide,
+                                         this->CWBranchNum,
+                                         this->CWCompNum);
                 } else { // not cooling system
                     SysRunning = false;
                 }
             }
 
             // Now simulate the system...
-            if (((OperatingMode == HeatingMode) || (OperatingMode == CoolingMode)) && SysRunning) CalcLowTempHydrRadSysComps(RadSysNum, LoadMet);
+            if (((OperatingMode == HeatingMode) || (OperatingMode == CoolingMode)) && SysRunning) this->CalcLowTempHydrRadSysComps(LoadMet);
         }
     }
 
-    void CalcLowTempHydrRadSysComps(int const RadSysNum, // Index for the low temperature radiant system under consideration
-                                    Real64 &LoadMet      // Load met by the low temperature radiant system, in Watts
-    )
+    void VariableFlowRadiantSystemData::CalcLowTempHydrRadSysComps(Real64 &LoadMet) // Load met by the low temperature radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -3278,17 +3255,17 @@ namespace LowTempRadiantSystem {
         {
             auto const SELECT_CASE_var(OperatingMode);
             if (SELECT_CASE_var == HeatingMode) {
-                WaterNodeIn = HydrRadSys(RadSysNum).HotWaterInNode;
+                WaterNodeIn = this->HotWaterInNode;
             } else if (SELECT_CASE_var == CoolingMode) {
-                WaterNodeIn = HydrRadSys(RadSysNum).ColdWaterInNode;
+                WaterNodeIn = this->ColdWaterInNode;
             } else {
                 WaterNodeIn = 0; // Suppress uninitialized warning
                 ShowSevereError("Illegal low temperature radiant system operating mode");
-                ShowContinueError("Occurs in Radiant System=" + HydrRadSys(RadSysNum).Name);
+                ShowContinueError("Occurs in Radiant System=" + this->Name);
                 ShowFatalError("Preceding condition causes termination.");
             }
         }
-        ZoneNum = HydrRadSys(RadSysNum).ZonePtr;
+        ZoneNum = this->ZonePtr;
         SysWaterMassFlow = Node(WaterNodeIn).MassFlowRate;
         WaterMassFlow = Node(WaterNodeIn).MassFlowRate / double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier);
         WaterTempIn = Node(WaterNodeIn).Temp;
@@ -3298,8 +3275,8 @@ namespace LowTempRadiantSystem {
             // This is possible with a mismatch between system and plant operation
             // or a slight mismatch between zone and system controls.  This is not
             // necessarily a "problem" so this exception is necessary in the code.
-            for (RadSurfNum = 1; RadSurfNum <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
-                SurfNum = HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum);
+            for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
+                SurfNum = this->SurfacePtr(RadSurfNum);
                 QRadSysSource(SurfNum) = 0.0;
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
                     QRadSysSource(Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
@@ -3307,19 +3284,12 @@ namespace LowTempRadiantSystem {
 
         } else {
 
-            for (RadSurfNum = 1; RadSurfNum <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
+            for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
 
-                SurfNum = HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum);
+                SurfNum = this->SurfacePtr(RadSurfNum);
                 // Determine the heat exchanger "effectiveness" term
-                EpsMdotCp = CalcRadSysHXEffectTerm(RadSysNum,
-                                                   HydronicSystem,
-                                                   WaterTempIn,
-                                                   WaterMassFlow,
-                                                   HydrRadSys(RadSysNum).SurfaceFrac(RadSurfNum),
-                                                   HydrRadSys(RadSysNum).NumCircuits(RadSurfNum),
-                                                   HydrRadSys(RadSysNum).TubeLength,
-                                                   HydrRadSys(RadSysNum).TubeDiameter,
-                                                   HydrRadSys(RadSysNum).GlycolIndex);
+
+                EpsMdotCp = CalcRadSysHXEffectTerm(WaterTempIn, WaterMassFlow, this->SurfaceFrac(RadSurfNum), this->NumCircuits(RadSurfNum));
 
                 // Obtain the heat balance coefficients and calculate the intermediate coefficients
                 // linking the inlet water temperature to the heat source/sink to the radiant system.
@@ -3411,40 +3381,40 @@ namespace LowTempRadiantSystem {
             }
 
             // "Temperature Comparison" Cut-off:
-            for (RadSurfNum = 1; RadSurfNum <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
+            for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
                 // Check to see whether or not the system should really be running.  If
                 // QRadSysSource is negative when we are in heating mode or QRadSysSource
                 // is positive when we are in cooling mode, then the radiant system will
                 // be doing the opposite of its intention.  In this case, the flow rate
                 // is set to zero to avoid heating in cooling mode or cooling in heating
                 // mode.
-                SurfNum = HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum);
+                SurfNum = this->SurfacePtr(RadSurfNum);
 
                 if (((OperatingMode == HeatingMode) && (QRadSysSource(SurfNum) <= 0.0)) ||
                     ((OperatingMode == CoolingMode) && (QRadSysSource(SurfNum) >= 0.0))) {
                     WaterMassFlow = 0.0;
                     if (OperatingMode == HeatingMode) {
                         SetComponentFlowRate(WaterMassFlow,
-                                             HydrRadSys(RadSysNum).HotWaterInNode,
-                                             HydrRadSys(RadSysNum).HotWaterOutNode,
-                                             HydrRadSys(RadSysNum).HWLoopNum,
-                                             HydrRadSys(RadSysNum).HWLoopSide,
-                                             HydrRadSys(RadSysNum).HWBranchNum,
-                                             HydrRadSys(RadSysNum).HWCompNum);
+                                             this->HotWaterInNode,
+                                             this->HotWaterOutNode,
+                                             this->HWLoopNum,
+                                             this->HWLoopSide,
+                                             this->HWBranchNum,
+                                             this->HWCompNum);
 
                     } else if (OperatingMode == CoolingMode) {
                         SetComponentFlowRate(WaterMassFlow,
-                                             HydrRadSys(RadSysNum).ColdWaterInNode,
-                                             HydrRadSys(RadSysNum).ColdWaterOutNode,
-                                             HydrRadSys(RadSysNum).CWLoopNum,
-                                             HydrRadSys(RadSysNum).CWLoopSide,
-                                             HydrRadSys(RadSysNum).CWBranchNum,
-                                             HydrRadSys(RadSysNum).CWCompNum);
+                                             this->ColdWaterInNode,
+                                             this->ColdWaterOutNode,
+                                             this->CWLoopNum,
+                                             this->CWLoopSide,
+                                             this->CWBranchNum,
+                                             this->CWCompNum);
                     }
-                    HydrRadSys(RadSysNum).WaterMassFlowRate = WaterMassFlow;
+                    this->WaterMassFlowRate = WaterMassFlow;
 
-                    for (RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                        SurfNum2 = HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum2);
+                    for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                        SurfNum2 = this->SurfacePtr(RadSurfNum2);
                         QRadSysSource(SurfNum2) = 0.0;
                         if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                             QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
@@ -3458,49 +3428,49 @@ namespace LowTempRadiantSystem {
             // dropped below the dew-point temperature.  If so, we need to shut off this radiant system.
             // A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
             // conditions.
-            HydrRadSys(RadSysNum).CondCausedShutDown = false;
+            this->CondCausedShutDown = false;
             DewPointTemp = PsyTdpFnWPb(ZoneAirHumRat(ZoneNum), OutBaroPress);
 
-            if ((OperatingMode == CoolingMode) && (HydrRadSys(RadSysNum).CondCtrlType == CondCtrlSimpleOff)) {
+            if ((OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlSimpleOff)) {
 
-                for (RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum2)) < (DewPointTemp + HydrRadSys(RadSysNum).CondDewPtDeltaT)) {
+                for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + this->CondDewPtDeltaT)) {
                         // Condensation warning--must shut off radiant system
-                        HydrRadSys(RadSysNum).CondCausedShutDown = true;
+                        this->CondCausedShutDown = true;
                         WaterMassFlow = 0.0;
                         SetComponentFlowRate(WaterMassFlow,
-                                             HydrRadSys(RadSysNum).ColdWaterInNode,
-                                             HydrRadSys(RadSysNum).ColdWaterOutNode,
-                                             HydrRadSys(RadSysNum).CWLoopNum,
-                                             HydrRadSys(RadSysNum).CWLoopSide,
-                                             HydrRadSys(RadSysNum).CWBranchNum,
-                                             HydrRadSys(RadSysNum).CWCompNum);
-                        HydrRadSys(RadSysNum).WaterMassFlowRate = WaterMassFlow;
-                        for (RadSurfNum3 = 1; RadSurfNum3 <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum3) {
-                            SurfNum2 = HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum3);
+                                             this->ColdWaterInNode,
+                                             this->ColdWaterOutNode,
+                                             this->CWLoopNum,
+                                             this->CWLoopSide,
+                                             this->CWBranchNum,
+                                             this->CWCompNum);
+                        this->WaterMassFlowRate = WaterMassFlow;
+                        for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
+                            SurfNum2 = this->SurfacePtr(RadSurfNum3);
                             QRadSysSource(SurfNum2) = 0.0;
                             if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                                 QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                         }
                         // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                         if (!WarmupFlag) {
-                            if (HydrRadSys(RadSysNum).CondErrIndex == 0) { // allow errors up to number of radiant systems
-                                ShowWarningMessage(cHydronicSystem + " [" + HydrRadSys(RadSysNum).Name + ']');
-                                ShowContinueError("Surface [" + Surface(HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum2)).Name +
+                            if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
+                                ShowWarningMessage(cHydronicSystem + " [" + this->Name + ']');
+                                ShowContinueError("Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError("Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError("Predicted radiant system surface temperature = " +
-                                                  RoundSigDigits(TH(2, 1, HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum2)), 2));
+                                                  RoundSigDigits(TH(2, 1, this->SurfacePtr(RadSurfNum2)), 2));
                                 ShowContinueError("Zone dew-point temperature + safety delta T= " +
-                                                  RoundSigDigits(DewPointTemp + HydrRadSys(RadSysNum).CondDewPtDeltaT, 2));
+                                                  RoundSigDigits(DewPointTemp + this->CondDewPtDeltaT, 2));
                                 ShowContinueErrorTimeStamp("");
-                                ShowContinueError("Note that a " + RoundSigDigits(HydrRadSys(RadSysNum).CondDewPtDeltaT, 4) +
+                                ShowContinueError("Note that a " + RoundSigDigits(this->CondDewPtDeltaT, 4) +
                                                   " C safety was chosen in the input for the shut-off criteria");
                                 ShowContinueError("Note also that this affects all surfaces that are part of this radiant system");
                             }
-                            ShowRecurringWarningErrorAtEnd(cHydronicSystem + " [" + HydrRadSys(RadSysNum).Name +
+                            ShowRecurringWarningErrorAtEnd(cHydronicSystem + " [" + this->Name +
                                                                "] condensation shut-off occurrence continues.",
-                                                           HydrRadSys(RadSysNum).CondErrIndex,
+                                                           this->CondErrIndex,
                                                            DewPointTemp,
                                                            DewPointTemp,
                                                            _,
@@ -3511,23 +3481,23 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if ((OperatingMode == CoolingMode) && (HydrRadSys(RadSysNum).CondCtrlType == CondCtrlNone)) {
+            } else if ((OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlNone)) {
 
-                for (RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum2)) < DewPointTemp) {
+                for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
                         // Condensation occurring but user does not want to shut radiant system off ever
-                        HydrRadSys(RadSysNum).CondCausedShutDown = true;
+                        this->CondCausedShutDown = true;
                     }
                 }
 
-            } else if ((OperatingMode == CoolingMode) && (HydrRadSys(RadSysNum).CondCtrlType == CondCtrlVariedOff)) {
+            } else if ((OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlVariedOff)) {
 
                 LowestRadSurfTemp = 999.9;
                 CondSurfNum = 0;
-                for (RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum2)) < (DewPointTemp + HydrRadSys(RadSysNum).CondDewPtDeltaT)) {
-                        if (TH(2, 1, HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum2)) < LowestRadSurfTemp) {
-                            LowestRadSurfTemp = TH(2, 1, HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum2));
+                for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + this->CondDewPtDeltaT)) {
+                        if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < LowestRadSurfTemp) {
+                            LowestRadSurfTemp = TH(2, 1, this->SurfacePtr(RadSurfNum2));
                             CondSurfNum = RadSurfNum2;
                         }
                     }
@@ -3543,15 +3513,15 @@ namespace LowTempRadiantSystem {
                     FullWaterMassFlow = WaterMassFlow;
                     WaterMassFlow = 0.0;
                     SetComponentFlowRate(WaterMassFlow,
-                                         HydrRadSys(RadSysNum).ColdWaterInNode,
-                                         HydrRadSys(RadSysNum).ColdWaterOutNode,
-                                         HydrRadSys(RadSysNum).CWLoopNum,
-                                         HydrRadSys(RadSysNum).CWLoopSide,
-                                         HydrRadSys(RadSysNum).CWBranchNum,
-                                         HydrRadSys(RadSysNum).CWCompNum);
-                    HydrRadSys(RadSysNum).WaterMassFlowRate = WaterMassFlow;
-                    for (RadSurfNum3 = 1; RadSurfNum3 <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum3) {
-                        SurfNum2 = HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum3);
+                                         this->ColdWaterInNode,
+                                         this->ColdWaterOutNode,
+                                         this->CWLoopNum,
+                                         this->CWLoopSide,
+                                         this->CWBranchNum,
+                                         this->CWCompNum);
+                    this->WaterMassFlowRate = WaterMassFlow;
+                    for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
+                        SurfNum2 = this->SurfacePtr(RadSurfNum3);
                         QRadSysSource(SurfNum2) = 0.0;
                         if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                             QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
@@ -3560,17 +3530,17 @@ namespace LowTempRadiantSystem {
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
                     // Now check all of the surface temperatures.  If any potentially have condensation, leave the system off.
-                    for (RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                        if (TH(2, 1, HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum2)) < (DewPointTemp + HydrRadSys(RadSysNum).CondDewPtDeltaT)) {
-                            HydrRadSys(RadSysNum).CondCausedShutDown = true;
+                    for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                        if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + this->CondDewPtDeltaT)) {
+                            this->CondCausedShutDown = true;
                         }
                     }
                     // If the system does not need to be shut down, then let's see if we can vary the flow based
                     // on the lowest temperature surface from before.  This will use interpolation to try a new
                     // flow rate.
-                    if (!HydrRadSys(RadSysNum).CondCausedShutDown) {
-                        PredictedCondTemp = DewPointTemp + HydrRadSys(RadSysNum).CondDewPtDeltaT;
-                        ZeroFlowSurfTemp = TH(2, 1, HydrRadSys(RadSysNum).SurfacePtr(CondSurfNum));
+                    if (!this->CondCausedShutDown) {
+                        PredictedCondTemp = DewPointTemp + this->CondDewPtDeltaT;
+                        ZeroFlowSurfTemp = TH(2, 1, this->SurfacePtr(CondSurfNum));
                         ReductionFrac = (ZeroFlowSurfTemp - PredictedCondTemp) / std::abs(ZeroFlowSurfTemp - LowestRadSurfTemp);
                         if (ReductionFrac < 0.0) ReductionFrac = 0.0; // Shouldn't happen as the above check should have screened this out
                         if (ReductionFrac > 1.0) ReductionFrac = 1.0; // Shouldn't happen either because condensation doesn't exist then
@@ -3578,27 +3548,21 @@ namespace LowTempRadiantSystem {
                         SysWaterMassFlow = double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier) * WaterMassFlow;
                         // Got a new reduced flow rate that should work...reset loop variable and resimulate the system
                         SetComponentFlowRate(SysWaterMassFlow,
-                                             HydrRadSys(RadSysNum).ColdWaterInNode,
-                                             HydrRadSys(RadSysNum).ColdWaterOutNode,
-                                             HydrRadSys(RadSysNum).CWLoopNum,
-                                             HydrRadSys(RadSysNum).CWLoopSide,
-                                             HydrRadSys(RadSysNum).CWBranchNum,
-                                             HydrRadSys(RadSysNum).CWCompNum);
-                        HydrRadSys(RadSysNum).WaterMassFlowRate = SysWaterMassFlow;
+                                             this->ColdWaterInNode,
+                                             this->ColdWaterOutNode,
+                                             this->CWLoopNum,
+                                             this->CWLoopSide,
+                                             this->CWBranchNum,
+                                             this->CWCompNum);
+                        this->WaterMassFlowRate = SysWaterMassFlow;
 
                         // Go through all of the surfaces again with the new flow rate...
-                        for (RadSurfNum3 = 1; RadSurfNum3 <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum3) {
-                            SurfNum = HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum3);
+                        for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
+                            SurfNum = this->SurfacePtr(RadSurfNum3);
                             // Determine the heat exchanger "effectiveness" term
-                            EpsMdotCp = CalcRadSysHXEffectTerm(RadSysNum,
-                                                               HydronicSystem,
-                                                               WaterTempIn,
-                                                               WaterMassFlow,
-                                                               HydrRadSys(RadSysNum).SurfaceFrac(RadSurfNum3),
-                                                               HydrRadSys(RadSysNum).NumCircuits(RadSurfNum3),
-                                                               HydrRadSys(RadSysNum).TubeLength,
-                                                               HydrRadSys(RadSysNum).TubeDiameter,
-                                                               HydrRadSys(RadSysNum).GlycolIndex);
+                            
+                            EpsMdotCp = CalcRadSysHXEffectTerm(WaterTempIn, WaterMassFlow, this->SurfaceFrac(RadSurfNum3), this->NumCircuits(RadSurfNum3));
+
                             if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF) {
                                 // For documentation on coefficients, see code earlier in this subroutine
                                 Ca = RadSysTiHBConstCoef(SurfNum);
@@ -3627,23 +3591,23 @@ namespace LowTempRadiantSystem {
 
                         // Check for condensation one more time.  If no condensation, we are done.  If there is
                         // condensation, shut things down and be done.
-                        for (RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                            if (HydrRadSys(RadSysNum).CondCausedShutDown) break;
-                            if (TH(2, 1, HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum2)) < (PredictedCondTemp)) {
+                        for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                            if (this->CondCausedShutDown) break;
+                            if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (PredictedCondTemp)) {
                                 // Condensation still present--must shut off radiant system
-                                HydrRadSys(RadSysNum).CondCausedShutDown = true;
+                                this->CondCausedShutDown = true;
                                 WaterMassFlow = 0.0;
                                 RadSurfNum = RadSurfNum2;
                                 SetComponentFlowRate(WaterMassFlow,
-                                                     HydrRadSys(RadSysNum).ColdWaterInNode,
-                                                     HydrRadSys(RadSysNum).ColdWaterOutNode,
-                                                     HydrRadSys(RadSysNum).CWLoopNum,
-                                                     HydrRadSys(RadSysNum).CWLoopSide,
-                                                     HydrRadSys(RadSysNum).CWBranchNum,
-                                                     HydrRadSys(RadSysNum).CWCompNum);
-                                HydrRadSys(RadSysNum).WaterMassFlowRate = WaterMassFlow;
-                                for (RadSurfNum3 = 1; RadSurfNum3 <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum3) {
-                                    SurfNum2 = HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum3);
+                                                     this->ColdWaterInNode,
+                                                     this->ColdWaterOutNode,
+                                                     this->CWLoopNum,
+                                                     this->CWLoopSide,
+                                                     this->CWBranchNum,
+                                                     this->CWCompNum);
+                                this->WaterMassFlowRate = WaterMassFlow;
+                                for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
+                                    SurfNum2 = this->SurfacePtr(RadSurfNum3);
                                     QRadSysSource(SurfNum2) = 0.0;
                                     if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                                         QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
@@ -3652,26 +3616,26 @@ namespace LowTempRadiantSystem {
                         }
                     }
 
-                    if (HydrRadSys(RadSysNum).CondCausedShutDown) {
+                    if (this->CondCausedShutDown) {
                         // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                         if (!WarmupFlag) {
-                            if (HydrRadSys(RadSysNum).CondErrIndex == 0) { // allow errors up to number of radiant systems
-                                ShowWarningMessage(cHydronicSystem + " [" + HydrRadSys(RadSysNum).Name + ']');
-                                ShowContinueError("Surface [" + Surface(HydrRadSys(RadSysNum).SurfacePtr(CondSurfNum)).Name +
+                            if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
+                                ShowWarningMessage(cHydronicSystem + " [" + this->Name + ']');
+                                ShowContinueError("Surface [" + Surface(this->SurfacePtr(CondSurfNum)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError("Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError("Predicted radiant system surface temperature = " +
-                                                  RoundSigDigits(TH(2, 1, HydrRadSys(RadSysNum).SurfacePtr(CondSurfNum)), 2));
+                                                  RoundSigDigits(TH(2, 1, this->SurfacePtr(CondSurfNum)), 2));
                                 ShowContinueError("Zone dew-point temperature + safety delta T= " +
-                                                  RoundSigDigits(DewPointTemp + HydrRadSys(RadSysNum).CondDewPtDeltaT, 2));
+                                                  RoundSigDigits(DewPointTemp + this->CondDewPtDeltaT, 2));
                                 ShowContinueErrorTimeStamp("");
-                                ShowContinueError("Note that a " + RoundSigDigits(HydrRadSys(RadSysNum).CondDewPtDeltaT, 4) +
+                                ShowContinueError("Note that a " + RoundSigDigits(this->CondDewPtDeltaT, 4) +
                                                   " C safety was chosen in the input for the shut-off criteria");
                                 ShowContinueError("Note also that this affects all surfaces that are part of this radiant system");
                             }
-                            ShowRecurringWarningErrorAtEnd(cHydronicSystem + " [" + HydrRadSys(RadSysNum).Name +
+                            ShowRecurringWarningErrorAtEnd(cHydronicSystem + " [" + this->Name +
                                                                "] condensation shut-off occurrence continues.",
-                                                           HydrRadSys(RadSysNum).CondErrIndex,
+                                                           this->CondErrIndex,
                                                            DewPointTemp,
                                                            DewPointTemp,
                                                            _,
@@ -3693,9 +3657,7 @@ namespace LowTempRadiantSystem {
         LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
     }
 
-    void CalcLowTempCFloRadiantSystem(int const RadSysNum, // name of the low temperature radiant system
-                                      Real64 &LoadMet      // load met by the radiant system, in Watts
-    )
+    void ConstantFlowRadiantSystemData::CalcLowTempCFloRadiantSystem(Real64 &LoadMet)      // load met by the radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -3768,56 +3730,56 @@ namespace LowTempRadiantSystem {
         Real64 mdot;            // local temporary for water mass flow rate kg/s
 
         // initialize local variables
-        ZoneNum = CFloRadSys(RadSysNum).ZonePtr;
+        ZoneNum = this->ZonePtr;
         SysRunning = true; // default to running and turn off only if not running
         VarOffCond = false;
 
-        if (GetCurrentScheduleValue(CFloRadSys(RadSysNum).SchedPtr) <= 0) SysRunning = false;
+        if (GetCurrentScheduleValue(this->SchedPtr) <= 0) SysRunning = false;
 
         if (SysRunning) { // Unit is probably on-->this section is intended to control the water
             // mass flow rate being sent to the radiant system
 
             // Set the current setpoint temperature (same procedure for either heating or cooling)
             
-            SetPointTemp = SetRadSysControlTemp(CFloRadSys(RadSysNum).ControlType,ZoneNum,CFloRadSys(RadSysNum).Name);
+            SetPointTemp = this->SetRadSysControlTemp();
 
             // Avoid problems when there is no heating or cooling control because the system only cools or heats
-            if (CFloRadSys(RadSysNum).HotCtrlHiTempSchedPtr > 0) {
-                OffTempHeat = GetCurrentScheduleValue(CFloRadSys(RadSysNum).HotCtrlHiTempSchedPtr);
+            if (this->HotCtrlHiTempSchedPtr > 0) {
+                OffTempHeat = GetCurrentScheduleValue(this->HotCtrlHiTempSchedPtr);
             } else {
                 OffTempHeat = LowTempHeating;
             }
-            if (CFloRadSys(RadSysNum).ColdCtrlLoTempSchedPtr > 0) {
-                OffTempCool = GetCurrentScheduleValue(CFloRadSys(RadSysNum).ColdCtrlLoTempSchedPtr);
+            if (this->ColdCtrlLoTempSchedPtr > 0) {
+                OffTempCool = GetCurrentScheduleValue(this->ColdCtrlLoTempSchedPtr);
             } else {
                 OffTempCool = HighTempCooling;
             }
 
             // Now actually decide what to do based on the setpoint temperature in relation to the control temperatures
-            if (SetPointTemp < OffTempHeat && CFloRadSys(RadSysNum).HeatingSystem) { // HEATING MODE
+            if (SetPointTemp < OffTempHeat && this->HeatingSystem) { // HEATING MODE
 
                 OperatingMode = HeatingMode;
 
-                CFloRadSys(RadSysNum).WaterMassFlowRate = CFloRadSys(RadSysNum).HotWaterMassFlowRate;
+                this->WaterMassFlowRate = this->HotWaterMassFlowRate;
 
-                if (!CFloRadSys(RadSysNum).HeatingSystem) {
+                if (!this->HeatingSystem) {
 
                     SysRunning = false; // Can't heat unless it's a heating system
 
                 } else { // It is a heating system so set all of the values for controls
 
-                    SetPointTempHi = GetCurrentScheduleValue(CFloRadSys(RadSysNum).HotCtrlHiTempSchedPtr);
-                    SetPointTempLo = GetCurrentScheduleValue(CFloRadSys(RadSysNum).HotCtrlLoTempSchedPtr);
+                    SetPointTempHi = GetCurrentScheduleValue(this->HotCtrlHiTempSchedPtr);
+                    SetPointTempLo = GetCurrentScheduleValue(this->HotCtrlLoTempSchedPtr);
                     if (SetPointTempHi < SetPointTempLo) {
-                        ShowSevereError("Heating setpoint temperature mismatch in" + CFloRadSys(RadSysNum).Name);
+                        ShowSevereError("Heating setpoint temperature mismatch in" + this->Name);
                         ShowContinueError("High setpoint temperature is less than low setpoint temperature--check your schedule input");
                         ShowFatalError("Preceding condition causes termination.");
                     }
 
-                    WaterTempHi = GetCurrentScheduleValue(CFloRadSys(RadSysNum).HotWaterHiTempSchedPtr);
-                    WaterTempLo = GetCurrentScheduleValue(CFloRadSys(RadSysNum).HotWaterLoTempSchedPtr);
+                    WaterTempHi = GetCurrentScheduleValue(this->HotWaterHiTempSchedPtr);
+                    WaterTempLo = GetCurrentScheduleValue(this->HotWaterLoTempSchedPtr);
                     if (WaterTempHi < WaterTempLo) {
-                        ShowSevereError("Heating water temperature mismatch in" + CFloRadSys(RadSysNum).Name);
+                        ShowSevereError("Heating water temperature mismatch in" + this->Name);
                         ShowContinueError("High water temperature is less than low water temperature--check your schedule input");
                         ShowFatalError("Preceding condition causes termination.");
                     }
@@ -3835,30 +3797,30 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if (SetPointTemp > OffTempCool && CFloRadSys(RadSysNum).CoolingSystem) { // COOLING MODE
+            } else if (SetPointTemp > OffTempCool && this->CoolingSystem) { // COOLING MODE
 
                 OperatingMode = CoolingMode;
 
-                CFloRadSys(RadSysNum).WaterMassFlowRate = CFloRadSys(RadSysNum).ChWaterMassFlowRate;
+                this->WaterMassFlowRate = this->ChWaterMassFlowRate;
 
-                if (!CFloRadSys(RadSysNum).CoolingSystem) {
+                if (!this->CoolingSystem) {
 
                     SysRunning = false; // Can't cool unless it's a cooling system
 
                 } else { // It is a cooling system so set all of the values for controls
 
-                    SetPointTempHi = GetCurrentScheduleValue(CFloRadSys(RadSysNum).ColdCtrlHiTempSchedPtr);
-                    SetPointTempLo = GetCurrentScheduleValue(CFloRadSys(RadSysNum).ColdCtrlLoTempSchedPtr);
+                    SetPointTempHi = GetCurrentScheduleValue(this->ColdCtrlHiTempSchedPtr);
+                    SetPointTempLo = GetCurrentScheduleValue(this->ColdCtrlLoTempSchedPtr);
                     if (SetPointTempHi < SetPointTempLo) {
-                        ShowSevereError("Cooling setpoint temperature mismatch in" + CFloRadSys(RadSysNum).Name);
+                        ShowSevereError("Cooling setpoint temperature mismatch in" + this->Name);
                         ShowContinueError("High setpoint temperature is less than low setpoint temperature--check your schedule input");
                         ShowFatalError("Preceding condition causes termination.");
                     }
 
-                    WaterTempHi = GetCurrentScheduleValue(CFloRadSys(RadSysNum).ColdWaterHiTempSchedPtr);
-                    WaterTempLo = GetCurrentScheduleValue(CFloRadSys(RadSysNum).ColdWaterLoTempSchedPtr);
+                    WaterTempHi = GetCurrentScheduleValue(this->ColdWaterHiTempSchedPtr);
+                    WaterTempLo = GetCurrentScheduleValue(this->ColdWaterLoTempSchedPtr);
                     if (WaterTempHi < WaterTempLo) {
-                        ShowSevereError("Cooling water temperature mismatch in" + CFloRadSys(RadSysNum).Name);
+                        ShowSevereError("Cooling water temperature mismatch in" + this->Name);
                         ShowContinueError("High water temperature is less than low water temperature--check your schedule input");
                         ShowFatalError("Preceding condition causes termination.");
                     }
@@ -3884,7 +3846,7 @@ namespace LowTempRadiantSystem {
         }
 
         if (SysRunning) {
-            CpFluid = GetSpecificHeatGlycol(fluidNameWater, RadInTemp, CFloRadSys(RadSysNum).GlycolIndex, RoutineName);
+            CpFluid = GetSpecificHeatGlycol(fluidNameWater, RadInTemp, this->GlycolIndex, RoutineName);
         }
 
         if ((!SysRunning) || (CpFluid < LowCpFluidValue)) {
@@ -3892,60 +3854,60 @@ namespace LowTempRadiantSystem {
             // set the flow rates to zero and then simulate the components with
             // the no flow conditions
             OperatingMode = NotOperating;
-            CFloRadSys(RadSysNum).WaterMassFlowRate = 0.0;
-            CFloRadSys(RadSysNum).WaterInjectionRate = 0.0;
-            CFloRadSys(RadSysNum).WaterRecircRate = 0.0;
-            CFloRadSys(RadSysNum).HeatPower = 0.0;
-            CFloRadSys(RadSysNum).CoolPower = 0.0;
-            CFloRadSys(RadSysNum).PumpPower = 0.0;
-            CFloRadSys(RadSysNum).PumpMassFlowRate = 0.0;
-            CFloRadSys(RadSysNum).PumpHeattoFluid = 0.0;
+            this->WaterMassFlowRate = 0.0;
+            this->WaterInjectionRate = 0.0;
+            this->WaterRecircRate = 0.0;
+            this->HeatPower = 0.0;
+            this->CoolPower = 0.0;
+            this->PumpPower = 0.0;
+            this->PumpMassFlowRate = 0.0;
+            this->PumpHeattoFluid = 0.0;
 
-            for (SurfNum = 1; SurfNum <= CFloRadSys(RadSysNum).NumOfSurfaces; ++SurfNum) {
-                SurfNum2 = CFloRadSys(RadSysNum).SurfacePtr(SurfNum);
+            for (SurfNum = 1; SurfNum <= this->NumOfSurfaces; ++SurfNum) {
+                SurfNum2 = this->SurfacePtr(SurfNum);
                 QRadSysSource(SurfNum2) = 0.0;
                 if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                     QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
             }
 
             // turn off flow requests made during init because it is not actually running
-            if (CFloRadSys(RadSysNum).CWLoopNum > 0) {
+            if (this->CWLoopNum > 0) {
                 mdot = 0.0;
                 SetComponentFlowRate(mdot,
-                                     CFloRadSys(RadSysNum).ColdWaterInNode,
-                                     CFloRadSys(RadSysNum).ColdWaterOutNode,
-                                     CFloRadSys(RadSysNum).CWLoopNum,
-                                     CFloRadSys(RadSysNum).CWLoopSide,
-                                     CFloRadSys(RadSysNum).CWBranchNum,
-                                     CFloRadSys(RadSysNum).CWCompNum);
+                                     this->ColdWaterInNode,
+                                     this->ColdWaterOutNode,
+                                     this->CWLoopNum,
+                                     this->CWLoopSide,
+                                     this->CWBranchNum,
+                                     this->CWCompNum);
             }
-            if (CFloRadSys(RadSysNum).HWLoopNum > 0) {
+            if (this->HWLoopNum > 0) {
                 mdot = 0.0;
                 SetComponentFlowRate(mdot,
-                                     CFloRadSys(RadSysNum).HotWaterInNode,
-                                     CFloRadSys(RadSysNum).HotWaterOutNode,
-                                     CFloRadSys(RadSysNum).HWLoopNum,
-                                     CFloRadSys(RadSysNum).HWLoopSide,
-                                     CFloRadSys(RadSysNum).HWBranchNum,
-                                     CFloRadSys(RadSysNum).HWCompNum);
+                                     this->HotWaterInNode,
+                                     this->HotWaterOutNode,
+                                     this->HWLoopNum,
+                                     this->HWLoopSide,
+                                     this->HWBranchNum,
+                                     this->HWCompNum);
             }
         } else { // (SysRunning) so simulate the system...
 
             // Determine pump flow rate and pump heat addition
-            CFloRadSys(RadSysNum).PumpMassFlowRate = CFloRadSys(RadSysNum).WaterMassFlowRate; // Set in InitLowTempRadiantSystem
-            if (CFloRadSys(RadSysNum).VolFlowSchedPtr > 0) {
-                PumpPartLoadRat = GetCurrentScheduleValue(CFloRadSys(RadSysNum).VolFlowSchedPtr);
+            this->PumpMassFlowRate = this->WaterMassFlowRate; // Set in InitLowTempRadiantSystem
+            if (this->VolFlowSchedPtr > 0) {
+                PumpPartLoadRat = GetCurrentScheduleValue(this->VolFlowSchedPtr);
             } else {
                 PumpPartLoadRat = 1.0;
             }
-            CFloRadSys(RadSysNum).PumpPower = PumpPartLoadRat * CFloRadSys(RadSysNum).NomPowerUse;
-            ShaftPower = CFloRadSys(RadSysNum).PumpPower * CFloRadSys(RadSysNum).MotorEffic;
+            this->PumpPower = PumpPartLoadRat * this->NomPowerUse;
+            ShaftPower = this->PumpPower * this->MotorEffic;
             // This adds the pump heat based on User input for the pump (same as in Pump module)
             // We assume that all of the heat ends up in the fluid eventually since this is a closed loop.
-            CFloRadSys(RadSysNum).PumpHeattoFluid =
-                ShaftPower + ((CFloRadSys(RadSysNum).PumpPower - ShaftPower) * CFloRadSys(RadSysNum).FracMotorLossToFluid);
-            if (CFloRadSys(RadSysNum).PumpMassFlowRate > 0.0) {
-                PumpTempRise = CFloRadSys(RadSysNum).PumpHeattoFluid / (CFloRadSys(RadSysNum).PumpMassFlowRate * CpFluid);
+            this->PumpHeattoFluid =
+                ShaftPower + ((this->PumpPower - ShaftPower) * this->FracMotorLossToFluid);
+            if (this->PumpMassFlowRate > 0.0) {
+                PumpTempRise = this->PumpHeattoFluid / (this->PumpMassFlowRate * CpFluid);
             } else {
                 PumpTempRise = 0.0;
             }
@@ -3955,61 +3917,61 @@ namespace LowTempRadiantSystem {
             if (OperatingMode == HeatingMode) {
 
                 // in heating mode so shut down cold water flow request
-                if (CFloRadSys(RadSysNum).CWLoopNum > 0) {
+                if (this->CWLoopNum > 0) {
                     mdot = 0.0;
                     SetComponentFlowRate(mdot,
-                                         CFloRadSys(RadSysNum).ColdWaterInNode,
-                                         CFloRadSys(RadSysNum).ColdWaterOutNode,
-                                         CFloRadSys(RadSysNum).CWLoopNum,
-                                         CFloRadSys(RadSysNum).CWLoopSide,
-                                         CFloRadSys(RadSysNum).CWBranchNum,
-                                         CFloRadSys(RadSysNum).CWCompNum);
+                                         this->ColdWaterInNode,
+                                         this->ColdWaterOutNode,
+                                         this->CWLoopNum,
+                                         this->CWLoopSide,
+                                         this->CWBranchNum,
+                                         this->CWCompNum);
                 }
-                LoopInNode = CFloRadSys(RadSysNum).HotWaterInNode;
+                LoopInNode = this->HotWaterInNode;
                 SysWaterInTemp = Node(LoopInNode).Temp;
                 Iteration = false;
 
-                if ((SysWaterInTemp >= LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= CFloRadSys(RadSysNum).WaterMassFlowRate)) {
+                if ((SysWaterInTemp >= LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
                     // Case 1: Adequate temperature and flow
                     // Best condition--loop inlet temperature greater than requested and we have enough flow.
                     // So, proceed assuming the RadInTemp requested by the controls and then figure out the
                     // mixing after the outlet radiant temperature is calculated.
-                    CFloRadSys(RadSysNum).WaterInletTemp = RadInTemp;
-                    CalcLowTempCFloRadSysComps(RadSysNum, LoopInNode, Iteration, LoadMet);
+                    this->WaterInletTemp = RadInTemp;
+                    this->CalcLowTempCFloRadSysComps(LoopInNode, Iteration, LoadMet);
 
                     // We now have inlet and outlet temperatures--we still need to set the flow rates
-                    if ((SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp) != 0.0) { // protect divide by zero
-                        CFloRadSys(RadSysNum).WaterInjectionRate =
-                            (CFloRadSys(RadSysNum).WaterMassFlowRate *
-                             (CFloRadSys(RadSysNum).WaterInletTemp - CFloRadSys(RadSysNum).WaterOutletTemp) /
-                             (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)) -
-                            (CFloRadSys(RadSysNum).PumpHeattoFluid / (CpFluid * (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)));
+                    if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect divide by zero
+                        this->WaterInjectionRate =
+                            (this->WaterMassFlowRate *
+                             (this->WaterInletTemp - this->WaterOutletTemp) /
+                             (SysWaterInTemp - this->WaterOutletTemp)) -
+                            (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
                     }
-                    CFloRadSys(RadSysNum).WaterRecircRate = CFloRadSys(RadSysNum).WaterMassFlowRate - CFloRadSys(RadSysNum).WaterInjectionRate;
+                    this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
 
-                } else if ((SysWaterInTemp < LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= CFloRadSys(RadSysNum).WaterMassFlowRate)) {
+                } else if ((SysWaterInTemp < LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
                     // Case 2: Adequate flow but temperature too low
                     // Only thing to do is to reset the inlet temperature and assume that the loop will supply
                     // the entire flow to the component (no recirculation but potentially some bypass for the
                     // overall loop).  There is no way we can meet the control temperature so don't even try.
-                    CFloRadSys(RadSysNum).WaterInletTemp = SysWaterInTemp + PumpTempRise;
-                    CalcLowTempCFloRadSysComps(RadSysNum, LoopInNode, Iteration, LoadMet);
+                    this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
+                    this->CalcLowTempCFloRadSysComps(LoopInNode, Iteration, LoadMet);
 
                     // We now have inlet and outlet temperatures--we still need to set the flow rates
-                    if ((SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp) != 0.0) { // protect divide by zero
-                        CFloRadSys(RadSysNum).WaterInjectionRate =
-                            (CFloRadSys(RadSysNum).WaterMassFlowRate *
-                             (CFloRadSys(RadSysNum).WaterInletTemp - CFloRadSys(RadSysNum).WaterOutletTemp) /
-                             (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)) -
-                            (CFloRadSys(RadSysNum).PumpHeattoFluid / (CpFluid * (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)));
+                    if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect divide by zero
+                        this->WaterInjectionRate =
+                            (this->WaterMassFlowRate *
+                             (this->WaterInletTemp - this->WaterOutletTemp) /
+                             (SysWaterInTemp - this->WaterOutletTemp)) -
+                            (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
                     } else {
-                        CFloRadSys(RadSysNum).WaterInjectionRate = CFloRadSys(RadSysNum).WaterMassFlowRate;
+                        this->WaterInjectionRate = this->WaterMassFlowRate;
                     }
-                    if (CFloRadSys(RadSysNum).WaterInjectionRate > CFloRadSys(RadSysNum).WaterMassFlowRate)
-                        CFloRadSys(RadSysNum).WaterInjectionRate = CFloRadSys(RadSysNum).WaterMassFlowRate;
-                    CFloRadSys(RadSysNum).WaterRecircRate = 0.0; // by definition
+                    if (this->WaterInjectionRate > this->WaterMassFlowRate)
+                        this->WaterInjectionRate = this->WaterMassFlowRate;
+                    this->WaterRecircRate = 0.0; // by definition
 
-                } else if ((SysWaterInTemp >= LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail < CFloRadSys(RadSysNum).WaterMassFlowRate)) {
+                } else if ((SysWaterInTemp >= LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
                     // Case 3: Adequate temperature but loop flow is less than component flow
                     // This case might work out, but there is no guarantee that there is enough loop flow to
                     // mix with the recirculation flow and still provide a high enough temperature.  First
@@ -4017,8 +3979,8 @@ namespace LowTempRadiantSystem {
                     // the proper temperature inlet to the radiant system, then we are done.  If not, we
                     // have to repeat the solution for an unknown inlet temperature and a known recirculation
                     // rate.
-                    CFloRadSys(RadSysNum).WaterInletTemp = RadInTemp;
-                    CalcLowTempCFloRadSysComps(RadSysNum, LoopInNode, Iteration, LoadMet);
+                    this->WaterInletTemp = RadInTemp;
+                    this->CalcLowTempCFloRadSysComps(LoopInNode, Iteration, LoadMet);
 
                     // Now see if we can really get that desired into temperature (RadInTemp) by solving
                     // for the flow that is injected from the loop.  A heat balance for the mixer that relates
@@ -4030,57 +3992,57 @@ namespace LowTempRadiantSystem {
                     // then we cannot meet the inlet temperature and we have to "iterate" through the
                     // alternate solution.
                     InjectFlowRate =
-                        (CFloRadSys(RadSysNum).WaterMassFlowRate * (CFloRadSys(RadSysNum).WaterInletTemp - CFloRadSys(RadSysNum).WaterOutletTemp) /
-                         (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)) -
-                        (CFloRadSys(RadSysNum).PumpHeattoFluid / (CpFluid * (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)));
+                        (this->WaterMassFlowRate * (this->WaterInletTemp - this->WaterOutletTemp) /
+                         (SysWaterInTemp - this->WaterOutletTemp)) -
+                        (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
                     if (InjectFlowRate > Node(LoopInNode).MassFlowRateMaxAvail) {
                         // We didn't have enough flow from the loop to meet our inlet temperature request.
                         // So, set the injection rate to the loop flow and calculate the recirculation flow.
                         // Then, resimulate the radiant system using these values (it will obtain the actual
                         // inlet temperature that results from this).
-                        CFloRadSys(RadSysNum).WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
-                        CFloRadSys(RadSysNum).WaterRecircRate = CFloRadSys(RadSysNum).WaterMassFlowRate - CFloRadSys(RadSysNum).WaterInjectionRate;
-                        CFloRadSys(RadSysNum).WaterInletTemp = SysWaterInTemp + PumpTempRise;
+                        this->WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
+                        this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
+                        this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                         Iteration = true;
-                        CalcLowTempCFloRadSysComps(RadSysNum, LoopInNode, Iteration, LoadMet);
+                        this->CalcLowTempCFloRadSysComps(LoopInNode, Iteration, LoadMet);
                     } else {
-                        CFloRadSys(RadSysNum).WaterInjectionRate = InjectFlowRate;
-                        CFloRadSys(RadSysNum).WaterRecircRate = CFloRadSys(RadSysNum).WaterMassFlowRate - CFloRadSys(RadSysNum).WaterInjectionRate;
+                        this->WaterInjectionRate = InjectFlowRate;
+                        this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                     }
 
-                } else if ((SysWaterInTemp < LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail < CFloRadSys(RadSysNum).WaterMassFlowRate)) {
+                } else if ((SysWaterInTemp < LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
                     // Case 4: Temperature too low and loop flow is less than component flow
                     // Worst condition--can't meet the temperature request at all.  Only thing to do is to
                     // set the loop flow and recirculation rate (known) and solve for the inlet temperature
                     // using the "iteration" solution scheme from "Case 3B" above
-                    CFloRadSys(RadSysNum).WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
-                    CFloRadSys(RadSysNum).WaterRecircRate = CFloRadSys(RadSysNum).WaterMassFlowRate - CFloRadSys(RadSysNum).WaterInjectionRate;
-                    CFloRadSys(RadSysNum).WaterInletTemp = SysWaterInTemp + PumpTempRise;
+                    this->WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
+                    this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
+                    this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                     Iteration = true;
-                    CalcLowTempCFloRadSysComps(RadSysNum, LoopInNode, Iteration, LoadMet);
-                }
+                    this->CalcLowTempCFloRadSysComps(LoopInNode, Iteration, LoadMet);
+               }
 
             } else if (OperatingMode == CoolingMode) {
 
                 // in cooling mode so shut down heating water flow request
-                if (CFloRadSys(RadSysNum).HWLoopNum > 0) {
+                if (this->HWLoopNum > 0) {
                     mdot = 0.0;
                     SetComponentFlowRate(mdot,
-                                         CFloRadSys(RadSysNum).HotWaterInNode,
-                                         CFloRadSys(RadSysNum).HotWaterOutNode,
-                                         CFloRadSys(RadSysNum).HWLoopNum,
-                                         CFloRadSys(RadSysNum).HWLoopSide,
-                                         CFloRadSys(RadSysNum).HWBranchNum,
-                                         CFloRadSys(RadSysNum).HWCompNum);
+                                         this->HotWaterInNode,
+                                         this->HotWaterOutNode,
+                                         this->HWLoopNum,
+                                         this->HWLoopSide,
+                                         this->HWBranchNum,
+                                         this->HWCompNum);
                 }
-                LoopInNode = CFloRadSys(RadSysNum).ColdWaterInNode;
+                LoopInNode = this->ColdWaterInNode;
                 SysWaterInTemp = Node(LoopInNode).Temp;
                 CFloCondIterNum = 1;
                 while ((CFloCondIterNum <= 1) ||
-                       ((CFloCondIterNum <= 2) && (CFloRadSys(RadSysNum).CondCtrlType == CondCtrlVariedOff) && (VarOffCond))) {
+                       ((CFloCondIterNum <= 2) && (this->CondCtrlType == CondCtrlVariedOff) && (VarOffCond))) {
                     Iteration = false;
 
-                    if ((SysWaterInTemp <= LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= CFloRadSys(RadSysNum).WaterMassFlowRate)) {
+                    if ((SysWaterInTemp <= LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
                         // Case 1: Adequate temperature and flow
                         // Best condition--loop inlet temperature lower than requested and we have enough flow.
                         // So, proceed assuming the RadInTemp requested by the controls and then figure out the
@@ -4088,43 +4050,43 @@ namespace LowTempRadiantSystem {
 
                         // This condition can also happen when LoopReqTemp has been reset  to dewpoint for condensation control
                         if (!VarOffCond) {
-                            CFloRadSys(RadSysNum).WaterInletTemp = RadInTemp;
+                            this->WaterInletTemp = RadInTemp;
                         } else {
-                            CFloRadSys(RadSysNum).WaterInletTemp = LoopReqTemp;
+                            this->WaterInletTemp = LoopReqTemp;
                         }
-                        CalcLowTempCFloRadSysComps(RadSysNum, LoopInNode, Iteration, LoadMet);
+                        this->CalcLowTempCFloRadSysComps(LoopInNode, Iteration, LoadMet);
 
                         // We now have inlet and outlet temperatures--we still need to set the flow rates
-                        CFloRadSys(RadSysNum).WaterInjectionRate =
-                            (CFloRadSys(RadSysNum).WaterMassFlowRate *
-                             (CFloRadSys(RadSysNum).WaterInletTemp - CFloRadSys(RadSysNum).WaterOutletTemp) /
-                             (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)) -
-                            (CFloRadSys(RadSysNum).PumpHeattoFluid / (CpFluid * (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)));
-                        CFloRadSys(RadSysNum).WaterRecircRate = CFloRadSys(RadSysNum).WaterMassFlowRate - CFloRadSys(RadSysNum).WaterInjectionRate;
+                        this->WaterInjectionRate =
+                            (this->WaterMassFlowRate *
+                             (this->WaterInletTemp - this->WaterOutletTemp) /
+                             (SysWaterInTemp - this->WaterOutletTemp)) -
+                            (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
+                        this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
 
-                    } else if ((SysWaterInTemp > LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= CFloRadSys(RadSysNum).WaterMassFlowRate)) {
+                    } else if ((SysWaterInTemp > LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail >= this->WaterMassFlowRate)) {
                         // Case 2: Adequate flow but temperature too high
                         // Only thing to do is to reset the inlet temperature and assume that the loop will supply
                         // the entire flow to the component (no recirculation but potentially some bypass for the
                         // overall loop).  There is no way we can meet the control temperature so don't even try.
-                        CFloRadSys(RadSysNum).WaterInletTemp = SysWaterInTemp + PumpTempRise;
-                        CalcLowTempCFloRadSysComps(RadSysNum, LoopInNode, Iteration, LoadMet);
+                        this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
+                        this->CalcLowTempCFloRadSysComps(LoopInNode, Iteration, LoadMet);
 
                         // We now have inlet and outlet temperatures--we still need to set the flow rates
-                        if ((SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp) != 0.0) { // protect div by zero
-                            CFloRadSys(RadSysNum).WaterInjectionRate =
-                                (CFloRadSys(RadSysNum).WaterMassFlowRate *
-                                 (CFloRadSys(RadSysNum).WaterInletTemp - CFloRadSys(RadSysNum).WaterOutletTemp) /
-                                 (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)) -
-                                (CFloRadSys(RadSysNum).PumpHeattoFluid / (CpFluid * (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)));
+                        if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect div by zero
+                            this->WaterInjectionRate =
+                                (this->WaterMassFlowRate *
+                                 (this->WaterInletTemp - this->WaterOutletTemp) /
+                                 (SysWaterInTemp - this->WaterOutletTemp)) -
+                                (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
                         } else { // no temp change present, set injection rate to full flow
-                            CFloRadSys(RadSysNum).WaterInjectionRate = CFloRadSys(RadSysNum).WaterMassFlowRate;
+                            this->WaterInjectionRate = this->WaterMassFlowRate;
                         }
-                        if (CFloRadSys(RadSysNum).WaterInjectionRate > CFloRadSys(RadSysNum).WaterMassFlowRate)
-                            CFloRadSys(RadSysNum).WaterInjectionRate = CFloRadSys(RadSysNum).WaterMassFlowRate;
-                        CFloRadSys(RadSysNum).WaterRecircRate = 0.0; // by definition
+                        if (this->WaterInjectionRate > this->WaterMassFlowRate)
+                            this->WaterInjectionRate = this->WaterMassFlowRate;
+                        this->WaterRecircRate = 0.0; // by definition
 
-                    } else if ((SysWaterInTemp <= LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail < CFloRadSys(RadSysNum).WaterMassFlowRate)) {
+                    } else if ((SysWaterInTemp <= LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
                         // Case 3: Adequate temperature but loop flow is less than component flow
                         // This case might work out, but there is no guarantee that there is enough loop flow to
                         // mix with the recirculation flow and still provide a high enough temperature.  First
@@ -4134,11 +4096,11 @@ namespace LowTempRadiantSystem {
                         // rate.
                         // This condition might happen when LoopReqTemp has been reset  to dewpoint for condensation control
                         if (!VarOffCond) {
-                            CFloRadSys(RadSysNum).WaterInletTemp = RadInTemp;
+                            this->WaterInletTemp = RadInTemp;
                         } else {
-                            CFloRadSys(RadSysNum).WaterInletTemp = LoopReqTemp;
+                            this->WaterInletTemp = LoopReqTemp;
                         }
-                        CalcLowTempCFloRadSysComps(RadSysNum, LoopInNode, Iteration, LoadMet);
+                        this->CalcLowTempCFloRadSysComps(LoopInNode, Iteration, LoadMet);
 
                         // Now see if we can really get that desired into temperature (RadInTemp) by solving
                         // for the flow that is injected from the loop.  A heat balance for the mixer that relates
@@ -4150,37 +4112,35 @@ namespace LowTempRadiantSystem {
                         // then we cannot meet the inlet temperature and we have to "iterate" through the
                         // alternate solution.
                         InjectFlowRate =
-                            (CFloRadSys(RadSysNum).WaterMassFlowRate *
-                             (CFloRadSys(RadSysNum).WaterInletTemp - CFloRadSys(RadSysNum).WaterOutletTemp) /
-                             (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)) -
-                            (CFloRadSys(RadSysNum).PumpHeattoFluid / (CpFluid * (SysWaterInTemp - CFloRadSys(RadSysNum).WaterOutletTemp)));
+                            (this->WaterMassFlowRate *
+                             (this->WaterInletTemp - this->WaterOutletTemp) /
+                             (SysWaterInTemp - this->WaterOutletTemp)) -
+                            (this->PumpHeattoFluid / (CpFluid * (SysWaterInTemp - this->WaterOutletTemp)));
                         if (InjectFlowRate > Node(LoopInNode).MassFlowRateMaxAvail) {
                             // We didn't have enough flow from the loop to meet our inlet temperature request.
                             // So, set the injection rate to the loop flow and calculate the recirculation flow.
                             // Then, resimulate the radiant system using these values (it will obtain the actual
                             // inlet temperature that results from this).
-                            CFloRadSys(RadSysNum).WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
-                            CFloRadSys(RadSysNum).WaterRecircRate =
-                                CFloRadSys(RadSysNum).WaterMassFlowRate - CFloRadSys(RadSysNum).WaterInjectionRate;
-                            CFloRadSys(RadSysNum).WaterInletTemp = SysWaterInTemp + PumpTempRise;
+                            this->WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
+                            this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
+                            this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                             Iteration = true;
-                            CalcLowTempCFloRadSysComps(RadSysNum, LoopInNode, Iteration, LoadMet);
+                            this->CalcLowTempCFloRadSysComps(LoopInNode, Iteration, LoadMet);
                         } else {
-                            CFloRadSys(RadSysNum).WaterInjectionRate = InjectFlowRate;
-                            CFloRadSys(RadSysNum).WaterRecircRate =
-                                CFloRadSys(RadSysNum).WaterMassFlowRate - CFloRadSys(RadSysNum).WaterInjectionRate;
+                            this->WaterInjectionRate = InjectFlowRate;
+                            this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                         }
 
-                    } else if ((SysWaterInTemp > LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail < CFloRadSys(RadSysNum).WaterMassFlowRate)) {
+                    } else if ((SysWaterInTemp > LoopReqTemp) && (Node(LoopInNode).MassFlowRateMaxAvail < this->WaterMassFlowRate)) {
                         // Case 4: Temperature too low and loop flow is less than component flow
                         // Worst condition--can't meet the temperature request at all.  Only thing to do is to
                         // set the loop flow and recirculation rate (known) and solve for the inlet temperature
                         // using the "iteration" solution scheme from "Case 3B" above
-                        CFloRadSys(RadSysNum).WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
-                        CFloRadSys(RadSysNum).WaterRecircRate = CFloRadSys(RadSysNum).WaterMassFlowRate - CFloRadSys(RadSysNum).WaterInjectionRate;
-                        CFloRadSys(RadSysNum).WaterInletTemp = SysWaterInTemp + PumpTempRise;
+                        this->WaterInjectionRate = Node(LoopInNode).MassFlowRateMaxAvail;
+                        this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
+                        this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                         Iteration = true;
-                        CalcLowTempCFloRadSysComps(RadSysNum, LoopInNode, Iteration, LoadMet);
+                        this->CalcLowTempCFloRadSysComps(LoopInNode, Iteration, LoadMet);
                     }
 
                     ++CFloCondIterNum;
@@ -4189,38 +4149,37 @@ namespace LowTempRadiantSystem {
             } // Operating mode (heating or cooling)
 
             // Case when system has been shut down because of condensation issues or other limitations:
-            if (CFloRadSys(RadSysNum).WaterMassFlowRate < MassFlowTolerance) {
-                CFloRadSys(RadSysNum).WaterMassFlowRate = 0.0;
-                CFloRadSys(RadSysNum).WaterInjectionRate = 0.0;
-                CFloRadSys(RadSysNum).WaterRecircRate = 0.0;
-                CFloRadSys(RadSysNum).PumpMassFlowRate = 0.0;
+            if (this->WaterMassFlowRate < MassFlowTolerance) {
+                this->WaterMassFlowRate = 0.0;
+                this->WaterInjectionRate = 0.0;
+                this->WaterRecircRate = 0.0;
+                this->PumpMassFlowRate = 0.0;
                 OperatingMode = NotOperating;
             }
 
             // There are some cases when the pump heat is actually enough to provide all the heating that the system needs.
             // In this case, the water injection flow rate will come back as a slightly negative number.  Reset it to zero
             // and just recirculate all the flow through the local loop.
-            if (CFloRadSys(RadSysNum).WaterInjectionRate < 0.0) {
-                CFloRadSys(RadSysNum).WaterInjectionRate = 0.0;
-                CFloRadSys(RadSysNum).WaterRecircRate = CFloRadSys(RadSysNum).WaterMassFlowRate;
+            if (this->WaterInjectionRate < 0.0) {
+                this->WaterInjectionRate = 0.0;
+                this->WaterRecircRate = this->WaterMassFlowRate;
             }
 
             // Error check, just in case
-            if (CFloRadSys(RadSysNum).WaterRecircRate < 0.0) {
+            if (this->WaterRecircRate < 0.0) {
                 ShowWarningError("Flow mismatch in radiant system--result will be an energy imbalance--should not get this error");
-                ShowContinueErrorTimeStamp("WaterRecircRate=" + TrimSigDigits(CFloRadSys(RadSysNum).WaterRecircRate, 2) +
-                                           ", in Radiant System=" + CFloRadSys(RadSysNum).Name + ',');
-                CFloRadSys(RadSysNum).WaterRecircRate = 0.0;
-                CFloRadSys(RadSysNum).WaterInjectionRate = CFloRadSys(RadSysNum).WaterMassFlowRate;
+                ShowContinueErrorTimeStamp("WaterRecircRate=" + TrimSigDigits(this->WaterRecircRate, 2) +
+                                           ", in Radiant System=" + this->Name + ',');
+                this->WaterRecircRate = 0.0;
+                this->WaterInjectionRate = this->WaterMassFlowRate;
             }
 
         } // System running mode (yes or no)
     }
 
-    void CalcLowTempCFloRadSysComps(int const RadSysNum,      // Index for the low temperature radiant system under consideration
-                                    int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
-                                    bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
-                                    Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
+    void ConstantFlowRadiantSystemData::CalcLowTempCFloRadSysComps(int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
+                                                                   bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
+                                                                   Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
     )
     {
 
@@ -4333,54 +4292,47 @@ namespace LowTempRadiantSystem {
 
         Ckj = 0.0;
         Cmj = 0.0;
-        WaterTempOut = CFloRadSys(RadSysNum).WaterInletTemp;
+        WaterTempOut = this->WaterInletTemp;
 
         // Set the conditions on the water side inlet
         {
             auto const SELECT_CASE_var(OperatingMode);
             if (SELECT_CASE_var == HeatingMode) {
-                WaterNodeIn = CFloRadSys(RadSysNum).HotWaterInNode;
+                WaterNodeIn = this->HotWaterInNode;
             } else if (SELECT_CASE_var == CoolingMode) {
-                WaterNodeIn = CFloRadSys(RadSysNum).ColdWaterInNode;
+                WaterNodeIn = this->ColdWaterInNode;
             } else {
                 ShowSevereError("Illegal low temperature radiant system operating mode");
-                ShowContinueError("Occurs in Radiant System=" + CFloRadSys(RadSysNum).Name);
+                ShowContinueError("Occurs in Radiant System=" + this->Name);
                 ShowFatalError("Preceding condition causes termination.");
             }
         }
-        ZoneNum = CFloRadSys(RadSysNum).ZonePtr;
+        ZoneNum = this->ZonePtr;
         ZoneMult = double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier);
-        WaterMassFlow = CFloRadSys(RadSysNum).WaterMassFlowRate / ZoneMult;
-        WaterTempIn = CFloRadSys(RadSysNum).WaterInletTemp;
+        WaterMassFlow = this->WaterMassFlowRate / ZoneMult;
+        WaterTempIn = this->WaterInletTemp;
 
         if (WaterMassFlow <= 0.0) {
             // No flow or below minimum allowed so there is no heat source/sink
             // This is possible with a mismatch between system and plant operation
             // or a slight mismatch between zone and system controls.  This is not
             // necessarily a "problem" so this exception is necessary in the code.
-            for (RadSurfNum = 1; RadSurfNum <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
-                SurfNum = CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum);
+            for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
+                SurfNum = this->SurfacePtr(RadSurfNum);
                 QRadSysSource(SurfNum) = 0.0;
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
                     QRadSysSource(Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
             }
 
-            CFloRadSys(RadSysNum).WaterOutletTemp = CFloRadSys(RadSysNum).WaterInletTemp;
+            this->WaterOutletTemp = this->WaterInletTemp;
 
         } else {
 
-            for (RadSurfNum = 1; RadSurfNum <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
-                SurfNum = CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum);
+            for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
+                SurfNum = this->SurfacePtr(RadSurfNum);
                 // Determine the heat exchanger "effectiveness" term
-                EpsMdotCp = CalcRadSysHXEffectTerm(RadSysNum,
-                                                   ConstantFlowSystem,
-                                                   WaterTempIn,
-                                                   WaterMassFlow,
-                                                   CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum),
-                                                   CFloRadSys(RadSysNum).NumCircuits(RadSurfNum),
-                                                   CFloRadSys(RadSysNum).TubeLength,
-                                                   CFloRadSys(RadSysNum).TubeDiameter,
-                                                   CFloRadSys(RadSysNum).GlycolIndex);
+                
+                EpsMdotCp = CalcRadSysHXEffectTerm(WaterTempIn, WaterMassFlow, this->SurfaceFrac(RadSurfNum), this->NumCircuits(RadSurfNum));
 
                 // Obtain the heat balance coefficients and calculate the intermediate coefficients
                 // linking the inlet water temperature to the heat source/sink to the radiant system.
@@ -4459,8 +4411,8 @@ namespace LowTempRadiantSystem {
                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
 
-                Mdot = WaterMassFlow * CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum);
-                Cp = GetSpecificHeatGlycol(fluidNameWater, WaterTempIn, CFloRadSys(RadSysNum).GlycolIndex, RoutineName);
+                Mdot = WaterMassFlow * this->SurfaceFrac(RadSurfNum);
+                Cp = GetSpecificHeatGlycol(fluidNameWater, WaterTempIn, this->GlycolIndex, RoutineName);
 
                 if (!Iteration) {
 
@@ -4509,7 +4461,7 @@ namespace LowTempRadiantSystem {
                     Ckj(RadSurfNum) = Ck;
                     Cmj(RadSurfNum) = (EpsMdotCp / (Mdot * Cp)) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
 
-                    if (RadSurfNum == CFloRadSys(RadSysNum).NumOfSurfaces) { // Last one so we can now do the other calculations
+                    if (RadSurfNum == this->NumOfSurfaces) { // Last one so we can now do the other calculations
                         // Equation for Twaterin is:
                         //   Twaterin = (LoopTerm + RecircTerm)/(TwiCoeff)
                         // where:
@@ -4518,26 +4470,26 @@ namespace LowTempRadiantSystem {
                         //   TwiCoeff   = 1 - (Mdotrecirc/Mdotradsys)*SUM(FlowFracj*(1 - Cm,j))
                         SumFlowFracCkCm = 0.0;
                         SumFlowFracOneMinusCm = 0.0;
-                        for (RadSurfNum2 = 1; RadSurfNum2 <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                            SumFlowFracCkCm += (CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum2) * Ckj(RadSurfNum) * Cmj(RadSurfNum2));
-                            SumFlowFracOneMinusCm += (CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum2) * (1.0 - Cmj(RadSurfNum2)));
+                        for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                            SumFlowFracCkCm += (this->SurfaceFrac(RadSurfNum2) * Ckj(RadSurfNum) * Cmj(RadSurfNum2));
+                            SumFlowFracOneMinusCm += (this->SurfaceFrac(RadSurfNum2) * (1.0 - Cmj(RadSurfNum2)));
                         }
 
-                        LoopTerm = (CFloRadSys(RadSysNum).WaterInjectionRate / CFloRadSys(RadSysNum).WaterMassFlowRate) * Node(MainLoopNodeIn).Temp +
-                                   (CFloRadSys(RadSysNum).PumpHeattoFluid / (CFloRadSys(RadSysNum).WaterMassFlowRate * Cp));
+                        LoopTerm = (this->WaterInjectionRate / this->WaterMassFlowRate) * Node(MainLoopNodeIn).Temp +
+                                   (this->PumpHeattoFluid / (this->WaterMassFlowRate * Cp));
 
-                        RecircTerm = (CFloRadSys(RadSysNum).WaterRecircRate / CFloRadSys(RadSysNum).WaterMassFlowRate) * SumFlowFracCkCm;
+                        RecircTerm = (this->WaterRecircRate / this->WaterMassFlowRate) * SumFlowFracCkCm;
 
-                        TwiCoeff = 1.0 - (CFloRadSys(RadSysNum).WaterRecircRate / CFloRadSys(RadSysNum).WaterMassFlowRate) * SumFlowFracOneMinusCm;
+                        TwiCoeff = 1.0 - (this->WaterRecircRate / this->WaterMassFlowRate) * SumFlowFracOneMinusCm;
 
                         WaterTempIn = (LoopTerm + RecircTerm) / (TwiCoeff);
 
-                        CFloRadSys(RadSysNum).WaterInletTemp = WaterTempIn;
+                        this->WaterInletTemp = WaterTempIn;
 
-                        for (RadSurfNum2 = 1; RadSurfNum2 <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
+                        for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                             WaterTempOut(RadSurfNum2) = WaterTempIn * (1.0 - Cmj(RadSurfNum2)) + (Ckj(RadSurfNum2) * Cmj(RadSurfNum2));
-                            Mdot = WaterMassFlow * CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum2);
-                            SurfNum = CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum2);
+                            Mdot = WaterMassFlow * this->SurfaceFrac(RadSurfNum2);
+                            SurfNum = this->SurfacePtr(RadSurfNum2);
                             QRadSysSource(SurfNum) = Mdot * Cp * (WaterTempIn - WaterTempOut(RadSurfNum2));
                             if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
                                 QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
@@ -4546,8 +4498,8 @@ namespace LowTempRadiantSystem {
                 }
             }
 
-            for (RadSurfNum = 1; RadSurfNum <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
-                SurfNum = CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum);
+            for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
+                SurfNum = this->SurfacePtr(RadSurfNum);
                 // "Temperature Comparison" Cut-off:
                 // Check to see whether or not the system should really be running.  If
                 // QRadSysSource is negative when we are in heating mode or QRadSysSource
@@ -4560,24 +4512,24 @@ namespace LowTempRadiantSystem {
                     WaterMassFlow = 0.0;
                     if (OperatingMode == HeatingMode) {
                         SetComponentFlowRate(WaterMassFlow,
-                                             CFloRadSys(RadSysNum).HotWaterInNode,
-                                             CFloRadSys(RadSysNum).HotWaterOutNode,
-                                             CFloRadSys(RadSysNum).HWLoopNum,
-                                             CFloRadSys(RadSysNum).HWLoopSide,
-                                             CFloRadSys(RadSysNum).HWBranchNum,
-                                             CFloRadSys(RadSysNum).HWCompNum);
+                                             this->HotWaterInNode,
+                                             this->HotWaterOutNode,
+                                             this->HWLoopNum,
+                                             this->HWLoopSide,
+                                             this->HWBranchNum,
+                                             this->HWCompNum);
                     } else if (OperatingMode == CoolingMode) {
                         SetComponentFlowRate(WaterMassFlow,
-                                             CFloRadSys(RadSysNum).ColdWaterInNode,
-                                             CFloRadSys(RadSysNum).ColdWaterOutNode,
-                                             CFloRadSys(RadSysNum).CWLoopNum,
-                                             CFloRadSys(RadSysNum).CWLoopSide,
-                                             CFloRadSys(RadSysNum).CWBranchNum,
-                                             CFloRadSys(RadSysNum).CWCompNum);
+                                             this->ColdWaterInNode,
+                                             this->ColdWaterOutNode,
+                                             this->CWLoopNum,
+                                             this->CWLoopSide,
+                                             this->CWBranchNum,
+                                             this->CWCompNum);
                     }
-                    CFloRadSys(RadSysNum).WaterMassFlowRate = WaterMassFlow;
-                    for (RadSurfNum2 = 1; RadSurfNum2 <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                        SurfNum2 = CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum2);
+                    this->WaterMassFlowRate = WaterMassFlow;
+                    for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                        SurfNum2 = this->SurfacePtr(RadSurfNum2);
                         QRadSysSource(SurfNum2) = 0.0;
                         if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                             QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
@@ -4590,49 +4542,49 @@ namespace LowTempRadiantSystem {
             // dropped below the dew-point temperature.  If so, we need to shut off this radiant system.
             // A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
             // conditions.
-            CFloRadSys(RadSysNum).CondCausedShutDown = false;
-            DewPointTemp = PsyTdpFnWPb(ZoneAirHumRat(CFloRadSys(RadSysNum).ZonePtr), OutBaroPress);
+            this->CondCausedShutDown = false;
+            DewPointTemp = PsyTdpFnWPb(ZoneAirHumRat(this->ZonePtr), OutBaroPress);
 
-            if ((OperatingMode == CoolingMode) && (CFloRadSys(RadSysNum).CondCtrlType == CondCtrlSimpleOff)) {
+            if ((OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlSimpleOff)) {
 
-                for (RadSurfNum2 = 1; RadSurfNum2 <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum2)) < (DewPointTemp + CFloRadSys(RadSysNum).CondDewPtDeltaT)) {
+                for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + this->CondDewPtDeltaT)) {
                         // Condensation warning--must shut off radiant system
-                        CFloRadSys(RadSysNum).CondCausedShutDown = true;
+                        this->CondCausedShutDown = true;
                         WaterMassFlow = 0.0;
                         SetComponentFlowRate(WaterMassFlow,
-                                             CFloRadSys(RadSysNum).ColdWaterInNode,
-                                             CFloRadSys(RadSysNum).ColdWaterOutNode,
-                                             CFloRadSys(RadSysNum).CWLoopNum,
-                                             CFloRadSys(RadSysNum).CWLoopSide,
-                                             CFloRadSys(RadSysNum).CWBranchNum,
-                                             CFloRadSys(RadSysNum).CWCompNum);
-                        CFloRadSys(RadSysNum).WaterMassFlowRate = WaterMassFlow;
-                        for (RadSurfNum3 = 1; RadSurfNum3 <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum3) {
-                            SurfNum2 = CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum3);
+                                             this->ColdWaterInNode,
+                                             this->ColdWaterOutNode,
+                                             this->CWLoopNum,
+                                             this->CWLoopSide,
+                                             this->CWBranchNum,
+                                             this->CWCompNum);
+                        this->WaterMassFlowRate = WaterMassFlow;
+                        for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
+                            SurfNum2 = this->SurfacePtr(RadSurfNum3);
                             QRadSysSource(SurfNum2) = 0.0;
                             if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                                 QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                         }
                         // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                         if (!WarmupFlag) {
-                            if (CFloRadSys(RadSysNum).CondErrIndex == 0) { // allow errors up to number of radiant systems
-                                ShowWarningMessage(cConstantFlowSystem + " [" + CFloRadSys(RadSysNum).Name + ']');
-                                ShowContinueError("Surface [" + Surface(CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum2)).Name +
+                            if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
+                                ShowWarningMessage(cConstantFlowSystem + " [" + this->Name + ']');
+                                ShowContinueError("Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError("Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError("Predicted radiant system surface temperature = " +
-                                                  RoundSigDigits(TH(2, 1, CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum2)), 2));
+                                                  RoundSigDigits(TH(2, 1, this->SurfacePtr(RadSurfNum2)), 2));
                                 ShowContinueError("Zone dew-point temperature + safety delta T= " +
-                                                  RoundSigDigits(DewPointTemp + CFloRadSys(RadSysNum).CondDewPtDeltaT, 2));
+                                                  RoundSigDigits(DewPointTemp + this->CondDewPtDeltaT, 2));
                                 ShowContinueErrorTimeStamp("");
-                                ShowContinueError("Note that a " + RoundSigDigits(CFloRadSys(RadSysNum).CondDewPtDeltaT, 4) +
+                                ShowContinueError("Note that a " + RoundSigDigits(this->CondDewPtDeltaT, 4) +
                                                   " C safety was chosen in the input for the shut-off criteria");
                                 ShowContinueError("Note also that this affects all surfaces that are part of this radiant system");
                             }
-                            ShowRecurringWarningErrorAtEnd(cConstantFlowSystem + " [" + CFloRadSys(RadSysNum).Name +
+                            ShowRecurringWarningErrorAtEnd(cConstantFlowSystem + " [" + this->Name +
                                                                "] condensation shut-off occurrence continues.",
-                                                           CFloRadSys(RadSysNum).CondErrIndex,
+                                                           this->CondErrIndex,
                                                            DewPointTemp,
                                                            DewPointTemp,
                                                            _,
@@ -4643,57 +4595,57 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if ((OperatingMode == CoolingMode) && (CFloRadSys(RadSysNum).CondCtrlType == CondCtrlNone)) {
+            } else if ((OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlNone)) {
 
-                for (RadSurfNum2 = 1; RadSurfNum2 <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum2)) < DewPointTemp) {
+                for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
                         // Condensation occurring but user does not want to shut radiant system off ever
-                        CFloRadSys(RadSysNum).CondCausedShutDown = true;
+                        this->CondCausedShutDown = true;
                     }
                 }
 
-            } else if ((OperatingMode == CoolingMode) && (CFloRadSys(RadSysNum).CondCtrlType == CondCtrlVariedOff)) {
+            } else if ((OperatingMode == CoolingMode) && (this->CondCtrlType == CondCtrlVariedOff)) {
 
-                for (RadSurfNum2 = 1; RadSurfNum2 <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum2) {
-                    if (TH(2, 1, CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum2)) < (DewPointTemp + CFloRadSys(RadSysNum).CondDewPtDeltaT)) {
+                for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
+                    if (TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (DewPointTemp + this->CondDewPtDeltaT)) {
                         VarOffCond = true;
                         if (CFloCondIterNum >= 2) {
                             // We have already iterated once so now we must shut off radiant system
-                            CFloRadSys(RadSysNum).CondCausedShutDown = true;
+                            this->CondCausedShutDown = true;
                             WaterMassFlow = 0.0;
                             SetComponentFlowRate(WaterMassFlow,
-                                                 CFloRadSys(RadSysNum).ColdWaterInNode,
-                                                 CFloRadSys(RadSysNum).ColdWaterOutNode,
-                                                 CFloRadSys(RadSysNum).CWLoopNum,
-                                                 CFloRadSys(RadSysNum).CWLoopSide,
-                                                 CFloRadSys(RadSysNum).CWBranchNum,
-                                                 CFloRadSys(RadSysNum).CWCompNum);
-                            CFloRadSys(RadSysNum).WaterMassFlowRate = WaterMassFlow;
-                            for (RadSurfNum3 = 1; RadSurfNum3 <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum3) {
-                                SurfNum2 = CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum3);
+                                                 this->ColdWaterInNode,
+                                                 this->ColdWaterOutNode,
+                                                 this->CWLoopNum,
+                                                 this->CWLoopSide,
+                                                 this->CWBranchNum,
+                                                 this->CWCompNum);
+                            this->WaterMassFlowRate = WaterMassFlow;
+                            for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
+                                SurfNum2 = this->SurfacePtr(RadSurfNum3);
                                 QRadSysSource(SurfNum2) = 0.0;
                                 if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
                                     QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                             }
                             // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                             if (!WarmupFlag) {
-                                if (CFloRadSys(RadSysNum).CondErrIndex == 0) { // allow errors up to number of radiant systems
-                                    ShowWarningMessage(cConstantFlowSystem + " [" + CFloRadSys(RadSysNum).Name + ']');
-                                    ShowContinueError("Surface [" + Surface(CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum2)).Name +
+                                if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
+                                    ShowWarningMessage(cConstantFlowSystem + " [" + this->Name + ']');
+                                    ShowContinueError("Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
                                                       "] temperature below dew-point temperature--potential for condensation exists");
                                     ShowContinueError("Flow to the radiant system will be shut-off to avoid condensation");
                                     ShowContinueError("Predicted radiant system surface temperature = " +
-                                                      RoundSigDigits(TH(2, 1, CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum2)), 2));
+                                                      RoundSigDigits(TH(2, 1, this->SurfacePtr(RadSurfNum2)), 2));
                                     ShowContinueError("Zone dew-point temperature + safety delta T= " +
-                                                      RoundSigDigits(DewPointTemp + CFloRadSys(RadSysNum).CondDewPtDeltaT, 2));
+                                                      RoundSigDigits(DewPointTemp + this->CondDewPtDeltaT, 2));
                                     ShowContinueErrorTimeStamp("");
-                                    ShowContinueError("Note that a " + RoundSigDigits(CFloRadSys(RadSysNum).CondDewPtDeltaT, 4) +
+                                    ShowContinueError("Note that a " + RoundSigDigits(this->CondDewPtDeltaT, 4) +
                                                       " C safety was chosen in the input for the shut-off criteria");
                                     ShowContinueError("Note also that this affects all surfaces that are part of this radiant system");
                                 }
-                                ShowRecurringWarningErrorAtEnd(cConstantFlowSystem + " [" + CFloRadSys(RadSysNum).Name +
+                                ShowRecurringWarningErrorAtEnd(cConstantFlowSystem + " [" + this->Name +
                                                                    "] condensation shut-off occurrence continues.",
-                                                               CFloRadSys(RadSysNum).CondErrIndex,
+                                                               this->CondErrIndex,
                                                                DewPointTemp,
                                                                DewPointTemp,
                                                                _,
@@ -4702,7 +4654,7 @@ namespace LowTempRadiantSystem {
                             }
                             break; // outer do loop
                         } else {   // (First iteration--reset loop required temperature and try again to avoid condensation)
-                            LoopReqTemp = DewPointTemp + CFloRadSys(RadSysNum).CondDewPtDeltaT;
+                            LoopReqTemp = DewPointTemp + this->CondDewPtDeltaT;
                         }
                     }
                 }
@@ -4711,24 +4663,23 @@ namespace LowTempRadiantSystem {
             // Determine radiant system outlet temperature (two ways to calculate--use as a check)
             WaterOutletTempCheck = 0.0;
             TotalRadSysPower = 0.0;
-            for (RadSurfNum = 1; RadSurfNum <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
-                SurfNum = CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum);
+            for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
+                SurfNum = this->SurfacePtr(RadSurfNum);
                 TotalRadSysPower += QRadSysSource(SurfNum);
-                WaterOutletTempCheck += (CFloRadSys(RadSysNum).SurfaceFrac(RadSurfNum) * WaterTempOut(RadSurfNum));
+                WaterOutletTempCheck += (this->SurfaceFrac(RadSurfNum) * WaterTempOut(RadSurfNum));
             }
             TotalRadSysPower *= ZoneMult;
 
-            if (CFloRadSys(RadSysNum).WaterMassFlowRate > 0.0) {
-                Cp = GetSpecificHeatGlycol(fluidNameWater, WaterTempIn, CFloRadSys(RadSysNum).GlycolIndex, RoutineName);
-                CFloRadSys(RadSysNum).WaterOutletTemp =
-                    CFloRadSys(RadSysNum).WaterInletTemp - (TotalRadSysPower / (CFloRadSys(RadSysNum).WaterMassFlowRate * Cp));
-                if ((std::abs(CFloRadSys(RadSysNum).WaterOutletTemp - WaterOutletTempCheck) > TempCheckLimit) &&
+            if (this->WaterMassFlowRate > 0.0) {
+                Cp = GetSpecificHeatGlycol(fluidNameWater, WaterTempIn, this->GlycolIndex, RoutineName);
+                this->WaterOutletTemp = this->WaterInletTemp - (TotalRadSysPower / (this->WaterMassFlowRate * Cp));
+                if ((std::abs(this->WaterOutletTemp - WaterOutletTempCheck) > TempCheckLimit) &&
                     (std::abs(TotalRadSysPower) > ZeroSystemResp)) {
                     // If the total system power is zero, that means we have shut down and the temperatures won't match because of that
                     ShowWarningError("Radiant system water outlet temperature calculation mismatch--this should not happen");
                 }
             } else {
-                CFloRadSys(RadSysNum).WaterOutletTemp = CFloRadSys(RadSysNum).WaterInletTemp;
+                this->WaterOutletTemp = this->WaterInletTemp;
             }
         }
 
@@ -4739,13 +4690,11 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
 
-        LoadMet = SumHATsurf(CFloRadSys(RadSysNum).ZonePtr) - ZeroSourceSumHATsurf(CFloRadSys(RadSysNum).ZonePtr);
+        LoadMet = SumHATsurf(this->ZonePtr) - ZeroSourceSumHATsurf(this->ZonePtr);
 
     }
 
-    void CalcLowTempElecRadiantSystem(int const RadSysNum, // name of the low temperature radiant system
-                                      Real64 &LoadMet      // load met by the radiant system, in Watts
-    )
+    void ElectricRadiantSystemData::CalcLowTempElecRadiantSystem(Real64 &LoadMet)  // load met by the radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -4792,14 +4741,14 @@ namespace LowTempRadiantSystem {
         int ZoneNum;        // number of zone being served
 
         // initialize local variables
-        ZoneNum = ElecRadSys(RadSysNum).ZonePtr;
+        ZoneNum = this->ZonePtr;
         HeatFrac = 0.0;
 
-        if (GetCurrentScheduleValue(ElecRadSys(RadSysNum).SchedPtr) <= 0.0) {
+        if (GetCurrentScheduleValue(this->SchedPtr) <= 0.0) {
 
             // Unit is off; set the heat source terms to zero
-            for (RadSurfNum = 1; RadSurfNum <= ElecRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
-                SurfNum = ElecRadSys(RadSysNum).SurfacePtr(RadSurfNum);
+            for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
+                SurfNum = this->SurfacePtr(RadSurfNum);
                 QRadSysSource(SurfNum) = 0.0;
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
                     QRadSysSource(Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
@@ -4809,25 +4758,25 @@ namespace LowTempRadiantSystem {
             // that the unit should be on or not
 
             // Determine the current setpoint temperature and the temperature at which the unit should be completely off
-            SetPtTemp = GetCurrentScheduleValue(ElecRadSys(RadSysNum).SetptSchedPtr);
-            OffTemp = SetPtTemp + 0.5 * ElecRadSys(RadSysNum).ThrottlRange;
+            SetPtTemp = GetCurrentScheduleValue(this->SetptSchedPtr);
+            OffTemp = SetPtTemp + 0.5 * this->ThrottlRange;
 
             // Determine the control temperature--what the setpoint/offtemp is being compared to for unit operation
             
-            ControlTemp = SetRadSysControlTemp(ElecRadSys(RadSysNum).ControlType,ZoneNum,ElecRadSys(RadSysNum).Name);
+            ControlTemp = this->SetRadSysControlTemp();
 
             if (ControlTemp < OffTemp) { // HEATING MODE
 
                 OperatingMode = HeatingMode;
 
-                HeatFrac = (OffTemp - ControlTemp) / ElecRadSys(RadSysNum).ThrottlRange;
+                HeatFrac = (OffTemp - ControlTemp) / this->ThrottlRange;
                 if (HeatFrac < 0.0) HeatFrac = 0.0;
                 if (HeatFrac > 1.0) HeatFrac = 1.0;
 
                 // Set the heat source for the low temperature electric radiant system
-                for (RadSurfNum = 1; RadSurfNum <= ElecRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
-                    SurfNum = ElecRadSys(RadSysNum).SurfacePtr(RadSurfNum);
-                    QRadSysSource(SurfNum) = HeatFrac * ElecRadSys(RadSysNum).MaxElecPower * ElecRadSys(RadSysNum).SurfaceFrac(RadSurfNum);
+                for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
+                    SurfNum = this->SurfacePtr(RadSurfNum);
+                    QRadSysSource(SurfNum) = HeatFrac * this->MaxElecPower * this->SurfaceFrac(RadSurfNum);
                     if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
                         QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
                 }
@@ -4840,8 +4789,8 @@ namespace LowTempRadiantSystem {
 
             } else { //  OFF or COOLING MODE (not allowed for an electric low temperature radiant system), turn it off
 
-                for (RadSurfNum = 1; RadSurfNum <= ElecRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
-                    SurfNum = ElecRadSys(RadSysNum).SurfacePtr(RadSurfNum);
+                for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
+                    SurfNum = this->SurfacePtr(RadSurfNum);
                     QRadSysSource(SurfNum) = 0.0;
                     if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
                         QRadSysSource(Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
@@ -4987,7 +4936,7 @@ namespace LowTempRadiantSystem {
                         SafeCopyPlantNode(WaterInletNode, WaterOutletNode);
                     }
                 }
-                CheckForOutOfRangeTempResult(SystemType, RadSysNum, Node(WaterOutletNode).Temp, Node(WaterInletNode).Temp, WaterMassFlow);
+                HydrRadSys(RadSysNum).CheckForOutOfRangeTempResult(Node(WaterOutletNode).Temp, Node(WaterInletNode).Temp);
             }
 
             if (HydrRadSys(RadSysNum).CoolingSystem) {
@@ -5016,7 +4965,7 @@ namespace LowTempRadiantSystem {
                         SafeCopyPlantNode(WaterInletNode, WaterOutletNode);
                     }
                 }
-                CheckForOutOfRangeTempResult(SystemType, RadSysNum, Node(WaterOutletNode).Temp, Node(WaterInletNode).Temp, WaterMassFlow);
+                HydrRadSys(RadSysNum).CheckForOutOfRangeTempResult(Node(WaterOutletNode).Temp, Node(WaterInletNode).Temp);
             }
 
         } // ...end of Hydronic System block
@@ -5055,8 +5004,7 @@ namespace LowTempRadiantSystem {
                                                      (Node(WaterOutletNode).MassFlowRate);
                     }
                 }
-                CheckForOutOfRangeTempResult(
-                    SystemType, RadSysNum, Node(WaterOutletNode).Temp, Node(WaterInletNode).Temp, Node(WaterOutletNode).MassFlowRate);
+                CFloRadSys(RadSysNum).CheckForOutOfRangeTempResult(Node(WaterOutletNode).Temp, Node(WaterInletNode).Temp);
             }
 
             if (CFloRadSys(RadSysNum).CoolingSystem) {
@@ -5084,8 +5032,7 @@ namespace LowTempRadiantSystem {
                                                      (Node(WaterOutletNode).MassFlowRate);
                     }
 
-                    CheckForOutOfRangeTempResult(
-                        SystemType, RadSysNum, Node(WaterOutletNode).Temp, Node(WaterInletNode).Temp, Node(WaterOutletNode).MassFlowRate);
+                    CFloRadSys(RadSysNum).CheckForOutOfRangeTempResult(Node(WaterOutletNode).Temp, Node(WaterInletNode).Temp);
                 }
             }
 
@@ -5094,8 +5041,7 @@ namespace LowTempRadiantSystem {
         // Electric systems just burn electrical current and do not need to update nodes.
     }
 
-    void CheckForOutOfRangeTempResult(
-        int const SystemType, int const RadSysNum, Real64 const outletTemp, Real64 const inletTemp, Real64 const EP_UNUSED(mdot))
+    void HydronicSystemBaseData::CheckForOutOfRangeTempResult(Real64 const outletTemp, Real64 const inletTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5127,86 +5073,44 @@ namespace LowTempRadiantSystem {
         }
 
         if (WarnTooLow || WarnTooHigh) {
-
-            {
-                auto const SELECT_CASE_var(SystemType);
-                if (SELECT_CASE_var == HydronicSystem) {
-                    if (WarnTooLow) {
-                        if (HydrRadSys(RadSysNum).OutRangeLoErrorCount == 0) {
-                            ShowSevereMessage("UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical.");
-                            ShowContinueError("Occurs for radiant system name = " + HydrRadSys(RadSysNum).Name);
-                            ShowContinueError("Calculated radiant system outlet temperature = " + RoundSigDigits(outletTemp, 3) + " [C]");
-                            ShowContinueError("Radiant system inlet temperature = " + RoundSigDigits(inletTemp, 3) + " [C]");
-                            ShowContinueError(
-                                "A possible cause is that the materials used in the internal source construction are not compatible with the model.");
-                        }
-                        ShowRecurringSevereErrorAtEnd(
-                            "UpdateLowTempRadiantSystem: Detected low out of range outlet temperature result for radiant system name =" +
-                                HydrRadSys(RadSysNum).Name,
-                            HydrRadSys(RadSysNum).OutRangeLoErrorCount,
-                            outletTemp,
-                            outletTemp);
-                    }
-                    if (WarnTooHigh) {
-                        if (HydrRadSys(RadSysNum).OutRangeHiErrorCount == 0) {
-                            ShowSevereMessage("UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical.");
-                            ShowContinueError("Occurs for radiant system name = " + HydrRadSys(RadSysNum).Name);
-                            ShowContinueError("Calculated radiant system outlet temperature = " + RoundSigDigits(outletTemp, 3) + " [C]");
-                            ShowContinueError("Radiant system inlet temperature = " + RoundSigDigits(inletTemp, 3) + " [C]");
-                            ShowContinueError(
-                                "A possible cause is that the materials used in the internal source construction are not compatible with the model.");
-                        }
-                        ShowRecurringSevereErrorAtEnd(
-                            "UpdateLowTempRadiantSystem: Detected high out of range outlet temperature result radiant system name =" +
-                                HydrRadSys(RadSysNum).Name,
-                            HydrRadSys(RadSysNum).OutRangeHiErrorCount,
-                            outletTemp,
-                            outletTemp);
-                    }
-
-                } else if (SELECT_CASE_var == ConstantFlowSystem) {
-                    if (WarnTooLow) {
-
-                        if (CFloRadSys(RadSysNum).OutRangeLoErrorCount == 0) {
-                            ShowSevereMessage("UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical.");
-                            ShowContinueError("Occurs for radiant system name = " + CFloRadSys(RadSysNum).Name);
-                            ShowContinueError("Calculated radiant system outlet temperature = " + RoundSigDigits(outletTemp, 3) + " [C]");
-                            ShowContinueError("Radiant system inlet temperature = " + RoundSigDigits(inletTemp, 3) + " [C]");
-                            ShowContinueError(
-                                "A possible cause is that the materials used in the internal source construction are not compatible with the model.");
-                        }
-                        ShowRecurringSevereErrorAtEnd(
-                            "UpdateLowTempRadiantSystem: Detected high out of range temperature result for radiant system name =" +
-                                CFloRadSys(RadSysNum).Name,
-                            CFloRadSys(RadSysNum).OutRangeLoErrorCount,
-                            outletTemp,
-                            outletTemp);
-                    }
-                    if (WarnTooHigh) {
-                        if (CFloRadSys(RadSysNum).OutRangeHiErrorCount == 0) {
-                            ShowSevereMessage("UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical.");
-                            ShowContinueError("Occurs for radiant system name = " + CFloRadSys(RadSysNum).Name);
-                            ShowContinueError("Calculated radiant system outlet temperature = " + RoundSigDigits(outletTemp, 3) + " [C]");
-                            ShowContinueError("Radiant system inlet temperature = " + RoundSigDigits(inletTemp, 3) + " [C]");
-                            ShowContinueError(
-                                "A possible cause is that the materials used in the internal source construction are not compatible with the model.");
-                        }
-                        ShowRecurringSevereErrorAtEnd(
-                            "UpdateLowTempRadiantSystem: Detected high out of range temperature result for radiant system name =" +
-                                CFloRadSys(RadSysNum).Name,
-                            CFloRadSys(RadSysNum).OutRangeHiErrorCount,
-                            outletTemp,
-                            outletTemp);
-                    }
+            if (WarnTooLow) {
+                if (this->OutRangeLoErrorCount == 0) {
+                    ShowSevereMessage("UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical.");
+                    ShowContinueError("Occurs for radiant system name = " + this->Name);
+                    ShowContinueError("Calculated radiant system outlet temperature = " + RoundSigDigits(outletTemp, 3) + " [C]");
+                    ShowContinueError("Radiant system inlet temperature = " + RoundSigDigits(inletTemp, 3) + " [C]");
+                    ShowContinueError(
+                        "A possible cause is that the materials used in the internal source construction are not compatible with the model.");
                 }
+                ShowRecurringSevereErrorAtEnd(
+                    "UpdateLowTempRadiantSystem: Detected low out of range outlet temperature result for radiant system name =" +
+                        this->Name,
+                    this->OutRangeLoErrorCount,
+                    outletTemp,
+                    outletTemp);
             }
+            
+            if (WarnTooHigh) {
+                if (this->OutRangeHiErrorCount == 0) {
+                    ShowSevereMessage("UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical.");
+                    ShowContinueError("Occurs for radiant system name = " + this->Name);
+                    ShowContinueError("Calculated radiant system outlet temperature = " + RoundSigDigits(outletTemp, 3) + " [C]");
+                    ShowContinueError("Radiant system inlet temperature = " + RoundSigDigits(inletTemp, 3) + " [C]");
+                    ShowContinueError(
+                        "A possible cause is that the materials used in the internal source construction are not compatible with the model.");
+                }
+                ShowRecurringSevereErrorAtEnd(
+                    "UpdateLowTempRadiantSystem: Detected high out of range outlet temperature result radiant system name =" +
+                        this->Name,
+                    this->OutRangeHiErrorCount,
+                    outletTemp,
+                    outletTemp);
+            }
+
         }
     }
 
-    Real64 SetRadSysControlTemp(int const RadSysCtrlType,       // Radiant system control type (set by user input)
-                                int const ZoneNum,              // Zone number for this low temperature radiant system
-                                std::string const RadSysName    // User input for radiant system name)
-    )
+    Real64 RadiantSystemBaseData::SetRadSysControlTemp()
     {
         using DataHeatBalance::MRT;
         using DataHeatBalance::Zone;
@@ -5214,6 +5118,10 @@ namespace LowTempRadiantSystem {
         
         // Return value
         Real64 ControlTemp;
+        
+        // Local Variables
+        auto RadSysCtrlType = this->ControlType;
+        auto ZoneNum = this->ZonePtr;
         
         if (RadSysCtrlType == MATControl) {
             ControlTemp = MAT(ZoneNum);
@@ -5231,7 +5139,7 @@ namespace LowTempRadiantSystem {
             ControlTemp = MAT(ZoneNum);     // THIS IS A TEMPORARY PLACEHOLDER
         } else { // Should never get here
             ControlTemp = MAT(ZoneNum);
-            ShowSevereError("Illegal control type in low temperature radiant system: " + RadSysName);
+            ShowSevereError("Illegal control type in low temperature radiant system: " + this->Name);
             ShowFatalError("Preceding condition causes termination.");
         }
 
@@ -5239,17 +5147,10 @@ namespace LowTempRadiantSystem {
         
     }
 
-
-
-    Real64 CalcRadSysHXEffectTerm(int const RadSysNum,        // Index number of radiant system under consideration !unused1208
-                                  int const SystemType,       // Type of radiant system: hydronic, constant flow, or electric
-                                  Real64 const Temperature,   // Temperature of water entering the radiant system, in C
-                                  Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
-                                  Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
-                                  Real64 const NumCircs,      // Number of fluid circuits in this surface
-                                  Real64 const TubeLength,    // Length of tubing in the radiant system, in m
-                                  Real64 const TubeDiameter,  // Inside diameter of the tubing in the radiant system, in m
-                                  int &EP_UNUSED(GlycolIndex) // Index for the fluid used in this radiant system
+    Real64 HydronicSystemBaseData::CalcRadSysHXEffectTerm(Real64 const Temperature,   // Temperature of water entering the radiant system, in C
+                                                          Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
+                                                          Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
+                                                          Real64 const NumCircs       // Number of fluid circuits in this surface
     )
     {
 
@@ -5323,7 +5224,7 @@ namespace LowTempRadiantSystem {
         Real64 MUactual;
         Real64 PRactual;
         Real64 Eff; // HX effectiveness
-
+        
         // First find out where we are in the range of temperatures
         Index = 1;
         while (Index <= NumOfPropDivisions) {
@@ -5349,49 +5250,24 @@ namespace LowTempRadiantSystem {
         }
         // arguments are glycol name, temperature, and concentration
         {
-            auto const SELECT_CASE_var(SystemType);
-            if (SELECT_CASE_var == HydronicSystem) {
-                {
-                    auto const SELECT_CASE_var1(OperatingMode);
-                    if (SELECT_CASE_var1 == HeatingMode) {
-                        CpWater = GetSpecificHeatGlycol(PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName,
-                                                        Temperature,
-                                                        PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
-                                                        RoutineName);
-                    } else if (SELECT_CASE_var1 == CoolingMode) {
-                        CpWater = GetSpecificHeatGlycol(PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                        Temperature,
-                                                        PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
-                                                        RoutineName);
-                    } else {
-                        assert(false);
-                    }
-                }
-            } else if (SELECT_CASE_var == ConstantFlowSystem) {
-                {
-                    auto const SELECT_CASE_var1(OperatingMode);
-
-                    if (SELECT_CASE_var1 == HeatingMode) {
-                        CpWater = GetSpecificHeatGlycol(PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidName,
-                                                        Temperature,
-                                                        PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
-                                                        RoutineName);
-                    } else if (SELECT_CASE_var1 == CoolingMode) {
-                        CpWater = GetSpecificHeatGlycol(PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                        Temperature,
-                                                        PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
-                                                        RoutineName);
-                    } else {
-                        assert(false);
-                    }
-                }
+            auto const SELECT_CASE_var1(OperatingMode);
+            if (SELECT_CASE_var1 == HeatingMode) {
+                CpWater = GetSpecificHeatGlycol(PlantLoop(this->HWLoopNum).FluidName,
+                                                Temperature,
+                                                PlantLoop(this->HWLoopNum).FluidIndex,
+                                                RoutineName);
+            } else if (SELECT_CASE_var1 == CoolingMode) {
+                CpWater = GetSpecificHeatGlycol(PlantLoop(this->CWLoopNum).FluidName,
+                                                Temperature,
+                                                PlantLoop(this->CWLoopNum).FluidIndex,
+                                                RoutineName);
             } else {
                 assert(false);
             }
         }
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        ReD = 4.0 * WaterMassFlow * FlowFraction / (Pi * MUactual * TubeDiameter * NumCircs);
+        ReD = 4.0 * WaterMassFlow * FlowFraction / (Pi * MUactual * this->TubeDiameter * NumCircs);
 
         // Calculate the Nusselt number based on what flow regime one is in
         if (ReD >= MaxLaminarRe) { // Turbulent flow --> use Colburn equation
@@ -5407,7 +5283,7 @@ namespace LowTempRadiantSystem {
         // NTU = UA/[(Mdot*Cp)min]
         // where: U = h (convection coefficient) and h = (k)(Nu)/D
         //        A = Pi*D*TubeLength
-        NTU = Pi * Kactual * NuD * TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
+        NTU = Pi * Kactual * NuD * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
 
         // Calculate Epsilon*MassFlowRate*Cp
         if (NTU > MaxExpPower) {

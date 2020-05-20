@@ -1549,14 +1549,14 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     CFloRadSys(RadSysNum).CoolingSystem = true;
     CFloRadSys(RadSysNum).HeatingSystem = false;
     Load = 1000.0;
-    CalcLowTempCFloRadiantSystem(RadSysNum, Load);
+    CFloRadSys(RadSysNum).CalcLowTempCFloRadiantSystem(Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     // Cooling
     CFloRadSys(RadSysNum).CoolingSystem = false;
     CFloRadSys(RadSysNum).HeatingSystem = true;
     DataHeatBalFanSys::MAT(1) = 26.0;
-    CalcLowTempCFloRadiantSystem(RadSysNum, Load);
+    CFloRadSys(RadSysNum).CalcLowTempCFloRadiantSystem(Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     CFloRadSys.deallocate();
@@ -1602,14 +1602,14 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     HydrRadSys(RadSysNum).CoolingSystem = true;
     HydrRadSys(RadSysNum).HeatingSystem = false;
     Load = 1000.0;
-    CalcLowTempHydrRadiantSystem(RadSysNum, Load);
+    HydrRadSys(RadSysNum).CalcLowTempHydrRadiantSystem(Load);
     EXPECT_EQ(0, LowTempRadiantSystem::OperatingMode);
 
     // Cooling
     HydrRadSys(RadSysNum).CoolingSystem = false;
     HydrRadSys(RadSysNum).HeatingSystem = true;
     DataHeatBalFanSys::MAT(1) = 26.0;
-    CalcLowTempHydrRadiantSystem(RadSysNum, Load);
+    HydrRadSys(RadSysNum).CalcLowTempHydrRadiantSystem(Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     HydrRadSys.deallocate();
@@ -1666,60 +1666,55 @@ TEST_F(LowTempRadiantSystemTest, SizeRadSysTubeLengthTest)
     // Test 1: Hydronic radiant system 1 (one surface)
     RadSysType = HydronicSystem;
     RadSysNum = 1;
-    FuncCalc = SizeRadSysTubeLength(RadSysType, RadSysNum);
+    FuncCalc = HydrRadSys(RadSysNum).SizeRadSysTubeLength();
     EXPECT_NEAR(FuncCalc, 1000.0, 0.1);
 
     // Test 2: Hydronic radiant system 2 (two surfaces)
     RadSysType = HydronicSystem;
     RadSysNum = 2;
-    FuncCalc = SizeRadSysTubeLength(RadSysType, RadSysNum);
+    FuncCalc = HydrRadSys(RadSysNum).SizeRadSysTubeLength();
     EXPECT_NEAR(FuncCalc, 1800.0, 0.1);
 
     // Test 3: Constant flow radiant system 1 (one surface)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 1;
-    FuncCalc = SizeRadSysTubeLength(RadSysType, RadSysNum);
+    FuncCalc = CFloRadSys(RadSysNum).SizeRadSysTubeLength();
     EXPECT_NEAR(FuncCalc, 1000.0, 0.1);
 
     // Test 4: Constant flow radiant system 2 (two surfaces)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 2;
-    FuncCalc = SizeRadSysTubeLength(RadSysType, RadSysNum);
+    FuncCalc = CFloRadSys(RadSysNum).SizeRadSysTubeLength();
     EXPECT_NEAR(FuncCalc, 1800.0, 0.1);
 
     // Test 5: Hydronic radiant system 3 (thickness out of range, low side)
     RadSysType = HydronicSystem;
     RadSysNum = 3;
     Construct(3).ThicknessPerpend = 0.004;
-    FuncCalc = SizeRadSysTubeLength(RadSysType, RadSysNum);
+    FuncCalc = HydrRadSys(RadSysNum).SizeRadSysTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 6: Hydronic radiant system 3 (thickness out of range, high side)
     RadSysType = HydronicSystem;
     RadSysNum = 3;
     Construct(3).ThicknessPerpend = 0.6;
-    FuncCalc = SizeRadSysTubeLength(RadSysType, RadSysNum);
+    FuncCalc = HydrRadSys(RadSysNum).SizeRadSysTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 7: Constant flow radiant system 3 (thickness out of range, low side)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 3;
     Construct(3).ThicknessPerpend = 0.004;
-    FuncCalc = SizeRadSysTubeLength(RadSysType, RadSysNum);
+    FuncCalc = CFloRadSys(RadSysNum).SizeRadSysTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 8: Constant flow radiant system 3 (thickness out of range, high side)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 3;
     Construct(3).ThicknessPerpend = 0.6;
-    FuncCalc = SizeRadSysTubeLength(RadSysType, RadSysNum);
+    FuncCalc = CFloRadSys(RadSysNum).SizeRadSysTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
-    // Test 9: Wrong system type
-    RadSysType = 0;
-    RadSysNum = 1;
-    FuncCalc = SizeRadSysTubeLength(RadSysType, RadSysNum);
-    EXPECT_NEAR(FuncCalc, 60.0, 0.1);
 }
 TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
 {
@@ -1809,7 +1804,6 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     Real64 TubeLength;
     Real64 TubeDiameter;
     Real64 HXEffectFuncResult;
-    int GlycolIndex = 0;
 
     // Set values of items that will stay constant for all calls to HX Effectiveness function
     RadSysNum = 1;
@@ -1826,9 +1820,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = HydronicSystem;
     Temperature = 10.0;
     HydrRadSys(RadSysNum).HWLoopNum = 1;
-    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
-                                                WaterMassFlow, FlowFraction, NumCircs,
-                                                TubeLength, TubeDiameter, GlycolIndex);
+    HXEffectFuncResult = HydrRadSys(RadSysNum).CalcRadSysHXEffectTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
     
     // Test 2: Cooling for Hydronic System
@@ -1837,9 +1829,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = HydronicSystem;
     Temperature = 10.0;
     HydrRadSys(RadSysNum).CWLoopNum = 1;
-    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
-                                                WaterMassFlow, FlowFraction, NumCircs,
-                                                TubeLength, TubeDiameter, GlycolIndex);
+    HXEffectFuncResult = HydrRadSys(RadSysNum).CalcRadSysHXEffectTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
     
     // Test 3: Heating for Constant Flow System
@@ -1848,9 +1838,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = ConstantFlowSystem;
     Temperature = 10.0;
     CFloRadSys(RadSysNum).HWLoopNum = 1;
-    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
-                                                WaterMassFlow, FlowFraction, NumCircs,
-                                                TubeLength, TubeDiameter, GlycolIndex);
+    HXEffectFuncResult = CFloRadSys(RadSysNum).CalcRadSysHXEffectTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
     
     // Test 4: Cooling for Constant Flow System
@@ -1859,9 +1847,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = ConstantFlowSystem;
     Temperature = 10.0;
     CFloRadSys(RadSysNum).CWLoopNum = 1;
-    HXEffectFuncResult = CalcRadSysHXEffectTerm(RadSysNum, RadSysType, Temperature,
-                                                WaterMassFlow, FlowFraction, NumCircs,
-                                                TubeLength, TubeDiameter, GlycolIndex);
+    HXEffectFuncResult = CFloRadSys(RadSysNum).CalcRadSysHXEffectTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
 
 }
