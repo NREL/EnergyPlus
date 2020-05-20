@@ -326,6 +326,7 @@ namespace MicroturbineElectricGenerator {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
                 ErrorsFound = true;
+                DataGlobalConstants::FuelTypeErrorsFound = false;
             } else {
                 MTGenerator(GeneratorNum).FuelType = DataGlobalConstants::FuelType;
             }

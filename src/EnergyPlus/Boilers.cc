@@ -215,6 +215,7 @@ namespace Boilers {
                 thisBoiler.BoilerFuelTypeForOutputVariable = "Electric";
                 thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
                 ErrorsFound = true;
+                DataGlobalConstants::FuelTypeErrorsFound = false;
             } else {
                 thisBoiler.BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelType;
                 thisBoiler.FuelType = DataGlobalConstants::FuelTypeNum;

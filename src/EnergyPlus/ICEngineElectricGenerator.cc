@@ -295,6 +295,7 @@ namespace ICEngineElectricGenerator {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + AlphArray(10));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
+                DataGlobalConstants::FuelTypeErrorsFound = false;
             } else {
                 ICEngineGenerator(genNum).FuelType = DataGlobalConstants::FuelType;
             }

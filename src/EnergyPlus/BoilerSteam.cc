@@ -204,6 +204,7 @@ namespace BoilerSteam {
                 // Set to Electric to avoid errors when setting up output variables
                 thisBoiler.BoilerFuelTypeForOutputVariable = "Electric";
                 ErrorsFound = true;
+                DataGlobalConstants::FuelTypeErrorsFound = false;
             } else {
                 thisBoiler.BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelType;
                 thisBoiler.FuelType = DataGlobalConstants::FuelTypeNum;

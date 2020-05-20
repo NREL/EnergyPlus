@@ -317,6 +317,7 @@ namespace CTElectricGenerator {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + AlphArray(11));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
+                DataGlobalConstants::FuelTypeErrorsFound = false;
             } else {
                 CTGenerator(genNum).FuelType = DataGlobalConstants::FuelType;
             }

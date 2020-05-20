@@ -3938,6 +3938,7 @@ namespace DXCoils {
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
+                DataGlobalConstants::FuelTypeErrorsFound = false;
             } else {
                 DXCoil(DXCoilNum).FuelType = DataGlobalConstants::FuelTypeNum;
             }
@@ -4417,6 +4418,7 @@ namespace DXCoils {
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
+                DataGlobalConstants::FuelTypeErrorsFound = false;
             } else {
                 DXCoil(DXCoilNum).FuelType = DataGlobalConstants::FuelTypeNum;
             }

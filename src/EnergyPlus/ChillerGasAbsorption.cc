@@ -461,6 +461,7 @@ namespace ChillerGasAbsorption {
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                 Get_ErrorsFound = true;
+                DataGlobalConstants::FuelTypeErrorsFound = false;
             } else {
                 thisChiller.FuelType = DataGlobalConstants::FuelType;
             }

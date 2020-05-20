@@ -2342,6 +2342,7 @@ namespace HVACVariableRefrigerantFlow {
                     ShowContinueError(
                         "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                     ErrorsFound = true;
+                    DataGlobalConstants::FuelTypeErrorsFound = false;
                 } else {
                     VRF(VRFNum).FuelType = DataGlobalConstants::FuelTypeNum;
                 }

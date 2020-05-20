@@ -316,7 +316,7 @@ namespace DataGlobalConstants {
     std::string FuelTypeInput;
     std::string FuelType;
     int FuelTypeNum;
-    bool FuelTypeErrorsFound;
+    bool FuelTypeErrorsFound(false);
 
     // DERIVED TYPE DEFINITIONS:
     // na
