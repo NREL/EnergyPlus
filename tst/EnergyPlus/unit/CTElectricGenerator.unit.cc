@@ -140,6 +140,7 @@ TEST_F(EnergyPlusFixture, CTElectricGenerator_Fueltype)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+
     GetCTGeneratorInput();
 
     EXPECT_EQ(DataGlobalConstants::FuelType, "Gas");

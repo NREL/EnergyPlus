@@ -128,6 +128,7 @@ TEST_F(EnergyPlusFixture, ICEngineElectricGenerator_Fueltype)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+
     GetICEngineGeneratorInput();
 
     EXPECT_EQ(DataGlobalConstants::FuelType, "Diesel");
