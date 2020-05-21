@@ -52,7 +52,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/PlantChillers.hh>
 
@@ -227,8 +226,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
     EngineDrivenChillerSpecs::getInput(state.dataPlantChillers);
 
     EXPECT_EQ(1, state.dataPlantChillers.NumEngineDrivenChillers);
-    EXPECT_EQ(DataGlobalConstants::FuelType, "Diesel");
-    EXPECT_FALSE(DataGlobalConstants::FuelTypeErrorsFound);
+    EXPECT_EQ(state.dataPlantChillers.EngineDrivenChiller(1).FuelType, "Diesel");
 }
 
 TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
@@ -297,6 +295,5 @@ TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
     GTChillerSpecs::getInput(state.dataPlantChillers);
 
     EXPECT_EQ(1, state.dataPlantChillers.NumGTChillers);
-    EXPECT_EQ(DataGlobalConstants::FuelType, "Gas");
-    EXPECT_FALSE(DataGlobalConstants::FuelTypeErrorsFound);
+    EXPECT_EQ(state.dataPlantChillers.GTChiller(1).FuelType, "Gas");
 }

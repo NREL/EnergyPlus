@@ -53,7 +53,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/ChillerGasAbsorption.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -169,6 +168,5 @@ TEST_F(EnergyPlusFixture, GasAbsorption_GetInput_Test)
     EXPECT_EQ("Gas", state.dataChillerGasAbsorption.GasAbsorber(1).FuelType);
 
     // Additional tests for fuel type input
-    EXPECT_EQ(DataGlobalConstants::FuelType, "Gas");
-    EXPECT_FALSE(DataGlobalConstants::FuelTypeErrorsFound);
+    EXPECT_EQ(state.dataChillerGasAbsorption.GasAbsorber(1).FuelType, "Gas");
 }

@@ -52,12 +52,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::ICEngineElectricGenerator;
-using namespace EnergyPlus::DataGlobalConstants;
 
 namespace EnergyPlus {
 
@@ -131,8 +129,7 @@ TEST_F(EnergyPlusFixture, ICEngineElectricGenerator_Fueltype)
 
     GetICEngineGeneratorInput();
 
-    EXPECT_EQ(DataGlobalConstants::FuelType, "Diesel");
-    EXPECT_FALSE(DataGlobalConstants::FuelTypeErrorsFound);
+    EXPECT_EQ(ICEngineGenerator(1).FuelType, "Diesel");
 }
 
 } // namespace EnergyPlus

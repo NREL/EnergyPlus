@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
@@ -77,7 +76,6 @@ using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace DataAirLoop;
 using namespace DataAirSystems;
-using namespace DataGlobalConstants;
 using namespace DataHVACGlobals;
 using namespace DataSizing;
 using namespace CurveManager;
@@ -1320,12 +1318,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     // Case 1 test
     GetDXCoils();
 
-    EXPECT_EQ(FuelTypeElectricity, DXCoil(1).FuelType);
+    EXPECT_EQ(FuelTypeElectricity, DXCoil(1).FuelType); // it also covers a test for fuel type input
     EXPECT_EQ(0, DXCoil(1).MSWasteHeat(2));
-        
-    // Additional tests for fuel type input
-    EXPECT_EQ(DataGlobalConstants::FuelTypeNum, 1); // FuelTypeElectricity
-    EXPECT_FALSE(DataGlobalConstants::FuelTypeErrorsFound);
     
     // Test calculations of the waste heat function #5162
 
@@ -3771,7 +3765,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     // get input
     GetDXCoils();
     SetPredefinedTables();
-
     // check multi-speed DX cooling coil
     EXPECT_EQ("ASHP CLG COIL", DXCoil(1).Name);
     EXPECT_EQ("Coil:Cooling:DX:MultiSpeed", DXCoil(1).DXCoilType);

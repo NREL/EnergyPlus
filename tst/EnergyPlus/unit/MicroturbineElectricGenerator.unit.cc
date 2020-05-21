@@ -51,14 +51,12 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::MicroturbineElectricGenerator;
-using namespace EnergyPlus::DataGlobalConstants;
 
 namespace EnergyPlus {
 
@@ -127,11 +125,9 @@ TEST_F(EnergyPlusFixture, MicroturbineElectricGenerator_Fueltype)
     ASSERT_TRUE(process_idf(idf_objects));
     DataIPShortCuts::cAlphaArgs(1) = "Capstone C65";
     DataIPShortCuts::cCurrentModuleObject = "Generator:MicroTurbine";
-
     GetMTGeneratorInput();
 
-    EXPECT_EQ(DataGlobalConstants::FuelType, "Gas");
-    EXPECT_FALSE(DataGlobalConstants::FuelTypeErrorsFound);
+    EXPECT_EQ(MTGenerator(1).FuelType, "Gas");
 }
 
 } // namespace EnergyPlus

@@ -52,12 +52,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CTElectricGenerator.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::CTElectricGenerator;
-using namespace EnergyPlus::DataGlobalConstants;
 
 namespace EnergyPlus {
 
@@ -143,8 +141,7 @@ TEST_F(EnergyPlusFixture, CTElectricGenerator_Fueltype)
 
     GetCTGeneratorInput();
 
-    EXPECT_EQ(DataGlobalConstants::FuelType, "Gas");
-    EXPECT_FALSE(DataGlobalConstants::FuelTypeErrorsFound);
+    EXPECT_EQ(CTGenerator(1).FuelType, "Gas");
 }
 
 } // namespace EnergyPlus
