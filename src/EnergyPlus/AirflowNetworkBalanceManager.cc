@@ -3622,7 +3622,7 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" invalid " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                     "\" illegal key.");
-                    ShowContinueError("Valid keys are: AirLoopHVAC:ZoneMixer, AirLoopHVAC:ZoneSplitter, AirLoopHVAC:OutdoorAirSystem, " 
+                    ShowContinueError("Valid keys are: AirLoopHVAC:ZoneMixer, AirLoopHVAC:ZoneSplitter, AirLoopHVAC:OutdoorAirSystem, "
                                       "OAMixerOutdoorAirStreamNode, OutdoorAir:NodeList, OutdoorAir:Node or Other.");
                     ErrorsFound = true;
                 }
@@ -8189,7 +8189,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 AirDensity;
         Real64 CpAir;
         Real64 Tamb;
-        Real64 hg; // latent heat of vaporization
+        Real64 hg;
         Real64 ReportingConstant;
         Real64 ReportingFraction;
         int AirLoopNum;
