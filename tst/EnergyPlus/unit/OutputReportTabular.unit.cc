@@ -3535,6 +3535,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     DataGlobals::DoWeathSim = true;
     DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
 
     GetInputTabularMonthly();
     EXPECT_EQ(MonthlyInputCount, 1);
@@ -3599,6 +3600,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     DataGlobals::DoWeathSim = true;
     DataGlobals::TimeStepZone = 1.0;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
     displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
@@ -6475,6 +6477,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 
     DataGlobals::DoWeathSim = true;
     DataGlobals::TimeStepZone = 0.25;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
 
     GetInputTabularMonthly();
     EXPECT_EQ(MonthlyInputCount, 1);
@@ -7805,6 +7808,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "General");
     DataGlobals::DoWeathSim = true;
     DataGlobals::TimeStepZone = 1.0;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
     displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
