@@ -59,7 +59,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -2186,17 +2185,15 @@ namespace PlantChillers {
             thisChiller.DesignMinExitGasTemp = DataIPShortCuts::rNumericArgs(24);
 
             // Validate fuel type input
-            DataGlobalConstants::FuelTypeInput = DataIPShortCuts::cAlphaArgs(12);
-            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
-            if (DataGlobalConstants::FuelTypeErrorsFound) {
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(12), thisChiller.FuelType, FuelTypeError);
+            if (FuelTypeError) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + '=' + DataIPShortCuts::cAlphaArgs(12));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
-                DataGlobalConstants::FuelTypeErrorsFound = false;
-            } else {
-                thisChiller.FuelType = DataGlobalConstants::FuelType;
+                FuelTypeError = false;
             }
 
             thisChiller.FuelHeatingValue = DataIPShortCuts::rNumericArgs(25);
@@ -4036,16 +4033,15 @@ namespace PlantChillers {
             }
 
             // Fuel Type Case Statement
-            DataGlobalConstants::FuelTypeInput = DataIPShortCuts::cAlphaArgs(10);
-            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
-            if (DataGlobalConstants::FuelTypeErrorsFound) {
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(10), thisChiller.FuelType, FuelTypeError);
+            if (FuelTypeError) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + DataIPShortCuts::cAlphaArgs(10));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
-            } else {
-                thisChiller.FuelType = DataGlobalConstants::FuelType;
+                FuelTypeError = false;
             }
 
             thisChiller.HeatRecMaxTemp = DataIPShortCuts::rNumericArgs(46);

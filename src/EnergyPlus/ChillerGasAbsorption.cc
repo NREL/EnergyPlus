@@ -453,17 +453,15 @@ namespace ChillerGasAbsorption {
             thisChiller.SizFac = rNumericArgs(17);
 
             // Validate fuel type input
-            DataGlobalConstants::FuelTypeInput = cAlphaArgs(17);
-            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
-            if (DataGlobalConstants::FuelTypeErrorsFound) {
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(cAlphaArgs(17), thisChiller.FuelType, FuelTypeError);
+            if (FuelTypeError) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value");
                 ShowContinueError("Invalid " + cAlphaFieldNames(17) + '=' + cAlphaArgs(17));
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                 Get_ErrorsFound = true;
-                DataGlobalConstants::FuelTypeErrorsFound = false;
-            } else {
-                thisChiller.FuelType = DataGlobalConstants::FuelType;
+                FuelTypeError = false;
             }
         }
 

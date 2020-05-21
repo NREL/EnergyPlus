@@ -57,7 +57,6 @@
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -311,15 +310,13 @@ namespace CTElectricGenerator {
             }
 
             // Validate fuel type input
-            DataGlobalConstants::FuelTypeInput = AlphArray(11);
-            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
-            if (DataGlobalConstants::FuelTypeErrorsFound) {
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(AlphArray(11), CTGenerator(genNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + AlphArray(11));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
-                DataGlobalConstants::FuelTypeErrorsFound = false;
-            } else {
-                CTGenerator(genNum).FuelType = DataGlobalConstants::FuelType;
+                FuelTypeError = false;
             }
 
             CTGenerator(genNum).HeatRecMaxTemp = NumArray(12);

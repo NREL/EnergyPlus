@@ -56,7 +56,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -320,15 +319,13 @@ namespace MicroturbineElectricGenerator {
             }
 
             // Validate fuel type input
-            DataGlobalConstants::FuelTypeInput = AlphArray(5);
-            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
-            if (DataGlobalConstants::FuelTypeErrorsFound) {
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(AlphArray(5), MTGenerator(GeneratorNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
                 ErrorsFound = true;
-                DataGlobalConstants::FuelTypeErrorsFound = false;
-            } else {
-                MTGenerator(GeneratorNum).FuelType = DataGlobalConstants::FuelType;
+                FuelTypeError = false;
             }
 
             MTGenerator(GeneratorNum).FuelHigherHeatingValue = NumArray(8);

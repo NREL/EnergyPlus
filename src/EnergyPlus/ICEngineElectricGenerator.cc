@@ -55,7 +55,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -289,17 +288,15 @@ namespace ICEngineElectricGenerator {
             }
 
             // Validate fuel type input
-            DataGlobalConstants::FuelTypeInput = AlphArray(10);
-            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
-            if (DataGlobalConstants::FuelTypeErrorsFound) {
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(AlphArray(10), ICEngineGenerator(genNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + AlphArray(10));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
-                DataGlobalConstants::FuelTypeErrorsFound = false;
-            } else {
-                ICEngineGenerator(genNum).FuelType = DataGlobalConstants::FuelType;
-            }
-
+                FuelTypeError = false;
+            }            
+            
             ICEngineGenerator(genNum).HeatRecMaxTemp = NumArray(11);
         }
 
