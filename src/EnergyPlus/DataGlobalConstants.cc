@@ -316,6 +316,7 @@ namespace DataGlobalConstants {
     std::string FuelTypeInput;
     std::string FuelType;
     int FuelTypeNum;
+    int FuelTypeNumforAssignResource;
     bool FuelTypeErrorsFound(false);
 
     // DERIVED TYPE DEFINITIONS:
@@ -658,6 +659,44 @@ namespace DataGlobalConstants {
         return ResourceTypeChar;
     }
 
+    enum FuelTypeNumber
+    {
+        ELECTRICITY,
+        NATURALGAS,
+        DIESEL,
+        GASOLINE,
+        COAL,
+        FUELOILNO1,
+        FUELOILNO2,
+        PROPANE,
+        OTHERFUEL1,
+        OTHERFUEL2
+    };
+
+    FuelTypeNumber ConvertFueltypeString(std::string FuelTypeInput)
+    {
+        if (FuelTypeInput == "ELECTRICITY")
+            return ELECTRICITY;
+        else if (FuelTypeInput == "NATURALGAS")
+            return NATURALGAS;
+        else if (FuelTypeInput == "DIESEL")
+            return DIESEL;
+        else if (FuelTypeInput == "GASOLINE")
+            return GASOLINE;
+        else if (FuelTypeInput == "COAL")
+            return COAL;
+        else if (FuelTypeInput == "FUELOILNO1")
+            return FUELOILNO1;
+        else if (FuelTypeInput == "FUELOILNO2")
+            return FUELOILNO2;
+        else if (FuelTypeInput == "PROPANE")
+            return PROPANE;
+        else if (FuelTypeInput == "OTHERFUEL1")
+            return OTHERFUEL1;
+        else if (FuelTypeInput == "OTHERFUEL2")
+            return OTHERFUEL2;
+    }
+
     void ValidateFuelType(std::string FuelTypeInput)
     {
         // FUNCTION INFORMATION:
@@ -669,131 +708,59 @@ namespace DataGlobalConstants {
         // PURPOSE OF THIS FUNCTION:
         // Validates fuel types and sets output strings
 
-        auto const SELECT_CASE_var(FuelTypeInput);
+        FuelTypeNumber Fuel = ConvertFueltypeString(FuelTypeInput);
 
-        if (SELECT_CASE_var == "ELECTRICITY") {
+        switch (Fuel) {
+        case ELECTRICITY:
             FuelType = "Electric";
-
-        } else if (SELECT_CASE_var == "NATURALGAS") {
+            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
+            FuelTypeNum = 1; // FuelTypeElectricity in DXCoils.cc and HVACVariableRefrigerantFlow.cc
+            break;
+        case NATURALGAS:
             FuelType = "Gas";
-
-        } else if (SELECT_CASE_var == "DIESEL") {
+            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
+            FuelTypeNum = 2; // FuelTypeNaturalGas in DXCoils.cc and HVACVariableRefrigerantFlow.cc
+            break;
+        case DIESEL:
             FuelType = "Diesel";
-
-        } else if (SELECT_CASE_var == "GASOLINE") {
+            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
+            FuelTypeNum = 4; // FuelTypeDiesel in DXCoils.cc and HVACVariableRefrigerantFlow.cc
+            break;
+        case GASOLINE:
             FuelType = "Gasoline";
-
-        } else if (SELECT_CASE_var == "COAL") {
+            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
+            FuelTypeNum = 5; // FuelTypeGasoline in DXCoils.cc and HVACVariableRefrigerantFlow.cc
+            break;
+        case COAL:
             FuelType = "Coal";
-
-        } else if (SELECT_CASE_var == "FUELOILNO1") {
+            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("COAL");
+            break;
+        case FUELOILNO1:
             FuelType = "FuelOil#1";
-
-        } else if (SELECT_CASE_var == "FUELOILNO2") {
+            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
+            FuelTypeNum = 6; // FuelTypeFuelOil1 in DXCoils.cc and HVACVariableRefrigerantFlow.cc
+            break;
+        case FUELOILNO2:
             FuelType = "FuelOil#2";
-
-        } else if (SELECT_CASE_var == "PROPANE") {
+            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
+            FuelTypeNum = 7; // FuelTypeFuelOil2 in DXCoils.cc and HVACVariableRefrigerantFlow.cc
+            break;
+        case PROPANE:
             FuelType = "Propane";
-
-        } else if (SELECT_CASE_var == "OTHERFUEL1") {
+            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
+            FuelTypeNum = 3; // FuelTypePropaneGas in DXCoils.cc and HVACVariableRefrigerantFlow.cc
+            break;
+        case OTHERFUEL1:
             FuelType = "OtherFuel1";
-
-        } else if (SELECT_CASE_var == "OTHERFUEL2") {
+            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
+            FuelTypeNum = 8; // FuelTypeOtherFuel1 in DXCoils.cc and HVACVariableRefrigerantFlow.cc
+            break;
+        case OTHERFUEL2:
             FuelType = "OtherFuel2";
-
-        } else {
-            FuelTypeErrorsFound = true;
-        }
-    }
-
-    void ValidateFuelTypeWithFuelTypeNum(std::string FuelTypeInput)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Dareum Nam
-        //       DATE WRITTEN   May 2020
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types and sets output strings with fuel type number (DXCoils.cc and HVACVariableRefrigerantFlow.cc)
-
-        if (UtilityRoutines::SameString(FuelTypeInput, "Electricity")) {
-            FuelTypeNum = 1; // FuelTypeElectricity
-        } else if (UtilityRoutines::SameString(FuelTypeInput, "NaturalGas")) {
-            FuelTypeNum = 2; // FuelTypeNaturalGas
-        } else if (UtilityRoutines::SameString(FuelTypeInput, "Propane")) {
-            FuelTypeNum = 3; // FuelTypePropaneGas
-        } else if (UtilityRoutines::SameString(FuelTypeInput, "Diesel")) {
-            FuelTypeNum = 4; // FuelTypeDiesel
-        } else if (UtilityRoutines::SameString(FuelTypeInput, "Gasoline")) {
-            FuelTypeNum = 5; // FuelTypeGasoline
-        } else if (UtilityRoutines::SameString(FuelTypeInput, "FuelOilNo1")) {
-            FuelTypeNum = 6; // FuelTypeFuelOil1
-        } else if (UtilityRoutines::SameString(FuelTypeInput, "FuelOilNo2")) {
-            FuelTypeNum = 7; // FuelTypeFuelOil2
-        } else if (UtilityRoutines::SameString(FuelTypeInput, "OtherFuel1")) {
-            FuelTypeNum = 8; // FuelTypeOtherFuel1
-        } else if (UtilityRoutines::SameString(FuelTypeInput, "OtherFuel2")) {
-            FuelTypeNum = 9; // FuelTypeOtherFuel2
-        } else {
-            FuelTypeErrorsFound = true;
-        }
-    }
-
-    void ValidateFuelTypeWithAssignResourceTypeNum(std::string FuelTypeInput)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Dareum Nam
-        //       DATE WRITTEN   May 2020
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types and sets output strings with AssignResourceTypeNum(std::string const &ResourceTypeChar) (Boilers.cc and BoilerSteam.cc)
-
-        auto const SELECT_CASE_var(FuelTypeInput);
-
-        if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelType = "Electric";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
-
-        } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelType = "Gas";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
-
-        } else if (SELECT_CASE_var == "DIESEL") {
-            FuelType = "Diesel";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
-
-        } else if (SELECT_CASE_var == "GASOLINE") {
-            FuelType = "Gasoline";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
-
-        } else if (SELECT_CASE_var == "COAL") {
-            FuelType = "Coal";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("COAL");
-
-        } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelType = "FuelOil#1";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
-
-        } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelType = "FuelOil#2";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
-
-        } else if (SELECT_CASE_var == "PROPANE") {
-            FuelType = "Propane";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
-
-        } else if (SELECT_CASE_var == "OTHERFUEL1") {
-            FuelType = "OtherFuel1";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
-
-        } else if (SELECT_CASE_var == "OTHERFUEL2") {
-            FuelType = "OtherFuel2";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
-
-        } else {
+            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
+            FuelTypeNum = 9; // FuelTypeOtherFuel2 in DXCoils.cc and HVACVariableRefrigerantFlow.cc
+            break;
+        default:
             FuelTypeErrorsFound = true;
         }
     }

@@ -3931,7 +3931,7 @@ namespace DXCoils {
 
             // A12; \field Fuel type, Validate fuel type input
             DataGlobalConstants::FuelTypeInput = Alphas(12);
-            DataGlobalConstants::ValidateFuelTypeWithFuelTypeNum(DataGlobalConstants::FuelTypeInput);
+            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
             if (DataGlobalConstants::FuelTypeErrorsFound) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(12) + ".  Entered choice = " + Alphas(12));
@@ -4411,7 +4411,7 @@ namespace DXCoils {
 
             // A9; \field Fuel type, Validate fuel type input 
             DataGlobalConstants::FuelTypeInput = Alphas(9);
-            DataGlobalConstants::ValidateFuelTypeWithFuelTypeNum(DataGlobalConstants::FuelTypeInput);
+            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
             if (DataGlobalConstants::FuelTypeErrorsFound) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(9) + ".  Entered choice = " + Alphas(9));

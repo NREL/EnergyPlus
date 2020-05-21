@@ -2335,7 +2335,7 @@ namespace HVACVariableRefrigerantFlow {
             if (!lAlphaFieldBlanks(39)) {
                 // A39; \field Fuel type, Validate fuel type input
                 DataGlobalConstants::FuelTypeInput = cAlphaArgs(39);
-                DataGlobalConstants::ValidateFuelTypeWithFuelTypeNum(DataGlobalConstants::FuelTypeInput);
+                DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
                 if (DataGlobalConstants::FuelTypeErrorsFound) {
                     ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\", " + cAlphaFieldNames(39) +
                                     " not found = " + cAlphaArgs(39));

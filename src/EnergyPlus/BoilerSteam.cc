@@ -197,7 +197,7 @@ namespace BoilerSteam {
 
             // Validate fuel type input
             DataGlobalConstants::FuelTypeInput = DataIPShortCuts::cAlphaArgs(2);
-            DataGlobalConstants::ValidateFuelTypeWithAssignResourceTypeNum(DataGlobalConstants::FuelTypeInput);
+            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
             if (DataGlobalConstants::FuelTypeErrorsFound) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
@@ -207,7 +207,7 @@ namespace BoilerSteam {
                 DataGlobalConstants::FuelTypeErrorsFound = false;
             } else {
                 thisBoiler.BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelType;
-                thisBoiler.FuelType = DataGlobalConstants::FuelTypeNum;
+                thisBoiler.FuelType = DataGlobalConstants::FuelTypeNumforAssignResource;
             }
              
             // INPUTS from the IDF file

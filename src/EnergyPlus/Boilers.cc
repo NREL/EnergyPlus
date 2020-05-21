@@ -207,7 +207,7 @@ namespace Boilers {
 
             // Validate fuel type input
             DataGlobalConstants::FuelTypeInput = DataIPShortCuts::cAlphaArgs(2);
-            DataGlobalConstants::ValidateFuelTypeWithAssignResourceTypeNum(DataGlobalConstants::FuelTypeInput);
+            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
             if (DataGlobalConstants::FuelTypeErrorsFound) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
@@ -218,7 +218,7 @@ namespace Boilers {
                 DataGlobalConstants::FuelTypeErrorsFound = false;
             } else {
                 thisBoiler.BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelType;
-                thisBoiler.FuelType = DataGlobalConstants::FuelTypeNum;
+                thisBoiler.FuelType = DataGlobalConstants::FuelTypeNumforAssignResource;
             }
 
             thisBoiler.NomCap = DataIPShortCuts::rNumericArgs(1);
