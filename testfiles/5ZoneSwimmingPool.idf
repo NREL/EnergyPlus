@@ -2,8 +2,8 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 5ZoneAirCooled.idf
-! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
+! 5SwimmingPool.idf
+! Basic file description:  Basic test of an indoor swimming pool.
 !
 ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
 !                          outside air stream controlled to preheat and precool setpoints.
@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name

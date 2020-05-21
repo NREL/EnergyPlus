@@ -510,7 +510,7 @@ ZoneAirContaminantBalance,
 The following output variables are available when Carbon Dioxide Concentration = Yes.
 
 \begin{lstlisting}
-HVAC,Average,Zone Air CO2 Internal Gain Volume Flow Rate
+HVAC,Average,Zone Air CO2 Internal Gain Volume Flow Rate [m3/s]
 HVAC,Average,Zone Air CO2 Concentration [ppm]
 \end{lstlisting}
 
@@ -520,7 +520,7 @@ This output variable represents the carbon dioxide concentration level in parts 
 
 \paragraph{Zone Air CO2 Internal Gain Volume Flow Rate {[}m3/s{]}}\label{zone-air-co2-internal-gain-volume-flow-rate-m3s}
 
-This is the rate of carbon dioxide added to a zone from all types of sources or sinks, in m\(^{3}\)/s.
+This is the total (net) rate of carbon dioxide internal gains/losses for a zone in \si{\volumeFlowRate} from all types of sources or sinks. It includes impacts from three objects: ZoneContaminantSourceAndSink:CarbonDioxide, People, and GasEquipment. Positive values denote carbon dioxide generation (gain or source), while negative values denote carbon dioxide removal (loss or sink).
 
 \subsubsection{Outputs}\label{outputs-1-024}
 

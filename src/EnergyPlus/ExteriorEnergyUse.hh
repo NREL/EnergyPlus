@@ -57,45 +57,33 @@
 
 namespace EnergyPlus {
 
+struct EnergyPlusData;
+struct ExteriorEnergyUseData;
+
 namespace ExteriorEnergyUse {
 
-    // Using/Aliasing
+    enum class ExteriorFuelUsage {
+        Unknown = 0,
+        ElecUse = 1,
+        GasUse = 2,
+        WaterUse = 3,
+        CoalUse = 4,
+        FuelOil1Use = 5,
+        FuelOil2Use = 6,
+        PropaneUse = 7,
+        GasolineUse = 8,
+        DieselUse = 9,
+        SteamUse = 10,
+        DistrictCoolUse = 11,
+        DistrictHeatUse = 12,
+        OtherFuel1Use = 13,
+        OtherFuel2Use = 14
+    };
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const ElecUse;         // Electricity
-    extern int const GasUse;          // Gas (Natural)
-    extern int const WaterUse;        // Water
-    extern int const CoalUse;         // Coal
-    extern int const FuelOil1Use;     // FuelOil#1
-    extern int const FuelOil2Use;     // FuelOil#2
-    extern int const PropaneUse;      // Propane
-    extern int const GasolineUse;     // Gasoline
-    extern int const DieselUse;       // Diesel
-    extern int const SteamUse;        // Steam
-    extern int const DistrictCoolUse; // Purchased Cooling
-    extern int const DistrictHeatUse; // Purchased Heating
-    extern int const OtherFuel1Use;   // OtherFuel1
-    extern int const OtherFuel2Use;   // OtherFuel2
-
-    extern int const ScheduleOnly;       // exterior lights only on schedule
-    extern int const AstroClockOverride; // exterior lights controlled to turn off during day.
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumExteriorLights; // Number of Exterior Light Inputs
-    extern int NumExteriorEqs;    // Number of Exterior Equipment Inputs
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>
-
-    // Clears the global data in ExteriorEnergyUse.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
-    // Name Public routines, optionally name Private routines within this module
-
-    // Types
+    enum class LightControlType {
+        ScheduleOnly = 1,      // exterior lights only on schedule
+        AstroClockOverride = 2 // exterior lights controlled to turn off during day.
+    };
 
     struct ExteriorLightUsage
     {
@@ -105,7 +93,7 @@ namespace ExteriorEnergyUse {
         Real64 DesignLevel;        // Consumption in Watts
         Real64 Power;              // Power = DesignLevel * ScheduleValue
         Real64 CurrentUse;         // Use for this time step
-        int ControlMode;           // Control mode Schedule Only or Astronomical Clock plus schedule
+        LightControlType ControlMode;           // Control mode Schedule Only or Astronomical Clock plus schedule
         bool ManageDemand;         // Flag to indicate whether to use demand limiting
         Real64 DemandLimit;        // Demand limit set by demand manager [W]
         bool PowerActuatorOn;      // EMS flag
@@ -115,8 +103,8 @@ namespace ExteriorEnergyUse {
 
         // Default Constructor
         ExteriorLightUsage()
-            : SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ControlMode(1), ManageDemand(false), DemandLimit(0.0),
-              PowerActuatorOn(false), SumConsumption(0.0), SumTimeNotZeroCons(0.0)
+                : SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ControlMode(LightControlType::ScheduleOnly), ManageDemand(false), DemandLimit(0.0),
+                  PowerActuatorOn(false), PowerActuatorValue(0.0), SumConsumption(0.0), SumTimeNotZeroCons(0.0)
         {
         }
     };
@@ -125,7 +113,7 @@ namespace ExteriorEnergyUse {
     {
         // Members
         std::string Name; // Descriptive name -- will show on reporting
-        int FuelType;
+        ExteriorFuelUsage FuelType;
         int SchedPtr;       // Can be scheduled
         Real64 DesignLevel; // Design Consumption (Watts, except for Water Equipment)
         Real64 Power;       // Power = DesignLevel * ScheduleValue
@@ -133,23 +121,17 @@ namespace ExteriorEnergyUse {
         bool ManageDemand;  // Flag to indicate whether to use demand limiting
         Real64 DemandLimit; // Demand limit set by demand manager [W]
 
-        // Default Constructor
-        ExteriorEquipmentUsage() : FuelType(0), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
+                            // Default Constructor
+        ExteriorEquipmentUsage() : FuelType(ExteriorFuelUsage::Unknown), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
         {
         }
     };
 
-    // Object Data
-    extern Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
-    extern Array1D<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
+    void ManageExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
 
-    // Functions
+    void GetExteriorEnergyUseInput(ExteriorEnergyUseData &exteriorEnergyUse);
 
-    void ManageExteriorEnergyUse();
-
-    void GetExteriorEnergyUseInput();
-
-    void ValidateFuelType(int &FuelTypeNumber,                    // Fuel Type to be set in structure.
+    void ValidateFuelType(ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber,                    // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,       // Fuel Type String
                           std::string &FuelTypeString,            // Standardized Fuel Type String (for variable naming)
                           std::string const &CurrentModuleObject, // object being parsed
@@ -157,7 +139,7 @@ namespace ExteriorEnergyUse {
                           std::string const &CurrentName          // current object name being parsed
     );
 
-    void ReportExteriorEnergyUse();
+    void ReportExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
 
 } // namespace ExteriorEnergyUse
 

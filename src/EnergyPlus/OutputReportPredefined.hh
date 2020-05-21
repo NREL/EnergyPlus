@@ -127,7 +127,8 @@ namespace OutputReportPredefined {
 
     extern int pdchDXCoolCoilNetCapSI; // Standard Rated (Net) Cooling Capacity [W]
     extern int pdchDXCoolCoilCOP;      // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
-    extern int pdchDXCoolCoilSEERIP;   // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
+    extern int pdchDXCoolCoilSEERUserIP;   // SEER value in IP unit at AHRI std. 210/240 conditionsand and user PLF curve [Btu/W-hr]
+    extern int pdchDXCoolCoilSEERStandardIP;   // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
     extern int pdchDXCoolCoilEERIP;    // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
     extern int pdchDXCoolCoilIEERIP;   // IEER value in IP unit at AHRI std. 340/360 conditions
 
@@ -796,8 +797,22 @@ namespace OutputReportPredefined {
     extern int pdchLeedPerfElDem;
     extern int pdchLeedPerfGasEneUse;
     extern int pdchLeedPerfGasDem;
-    extern int pdchLeedPerfAddFuelEneUse;
-    extern int pdchLeedPerfAddFuelDem;
+    extern int pdchLeedPerfGasolineEneUse;
+    extern int pdchLeedPerfGasolineDem;
+    extern int pdchLeedPerfDieselEneUse;
+    extern int pdchLeedPerfDieselDem;
+    extern int pdchLeedPerfCoalEneUse;
+    extern int pdchLeedPerfCoalDem;
+    extern int pdchLeedPerfFuelOil1EneUse;
+    extern int pdchLeedPerfFuelOil1Dem;
+    extern int pdchLeedPerfFuelOil2EneUse;
+    extern int pdchLeedPerfFuelOil2Dem;
+    extern int pdchLeedPerfPropaneEneUse;
+    extern int pdchLeedPerfPropaneDem;
+    extern int pdchLeedPerfOtherFuel1EneUse;
+    extern int pdchLeedPerfOtherFuel1Dem;
+    extern int pdchLeedPerfOtherFuel2EneUse;
+    extern int pdchLeedPerfOtherFuel2Dem;
     extern int pdchLeedPerfDisClEneUse;
     extern int pdchLeedPerfDisClDem;
     extern int pdchLeedPerfDisHtEneUse;

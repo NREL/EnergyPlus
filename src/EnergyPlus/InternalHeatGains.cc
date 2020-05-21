@@ -80,6 +80,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -165,7 +166,7 @@ namespace InternalHeatGains {
         ErrorsFound = false;
     }
 
-    void ManageInternalHeatGains(Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
+    void ManageInternalHeatGains(EnergyPlusData &state, Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
 
         // SUBROUTINE INFORMATION:
@@ -203,7 +204,7 @@ namespace InternalHeatGains {
 
         // FLOW:
         if (GetInternalHeatGainsInputFlag) {
-            GetInternalHeatGainsInput(OutputFiles::getSingleton());
+            GetInternalHeatGainsInput(state, OutputFiles::getSingleton());
             GetInternalHeatGainsInputFlag = false;
         }
 
@@ -211,7 +212,7 @@ namespace InternalHeatGains {
             if (InitOnly) return;
         }
 
-        InitInternalHeatGains();
+        InitInternalHeatGains(state);
 
         ReportInternalHeatGains();
 
@@ -221,7 +222,7 @@ namespace InternalHeatGains {
         if (ZoneSizingCalc) GatherComponentLoadsIntGain();
     }
 
-    void GetInternalHeatGainsInput(OutputFiles &outputFiles)
+    void GetInternalHeatGainsInput(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -264,7 +265,6 @@ namespace InternalHeatGains {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const RoutineName("GetInternalHeatGains: ");
-        int const noOtherFuelTypeZero = 0;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string AlphaName;
@@ -1423,7 +1423,7 @@ namespace InternalHeatGains {
                         }
                     }
                     if (Lights(Loop).ZonePtr > 0) {
-                        Lights(Loop).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(Zone(Lights(Loop).ZonePtr).Name, retNodeName);
+                        Lights(Loop).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(state, Zone(Lights(Loop).ZonePtr).Name, retNodeName);
                     }
 
                     if ((Lights(Loop).ZoneReturnNum == 0) && (Lights(Loop).FractionReturnAir > 0.0) && (!lAlphaFieldBlanks(7))) {
@@ -3290,7 +3290,7 @@ namespace InternalHeatGains {
 
                     std::string FuelTypeString("");
                     if (AlphaName(2) == "NONE") {
-                        ZoneOtherEq(Loop).OtherEquipFuelType = noOtherFuelTypeZero;
+                        ZoneOtherEq(Loop).OtherEquipFuelType = ExteriorEnergyUse::ExteriorFuelUsage::Unknown;
                         FuelTypeString = AlphaName(2);
                     } else {
                         ExteriorEnergyUse::ValidateFuelType(ZoneOtherEq(Loop).OtherEquipFuelType,
@@ -3299,8 +3299,8 @@ namespace InternalHeatGains {
                                                             CurrentModuleObject,
                                                             cAlphaFieldNames(2),
                                                             AlphaName(2));
-                        if (ZoneOtherEq(Loop).OtherEquipFuelType == noOtherFuelTypeZero ||
-                            ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::WaterUse) {
+                        if (ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::Unknown ||
+                            ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::WaterUse) {
                             ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered=" + AlphaName(2) +
                                             " for " + cAlphaFieldNames(1) + '=' + AlphaName(1));
                             ErrorsFound = true;
@@ -3380,7 +3380,7 @@ namespace InternalHeatGains {
                     }
 
                     // Throw an error if the design level is negative and we have a fuel type
-                    if (ZoneOtherEq(Loop).DesignLevel < 0.0 && ZoneOtherEq(Loop).OtherEquipFuelType != noOtherFuelTypeZero) {
+                    if (ZoneOtherEq(Loop).DesignLevel < 0.0 && ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                         cNumericFieldNames(DesignLevelFieldNumber) + " is not allowed to be negative");
                         ShowContinueError("... when a fuel type of " + FuelTypeString + " is specified.");
@@ -3427,7 +3427,7 @@ namespace InternalHeatGains {
                     if (ZoneOtherEq(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    if (ZoneOtherEq(Loop).OtherEquipFuelType > noOtherFuelTypeZero) {
+                    if (ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                         SetupOutputVariable("Other Equipment " + FuelTypeString + " Rate",
                                             OutputProcessor::Unit::W,
                                             ZoneOtherEq(Loop).Power,
@@ -3515,7 +3515,7 @@ namespace InternalHeatGains {
                     if (RepVarSet(ZoneOtherEq(Loop).ZonePtr)) {
                         RepVarSet(ZoneOtherEq(Loop).ZonePtr) = false;
 
-                        if (ZoneOtherEq(Loop).OtherEquipFuelType > noOtherFuelTypeZero) {
+                        if (ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                             SetupOutputVariable("Zone Other Equipment " + FuelTypeString + " Rate",
                                                 OutputProcessor::Unit::W,
                                                 ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherPower,
@@ -3943,7 +3943,7 @@ namespace InternalHeatGains {
                 if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
                     Real64 TAirInSizing = 0.0;
                     // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite object
-                    SetPointManager::GetSetPointManagerInputData(ErrorsFound);
+                    SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
                     for (int SetPtMgrNum = 1; SetPtMgrNum <= SetPointManager::NumSZClSetPtMgrs; ++SetPtMgrNum) {
                         if (SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == Loop) {
                             TAirInSizing = SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
@@ -5135,7 +5135,7 @@ namespace InternalHeatGains {
         }
     }
 
-    void InitInternalHeatGains()
+    void InitInternalHeatGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5265,6 +5265,7 @@ namespace InternalHeatGains {
             e.HWPower = 0.0;
             e.SteamPower = 0.0;
             e.BaseHeatPower = 0.0;
+            e.CO2Rate = 0.0;
         }
 
         //  QSA = 0.0
@@ -5539,14 +5540,14 @@ namespace InternalHeatGains {
 
         if (NumZoneITEqStatements > 0) CalcZoneITEq();
 
-        CalcWaterThermalTankZoneGains();
+        CalcWaterThermalTankZoneGains(state);
         PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
         CalcWaterUseZoneGains();
         FigureFuelCellZoneGains();
         FigureMicroCHPZoneGains();
         initializeElectricPowerServiceZoneGains();
         FigureTDDZoneGains();
-        FigureRefrigerationZoneGains();
+        FigureRefrigerationZoneGains(state);
 
         // store pointer values to hold generic internal gain values constant for entire timestep
         UpdateInternalGainValues();
