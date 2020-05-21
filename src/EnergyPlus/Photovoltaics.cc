@@ -307,6 +307,7 @@ namespace Photovoltaics {
         using General::RoundSigDigits;
         using ScheduleManager::GetScheduleIndex;
         using TranspiredCollector::GetTranspiredCollectorIndex;
+        using PhotovoltaicThermalCollectors::GetPVTmodelIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PVnum;     // working variable for do loop through pv arrays
@@ -448,7 +449,7 @@ namespace Photovoltaics {
                 auto const SELECT_CASE_var(PVarray(PVnum).CellIntegrationMode);
 
                 if ((SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) || (SELECT_CASE_var == iTranspiredCollectorCellIntegration) ||
-                    (SELECT_CASE_var == iExteriorVentedCavityCellIntegration)) {
+                    (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) || (SELECT_CASE_var == iPVTSolarCollectorCellIntegration)) {
                     dupPtr = UtilityRoutines::FindItemInList(PVarray(PVnum).SurfaceName, PVarray({PVnum + 1, NumPVs}), &PVArrayStruct::SurfaceName);
                     if (dupPtr != 0) dupPtr += PVnum; // to correct for shortened array in find item
                     if (dupPtr != 0) {
@@ -469,6 +470,12 @@ namespace Photovoltaics {
                             ShowContinueError("When using IntegratedExteriorVentedCavity heat transfer mode, only one PV array can be coupled");
                             ShowContinueError("Both " + PVarray(PVnum).Name + " and " + PVarray(dupPtr).Name +
                                               " are using exterior vented surface = " + PVarray(PVnum).SurfaceName);
+                            ErrorsFound = true;
+                        } else if (PVarray(dupPtr).CellIntegrationMode == iPVTSolarCollectorCellIntegration) {
+                            ShowSevereError(cCurrentModuleObject + ": problem detected with multiple PV arrays.");
+                            ShowContinueError("When using PhotovoltaicThermalSolarCollector heat transfer mode, only one PV array can be coupled");
+                            ShowContinueError("Both " + PVarray(PVnum).Name + " and " + PVarray(dupPtr).Name +
+                                " are using PVT surface = " + PVarray(PVnum).SurfaceName);
                             ErrorsFound = true;
                         }
                     }
@@ -761,7 +768,7 @@ namespace Photovoltaics {
             }
 
             if (PVarray(PVnum).CellIntegrationMode == iPVTSolarCollectorCellIntegration) {
-                // Call GetPVTmodelIndex( PVarray(PVNum)%SurfacePtr , PVarray(PVNum)%PVTPtr )
+                GetPVTmodelIndex( PVarray(PVnum).SurfacePtr , PVarray(PVnum).PVTPtr );
             }
         }
 
@@ -903,6 +910,7 @@ namespace Photovoltaics {
         using DataHeatBalFanSys::QPVSysSource;
         using DataSurfaces::Surface;
         using TranspiredCollector::SetUTSCQdotSource;
+        using PhotovoltaicThermalCollectors::SetPVTQdotSource;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int thisZone; // working index for zones
@@ -931,7 +939,7 @@ namespace Photovoltaics {
                 SetVentedModuleQdotSource(PVarray(PVnum).ExtVentCavPtr, -1.0 * PVarray(PVnum).SurfaceSink);
 
             } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
-                // CALL SetPVTQdotSource(PVarray(PVNum)%ExtVentCavPtr,  -1 * PVarray(PVNum)%SurfaceSink )
+                SetPVTQdotSource(PVarray(PVnum).PVTPtr,  -1 * PVarray(PVnum).SurfaceSink );
             }
         }
     }
@@ -975,6 +983,7 @@ namespace Photovoltaics {
         using DataHeatBalSurface::TempSurfOut;
         using DataSurfaces::Surface;
         using TranspiredCollector::GetUTSCTsColl;
+        using PhotovoltaicThermalCollectors::GetPVTTsColl;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1056,8 +1065,13 @@ namespace Photovoltaics {
                                                                             PVarray(PVnum).SNLPVModule.DT0);
 
                 } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
-                    // add calls to PVT models here
+                    GetPVTTsColl(PVarray(PVnum).PVTPtr, PVarray(PVnum).SNLPVCalc.Tback);
 
+                    PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
+                        PVarray(PVnum).SNLPVinto.IcBeam,
+                        PVarray(PVnum).SNLPVinto.IcDiffuse,
+                        PVarray(PVnum).SNLPVModule.fd,
+                        PVarray(PVnum).SNLPVModule.DT0);
                 } else {
                     ShowSevereError("Sandia PV Simulation Temperature Modeling Mode Error in " + PVarray(PVnum).Name);
                 }
@@ -1314,6 +1328,7 @@ namespace Photovoltaics {
         using DataHeatBalance::Zone;
         using DataHeatBalSurface::TempSurfOut;
         using TranspiredCollector::GetUTSCTsColl;
+        using PhotovoltaicThermalCollectors::GetPVTTsColl;
 
         // Locals
         // SUBROUTINE FUNCTION DECLARATIONS:
@@ -1419,7 +1434,8 @@ namespace Photovoltaics {
                         GetExtVentedCavityTsColl(PVarray(PVnum).ExtVentCavPtr, CellTemp);
                         CellTemp += KelvinConv;
                     } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
-                        // get PVT model result for cell temp..
+                        GetPVTTsColl(PVarray(PVnum).PVTPtr, CellTemp);
+                        CellTemp += KelvinConv;
                     }
                 }
 
@@ -1492,7 +1508,8 @@ namespace Photovoltaics {
                     GetExtVentedCavityTsColl(PVarray(PVnum).ExtVentCavPtr, CellTemp);
                     CellTemp += KelvinConv;
                 } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
-                    // get PVT model result for cell temp.. //Bug CellTemp not set but used below
+                    GetPVTTsColl(PVarray(PVnum).PVTPtr, CellTemp);
+                    CellTemp += KelvinConv;
                 } else {
                     assert(false);
                 }
