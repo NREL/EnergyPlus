@@ -276,8 +276,12 @@ namespace HVACFan {
         m_rhoAirStdInit = DataEnvironment::StdRhoAir;
         m_maxAirMassFlowRate = designAirVolFlowRate * m_rhoAirStdInit;
 
-        // calculate total fan system efficiency at design
-        m_fanTotalEff = designAirVolFlowRate * deltaPress / designElecPower;
+        // calculate total fan system efficiency at design, else set to 1 to avoid div by zero
+        if (designElecPower > 0.0) {
+            m_fanTotalEff = designAirVolFlowRate * deltaPress / designElecPower;
+        } else{
+            m_fanTotalEff = 1.0;
+        }
 
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) { // set up values at speeds
             m_massFlowAtSpeed.resize(m_numSpeeds, 0.0);
@@ -285,8 +289,13 @@ namespace HVACFan {
             for (auto loop = 0; loop < m_numSpeeds; ++loop) {
                 m_massFlowAtSpeed[loop] = m_maxAirMassFlowRate * m_flowFractionAtSpeed[loop];
                 if (m_powerFractionInputAtSpeed[loop]) { // use speed power fraction
-                    m_totEfficAtSpeed[loop] =
-                        m_flowFractionAtSpeed[loop] * designAirVolFlowRate * deltaPress / (designElecPower * m_powerFractionAtSpeed[loop]);
+                    if (designElecPower > 0.0) {
+                        m_totEfficAtSpeed[loop] =
+                            m_flowFractionAtSpeed[loop] * designAirVolFlowRate * deltaPress / (designElecPower * m_powerFractionAtSpeed[loop]);
+                    }
+                    else {
+                        m_totEfficAtSpeed[loop] = 1.0;
+                    }
                 } else { // use power curve
                     m_totEfficAtSpeed[loop] =
                         m_flowFractionAtSpeed[loop] * designAirVolFlowRate * deltaPress /
@@ -324,6 +333,7 @@ namespace HVACFan {
         // ANSI/AMCA Standard 207-17: Fan System Efficiency and Fan System Input Power Calculation, 2017.
         // AANSI / AMCA Standard 208 - 18: Calculation of the Fan Energy Index, 2018.
 
+        assert(DataEnvironment::StdRhoAir > 0.0);
         // Calculate reference fan shaft power
         Real64 refFanShaftPower = (designFlowRate + 0.118) * (designDeltaPress + 100 * inletRhoAir / DataEnvironment::StdRhoAir) / (1000 * 0.66);
 
