@@ -3347,6 +3347,22 @@
 
   Output:Variable,*,AFN Node Temperature,timestep;
 
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Gain Rate,timestep;
+
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Gain Energy,timestep;
+
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Loss Rate,timestep;
+
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Loss Energy,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Gain Rate,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Gain Energy,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Loss Rate,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Loss Energy,timestep;
+
   Output:Variable,Zn001:Wall001:Win001,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;
 
   Output:Variable,Zn001:Wall001:Win001,AFN Linkage Node 2 to Node 1 Volume Flow Rate,timestep;
