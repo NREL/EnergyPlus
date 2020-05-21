@@ -2567,4 +2567,61 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRa
     EXPECT_NEAR(ExpectedQconvPerArea2, GetQdotConvOutRepPerArea(1), 0.01);
 }
 
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
+{
+
+    DataSurfaces::TotSurfaces = 2;
+    DataGlobals::NumOfZones = 2;
+    DataHeatBalance::TotMaterials = 1;
+    DataHeatBalance::TotConstructs = 1;
+
+    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+    DataHeatBalance::Construct.allocate(DataHeatBalance::TotConstructs);
+    DataHeatBalSurface::VMULT.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Construct(1).TransDiff = 0.1;
+    DataHeatBalSurface::VMULT(1) = 1.0;
+    DataHeatBalSurface::VMULT(2) = 1.0;
+
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Construction = 1;
+    DataSurfaces::Surface(1).ExtBoundCond = 2;
+    DataSurfaces::Surface(1).Area = 1.0;
+    DataSurfaces::Surface(1).Zone = 1;
+
+    DataSurfaces::Surface(2).HeatTransSurf = true;
+    DataSurfaces::Surface(2).Construction = 1;
+    DataSurfaces::Surface(2).ExtBoundCond = 1;
+    DataSurfaces::Surface(2).Area = 1.0;
+    DataSurfaces::Surface(2).Zone = 2;
+
+    DataSurfaces::Surface(1).SolarEnclIndex = 1;
+    DataSurfaces::Surface(2).SolarEnclIndex = 2;
+
+    ComputeDifSolExcZonesWIZWindows(DataGlobals::NumOfZones);
+
+    EXPECT_EQ(1, DataHeatBalSurface::FractDifShortZtoZ(1, 1));
+    EXPECT_EQ(1, DataHeatBalSurface::FractDifShortZtoZ(2, 2));
+    EXPECT_FALSE(DataHeatBalSurface::RecDifShortFromZ(1));
+    EXPECT_FALSE(DataHeatBalSurface::RecDifShortFromZ(2));
+
+    DataHeatBalance::Zone(1).HasInterZoneWindow = true;
+    DataHeatBalance::Zone(2).HasInterZoneWindow = true;
+
+    ComputeDifSolExcZonesWIZWindows(DataGlobals::NumOfZones);
+
+    EXPECT_TRUE(DataHeatBalSurface::RecDifShortFromZ(1));
+    EXPECT_TRUE(DataHeatBalSurface::RecDifShortFromZ(2));
+
+    DataGlobals::KickOffSimulation = true;
+    ComputeDifSolExcZonesWIZWindows(DataGlobals::NumOfZones);
+
+    EXPECT_EQ(1, DataHeatBalSurface::FractDifShortZtoZ(1, 1));
+    EXPECT_EQ(1, DataHeatBalSurface::FractDifShortZtoZ(2, 2));
+    EXPECT_FALSE(DataHeatBalSurface::RecDifShortFromZ(1));
+    EXPECT_FALSE(DataHeatBalSurface::RecDifShortFromZ(2));
+
+}
+
 } // namespace EnergyPlus
