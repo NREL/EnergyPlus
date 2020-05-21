@@ -2334,19 +2334,16 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).FuelType = FuelTypeElectric;
             if (!lAlphaFieldBlanks(39)) {
                 // A39; \field Fuel type, Validate fuel type input
-                DataGlobalConstants::FuelTypeInput = cAlphaArgs(39);
-                DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
-                if (DataGlobalConstants::FuelTypeErrorsFound) {
+                bool FuelTypeError(false);
+                UtilityRoutines::ValidateFuelTypeWithFuelTypeNum(cAlphaArgs(39), VRF(VRFNum).FuelType, FuelTypeError);
+                if (FuelTypeError) {
                     ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\", " + cAlphaFieldNames(39) +
                                     " not found = " + cAlphaArgs(39));
                     ShowContinueError(
                         "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                     ErrorsFound = true;
-                    DataGlobalConstants::FuelTypeErrorsFound = false;
-                } else {
-                    VRF(VRFNum).FuelType = DataGlobalConstants::FuelTypeNum;
+                    FuelTypeError = false;
                 }
-            }
 
             if (VRF(VRFNum).HeatRecoveryUsed) {
                 if (lNumericFieldBlanks(29)) {

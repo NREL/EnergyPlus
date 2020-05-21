@@ -242,12 +242,6 @@ namespace DataGlobalConstants {
     extern int const iEvapCoolerInDirectRDDSpecial;
     extern int const iEvapCoolerDirectResearchSpecial;
 
-    extern std::string FuelTypeInput;
-    extern std::string FuelType;
-    extern int FuelTypeNum;
-    extern int FuelTypeNumforAssignResource;
-    extern bool FuelTypeErrorsFound;
-
     // DERIVED TYPE DEFINITIONS:
     // na
 
@@ -261,8 +255,6 @@ namespace DataGlobalConstants {
     int AssignResourceTypeNum(std::string const &ResourceTypeChar);
 
     std::string GetResourceTypeChar(int const ResourceTypeNum);
-
-    void ValidateFuelType(std::string FuelTypeInput);
 
 } // namespace DataGlobalConstants
 

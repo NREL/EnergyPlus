@@ -50,7 +50,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -312,12 +311,6 @@ namespace DataGlobalConstants {
     int const iEvapCoolerInDirectWETCOIL(1003);
     int const iEvapCoolerInDirectRDDSpecial(1004);
     int const iEvapCoolerDirectResearchSpecial(1005);
-
-    std::string FuelTypeInput;
-    std::string FuelType;
-    int FuelTypeNum;
-    int FuelTypeNumforAssignResource;
-    bool FuelTypeErrorsFound(false);
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -657,112 +650,6 @@ namespace DataGlobalConstants {
         }
 
         return ResourceTypeChar;
-    }
-
-    enum FuelTypeNumber
-    {
-        ELECTRICITY,
-        NATURALGAS,
-        DIESEL,
-        GASOLINE,
-        COAL,
-        FUELOILNO1,
-        FUELOILNO2,
-        PROPANE,
-        OTHERFUEL1,
-        OTHERFUEL2
-    };
-
-    FuelTypeNumber ConvertFueltypeString(std::string FuelTypeInput)
-    {
-        if (FuelTypeInput == "ELECTRICITY")
-            return ELECTRICITY;
-        else if (FuelTypeInput == "NATURALGAS")
-            return NATURALGAS;
-        else if (FuelTypeInput == "DIESEL")
-            return DIESEL;
-        else if (FuelTypeInput == "GASOLINE")
-            return GASOLINE;
-        else if (FuelTypeInput == "COAL")
-            return COAL;
-        else if (FuelTypeInput == "FUELOILNO1")
-            return FUELOILNO1;
-        else if (FuelTypeInput == "FUELOILNO2")
-            return FUELOILNO2;
-        else if (FuelTypeInput == "PROPANE")
-            return PROPANE;
-        else if (FuelTypeInput == "OTHERFUEL1")
-            return OTHERFUEL1;
-        else if (FuelTypeInput == "OTHERFUEL2")
-            return OTHERFUEL2;
-    }
-
-    void ValidateFuelType(std::string FuelTypeInput)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Dareum Nam
-        //       DATE WRITTEN   May 2020
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types and sets output strings
-
-        FuelTypeNumber Fuel = ConvertFueltypeString(FuelTypeInput);
-
-        switch (Fuel) {
-        case ELECTRICITY:
-            FuelType = "Electric";
-            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
-            FuelTypeNum = 1; // FuelTypeElectricity in DXCoils.cc and HVACVariableRefrigerantFlow.cc
-            break;
-        case NATURALGAS:
-            FuelType = "Gas";
-            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
-            FuelTypeNum = 2; // FuelTypeNaturalGas in DXCoils.cc and HVACVariableRefrigerantFlow.cc
-            break;
-        case DIESEL:
-            FuelType = "Diesel";
-            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
-            FuelTypeNum = 4; // FuelTypeDiesel in DXCoils.cc and HVACVariableRefrigerantFlow.cc
-            break;
-        case GASOLINE:
-            FuelType = "Gasoline";
-            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
-            FuelTypeNum = 5; // FuelTypeGasoline in DXCoils.cc and HVACVariableRefrigerantFlow.cc
-            break;
-        case COAL:
-            FuelType = "Coal";
-            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("COAL");
-            break;
-        case FUELOILNO1:
-            FuelType = "FuelOil#1";
-            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
-            FuelTypeNum = 6; // FuelTypeFuelOil1 in DXCoils.cc and HVACVariableRefrigerantFlow.cc
-            break;
-        case FUELOILNO2:
-            FuelType = "FuelOil#2";
-            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
-            FuelTypeNum = 7; // FuelTypeFuelOil2 in DXCoils.cc and HVACVariableRefrigerantFlow.cc
-            break;
-        case PROPANE:
-            FuelType = "Propane";
-            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
-            FuelTypeNum = 3; // FuelTypePropaneGas in DXCoils.cc and HVACVariableRefrigerantFlow.cc
-            break;
-        case OTHERFUEL1:
-            FuelType = "OtherFuel1";
-            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
-            FuelTypeNum = 8; // FuelTypeOtherFuel1 in DXCoils.cc and HVACVariableRefrigerantFlow.cc
-            break;
-        case OTHERFUEL2:
-            FuelType = "OtherFuel2";
-            FuelTypeNumforAssignResource = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
-            FuelTypeNum = 9; // FuelTypeOtherFuel2 in DXCoils.cc and HVACVariableRefrigerantFlow.cc
-            break;
-        default:
-            FuelTypeErrorsFound = true;
-        }
     }
 
 } // namespace DataGlobalConstants

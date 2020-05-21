@@ -3930,17 +3930,15 @@ namespace DXCoils {
             }
 
             // A12; \field Fuel type, Validate fuel type input
-            DataGlobalConstants::FuelTypeInput = Alphas(12);
-            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
-            if (DataGlobalConstants::FuelTypeErrorsFound) {
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelTypeWithFuelTypeNum(Alphas(12), DXCoil(DXCoilNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(12) + ".  Entered choice = " + Alphas(12));
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
-                DataGlobalConstants::FuelTypeErrorsFound = false;
-            } else {
-                DXCoil(DXCoilNum).FuelType = DataGlobalConstants::FuelTypeNum;
+                FuelTypeError = false;
             }
 
             DXCoil(DXCoilNum).NumOfSpeeds = Numbers(6); // Number of speeds
@@ -4409,18 +4407,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             }
 
-            // A9; \field Fuel type, Validate fuel type input 
-            DataGlobalConstants::FuelTypeInput = Alphas(9);
-            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
-            if (DataGlobalConstants::FuelTypeErrorsFound) {
+            // A9; \field Fuel type, Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelTypeWithFuelTypeNum(Alphas(9), DXCoil(DXCoilNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(9) + ".  Entered choice = " + Alphas(9));
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
-                DataGlobalConstants::FuelTypeErrorsFound = false;
-            } else {
-                DXCoil(DXCoilNum).FuelType = DataGlobalConstants::FuelTypeNum;
+                FuelTypeError = false;
             }
 
             DXCoil(DXCoilNum).RegionNum = Numbers(8);   // Region Number for HSPF Calc

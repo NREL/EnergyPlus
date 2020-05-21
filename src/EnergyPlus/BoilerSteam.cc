@@ -196,18 +196,16 @@ namespace BoilerSteam {
             thisBoiler.Name = DataIPShortCuts::cAlphaArgs(1);
 
             // Validate fuel type input
-            DataGlobalConstants::FuelTypeInput = DataIPShortCuts::cAlphaArgs(2);
-            DataGlobalConstants::ValidateFuelType(DataGlobalConstants::FuelTypeInput);
-            if (DataGlobalConstants::FuelTypeErrorsFound) {
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(
+                DataIPShortCuts::cAlphaArgs(2), thisBoiler.BoilerFuelTypeForOutputVariable, thisBoiler.FuelType, FuelTypeError);
+            if (FuelTypeError) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                 // Set to Electric to avoid errors when setting up output variables
                 thisBoiler.BoilerFuelTypeForOutputVariable = "Electric";
                 ErrorsFound = true;
-                DataGlobalConstants::FuelTypeErrorsFound = false;
-            } else {
-                thisBoiler.BoilerFuelTypeForOutputVariable = DataGlobalConstants::FuelType;
-                thisBoiler.FuelType = DataGlobalConstants::FuelTypeNumforAssignResource;
+                FuelTypeError = false;
             }
              
             // INPUTS from the IDF file
