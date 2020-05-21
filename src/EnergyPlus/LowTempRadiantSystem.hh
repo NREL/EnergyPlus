@@ -154,6 +154,8 @@ namespace LowTempRadiantSystem {
         );
         
         Real64 SetRadSysControlTemp();
+        
+        void UpdateLowTempRadiantSystemSurfaces();
 
     };
 
@@ -252,6 +254,10 @@ namespace LowTempRadiantSystem {
         void CalcLowTempHydrRadiantSystem(Real64 &LoadMet); // load met by the radiant system, in Watts
 
         void CalcLowTempHydrRadSysComps(Real64 &LoadMet);   // Load met by the low temperature radiant system, in Watts
+        
+        void UpdateVariableFlowSystem();
+        
+        void ReportVariableFlowSystem();
 
     };
 
@@ -321,6 +327,10 @@ namespace LowTempRadiantSystem {
                                         bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
                                         Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
         );
+        
+        void UpdateConstantFlowSystem();
+        
+        void ReportConstantFlowSystem();
 
     };
 
@@ -348,6 +358,8 @@ namespace LowTempRadiantSystem {
         }
         
         void CalcLowTempElecRadiantSystem(Real64 &LoadMet); // load met by the radiant system, in Watts
+        
+        void ReportElectricRadiantSystem();
 
     };
 
@@ -416,18 +428,9 @@ namespace LowTempRadiantSystem {
                                   int const SystemType // Type of radiant system: hydronic, constant flow, or electric
     );
 
-    void UpdateLowTempRadiantSystem(bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                                    int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
-                                    int const SystemType // Type of radiant system: hydronic, constant flow, or electric
-    );
-
     void UpdateRadSysSourceValAvg(bool &LowTempRadSysOn); // .TRUE. if the radiant system has run this zone time step
 
     Real64 SumHATsurf(int const ZoneNum); // Zone number
-
-    void ReportLowTempRadiantSystem(int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
-                                    int const SystemType // Type of radiant system: hydronic, constant flow, or electric
-    );
 
 } // namespace LowTempRadiantSystem
 

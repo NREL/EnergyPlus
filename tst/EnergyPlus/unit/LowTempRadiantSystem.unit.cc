@@ -1813,6 +1813,10 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     TubeLength = 10.0;
     TubeDiameter = 0.05;
     PlantLoop(1).FluidName = "WATER";
+    HydrRadSys(RadSysNum).TubeLength = TubeLength;
+    HydrRadSys(RadSysNum).TubeDiameter = TubeDiameter;
+    CFloRadSys(RadSysNum).TubeLength = TubeLength;
+    CFloRadSys(RadSysNum).TubeDiameter = TubeDiameter;
 
     // Test 1: Heating for Hydronic System
     HXEffectFuncResult = 0.0;
