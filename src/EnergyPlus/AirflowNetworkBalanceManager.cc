@@ -492,7 +492,7 @@ namespace AirflowNetworkBalanceManager {
         if (present(FirstHVACIteration) && FirstHVACIteration) VAVTerminalRatio = 0.0;
 
         // Set AirLoop Number for fans
-        if (FirstHVACIteration) AssignFanAirLoopNum();
+        if (BeginEnvrnFlag) AssignFanAirLoopNum();
 
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
             if (ValidateDistributionSystemFlag) {
@@ -9601,15 +9601,11 @@ namespace AirflowNetworkBalanceManager {
     {
         // Assign the system Fan AirLoop Number based on the zone inlet node
 
-        int i;
-        int j;
-        int k;
-
-        for (i = 1; i <= AirflowNetworkNumOfZones; i++) {
-            for (j = 1; j <= NumOfZones; j++) {
+        for (int i = 1; i <= AirflowNetworkNumOfZones; i++) {
+            for (int j = 1; j <= NumOfZones; j++) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;
                 if ((MultizoneZoneData(i).ZoneNum == j) && (ZoneEquipConfig(j).NumInletNodes > 0)) {
-                    for (k = 1; k <= DisSysNumOfCVFs; k++) {
+                    for (int k = 1; k <= DisSysNumOfCVFs; k++) {
                         if (DisSysCompCVFData(k).AirLoopNum == 0) {
                             DisSysCompCVFData(k).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(1);
                         }
