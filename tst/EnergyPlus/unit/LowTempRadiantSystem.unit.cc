@@ -1549,14 +1549,14 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     CFloRadSys(RadSysNum).CoolingSystem = true;
     CFloRadSys(RadSysNum).HeatingSystem = false;
     Load = 1000.0;
-    CFloRadSys(RadSysNum).CalcLowTempCFloRadiantSystem(Load);
+    CFloRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     // Cooling
     CFloRadSys(RadSysNum).CoolingSystem = false;
     CFloRadSys(RadSysNum).HeatingSystem = true;
     DataHeatBalFanSys::MAT(1) = 26.0;
-    CFloRadSys(RadSysNum).CalcLowTempCFloRadiantSystem(Load);
+    CFloRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     CFloRadSys.deallocate();
@@ -1602,14 +1602,14 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     HydrRadSys(RadSysNum).CoolingSystem = true;
     HydrRadSys(RadSysNum).HeatingSystem = false;
     Load = 1000.0;
-    HydrRadSys(RadSysNum).CalcLowTempHydrRadiantSystem(Load);
+    HydrRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(Load);
     EXPECT_EQ(0, LowTempRadiantSystem::OperatingMode);
 
     // Cooling
     HydrRadSys(RadSysNum).CoolingSystem = false;
     HydrRadSys(RadSysNum).HeatingSystem = true;
     DataHeatBalFanSys::MAT(1) = 26.0;
-    HydrRadSys(RadSysNum).CalcLowTempHydrRadiantSystem(Load);
+    HydrRadSys(RadSysNum).calculateLowTemperatureRadiantSystem(Load);
     EXPECT_EQ(NotOperating, OperatingMode);
 
     HydrRadSys.deallocate();
@@ -1666,53 +1666,53 @@ TEST_F(LowTempRadiantSystemTest, SizeRadSysTubeLengthTest)
     // Test 1: Hydronic radiant system 1 (one surface)
     RadSysType = HydronicSystem;
     RadSysNum = 1;
-    FuncCalc = HydrRadSys(RadSysNum).SizeRadSysTubeLength();
+    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 1000.0, 0.1);
 
     // Test 2: Hydronic radiant system 2 (two surfaces)
     RadSysType = HydronicSystem;
     RadSysNum = 2;
-    FuncCalc = HydrRadSys(RadSysNum).SizeRadSysTubeLength();
+    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 1800.0, 0.1);
 
     // Test 3: Constant flow radiant system 1 (one surface)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 1;
-    FuncCalc = CFloRadSys(RadSysNum).SizeRadSysTubeLength();
+    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 1000.0, 0.1);
 
     // Test 4: Constant flow radiant system 2 (two surfaces)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 2;
-    FuncCalc = CFloRadSys(RadSysNum).SizeRadSysTubeLength();
+    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 1800.0, 0.1);
 
     // Test 5: Hydronic radiant system 3 (thickness out of range, low side)
     RadSysType = HydronicSystem;
     RadSysNum = 3;
     Construct(3).ThicknessPerpend = 0.004;
-    FuncCalc = HydrRadSys(RadSysNum).SizeRadSysTubeLength();
+    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 6: Hydronic radiant system 3 (thickness out of range, high side)
     RadSysType = HydronicSystem;
     RadSysNum = 3;
     Construct(3).ThicknessPerpend = 0.6;
-    FuncCalc = HydrRadSys(RadSysNum).SizeRadSysTubeLength();
+    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 7: Constant flow radiant system 3 (thickness out of range, low side)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 3;
     Construct(3).ThicknessPerpend = 0.004;
-    FuncCalc = CFloRadSys(RadSysNum).SizeRadSysTubeLength();
+    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 8: Constant flow radiant system 3 (thickness out of range, high side)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 3;
     Construct(3).ThicknessPerpend = 0.6;
-    FuncCalc = CFloRadSys(RadSysNum).SizeRadSysTubeLength();
+    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength();
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
 }
@@ -1824,7 +1824,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = HydronicSystem;
     Temperature = 10.0;
     HydrRadSys(RadSysNum).HWLoopNum = 1;
-    HXEffectFuncResult = HydrRadSys(RadSysNum).CalcRadSysHXEffectTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
     
     // Test 2: Cooling for Hydronic System
@@ -1833,7 +1833,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = HydronicSystem;
     Temperature = 10.0;
     HydrRadSys(RadSysNum).CWLoopNum = 1;
-    HXEffectFuncResult = HydrRadSys(RadSysNum).CalcRadSysHXEffectTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
     
     // Test 3: Heating for Constant Flow System
@@ -1842,7 +1842,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = ConstantFlowSystem;
     Temperature = 10.0;
     CFloRadSys(RadSysNum).HWLoopNum = 1;
-    HXEffectFuncResult = CFloRadSys(RadSysNum).CalcRadSysHXEffectTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
     
     // Test 4: Cooling for Constant Flow System
@@ -1851,7 +1851,122 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = ConstantFlowSystem;
     Temperature = 10.0;
     CFloRadSys(RadSysNum).CWLoopNum = 1;
-    HXEffectFuncResult = CFloRadSys(RadSysNum).CalcRadSysHXEffectTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
+
+}
+
+TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
+{
+    static std::string const meanAirTemperature("MeanAirTemperature");
+    static std::string const meanRadiantTemperature("MeanRadiantTemperature");
+    static std::string const operativeTemperature("OperativeTemperature");
+    static std::string const outsideAirDryBulbTemperature("OutdoorDryBulbTemperature");
+    static std::string const outsideAirWetBulbTemperature("OutdoorWetBulbTemperature");
+    static std::string const surfaceFaceTemperature("SurfaceFaceTemperature");
+    static std::string const surfaceInteriorTemperature("SurfaceInteriorTemperature");
+
+    std::string inputFunction;
+    std::string textField2Pass("FieldName");
+    int expectedResult;
+    int actualFunctionAnswer;
+
+    HydrRadSys.allocate(1);
+    HydrRadSys(1).Name = "VariableFlowRadSys1";
+    CFloRadSys.allocate(1);
+    CFloRadSys(1).Name = "ConstantFlowRadSys1";
+    ElecRadSys.allocate(1);
+    ElecRadSys(1).Name = "ElectricRadSys1";
+
+    // Test 1: MAT test (done for all three types of systems)
+    inputFunction = meanAirTemperature;
+    expectedResult = MATControl;
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+
+    // Test 2: MRT test (done for all three types of systems)
+    inputFunction = meanRadiantTemperature;
+    expectedResult = MRTControl;
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+
+    // Test 3: Operative Temperature test (done for all three types of systems)
+    inputFunction = operativeTemperature;
+    expectedResult = OperativeControl;
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+
+    // Test 4: Outside Dry-Bulb Temperature test (done for all three types of systems)
+    inputFunction = outsideAirDryBulbTemperature;
+    expectedResult = ODBControl;
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+
+    // Test 5: Outside Wet-Bulb Temperature test (done for all three types of systems)
+    inputFunction = outsideAirWetBulbTemperature;
+    expectedResult = OWBControl;
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+
+    // Test 6: Inside Face Surface Temperature test (done for all three types of systems)
+    inputFunction = surfaceFaceTemperature;
+    expectedResult = SurfFaceTempControl;
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+
+    // Test 7: Inside Face Surface Temperature test (done for all three types of systems)
+    inputFunction = surfaceInteriorTemperature;
+    expectedResult = SurfIntTempControl;
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
+    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
+    EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
 }

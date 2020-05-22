@@ -148,14 +148,19 @@ namespace LowTempRadiantSystem {
             {
             }
         
-        int ProcessRadiantSystemControlInput(std::string const ControlInput,
-                                             std::string const ControlInputField,
-                                             std::string const RadSysName
+        int processRadiantSystemControlInput(std::string const controlInput,
+                                             std::string const controlInputField
         );
         
-        Real64 SetRadSysControlTemp();
+        Real64 setRadiantSystemControlTemperature();
         
-        void UpdateLowTempRadiantSystemSurfaces();
+        virtual void calculateLowTemperatureRadiantSystem(Real64 &LoadMet) = 0;
+        
+        void updateLowTemperatureRadiantSystemSurfaces();
+        
+        virtual void updateLowTemperatureRadiantSystem() = 0;
+        
+        virtual void reportLowTemperatureRadiantSystem() = 0;
 
     };
 
@@ -208,16 +213,16 @@ namespace LowTempRadiantSystem {
         {
         }
         
-        Real64 CalcRadSysHXEffectTerm(Real64 const Temperature,   // Temperature of water entering the radiant system, in C
-                                      Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
-                                      Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
-                                      Real64 const NumCircs      // Number of fluid circuits in this surface
+        Real64 calculateHXEffectivenessTerm(Real64 const Temperature,   // Temperature of water entering the radiant system, in C
+                                            Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
+                                            Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
+                                            Real64 const NumCircs      // Number of fluid circuits in this surface
         );
 
-        Real64 SizeRadSysTubeLength();
+        Real64 sizeRadiantSystemTubeLength();
         
-        void CheckForOutOfRangeTempResult(Real64 const outletTemp, Real64 const inletTemp);
-
+        void checkForOutOfRangeTemperatureResult(Real64 const outletTemp, Real64 const inletTemp);
+        
     };
 
     struct VariableFlowRadiantSystemData : HydronicSystemBaseData
@@ -251,13 +256,13 @@ namespace LowTempRadiantSystem {
             {
             }
         
-        void CalcLowTempHydrRadiantSystem(Real64 &LoadMet); // load met by the radiant system, in Watts
-
-        void CalcLowTempHydrRadSysComps(Real64 &LoadMet);   // Load met by the low temperature radiant system, in Watts
+        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
         
-        void UpdateVariableFlowSystem();
+        void calculateLowTemperatureRadiantSystemComponents(Real64 &LoadMet);
         
-        void ReportVariableFlowSystem();
+        void updateLowTemperatureRadiantSystem();
+        
+        void reportLowTemperatureRadiantSystem();
 
     };
 
@@ -321,16 +326,16 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        void CalcLowTempCFloRadiantSystem(Real64 &LoadMet); // load met by the radiant system, in Watts
-
-        void CalcLowTempCFloRadSysComps(int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
-                                        bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
-                                        Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
+        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
+        
+        void calculateLowTemperatureRadiantSystemComponents(int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
+                                                            bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
+                                                            Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
         );
         
-        void UpdateConstantFlowSystem();
+        void updateLowTemperatureRadiantSystem();
         
-        void ReportConstantFlowSystem();
+        void reportLowTemperatureRadiantSystem();
 
     };
 
@@ -357,9 +362,11 @@ namespace LowTempRadiantSystem {
         {
         }
         
-        void CalcLowTempElecRadiantSystem(Real64 &LoadMet); // load met by the radiant system, in Watts
+        void calculateLowTemperatureRadiantSystem(Real64 &LoadMet);
+
+        void updateLowTemperatureRadiantSystem();
         
-        void ReportElectricRadiantSystem();
+        void reportLowTemperatureRadiantSystem();
 
     };
 
