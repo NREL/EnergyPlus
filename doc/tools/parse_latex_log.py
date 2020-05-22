@@ -329,6 +329,10 @@ if __name__ == "__main__":
                     ).resolve()
             print("="*60)
             print(f"Processing {tag}...")
+            if os.path.exists(err_path):
+                os.remove(err_path)
+            if os.path.exists(json_err):
+                os.remove(json_err)
             main(
                     log_path=str(log_path),
                     error_path=err_path,
