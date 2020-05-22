@@ -158,10 +158,10 @@ namespace DXCoils {
     Real64 const RatedInletWetBulbTemp(19.4444); // 19.44 or 67F
     Real64 const RatedInletAirHumRat(0.0111847);      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     Real64 const RatedOutdoorAirTemp(35.0);                                            // 35 C or 95F
-    Real64 const RatedInletAirTempHeat(21.11);                                         // 21.11C or 70F
-    Real64 const RatedOutdoorAirTempHeat(8.33);                                        // 8.33 C or 47F
-    Real64 const RatedOutdoorWetBulbTempHeat(6.11);                                    // 6.11 C or 43F
-    Real64 const RatedInletWetBulbTempHeat(15.55);                                     // 15.55 or 60F
+    Real64 const RatedInletAirTempHeat(21.1111);                                       // 21.11C or 70F
+    Real64 const RatedOutdoorAirTempHeat(8.3333);                                      // 8.33 C or 47F
+    Real64 const RatedOutdoorWetBulbTempHeat(6.1111);                                  // 6.11 C or 43F
+    Real64 const RatedInletWetBulbTempHeat(15.5556);                                   // 15.55 or 60F
 
     Real64 const DryCoilOutletHumRatioMin(0.00001); // dry coil outlet minimum hum ratio kgWater/kgDryAir
 

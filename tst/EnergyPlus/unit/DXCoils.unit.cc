@@ -1498,8 +1498,8 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
                                     DXCoil(1).RatedSHR(1),
                                     true);
 
-    EXPECT_NEAR(0.788472, DXCoil(1).RatedSHR(1), 0.0000001);
-    EXPECT_NEAR(0.0003944, CBF_calculated, 0.0000001);
+    EXPECT_NEAR(0.792472, DXCoil(1).RatedSHR(1), 0.0000001);
+    EXPECT_NEAR(0.00213735, CBF_calculated, 0.0000001);
 
     DXCoil(1).RatedTotCap(1) = 35000.0; // simulate outlet condition right at the saturation curve
     DXCoil(1).RatedSHR(1) = AutoSize;
@@ -1514,8 +1514,8 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
                              DXCoil(1).RatedSHR(1),
                              true);
 
-    EXPECT_NEAR(0.67608322, DXCoil(1).RatedSHR(1), 0.0000001);
-    EXPECT_NEAR(0.0003243, CBF_calculated, 0.0000001);
+    EXPECT_NEAR(0.67908322, DXCoil(1).RatedSHR(1), 0.0000001);
+    EXPECT_NEAR(0.00298921, CBF_calculated, 0.0000001);
 
     DXCoil(1).RatedTotCap(1) = 40000.0; // reverse perturb SHR (i.e., decrease SHR), CalcCBF would have failed with RH >= 1.0
     DXCoil(1).RatedSHR(1) = AutoSize;
@@ -1530,8 +1530,8 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
                              DXCoil(1).RatedSHR(1),
                              true);
 
-    EXPECT_NEAR(0.64408322, DXCoil(1).RatedSHR(1), 0.0000001);
-    EXPECT_NEAR(0.0028271, CBF_calculated, 0.0000001);
+    EXPECT_NEAR(0.64708322, DXCoil(1).RatedSHR(1), 0.0000001);
+    EXPECT_NEAR(0.00252307, CBF_calculated, 0.0000001);
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)

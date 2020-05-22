@@ -2429,36 +2429,36 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     // autosized air flow and capacity, unitary sytsem capacity matches coils
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.5);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.5);
-    EXPECT_NEAR(thisSys->m_DesignCoolingCapacity, 32752.541, 0.001);
+    EXPECT_NEAR(thisSys->m_DesignCoolingCapacity, 32768.550, 0.001);
     EXPECT_EQ(thisSys->m_DesignCoolingCapacity, VariableSpeedCoils::VarSpeedCoil(1).RatedCapCoolTotal);
-    EXPECT_NEAR(thisSys->m_DesignHeatingCapacity, 32752.541, 0.001);
+    EXPECT_NEAR(thisSys->m_DesignHeatingCapacity, 32768.550, 0.001);
     EXPECT_EQ(thisSys->m_DesignHeatingCapacity, VariableSpeedCoils::VarSpeedCoil(2).RatedCapHeat);
     // variable speed coils size air flow differently than other models. The design air volume flow rate is back calculated from design capacity
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).RatedAirVolFlowRate,
               VariableSpeedCoils::VarSpeedCoil(1).RatedCapCoolTotal * VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowPerRatedTotCap(10));
-    EXPECT_NEAR(VariableSpeedCoils::VarSpeedCoil(1).RatedAirVolFlowRate, 1.82964, 0.00001); // different than unitary system air volume flow rate
+    EXPECT_NEAR(VariableSpeedCoils::VarSpeedCoil(1).RatedAirVolFlowRate, 1.830539, 0.00001); // different than unitary system air volume flow rate
     EXPECT_NEAR(VariableSpeedCoils::VarSpeedCoil(2).RatedAirVolFlowRate, 1.70, 0.01);       // VS DX heating coil was not autosized
 
     // checks on autosized cooling air flow rates
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[1], 0.182964, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[1], 0.1830539, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(1), thisSys->m_CoolVolumeFlowRate[1]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[2], 0.365929, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[2], 0.3661078, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(2), thisSys->m_CoolVolumeFlowRate[2]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[3], 0.548893, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[3], 0.5491617, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(3), thisSys->m_CoolVolumeFlowRate[3]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[4], 0.731858, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[4], 0.7322156, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(4), thisSys->m_CoolVolumeFlowRate[4]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[5], 0.914822, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[5], 0.9152695, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(5), thisSys->m_CoolVolumeFlowRate[5]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[6], 1.097787, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[6], 1.0983234, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(6), thisSys->m_CoolVolumeFlowRate[6]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[7], 1.280751, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[7], 1.2813773, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(7), thisSys->m_CoolVolumeFlowRate[7]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[8], 1.463716, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[8], 1.4644312, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(8), thisSys->m_CoolVolumeFlowRate[8]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[9], 1.646680, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[9], 1.6474851, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(9), thisSys->m_CoolVolumeFlowRate[9]);
-    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[10], 1.829645, 0.000001);
+    EXPECT_NEAR(thisSys->m_CoolVolumeFlowRate[10], 1.830539, 0.000001);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(10), thisSys->m_CoolVolumeFlowRate[10]);
 
     // checks on autosized heating air flow rates
@@ -13813,7 +13813,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 1.0);
     EXPECT_NEAR(thisSys->CoilSHR, thisSys->LoadSHR, 0.001);
     EXPECT_NEAR(SenOutput, -227.705, 0.1);
-    EXPECT_NEAR(LatOutput, -750.9234, 0.1);
+    EXPECT_NEAR(LatOutput, -751.3286, 0.1);
 
     // OperatingMode 3 with mode ratio < 1
     thisSys->m_ZoneSequenceCoolingNum = 0;
@@ -13846,7 +13846,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_NEAR(thisSys->LoadSHR, 0.57154, 0.001);
     EXPECT_NEAR(thisSys->CoilSHR, 0.44680, 0.001);
     EXPECT_NEAR(SenOutput, -397.162, 0.1);
-    EXPECT_NEAR(LatOutput, -524.623, 0.1);
+    EXPECT_NEAR(LatOutput, -524.583, 0.1);
 
     // OperatingMode 2
     thisSys->m_ZoneSequenceCoolingNum = 0;
@@ -13870,7 +13870,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_NEAR(thisSys->LoadSHR, 0.98533, 0.001);
     EXPECT_NEAR(thisSys->CoilSHR, 0.97600, 0.001);
     EXPECT_NEAR(SenOutput, -2000.0, 0.5);
-    EXPECT_NEAR(LatOutput, -330.85, 0.1);
+    EXPECT_NEAR(LatOutput, -330.95, 0.1);
 }
 // This issue tests for GetInput with respect to Autosizing, especially for issue #7771 where
 // 'Minimum Supply Air Temperature' == 'Autosize' produces a crash
