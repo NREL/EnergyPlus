@@ -173,13 +173,14 @@ def parse_log(log_path, src_dir, verbose=False):
     issues = {"log_file_path": log_path, "issues": []}
     with open(log_path) as rd:
         previous_line = None
+        issue_line = None
         reading_bang_message = False
         reading_latex_warning = False
         current_tex_file = None
         current_issue = None
         for line in rd.readlines():
             if reading_bang_message:
-                if line.strip() == "":
+                if line.strip() == "" and not ((issue_line == 1) and (len(line) > 1)):
                     reading_bang_message = False
                     line_no = parse_line_number(current_issue)
                     issues['issues'].append({
@@ -192,8 +193,9 @@ def parse_log(log_path, src_dir, verbose=False):
                     current_issue = None
                 else:
                     current_issue += line
+                issue_line += 1
             elif reading_latex_warning:
-                if line.strip() == "":
+                if line.strip() == "" and not ((issue_line == 1) and (len(line) > 1)):
                     reading_latex_warning = False
                     warn = parse_warning(current_issue, src_dir)
                     if warn is not None:
@@ -203,7 +205,9 @@ def parse_log(log_path, src_dir, verbose=False):
                     current_issue = None
                 else:
                     current_issue += line
+                issue_line += 1
             else:
+                issue_line = None
                 if previous_line is not None:
                     full_line = previous_line.strip() + line
                 else:
@@ -216,6 +220,7 @@ def parse_log(log_path, src_dir, verbose=False):
                 else:
                     issue_start = parse_bang_start(line)
                     if issue_start is not None:
+                        issue_line = 1
                         if verbose:
                             print(f"- issue {issue_start}")
                         reading_bang_message = True
@@ -223,6 +228,7 @@ def parse_log(log_path, src_dir, verbose=False):
                     else:
                         warning_start = parse_latex_warning_start(line)
                         if warning_start is not None:
+                            issue_line = 1
                             if verbose:
                                 print(f"- warning {warning_start}")
                             reading_latex_warning = True
