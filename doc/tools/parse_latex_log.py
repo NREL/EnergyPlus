@@ -13,7 +13,7 @@ SEVERITY_WARNING = 'WARNING'
 SEVERITY_ERROR = 'ERROR'
 
 
-LINE_RE = re.compile(r"\((.*\.tex)")
+LINE_RE = re.compile(r"\((.*\.tex)(.*)$")
 BANG_MSG = re.compile(r"^! (.*)$")
 LATEX_WARNING = re.compile(r"^LaTeX Warning: (.*)$")
 LABEL_MULTIPLY_DEFINED_WARN = re.compile(
@@ -36,7 +36,11 @@ def parse_current_tex_file(line, root_dir):
     if m is not None:
         pp_dir = pathlib.Path(root_dir)
         pp_file = pp_dir / pathlib.Path(m.group(1))
-        return str(pp_file.relative_to(pp_dir))
+        try:
+            return str(pp_file.relative_to(pp_dir))
+        except ValueError:
+            # not a file under root_dir -- ignore
+            return None
     return None
 
 
@@ -168,6 +172,7 @@ def parse_log(log_path, src_dir, verbose=False):
     """
     issues = {"log_file_path": log_path, "issues": []}
     with open(log_path) as rd:
+        previous_line = None
         reading_bang_message = False
         reading_latex_warning = False
         current_tex_file = None
@@ -185,8 +190,8 @@ def parse_log(log_path, src_dir, verbose=False):
                             'line': line_no}],
                         'message': current_issue})
                     current_issue = None
-                    continue
-                current_issue += line
+                else:
+                    current_issue += line
             elif reading_latex_warning:
                 if line.strip() == "":
                     reading_latex_warning = False
@@ -196,47 +201,51 @@ def parse_log(log_path, src_dir, verbose=False):
                     else:
                         print(f"Unhandled: {current_issue}")
                     current_issue = None
-                    continue
-                current_issue += line
+                else:
+                    current_issue += line
             else:
-                tex_file = parse_current_tex_file(line, src_dir)
+                if previous_line is not None:
+                    full_line = previous_line.strip() + line
+                else:
+                    full_line = line
+                tex_file = parse_current_tex_file(full_line, src_dir)
                 if tex_file is not None:
                     if verbose:
                         print(f"processing {tex_file} ...")
                     current_tex_file = tex_file
-                    continue
-                issue_start = parse_bang_start(line)
-                if issue_start is not None:
-                    if verbose:
-                        print(f"- issue {issue_start}")
-                    reading_bang_message = True
-                    current_issue = issue_start
-                    continue
-                warning_start = parse_latex_warning_start(line)
-                if warning_start is not None:
-                    if verbose:
-                        print(f"- warning {warning_start}")
-                    reading_latex_warning = True
-                    current_issue = warning_start
-                    continue
+                else:
+                    issue_start = parse_bang_start(line)
+                    if issue_start is not None:
+                        if verbose:
+                            print(f"- issue {issue_start}")
+                        reading_bang_message = True
+                        current_issue = issue_start
+                    else:
+                        warning_start = parse_latex_warning_start(line)
+                        if warning_start is not None:
+                            if verbose:
+                                print(f"- warning {warning_start}")
+                            reading_latex_warning = True
+                            current_issue = warning_start
+            previous_line = line
     return issues
 
 
-def main(log_file, error_file, json_error_path, src_dir):
+def main(log_path, error_path, json_error_path, src_dir):
     """
-    - log_file: string, path to LaTeX log file to read
-    - error_file: string, path to error file to write
+    - log_path: string, path to LaTeX log file to read
+    - error_path: string, path to error file to write
     - json_error_path: string, path to JSON error file to write
     - src_dir: string, path to the source directory of the processed LaTeX files
     RETURNS: None
     SIDE_EFFECTS:
-    - if significant errors are found in the log_file, writes error_file with a
+    - if significant errors are found in the log_path, writes error_path with a
       summary of issues
     - will ONLY write the error file if an issue is found
     - exits with a non-zero exit code if the script itself encounters any errors
     """
     try:
-        errs = parse_log(log_file, src_dir)
+        errs = parse_log(log_path, src_dir)
     except Exception as e:
         import traceback
         print(f"issue encountered in parsing log: {e}")
@@ -245,7 +254,7 @@ def main(log_file, error_file, json_error_path, src_dir):
     num_issues = len(errs['issues'])
     if (num_issues > 0):
         print(f"ISSUES: {num_issues}")
-        with open(error_file, 'w') as f:
+        with open(error_path, 'w') as f:
             for issue in errs['issues']:
                 f.write("[LATEX")
                 f.write(issue['severity'] + "::")
@@ -288,6 +297,45 @@ def run_tests():
 
 
 if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        # shim for testing
+        doc_tags = [
+                'acknowledgments',
+                'auxiliary-programs',
+                'ems-application-guide',
+                'engineering-reference',
+                'essentials',
+                'external-interfaces-application-guide',
+                'getting-started',
+                'input-output-reference',
+                'interface-developer',
+                'module-developer',
+                'output-details-and-examples',
+                'plant-application-guide',
+                'tips-and-tricks-using-energyplus',
+                'using-energyplus-for-compliance',
+                ]
+        current_dir = pathlib.Path('.')
+        for tag in doc_tags:
+            log_path = (
+                    current_dir / pathlib.Path('..') / pathlib.Path(tag) /
+                    pathlib.Path(tag + '.log')
+                    ).resolve()
+            assert log_path.exists()
+            err_path = f'{tag}-err.txt'
+            json_err = f'{tag}-err.json'
+            src_dir = (
+                    current_dir / pathlib.Path('..') / pathlib.Path(tag)
+                    ).resolve()
+            print("="*60)
+            print(f"Processing {tag}...")
+            main(
+                    log_path=str(log_path),
+                    error_path=err_path,
+                    json_error_path=json_err,
+                    src_dir=str(src_dir))
+        print("Done!")
+        sys.exit(0)
     if len(sys.argv) == 2 and (sys.argv[1] == 'test'):
         print("TESTING:")
         run_tests()
