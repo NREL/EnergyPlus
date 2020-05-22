@@ -12152,7 +12152,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
 
     // Issue 7777
     std::string const error_string = delimited_string({
-        "   ** Warning ** getUnitarySystemInputDataAirLoopHVAC:UnitarySystem=\"UNITARY SYSTEM MODEL\", invalid Availability Schedule Name = FANANDCOILAVAILTEST",   
+        "   ** Warning ** getUnitarySystemInputDataAirLoopHVAC:UnitarySystem=\"UNITARY SYSTEM MODEL\", invalid Availability Schedule Name = FANANDCOILAVAILTEST",
         "   **   ~~~   ** Set the default as Always On. Simulation continues.",
     });
 
@@ -12383,9 +12383,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems);
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum));
 
-    EXPECT_TRUE(thisSys->m_FanExists); 
-    EXPECT_TRUE(thisSys->m_CoolCoilExists); 
-    EXPECT_TRUE(thisSys->m_HeatCoilExists); 
+    EXPECT_TRUE(thisSys->m_FanExists);
+    EXPECT_TRUE(thisSys->m_CoolCoilExists);
+    EXPECT_TRUE(thisSys->m_HeatCoilExists);
 
     auto &thisClgCoil = DXCoils::DXCoil(1);
     auto &thisHtgCoil = HeatingCoils::HeatingCoil(1);
@@ -12440,8 +12440,6 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
 {
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Timestep,4;",
 
