@@ -7789,7 +7789,7 @@ namespace UnitarySystems {
                                                 Real64 &OnOffAirFlowRatio,     // ratio of heating PLR to cooling PLR (is this correct?)
                                                 Real64 const ZoneLoad,
                                                 Real64 &FullSensibleOutput,
-                                                bool HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
+                                                bool &HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
                                                 int CompOn)
     {
 
@@ -8549,7 +8549,7 @@ namespace UnitarySystems {
                         if (CoolingLoad) Par[6] = 1.0;
                         Par[7] = 1.0;               // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
                         Par[8] = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
-                        Par[9] = 0.0;               // HXUnitOn is always false for HX
+                        Par[9] = HXUnitOn;          // HXUnitOn turns on or off HX in coil system
                         Par[10] = this->m_HeatingPartLoadFrac;
                         Par[11] = double(AirLoopNum);
 
@@ -8881,6 +8881,7 @@ namespace UnitarySystems {
             }
 
             if (MoistureLoad < LatOutputOn && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
+                HXUnitOn = true; // HX is needed to meet moisture load
                 if (this->m_NumOfSpeedCooling > 0) {
                     for (SpeedNum = this->m_CoolingSpeedNum; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
                         CoolPLR = 1.0;
