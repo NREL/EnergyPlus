@@ -22,6 +22,18 @@ HYPER_UNDEFINED_WARN = re.compile(
         r"^Hyper reference `([^']*)' on page (\d+) " +
         "undefined on input line (\d+)\.$")
 LINE_NO = re.compile(r"l\.(\d+)")
+ON_INPUT_LINE = re.compile("on input line (\d+)\.")
+
+
+def parse_on_input_line(line):
+    """
+    - line: str, the line to parse
+    RETURN: None or int
+    """
+    m = ON_INPUT_LINE.search(line)
+    if m is not None:
+        return int(m.group(1))
+    return None
 
 
 def parse_current_tex_file(line, root_dir):
@@ -201,7 +213,14 @@ def parse_log(log_path, src_dir, verbose=False):
                     if warn is not None:
                         issues['issues'].append(warn)
                     else:
-                        print(f"Unhandled: {current_issue}")
+                        line_no = parse_on_input_line(current_issue)
+                        issues['issues'].append({
+                            'severity': SEVERITY_WARNING,
+                            'type': 'LaTeX Warning',
+                            'locations': [{
+                                'file': current_tex_file,
+                                'line': line_no}],
+                            'message': current_issue})
                     current_issue = None
                 else:
                     current_issue += line
