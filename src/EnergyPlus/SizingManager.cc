@@ -281,11 +281,7 @@ namespace SizingManager {
                 outputFiles.zsz.fileName = outputFiles.outputZszTxtFileName;
             }
 
-<<<<<<< HEAD
-            outputFiles.zsz.ensure_open(outputFiles.outputControl.zsz);
-=======
-            outputFiles.zsz.ensure_open("ManageSizing");
->>>>>>> origin/develop
+            outputFiles.zsz.ensure_open("ManageSizing", outputFiles.outputControl.zsz);
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
@@ -484,11 +480,7 @@ namespace SizingManager {
             } else {
                 outputFiles.ssz.fileName = outputFiles.outputSszTxtFileName;
             }
-<<<<<<< HEAD
-            outputFiles.ssz.ensure_open(outputFiles.outputControl.ssz);
-=======
-            outputFiles.ssz.ensure_open("ManageSizing");
->>>>>>> origin/develop
+            outputFiles.ssz.ensure_open("ManageSizing", outputFiles.outputControl.ssz);
 
             SimAir = true;
             SimZoneEquip = true;

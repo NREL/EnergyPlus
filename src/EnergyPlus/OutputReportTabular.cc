@@ -5699,11 +5699,7 @@ namespace OutputReportTabular {
         }
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
-<<<<<<< HEAD
-        outputFiles.audit.ensure_open(outputFiles.outputControl.audit);
-=======
-        outputFiles.audit.ensure_open("WriteTabularReports");
->>>>>>> origin/develop
+        outputFiles.audit.ensure_open("WriteTabularReports", outputFiles.outputControl.audit);
         print(outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
         print(outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
         print(outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);

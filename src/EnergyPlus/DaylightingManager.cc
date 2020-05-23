@@ -812,21 +812,7 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-<<<<<<< HEAD
-            ////  Change to following once dfs is converted to OutputFiles
-            //    outputFiles.dfs.ensure_open(outputFiles.outputControl.dfs);
-            OutputFileDFS = outputFiles.open_gio(DataStringGlobals::outputDfsFileName, "CalcDayltgCoefficients", outputFiles.outputControl.dfs);
-
-            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "This file contains daylight factors for all exterior windows of daylight zones.";
-            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "If only one reference point the last 4 columns in the data will be zero.";
-            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "MonthAndDay,Zone Name,Window Name,Window State";
-            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at "
-                                                          "Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for "
-                                                          "Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight "
-                                                          "Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at "
-                                                          "Reference point 2,Daylight Factor for Overcast Sky at Reference point 2";
-=======
-            OutputFile &dfs = outputFiles.dfs.ensure_open("CalcDayltgCoefficients");
+            OutputFile &dfs = outputFiles.dfs.ensure_open("CalcDayltgCoefficients", outputFiles.outputControl.dfs);
             print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
             print(dfs, "{}\n", "If only one reference point the last 4 columns in the data will be zero.");
             print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
@@ -836,7 +822,6 @@ namespace DaylightingManager {
                    "Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight "
                    "Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at "
                    "Reference point 2,Daylight Factor for Overcast Sky at Reference point 2");
->>>>>>> origin/develop
             CreateDFSReportFile = false;
         }
 

@@ -385,21 +385,13 @@ namespace CommandLineInterface {
         }
 
         // EnergyPlus files
-<<<<<<< HEAD
-        auto & outputFiles = OutputFiles::getSingleton();
-        outputFiles.audit.fileName = outputFilePrefix + normalSuffix + ".audit";
-        outputFiles.bnd.fileName = outputFilePrefix + normalSuffix + ".bnd";
-        outputDxfFileName = outputFilePrefix + normalSuffix + ".dxf";
-        outputFiles.eio.fileName = outputFilePrefix + normalSuffix + ".eio";
-=======
         OutputFiles::getSingleton().audit.fileName = outputFilePrefix + normalSuffix + ".audit";
         OutputFiles::getSingleton().bnd.fileName = outputFilePrefix + normalSuffix + ".bnd";
         OutputFiles::getSingleton().dxf.fileName = outputFilePrefix + normalSuffix + ".dxf";
         OutputFiles::getSingleton().eio.fileName = outputFilePrefix + normalSuffix + ".eio";
->>>>>>> origin/develop
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
-        outputFiles.eso.fileName = outputFilePrefix + normalSuffix + ".eso";
+        OutputFiles::getSingleton().eso.fileName = outputFilePrefix + normalSuffix + ".eso";
 
         outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
         outputTSZoneJsonFileName = outputFilePrefix + normalSuffix + "_detailed_zone.json";
@@ -430,9 +422,9 @@ namespace CommandLineInterface {
         outputSMMsgPackFileName = outputFilePrefix + normalSuffix + "_runperiod.msgpack";
 
         outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
-        outputFiles.mdd.fileName = outputFilePrefix + normalSuffix + ".mdd";
-        outputFiles.mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
-        outputFiles.rdd.fileName = outputFilePrefix + normalSuffix + ".rdd";
+        OutputFiles::getSingleton().mdd.fileName = outputFilePrefix + normalSuffix + ".mdd";
+        OutputFiles::getSingleton().mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
+        OutputFiles::getSingleton().rdd.fileName = outputFilePrefix + normalSuffix + ".rdd";
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         OutputFiles::getSingleton().dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
         outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
@@ -452,12 +444,12 @@ namespace CommandLineInterface {
         outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
         outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
         outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
-        outputFiles.outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
-        outputFiles.outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
-        outputFiles.outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
-        outputFiles.outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
-        outputFiles.outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
-        outputFiles.outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
+        OutputFiles::getSingleton().outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
+        OutputFiles::getSingleton().outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
+        OutputFiles::getSingleton().outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
+        OutputFiles::getSingleton().outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
+        OutputFiles::getSingleton().outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
+        OutputFiles::getSingleton().outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
         outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
         outputExtShdFracFileName = outputFilePrefix + shdSuffix + ".csv";
         if (suffixType == "L" || suffixType == "l") {
@@ -476,8 +468,8 @@ namespace CommandLineInterface {
         eplusADSFileName = inputDirPathName + "eplusADS.inp";
 
         // Readvars files
-        outputFiles.csv.fileName = outputFilePrefix + normalSuffix + ".csv";
-        outputFiles.mtr_csv.fileName = outputFilePrefix + meterSuffix + ".csv";
+        OutputFiles::getSingleton().csv.fileName = outputFilePrefix + normalSuffix + ".csv";
+        OutputFiles::getSingleton().mtr_csv.fileName = outputFilePrefix + meterSuffix + ".csv";
         outputRvauditFileName = outputFilePrefix + normalSuffix + ".rvaudit";
 
         // EPMacro files
@@ -579,11 +571,6 @@ namespace CommandLineInterface {
             }
         }
 
-<<<<<<< HEAD
-=======
-        OutputFiles::getSingleton().debug.ensure_open("OpenOutputFiles");
-
->>>>>>> origin/develop
         // TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 
         // Preprocessors (These will likely move to a new file)

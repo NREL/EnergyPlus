@@ -244,13 +244,6 @@ void LinesOut(std::string const &option)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static bool optiondone(false);
     static std::string lastoption;
-<<<<<<< HEAD
-    int unit; // Unit number on which to write file
-    int surf; // Loop variable for surfaces
-    int vert; // Loop counter
-    std::string optcommasemi;
-=======
->>>>>>> origin/develop
 
     if (TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
@@ -266,14 +259,7 @@ void LinesOut(std::string const &option)
     lastoption = option;
     optiondone = true;
 
-<<<<<<< HEAD
-    auto & outputFiles = OutputFiles::getSingleton();
-    ////  Change to following once sln is converted to OutputFiles
-    //    outputFiles.sln.ensure_open(outputFiles.outputControl.sln);
-    unit = outputFiles.open_gio(DataStringGlobals::outputSlnFileName, "LinesOut", outputFiles.outputControl.sln);
-=======
-    auto slnfile = OutputFiles::getSingleton().sln.open("LinesOut");
->>>>>>> origin/develop
+    auto slnfile = OutputFiles::getSingleton().sln.open("LinesOut", outputFiles.outputControl.sln);
 
     if (option != "IDF") {
         for (int surf = 1; surf <= TotSurfaces; ++surf) {
@@ -542,40 +528,10 @@ void DXFOut(OutputFiles &outputFiles,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     //  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
-<<<<<<< HEAD
-    int unit;       // Unit number on which to write file
-    int surf;       // Loop variable for surfaces
-    int vert;       // Loop counter
-    int colorindex; // color index by surface type
-    Real64 minx;    // minimum x in surface data
-    Real64 miny;    // minimum y in surface data
-    Real64 minz;    // minimum z in surface data (for polygon output)
-    int zones;      // loop counter for zone loop
-    std::string ZoneNum;
-    std::string TempZoneName;
-    std::string::size_type pos;
-    std::string ShadeType;
-    static bool ThickPolyline(false);
-    static bool RegularPolyline(false);
-    static std::string PolylineWidth(" 0.55");
-    static bool TriangulateFace(false);
-    int ntri;
-    int svert;
-    int vv0;
-    int vv1;
-    int vv2;
-    int refpt;      // for daylighting ref points
-    int curcolorno; // again for daylighting ref pts
-    int mapnum;
-
-    // Object Data
-    Array1D<dTriangle> mytriangles;
-=======
     bool ThickPolyline(false);
     bool RegularPolyline(false);
     std::string PolylineWidth(" 0.55");
     bool TriangulateFace(false);
->>>>>>> origin/develop
 
     // Formats
     constexpr auto Format_702("  0\nSECTION\n  2\nENTITIES\n");
@@ -623,14 +579,7 @@ void DXFOut(OutputFiles &outputFiles,
         return;
     }
 
-<<<<<<< HEAD
-    auto & outputFiles = OutputFiles::getSingleton();
-////  Change to following once dxf is converted to OutputFiles
-//    outputFiles.dxf.ensure_open(outputFiles.outputControl.dxf);
-    unit = outputFiles.open_gio(DataStringGlobals::outputDxfFileName, "DXFOut", outputFiles.outputControl.dxf);
-=======
-    auto dxffile = outputFiles.dxf.open("DXFOut");
->>>>>>> origin/develop
+    auto dxffile = outputFiles.dxf.open("DXFOut", outputFiles.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -952,27 +901,6 @@ void DXFOutLines(std::string const &ColorScheme)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     //  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
-<<<<<<< HEAD
-    int unit;       // Unit number on which to write file
-    int surf;       // Loop variable for surfaces
-    int vert;       // Loop counter
-    int colorindex; // color index by surface type
-    Real64 minx;    // minimum x in surface data
-    Real64 miny;    // minimum y in surface data
-    Real64 minz;    // minimum z in surface data (for polygon output)
-    int zones;      // loop counter for zone loop
-    std::string ZoneNum;
-    std::string TempZoneName;
-    std::string::size_type pos;
-    std::string ShadeType;
-    // unused  character(len=5) :: PolylineWidth=' 0.55'
-    std::string cSurfNum;
-    int surfcount;
-    int sptr;
-    int refpt;
-    int curcolorno;
-=======
->>>>>>> origin/develop
 
     // Formats
     constexpr auto Format_702("  0\nSECTION\n  2\nENTITIES\n");
@@ -990,21 +918,7 @@ void DXFOutLines(std::string const &ColorScheme)
         return;
     }
 
-<<<<<<< HEAD
-    auto & outputFiles = OutputFiles::getSingleton();
-////  Change to following once dxf is converted to OutputFiles
-//    outputFiles.dxf.ensure_open(outputFiles.outputControl.dxf);
-    unit = outputFiles.open_gio(DataStringGlobals::outputDxfFileName, "DXFOutLines", outputFiles.outputControl.dxf);
-
-    ObjexxFCL::gio::write(unit, Format_702); // Start of Entities section
-
-    ObjexxFCL::gio::write(unit, Format_707); // Comment
-
-    ObjexxFCL::gio::write(unit, Format_708) << "Program Version"
-                                 << "," << VerString;
-=======
-    auto dxffile = OutputFiles::getSingleton().dxf.open("DXFOutLines");
->>>>>>> origin/develop
+    auto dxffile = OutputFiles::getSingleton().dxf.open("DXFOutLines", outputFiles.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1199,28 +1113,7 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     //  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
-<<<<<<< HEAD
-    int unit;       // Unit number on which to write file
-    int surf;       // Loop variable for surfaces
-    int vert;       // Loop counter
-    int colorindex; // color index by surface type
-    Real64 minx;    // minimum x in surface data
-    Real64 miny;    // minimum y in surface data
-    Real64 minz;    // minimum z in surface data (for polygon output)
-    int zones;      // loop counter for zone loop
-    std::string ZoneNum;
-    std::string TempZoneName;
-    std::string SaveZoneName;
-    std::string::size_type pos;
-    std::string ShadeType;
-    static std::string PolylineWidth(" 0.55");
-    std::string cSurfNum;
-    int surfcount;
-    int refpt;
-    int curcolorno;
-=======
     std::string const PolylineWidth(" 0.55");
->>>>>>> origin/develop
 
     constexpr auto Format_702("  0\nSECTION\n  2\nENTITIES\n");
     constexpr auto Format_707("999\nDXF created from EnergyPlus\n");
@@ -1237,14 +1130,7 @@ void DXFOutWireFrame(OutputFiles &outputFiles, std::string const &ColorScheme)
         return;
     }
 
-<<<<<<< HEAD
-    auto & outputFiles = OutputFiles::getSingleton();
-////  Change to following once dxf is converted to OutputFiles
-//    outputFiles.dxf.ensure_open(outputFiles.outputControl.dxf);
-    unit = outputFiles.open_gio(DataStringGlobals::outputDxfFileName, "DXFOutWireFrame", outputFiles.outputControl.dxf);
-=======
-    auto dxffile = outputFiles.dxf.open("DXFOutWireFrame");
->>>>>>> origin/develop
+    auto dxffile = outputFiles.dxf.open("DXFOutWireFrame", outputFiles.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1879,12 +1765,6 @@ void CostInfoOut(OutputFiles &outputFiles)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array1D_bool uniqueSurf;
-<<<<<<< HEAD
-
-    // Formats
-    static ObjexxFCL::gio::Fmt Format_801("(I5,',',A,',',A,',',A,',',f14.5,',',f14.5)");
-=======
->>>>>>> origin/develop
 
     if (TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
@@ -1905,19 +1785,7 @@ void CostInfoOut(OutputFiles &outputFiles)
         }
     }
 
-<<<<<<< HEAD
-    // sci = surface cost info
-    auto & outputFiles = OutputFiles::getSingleton();
-////  Change to following once sci is converted to OutputFiles
-//    outputFiles.sci.ensure_open(outputFiles.outputControl.sci);
-    unit = outputFiles.open_gio(DataStringGlobals::outputSciFileName, "CostInfoOut", outputFiles.outputControl.sci);
-
-    ObjexxFCL::gio::write(unit, fmtLD) << TotSurfaces << int(count(uniqueSurf));
-    ObjexxFCL::gio::write(unit, fmtLD) << "data for surfaces useful for cost information";
-    ObjexxFCL::gio::write(unit, fmtLD) << "Number, Name, Construction, class, area, grossarea";
-=======
-    auto scifile = outputFiles.sci.open("CostInfoOut");
->>>>>>> origin/develop
+    auto scifile = outputFiles.sci.open("CostInfoOut", outputFiles.outputControl.sci);
 
     print(scifile, "{:12}{:12}\n", TotSurfaces, count(uniqueSurf));
     print(scifile, "{}\n", " data for surfaces useful for cost information");
@@ -1986,27 +1854,10 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string ShadeType;
-<<<<<<< HEAD
-    static bool ThickPolyline(false);
-    static bool RegularPolyline(false);
-    static std::string PolylineWidth(" 0.55");
-    static bool TriangulateFace(false);
-    int ntri;
-    int svert;
-    int vv0;
-    int vv1;
-    int vv2;
-    std::string csurfnumber;
-    std::string csidenumber;
-
-    // Object Data
-    Array1D<dTriangle> mytriangles;
-=======
     bool ThickPolyline(false);
     bool RegularPolyline(false);
     std::string PolylineWidth(" 0.55");
     bool TriangulateFace(false);
->>>>>>> origin/develop
 
     // Formats
     static constexpr auto Format_702("#VRML V2.0 utf8\n");
@@ -2037,14 +1888,7 @@ void VRMLOut(OutputFiles &outputFiles, const std::string &PolygonAction, const s
         return;
     }
 
-<<<<<<< HEAD
-    auto & outputFiles = OutputFiles::getSingleton();
-////  Change to following once wrl is converted to OutputFiles
-//    outputFiles.wrl.ensure_open(outputFiles.outputControl.wrl);
-    unit = outputFiles.open_gio(DataStringGlobals::outputWrlFileName, "VRMLOut", outputFiles.outputControl.wrl);
-=======
-    auto wrlfile = outputFiles.wrl.open("VRMLOut");
->>>>>>> origin/develop
+    auto wrlfile = outputFiles.wrl.open("VRMLOut", outputFiles.outputControl.wrl);
 
     print(wrlfile, Format_702);
 

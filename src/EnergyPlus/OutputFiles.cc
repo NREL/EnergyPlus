@@ -57,11 +57,7 @@
 
 namespace EnergyPlus {
 
-<<<<<<< HEAD
-OutputFile &OutputFile::ensure_open(bool output_to_file)
-=======
-OutputFile &OutputFile::ensure_open(const std::string &caller)
->>>>>>> origin/develop
+OutputFile &OutputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
     if (!good()) {
         open(output_to_file);

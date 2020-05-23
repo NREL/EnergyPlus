@@ -3174,14 +3174,8 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccTS) {
-<<<<<<< HEAD
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).TSAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).TSAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccTSFO);
-                ResultsFramework::resultsFramework->TSMeters.pushVariableValue(EnergyMeters(Loop).TSAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).TSAccRptNum, fmt::to_string(EnergyMeters(Loop).TSAccRptNum), EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccTSFO);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->TSMeters.pushVariableValue(EnergyMeters(Loop).TSAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
 
@@ -3285,15 +3279,8 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccHR) {
-<<<<<<< HEAD
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).HRAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).HRAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccHRFO);
-                ResultsFramework::resultsFramework->HRMeters.pushVariableValue(EnergyMeters(Loop).HRAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).HRAccRptNum, fmt::to_string(EnergyMeters(Loop).HRAccRptNum), EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccHRFO);
-                ResultsFramework::OutputSchema->HRMeters.pushVariableValue(EnergyMeters(Loop).HRAccRptNum, EnergyMeters(Loop).SMValue);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->HRMeters.pushVariableValue(EnergyMeters(Loop).HRAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3336,16 +3323,11 @@ namespace OutputProcessor {
         bool PrintTimeStamp;
         int CurDayType;
 
-<<<<<<< HEAD
         if (!ResultsFramework::resultsFramework->DYMeters.rVariablesScanned()) {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Daily);
-=======
-        if (!ResultsFramework::OutputSchema->DYMeters.rVariablesScanned()) {
-            ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Daily);
         }
-        if (ResultsFramework::OutputSchema->DYMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->DYMeters.newRow(fmt::to_string(Month) + "/" + fmt::to_string(DayOfMonth));
->>>>>>> origin/develop
+        if (ResultsFramework::resultsFramework->DYMeters.rDataFrameEnabled()) {
+            ResultsFramework::resultsFramework->DYMeters.newRow(fmt::to_string(Month) + "/" + fmt::to_string(DayOfMonth));
         }
 
         PrintTimeStamp = true;
@@ -3395,15 +3377,8 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccDY) {
-<<<<<<< HEAD
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).DYAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).DYAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccDYFO);
-                ResultsFramework::resultsFramework->DYMeters.pushVariableValue(EnergyMeters(Loop).DYAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).DYAccRptNum, fmt::to_string(EnergyMeters(Loop).DYAccRptNum), EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccDYFO);
-                ResultsFramework::OutputSchema->DYMeters.pushVariableValue(EnergyMeters(Loop).DYAccRptNum, EnergyMeters(Loop).SMValue);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->DYMeters.pushVariableValue(EnergyMeters(Loop).DYAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3446,16 +3421,11 @@ namespace OutputProcessor {
         int Loop; // Loop Control
         bool PrintTimeStamp;
 
-<<<<<<< HEAD
         if (!ResultsFramework::resultsFramework->MNMeters.rVariablesScanned()) {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Monthly);
-=======
-        if (!ResultsFramework::OutputSchema->MNMeters.rVariablesScanned()) {
-            ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Monthly);
         }
-        if (ResultsFramework::OutputSchema->MNMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->MNMeters.newRow(fmt::to_string(Month));
->>>>>>> origin/develop
+        if (ResultsFramework::resultsFramework->MNMeters.rDataFrameEnabled()) {
+            ResultsFramework::resultsFramework->MNMeters.newRow(fmt::to_string(Month));
         }
 
         PrintTimeStamp = true;
@@ -3495,15 +3465,8 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccMN) {
-<<<<<<< HEAD
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).MNAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).MNAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccMNFO);
-                ResultsFramework::resultsFramework->MNMeters.pushVariableValue(EnergyMeters(Loop).MNAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).MNAccRptNum, fmt::to_string(EnergyMeters(Loop).MNAccRptNum), EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccMNFO);
-                ResultsFramework::OutputSchema->MNMeters.pushVariableValue(EnergyMeters(Loop).MNAccRptNum, EnergyMeters(Loop).SMValue);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->MNMeters.pushVariableValue(EnergyMeters(Loop).MNAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3580,14 +3543,8 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccYR) {
-<<<<<<< HEAD
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).YRAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).YRAccRptNum, cReportID, EnergyMeters(Loop).YRValue, EnergyMeters(Loop).RptAccYRFO);
-                ResultsFramework::resultsFramework->YRMeters.pushVariableValue(EnergyMeters(Loop).YRAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).YRAccRptNum, fmt::to_string(EnergyMeters(Loop).YRAccRptNum), EnergyMeters(Loop).YRValue, EnergyMeters(Loop).RptAccYRFO);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->YRMeters.pushVariableValue(EnergyMeters(Loop).YRAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3676,15 +3633,8 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccSM) {
-<<<<<<< HEAD
-                ObjexxFCL::gio::write(cReportID, fmtLD) << EnergyMeters(Loop).SMAccRptNum;
-                strip(cReportID);
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).SMAccRptNum, cReportID, EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccSMFO);
-                ResultsFramework::resultsFramework->SMMeters.pushVariableValue(EnergyMeters(Loop).SMAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(EnergyMeters(Loop).SMAccRptNum, fmt::to_string(EnergyMeters(Loop).SMAccRptNum), EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccSMFO);
-                ResultsFramework::OutputSchema->SMMeters.pushVariableValue(EnergyMeters(Loop).SMAccRptNum, EnergyMeters(Loop).SMValue);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->SMMeters.pushVariableValue(EnergyMeters(Loop).SMAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
 

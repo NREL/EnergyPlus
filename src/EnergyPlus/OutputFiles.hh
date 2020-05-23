@@ -66,11 +66,7 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-<<<<<<< HEAD
-    OutputFile &ensure_open(bool output_to_file = true);
-=======
-    OutputFile &ensure_open(const std::string &caller);
->>>>>>> origin/develop
+    OutputFile &ensure_open(const std::string &caller, bool output_to_file = true);
 
     std::string fileName;
     void open(bool output_to_file = true);

@@ -1786,38 +1786,20 @@ namespace SimulationManager {
 
         // FLOW:
         StdOutputRecordCount = 0;
-<<<<<<< HEAD
-        auto & outputFiles = OutputFiles::getSingleton();
-        outputFiles.eso.ensure_open(outputFiles.outputControl.eso);
-        print(outputFiles.eso, "Program Version,{}\n", VerString);
-
-        // Open the Initialization Output File
-        outputFiles.eio.ensure_open(outputFiles.outputControl.eio);
-        print(outputFiles.eio, "Program Version,{}\n", VerString);
-
-        // Open the Meters Output File
-        outputFiles.mtr.ensure_open(outputFiles.outputControl.mtr);
-        print(outputFiles.mtr, "Program Version,{}\n", VerString);
-
-        // Open the Branch-Node Details Output File
-        outputFiles.bnd.ensure_open(outputFiles.outputControl.bnd);
-        print(outputFiles.bnd, "Program Version,{}\n", VerString);
-=======
-        OutputFiles::getSingleton().eso.ensure_open("OpenOutputFiles");
+        OutputFiles::getSingleton().eso.ensure_open("OpenOutputFiles", outputFiles.outputControl.eso);
         print(OutputFiles::getSingleton().eso, "Program Version,{}\n", VerString);
 
         // Open the Initialization Output File
-        OutputFiles::getSingleton().eio.ensure_open("OpenOutputFiles");
+        OutputFiles::getSingleton().eio.ensure_open("OpenOutputFiles", outputFiles.outputControl.eio);
         print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        OutputFiles::getSingleton().mtr.ensure_open("OpenOutputFiles");
+        OutputFiles::getSingleton().mtr.ensure_open("OpenOutputFiles", outputFiles.outputControl.mtr);
         print(OutputFiles::getSingleton().mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
-        OutputFiles::getSingleton().bnd.ensure_open("OpenOutputFiles");
+        OutputFiles::getSingleton().bnd.ensure_open("OpenOutputFiles", outputFiles.outputControl.bnd);
         print(OutputFiles::getSingleton().bnd, "Program Version,{}\n", VerString);
->>>>>>> origin/develop
     }
 
     void CloseOutputFiles(OutputFiles &outputFiles)
@@ -1889,11 +1871,7 @@ namespace SimulationManager {
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
 
-<<<<<<< HEAD
-        OutputFiles::getSingleton().audit.ensure_open(OutputFiles::getSingleton().outputControl.audit);
-=======
-        OutputFiles::getSingleton().audit.ensure_open("CloseOutputFiles");
->>>>>>> origin/develop
+        OutputFiles::getSingleton().audit.ensure_open("CloseOutputFiles", OutputFiles::getSingleton().outputControl.audit);
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
         print(outputFiles.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);

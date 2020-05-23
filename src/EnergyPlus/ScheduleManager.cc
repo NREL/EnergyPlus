@@ -725,11 +725,7 @@ namespace ScheduleManager {
         Schedule(0).ScheduleTypePtr = 0;
         Schedule(0).WeekSchedulePointer = 0;
 
-<<<<<<< HEAD
-        print(outputFiles.audit.ensure_open(outputFiles.outputControl.audit), "{}\n", "  Processing Schedule Input -- Start");
-=======
-        print(outputFiles.audit.ensure_open("ProcessScheduleInput"), "{}\n", "  Processing Schedule Input -- Start");
->>>>>>> origin/develop
+        print(outputFiles.audit.ensure_open("ProcessScheduleInput", outputFiles.outputControl.audit), "{}\n", "  Processing Schedule Input -- Start");
 
         //!! Get Schedule Types
 
