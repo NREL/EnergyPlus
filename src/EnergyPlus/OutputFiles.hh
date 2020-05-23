@@ -66,7 +66,11 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
+<<<<<<< HEAD
     OutputFile &ensure_open(bool output_to_file = true);
+=======
+    OutputFile &ensure_open(const std::string &caller);
+>>>>>>> origin/develop
 
     std::string fileName;
     void open(bool output_to_file = true);
@@ -85,9 +89,20 @@ private:
     friend class OutputFiles;
 };
 
+
 class OutputFiles
 {
 public:
+
+    struct OutputFileName
+    {
+        std::string fileName;
+        OutputFile open(const std::string &caller) {
+            OutputFile of{fileName};
+            of.ensure_open(caller);
+            return of;
+        }
+    };
 
     class GIOOutputFile
     {
@@ -173,6 +188,14 @@ public:
     OutputFile mtr_csv{"eplusmtr.csv"};
 
     OutputFile debug{"eplusout.dbg"};
+
+    OutputFile dfs{"eplusout.dfs"};
+
+    OutputFileName sln{"eplusout.sln"};
+    OutputFileName dxf{"eplusout.dxf"};
+    OutputFileName sci{"eplusout.sci"};
+    OutputFileName wrl{"eplusout.wrl"};
+
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 
@@ -192,8 +215,14 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
 // on the value being printed.
 // This is necessary for parity with the old "RoundSigDigits" utility function
 //
+// Defines a custom formatting type 'S' that behaves like Fortran's G type, but stripped of whitespace
+// 'S' was chosen for "Stripped". It is implemented in terms of 'N'
+//
 // Defines a custom formatting type 'N' that behaves like Fortran's G type.
 // 'N' was chosen for "Number"
+//
+// Defines a custom formatting type 'Z' that behaves like Fortran's E type.
+// 'Z' was chosen because Fortran's 'E' format always starts with a Zero
 //
 // Defines a custom formatting type 'T' that that truncates the value
 // to match the behavior of TrimSigDigits utility function

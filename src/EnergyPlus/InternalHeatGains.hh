@@ -79,11 +79,11 @@ namespace InternalHeatGains {
     // Functions
     void clear_state();
 
-    void ManageInternalHeatGains(EnergyPlusData &state, Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
+    void ManageInternalHeatGains(EnergyPlus::EnergyPlusData &state, Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
 
-    void GetInternalHeatGainsInput(EnergyPlusData &state, OutputFiles &outputFiles);
+    void GetInternalHeatGainsInput(EnergyPlus::EnergyPlusData &state, OutputFiles &outputFiles);
 
-    void InitInternalHeatGains(EnergyPlusData &state);
+    void InitInternalHeatGains(EnergyPlus::EnergyPlusData &state);
 
     void CheckReturnAirHeatGain();
 
