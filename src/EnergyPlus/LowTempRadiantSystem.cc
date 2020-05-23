@@ -164,14 +164,6 @@ namespace LowTempRadiantSystem {
     int const NotOperating(0); // Parameter for use with OperatingMode variable, set for heating
     int const HeatingMode(1);  // Parameter for use with OperatingMode variable, set for heating
     int const CoolingMode(2);  // Parameter for use with OperatingMode variable, set for cooling
-    // Control types:
-    int const MATControl(1);       // Controls system using mean air temperature
-    int const MRTControl(2);       // Controls system using mean radiant temperature
-    int const OperativeControl(3); // Controls system using operative temperature
-    int const ODBControl(4);       // Controls system using outside air dry-bulb temperature
-    int const OWBControl(5);       // Controls system using outside air wet-bulb temperature
-    int const SurfFaceTempControl(6);   // Controls system using the surface inside face temperature
-    int const SurfIntTempControl(7);    // Controls system using a temperature inside the radiant system construction as defined by the Construction:InternalSource input
     // Condensation control types:
     int const CondCtrlNone(0);      // Condensation control--none, so system never shuts down
     int const CondCtrlSimpleOff(1); // Condensation control--simple off, system shuts off when condensation predicted
@@ -1616,7 +1608,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    int RadiantSystemBaseData::processRadiantSystemControlInput(std::string const controlInput,
+    enum LowTempRadiantControlTypes RadiantSystemBaseData::processRadiantSystemControlInput(std::string const controlInput,
                                                                 std::string const controlInputField)
     {
         static std::string const meanAirTemperature("MeanAirTemperature");
@@ -1628,29 +1620,29 @@ namespace LowTempRadiantSystem {
         static std::string const surfaceInteriorTemperature("SurfaceInteriorTemperature");
         
         // Return value
-        int radSysCtrlType;
+        LowTempRadiantControlTypes radSysCtrlType;
 
         if (UtilityRoutines::SameString(controlInput, meanAirTemperature)) {
-            radSysCtrlType = MATControl;
+            radSysCtrlType = LowTempRadiantControlTypes::MATControl;
         } else if (UtilityRoutines::SameString(controlInput, meanRadiantTemperature)) {
-            radSysCtrlType = MRTControl;
+            radSysCtrlType = LowTempRadiantControlTypes::MRTControl;
         } else if (UtilityRoutines::SameString(controlInput, operativeTemperature)) {
-            radSysCtrlType = OperativeControl;
+            radSysCtrlType = LowTempRadiantControlTypes::OperativeControl;
         } else if (UtilityRoutines::SameString(controlInput, outsideAirDryBulbTemperature)) {
-            radSysCtrlType = ODBControl;
+            radSysCtrlType = LowTempRadiantControlTypes::ODBControl;
         } else if (UtilityRoutines::SameString(controlInput, outsideAirWetBulbTemperature)) {
-            radSysCtrlType = OWBControl;
+            radSysCtrlType = LowTempRadiantControlTypes::OWBControl;
         } else if (UtilityRoutines::SameString(controlInput, surfaceFaceTemperature)) {
-            radSysCtrlType = SurfFaceTempControl;
+            radSysCtrlType = LowTempRadiantControlTypes::SurfFaceTempControl;
         } else if (UtilityRoutines::SameString(controlInput, surfaceInteriorTemperature)) {
-             radSysCtrlType = SurfIntTempControl;
+             radSysCtrlType = LowTempRadiantControlTypes::SurfIntTempControl;
         } else {
             ShowWarningError("Invalid " + controlInputField + " = " + controlInput);
             ShowContinueError("Occurs in Low Temperature Radiant System = " + this->Name);
             ShowContinueError("Control reset to MAT control for this Low Temperature Radiant System.");
-            radSysCtrlType = MATControl;
+            radSysCtrlType = LowTempRadiantControlTypes::MATControl;
         }
-
+        
         return radSysCtrlType;
     }
 
@@ -5083,21 +5075,22 @@ namespace LowTempRadiantSystem {
         // Local Variables
         auto radSysCtrlType = this->ControlType;
         auto zoneNum = this->ZonePtr;
+        auto surfNum = this->SurfacePtr(1);
         
-        if (radSysCtrlType == MATControl) {
+        if (radSysCtrlType == LowTempRadiantControlTypes::MATControl) {
             controlTemperature = MAT(zoneNum);
-        } else if (radSysCtrlType == MRTControl) {
+        } else if (radSysCtrlType == LowTempRadiantControlTypes::MRTControl) {
             controlTemperature = MRT(zoneNum);
-        } else if (radSysCtrlType == OperativeControl) {
+        } else if (radSysCtrlType == LowTempRadiantControlTypes::OperativeControl) {
             controlTemperature = 0.5 * (MAT(zoneNum) + MRT(zoneNum));
-        } else if (radSysCtrlType == ODBControl) {
+        } else if (radSysCtrlType == LowTempRadiantControlTypes::ODBControl) {
             controlTemperature = Zone(zoneNum).OutDryBulbTemp;
-        } else if (radSysCtrlType == OWBControl) {
+        } else if (radSysCtrlType == LowTempRadiantControlTypes::OWBControl) {
             controlTemperature = Zone(zoneNum).OutWetBulbTemp;
-        } else if (radSysCtrlType == SurfFaceTempControl) {
-            controlTemperature = TempSurfIn(this->SurfacePtr(1));   // Grabs the inside face temperature of the first surface in the list
-        } else if (radSysCtrlType == SurfIntTempControl) {
-            controlTemperature = TempUserLoc(this->SurfacePtr(1));   // Grabs the temperature inside the slab at the location specified by the user
+        } else if (radSysCtrlType == LowTempRadiantControlTypes::SurfFaceTempControl) {
+            controlTemperature = TempSurfIn(surfNum);   // Grabs the inside face temperature of the first surface in the list
+        } else if (radSysCtrlType == LowTempRadiantControlTypes::SurfIntTempControl) {
+            controlTemperature = TempUserLoc(surfNum);   // Grabs the temperature inside the slab at the location specified by the user
         } else { // Should never get here
             controlTemperature = MAT(zoneNum);
             ShowSevereError("Illegal control type in low temperature radiant system: " + this->Name);

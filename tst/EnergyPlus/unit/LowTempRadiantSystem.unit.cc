@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
+#include <EnergyPlus/DataHeatBalSurface.cc>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/General.hh>
@@ -1527,7 +1528,7 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     TotalNumOfRadSystems = 0;
     CFloRadSys(RadSysNum).ZonePtr = 1;
     CFloRadSys(RadSysNum).SchedPtr = 1;
-    CFloRadSys(RadSysNum).ControlType = 1;
+    CFloRadSys(RadSysNum).ControlType = LowTempRadiantControlTypes::MATControl;
     CFloRadSys(RadSysNum).HotCtrlHiTempSchedPtr = 2;
     CFloRadSys(RadSysNum).ColdCtrlLoTempSchedPtr = 3;
 
@@ -1586,7 +1587,7 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     TotalNumOfRadSystems = 0;
     HydrRadSys(RadSysNum).ZonePtr = 1;
     HydrRadSys(RadSysNum).SchedPtr = 1;
-    HydrRadSys(RadSysNum).ControlType = 1;
+    HydrRadSys(RadSysNum).ControlType = LowTempRadiantControlTypes::MATControl;
     HydrRadSys(RadSysNum).HotSetptSchedPtr = 2;
     HydrRadSys(RadSysNum).ColdSetptSchedPtr = 3;
 
@@ -1868,8 +1869,8 @@ TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
 
     std::string inputFunction;
     std::string textField2Pass("FieldName");
-    int expectedResult;
-    int actualFunctionAnswer;
+    LowTempRadiantControlTypes expectedResult;
+    LowTempRadiantControlTypes actualFunctionAnswer;
 
     HydrRadSys.allocate(1);
     HydrRadSys(1).Name = "VariableFlowRadSys1";
@@ -1880,93 +1881,247 @@ TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
 
     // Test 1: MAT test (done for all three types of systems)
     inputFunction = meanAirTemperature;
-    expectedResult = MATControl;
-    actualFunctionAnswer = 0; // reset
+    expectedResult = LowTempRadiantControlTypes::MATControl;
+    actualFunctionAnswer = LowTempRadiantControlTypes::MRTControl; // reset
     actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MRTControl; // reset
     actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MRTControl; // reset
     actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 2: MRT test (done for all three types of systems)
     inputFunction = meanRadiantTemperature;
-    expectedResult = MRTControl;
-    actualFunctionAnswer = 0; // reset
+    expectedResult = LowTempRadiantControlTypes::MRTControl;
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 3: Operative Temperature test (done for all three types of systems)
     inputFunction = operativeTemperature;
-    expectedResult = OperativeControl;
-    actualFunctionAnswer = 0; // reset
+    expectedResult = LowTempRadiantControlTypes::OperativeControl;
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 4: Outside Dry-Bulb Temperature test (done for all three types of systems)
     inputFunction = outsideAirDryBulbTemperature;
-    expectedResult = ODBControl;
-    actualFunctionAnswer = 0; // reset
+    expectedResult = LowTempRadiantControlTypes::ODBControl;
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 5: Outside Wet-Bulb Temperature test (done for all three types of systems)
     inputFunction = outsideAirWetBulbTemperature;
-    expectedResult = OWBControl;
-    actualFunctionAnswer = 0; // reset
+    expectedResult = LowTempRadiantControlTypes::OWBControl;
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 6: Inside Face Surface Temperature test (done for all three types of systems)
     inputFunction = surfaceFaceTemperature;
-    expectedResult = SurfFaceTempControl;
-    actualFunctionAnswer = 0; // reset
+    expectedResult = LowTempRadiantControlTypes::SurfFaceTempControl;
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
 
     // Test 7: Inside Face Surface Temperature test (done for all three types of systems)
     inputFunction = surfaceInteriorTemperature;
-    expectedResult = SurfIntTempControl;
-    actualFunctionAnswer = 0; // reset
+    expectedResult = LowTempRadiantControlTypes::SurfIntTempControl;
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = HydrRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = CFloRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
-    actualFunctionAnswer = 0; // reset
+    actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = ElecRadSys(1).processRadiantSystemControlInput(inputFunction, textField2Pass);
     EXPECT_EQ(expectedResult,actualFunctionAnswer);
+
+}
+
+TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
+{
+
+    Real64 expectedResult;
+    Real64 actualResult;
+    Real64 acceptibleError = 0.001;
+    
+    DataHeatBalFanSys::MAT.allocate(1);
+    MRT.allocate(1);
+    Zone.allocate(1);
+    DataHeatBalSurface::TempSurfIn.allocate(1);
+    DataHeatBalSurface::TempUserLoc.allocate(1);
+    HydrRadSys.allocate(1);
+    CFloRadSys.allocate(1);
+    ElecRadSys.allocate(1);
+
+    // Test Data
+    DataHeatBalFanSys::MAT(1) = 23.456;
+    MRT(1) = 12.345;
+    Zone(1).OutDryBulbTemp = 34.567;
+    Zone(1).OutWetBulbTemp = 1.234;
+    DataHeatBalSurface::TempSurfIn(1) = 5.678;
+    DataHeatBalSurface::TempUserLoc(1) = 7.890;
+    HydrRadSys(1).ZonePtr = 1;
+    HydrRadSys(1).SurfacePtr.allocate(1);
+    HydrRadSys(1).SurfacePtr(1) = 1;
+    CFloRadSys(1).ZonePtr = 1;
+    CFloRadSys(1).SurfacePtr.allocate(1);
+    CFloRadSys(1).SurfacePtr(1) = 1;
+    ElecRadSys(1).ZonePtr = 1;
+    ElecRadSys(1).SurfacePtr.allocate(1);
+    ElecRadSys(1).SurfacePtr(1) = 1;
+
+    // Test 1: MAT Control
+    HydrRadSys(1).ControlType = LowTempRadiantControlTypes::MATControl;
+    expectedResult = DataHeatBalFanSys::MAT(1);
+    actualResult = 0.0; // reset
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    CFloRadSys(1).ControlType = LowTempRadiantControlTypes::MATControl;
+    expectedResult = DataHeatBalFanSys::MAT(1);
+    actualResult = 0.0; // reset
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    ElecRadSys(1).ControlType = LowTempRadiantControlTypes::MATControl;
+    expectedResult = DataHeatBalFanSys::MAT(1);
+    actualResult = 0.0; // reset
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+
+    // Test 2: MRT Control
+    HydrRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
+    expectedResult = MRT(1);
+    actualResult = 0.0; // reset
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    CFloRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
+    expectedResult = MRT(1);
+    actualResult = 0.0; // reset
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    ElecRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
+    expectedResult = MRT(1);
+    actualResult = 0.0; // reset
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+
+    // Test 3: Operative Temperature Control
+    HydrRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
+    expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
+    actualResult = 0.0; // reset
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    CFloRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
+    expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
+    actualResult = 0.0; // reset
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    ElecRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
+    expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
+    actualResult = 0.0; // reset
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    
+    // Test 4: ODB Temperature Control
+    HydrRadSys(1).ControlType = LowTempRadiantControlTypes::ODBControl;
+    expectedResult = Zone(1).OutDryBulbTemp;
+    actualResult = 0.0; // reset
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    CFloRadSys(1).ControlType = LowTempRadiantControlTypes::ODBControl;
+    expectedResult = Zone(1).OutDryBulbTemp;
+    actualResult = 0.0; // reset
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    ElecRadSys(1).ControlType = LowTempRadiantControlTypes::ODBControl;
+    expectedResult = Zone(1).OutDryBulbTemp;
+    actualResult = 0.0; // reset
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+
+    // Test 5: OWB Temperature Control
+    HydrRadSys(1).ControlType = LowTempRadiantControlTypes::OWBControl;
+    expectedResult = Zone(1).OutWetBulbTemp;
+    actualResult = 0.0; // reset
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    CFloRadSys(1).ControlType = LowTempRadiantControlTypes::OWBControl;
+    expectedResult = Zone(1).OutWetBulbTemp;
+    actualResult = 0.0; // reset
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    ElecRadSys(1).ControlType = LowTempRadiantControlTypes::OWBControl;
+    expectedResult = Zone(1).OutWetBulbTemp;
+    actualResult = 0.0; // reset
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+
+    // Test 6: Surface Inside Face Temperature Control
+    HydrRadSys(1).ControlType = LowTempRadiantControlTypes::SurfFaceTempControl;
+    expectedResult = DataHeatBalSurface::TempSurfIn(1);
+    actualResult = 0.0; // reset
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    CFloRadSys(1).ControlType = LowTempRadiantControlTypes::SurfFaceTempControl;
+    expectedResult = DataHeatBalSurface::TempSurfIn(1);
+    actualResult = 0.0; // reset
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    ElecRadSys(1).ControlType = LowTempRadiantControlTypes::SurfFaceTempControl;
+    expectedResult = DataHeatBalSurface::TempSurfIn(1);
+    actualResult = 0.0; // reset
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    
+    // Test 7: Surface Inside (within the slab) Temperature Control
+    HydrRadSys(1).ControlType = LowTempRadiantControlTypes::SurfIntTempControl;
+    expectedResult = DataHeatBalSurface::TempUserLoc(1);
+    actualResult = 0.0; // reset
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    CFloRadSys(1).ControlType = LowTempRadiantControlTypes::SurfIntTempControl;
+    expectedResult = DataHeatBalSurface::TempUserLoc(1);
+    actualResult = 0.0; // reset
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
+    ElecRadSys(1).ControlType = LowTempRadiantControlTypes::SurfIntTempControl;
+    expectedResult = DataHeatBalSurface::TempUserLoc(1);
+    actualResult = 0.0; // reset
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature();
+    EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
 }

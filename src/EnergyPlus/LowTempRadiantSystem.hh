@@ -76,11 +76,15 @@ namespace LowTempRadiantSystem {
     extern int const HeatingMode;  // Parameter for use with OperatingMode variable, set for heating
     extern int const CoolingMode;  // Parameter for use with OperatingMode variable, set for cooling
     // Control types:
-    extern int const MATControl;       // Controls system using mean air temperature
-    extern int const MRTControl;       // Controls system using mean radiant temperature
-    extern int const OperativeControl; // Controls system using operative temperature
-    extern int const ODBControl;       // Controls system using outside air dry-bulb temperature
-    extern int const OWBControl;       // Controls system using outside air wet-bulb temperature
+    enum class LowTempRadiantControlTypes {
+      MATControl,           // Controls system using mean air temperature
+      MRTControl,           // Controls system using mean radiant temperature
+      OperativeControl,     // Controls system using operative temperature
+      ODBControl,           // Controls system using outside air dry-bulb temperature
+      OWBControl,           // Controls system using outside air wet-bulb temperature
+      SurfFaceTempControl,  // Controls system using the surface inside face temperature
+      SurfIntTempControl    // Controls system using a temperature inside the radiant system construction as defined by the Construction:InternalSource input
+    };
     // Condensation control types:
     extern int const CondCtrlNone;      // Condensation control--none, so system never shuts down
     extern int const CondCtrlSimpleOff; // Condensation control--simple off, system shuts off when condensation predicted
@@ -138,18 +142,18 @@ namespace LowTempRadiantSystem {
         Array1D_string SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfaceFrac;     // Fraction of flow/pipe length or electric power for a particular surface
         Real64 TotalSurfaceArea;         // Total surface area for all surfaces that are part of this radiant system
-        int ControlType;                 // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
+        enum LowTempRadiantControlTypes ControlType; // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
         Real64 HeatPower;             // heating sent to panel in Watts
         Real64 HeatEnergy;            // heating sent to panel in Joules
 
         // Default Constructor
             RadiantSystemBaseData()
-                : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), ControlType(0)
+                : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), ControlType(LowTempRadiantControlTypes::MATControl)
             {
             }
         
-        int processRadiantSystemControlInput(std::string const controlInput,
-                                             std::string const controlInputField
+        enum LowTempRadiantControlTypes processRadiantSystemControlInput(std::string const controlInput,
+                                                                         std::string const controlInputField
         );
         
         Real64 setRadiantSystemControlTemperature();
