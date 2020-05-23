@@ -311,7 +311,7 @@ namespace SimulationManager {
         }
         ResultsFramework::resultsFramework->setupOutputOptions();
 
-        outputFiles.debug.ensure_open(outputFiles.outputControl.dbg);
+        outputFiles.debug.ensure_open("OpenOutputFiles", outputFiles.outputControl.dbg);
 
         // CreateSQLiteDatabase();
         sqlite = EnergyPlus::CreateSQLiteDatabase();
@@ -1786,19 +1786,19 @@ namespace SimulationManager {
 
         // FLOW:
         StdOutputRecordCount = 0;
-        OutputFiles::getSingleton().eso.ensure_open("OpenOutputFiles", outputFiles.outputControl.eso);
+        OutputFiles::getSingleton().eso.ensure_open("OpenOutputFiles", OutputFiles::getSingleton().outputControl.eso);
         print(OutputFiles::getSingleton().eso, "Program Version,{}\n", VerString);
 
         // Open the Initialization Output File
-        OutputFiles::getSingleton().eio.ensure_open("OpenOutputFiles", outputFiles.outputControl.eio);
+        OutputFiles::getSingleton().eio.ensure_open("OpenOutputFiles", OutputFiles::getSingleton().outputControl.eio);
         print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        OutputFiles::getSingleton().mtr.ensure_open("OpenOutputFiles", outputFiles.outputControl.mtr);
+        OutputFiles::getSingleton().mtr.ensure_open("OpenOutputFiles", OutputFiles::getSingleton().outputControl.mtr);
         print(OutputFiles::getSingleton().mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
-        OutputFiles::getSingleton().bnd.ensure_open("OpenOutputFiles", outputFiles.outputControl.bnd);
+        OutputFiles::getSingleton().bnd.ensure_open("OpenOutputFiles", OutputFiles::getSingleton().outputControl.bnd);
         print(OutputFiles::getSingleton().bnd, "Program Version,{}\n", VerString);
     }
 

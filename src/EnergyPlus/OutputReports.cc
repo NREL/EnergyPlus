@@ -259,7 +259,7 @@ void LinesOut(std::string const &option)
     lastoption = option;
     optiondone = true;
 
-    auto slnfile = OutputFiles::getSingleton().sln.open("LinesOut", outputFiles.outputControl.sln);
+    auto slnfile = OutputFiles::getSingleton().sln.open("LinesOut", OutputFiles::getSingleton().outputControl.sln);
 
     if (option != "IDF") {
         for (int surf = 1; surf <= TotSurfaces; ++surf) {
@@ -918,7 +918,7 @@ void DXFOutLines(std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = OutputFiles::getSingleton().dxf.open("DXFOutLines", outputFiles.outputControl.dxf);
+    auto dxffile = OutputFiles::getSingleton().dxf.open("DXFOutLines", OutputFiles::getSingleton().outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 

@@ -3327,7 +3327,7 @@ namespace OutputProcessor {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Daily);
         }
         if (ResultsFramework::resultsFramework->DYMeters.rDataFrameEnabled()) {
-            ResultsFramework::resultsFramework->DYMeters.newRow(fmt::to_string(Month) + "/" + fmt::to_string(DayOfMonth));
+            ResultsFramework::resultsFramework->DYMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
         }
 
         PrintTimeStamp = true;
@@ -3425,7 +3425,7 @@ namespace OutputProcessor {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Monthly);
         }
         if (ResultsFramework::resultsFramework->MNMeters.rDataFrameEnabled()) {
-            ResultsFramework::resultsFramework->MNMeters.newRow(fmt::to_string(Month));
+            ResultsFramework::resultsFramework->MNMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
         }
 
         PrintTimeStamp = true;
@@ -8847,8 +8847,8 @@ void ProduceRDDMDD()
     }
 
     auto & outputFiles = OutputFiles::getSingleton();
-    outputFiles.rdd.ensure_open(outputFiles.outputControl.rdd);
-    outputFiles.mdd.ensure_open(outputFiles.outputControl.mdd);
+    outputFiles.rdd.ensure_open("ProduceRDDMDD", outputFiles.outputControl.rdd);
+    outputFiles.mdd.ensure_open("ProduceRDDMDD", outputFiles.outputControl.mdd);
     if (ProduceReportVDD == ReportVDD_Yes) {
         print(outputFiles.rdd, "Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
         print(outputFiles.rdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", DataStringGlobals::NL);

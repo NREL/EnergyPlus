@@ -870,10 +870,7 @@ namespace ResultsFramework {
 
     void CSVWriter::writeOutput(std::vector<std::string> const & outputVariables, OutputFile & outputFile, bool outputControl)
     {
-        outputFile.ensure_open(outputControl);
-        if (!outputFile.good()) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + outputFile.fileName + " for output (write).");
-        }
+        outputFile.ensure_open("OpenOutputFiles", outputControl);
 
         print(outputFile, "{}", "Date/Time,");
         std::string sep;

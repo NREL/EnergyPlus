@@ -93,9 +93,9 @@ public:
     struct OutputFileName
     {
         std::string fileName;
-        OutputFile open(const std::string &caller) {
+        OutputFile open(const std::string &caller, bool output_to_file = true) {
             OutputFile of{fileName};
-            of.ensure_open(caller);
+            of.ensure_open(caller, output_to_file);
             return of;
         }
     };
