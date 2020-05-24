@@ -117,7 +117,6 @@ namespace PondGroundHeatExchanger {
     //   With Closed-Loop Ground-Source Heat Pump Systems.
     //   ASHRAE Transactions.  106(2):107-121.
 
-    Real64 constexpr SmallNum(1.0e-30);         // Very small number to avoid div0 errors
     Real64 constexpr StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
     auto constexpr fluidNameWater("WATER");
 
