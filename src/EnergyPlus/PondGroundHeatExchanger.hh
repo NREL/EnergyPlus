@@ -62,9 +62,6 @@ namespace EnergyPlus {
 
 namespace PondGroundHeatExchanger {
 
-    extern Real64 const SmallNum;      // Very small number to avoid div0 errors
-    extern Real64 const StefBoltzmann; // Stefan-Boltzmann constant
-
     extern int NumOfPondGHEs; // Number of pond ground heat exchangers
 
     struct PondGroundHeatExchangerData : PlantComponent
