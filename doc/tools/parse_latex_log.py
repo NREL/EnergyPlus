@@ -233,11 +233,11 @@ class LogParser:
             'locations': [{
                 'file': self._current_tex_file,
                 'line': line_no}],
-            'message': self._current_issue})
+            'message': self._current_issue.strip()})
 
     def _read_warning(self, line):
         warn = parse_warning(self._current_issue, self.src_dir)
-        if self._current_issue not in ISSUES_TO_SKIP:
+        if self._current_issue.strip() not in ISSUES_TO_SKIP:
             if warn is not None:
                 self._issues['issues'].append(warn)
             else:
@@ -248,7 +248,7 @@ class LogParser:
                     'locations': [{
                         'file': self._current_tex_file,
                         'line': line_no}],
-                    'message': self._current_issue})
+                    'message': self._current_issue.strip()})
 
     def _read_error(self, line):
         if self._current_issue not in ISSUES_TO_SKIP:
@@ -259,7 +259,7 @@ class LogParser:
                 'locations': [{
                     'file': self._current_tex_file,
                     'line': line_no}],
-                'message': self._current_issue})
+                'message': self._current_issue.strip()})
 
     def _read_issue(self, line):
         is_ws = (line.strip() == "")
