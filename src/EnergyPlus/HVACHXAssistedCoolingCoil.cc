@@ -968,13 +968,16 @@ namespace HVACHXAssistedCoolingCoil {
                 Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
                 Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
                 Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-                VariableSpeedCoils::SimVariableSpeedCoils(state, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                int CompOn = CompOp;
+                if (PartLoadRatio == 0.0) CompOn = 0;
+                VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                          HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                                                           HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
-                                                          CompOp,
+                                                          FanOpMode,
                                                           MaxONOFFCyclesperHour,
                                                           HPTimeConstant,
                                                           FanDelayTime,
-                                                          1.0,
+                                                          CompOn,
                                                           PartLoadRatio,
                                                           HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds,
                                                           QZnReq,

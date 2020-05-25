@@ -2375,9 +2375,22 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
 
     ReportAirflowNetwork();
 
-    EXPECT_NEAR(34.3673036, AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
-    EXPECT_NEAR(36.7133377, AirflowNetwork::AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
-    EXPECT_NEAR(89.3450925, AirflowNetwork::AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
+    EXPECT_NEAR(35.0349959, AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
+    EXPECT_NEAR(38.1554377, AirflowNetwork::AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
+    EXPECT_NEAR(91.0809002, AirflowNetwork::AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
+
+    Real64 hg = Psychrometrics::PsyHgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(1), DataHeatBalFanSys::MAT(1));
+    Real64 hzone = Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1));
+    Real64 hamb =  Psychrometrics::PsyHFnTdbW(0.0, DataEnvironment::OutHumRat);
+    Real64 hdiff = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * (hzone - hamb);
+    Real64 sum =
+        AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW - AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW;
+    // Existing code uses T_average to calculate hg, get close results
+    EXPECT_NEAR(hdiff, sum, 0.4);
+    Real64 dhlatent = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * hg * (DataHeatBalFanSys::ZoneAirHumRat(1) - DataEnvironment::OutHumRat);
+    // when hg is calculated with indoor temperature, get exact results
+    sum = AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW + dhlatent;
+    EXPECT_NEAR(hdiff, sum, 0.001);
 
 }
 TEST_F(EnergyPlusFixture, TestZoneVentingSchWithAdaptiveCtrl)
@@ -3048,8 +3061,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
-
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",
@@ -8223,8 +8234,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
 
 TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 {
-    std::string const idf_objects = delimited_string(
-        {"Version,9.3;",
+    std::string const idf_objects = delimited_string({
          "Material,",
          "  A1 - 1 IN STUCCO,        !- Name",
          "  Smooth,                  !- Roughness",
@@ -8955,8 +8965,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 
 TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
 {
-    std::string const idf_objects = delimited_string(
-        {"Version,9.3;",
+    std::string const idf_objects = delimited_string({
          "SimulationControl,",
          "  No,                      !- Do Zone Sizing Calculation",
          "  No,                      !- Do System Sizing Calculation",
@@ -13016,8 +13025,7 @@ TEST_F(EnergyPlusFixture, AFN_CheckNumOfFansInAirLoopTest)
 
 TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
 {
-    std::string const idf_objects = delimited_string(
-        { "Version,9.3;",
+    std::string const idf_objects = delimited_string({
         "SimulationControl,",
         "  No,                      !- Do Zone Sizing Calculation",
         "  No,                      !- Do System Sizing Calculation",
@@ -13460,8 +13468,6 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
     int i;
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
-
         "  Building,",
         "    House with AirflowNetwork simulation,  !- Name",
         "    0,                       !- North Axis {deg}",
@@ -15588,8 +15594,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
-
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",
