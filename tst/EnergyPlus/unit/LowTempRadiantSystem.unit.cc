@@ -1518,6 +1518,7 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     SystemType = ConstantFlowSystem;
     NumOfCFloLowTempRadSys = 1;
     CFloRadSys.allocate(NumOfCFloLowTempRadSys);
+    CFloRadSys(RadSysNum).SurfacePtr.allocate(1);
     Schedule.allocate(3);
     DataHeatBalFanSys::MAT.allocate(1);
     Schedule(1).CurrentValue = 1;
@@ -1531,6 +1532,7 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     CFloRadSys(RadSysNum).ControlType = LowTempRadiantControlTypes::MATControl;
     CFloRadSys(RadSysNum).HotCtrlHiTempSchedPtr = 2;
     CFloRadSys(RadSysNum).ColdCtrlLoTempSchedPtr = 3;
+    CFloRadSys(RadSysNum).SurfacePtr(1) = 1;
 
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
@@ -1577,6 +1579,8 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     //	SystemType = ConstantFlowSystem;
     NumOfHydrLowTempRadSys = 1;
     HydrRadSys.allocate(NumOfHydrLowTempRadSys);
+    HydrRadSys(RadSysNum).SurfacePtr.allocate(1);
+    HydrRadSys(RadSysNum).SurfacePtr(1) = 1;
     Schedule.allocate(3);
     DataHeatBalFanSys::MAT.allocate(1);
     Schedule(1).CurrentValue = 1;

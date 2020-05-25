@@ -5063,38 +5063,32 @@ namespace LowTempRadiantSystem {
 
     Real64 RadiantSystemBaseData::setRadiantSystemControlTemperature()
     {
-        using DataHeatBalance::MRT;
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalSurface::TempSurfIn;
-        using DataHeatBalSurface::TempUserLoc;
         
         // Return value
         Real64 controlTemperature;
-        
-        // Local Variables
-        auto radSysCtrlType = this->ControlType;
-        auto zoneNum = this->ZonePtr;
-        auto surfNum = this->SurfacePtr(1);
-        
-        if (radSysCtrlType == LowTempRadiantControlTypes::MATControl) {
-            controlTemperature = MAT(zoneNum);
-        } else if (radSysCtrlType == LowTempRadiantControlTypes::MRTControl) {
-            controlTemperature = MRT(zoneNum);
-        } else if (radSysCtrlType == LowTempRadiantControlTypes::OperativeControl) {
-            controlTemperature = 0.5 * (MAT(zoneNum) + MRT(zoneNum));
-        } else if (radSysCtrlType == LowTempRadiantControlTypes::ODBControl) {
-            controlTemperature = Zone(zoneNum).OutDryBulbTemp;
-        } else if (radSysCtrlType == LowTempRadiantControlTypes::OWBControl) {
-            controlTemperature = Zone(zoneNum).OutWetBulbTemp;
-        } else if (radSysCtrlType == LowTempRadiantControlTypes::SurfFaceTempControl) {
-            controlTemperature = TempSurfIn(surfNum);   // Grabs the inside face temperature of the first surface in the list
-        } else if (radSysCtrlType == LowTempRadiantControlTypes::SurfIntTempControl) {
-            controlTemperature = TempUserLoc(surfNum);   // Grabs the temperature inside the slab at the location specified by the user
-        } else { // Should never get here
-            controlTemperature = MAT(zoneNum);
-            ShowSevereError("Illegal control type in low temperature radiant system: " + this->Name);
-            ShowFatalError("Preceding condition causes termination.");
+                
+        switch (this->ControlType) {
+        case LowTempRadiantControlTypes::MATControl:
+            controlTemperature = DataHeatBalFanSys::MAT(this->ZonePtr);
+            break;
+        case LowTempRadiantControlTypes::MRTControl:
+            controlTemperature = DataHeatBalance::MRT(this->ZonePtr);
+            break;
+        case LowTempRadiantControlTypes::OperativeControl:
+            controlTemperature = 0.5 * (DataHeatBalFanSys::MAT(this->ZonePtr) + DataHeatBalance::MRT(this->ZonePtr));
+            break;
+        case LowTempRadiantControlTypes::ODBControl:
+            controlTemperature = DataHeatBalance::Zone(this->ZonePtr).OutDryBulbTemp;
+            break;
+        case LowTempRadiantControlTypes::OWBControl:
+            controlTemperature = DataHeatBalance::Zone(this->ZonePtr).OutWetBulbTemp;
+            break;
+        case LowTempRadiantControlTypes::SurfFaceTempControl:
+            controlTemperature = DataHeatBalSurface::TempSurfIn(this->SurfacePtr(1));   // Grabs the inside face temperature of the first surface in the list
+            break;
+        case LowTempRadiantControlTypes::SurfIntTempControl:
+            controlTemperature = DataHeatBalSurface::TempUserLoc(this->SurfacePtr(1));   // Grabs the temperature inside the slab at the location specified by the user
+            break;
         }
 
         return controlTemperature;
