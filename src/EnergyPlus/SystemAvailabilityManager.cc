@@ -2741,7 +2741,7 @@ namespace SystemAvailabilityManager {
             for (I = 1; I <= 24; ++I) {
                 for (J = 1; J <= NumOfTimeStepInHour; ++J) {
                     if (DayValues(J, I) <= 0.0) continue;
-                    FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
+                    FanStartTime = static_cast<Real64>(I - 1) + 1.0 / static_cast<Real64>(NumOfTimeStepInHour) * static_cast<Real64>(J) - 0.01;
                     exitLoop = true;
                     break;
                 }
@@ -2752,7 +2752,7 @@ namespace SystemAvailabilityManager {
             for (I = 1; I <= 24; ++I) {
                 for (J = 1; J <= NumOfTimeStepInHour; ++J) {
                     if (DayValuesTmr(J, I) <= 0.0) continue;
-                    FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
+                    FanStartTimeTmr = static_cast<Real64>(I - 1) + 1.0 / static_cast<Real64>(NumOfTimeStepInHour) * static_cast<Real64>(J) - 0.01;
                     exitLoop = true;
                     break;
                 }
