@@ -11,4 +11,8 @@ macro( CREATE_DOC_TARGET SOURCE_FILENAME OUTPUT_FILENAME )
     )
 
   add_dependencies(docs zPDF_${OUTPUT_FILENAME})
+
+  add_test(NAME ${OUTPUT_FILENAME}.test
+    COMMAND python "${PROJECT_SOURCE_DIR}/tools/parse_latex_log.py" "${PROJECT_SOURCE_DIR}/${SOURCE_FILENAME}/${SOURCE_FILENAME}.log" "${PROJECT_SOURCE_DIR}/${SOURCE_FILENAME}" "${PROJECT_BINARY_DIR}/${OUTPUT_FILENAME}_errors.json"
+    )       
 endmacro()
