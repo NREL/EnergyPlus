@@ -1389,10 +1389,10 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ProperConstruction)
         "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
 
         "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
-        "Default Algorithm,       !- Name",
+        "Default Algorithm;       !- Name",
 
         "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,",
-        "Default algorithms,      !- Name"
+        "Default algorithms;      !- Name"
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
