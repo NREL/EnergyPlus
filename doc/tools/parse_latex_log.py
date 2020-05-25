@@ -5,8 +5,16 @@ import json
 import os
 import os.path
 import pathlib
+import pdb
 import re
 import sys
+
+
+DEBUG = False
+VERBOSE = False
+EXIT_CODE_ISSUES_FOUND = 2
+EXIT_CODE_ERROR = 1
+EXIT_CODE_GOOD = 0
 
 
 SEVERITY_WARNING = 'WARNING'
@@ -15,15 +23,19 @@ SEVERITY_ERROR = 'ERROR'
 
 LINE_RE = re.compile(r"\((.*\.tex)(.*)$")
 TEX_ERROR = re.compile(r"^! (.*)$")
+GENERAL_ERROR = re.compile(
+        r"^(! )?(LaTeX|pdfTeX|Package|Class) ((.*) )?Error.*?:(.*)")
+GENERAL_WARNING = re.compile(
+        r"^(! )?(LaTeX|pdfTeX|Package|Class) ((.*) )?Warning.*?:(.*)$")
 LATEX_WARNING = re.compile(r"^LaTeX Warning: (.*)$")
 LABEL_MULTIPLY_DEFINED_WARN = re.compile(
-        r"^Label `([^']*)' multiply defined\.$")
+        r"^ Label `([^']*)' multiply defined\.$")
 HYPER_UNDEFINED_WARN = re.compile(
-        r"^Hyper reference `([^']*)' on page (\d+) " +
-        "undefined on input line (\d+)\.$")
+        r"^ Hyper reference `([^']*)' on page (\d+) " +
+        r"undefined on input line (\d+)\.$")
 LINE_NO = re.compile(r"l\.(\d+)")
-ON_INPUT_LINE = re.compile("on input line (\d+)\.")
-ISSUES_TO_SKIP = {"There were undefined references.",}
+ON_INPUT_LINE = re.compile(r"on input line (\d+)\.")
+ISSUES_TO_SKIP = {"There were undefined references.", }
 
 
 def parse_on_input_line(line):
@@ -42,7 +54,8 @@ def parse_current_tex_file(line, root_dir):
     Parse a single latex log line to find the current LaTeX file being
     processed if any.
     - line: str, the line to parse
-    - root_dir: str, the root directory of the file if found (for normalization)
+    - root_dir: str, the root directory of the file if found (for
+      normalization)
     RETURN: None or string
     """
     m = LINE_RE.search(line)
@@ -57,14 +70,33 @@ def parse_current_tex_file(line, root_dir):
     return None
 
 
-def parse_latex_warning_start(line):
+def parse_warning_start(line):
     """
     - line: str, line
-    RETURN: None, or line
+    RETURN: None OR
+    (Tuple str, str, str)
+    - the warning type
+    - warning type continued (usually for package)
+    - the message
     """
-    m = LATEX_WARNING.match(line)
+    m = GENERAL_WARNING.match(line)
     if m is not None:
-        return m.group(1)
+        return (m.group(2), m.group(4), m.group(5))
+    return None
+
+
+def parse_error_start(line):
+    """
+    - line: str, line
+    RETURN: None OR
+    (Tuple str, str, str)
+    - the error type
+    - error type continued (usually for package)
+    - the message
+    """
+    m = GENERAL_ERROR.match(line)
+    if m is not None:
+        return (m.group(2), m.group(4), m.group(5))
     return None
 
 
@@ -146,7 +178,7 @@ def parse_warning(line, src_dir):
         label = m.group(1)
         locations = find_multiply_defined_labels(src_dir, label)
         return {'severity': SEVERITY_WARNING,
-                'type':"Label multiply defined",
+                'type': "Label multiply defined",
                 'locations': locations,
                 'message': line,
                 'label': m.group(1)}
@@ -155,9 +187,9 @@ def parse_warning(line, src_dir):
         label = m.group(1)
         locations = find_undefined_hyperref(src_dir, label)
         return {'severity': SEVERITY_WARNING,
-                'type':"Hyper reference undefined",
+                'type': "Hyper reference undefined",
                 'locations': locations,
-                'message':line,
+                'message': line,
                 'label': m.group(1)}
     return None
 
@@ -173,6 +205,17 @@ def parse_line_number(message):
     return None
 
 
+def to_s(x):
+    """
+    A custom version of str(.) that prevents None from coming out as "None"
+    - x: any, the thing to "stringify"
+    RETURN: string
+    """
+    if x is None:
+        return ""
+    return str(x)
+
+
 class LogParser:
     """
     The LaTeX Log Parser.
@@ -182,21 +225,17 @@ class LogParser:
         self.src_dir = src_dir
         self.verbose = verbose
 
-
     def _read_tex_error(self, line):
-        self._reading_tex_error = False
         line_no = parse_line_number(self._current_issue)
         self._issues['issues'].append({
             'severity': SEVERITY_WARNING,
-            'type': "TeX Error",
+            'type': self._type,
             'locations': [{
                 'file': self._current_tex_file,
                 'line': line_no}],
             'message': self._current_issue})
 
-
-    def _read_latex_warning(self, line):
-        self._reading_latex_warning = False
+    def _read_warning(self, line):
         warn = parse_warning(self._current_issue, self.src_dir)
         if self._current_issue not in ISSUES_TO_SKIP:
             if warn is not None:
@@ -205,75 +244,121 @@ class LogParser:
                 line_no = parse_on_input_line(self._current_issue)
                 self._issues['issues'].append({
                     'severity': SEVERITY_WARNING,
-                    'type': 'LaTeX Warning',
+                    'type': self._type,
                     'locations': [{
                         'file': self._current_tex_file,
                         'line': line_no}],
                     'message': self._current_issue})
 
+    def _read_error(self, line):
+        if self._current_issue not in ISSUES_TO_SKIP:
+            line_no = parse_on_input_line(self._current_issue)
+            self._issues['issues'].append({
+                'severity': SEVERITY_ERROR,
+                'type': self._type,
+                'locations': [{
+                    'file': self._current_tex_file,
+                    'line': line_no}],
+                'message': self._current_issue})
 
     def _read_issue(self, line):
-        if line.strip() == "" and not ((self._issue_line == 1) and (len(line) > 1)):
-            if self._reading_tex_error:
+        is_ws = (line.strip() == "")
+        first_line = (self._issue_line == 1)
+        nonempty = len(line) > 1
+        if is_ws and (not (first_line and nonempty)):
+            if self._in_tex_err:
                 self._read_tex_error(line)
-            elif self._reading_latex_warning:
-                self._read_latex_warning(line)
-            self._current_issue = None
+            elif self._in_warn:
+                self._read_warning(line)
+            elif self._in_err:
+                self._read_error(line)
+            else:
+                raise Exception("unhandled issue read")
+            self._reset_after_read()
         else:
             self._current_issue += line
         self._issue_line += 1
 
-
     def _init_state(self):
         self._previous_line = None
         self._issue_line = None
-        self._reading_tex_error = False
-        self._reading_latex_warning = False
+        self._in_tex_err = False
+        self._in_warn = False
+        self._in_err = False
+        self._type = None
         self._current_tex_file = None
         self._current_issue = None
 
+    def _reset_after_read(self):
+        self._in_tex_err = False
+        self._in_warn = False
+        self._in_err = False
+        self._type = None
+        self._current_issue = None
 
     def _report(self, message):
         if self.verbose:
             print(message)
 
+    def _assemble_full_line(self, line):
+        if self._previous_line is not None:
+            full_line = self._previous_line.strip() + line
+        else:
+            full_line = line
+        return full_line
 
     def __call__(self):
         self._issues = {"log_file_path": self.log_path, "issues": []}
         with open(self.log_path) as rd:
             self._init_state()
             for line in rd.readlines():
-                if self._reading_tex_error or self._reading_latex_warning:
+                if (self._in_tex_err or self._in_warn or self._in_err):
+                    if DEBUG:
+                        pdb.set_trace()
                     self._read_issue(line)
                 else:
-                    issue_line = None
-                    if self._previous_line is not None:
-                        full_line = self._previous_line.strip() + line
-                    else:
-                        full_line = line
+                    self._issue_line = None
+                    full_line = self._assemble_full_line(line)
                     tex_file = parse_current_tex_file(full_line, self.src_dir)
+                    issue_start = parse_tex_error(line)
+                    warning_start = parse_warning_start(line)
+                    err_start = parse_error_start(line)
                     if tex_file is not None:
-                        self._report(f"processing {tex_file} ...")
                         self._current_tex_file = tex_file
-                    else:
-                        issue_start = parse_tex_error(line)
-                        if issue_start is not None:
-                            self._issue_line = 1
-                            self._report(f"- issue {issue_start}")
-                            self._reading_tex_error = True
-                            self._current_issue = issue_start
-                        else:
-                            warning_start = parse_latex_warning_start(line)
-                            if warning_start is not None:
-                                self._issue_line = 1
-                                self._report(f"- warning {warning_start}")
-                                self._reading_latex_warning = True
-                                self._current_issue = warning_start
+                        self._report(f"processing {tex_file} ...")
+                    elif issue_start is not None:
+                        if DEBUG:
+                            pdb.set_trace()
+                        self._issue_line = 1
+                        self._in_tex_err = True
+                        self._type = "TeX Error"
+                        self._current_issue = issue_start
+                        self._report(f"- issue {issue_start}")
+                    elif warning_start is not None:
+                        if DEBUG:
+                            pdb.set_trace()
+                        self._issue_line = 1
+                        self._in_warn = True
+                        self._type = (
+                                to_s(warning_start[0]) +
+                                " " + to_s(warning_start[1])).strip()
+                        self._current_issue = warning_start[2]
+                        self._report(f"- warning {self._current_issue}")
+                    elif err_start is not None:
+                        if DEBUG:
+                            pdb.set_trace()
+                        self._issue_line = 1
+                        self._in_err = True
+                        self._type = (
+                                to_s(err_start[0]) +
+                                " " + to_s(err_start[1])).strip()
+                        self._current_issue = err_start[2]
+                        self._report(f"- error {self._current_issue}")
                 self._previous_line = line
         return self._issues
 
 
-def parse_log(log_path, src_dir, verbose=False):
+def parse_log(log_path, src_dir, verbose=VERBOSE):
     """
     - log_path: str, the path to the LaTeX log file
     - src_dir: str, the path to the LaTeX source directory
@@ -287,18 +372,18 @@ def parse_log(log_path, src_dir, verbose=False):
     return log_parser()
 
 
-def main(log_path, error_path, json_error_path, src_dir):
+def find_issues(log_path, json_error_path, src_dir):
     """
     - log_path: string, path to LaTeX log file to read
-    - error_path: string, path to error file to write
     - json_error_path: string, path to JSON error file to write
-    - src_dir: string, path to the source directory of the processed LaTeX files
-    RETURNS: None
+    - src_dir: string, path to the source directory of the processed LaTeX
+      files
+    RETURNS: Bool
     SIDE_EFFECTS:
-    - if significant errors are found in the log_path, writes error_path with a
-      summary of issues
-    - will ONLY write the error file if an issue is found
-    - exits with a non-zero exit code if the script itself encounters any errors
+    - if significant errors are found in the log_path, writes json_error_path
+      with a summary of issues. Also writes issues to stdout
+    - will ONLY write the json error file if an issue is found
+    - returns True if issues found, else false
     """
     try:
         errs = parse_log(log_path, src_dir)
@@ -306,24 +391,27 @@ def main(log_path, error_path, json_error_path, src_dir):
         import traceback
         print(f"issue encountered in parsing log: {e}")
         traceback.print_tb(sys.last_traceback)
-        sys.exit(1)
+        sys.exit(EXIT_CODE_ERROR)
     num_issues = len(errs['issues'])
     if (num_issues > 0):
-        print(f"ISSUES: {num_issues}")
-        with open(error_path, 'w') as f:
-            for issue in errs['issues']:
-                f.write("[LATEX")
-                f.write(issue['severity'] + "::")
-                locs = [loc['file'] + ":" + str(loc['line']) for loc in issue['locations']]
-                f.write(",".join(locs) + "::")
-                msg = issue['message'].replace("\r\n", " ")
-                msg = msg.replace("\n", " ")
-                msg = msg.replace("\r", " ")
-                msg = msg.replace("\t", " ")
-                msg = " ".join(msg.split())
-                f.write(msg + "]\n")
+        if VERBOSE:
+            print(f"ISSUES: {num_issues}")
+        f = sys.stdout
+        for issue in errs['issues']:
+            f.write("[LATEX")
+            f.write(issue['severity'] + "::")
+            locs = [loc['file'] + ":" + str(loc['line'])
+                    for loc in issue['locations']]
+            f.write(",".join(locs) + "::")
+            msg = issue['message'].replace("\r\n", " ")
+            msg = msg.replace("\n", " ")
+            msg = msg.replace("\r", " ")
+            msg = msg.replace("\t", " ")
+            msg = " ".join(msg.split())
+            f.write(msg + "]\n")
         with open(json_error_path, 'w', encoding='utf-8') as f:
             json.dump(errs, f, ensure_ascii=False, indent=4)
+    return (num_issues > 0)
 
 
 def run_tests():
@@ -336,20 +424,23 @@ def run_tests():
             "/home/user/stuff/input-output-reference")
     assert out == "src/overview/group-compliance-objects.tex", f"out = {out}"
     out = parse_current_tex_file(
-            "Underfull \hbox (badness 10000) in paragraph at lines 1042--1043",
+            "Underfull \\hbox (badness 10000) in paragraph at lines " +
+            "1042--1043",
             "/home/user/stuff/input-output-reference")
     assert out is None, f"out = {out}"
     out = parse_current_tex_file(
-            "]) (./src/overview/group-location-climate-weather-file-access.tex" +
-            " [77] [78] [79",
+            "]) (./src/overview/group-location-climate-weather-file-access" +
+            ".tex [77] [78] [79",
             "/home/user/stuff/input-output-reference")
-    assert out == "src/overview/group-location-climate-weather-file-access.tex", f"out = {out}"
+    assert out == (
+            "src/overview/group-location-climate-weather-file-access.tex")
     out = parse_tex_error("! Misplaced alignment tab character &.")
     assert out == "Misplaced alignment tab character &.", f"out == {out}"
-    out = parse_latex_warning_start(
+    out = parse_warning_start(
             "LaTeX Warning: Hyper reference " +
             "`airterminalsingleductuncontrolled' on page 2467")
-    assert out == "Hyper reference `airterminalsingleductuncontrolled' on page 2467", f"out = {out}"
+    assert out[2] == (" Hyper reference `airterminalsingleductuncontrolled' " +
+                      "on page 2467"), f"out = {out}"
 
 
 if __name__ == "__main__":
@@ -378,45 +469,43 @@ if __name__ == "__main__":
                     pathlib.Path(tag + '.log')
                     ).resolve()
             assert log_path.exists()
-            err_path = f'{tag}-err.txt'
             json_err = f'{tag}-err.json'
             src_dir = (
                     current_dir / pathlib.Path('..') / pathlib.Path(tag)
                     ).resolve()
             print("="*60)
             print(f"Processing {tag}...")
-            if os.path.exists(err_path):
-                os.remove(err_path)
             if os.path.exists(json_err):
                 os.remove(json_err)
-            main(
+            find_issues(
                     log_path=str(log_path),
-                    error_path=err_path,
                     json_error_path=json_err,
                     src_dir=str(src_dir))
         print("Done!")
-        sys.exit(0)
+        sys.exit(EXIT_CODE_GOOD)
     if len(sys.argv) == 2 and (sys.argv[1] == 'test'):
         print("TESTING:")
         run_tests()
         print("all tests passed")
-        sys.exit(0)
-    if len(sys.argv) != 5:
-        print(f"USAGE python {sys.argv[0]} <latex-log-file-path> <latex-source-dir> <err-file-path> <json-err-path>")
+        sys.exit(EXIT_CODE_GOOD)
+    if len(sys.argv) != 4:
+        print("USAGE python " + sys.argv[0] + " <latex-log-file-path> " +
+              "<latex-source-dir> <json-err-path>")
         print("- <latex-log-file-path>: file path to LaTeX log file to parse")
         print("- <latex-source-dir>: path to LaTeX source directory")
-        print("- <err-file-path>: file path to error file to write if issues found")
-        print("- <json-err-path>: file path to a JSON version of the error file; only written if issues found")
-        print("NOTE: no error file is written if no significant errors/warnings found")
+        print("- <json-err-path>: file path to a JSON version of the error " +
+              "file; only written if issues found")
+        print("NOTE: no error file is written if no significant " +
+              "errors/warnings found")
         print(f"To run tests, call `python {sys.argv[0]} test'")
-        sys.exit(1)
+        sys.exit(EXIT_CODE_ERROR)
     log_path = sys.argv[1]
     src_dir = sys.argv[2]
-    err_path = sys.argv[3]
-    json_err = sys.argv[4]
-    print(f"log_path: {log_path}")
-    print(f"src_dir : {src_dir}")
-    print(f"err_path: {err_path}")
-    print(f"json_err: {json_err}")
-    main(log_path, err_path, json_err, src_dir)
-    print("Done!")
+    json_err = sys.argv[3]
+    if VERBOSE:
+        print(f"log_path: {log_path}")
+        print(f"src_dir : {src_dir}")
+        print(f"json_err: {json_err}")
+    issues_found = find_issues(log_path, json_err, src_dir)
+    if issues_found:
+        sys.exit(EXIT_CODE_ISSUES_FOUND)
