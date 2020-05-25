@@ -21,7 +21,7 @@ SEVERITY_WARNING = 'WARNING'
 SEVERITY_ERROR = 'ERROR'
 
 
-LINE_RE = re.compile(r"\((.*\.tex)(.*)$")
+LINE_RE = re.compile(r".*\((.*?\.tex)")
 TEX_ERROR = re.compile(r"^! (.*)$")
 GENERAL_ERROR = re.compile(
         r"^(! )?(LaTeX|pdfTeX|Package|Class) ((.*) )?Error.*?:(.*)")
@@ -35,7 +35,10 @@ HYPER_UNDEFINED_WARN = re.compile(
         r"undefined on input line (\d+)\.$")
 LINE_NO = re.compile(r"l\.(\d+)")
 ON_INPUT_LINE = re.compile(r"on input line (\d+)\.")
-ISSUES_TO_SKIP = {"There were undefined references.", }
+ISSUES_TO_SKIP = {
+        "There were undefined references.",
+        "There were multiply-defined labels.",
+        }
 
 
 def parse_on_input_line(line):
@@ -228,7 +231,7 @@ class LogParser:
     def _read_tex_error(self, line):
         line_no = parse_line_number(self._current_issue)
         self._issues['issues'].append({
-            'severity': SEVERITY_WARNING,
+            'severity': SEVERITY_ERROR,
             'type': self._type,
             'locations': [{
                 'file': self._current_tex_file,
@@ -334,16 +337,6 @@ class LogParser:
                         self._type = "TeX Error"
                         self._current_issue = issue_start
                         self._report(f"- issue {issue_start}")
-                    elif warning_start is not None:
-                        if DEBUG:
-                            pdb.set_trace()
-                        self._issue_line = 1
-                        self._in_warn = True
-                        self._type = (
-                                to_s(warning_start[0]) +
-                                " " + to_s(warning_start[1])).strip()
-                        self._current_issue = warning_start[2]
-                        self._report(f"- warning {self._current_issue}")
                     elif err_start is not None:
                         if DEBUG:
                             pdb.set_trace()
@@ -354,6 +347,16 @@ class LogParser:
                                 " " + to_s(err_start[1])).strip()
                         self._current_issue = err_start[2]
                         self._report(f"- error {self._current_issue}")
+                    elif warning_start is not None:
+                        if DEBUG:
+                            pdb.set_trace()
+                        self._issue_line = 1
+                        self._in_warn = True
+                        self._type = (
+                                to_s(warning_start[0]) +
+                                " " + to_s(warning_start[1])).strip()
+                        self._current_issue = warning_start[2]
+                        self._report(f"- warning {self._current_issue}")
                 self._previous_line = line
         return self._issues
 
@@ -434,6 +437,15 @@ def run_tests():
             "/home/user/stuff/input-output-reference")
     assert out == (
             "src/overview/group-location-climate-weather-file-access.tex")
+    out = parse_current_tex_file(
+            "(./src/appendix-a-units-and-abbreviations/" +
+            "standard-energyplus-conditions.tex) " +
+            "(./src/appendix-a-units-and-abbreviations/" +
+            "standard-energyplus-units.tex",
+            "/home/user/stuff/input-output-reference")
+    assert out == (
+            "src/appendix-a-units-and-abbreviations/" +
+            "standard-energyplus-units.tex"), f"out == {out}"
     out = parse_tex_error("! Misplaced alignment tab character &.")
     assert out == "Misplaced alignment tab character &.", f"out == {out}"
     out = parse_warning_start(
