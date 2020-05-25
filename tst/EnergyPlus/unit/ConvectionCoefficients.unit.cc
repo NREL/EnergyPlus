@@ -1379,8 +1379,136 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependen
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 }
 
+TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ProperConstruction)
+{
+    // This unit test checks to make sure the InsideFaceAdaptiveConvectionAlgo and OutsideFaceAdaptiveConvectionAlgo objects default construct their
+    // members to the correct algorithm integer identifiers
+
+    std::string const idf_objects = delimited_string({
+        "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
+        "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
+
+        "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
+        "Default Algorithm,       !- Name",
+
+        "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,",
+        "Default algorithms,      !- Name"
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    int algorithm_identifier;
+
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_FohannoPolidoriVerticalWall);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondUnstableHorizontal);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq3WallAwayFromHeat);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq4CeilingAwayFromHeat);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_AwbiHattonHeatedFloor);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_KaradagChilledCeiling);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq6NonHeatedWalls);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_AwbiHattonHeatedWall);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq7Ceiling);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_FohannoPolidoriVerticalWall);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq5WallNearHeat);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq7Ceiling);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWalls);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_FisherPedersenCeilDiffuserCeiling);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserFloor);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWindow);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq3WallAwayFromHeat);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq4CeilingAwayFromHeat);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedAssistingWall);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedOppossingWall);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedStableFloor);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedUnstableFloor);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedStableCeiling);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedUnstableCeiling);
+    algorithm_identifier = ConvectionCoefficients::InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum;
+    ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWindow);
+
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_SparrowWindward);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_SparrowLeeward);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_ClearRoof);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_NaturalASHRAEVerticalWall);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonStableHorizontalOrTilt);
+    algorithm_identifier = ConvectionCoefficients::OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
+    ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonUnstableHorizontalOrTilt);
+
+}
+
 TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
 {
+    // This unit test checks to make sure the InsideFaceAdaptiveConvectionAlgo and OutsideFaceAdaptiveConvectionAlgo objects assign their
+    // members to the correct algorithm integer identifiers inside the GetUserConvectionCoefficients() function
     std::string const idf_objects = delimited_string({
                                                          "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
                                                          "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
@@ -1515,26 +1643,12 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
     DataHeatBalSurface::TempSurfInTmp.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, AdaptiveModelSelections_BadInput)
+
+TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
 {
-    std::string const idf_objects = delimited_string({
-                                                         "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
-
-                                                         "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
-                                                         "Default Algorithm,                  !- Name",
-                                                         "ACurveThatDoesntExists,             !- Simple Buoyancy Vertical Wall Equation Source",
-                                                         ",                                   !- Simple Buoyancy Vertical Wall User Curve Name",
-                                                         "AlamdariHammondStableHorizontal,    !- Simple Buoyancy Stable Horizontal Equation Source",
-                                                         ",                                   !- Simple Buoyancy Stable Horizontal Equation User Curve Name",
-                                                         "AlamdariHammondUnstableHorizontal,  !- Simple Buoyancy Unstable Horizontal Equation Source",
-                                                         ";                                   !- Simple Buoyancy Unstable Horizontal Equation User Curve Name",
-                                                     });
-
-    ASSERT_DEATH(process_idf(idf_objects), "");
-}
-
-TEST_F(EnergyPlusFixture, AdaptiveModelSelections)
-{
+    // This unit test checks to make sure the InsideFaceAdaptiveConvectionAlgo and OutsideFaceAdaptiveConvectionAlgo objects assign their
+    // members to the correct algorithm integer identifiers inside the GetUserConvectionCoefficients() function when non-default assignments
+    // are specified in the idf
     std::string const idf_objects = delimited_string({
 
                                                          "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
