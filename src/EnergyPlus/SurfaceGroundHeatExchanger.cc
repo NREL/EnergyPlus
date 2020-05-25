@@ -671,7 +671,8 @@ namespace SurfaceGroundHeatExchanger {
         loopSideNum = this->LoopSideNum;
 
         // check if we are in very first call for this zone time step
-        if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && this->firstTimeThrough) {
+        if (BeginTimeStepFlag && FirstHVACIteration && PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 1) {
+        //if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && this->firstTimeThrough) {
             this->firstTimeThrough = false;
 
             // calc temps and fluxes with past env. conditions and average source flux
@@ -1395,7 +1396,8 @@ namespace SurfaceGroundHeatExchanger {
 
         loopNum = this->LoopNum;
         loopSideNum = this->LoopSideNum;
-        if (this->LastSysTimeElapsed == SysTimeElapsed) {
+        if (PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock > 0) {
+        //if (this->LastSysTimeElapsed == SysTimeElapsed) {
             // Still iterating or reducing system time step, so subtract old values which were
             // not valid
             this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / TimeStepZone;
