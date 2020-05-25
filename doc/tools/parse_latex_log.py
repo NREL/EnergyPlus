@@ -14,7 +14,7 @@ SEVERITY_ERROR = 'ERROR'
 
 
 LINE_RE = re.compile(r"\((.*\.tex)(.*)$")
-BANG_MSG = re.compile(r"^! (.*)$")
+TEX_ERROR = re.compile(r"^! (.*)$")
 LATEX_WARNING = re.compile(r"^LaTeX Warning: (.*)$")
 LABEL_MULTIPLY_DEFINED_WARN = re.compile(
         r"^Label `([^']*)' multiply defined\.$")
@@ -23,6 +23,7 @@ HYPER_UNDEFINED_WARN = re.compile(
         "undefined on input line (\d+)\.$")
 LINE_NO = re.compile(r"l\.(\d+)")
 ON_INPUT_LINE = re.compile("on input line (\d+)\.")
+ISSUES_TO_SKIP = {"There were undefined references.",}
 
 
 def parse_on_input_line(line):
@@ -67,14 +68,14 @@ def parse_latex_warning_start(line):
     return None
 
 
-def parse_bang_start(line):
+def parse_tex_error(line):
     """
     Parse a single latex log line indicating an error/warning message
     beginning.
     - line: str, the line to parse
     RETURN: None or string
     """
-    m = BANG_MSG.match(line)
+    m = TEX_ERROR.match(line)
     if m is not None:
         return m.group(1)
     return None
@@ -172,6 +173,106 @@ def parse_line_number(message):
     return None
 
 
+class LogParser:
+    """
+    The LaTeX Log Parser.
+    """
+    def __init__(self, log_path, src_dir, verbose=False):
+        self.log_path = log_path
+        self.src_dir = src_dir
+        self.verbose = verbose
+
+
+    def _read_tex_error(self, line):
+        self._reading_tex_error = False
+        line_no = parse_line_number(self._current_issue)
+        self._issues['issues'].append({
+            'severity': SEVERITY_WARNING,
+            'type': "TeX Error",
+            'locations': [{
+                'file': self._current_tex_file,
+                'line': line_no}],
+            'message': self._current_issue})
+
+
+    def _read_latex_warning(self, line):
+        self._reading_latex_warning = False
+        warn = parse_warning(self._current_issue, self.src_dir)
+        if self._current_issue not in ISSUES_TO_SKIP:
+            if warn is not None:
+                self._issues['issues'].append(warn)
+            else:
+                line_no = parse_on_input_line(self._current_issue)
+                self._issues['issues'].append({
+                    'severity': SEVERITY_WARNING,
+                    'type': 'LaTeX Warning',
+                    'locations': [{
+                        'file': self._current_tex_file,
+                        'line': line_no}],
+                    'message': self._current_issue})
+
+
+    def _read_issue(self, line):
+        if line.strip() == "" and not ((self._issue_line == 1) and (len(line) > 1)):
+            if self._reading_tex_error:
+                self._read_tex_error(line)
+            elif self._reading_latex_warning:
+                self._read_latex_warning(line)
+            self._current_issue = None
+        else:
+            self._current_issue += line
+        self._issue_line += 1
+
+
+    def _init_state(self):
+        self._previous_line = None
+        self._issue_line = None
+        self._reading_tex_error = False
+        self._reading_latex_warning = False
+        self._current_tex_file = None
+        self._current_issue = None
+
+
+    def _report(self, message):
+        if self.verbose:
+            print(message)
+
+
+    def __call__(self):
+        self._issues = {"log_file_path": self.log_path, "issues": []}
+        with open(self.log_path) as rd:
+            self._init_state()
+            for line in rd.readlines():
+                if self._reading_tex_error or self._reading_latex_warning:
+                    self._read_issue(line)
+                else:
+                    issue_line = None
+                    if self._previous_line is not None:
+                        full_line = self._previous_line.strip() + line
+                    else:
+                        full_line = line
+                    tex_file = parse_current_tex_file(full_line, self.src_dir)
+                    if tex_file is not None:
+                        self._report(f"processing {tex_file} ...")
+                        self._current_tex_file = tex_file
+                    else:
+                        issue_start = parse_tex_error(line)
+                        if issue_start is not None:
+                            self._issue_line = 1
+                            self._report(f"- issue {issue_start}")
+                            self._reading_tex_error = True
+                            self._current_issue = issue_start
+                        else:
+                            warning_start = parse_latex_warning_start(line)
+                            if warning_start is not None:
+                                self._issue_line = 1
+                                self._report(f"- warning {warning_start}")
+                                self._reading_latex_warning = True
+                                self._current_issue = warning_start
+                self._previous_line = line
+        return self._issues
+
+
 def parse_log(log_path, src_dir, verbose=False):
     """
     - log_path: str, the path to the LaTeX log file
@@ -182,78 +283,8 @@ def parse_log(log_path, src_dir, verbose=False):
                 "warnings": [{"type": str, "message": str, "key": str}*]
             }
     """
-    issues = {"log_file_path": log_path, "issues": []}
-    with open(log_path) as rd:
-        previous_line = None
-        issue_line = None
-        reading_bang_message = False
-        reading_latex_warning = False
-        current_tex_file = None
-        current_issue = None
-        for line in rd.readlines():
-            if reading_bang_message:
-                if line.strip() == "" and not ((issue_line == 1) and (len(line) > 1)):
-                    reading_bang_message = False
-                    line_no = parse_line_number(current_issue)
-                    issues['issues'].append({
-                        'severity': SEVERITY_WARNING,
-                        'type': "!",
-                        'locations': [{
-                            'file': current_tex_file,
-                            'line': line_no}],
-                        'message': current_issue})
-                    current_issue = None
-                else:
-                    current_issue += line
-                issue_line += 1
-            elif reading_latex_warning:
-                if line.strip() == "" and not ((issue_line == 1) and (len(line) > 1)):
-                    reading_latex_warning = False
-                    warn = parse_warning(current_issue, src_dir)
-                    if warn is not None:
-                        issues['issues'].append(warn)
-                    else:
-                        line_no = parse_on_input_line(current_issue)
-                        issues['issues'].append({
-                            'severity': SEVERITY_WARNING,
-                            'type': 'LaTeX Warning',
-                            'locations': [{
-                                'file': current_tex_file,
-                                'line': line_no}],
-                            'message': current_issue})
-                    current_issue = None
-                else:
-                    current_issue += line
-                issue_line += 1
-            else:
-                issue_line = None
-                if previous_line is not None:
-                    full_line = previous_line.strip() + line
-                else:
-                    full_line = line
-                tex_file = parse_current_tex_file(full_line, src_dir)
-                if tex_file is not None:
-                    if verbose:
-                        print(f"processing {tex_file} ...")
-                    current_tex_file = tex_file
-                else:
-                    issue_start = parse_bang_start(line)
-                    if issue_start is not None:
-                        issue_line = 1
-                        if verbose:
-                            print(f"- issue {issue_start}")
-                        reading_bang_message = True
-                        current_issue = issue_start
-                    else:
-                        warning_start = parse_latex_warning_start(line)
-                        if warning_start is not None:
-                            issue_line = 1
-                            if verbose:
-                                print(f"- warning {warning_start}")
-                            reading_latex_warning = True
-                            current_issue = warning_start
-            previous_line = line
-    return issues
+    log_parser = LogParser(log_path, src_dir, verbose)
+    return log_parser()
 
 
 def main(log_path, error_path, json_error_path, src_dir):
@@ -313,7 +344,7 @@ def run_tests():
             " [77] [78] [79",
             "/home/user/stuff/input-output-reference")
     assert out == "src/overview/group-location-climate-weather-file-access.tex", f"out = {out}"
-    out = parse_bang_start("! Misplaced alignment tab character &.")
+    out = parse_tex_error("! Misplaced alignment tab character &.")
     assert out == "Misplaced alignment tab character &.", f"out == {out}"
     out = parse_latex_warning_start(
             "LaTeX Warning: Hyper reference " +
