@@ -258,9 +258,6 @@ protected:
                      std::vector<Real64> const &numbers,
                      std::vector<bool> const &numbers_blank);
 
-    OutputFiles &outputFiles() {
-        return m_outputFiles.get();
-    }
 
 public:
     EnergyPlusData state;
@@ -273,7 +270,7 @@ private:
     // This function should be called by process_idf() so unit tests can take advantage of caching
     // To test this function use InputProcessorFixture
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
-    // if it makes sense for the unit test to continue after returning from function.
+    // if it makes sense for the unit test to continue after retrning from function.
     // Will return false if no errors found and true if errors found
 
     static bool process_idd(std::string const &idd, bool &errors_found);

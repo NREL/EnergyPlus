@@ -807,7 +807,7 @@ TEST_F(EnergyPlusFixture, TestAnyRanArgument)
     ASSERT_TRUE(process_idf(idf_objects));
 
     OutAirNodeManager::SetOutAirNodes();
-    NodeInputManager::SetupNodeVarsForReporting(outputFiles());
+    NodeInputManager::SetupNodeVarsForReporting(state.outputFiles);
     EMSManager::CheckIfAnyEMS();
 
     EMSManager::FinishProcessingUserInput = true;

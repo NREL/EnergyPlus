@@ -97,7 +97,7 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 
     OutAirNodeManager::SetOutAirNodes();
 
-    NodeInputManager::SetupNodeVarsForReporting(outputFiles());
+    NodeInputManager::SetupNodeVarsForReporting(state.outputFiles);
 
     EMSManager::CheckIfAnyEMS();
 

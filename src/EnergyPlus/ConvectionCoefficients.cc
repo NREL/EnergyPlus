@@ -331,7 +331,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients();
+            GetUserConvectionCoefficients(outputFiles);
             GetUserSuppliedConvectionCoeffs = false;
         }
 
@@ -547,7 +547,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients();
+            GetUserConvectionCoefficients(outputFiles);
             GetUserSuppliedConvectionCoeffs = false;
         }
 
@@ -859,7 +859,7 @@ namespace ConvectionCoefficients {
         return AgainstWind;
     }
 
-    void GetUserConvectionCoefficients()
+    void GetUserConvectionCoefficients(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:

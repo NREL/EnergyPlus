@@ -1721,7 +1721,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.outputFiles);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -1737,7 +1737,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    TestAirPathIntegrity(state, outputFiles(), ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
+    TestAirPathIntegrity(state, state.outputFiles, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
@@ -3295,7 +3295,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.outputFiles);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early

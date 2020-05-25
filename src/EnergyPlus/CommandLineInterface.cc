@@ -571,7 +571,7 @@ namespace CommandLineInterface {
             }
         }
 
-        OutputFiles::getSingleton().debug.ensure_open("OpenOutputFiles");
+        state.outputFiles.debug.ensure_open("OpenOutputFiles");
 
         // TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 
@@ -783,7 +783,8 @@ namespace CommandLineInterface {
         }
     }
 
-    int runReadVarsESO() {
+    int runReadVarsESO(OutputFiles &outputFiles)
+    {
         std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 
         if (!fileExists(readVarsPath)) {
@@ -803,7 +804,7 @@ namespace CommandLineInterface {
             if (!ofs.good()) {
                 ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
-                ofs << OutputFiles::getSingleton().eso.fileName << '\n';
+                ofs << outputFiles.eso.fileName << '\n';
                 ofs << outputCsvFileName << '\n';
             }
         }
@@ -814,7 +815,7 @@ namespace CommandLineInterface {
             if (!ofs.good()) {
                 ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
-                ofs << OutputFiles::getSingleton().mtr.fileName << '\n';
+                ofs << outputFiles.mtr.fileName << '\n';
                 ofs << outputMtrCsvFileName << '\n';
             }
         }
