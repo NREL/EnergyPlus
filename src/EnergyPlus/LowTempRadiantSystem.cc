@@ -1608,42 +1608,29 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    enum LowTempRadiantControlTypes RadiantSystemBaseData::processRadiantSystemControlInput(std::string const controlInput,
-                                                                std::string const controlInputField)
+    LowTempRadiantControlTypes RadiantSystemBaseData::processRadiantSystemControlInput(std::string const& controlInput,
+                                                                std::string const& controlInputField)
     {
-        static std::string const meanAirTemperature("MeanAirTemperature");
-        static std::string const meanRadiantTemperature("MeanRadiantTemperature");
-        static std::string const operativeTemperature("OperativeTemperature");
-        static std::string const outsideAirDryBulbTemperature("OutdoorDryBulbTemperature");
-        static std::string const outsideAirWetBulbTemperature("OutdoorWetBulbTemperature");
-        static std::string const surfaceFaceTemperature("SurfaceFaceTemperature");
-        static std::string const surfaceInteriorTemperature("SurfaceInteriorTemperature");
-        
-        // Return value
-        LowTempRadiantControlTypes radSysCtrlType;
-
-        if (UtilityRoutines::SameString(controlInput, meanAirTemperature)) {
-            radSysCtrlType = LowTempRadiantControlTypes::MATControl;
-        } else if (UtilityRoutines::SameString(controlInput, meanRadiantTemperature)) {
-            radSysCtrlType = LowTempRadiantControlTypes::MRTControl;
-        } else if (UtilityRoutines::SameString(controlInput, operativeTemperature)) {
-            radSysCtrlType = LowTempRadiantControlTypes::OperativeControl;
-        } else if (UtilityRoutines::SameString(controlInput, outsideAirDryBulbTemperature)) {
-            radSysCtrlType = LowTempRadiantControlTypes::ODBControl;
-        } else if (UtilityRoutines::SameString(controlInput, outsideAirWetBulbTemperature)) {
-            radSysCtrlType = LowTempRadiantControlTypes::OWBControl;
-        } else if (UtilityRoutines::SameString(controlInput, surfaceFaceTemperature)) {
-            radSysCtrlType = LowTempRadiantControlTypes::SurfFaceTempControl;
-        } else if (UtilityRoutines::SameString(controlInput, surfaceInteriorTemperature)) {
-             radSysCtrlType = LowTempRadiantControlTypes::SurfIntTempControl;
+        if (UtilityRoutines::SameString(controlInput, "MeanAirTemperature")) {
+            return LowTempRadiantControlTypes::MATControl;
+        } else if (UtilityRoutines::SameString(controlInput, "MeanRadiantTemperature")) {
+            return LowTempRadiantControlTypes::MRTControl;
+        } else if (UtilityRoutines::SameString(controlInput, "OperativeTemperature")) {
+            return LowTempRadiantControlTypes::OperativeControl;
+        } else if (UtilityRoutines::SameString(controlInput, "OutdoorDryBulbTemperature")) {
+            return LowTempRadiantControlTypes::ODBControl;
+        } else if (UtilityRoutines::SameString(controlInput, "OutdoorWetBulbTemperature")) {
+            return LowTempRadiantControlTypes::OWBControl;
+        } else if (UtilityRoutines::SameString(controlInput, "SurfaceFaceTemperature")) {
+            return LowTempRadiantControlTypes::SurfFaceTempControl;
+        } else if (UtilityRoutines::SameString(controlInput, "SurfaceInteriorTemperature")) {
+             return LowTempRadiantControlTypes::SurfIntTempControl;
         } else {
             ShowWarningError("Invalid " + controlInputField + " = " + controlInput);
             ShowContinueError("Occurs in Low Temperature Radiant System = " + this->Name);
             ShowContinueError("Control reset to MAT control for this Low Temperature Radiant System.");
-            radSysCtrlType = LowTempRadiantControlTypes::MATControl;
+            return LowTempRadiantControlTypes::MATControl;
         }
-        
-        return radSysCtrlType;
     }
 
     void InitLowTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -5063,36 +5050,26 @@ namespace LowTempRadiantSystem {
 
     Real64 RadiantSystemBaseData::setRadiantSystemControlTemperature()
     {
-        
-        // Return value
-        Real64 controlTemperature;
-                
         switch (this->ControlType) {
         case LowTempRadiantControlTypes::MATControl:
-            controlTemperature = DataHeatBalFanSys::MAT(this->ZonePtr);
-            break;
+            return DataHeatBalFanSys::MAT(this->ZonePtr);
         case LowTempRadiantControlTypes::MRTControl:
-            controlTemperature = DataHeatBalance::MRT(this->ZonePtr);
-            break;
+            return DataHeatBalance::MRT(this->ZonePtr);
         case LowTempRadiantControlTypes::OperativeControl:
-            controlTemperature = 0.5 * (DataHeatBalFanSys::MAT(this->ZonePtr) + DataHeatBalance::MRT(this->ZonePtr));
-            break;
+            return 0.5 * (DataHeatBalFanSys::MAT(this->ZonePtr) + DataHeatBalance::MRT(this->ZonePtr));
         case LowTempRadiantControlTypes::ODBControl:
-            controlTemperature = DataHeatBalance::Zone(this->ZonePtr).OutDryBulbTemp;
-            break;
+            return DataHeatBalance::Zone(this->ZonePtr).OutDryBulbTemp;
         case LowTempRadiantControlTypes::OWBControl:
-            controlTemperature = DataHeatBalance::Zone(this->ZonePtr).OutWetBulbTemp;
-            break;
+            return DataHeatBalance::Zone(this->ZonePtr).OutWetBulbTemp;
         case LowTempRadiantControlTypes::SurfFaceTempControl:
-            controlTemperature = DataHeatBalSurface::TempSurfIn(this->SurfacePtr(1));   // Grabs the inside face temperature of the first surface in the list
-            break;
+            return DataHeatBalSurface::TempSurfIn(this->SurfacePtr(1));   // Grabs the inside face temperature of the first surface in the list
         case LowTempRadiantControlTypes::SurfIntTempControl:
-            controlTemperature = DataHeatBalSurface::TempUserLoc(this->SurfacePtr(1));   // Grabs the temperature inside the slab at the location specified by the user
-            break;
+            return DataHeatBalSurface::TempUserLoc(this->SurfacePtr(1));   // Grabs the temperature inside the slab at the location specified by the user
+        default:
+            ShowSevereError("Illegal control type in low temperature radiant system: " + this->Name);
+            ShowFatalError("Preceding condition causes termination.");
+            return 0.0; // hush the compiler
         }
-
-        return controlTemperature;
-        
     }
 
     Real64 HydronicSystemBaseData::calculateHXEffectivenessTerm(Real64 const Temperature,   // Temperature of water entering the radiant system, in C
