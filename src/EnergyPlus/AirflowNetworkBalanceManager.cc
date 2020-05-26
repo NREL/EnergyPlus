@@ -278,8 +278,6 @@ namespace AirflowNetworkBalanceManager {
     Array1D<Real64> FacadeAng(5);           // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
     int WindDirNum;                         // Wind direction number
     Real64 WindAng;                         // Wind direction angle (degrees clockwise from North)
-    int SupplyFanInletNode(0);              // Supply air fan inlet node number
-    int SupplyFanOutletNode(0);             // Supply air fan outlet node number
     int SupplyFanType(0);                   // Supply air fan type
     Real64 OnOffFanRunTimeFraction(0.0);    // Run time fraction for an On/Off fan flow rate
     Real64 MaxOnOffFanRunTimeFraction(0.0); // max Run time fraction for an On/Off fan flow rate among airloops
@@ -349,8 +347,6 @@ namespace AirflowNetworkBalanceManager {
         FacadeAng = Array1D<Real64>(5);
         WindDirNum = 0; // added default value
         WindAng = 0;    // added default value
-        SupplyFanInletNode = 0;
-        SupplyFanOutletNode = 0;
         SupplyFanType = 0;
         OnOffFanRunTimeFraction = 0.0;
         CurrentEndTime = 0.0;
@@ -382,12 +378,6 @@ namespace AirflowNetworkBalanceManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs simulation of air distribution system.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using DataAirLoop::AirLoopAFNInfo;
@@ -530,12 +520,6 @@ namespace AirflowNetworkBalanceManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reads airflow element inputs (eventually)
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         static std::string const RoutineName{"getAirflowElementInput"};
         std::string CurrentModuleObject;
@@ -1425,8 +1409,6 @@ namespace AirflowNetworkBalanceManager {
                     outletNode = GetFanOutletNode(state.fans, "Fan:VariableVolume", fan_name, ErrorsFound);
                     VAVSystem = true;
                 }
-                SupplyFanInletNode = inletNode;
-                SupplyFanOutletNode = outletNode;
 
                 if (ErrorsFound) {
                     success = false;
@@ -1559,12 +1541,6 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reads inputs of air distribution system
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
         using DataGlobals::AnyLocalEnvironmentsInModel;
@@ -1580,18 +1556,8 @@ namespace AirflowNetworkBalanceManager {
         using OutAirNodeManager::SetOutAirNodes;
         using RoomAirModelManager::GetRAFNNodeNum;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetAirflowNetworkInput: "); // include trailing blank space
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -4843,27 +4809,8 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes variables of additional zone loads caused by ADS.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // USE STATEMENTS:
         using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool OneTimeFlag(true);
@@ -5121,27 +5068,8 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes variables and allocates dynamic arrays.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -5731,12 +5659,6 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs simulations of nodal pressures and linkage airflows.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataAirLoop::AirLoopAFNInfo;
         using DataGlobals::AnyLocalEnvironmentsInModel;
@@ -5744,18 +5666,8 @@ namespace AirflowNetworkBalanceManager {
         using DataHVACGlobals::VerySmallMassFlow;
         using General::SolveRoot;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const CycFanCycComp(1); // fan cycles with compressor operation
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -6138,28 +6050,8 @@ namespace AirflowNetworkBalanceManager {
         // METHODOLOGY EMPLOYED:
         //  Calls AIRMOV to get the pressure in the controlled zone and calculates the residual as defined above
 
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 AFNPressureResidual;
-
-        // Argument array dimensioning
-
-        // Locals
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 PressureSet;
@@ -6247,9 +6139,6 @@ namespace AirflowNetworkBalanceManager {
         // Using/Aliasing
         using namespace DataSurfaces;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:na
-        // SUBROUTINE PARAMETER DEFINITIONS
         //  index 1 is wind incidence angle (0,30,60,...,300,330 deg)
         //  index 2 is side ratio (0.25,1.0,4.0),
         static Array2D<Real64> const CPHighRiseWall(
@@ -6270,9 +6159,6 @@ namespace AirflowNetworkBalanceManager {
                                    -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55},
                                   {3, 12})); // Surface-averaged wind-pressure coefficient array for roof // Explicit reshape2 template args are
                                              // work-around for VC++2013 bug
-
-        // INTERFACE BLOCK SPECIFICATIONS:na
-        // DERIVED TYPE DEFINITIONS:na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FacadeNum;         // Facade number
@@ -6743,12 +6629,6 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs AirflowNetwork thermal simulations.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // USE STATEMENTS:
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
@@ -6758,19 +6638,6 @@ namespace AirflowNetworkBalanceManager {
         using DataHeatBalFanSys::QRadSurfAFNDuct;
         using DataHeatBalSurface::TH;
         using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -7270,28 +7137,6 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs AirflowNetwork moisture simulations.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
         int j;
@@ -7590,28 +7435,6 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs AirflowNetwork CO2 simulations.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
         int j;
@@ -7821,28 +7644,6 @@ namespace AirflowNetworkBalanceManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs AirflowNetwork generic contaminant simulations.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -8055,27 +7856,6 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine inverses a matrix
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
         int j;
@@ -8083,7 +7863,6 @@ namespace AirflowNetworkBalanceManager {
         int M;
         Real64 R1;
         Real64 S;
-        //   ############################################## MATRIX INVERSION
 
         IVEC = 0;
         for (i = 1; i <= NORDER; ++i) {
@@ -8137,8 +7916,6 @@ namespace AirflowNetworkBalanceManager {
             }
             IVEC(i + 20) = i;
         }
-        return;
-        //   ########################################################### END
     }
 
     void ReportAirflowNetwork()
@@ -8153,12 +7930,6 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reports outputs of air distribution systems
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalance::MRT;
         using DataHeatBalance::ZonePreDefRep;
@@ -8167,18 +7938,8 @@ namespace AirflowNetworkBalanceManager {
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::TurnFansOn;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Lam(2.5e6); // Heat of vaporization (J/kg)
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -8733,30 +8494,12 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine update variables used in the AirflowNetwork model.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -9369,23 +9112,12 @@ namespace AirflowNetworkBalanceManager {
         // Determines the venting opening factor for an exterior or interior window or door
         // as determined by the venting control method.
 
-        // METHODOLOGY EMPLOYED:na
-        // REFERENCES:na
-
         // Using/Aliasing
         using DataSurfaces::SurfaceWindow;
         using ScheduleManager::GetCurrentScheduleValue;
         using ThermalComfort::ThermalComfortData;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:na
-        // INTERFACE BLOCK SPECIFICATIONS:na
-        // DERIVED TYPE DEFINITIONS:na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Real64 VentTemp;                // Venting temperature (C)
         Real64 ZoneAirEnthalpy;         // Enthalpy of zone air (J/kg)
         Real64 OpenFactorMult;          // Window/door opening modulation multiplier on venting open factor
@@ -11042,29 +10774,11 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This function outputs air change per hour in a given zone
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
 
         // Return value
         Real64 ACH; // Zone air change rate [ACH]
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 InfilVolume; // Zone infiltration volume

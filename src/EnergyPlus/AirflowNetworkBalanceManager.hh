@@ -103,7 +103,6 @@ namespace AirflowNetworkBalanceManager {
     extern int DisSysNumOfLeaks;
     extern int DisSysNumOfELRs;
     extern int DisSysNumOfDucts;
-    extern int DysSysNumOfDuctViewFactors;
     extern int DisSysNumOfDampers;
     extern int DisSysNumOfCVFs;
     extern int DisSysNumOfDetFans;
@@ -118,8 +117,6 @@ namespace AirflowNetworkBalanceManager {
     extern Array1D<Real64> FacadeAng;      // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
     extern int WindDirNum;                 // Wind direction number
     extern Real64 WindAng;                 // Wind direction angle (degrees clockwise from North)
-    extern int SupplyFanInletNode;         // Supply air fan inlet node number
-    extern int SupplyFanOutletNode;        // Supply air fan outlet node number
     extern int SupplyFanType;              // Supply air fan type
     extern Real64 OnOffFanRunTimeFraction; // Run time fraction for an On/Off fan flow rate
     extern int AirflowNetworkNumOfOccuVentCtrls;
@@ -182,29 +179,29 @@ namespace AirflowNetworkBalanceManager {
 
     void CalcWindPressureCoeffs();
 
-    Real64 CalcDuctInsideConvResist(Real64 const Tair, // Average air temperature
-                                    Real64 const mdot, // Mass flow rate
-                                    Real64 const Dh,   // Hydraulic diameter
-                                    Real64 const hIn   // User defined convection coefficient
+    Real64 CalcDuctInsideConvResist(Real64 Tair, // Average air temperature
+                                    Real64 mdot, // Mass flow rate
+                                    Real64 Dh,   // Hydraulic diameter
+                                    Real64 hIn   // User defined convection coefficient
     );
 
-    Real64 CalcDuctOutsideConvResist(Real64 const Ts,      // Surface temperature
-                                     Real64 const Tamb,    // Free air temperature
-                                     Real64 const Wamb,    // Free air humidity ratio
-                                     Real64 const Pamb,    // Free air barometric pressure
-                                     Real64 const Dh,      // Hydraulic diameter
-                                     Real64 const ZoneNum, // Zone number
-                                     Real64 const hOut     // User defined convection coefficient
+    Real64 CalcDuctOutsideConvResist(Real64 Ts,      // Surface temperature
+                                     Real64 Tamb,    // Free air temperature
+                                     Real64 Wamb,    // Free air humidity ratio
+                                     Real64 Pamb,    // Free air barometric pressure
+                                     Real64 Dh,      // Hydraulic diameter
+                                     Real64 ZoneNum, // Zone number
+                                     Real64 hOut     // User defined convection coefficient
     );
 
-    Real64 CalcWindPressure(int const curve,           // Curve index, change this to pointer after curve refactor
-                            bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
-                            bool const relativeAngle,  // True if the Cp curve angle is measured relative to the surface
-                            Real64 const azimuth,      // Azimuthal angle of surface
-                            Real64 const windSpeed,    // Wind velocity
-                            Real64 const windDir,      // Wind direction
-                            Real64 const dryBulbTemp,  // Air node dry bulb temperature
-                            Real64 const humRat        // Air node humidity ratio
+    Real64 CalcWindPressure(int curve,           // Curve index, change this to pointer after curve refactor
+                            bool symmetricCurve, // True if the curve is symmetric (0 to 180)
+                            bool relativeAngle,  // True if the Cp curve angle is measured relative to the surface
+                            Real64 azimuth,      // Azimuthal angle of surface
+                            Real64 windSpeed,    // Wind velocity
+                            Real64 windDir,      // Wind direction
+                            Real64 dryBulbTemp,  // Air node dry bulb temperature
+                            Real64 humRat        // Air node humidity ratio
     );
 
     void CalcAirflowNetworkHeatBalance();
@@ -215,13 +212,13 @@ namespace AirflowNetworkBalanceManager {
 
     void CalcAirflowNetworkGCBalance();
 
-    void MRXINV(int const NORDER);
+    void MRXINV(int NORDER);
 
     void ReportAirflowNetwork();
 
     void UpdateAirflowNetwork(Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
 
-    void AirflowNetworkVentingControl(int const i,       // AirflowNetwork surface number
+    void AirflowNetworkVentingControl(int i,       // AirflowNetwork surface number
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
 
@@ -235,11 +232,11 @@ namespace AirflowNetworkBalanceManager {
 
     void CalcSingleSidedCps(std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
 
-    Real64 GetZoneInfilAirChangeRate(int const ZoneNum); // hybrid ventilation system controlled zone number
+    Real64 GetZoneInfilAirChangeRate(int ZoneNum); // hybrid ventilation system controlled zone number
 
-    int GetAirLoopNumber(EnergyPlusData &state, int const NodeNumber); // Get air loop number for each distribution node and linkage
+    int GetAirLoopNumber(EnergyPlusData &state, int NodeNumber); // Get air loop number for each distribution node and linkage
 
-    Real64 AFNPressureResidual(Real64 const ExFanMassFlowRate,
+    Real64 AFNPressureResidual(Real64 ExFanMassFlowRate,
                                Array1D<Real64> const &Par); // Residual function using Regula Falsi
 
     // derived class or struct
@@ -269,19 +266,19 @@ namespace AirflowNetworkBalanceManager {
         {
         }
 
-        void calc(int const ZoneNum,
-                  int const SurfNum,
-                  int const PrevOpeningstatus,
-                  Real64 const TimeOpenDuration,
-                  Real64 const TimeCloseDuration,
+        void calc(int ZoneNum,
+                  int SurfNum,
+                  int PrevOpeningstatus,
+                  Real64 TimeOpenDuration,
+                  Real64 TimeCloseDuration,
                   int &OpeningStatus,
                   int &OpeningProbStatus,
                   int &ClosingProbStatus); // function to perform calculations
 
-        bool openingProbability(int const ZoneNum,
-                                Real64 const TimeCloseDuration); // function to perform calculations of opening probability
+        bool openingProbability(int ZoneNum,
+                                Real64 TimeCloseDuration); // function to perform calculations of opening probability
 
-        bool closingProbability(Real64 const TimeCloseDuration); // function to perform calculations of closing probability
+        bool closingProbability(Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
 
     extern Array1D<OccupantVentilationControlProp> OccupantVentilationControl;
