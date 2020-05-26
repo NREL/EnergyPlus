@@ -362,14 +362,15 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
 
     EXPECT_EQ(DataHVACGlobals::CycleOn, SystemAvailabilityManager::OptStartSysAvailMgrData(2).AvailStatus); // avail manager should be set at 6 AM
 
+    // #8013 - Check that the optimum start is available during the correct times when using a partial hour fan start
     DataGlobals::CurrentTime = 5.00;   // set the current time to 5:00 AM, before max optimum start time
     SystemAvailabilityManager::ManageSystemAvailability();
-    EXPECT_FALSE(DataHVACGlobals::OptStartData.OptStartFlag(6)); // avail manager should be set to no action
+    EXPECT_FALSE(DataHVACGlobals::OptStartData.OptStartFlag(6)); // avail manager should be set to no action for Zone 6
     DataGlobals::CurrentTime = 6.50;   // set the current time to 6:30 AM when occupancy begins
     SystemAvailabilityManager::ManageSystemAvailability();
-    EXPECT_TRUE(DataHVACGlobals::OptStartData.OptStartFlag(6)); // avail manager should be set to no action
+    EXPECT_TRUE(DataHVACGlobals::OptStartData.OptStartFlag(6)); // avail manager should be set to cycle on for Zone 6
 
-    // Check that the system restores setpoints to unoccupied setpoints and don't use occupied setpoints post-occupancy
+    // #7866 - Check that the system restores setpoints to unoccupied setpoints and don't use occupied setpoints post-occupancy
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(OutputFiles::getSingleton());
     DataHeatBalFanSys::TempControlType.allocate(DataGlobals::NumOfZones);
     DataHeatBalFanSys::TempZoneThermostatSetPoint.allocate(DataGlobals::NumOfZones);
