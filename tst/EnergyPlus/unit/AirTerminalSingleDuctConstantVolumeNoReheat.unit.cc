@@ -506,7 +506,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     ASSERT_FALSE(ErrorsFound);
 
     SizingManager::GetOARequirements();
-    InternalHeatGains::GetInternalHeatGainsInput(state, state.outputFiles);
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
     GetSysInput(state);

@@ -4048,7 +4048,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
 
     ScheduleManager::ProcessScheduleInput(state.outputFiles);
     // get OA Controller
-    MixedAir::GetOAControllerInputs(state, state.outputFiles);
+    MixedAir::GetOAControllerInputs(state);
     int OAContrllerNum = 1;
     auto &thisOAController(MixedAir::OAController(OAContrllerNum));
     EXPECT_EQ(1, MixedAir::NumOAControllers);

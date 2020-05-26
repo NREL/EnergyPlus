@@ -444,14 +444,13 @@ namespace HeatBalanceManager {
 
         // FLOW:
 
-        auto &outputFiles = OutputFiles::getSingleton();
-        GetProjectControlData(outputFiles, ErrorsFound);
+        GetProjectControlData(state.outputFiles, ErrorsFound);
 
-        GetSiteAtmosphereData(outputFiles, ErrorsFound);
+        GetSiteAtmosphereData(state.outputFiles, ErrorsFound);
 
         GetWindowGlassSpectralData(ErrorsFound);
 
-        GetMaterialData(outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(state.outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
@@ -6273,7 +6272,7 @@ namespace HeatBalanceManager {
         // ErrorsFound = .FALSE.
         EOFonFile = false;
 
-        CheckForActualFileName(DesiredFileName, exists, TempFullFileName);
+        CheckForActualFileName(OutputFiles::getSingleton(), DesiredFileName, exists, TempFullFileName);
         // INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
         if (!exists) {
             ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Could not locate Window5 Data File, expecting it as file name=" +

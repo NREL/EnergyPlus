@@ -287,7 +287,7 @@ namespace SizingManager {
 
             ResetEnvironmentCounter();
             KickOffSizing = true;
-            SetupZoneSizing(state, state.outputFiles, ErrorsFound); // Should only be done ONCE
+            SetupZoneSizing(state, ErrorsFound); // Should only be done ONCE
             KickOffSizing = false;
 
             for (iZoneCalcIter = 1; iZoneCalcIter <= numZoneSizeIter; ++iZoneCalcIter) { // normally this is performed once but if load component
@@ -307,7 +307,7 @@ namespace SizingManager {
                 NumSizingPeriodsPerformed = 0;
                 while (Available) { // loop over environments
 
-                    GetNextEnvironment(state.dataGlobals, state.outputFiles, Available, ErrorsFound); // get an environment
+                    GetNextEnvironment(state, Available, ErrorsFound); // get an environment
 
                     if (!Available) break;
                     if (ErrorsFound) break;
@@ -358,7 +358,7 @@ namespace SizingManager {
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
-                            UpdateZoneSizing(state.dataGlobals, state.outputFiles, BeginDay);
+                            UpdateZoneSizing(state, BeginDay);
                             UpdateFacilitySizing(state.dataGlobals, BeginDay);
                         }
 
@@ -417,7 +417,7 @@ namespace SizingManager {
                         } // ... End hour loop.
 
                         if (EndDayFlag) {
-                            UpdateZoneSizing(state.dataGlobals, state.outputFiles, EndDay);
+                            UpdateZoneSizing(state, EndDay);
                             UpdateFacilitySizing(state.dataGlobals, EndDay);
                         }
 
@@ -433,7 +433,7 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(state.dataGlobals, state.outputFiles, state.dataGlobals.EndZoneSizingCalc);
+                    UpdateZoneSizing(state, state.dataGlobals.EndZoneSizingCalc);
                     UpdateFacilitySizing(state.dataGlobals, state.dataGlobals.EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
@@ -450,7 +450,7 @@ namespace SizingManager {
             // both the pulse and normal zone sizing is complete so now post processing of the results is performed
             if (CompLoadReportIsReq) {
                 // call the routine that computes the decay curve
-                ComputeLoadComponentDecayCurve(OutputFiles::getSingleton());
+                ComputeLoadComponentDecayCurve(state.outputFiles);
                 // remove some of the arrays used to derive the decay curves
                 DeallocateLoadComponentArrays();
             }
@@ -495,7 +495,7 @@ namespace SizingManager {
             NumSizingPeriodsPerformed = 0;
             while (Available) { // loop over environments
 
-                GetNextEnvironment(state.dataGlobals, state.outputFiles, Available, ErrorsFound); // get an environment
+                GetNextEnvironment(state, Available, ErrorsFound); // get an environment
 
                 // check that environment is one of the design days
                 if (KindOfSim == ksRunPeriodWeather) {
@@ -3852,7 +3852,7 @@ namespace SizingManager {
         }
     }
 
-    void SetupZoneSizing(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3883,7 +3883,7 @@ namespace SizingManager {
         CurOverallSimDay = 0;
         while (Available) { // do for each environment
 
-            GetNextEnvironment(state.dataGlobals, outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;

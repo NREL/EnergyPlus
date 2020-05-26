@@ -462,7 +462,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
 
     ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
-    MixedAir::GetOAControllerInputs(state, state.outputFiles);
+    MixedAir::GetOAControllerInputs(state);
 
     // there are two OA controller objects
     EXPECT_EQ(MixedAir::NumOAControllers, 2);
@@ -690,7 +690,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
 
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());  // read schedule data
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);  // read schedule data
     int avaiSchedIndex = ScheduleManager::GetScheduleIndex("AVAILSCHED");
     EXPECT_EQ(1, avaiSchedIndex);
     int severitySchedIndex = ScheduleManager::GetScheduleIndex("SEVERITYSCHED");

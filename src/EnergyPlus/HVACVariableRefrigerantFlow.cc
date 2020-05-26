@@ -5805,7 +5805,7 @@ namespace HVACVariableRefrigerantFlow {
         // Size TU
         if (MySizeFlag(VRFTUNum)) {
             if (!ZoneSizingCalc && !SysSizingCalc) {
-                SizeVRF(state, OutputFiles::getSingleton(), VRFTUNum);
+                SizeVRF(state, VRFTUNum);
                 TerminalUnitList(TUListIndex).TerminalUnitNotSizedYet(IndexToTUInTUList) = false;
                 MySizeFlag(VRFTUNum) = false;
             } // IF ( .NOT. ZoneSizingCalc) THEN
@@ -6849,7 +6849,7 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    void SizeVRF(EnergyPlusData &state, OutputFiles &outputFiles, int const VRFTUNum)
+    void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7985,11 +7985,11 @@ namespace HVACVariableRefrigerantFlow {
                         "! <VRF System Information>, VRF System Type, VRF System Name, VRF System Cooling Combination Ratio, VRF "
                         "System Heating Combination Ratio, VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
                         "Correction Factor\n");
-                    print(outputFiles.eio, Format_990);
+                    print(state.outputFiles.eio, Format_990);
                     MyOneTimeEIOFlag = false;
                 }
                 static constexpr auto Format_991(" VRF System Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
-                print(outputFiles.eio,
+                print(state.outputFiles.eio,
                       Format_991,
                       cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
                       VRF(VRFCond).Name,

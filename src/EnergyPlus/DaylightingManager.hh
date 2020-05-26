@@ -333,7 +333,7 @@ namespace DaylightingManager {
                                                 int const ICtrl // Window control counter
     );
 
-    void GetDaylightingParametersInput();
+    void GetDaylightingParametersInput(OutputFiles &outputFiles);
 
     void GetInputIlluminanceMap(OutputFiles &outputFiles, bool &ErrorsFound);
 

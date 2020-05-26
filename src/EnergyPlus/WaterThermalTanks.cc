@@ -236,9 +236,9 @@ namespace WaterThermalTanks {
 
         if (DataPlant::PlantFirstSizesOkayToFinalize) {
             if (!this->IsChilledWaterTank) {
-                this->CalcStandardRatings(state, OutputFiles::getSingleton());
+                this->CalcStandardRatings(state);
             } else {
-                this->ReportCWTankInits(OutputFiles::getSingleton());
+                this->ReportCWTankInits(state.outputFiles);
             }
         }
     }
@@ -6337,7 +6337,7 @@ namespace WaterThermalTanks {
                 this->AlreadyRated = true;
             } else {
                 if (!DataGlobals::AnyPlantInModel || DataPlant::PlantFirstSizesOkayToReport || this->MaxCapacity > 0.0 || this->HeatPumpNum > 0) {
-                    this->CalcStandardRatings(state, OutputFiles::getSingleton());
+                    this->CalcStandardRatings(state);
                 }
             }
         }
@@ -11443,7 +11443,7 @@ namespace WaterThermalTanks {
         this->VolumeConsumed = this->VolFlowRate * SecInTimeStep;
     }
 
-    void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state, OutputFiles &outputFiles)
+    void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11850,7 +11850,7 @@ namespace WaterThermalTanks {
             }
 
             static constexpr auto Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
-            print(outputFiles.eio,
+            print(state.outputFiles.eio,
                   Format_720,
                   this->Type,
                   this->Name,
@@ -11860,7 +11860,7 @@ namespace WaterThermalTanks {
                   EnergyFactor);
         } else {
             static constexpr auto Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
-            print(outputFiles.eio,
+            print(state.outputFiles.eio,
                   Format_721,
                   HPWaterHeater(this->HeatPumpNum).Type,
                   HPWaterHeater(this->HeatPumpNum).Name,

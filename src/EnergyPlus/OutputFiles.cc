@@ -52,6 +52,7 @@
 
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
+#include <stdexcept>
 
 namespace EnergyPlus {
 
@@ -141,19 +142,24 @@ std::vector<std::string> OutputFile::getLines()
     return std::vector<std::string>();
 }
 
-OutputFiles OutputFiles::makeOutputFiles()
-{
-    return OutputFiles();
-}
-
-OutputFiles::OutputFiles()
-{
-}
-
 OutputFiles &OutputFiles::getSingleton()
 {
-    static OutputFiles ofs{makeOutputFiles()};
-    return ofs;
+    assert(getSingletonInternal() != nullptr);
+
+    if (getSingletonInternal() == nullptr) {
+        throw std::runtime_error("Invalid impossible state of no outputfiles!?!?!");
+    }
+    return *getSingletonInternal();
+}
+
+void OutputFiles::setSingleton(OutputFiles *newSingleton) noexcept
+{
+    getSingletonInternal() = newSingleton;
+}
+
+OutputFiles *&OutputFiles::getSingletonInternal() {
+    static OutputFiles *singleton{nullptr};
+    return singleton;
 }
 
 using arg_formatter = fmt::arg_formatter<fmt::buffer_range<char>>;

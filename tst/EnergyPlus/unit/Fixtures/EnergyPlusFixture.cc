@@ -84,7 +84,7 @@ void EnergyPlusFixture::SetUpTestCase()
 void EnergyPlusFixture::SetUp()
 {
     EnergyPlus::clearThisState(state);
-    EnergyPlus::clearAllStates();
+    EnergyPlus::clearAllStates(state.outputFiles);
 
     show_message();
 
@@ -137,7 +137,7 @@ void EnergyPlusFixture::TearDown()
     }
 
     clearThisState(this->state);
-    clearAllStates();
+    clearAllStates(state.outputFiles);
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)

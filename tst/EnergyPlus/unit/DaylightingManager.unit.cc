@@ -848,10 +848,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
-    InternalHeatGains::GetInternalHeatGainsInput(state, state.outputFiles);
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
 
-    GetDaylightingParametersInput();
+    GetDaylightingParametersInput(state.outputFiles);
     compare_err_stream("");
     EXPECT_EQ(3, TotRefPoints);
 
@@ -1334,10 +1334,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
 
     int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone);
-    InternalHeatGains::GetInternalHeatGainsInput(state, state.outputFiles);
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
     DaylightingManager::GetInputDayliteRefPt(foundErrors);
-    DaylightingManager::GetDaylightingParametersInput();
+    DaylightingManager::GetDaylightingParametersInput(state.outputFiles);
     DaylightingManager::GILSK = 100.0;
     DataGlobals::WeightNow = 1.0;
     DataEnvironment::HISUNF = 100.0;

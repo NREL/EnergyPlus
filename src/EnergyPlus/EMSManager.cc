@@ -129,7 +129,7 @@ namespace EMSManager {
         FinishProcessingUserInput = true;
     }
 
-    void CheckIfAnyEMS()
+    void CheckIfAnyEMS(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -231,7 +231,7 @@ namespace EMSManager {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
                 // open up output file for EMS EDD file  EMS Data and Debug
-                OutputFiles::getSingleton().edd.ensure_open("CheckIFAnyEMS");
+                outputFiles.edd.ensure_open("CheckIFAnyEMS");
             }
         } else {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);

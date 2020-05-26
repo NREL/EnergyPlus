@@ -99,7 +99,7 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 
     NodeInputManager::SetupNodeVarsForReporting(state.outputFiles);
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
 
     EMSManager::FinishProcessingUserInput = true;
 

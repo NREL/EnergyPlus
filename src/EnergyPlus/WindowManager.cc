@@ -1825,7 +1825,7 @@ namespace WindowManager {
             }
         } // End of surface loop
 
-        ReportGlass(OutputFiles::getSingleton());
+        ReportGlass(outputFiles);
     }
 
     //*****************************************************************************************

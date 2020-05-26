@@ -7535,14 +7535,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetFanCoilUnits(state);
 

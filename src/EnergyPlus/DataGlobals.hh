@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 
@@ -296,7 +297,7 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state();
+    void clear_state(EnergyPlus::OutputFiles &outputFiles);
 
 } // namespace DataGlobals
 

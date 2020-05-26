@@ -262,7 +262,7 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state()
+    void clear_state(OutputFiles &outputFiles)
     {
         runReadVars = false;
         DDOnlySimulation = false;
@@ -295,15 +295,15 @@ namespace DataGlobals {
         TimeStep = 0;
         TimeStepZone = 0.0;
         WarmupFlag = false;
-        OutputFiles::getSingleton().eso.close();
+        outputFiles.eso.close();
         OutputStandardError = 0;
         StdOutputRecordCount = 0;
-        OutputFiles::getSingleton().debug.close();
-        OutputFiles::getSingleton().zsz.close();
-        OutputFiles::getSingleton().ssz.close();
-        OutputFiles::getSingleton().mtr.close();
+        outputFiles.debug.close();
+        outputFiles.zsz.close();
+        outputFiles.ssz.close();
+        outputFiles.mtr.close();
         OutputFilePerfLog = 0;
-        OutputFiles::getSingleton().shade.close();
+        outputFiles.shade.close();
         StdMeterRecordCount = 0;
         ZoneSizingCalc = false;
         SysSizingCalc = false;
@@ -357,7 +357,7 @@ namespace DataGlobals {
         progressCallback = nullptr;
         messageCallback = nullptr;
         errorCallback = nullptr;
-        OutputFiles::getSingleton().mtr.close();
+        outputFiles.mtr.close();
         err_stream = nullptr;
         eplusRunningViaAPI = false;
     }

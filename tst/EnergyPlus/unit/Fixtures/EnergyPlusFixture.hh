@@ -282,7 +282,6 @@ private:
     std::unique_ptr<std::ostringstream> m_delightin_stream;
     std::unique_ptr<RedirectCout> m_redirect_cout;
     std::unique_ptr<RedirectCerr> m_redirect_cerr;
-    std::reference_wrapper<OutputFiles> m_outputFiles{OutputFiles::getSingleton()};
 };
 
 } // namespace EnergyPlus

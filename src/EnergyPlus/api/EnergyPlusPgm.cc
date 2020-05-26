@@ -385,7 +385,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         ScheduleManager::ReportOrphanSchedules();
 
         if (DataGlobals::runReadVars) {
-            int status = CommandLineInterface::runReadVarsESO(outputFiles);
+            int status = CommandLineInterface::runReadVarsESO(state.outputFiles);
             if (status) {
                 return status;
             }

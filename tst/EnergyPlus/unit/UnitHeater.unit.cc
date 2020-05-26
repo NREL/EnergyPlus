@@ -1136,7 +1136,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     DataSizing::CurZoneEqNum = 1;
 
     InitUnitHeater(state, UnitHeatNum, ZoneNum, FirstHVACIteration);
-    InitWaterCoil(state, state.outputFiles, CoilNum, FirstHVACIteration); // init hot water heating coil
+    InitWaterCoil(state, CoilNum, FirstHVACIteration); // init hot water heating coil
 
     PltSizHeatNum = PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water",
                                                        UnitHeat(UnitHeatNum).HCoilName,

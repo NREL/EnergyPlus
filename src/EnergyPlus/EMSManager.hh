@@ -87,7 +87,7 @@ namespace EMSManager {
     // Functions
     void clear_state();
 
-    void CheckIfAnyEMS();
+    void CheckIfAnyEMS(OutputFiles &outputFiles);
 
     // MODULE SUBROUTINES:
 

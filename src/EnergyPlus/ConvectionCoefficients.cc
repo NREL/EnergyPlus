@@ -331,7 +331,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients(outputFiles);
+            GetUserConvectionCoefficients(OutputFiles::getSingleton());
             GetUserSuppliedConvectionCoeffs = false;
         }
 
@@ -547,7 +547,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients(outputFiles);
+            GetUserConvectionCoefficients(OutputFiles::getSingleton());
             GetUserSuppliedConvectionCoeffs = false;
         }
 
@@ -3266,7 +3266,7 @@ namespace ConvectionCoefficients {
             ShowFatalError(RoutineName + "Errors found getting input.  Program termination.");
         }
 
-        SetupAdaptiveConvectionStaticMetaData(OutputFiles::getSingleton());
+        SetupAdaptiveConvectionStaticMetaData(outputFiles);
     }
 
     void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int const Value)

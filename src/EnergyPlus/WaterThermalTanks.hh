@@ -693,7 +693,7 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankMixed(); // Water Heater being simulated
 
-        void CalcStandardRatings(EnergyPlusData &state, OutputFiles &outputFiles);
+        void CalcStandardRatings(EnergyPlusData &state);
 
         void ReportCWTankInits(OutputFiles &outputFiles);
 

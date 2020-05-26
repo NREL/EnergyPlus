@@ -310,8 +310,16 @@ namespace EnergyPlus {
         // todo: move this from a reference to an object value
         // after we have eliminated all calls to getSingleton
         // after we've plumbed enough of the functions to allow
-        OutputFiles &outputFiles = OutputFiles::getSingleton();
+        OutputFiles outputFiles;
 
+        EnergyPlusData() {
+            OutputFiles::setSingleton(&outputFiles);
+        }
+
+        // Cannot safely copy or delete this until we eradicate all remaining
+        // calls to OutputFiles::getSingleton and OutputFiles::setSingleton
+        EnergyPlusData(const EnergyPlusData &) = delete;
+        EnergyPlusData(EnergyPlusData &&) = delete;
 
         // all clear states
         void clear_state() override {

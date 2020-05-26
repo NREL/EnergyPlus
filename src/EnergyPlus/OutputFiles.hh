@@ -48,7 +48,6 @@
 #ifndef OutputFiles_hh_INCLUDED
 #define OutputFiles_hh_INCLUDED
 
-#include "DataGlobals.hh"
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -136,11 +135,11 @@ public:
 
     OutputFileName screenCsv{"eplusscreen.csv"};
 
-    static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
+    static void setSingleton(OutputFiles *newSingleton) noexcept;
 
 private:
-    OutputFiles();
+    static OutputFiles *&getSingletonInternal();
 };
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);

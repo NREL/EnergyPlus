@@ -328,7 +328,7 @@ namespace SimulationManager {
             (inputProcessor->getNumObjectsFound("RunPeriod") > 0 || inputProcessor->getNumObjectsFound("RunPeriod:CustomRange") > 0 || FullAnnualRun);
         AskForConnectionsReport = false; // set to false until sizing is finished
 
-        OpenOutputFiles();
+        OpenOutputFiles(state.outputFiles);
         GetProjectData(state.outputFiles);
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
@@ -338,7 +338,7 @@ namespace SimulationManager {
         SetupTimePointers("Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
         SetupTimePointers("HVAC", TimeStepSys);
 
-        CheckIfAnyEMS();
+        CheckIfAnyEMS(state.outputFiles);
         CheckIfAnyPlant();
         CheckIfAnySlabs();
         CheckIfAnyBasements(state);
@@ -471,7 +471,7 @@ namespace SimulationManager {
 
         // if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
         if (DoHVACSizingSimulation) {
-            ManageHVACSizingSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
+            ManageHVACSizingSimulation(state, ErrorsFound);
         }
 
         ShowMessage("Beginning Simulation");
@@ -484,7 +484,7 @@ namespace SimulationManager {
 
         while (Available) {
 
-            GetNextEnvironment(state.dataGlobals, state.outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -585,7 +585,7 @@ namespace SimulationManager {
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(state.dataGlobals, OutputFiles::getSingleton(), false);
+                            SimulateGroundDomains(state, false);
                         }
 
                         if (AnyUnderwaterBoundaries) {
@@ -678,7 +678,7 @@ namespace SimulationManager {
 
         OpenOutputTabularFile();
 
-        WriteTabularReports(state, state.outputFiles); //     Create the tabular reports at completion of each
+        WriteTabularReports(state); //     Create the tabular reports at completion of each
 
         WriteTabularTariffReports();
 
@@ -1741,7 +1741,7 @@ namespace SimulationManager {
         }
     }
 
-    void OpenOutputFiles()
+    void OpenOutputFiles(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1778,20 +1778,20 @@ namespace SimulationManager {
 
         // FLOW:
         StdOutputRecordCount = 0;
-        OutputFiles::getSingleton().eso.ensure_open("OpenOutputFiles");
-        print(OutputFiles::getSingleton().eso, "Program Version,{}\n", VerString);
+        outputFiles.eso.ensure_open("OpenOutputFiles");
+        print(outputFiles.eso, "Program Version,{}\n", VerString);
 
         // Open the Initialization Output File
-        OutputFiles::getSingleton().eio.ensure_open("OpenOutputFiles");
-        print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
+        outputFiles.eio.ensure_open("OpenOutputFiles");
+        print(outputFiles.eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        OutputFiles::getSingleton().mtr.ensure_open("OpenOutputFiles");
-        print(OutputFiles::getSingleton().mtr, "Program Version,{}\n", VerString);
+        outputFiles.mtr.ensure_open("OpenOutputFiles");
+        print(outputFiles.mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
-        OutputFiles::getSingleton().bnd.ensure_open("OpenOutputFiles");
-        print(OutputFiles::getSingleton().bnd, "Program Version,{}\n", VerString);
+        outputFiles.bnd.ensure_open("OpenOutputFiles");
+        print(outputFiles.bnd, "Program Version,{}\n", VerString);
     }
 
     void CloseOutputFiles(OutputFiles &outputFiles)
@@ -1863,7 +1863,7 @@ namespace SimulationManager {
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
 
-        OutputFiles::getSingleton().audit.ensure_open("CloseOutputFiles");
+        outputFiles.audit.ensure_open("CloseOutputFiles");
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
         print(outputFiles.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
@@ -2050,7 +2050,7 @@ namespace SimulationManager {
 
         while (Available) { // do for each environment
 
-            GetNextEnvironment(state.dataGlobals, state.outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -2113,7 +2113,7 @@ namespace SimulationManager {
         } // ... End environment loop.
 
         if (AnySlabsInModel || AnyBasementsInModel) {
-            SimulateGroundDomains(state.dataGlobals, state.outputFiles, true);
+            SimulateGroundDomains(state, true);
         }
 
         if (!ErrorsFound) SimCostEstimate(state); // basically will get and check input
