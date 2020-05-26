@@ -61,70 +61,9 @@ namespace EnergyPlus {
 
 namespace AirflowNetworkBalanceManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const VentCtrNum_None;  // Wrong input
-    extern int const VentCtrNum_Temp;  // Temperature venting control
-    extern int const VentCtrNum_Enth;  // Enthalpy venting control
-    extern int const VentCtrNum_Const; // Constant venting control
-    extern int const VentCtrNum_ASH55;
-    extern int const VentCtrNum_CEN15251;
-    extern int const VentCtrNum_Novent;    // No venting
-    extern int const VentCtrNum_ZoneLevel; // ZoneLevel control for a heat transfer subsurface
-    extern int const VentCtrNum_AdjTemp;   // Temperature venting control based on adjacent zone conditions
-    extern int const VentCtrNum_AdjEnth;   // Enthalpy venting control based on adjacent zone conditions
-    extern int const NumOfVentCtrTypes;    // Number of zone level venting control types
-
-    // DERIVED TYPE DEFINITIONS:
-    // Report variables
-
-    // MODULE VARIABLE DECLARATIONS:
-    // Report variables
-    extern Array1D<Real64> PZ;
-    // Inverse matrix
-    extern Array1D<Real64> MA;
-    extern Array1D<Real64> MV;
-    extern Array1D_int IVEC;
     extern Array1D_int SplitterNodeNumbers;
-
     extern bool AirflowNetworkGetInputFlag;
-    extern int VentilationCtrl;  // Hybrid ventilation control type
-    extern int NumOfExhaustFans; // Number of exhaust fans
-
-    extern int NumAirflowNetwork;
-    extern int AirflowNetworkNumOfDetOpenings;
-    extern int AirflowNetworkNumOfSimOpenings;
-    extern int AirflowNetworkNumOfHorOpenings;
-    extern int AirflowNetworkNumOfSurCracks;
-    extern int AirflowNetworkNumOfSurELA;
-    extern int AirflowNetworkNumOfExtNode;
-    extern int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
-    extern int DisSysNumOfNodes;
-    extern int DisSysNumOfLeaks;
-    extern int DisSysNumOfELRs;
-    extern int DisSysNumOfDucts;
-    extern int DisSysNumOfDampers;
-    extern int DisSysNumOfCVFs;
-    extern int DisSysNumOfDetFans;
-    extern int DisSysNumOfCoils;
-    extern int DisSysNumOfHXs;
-    extern int DisSysNumOfCPDs;
-    extern int DisSysNumOfTermUnits;
-    extern int DisSysNumOfLinks;
-    extern int NumOfExtNodes;
     extern int AirflowNetworkNumOfExtSurfaces;
-    extern Real64 IncAng;                  // Wind incidence angle relative to facade normal (deg)
-    extern Array1D<Real64> FacadeAng;      // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
-    extern int WindDirNum;                 // Wind direction number
-    extern Real64 WindAng;                 // Wind direction angle (degrees clockwise from North)
-    extern int SupplyFanType;              // Supply air fan type
-    extern Real64 OnOffFanRunTimeFraction; // Run time fraction for an On/Off fan flow rate
-    extern int AirflowNetworkNumOfOccuVentCtrls;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE AirflowNetworkBalanceManager:
-    // Name Public routines, optionally name Private routines within this module
-
-    // Types
 
     struct AirflowNetworkReportVars
     {
@@ -158,8 +97,6 @@ namespace AirflowNetworkBalanceManager {
 
     // Object Data
     extern Array1D<AirflowNetworkReportVars> AirflowNetworkZnRpt;
-
-    // Functions
 
     void clear_state();
 
