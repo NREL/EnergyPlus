@@ -134,13 +134,16 @@ def find_locations(root_dir, target, target_ext='.tex', verbose=False):
             if verbose:
                 print(f"checking {path}...")
             pp_path = pathlib.Path(path)
-            with open(path) as f:
-                for line_number, line in enumerate(f.readlines()):
-                    if target in line:
-                        path_to_log = str(pp_path.relative_to(pp_dir))
-                        locations.append({
-                            'file': path_to_log,
-                            'line': line_number + 1})
+            try:
+                with open(path, encoding="utf8", errors="ignore") as f:
+                    for line_number, line in enumerate(f.readlines()):
+                        if target in line:
+                            path_to_log = str(pp_path.relative_to(pp_dir))
+                            locations.append({
+                                'file': path_to_log,
+                                'line': line_number + 1})
+            except:
+                sys.exit(EXIT_CODE_ERROR)
     return locations
 
 
@@ -312,52 +315,56 @@ class LogParser:
 
     def __call__(self):
         self._issues = {"log_file_path": self.log_path, "issues": []}
-        with open(self.log_path) as rd:
-            self._init_state()
-            for line in rd.readlines():
-                if (self._in_tex_err or self._in_warn or self._in_err):
-                    if DEBUG:
-                        pdb.set_trace()
-                    self._read_issue(line)
-                else:
-                    self._issue_line = None
-                    full_line = self._assemble_full_line(line)
-                    tex_file = parse_current_tex_file(full_line, self.src_dir)
-                    issue_start = parse_tex_error(line)
-                    warning_start = parse_warning_start(line)
-                    err_start = parse_error_start(line)
-                    if tex_file is not None:
-                        self._current_tex_file = tex_file
-                        self._report(f"processing {tex_file} ...")
-                    elif issue_start is not None:
+        try:
+            with open(self.log_path, encoding="utf8", errors="ignore") as rd:
+                self._init_state()
+                for line in rd.readlines():
+                    if (self._in_tex_err or self._in_warn or self._in_err):
                         if DEBUG:
                             pdb.set_trace()
-                        self._issue_line = 1
-                        self._in_tex_err = True
-                        self._type = "TeX Error"
-                        self._current_issue = issue_start
-                        self._report(f"- issue {issue_start}")
-                    elif err_start is not None:
-                        if DEBUG:
-                            pdb.set_trace()
-                        self._issue_line = 1
-                        self._in_err = True
-                        self._type = (
-                                to_s(err_start[0]) +
-                                " " + to_s(err_start[1])).strip()
-                        self._current_issue = err_start[2]
-                        self._report(f"- error {self._current_issue}")
-                    elif warning_start is not None:
-                        if DEBUG:
-                            pdb.set_trace()
-                        self._issue_line = 1
-                        self._in_warn = True
-                        self._type = (
-                                to_s(warning_start[0]) +
-                                " " + to_s(warning_start[1])).strip()
-                        self._current_issue = warning_start[2]
-                        self._report(f"- warning {self._current_issue}")
-                self._previous_line = line
+                        self._read_issue(line)
+                    else:
+                        self._issue_line = None
+                        full_line = self._assemble_full_line(line)
+                        tex_file = parse_current_tex_file(
+                                full_line, self.src_dir)
+                        issue_start = parse_tex_error(line)
+                        warning_start = parse_warning_start(line)
+                        err_start = parse_error_start(line)
+                        if tex_file is not None:
+                            self._current_tex_file = tex_file
+                            self._report(f"processing {tex_file} ...")
+                        elif issue_start is not None:
+                            if DEBUG:
+                                pdb.set_trace()
+                            self._issue_line = 1
+                            self._in_tex_err = True
+                            self._type = "TeX Error"
+                            self._current_issue = issue_start
+                            self._report(f"- issue {issue_start}")
+                        elif err_start is not None:
+                            if DEBUG:
+                                pdb.set_trace()
+                            self._issue_line = 1
+                            self._in_err = True
+                            self._type = (
+                                    to_s(err_start[0]) +
+                                    " " + to_s(err_start[1])).strip()
+                            self._current_issue = err_start[2]
+                            self._report(f"- error {self._current_issue}")
+                        elif warning_start is not None:
+                            if DEBUG:
+                                pdb.set_trace()
+                            self._issue_line = 1
+                            self._in_warn = True
+                            self._type = (
+                                    to_s(warning_start[0]) +
+                                    " " + to_s(warning_start[1])).strip()
+                            self._current_issue = warning_start[2]
+                            self._report(f"- warning {self._current_issue}")
+                    self._previous_line = line
+        except:
+            return sys.exit(EXIT_CODE_ERROR)
         return self._issues
 
 
