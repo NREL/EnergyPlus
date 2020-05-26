@@ -219,9 +219,9 @@
 #include <unistd.h>
 #endif
 
-void EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath)
+int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath)
 {
-    std::exit(RunEnergyPlus(state, filepath));
+    return RunEnergyPlus(state, filepath);
 }
 
 int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath) {
