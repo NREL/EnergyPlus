@@ -60,6 +60,7 @@
 
 namespace EnergyPlus {
 
+    struct EnergyPlusData;
     struct FansData;
 
 namespace Fans {
@@ -335,7 +336,7 @@ namespace Fans {
     int getFanInNodeIndex(FansData &fans, int const &FanIndex, // fan index
                           bool &ErrorsFound    // set to true if problem
     );
-        
+
     int GetFanOutletNode(FansData &fans, std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem
