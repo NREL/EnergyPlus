@@ -258,6 +258,8 @@ protected:
                      std::vector<Real64> const &numbers,
                      std::vector<bool> const &numbers_blank);
 
+    // Opens output files as stringstreams
+    void openOutputFiles(OutputFiles &outputFiles);
 
 public:
     EnergyPlusData state;

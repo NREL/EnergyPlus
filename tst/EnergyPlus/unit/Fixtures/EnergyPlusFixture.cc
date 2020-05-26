@@ -55,10 +55,10 @@
 #include "EnergyPlusFixture.hh"
 
 // A to Z order
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
@@ -67,10 +67,10 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <nlohmann/json.hpp>
 #include <EnergyPlus/StateManagement.hh>
 #include <algorithm>
 #include <fstream>
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
@@ -81,6 +81,18 @@ void EnergyPlusFixture::SetUpTestCase()
     EnergyPlus::inputProcessor = InputProcessor::factory();
 }
 
+void EnergyPlusFixture::openOutputFiles(OutputFiles &outputFiles)
+{
+    outputFiles.eio.open_as_stringstream();
+    outputFiles.mtr.open_as_stringstream();
+    outputFiles.eso.open_as_stringstream();
+    outputFiles.audit.open_as_stringstream();
+    outputFiles.bnd.open_as_stringstream();
+    outputFiles.debug.open_as_stringstream();
+    outputFiles.mtd.open_as_stringstream();
+    outputFiles.edd.open_as_stringstream();
+}
+
 void EnergyPlusFixture::SetUp()
 {
     EnergyPlus::clearThisState(state);
@@ -88,15 +100,8 @@ void EnergyPlusFixture::SetUp()
 
     show_message();
 
-    state.outputFiles.eio.open_as_stringstream();
-    state.outputFiles.mtr.open_as_stringstream();
-    state.outputFiles.eso.open_as_stringstream();
-    state.outputFiles.audit.open_as_stringstream();
-    state.outputFiles.bnd.open_as_stringstream();
-    state.outputFiles.debug.open_as_stringstream();
-    state.outputFiles.mtd.open_as_stringstream();
-    state.outputFiles.edd.open_as_stringstream();
-
+    openOutputFiles(state.outputFiles);
+    
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
 
@@ -279,9 +284,7 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
 
     // Add common objects that will trigger a warning if not present
     if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {
-        inputProcessor->epJSON["Version"] = {{"",
-                                               {{"idf_order", 0},
-                                                {"version_identifier", DataStringGlobals::MatchVersion}}}};
+        inputProcessor->epJSON["Version"] = {{"", {{"idf_order", 0}, {"version_identifier", DataStringGlobals::MatchVersion}}}};
     }
     if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
         inputProcessor->epJSON["Building"] = {{"Bldg",
