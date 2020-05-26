@@ -64,7 +64,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
-#include <EnergyPlus/DataHeatBalSurface.cc>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/General.hh>
