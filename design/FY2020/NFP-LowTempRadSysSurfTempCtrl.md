@@ -5,6 +5,7 @@ Low Temperature Radiant System Surface Temperature Control
 
  - Original Date: April 29, 2020
  - Latest Revision Date: May 11, 2020 (Version 4, Design Document)
+ - Minor edit/correction of type: May 25, 2020 (Version 5)
  
 
 ## Justification for New Feature ##
@@ -60,7 +61,7 @@ The SurfaceFaceTemperature option allows the user to control the radiant system 
 
 Similar changes need to be made in the constant flow and electric radiant systems.
 
-Note that the text for the Field: Temperature Calculation Requested After Layer Number in Contstruction:InternalSource will also be modified to reflect this additional interpretation of this input field and the change to its interpretation for 2-D solutions.  Here is the proposed additional text:
+Note that the text for the Field: Temperature Calculation Requested After Layer Number in Construction:InternalSource will also be modified to reflect this additional interpretation of this input field and the change to its interpretation for 2-D solutions.  Here is the proposed additional text:
 
 “In addition, this field is also used by the radiant system model when the user selects the SurfaceInterior control method.  In this control type, the user is controlling the system based on a temperature on the interior of the slab.  This field then also sets this point inside the slab for this control.  Note also that when this field is used in conjunction with a 2-D solution (see next input field) that the interior temperature being calculated (and then used for control) will be calculated at the depth specified and at the mid-point between the tubing (not at the horizontal point in-line with the tubing).”
 
