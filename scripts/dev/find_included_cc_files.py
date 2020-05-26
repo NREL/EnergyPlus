@@ -18,13 +18,12 @@ for this_root in full_path_dirs_to_search:
                 continue
             file_path = os.path.join(root, filename)
             relative_file_path = os.path.relpath(file_path, repo_root)
-            # print("processing file: " + relative_file_path)
-            # if 'LowTempRadiantSystem.unit.cc' in relative_file_path:
-            #     i = 1
             try:
                 with io.open(file_path, encoding='utf-8', errors='strict') as f_idf:
                     idf_text = f_idf.read()
+                    line_num = 0
                     for line in idf_text.split('\n'):
+                        line_num += 1
                         line = line.strip()
                         if '#include' in line and '<' in line and '>' in line:
                             include_token = line.split('<')[1].split('>')[0].strip()
@@ -32,6 +31,7 @@ for this_root in full_path_dirs_to_search:
                                 ci_msg = {'tool': 'find_included_cc_files',
                                           'filename': filename,
                                           'file': relative_file_path,
+                                          'line': line_num,
                                           'messagetype': 'error',
                                           'message': ("Found included CC file: '{}'".format(line))
                                           }
