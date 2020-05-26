@@ -52,8 +52,6 @@
 #include <vector>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -61,6 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -688,7 +687,7 @@ namespace WeatherManager {
 
     void ResetEnvironmentCounter();
 
-    bool GetNextEnvironment(OutputFiles &outputFiles,
+    bool GetNextEnvironment(DataGlobal &dataGlobals, OutputFiles &outputFiles,
                             bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     );
@@ -708,9 +707,9 @@ namespace WeatherManager {
 
     void UpdateLocationAndOrientation();
 
-    void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, Array1A_int WeekDays);
+    void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, Array1D_int &WeekDays);
 
-    void ResetWeekDaysByMonth(Array1A_int WeekDays,
+    void ResetWeekDaysByMonth(Array1D_int &WeekDays,
                               int const LeapYearAdd,
                               int const StartMonth,
                               int const StartMonthDay,
@@ -719,14 +718,14 @@ namespace WeatherManager {
                               bool const Rollover,
                               Optional_bool_const MidSimReset = _);
 
-    void SetDSTDateRanges(Array1S_int MonWeekDay, // Weekday of each day 1 of month
-                          Array1S_int DSTIndex,   // DST Index for each julian day (1:366)
+    void SetDSTDateRanges(Array1D_int &MonWeekDay, // Weekday of each day 1 of month
+                          Array1D_int &DSTIndex,   // DST Index for each julian day (1:366)
                           Optional_int DSTActStMon = _,
                           Optional_int DSTActStDay = _,
                           Optional_int DSTActEnMon = _,
                           Optional_int DSTActEnDay = _);
 
-    void SetSpecialDayDates(Array1S_int MonWeekDay); // Weekday of each day 1 of month
+    void SetSpecialDayDates(Array1D_int &MonWeekDay); // Weekday of each day 1 of month
 
     void InitializeWeather(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
@@ -739,7 +738,8 @@ namespace WeatherManager {
                            bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     );
 
-    void ReadEPlusWeatherForDay(int const DayToRead,          // =1 when starting out, otherwise signifies next day
+    void ReadEPlusWeatherForDay(OutputFiles &outputFiles,
+                                int const DayToRead,          // =1 when starting out, otherwise signifies next day
                                 int const Environ,            // Environment being simulated
                                 bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     );
@@ -752,40 +752,40 @@ namespace WeatherManager {
     );
 
     void InterpretWeatherDataLine(std::string &Line,
-                                  bool &ErrorFound,      // True if an error is found, false otherwise
+                                  bool &ErrorFound,       // True if an error is found, false otherwise
                                   int &WYear,
                                   int &WMonth,
                                   int &WDay,
                                   int &WHour,
                                   int &WMinute,
-                                  Real64 &RField1,       // DryBulb
-                                  Real64 &RField2,       // DewPoint
-                                  Real64 &RField3,       // RelHum
-                                  Real64 &RField4,       // AtmPress
-                                  Real64 &RField5,       // ETHoriz
-                                  Real64 &RField6,       // ETDirect
-                                  Real64 &RField7,       // IRHoriz
-                                  Real64 &RField8,       // GLBHoriz
-                                  Real64 &RField9,       // DirectRad
-                                  Real64 &RField10,      // DiffuseRad
-                                  Real64 &RField11,      // GLBHorizIllum
-                                  Real64 &RField12,      // DirectNrmIllum
-                                  Real64 &RField13,      // DiffuseHorizIllum
-                                  Real64 &RField14,      // ZenLum
-                                  Real64 &RField15,      // WindDir
-                                  Real64 &RField16,      // WindSpeed
-                                  Real64 &RField17,      // TotalSkyCover
-                                  Real64 &RField18,      // OpaqueSkyCover
-                                  Real64 &RField19,      // Visibility
-                                  Real64 &RField20,      // CeilHeight
-                                  int &WObs,             // PresWeathObs
-                                  Array1A_int WCodesArr, // PresWeathConds
-                                  Real64 &RField22,      // PrecipWater
-                                  Real64 &RField23,      // AerosolOptDepth
-                                  Real64 &RField24,      // SnowDepth
-                                  Real64 &RField25,      // DaysSinceLastSnow
-                                  Real64 &RField26,      // Albedo
-                                  Real64 &RField27       // LiquidPrecip
+                                  Real64 &RField1,        // DryBulb
+                                  Real64 &RField2,        // DewPoint
+                                  Real64 &RField3,        // RelHum
+                                  Real64 &RField4,        // AtmPress
+                                  Real64 &RField5,        // ETHoriz
+                                  Real64 &RField6,        // ETDirect
+                                  Real64 &RField7,        // IRHoriz
+                                  Real64 &RField8,        // GLBHoriz
+                                  Real64 &RField9,        // DirectRad
+                                  Real64 &RField10,       // DiffuseRad
+                                  Real64 &RField11,       // GLBHorizIllum
+                                  Real64 &RField12,       // DirectNrmIllum
+                                  Real64 &RField13,       // DiffuseHorizIllum
+                                  Real64 &RField14,       // ZenLum
+                                  Real64 &RField15,       // WindDir
+                                  Real64 &RField16,       // WindSpeed
+                                  Real64 &RField17,       // TotalSkyCover
+                                  Real64 &RField18,       // OpaqueSkyCover
+                                  Real64 &RField19,       // Visibility
+                                  Real64 &RField20,       // CeilHeight
+                                  int &WObs,              // PresWeathObs
+                                  Array1D_int &WCodesArr, // PresWeathConds
+                                  Real64 &RField22,       // PrecipWater
+                                  Real64 &RField23,       // AerosolOptDepth
+                                  Real64 &RField24,       // SnowDepth
+                                  Real64 &RField25,       // DaysSinceLastSnow
+                                  Real64 &RField26,       // Albedo
+                                  Real64 &RField27        // LiquidPrecip
     );
 
     void SetUpDesignDay(OutputFiles &outputFiles, int const EnvrnNum); // Environment number passed into the routine
@@ -824,13 +824,14 @@ namespace WeatherManager {
                                       Real64 const EqOfTime,     // Equation of Time
                                       Real64 const SinSolDeclin, // Sine of Solar Declination
                                       Real64 const CosSolDeclin, // Cosine of Solar Declination
-                                      Array1A<Real64> SUNCOS);
+                                      Array1D<Real64> &SUNCOS);
 
-    void DetermineSunUpDown(Array1A<Real64> SunDirectionCosines);
+    void DetermineSunUpDown(Array1D<Real64> &SunDirectionCosines);
 
     void OpenWeatherFile(bool &ErrorsFound);
 
-    void OpenEPlusWeatherFile(bool &ErrorsFound,       // Will be set to true if errors found
+    void OpenEPlusWeatherFile(OutputFiles &outputFiles,
+                              bool &ErrorsFound,       // Will be set to true if errors found
                               bool const ProcessHeader // Set to true when headers should be processed (rather than just read)
     );
 
@@ -842,11 +843,12 @@ namespace WeatherManager {
 
     void CheckWeatherFileValidity();
 
-    void ReportOutputFileHeaders();
+    void ReportOutputFileHeaders(OutputFiles &outputFiles);
 
-    void ReportWeatherAndTimeInformation(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
+    void ReportWeatherAndTimeInformation(OutputFiles &outputFiles,
+                                         bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
-    void ReadUserWeatherInput(OutputFiles &outputFiles);
+    void ReadUserWeatherInput(DataGlobal &dataGlobals, OutputFiles &outputFiles);
 
     void GetRunPeriodData(int &TotRunPers, // Total number of Run Periods requested
                           bool &ErrorsFound);
@@ -866,7 +868,7 @@ namespace WeatherManager {
 
     void GetWeatherProperties(bool &ErrorsFound);
 
-    void GetGroundTemps(bool &ErrorsFound);
+    void GetGroundTemps(DataGlobal &dataGlobals, bool &ErrorsFound);
 
     void GetGroundReflectances(OutputFiles &outputFiles, bool &ErrorsFound);
 

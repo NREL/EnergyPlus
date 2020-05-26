@@ -64,6 +64,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -188,7 +189,7 @@ void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(int cons
     // as more sizing adjustments are added this will need to change to consider all not just plant coincident
     FinalSizingHVACSizingSimIteration = plantCoinAnalyRequestsAnotherIteration;
 }
-void HVACSizingSimulationManager::RedoKickOffAndResize()
+void HVACSizingSimulationManager::RedoKickOffAndResize(EnergyPlusData &state)
 {
     using DataGlobals::KickOffSimulation;
     using DataGlobals::RedoSizesHVACSimulation;
@@ -199,7 +200,7 @@ void HVACSizingSimulationManager::RedoKickOffAndResize()
     RedoSizesHVACSimulation = true;
 
     ResetEnvironmentCounter();
-    SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SetupSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
 
     KickOffSimulation = false;
     RedoSizesHVACSimulation = false;
@@ -217,7 +218,7 @@ void HVACSizingSimulationManager::UpdateSizingLogsSystemStep()
 
 std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
+void ManageHVACSizingSimulation(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound)
 {
     using DataEnvironment::CurMnDy;
     using DataEnvironment::CurrentOverallSimDay;
@@ -240,8 +241,6 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
     bool Available; // an environment is available to process
     int HVACSizingIterCount;
 
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-
     hvacSizingSimulationManager->DetermineSizingAnalysesNeeded();
 
     hvacSizingSimulationManager->SetupSizingAnalyses();
@@ -263,7 +262,7 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
         Available = true;
         for (int i = 1; i <= NumOfEnvrn; ++i) { // loop over environments
 
-            GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
+            GetNextEnvironment(state.dataGlobals, OutputFiles::getSingleton(), Available, ErrorsFound);
             if (ErrorsFound) break;
             if (!Available) continue;
 
@@ -301,11 +300,11 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
             // EndMonthFlag = false;
             WarmupFlag = true;
             DayOfSim = 0;
-            DayOfSimChr = "0";
+            state.dataGlobals.DayOfSimChr = "0";
             NumOfWarmupDays = 0;
 
             bool anyEMSRan;
-            ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
@@ -313,13 +312,12 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
                     if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
                 }
                 ++DayOfSim;
-                ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
-                strip(DayOfSimChr);
+                state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
-                    DayOfSimChr = "0";
+                    state.dataGlobals.DayOfSimChr = "0";
                 }
                 BeginDayFlag = true;
                 EndDayFlag = false;
@@ -344,7 +342,7 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(OutputFiles::getSingleton(), false);
+                            SimulateGroundDomains(state.dataGlobals, OutputFiles::getSingleton(), false);
                         }
 
                         BeginTimeStepFlag = true;
@@ -368,9 +366,9 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
 
                         ManageWeather();
 
-                        ManageExteriorEnergyUse();
+                        ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-                        ManageHeatBalance();
+                        ManageHeatBalance(state, outputFiles);
 
                         BeginHourFlag = false;
                         BeginDayFlag = false;
@@ -398,7 +396,7 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
 
         hvacSizingSimulationManager->ProcessCoincidentPlantSizeAdjustments(HVACSizingIterCount);
 
-        hvacSizingSimulationManager->RedoKickOffAndResize();
+        hvacSizingSimulationManager->RedoKickOffAndResize(state);
 
         if (!hvacSizingSimulationManager->plantCoinAnalyRequestsAnotherIteration) {
             // jump out of for loop, or change for to a while

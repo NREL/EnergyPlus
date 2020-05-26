@@ -17,7 +17,7 @@ class ResizePSZToMatchProductAvailability(EnergyPlusPlugin):
                 "Intermediate Air System Main Supply Volume Flow Rate", "PSZ-AC_%s:%s" % (zone_num, zone_num)
             )
             actuator_handle = self.api.exchange.get_actuator_handle(
-                "PSZ-AC_%s:%s" % (zone_num, zone_num), "Sizing:System", "Main Supply Volume Flow Rate"
+                "Sizing:System", "Main Supply Volume Flow Rate", "PSZ-AC_%s:%s" % (zone_num, zone_num)
             )
             initial_value = self.api.exchange.get_internal_variable_value(var_handle)
             new_value = self.select_discrete_nominal_airflow(initial_value)

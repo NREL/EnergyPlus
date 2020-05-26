@@ -93,7 +93,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Output:Diagnostics,
     DisplayAllWarnings;      !- Key 1
@@ -490,7 +490,7 @@
     TU1,                     !- Zone Terminal Unit Name 3
     TU2,                     !- Zone Terminal Unit Name 4
     TU5inAirloop,            !- Zone Terminal Unit Name 5
-    TU6inOASystem;           !- Airloop Terminal Unit Name 6
+    TU6inOASystem;           !- Zone Terminal Unit Name 6
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     TU1,                     !- Zone Terminal Unit Name
@@ -695,24 +695,24 @@
     autosize,                !- Design Supply Air Flow Rate {m3/s}
     Airloop Branches,        !- Branch List Name
     ,                        !- Connector List Name
-    Airloop Supply Inlet Node,           !- Supply Side Inlet Node Name
-    Airloop Return Air Outlet, !- Demand Side Outlet Node Name
+    Airloop Supply Inlet Node,  !- Supply Side Inlet Node Name
+    Airloop Return Air Outlet,  !- Demand Side Outlet Node Name
     Zone Eq In Node,         !- Demand Side Inlet Node Names
     Airloop Fan Outlet Node; !- Supply Side Outlet Node Names
 
   SetpointManager:Scheduled,
     Supply Air OA Damper Manager,  !- Name
-    Temperature,               !- Control Variable
+    Temperature,             !- Control Variable
     Seasonal Reset Supply Air Temp Sch,  !- Schedule Name
-    Airloop Fan Outlet Node;   !- Setpoint Node or NodeList Name
+    Airloop Fan Outlet Node; !- Setpoint Node or NodeList Name
 
   SetpointManager:MixedAir,
     Mixed Air Temp Manager 1,!- Name
     Temperature,             !- Control Variable
-    Airloop Fan Outlet Node,   !- Reference Setpoint Node Name
+    Airloop Fan Outlet Node, !- Reference Setpoint Node Name
     TU5 VRF DX HCoil Outlet Node,  !- Fan Inlet Node Name
-    Airloop Fan Outlet Node,   !- Fan Outlet Node Name
-    Airloop Mixed Air Outlet;  !- Setpoint Node or NodeList Name
+    Airloop Fan Outlet Node, !- Fan Outlet Node Name
+    Airloop Mixed Air Outlet;!- Setpoint Node or NodeList Name
 
   Schedule:Compact,
     Seasonal Reset Supply Air Temp Sch,  !- Name
@@ -728,146 +728,146 @@
     Until: 24:00,16.0;       !- Field 11
 
   BranchList,
-    Airloop Branches,           !- Name
-    Airloop Main Branch;        !- Branch 1 Name
+    Airloop Branches,        !- Name
+    Airloop Main Branch;     !- Branch 1 Name
 
   Branch,
-    Airloop Main Branch,        !- Name
-    ,                           !- Pressure Drop Curve Name
+    Airloop Main Branch,     !- Name
+    ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
-    Airloop OA System,          !- Component 1 Name
-    Airloop Supply Inlet Node,              !- Component 1 Inlet Node Name
-    Airloop Mixed Air Outlet,   !- Component 1 Outlet Node Name
-    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,   !- Component 3 Object Type
-    TU5inAirloop,               !- Component 3 Name
-    Airloop Mixed Air Outlet,   !- Component 3 Inlet Node Name
-    Airloop Fan Outlet Node;    !- Component 4 Outlet Node Name
+    Airloop OA System,       !- Component 1 Name
+    Airloop Supply Inlet Node,  !- Component 1 Inlet Node Name
+    Airloop Mixed Air Outlet,!- Component 1 Outlet Node Name
+    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Component 2 Object Type
+    TU5inAirloop,            !- Component 2 Name
+    Airloop Mixed Air Outlet,!- Component 2 Inlet Node Name
+    Airloop Fan Outlet Node; !- Component 2 Outlet Node Name
 
   AirLoopHVAC:SupplyPath,
-    Airloop Supply Path,        !- Name
-    Zone Eq In Node,            !- Supply Air Path Inlet Node Name
-    AirLoopHVAC:ZoneSplitter,   !- Component 1 Object Type
-    Airloop Zone Splitter;      !- Component 1 Name
+    Airloop Supply Path,     !- Name
+    Zone Eq In Node,         !- Supply Air Path Inlet Node Name
+    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
+    Airloop Zone Splitter;   !- Component 1 Name
 
   AirLoopHVAC:ZoneSplitter,
-    Airloop Zone Splitter,       !- Name
-    Zone Eq In Node,             !- Inlet Node Name
-    SPACE1-1 Zone Equip ATInlet, !- Outlet 1 Node Name
-    SPACE2-1 Zone Equip ATInlet, !- Outlet 2 Node Name
-    SPACE3-1 Zone Equip ATInlet, !- Outlet 3 Node Name
-    SPACE4-1 Zone Equip ATInlet, !- Outlet 4 Node Name
-    SPACE5-1 Zone Equip ATInlet; !- Outlet 5 Node Name
+    Airloop Zone Splitter,   !- Name
+    Zone Eq In Node,         !- Inlet Node Name
+    SPACE1-1 Zone Equip ATInlet,  !- Outlet 1 Node Name
+    SPACE2-1 Zone Equip ATInlet,  !- Outlet 2 Node Name
+    SPACE3-1 Zone Equip ATInlet,  !- Outlet 3 Node Name
+    SPACE4-1 Zone Equip ATInlet,  !- Outlet 4 Node Name
+    SPACE5-1 Zone Equip ATInlet;  !- Outlet 5 Node Name
 
   AirLoopHVAC:ReturnPath,
-    Airloop Return Path,        !- Name
+    Airloop Return Path,     !- Name
     Airloop Return Air Outlet,  !- Return Air Path Outlet Node Name
-    AirLoopHVAC:ZoneMixer,      !- Component 1 Object Type
-    Airloop Zone Mixer;         !- Component 1 Name
+    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
+    Airloop Zone Mixer;      !- Component 1 Name
 
   AirLoopHVAC:ZoneMixer,
-    Airloop Zone Mixer,         !- Name
+    Airloop Zone Mixer,      !- Name
     Airloop Return Air Outlet,  !- Outlet Node Name
-    SPACE1-1 Out Node,          !- Inlet 1 Node Name
-    SPACE2-1 Out Node,          !- Inlet 2 Node Name
-    SPACE3-1 Out Node,          !- Inlet 3 Node Name
-    SPACE4-1 Out Node,          !- Inlet 4 Node Name
-    SPACE5-1 Out Node;          !- Inlet 5 Node Name
+    SPACE1-1 Out Node,       !- Inlet 1 Node Name
+    SPACE2-1 Out Node,       !- Inlet 2 Node Name
+    SPACE3-1 Out Node,       !- Inlet 3 Node Name
+    SPACE4-1 Out Node,       !- Inlet 4 Node Name
+    SPACE5-1 Out Node;       !- Inlet 5 Node Name
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    Space1AirTerminal,          !- Name
-    VRFAvailSched,              !- Availability Schedule Name
-    SPACE1-1 Zone Equip ATInlet, !- Air Inlet Node Name
-    SPACE1-1 Zone Inlet,        !- Air Outlet Node Name
-    autosize,                   !- Maximum Air Flow Rate {m3/s}
-    ,                           !- Design Specification Outdoor Air Object Name
-    ;                           !- Per Person Ventilation Rate Mode
+    Space1AirTerminal,       !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    SPACE1-1 Zone Equip ATInlet,  !- Air Inlet Node Name
+    SPACE1-1 Zone Inlet,     !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE1-1 AirTerminal ADU,  !- Name
-    SPACE1-1 Zone Inlet,       !- Air Distribution Unit Outlet Node Name
+    SPACE1-1 AirTerminal ADU,!- Name
+    SPACE1-1 Zone Inlet,     !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
-    Space1AirTerminal,         !- Air Terminal Name
-    ,                          !- Nominal Upstream Leakage Fraction
-    ,                          !- Constant Downstream Leakage Fraction
-    ;                          !- Design Specification Air Terminal Sizing Object Name
+    Space1AirTerminal,       !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    Space2AirTerminal,          !- Name
-    VRFAvailSched,              !- Availability Schedule Name
-    SPACE2-1 Zone Equip ATInlet, !- Air Inlet Node Name
-    SPACE2-1 Zone Inlet,        !- Air Outlet Node Name
-    autosize,                   !- Maximum Air Flow Rate {m3/s}
-    ,                           !- Design Specification Outdoor Air Object Name
-    ;                           !- Per Person Ventilation Rate Mode
+    Space2AirTerminal,       !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    SPACE2-1 Zone Equip ATInlet,  !- Air Inlet Node Name
+    SPACE2-1 Zone Inlet,     !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE2-1 AirTerminal ADU,  !- Name
-    SPACE2-1 Zone Inlet,       !- Air Distribution Unit Outlet Node Name
+    SPACE2-1 AirTerminal ADU,!- Name
+    SPACE2-1 Zone Inlet,     !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
-    Space2AirTerminal,         !- Air Terminal Name
-    ,                          !- Nominal Upstream Leakage Fraction
-    ,                          !- Constant Downstream Leakage Fraction
-    ;                          !- Design Specification Air Terminal Sizing Object Name
+    Space2AirTerminal,       !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    Space3AirTerminal,          !- Name
-    VRFAvailSched,              !- Availability Schedule Name
-    SPACE3-1 Zone Equip ATInlet, !- Air Inlet Node Name
-    SPACE3-1 Zone Inlet,        !- Air Outlet Node Name
-    autosize,                   !- Maximum Air Flow Rate {m3/s}
-    ,                           !- Design Specification Outdoor Air Object Name
-    ;                           !- Per Person Ventilation Rate Mode
+    Space3AirTerminal,       !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    SPACE3-1 Zone Equip ATInlet,  !- Air Inlet Node Name
+    SPACE3-1 Zone Inlet,     !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE3-1 AirTerminal ADU,  !- Name
-    SPACE3-1 Zone Inlet,       !- Air Distribution Unit Outlet Node Name
+    SPACE3-1 AirTerminal ADU,!- Name
+    SPACE3-1 Zone Inlet,     !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
-    Space3AirTerminal,         !- Air Terminal Name
-    ,                          !- Nominal Upstream Leakage Fraction
-    ,                          !- Constant Downstream Leakage Fraction
-    ;                          !- Design Specification Air Terminal Sizing Object Name
+    Space3AirTerminal,       !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    Space4AirTerminal,          !- Name
-    VRFAvailSched,              !- Availability Schedule Name
-    SPACE4-1 Zone Equip ATInlet, !- Air Inlet Node Name
-    SPACE4-1 Zone Inlet,        !- Air Outlet Node Name
-    autosize,                   !- Maximum Air Flow Rate {m3/s}
-    ,                           !- Design Specification Outdoor Air Object Name
-    ;                           !- Per Person Ventilation Rate Mode
+    Space4AirTerminal,       !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    SPACE4-1 Zone Equip ATInlet,  !- Air Inlet Node Name
+    SPACE4-1 Zone Inlet,     !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE4-1 AirTerminal ADU,  !- Name
-    SPACE4-1 Zone Inlet,       !- Air Distribution Unit Outlet Node Name
+    SPACE4-1 AirTerminal ADU,!- Name
+    SPACE4-1 Zone Inlet,     !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
-    Space4AirTerminal,         !- Air Terminal Name
-    ,                          !- Nominal Upstream Leakage Fraction
-    ,                          !- Constant Downstream Leakage Fraction
-    ;                          !- Design Specification Air Terminal Sizing Object Name
+    Space4AirTerminal,       !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    Space5AirTerminal,          !- Name
-    VRFAvailSched,              !- Availability Schedule Name
-    SPACE5-1 Zone Equip ATInlet, !- Air Inlet Node Name
-    SPACE5-1 Zone Inlet,        !- Air Outlet Node Name
-    autosize,                   !- Maximum Air Flow Rate {m3/s}
-    ,                           !- Design Specification Outdoor Air Object Name
-    ;                           !- Per Person Ventilation Rate Mode
+    Space5AirTerminal,       !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    SPACE5-1 Zone Equip ATInlet,  !- Air Inlet Node Name
+    SPACE5-1 Zone Inlet,     !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
   ZoneHVAC:AirDistributionUnit,
-    SPACE5-1 AirTerminal ADU,  !- Name
-    SPACE5-1 Zone Inlet,       !- Air Distribution Unit Outlet Node Name
+    SPACE5-1 AirTerminal ADU,!- Name
+    SPACE5-1 Zone Inlet,     !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
-    Space5AirTerminal,         !- Air Terminal Name
-    ,                          !- Nominal Upstream Leakage Fraction
-    ,                          !- Constant Downstream Leakage Fraction
-    ;                          !- Design Specification Air Terminal Sizing Object Name
+    Space5AirTerminal,       !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Eq,             !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type
-    SPACE1-1 AirTerminal ADU,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPACE1-1 AirTerminal ADU,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -882,8 +882,8 @@
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type
-    SPACE2-1 AirTerminal ADU,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPACE2-1 AirTerminal ADU,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -898,8 +898,8 @@
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type
-    SPACE3-1 AirTerminal ADU,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPACE3-1 AirTerminal ADU,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -914,8 +914,8 @@
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type
-    SPACE4-1 AirTerminal ADU,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPACE4-1 AirTerminal ADU,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -930,8 +930,8 @@
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type
-    SPACE5-1 AirTerminal ADU, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPACE5-1 AirTerminal ADU,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -978,35 +978,35 @@
     SPACE5-1 Zone Inlet;     !- Node 1 Name
 
   AirLoopHVAC:OutdoorAirSystem,
-    Airloop OA System,             !- Name
-    Airloop OA System Controllers, !- Controller List Name
-    Airloop OA System Equipment,   !- Outdoor Air Equipment List Name
-    Airloop Availability Managers; !- Availability Manager List Name
+    Airloop OA System,       !- Name
+    Airloop OA System Controllers,  !- Controller List Name
+    Airloop OA System Equipment,  !- Outdoor Air Equipment List Name
+    Airloop Availability Managers;  !- Availability Manager List Name
 
   AirLoopHVAC:ControllerList,
-    Airloop OA System Controllers, !- Name
-    Controller:OutdoorAir,         !- Controller 1 Object Type
-    Airloop OA Controller;         !- Controller 1 Name
+    Airloop OA System Controllers,  !- Name
+    Controller:OutdoorAir,   !- Controller 1 Object Type
+    Airloop OA Controller;   !- Controller 1 Name
 
   AirLoopHVAC:OutdoorAirSystem:EquipmentList,
-    Airloop OA System Equipment,   !- Name
-    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
-    TU6inOASystem,                 !- Zone Terminal Unit Name
-    OutdoorAir:Mixer,              !- Component 1 Object Type
-    Airloop OA Mixing Box;         !- Component 1 Name
+    Airloop OA System Equipment,  !- Name
+    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Component 1 Object Type
+    TU6inOASystem,           !- Component 1 Name
+    OutdoorAir:Mixer,        !- Component 2 Object Type
+    Airloop OA Mixing Box;   !- Component 2 Name
 
   OutdoorAir:Mixer,
-    Airloop OA Mixing Box,      !- Name
-    Airloop Mixed Air Outlet,   !- Mixed Air Node Name
-    TU6 Outlet Node to Mixer,        !- Outdoor Air Stream Node Name
+    Airloop OA Mixing Box,   !- Name
+    Airloop Mixed Air Outlet,!- Mixed Air Node Name
+    TU6 Outlet Node to Mixer,!- Outdoor Air Stream Node Name
     Airloop Relief Air Outlet,  !- Relief Air Stream Node Name
-    Airloop Supply Inlet Node;              !- Return Air Stream Node Name
+    Airloop Supply Inlet Node;  !- Return Air Stream Node Name
 
   Controller:OutdoorAir,
-    Airloop OA Controller,      !- Name
+    Airloop OA Controller,   !- Name
     Airloop Relief Air Outlet,  !- Relief Air Outlet Node Name
-    Airloop Supply Inlet Node,              !- Return Air Node Name
-    Airloop Mixed Air Outlet,   !- Mixed Air Node Name
+    Airloop Supply Inlet Node,  !- Return Air Node Name
+    Airloop Mixed Air Outlet,!- Mixed Air Node Name
     Airloop Outdoor Air Inlet,  !- Actuator Node Name
     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
@@ -1058,15 +1058,15 @@
     ;                        !- Controlling Zone or Thermostat Location
 
   COIL:Cooling:DX:VariableRefrigerantFlow,
-    TU6 OA VRF DX Cooling Coil, !- Name
+    TU6 OA VRF DX Cooling Coil,  !- Name
     VRFAvailSched,           !- Availability Schedule Name
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Heat Ratio
     autosize,                !- Rated Air Flow Rate {m3/s}
     VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name
     VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name
-    Airloop Outdoor Air Inlet,     !- Air Inlet Node Name
-    OA Heating Coil Air Inlet Node,  !- Air Outlet Node Name
+    Airloop Outdoor Air Inlet,  !- Coil Air Inlet Node
+    OA Heating Coil Air Inlet Node,  !- Coil Air Outlet Node
     ;                        !- Name of Water Storage Tank for Condensate Collection
 
   Schedule:Compact,
@@ -1074,21 +1074,21 @@
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 25.0;      !- Field 3
+    Until: 24:00,25.0;       !- Field 3
 
   SetpointManager:Scheduled,
     OA Cooling Supply Air Temp Manager,  !- Name
     Temperature,             !- Control Variable
     OA CCoil SPM,            !- Schedule Name
-    OA Heating Coil Air Inlet Node; !- Setpoint Node or NodeList Name
+    OA Heating Coil Air Inlet Node;  !- Setpoint Node or NodeList Name
 
   COIL:Heating:DX:VariableRefrigerantFlow,
-    TU6 OA VRF DX Heating Coil, !- Name
+    TU6 OA VRF DX Heating Coil,  !- Name
     VRFAvailSched,           !- Availability Schedule
     autosize,                !- Gross Rated Heating Capacity {W}
     autosize,                !- Rated Air Flow Rate {m3/s}
-    OA Heating Coil Air Inlet Node,  !- Air Inlet Node Name
-    TU6 Outlet Node to Mixer,     !- Air Outlet Node Name
+    OA Heating Coil Air Inlet Node,  !- Coil Air Inlet Node
+    TU6 Outlet Node to Mixer,!- Coil Air Outlet Node
     VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name
     VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name
 
@@ -1097,21 +1097,21 @@
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 20.0;      !- Field 3
+    Until: 24:00,20.0;       !- Field 3
 
   SetpointManager:Scheduled,
     OA Heating Supply Air Temp Manager,  !- Name
     Temperature,             !- Control Variable
     OA HCoil SPM,            !- Schedule Name
-    TU6 Outlet Node to Mixer;     !- Setpoint Node or NodeList Name
+    TU6 Outlet Node to Mixer;!- Setpoint Node or NodeList Name
 
   AvailabilityManagerAssignmentList,
     Airloop Availability Managers,  !- Name
     AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
-    Airloop Availability;       !- Availability Manager 1 Name
+    Airloop Availability;    !- Availability Manager 1 Name
 
   AvailabilityManager:Scheduled,
-    Airloop Availability,       !- Name
+    Airloop Availability,    !- Name
     OCCUPY-1;                !- Schedule Name
 
   OutdoorAir:Mixer,
@@ -1143,11 +1143,11 @@
     TU4 Inlet Node;          !- Return Air Stream Node Name
 
   OutdoorAir:Mixer,
-    TU5 OA Mixer,             !- Name
+    TU5 OA Mixer,            !- Name
     TU5 VRF DX CCoil Inlet Node,  !- Mixed Air Node Name
-    Outside Air Inlet Node 5, !- Outdoor Air Stream Node Name
-    Relief Air Outlet Node 5, !- Relief Air Stream Node Name
-    Airloop Mixed Air Outlet; !- Return Air Stream Node Name
+    Outside Air Inlet Node 5,!- Outdoor Air Stream Node Name
+    Relief Air Outlet Node 5,!- Relief Air Stream Node Name
+    Airloop Mixed Air Outlet;!- Return Air Stream Node Name
 
   Fan:SystemModel,
     TU1 VRF Supply Fan,      !- Name
@@ -1220,8 +1220,8 @@
   Fan:SystemModel,
     TU5 VRF Supply Fan,      !- Name
     VRFAvailSched,           !- Availability Schedule Name
-    TU5 VRF DX HCoil Outlet Node, !- Air Inlet Node Name
-    Airloop Fan Outlet Node,  !- Air Outlet Node Name
+    TU5 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
+    Airloop Fan Outlet Node, !- Air Outlet Node Name
     AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
@@ -1412,7 +1412,7 @@
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -1432,7 +1432,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -3006,8 +3006,8 @@
     3.7,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   Sizing:Parameters,
-    1.15,                     !- Heating Sizing Factor
-    1.15;                     !- Cooling Sizing Factor
+    1.15,                    !- Heating Sizing Factor
+    1.15;                    !- Cooling Sizing Factor
 
   Sizing:Zone,
     SPACE1-1,                !- Zone or ZoneList Name
@@ -3031,7 +3031,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
@@ -3062,7 +3067,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE2-1,        !- Name
@@ -3093,7 +3103,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE3-1,        !- Name
@@ -3124,7 +3139,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
@@ -3155,7 +3175,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name
@@ -3360,7 +3385,7 @@
     Outside Air Inlet Node 4,!- Node 4 Name
     Outside Air Inlet Node 5,!- Node 5 Name
     MyVRFCondenserInletNode, !- Node 6 Name
-    Airloop Outdoor Air Inlet; !- Node 7 Name
+    Airloop Outdoor Air Inlet;  !- Node 7 Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE1-1,                !- Zone Name
@@ -3576,11 +3601,11 @@
 
   Output:Variable,Airloop Fan Outlet Node,System Node Standard Density Volume Flow Rate,timestep;
 
- Output:Variable,TU5 VRF DX CCoil Inlet Node,System Node Temperature,timestep;
+  Output:Variable,TU5 VRF DX CCoil Inlet Node,System Node Temperature,timestep;
 
- Output:Variable,TU5 VRF DX CCoil Outlet Node,System Node Temperature,timestep;
- 
- Output:Variable,TU5 VRF DX HCoil Outlet Node,System Node Temperature,timestep;
+  Output:Variable,TU5 VRF DX CCoil Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,TU5 VRF DX HCoil Outlet Node,System Node Temperature,timestep;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,timestep;
 

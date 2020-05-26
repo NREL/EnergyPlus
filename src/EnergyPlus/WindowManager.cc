@@ -1887,6 +1887,7 @@ namespace WindowManager {
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             if (Construct(ConstrNum).FromWindow5DataFile) continue;
             if (Construct(ConstrNum).WindowTypeBSDF) continue;
+            if (Construct(ConstrNum).TypeIsAirBoundaryInteriorWindow) continue;
             Construct(ConstrNum).TransDiff = 0.0;
             Construct(ConstrNum).TransDiffVis = 0.0;
             Construct(ConstrNum).AbsDiffBackShade = 0.0;
@@ -2943,6 +2944,7 @@ namespace WindowManager {
                 if (AnyLocalEnvironmentsInModel) {
                     if (Surface(SurfNum).HasSurroundingSurfProperties) {
                         SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+
                         if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                             surface.ViewFactorSkyIR = SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                         }
@@ -2953,7 +2955,7 @@ namespace WindowManager {
                             SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs =
                                 GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
-                            OutSrdIR += sigma * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
+                            OutSrdIR += sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
                         }
                     }
                 }
@@ -3072,7 +3074,11 @@ namespace WindowManager {
         QdotConvOutRepPerArea(SurfNum) = -hcout * (Tsout - tout);
         QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
 
-        QRadLWOutSrdSurfs(SurfNum) = 0;
+        Real64 const Tsout_4(pow_4(Tsout)); // Tuned To reduce pow calls and redundancies
+        Real64 const Tout_4(pow_4(tout));
+        Real64 const emiss_sigma_product(SurfOutsideEmiss * sigma);
+        Real64 rad_out_lw_srd_per_area = 0;
+
         if (AnyLocalEnvironmentsInModel) {
             if (Surface(SurfNum).HasSurroundingSurfProperties) {
                 SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
@@ -3080,20 +3086,25 @@ namespace WindowManager {
                     SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                     SrdSurfTempAbs =
                         GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
-                    QRadLWOutSrdSurfs(SurfNum) += SurfOutsideEmiss * sigma * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(Tsout));
+                    rad_out_lw_srd_per_area += - emiss_sigma_product * SrdSurfViewFac * (Tsout_4 - pow_4(SrdSurfTempAbs));
                 }
             }
         }
 
-        Real64 const Tsout_4(pow_4(Tsout)); // Tuned To reduce pow calls and redundancies
-        Real64 const rad_out_per_area(
-            -SurfOutsideEmiss * sigma *
-            ((((1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR + surface.ViewFactorGroundIR) * (Tsout_4 - pow_4(tout))) +
-             (AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(SkyTempKelvin))) + QRadLWOutSrdSurfs(SurfNum)));
+        Real64 const rad_out_air_per_area = - emiss_sigma_product * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * (Tsout_4 - Tout_4);
+        Real64 const rad_out_ground_per_area = - emiss_sigma_product * surface.ViewFactorGroundIR * (Tsout_4 - Tout_4);
+        Real64 const rad_out_sky_per_area = - emiss_sigma_product * AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(SkyTempKelvin));
+        Real64 const rad_out_per_area = rad_out_air_per_area + rad_out_sky_per_area + rad_out_ground_per_area + rad_out_lw_srd_per_area;
+
+        QRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
         QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area;
         QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
-
         QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
+
+        // Radiation emission to air rate
+        DataHeatBalSurface::QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
+        DataHeatBalSurface::QHeatEmiReport(SurfNum) = surface.Area * hcout * (Tsout - tout) + DataHeatBalSurface::QAirExtReport(SurfNum);;
+
     }
 
     //****************************************************************************
@@ -4700,7 +4711,7 @@ namespace WindowManager {
 
     void LUdecomposition(Array2<Real64> &ajac, // As input: matrix to be decomposed;
                          int const n,          // Dimension of matrix
-                         Array1_int &indx,     // Vector of row permutations
+                         Array1D_int &indx,    // Vector of row permutations
                          Real64 &d             // +1 if even number of row interchange is even, -1
     )
     {
@@ -4803,8 +4814,8 @@ namespace WindowManager {
 
     void LUsolution(Array2<Real64> const &a, // Matrix and vector in a.x = b;
                     int const n,             // Dimension of a and b
-                    Array1_int const &indx,  // Vector of row permutations
-                    Array1<Real64> &b        // Matrix and vector in a.x = b;
+                    Array1D_int const &indx, // Vector of row permutations
+                    Array1D<Real64> &b       // Matrix and vector in a.x = b;
     )
     {
 

@@ -53,6 +53,7 @@
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -78,7 +79,7 @@ struct CoilCoolingDX
     static void clear_state();
     void instantiateFromInputSpec(const CoilCoolingDXInputSpecification &input_data);
     void oneTimeInit();
-    void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
+    void simulate(int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR = -1.0);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
                       int &evapOutletNodeIndex,
@@ -91,7 +92,7 @@ struct CoilCoolingDX
                             std::vector<Real64> &normalModeFlowRates,
                             std::vector<Real64> &normalModeRatedCapacities);
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
-    void size();
+    void size(EnergyPlusData &state);
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;
@@ -118,6 +119,7 @@ struct CoilCoolingDX
     int supplyFanType = 0;
     std::string supplyFanName = "";
     bool doStandardRatingFlag = true;
+    int CoolingCoilType = 0; // Coolig coil type
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
@@ -142,7 +144,13 @@ struct CoilCoolingDX
     Real64 speedRatioReport = 0.0;
     Real64 wasteHeatEnergyRate = 0.0;
     Real64 wasteHeatEnergy = 0.0;
+    Real64 recoveredHeatEnergy = 0.0;
+    Real64 recoveredHeatEnergyRate = 0.0;
 };
+
+extern int const coilNormalMode; // Normal operation mode
+extern int const coilEnhancedMode; // Enhanced operation mode
+extern int const coilSubcoolReheatMode; // SubcoolReheat operation mode
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
 extern bool coilCoolingDXGetInputFlag;

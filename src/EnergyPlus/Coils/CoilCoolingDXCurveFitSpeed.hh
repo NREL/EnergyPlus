@@ -54,6 +54,7 @@
 
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -120,6 +121,7 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 parentModeRatedGrossTotalCap = 0.0;
     Real64 parentModeRatedEvapAirFlowRate = 0.0;
     Real64 parentModeRatedCondAirFlowRate = 0.0;
+    int parentOperatingMode = 0;
 
     // speed class objects
     Real64 ambPressure = 0.0; // outdoor pressure {Pa]
@@ -143,7 +145,7 @@ struct CoilCoolingDXCurveFitSpeed
 
     void CalcSpeedOutput(
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
-    void size();
+    void size(EnergyPlusData &state);
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
 
 private:

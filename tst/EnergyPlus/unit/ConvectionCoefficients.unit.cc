@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -75,7 +76,323 @@
 using namespace EnergyPlus;
 using namespace ConvectionCoefficients;
 
-TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_ConvectionCofficients)
+class ConvectionCoefficientsFixture : public EnergyPlus::EnergyPlusFixture
+{
+public:
+
+protected:
+    void SetUp() override
+    {
+        EnergyPlus::EnergyPlusFixture::SetUp();
+    }
+
+    void TearDown() override
+    {
+        EnergyPlus::EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+    };
+
+    std::string getIDFString()
+    {
+        std::vector<std::string> idf_lines = {
+
+            "  Zone,",
+            "    Zone 1,                  !- Name",
+            "    0,                       !- Direction of Relative North {deg}",
+            "    0,                       !- X Origin {m}",
+            "    0,                       !- Y Origin {m}",
+            "    0;                       !- Z Origin {m}",
+
+            "  SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
+
+            "  ZoneHVAC:EquipmentConnections,",
+            "    Zone 1,                  !- Zone Name",
+            "    Zone 1 Eq,               !- Zone Conditioning Equipment List Name",
+            "    ,                        !- Zone Air Inlet Node or NodeList Name",
+            "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+            "    SPACE2-1 Node,           !- Zone Air Node Name",
+            "    SPACE2-1 ret node;       !- Zone Return Air Node Name",
+
+            "  ZoneHVAC:EquipmentList,",
+            "    Zone 1 Eq,               !- Name",
+            "    SequentialLoad,          !- Load Distribution Scheme",
+            "    ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 1 Object Type",
+            "    Zone 1 Baseboard,        !- Zone Equipment 1 Name",
+            "    1,                       !- Zone Equipment 1 Cooling Sequence",
+            "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+            " ZoneHVAC:Baseboard:Convective:Electric,",
+            "    Zone 1 Baseboard,        !- Name",
+            "    ,                        !- Availability Schedule Name",
+            "    HeatingDesignCapacity,   !- Heating Design Capacity Method",
+            "    1000.0,                  !- Heating Design Capacity {W}",
+            "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+            "    ,                        !- Fraction of Autosized Heating Design Capacity",
+            "    0.97;                    !- Efficiency",
+
+            "  GlobalGeometryRules,LowerLeftCorner,CounterClockwise,World,World;",
+
+            "  BuildingSurface:Detailed,",
+            "    Vertical Wall,                 !- Name",
+            "    WALL,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,0.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Tilted Down Wall,                 !- Name",
+            "    WALL,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,-2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,-2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Tilted Up Wall,                 !- Name",
+            "    WALL,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Horizontal Up Wall,                 !- Name",
+            "    WALL,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,10.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Horizontal Down Wall,                 !- Name",
+            "    WALL,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    0.0,10.0,3.0,  !- X,Y,Z ==> Vertex 4 {m}",
+            "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    10.0,0.0,3.0;  !- X,Y,Z ==> Vertex 2 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Vertical Roof,                 !- Name",
+            "    ROOF,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,0.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Tilted Down Roof,                 !- Name",
+            "    ROOF,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,-2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,-2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Tilted Up Roof,                 !- Name",
+            "    ROOF,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Horizontal Up Roof,                 !- Name",
+            "    ROOF,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,10.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Horizontal Down Roof,                 !- Name",
+            "    ROOF,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    0.0,10.0,3.0,  !- X,Y,Z ==> Vertex 4 {m}",
+            "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    10.0,0.0,3.0;  !- X,Y,Z ==> Vertex 2 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Vertical Floor,                 !- Name",
+            "    FLOOR,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,0.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Tilted Down Floor,                 !- Name",
+            "    FLOOR,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,-2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,-2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Tilted Up Floor,                 !- Name",
+            "    FLOOR,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Horizontal Up Floor,                 !- Name",
+            "    FLOOR,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    0.0,10.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+            "  BuildingSurface:Detailed,",
+            "    Horizontal Down Floor,                 !- Name",
+            "    FLOOR,                    !- Surface Type",
+            "    WALL-1,                  !- Construction Name",
+            "    Zone 1,                  !- Zone Name",
+            "    Outdoors,                !- Outside Boundary Condition",
+            "    ,                        !- Outside Boundary Condition Object",
+            "    SunExposed,              !- Sun Exposure",
+            "    WindExposed,             !- Wind Exposure",
+            "    0.50000,                 !- View Factor to Ground",
+            "    4,                       !- Number of Vertices",
+            "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "    0.0,10.0,3.0,  !- X,Y,Z ==> Vertex 4 {m}",
+            "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "    10.0,0.0,3.0;  !- X,Y,Z ==> Vertex 2 {m}",
+
+            "  Construction,",
+            "    WALL-1,                  !- Name",
+            "    GP01;                    !- Outside Layer",
+
+            "  Material,",
+            "    GP01,                    !- Name",
+            "    MediumSmooth,            !- Roughness",
+            "    1.2700000E-02,           !- Thickness {m}",
+            "    0.1600000,               !- Conductivity {W/m-K}",
+            "    801.0000,                !- Density {kg/m3}",
+            "    837.0000,                !- Specific Heat {J/kg-K}",
+            "    0.9000000,               !- Thermal Absorptance",
+            "    0.7500000,               !- Solar Absorptance",
+            "    0.7500000;               !- Visible Absorptance",
+
+        };
+
+        return delimited_string(idf_lines);
+    }
+};
+
+TEST_F(ConvectionCoefficientsFixture, ConvectionCofficients)
 {
 
     Real64 DeltaTemp;     // [C] temperature difference between surface and air
@@ -110,312 +427,19 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_ConvectionCofficients)
     EXPECT_NEAR(-8.09685, Hc, 0.0001);
 }
 
-TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_DynamicIntConvSurfaceClassification)
+TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 {
 
-    std::string const idf_objects = delimited_string({
-
-        "  Zone,",
-        "    Zone 1,                  !- Name",
-        "    0,                       !- Direction of Relative North {deg}",
-        "    0,                       !- X Origin {m}",
-        "    0,                       !- Y Origin {m}",
-        "    0;                       !- Z Origin {m}",
-
-        "  SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
-
-        "  ZoneHVAC:EquipmentConnections,",
-        "    Zone 1,                  !- Zone Name",
-        "    Zone 1 Eq,               !- Zone Conditioning Equipment List Name",
-        "    ,                        !- Zone Air Inlet Node or NodeList Name",
-        "    ,                        !- Zone Air Exhaust Node or NodeList Name",
-        "    SPACE2-1 Node,           !- Zone Air Node Name",
-        "    SPACE2-1 ret node;       !- Zone Return Air Node Name",
-
-        "  ZoneHVAC:EquipmentList,",
-        "    Zone 1 Eq,               !- Name",
-        "    SequentialLoad,          !- Load Distribution Scheme",
-        "    ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 1 Object Type",
-        "    Zone 1 Baseboard,        !- Zone Equipment 1 Name",
-        "    1,                       !- Zone Equipment 1 Cooling Sequence",
-        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
-
-        " ZoneHVAC:Baseboard:Convective:Electric,",
-        "    Zone 1 Baseboard,        !- Name",
-        "    ,                        !- Availability Schedule Name",
-        "    HeatingDesignCapacity,   !- Heating Design Capacity Method",
-        "    1000.0,                  !- Heating Design Capacity {W}",
-        "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
-        "    ,                        !- Fraction of Autosized Heating Design Capacity",
-        "    0.97;                    !- Efficiency",
-
-        "  GlobalGeometryRules,LowerLeftCorner,CounterClockwise,World,World;",
-
-        "  BuildingSurface:Detailed,",
-        "    Vertical Wall,                 !- Name",
-        "    WALL,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,0.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Tilted Down Wall,                 !- Name",
-        "    WALL,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,-2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,-2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Tilted Up Wall,                 !- Name",
-        "    WALL,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Horizontal Up Wall,                 !- Name",
-        "    WALL,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,10.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Horizontal Down Wall,                 !- Name",
-        "    WALL,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    0.0,10.0,3.0,  !- X,Y,Z ==> Vertex 4 {m}",
-        "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    10.0,0.0,3.0;  !- X,Y,Z ==> Vertex 2 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Vertical Roof,                 !- Name",
-        "    ROOF,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,0.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Tilted Down Roof,                 !- Name",
-        "    ROOF,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,-2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,-2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Tilted Up Roof,                 !- Name",
-        "    ROOF,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Horizontal Up Roof,                 !- Name",
-        "    ROOF,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,10.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Horizontal Down Roof,                 !- Name",
-        "    ROOF,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    0.0,10.0,3.0,  !- X,Y,Z ==> Vertex 4 {m}",
-        "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    10.0,0.0,3.0;  !- X,Y,Z ==> Vertex 2 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Vertical Floor,                 !- Name",
-        "    FLOOR,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,0.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Tilted Down Floor,                 !- Name",
-        "    FLOOR,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,-2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,-2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Tilted Up Floor,                 !- Name",
-        "    FLOOR,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,2.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,2.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Horizontal Up Floor,                 !- Name",
-        "    FLOOR,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    10.0,0.0,3.0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    0.0,10.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
-
-        "  BuildingSurface:Detailed,",
-        "    Horizontal Down Floor,                 !- Name",
-        "    FLOOR,                    !- Surface Type",
-        "    WALL-1,                  !- Construction Name",
-        "    Zone 1,                  !- Zone Name",
-        "    Outdoors,                !- Outside Boundary Condition",
-        "    ,                        !- Outside Boundary Condition Object",
-        "    SunExposed,              !- Sun Exposure",
-        "    WindExposed,             !- Wind Exposure",
-        "    0.50000,                 !- View Factor to Ground",
-        "    4,                       !- Number of Vertices",
-        "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    0.0,10.0,3.0,  !- X,Y,Z ==> Vertex 4 {m}",
-        "    10.0,10.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    10.0,0.0,3.0;  !- X,Y,Z ==> Vertex 2 {m}",
-
-        "  Construction,",
-        "    WALL-1,                  !- Name",
-        "    GP01;                    !- Outside Layer",
-
-        "  Material,",
-        "    GP01,                    !- Name",
-        "    MediumSmooth,            !- Roughness",
-        "    1.2700000E-02,           !- Thickness {m}",
-        "    0.1600000,               !- Conductivity {W/m-K}",
-        "    801.0000,                !- Density {kg/m3}",
-        "    837.0000,                !- Specific Heat {J/kg-K}",
-        "    0.9000000,               !- Thermal Absorptance",
-        "    0.7500000,               !- Solar Absorptance",
-        "    0.7500000;               !- Visible Absorptance",
-
-    });
+    std::string const idf_objects = this->getIDFString();
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(outputFiles(), errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -425,14 +449,14 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_DynamicIntConvSurfaceClassi
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -559,7 +583,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_DynamicIntConvSurfaceClassi
     EXPECT_EQ(DataSurfaces::Surface(15).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
 }
 
-TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateIntHcModelsFisherPedersen)
+TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 {
 
     int SurfNum;
@@ -675,9 +699,9 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateIntHcModelsFisherPe
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 }
 
-TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateHnModels)
+TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
 {
-    
+
     int SurfNum;
     Real64 DeltaTemp;
     Real64 CosineTilt;
@@ -695,7 +719,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateHnModels)
     SurfTemp.allocate(1);
     HcIn.allocate(1);
     Vhc.allocate(1);
-    
+
     // Test 1: CalcWaltonUnstableHorizontalOrTilt calculation for Hn
     DeltaTemp = 1.0;
     CosineTilt = 1.0;
@@ -729,14 +753,14 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateHnModels)
 
 }
 
-TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcZoneSystemACH)
+TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
 {
-    
+
     int ZoneNum = 1;
     int TotalNumberofZones = 1;
     Real64 ACHAnswer;
     Real64 ACHExpected;
-    
+
     if (!allocated(DataHeatBalance::Zone)) DataHeatBalance::Zone.allocate(TotalNumberofZones);
     DataHeatBalance::Zone(ZoneNum).Volume = 100.0;
     DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber = 1;
@@ -745,13 +769,13 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcZoneSystemACH)
     DataHeatBalance::Zone(ZoneNum).ListMultiplier = 1.0;
     EnergyPlus::DataEnvironment::OutBaroPress = 101400.0;
     Real64 ZoneNode = DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber;
-    
+
     // Test 1: Node not allocated, returns a zero ACH
     if (allocated(EnergyPlus::DataLoopNode::Node)) EnergyPlus::DataLoopNode::Node.deallocate();
     ACHExpected = 0.0;
     ACHAnswer = CalcZoneSystemACH(ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
-    
+
     // Test 2: Node now allocated, needs to return a proper ACH
     EnergyPlus::DataLoopNode::Node.allocate(DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber);
     EnergyPlus::DataLoopNode::Node(ZoneNode).Temp = 20.0;
@@ -759,10 +783,10 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcZoneSystemACH)
     ACHExpected = 6.11506;
     ACHAnswer = CalcZoneSystemACH(ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
-    
+
 }
 
-TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcFisherPedersenCeilDiffuserNatConv)
+TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
 {
 
     Real64 Hforced;
@@ -775,7 +799,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcFisherPedersenCeilD
     bool isWindow;
     Real64 ExpectedHconv;
     Real64 CalculatedHconv;
-    
+
     DataEnvironment::OutBaroPress = 101325.0;
 
     // Test 1: Non-window, all natural
@@ -790,7 +814,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcFisherPedersenCeilD
     ExpectedHconv = 1.2994;
     CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
-    
+
     // Test 2: Window, all natural
     Hforced = 10.0;
     ACH = 0.25;
@@ -842,25 +866,25 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcFisherPedersenCeilD
     ExpectedHconv = 10.0;
     CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
-    
+
 }
 
-TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestWindward)
+TEST_F(ConvectionCoefficientsFixture, TestWindward)
 {
 
     bool AgainstWind;
-    
+
     Real64 CosTilt;
     Real64 Azimuth;
     Real64 WindDirection;
-    
+
     // Test 1: Horizontal surface
     CosTilt = 1.0;
     Azimuth = 180.0;
     WindDirection = 180.0;
     AgainstWind = Windward(CosTilt,Azimuth,WindDirection);
     EXPECT_TRUE(AgainstWind);
-    
+
     // Test 2: Vertical surface, Azimuth and WindDiretion within 90 degrees of one another (windward or against wind)
     CosTilt = 0.5;
     Azimuth = 269.0;
@@ -875,4 +899,482 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestWindward)
     AgainstWind = Windward(CosTilt,Azimuth,WindDirection);
     EXPECT_FALSE(AgainstWind);
 
+}
+
+TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
+{
+
+    std::string const idf_objects = this->getIDFString();
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    bool errorsFound(false);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                              // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                        // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                         // expect no errors
+
+    HeatBalanceManager::GetZoneData(errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    ASSERT_FALSE(errorsFound);
+    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+
+    DataZoneEquipment::GetZoneEquipmentData1(state);
+
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+
+    DataGlobals::ZoneSizingCalc = true;
+
+    Real64 tolerance = 1E-3;
+
+    // Calculate convection coefficient DeltaT and Height != 0
+    Real64 deltaTemp = 10.0;
+    Real64 height = 1.0;
+    Real64 surfTemp = 20.0;
+    int zoneNum = 1;
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 2.667, tolerance);
+
+    // DeltaT = 0 Error Path
+    deltaTemp = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+
+    // Height = 0 Error Path
+    deltaTemp = 10.0;
+    height = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+}
+
+TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
+{
+
+    std::string const idf_objects = this->getIDFString();
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    bool errorsFound(false);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                              // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                        // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                         // expect no errors
+
+    HeatBalanceManager::GetZoneData(errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    ASSERT_FALSE(errorsFound);
+    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+
+    DataZoneEquipment::GetZoneEquipmentData1(state);
+
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+
+    DataGlobals::ZoneSizingCalc = true;
+
+    Real64 tolerance = 1E-3;
+
+    // Calculate convection coefficient DeltaT and Height != 0
+    Real64 deltaTemp = 10.0;
+    Real64 height = 1.0;
+    Real64 surfTemp = 20.0;
+    int zoneNum = 1;
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 2.673, tolerance);
+
+    // DeltaT = 0 Error Path
+    deltaTemp = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+
+    // Height = 0 Error Path
+    deltaTemp = 10.0;
+    height = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+}
+
+TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
+{
+
+    std::string const idf_objects = this->getIDFString();
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    bool errorsFound(false);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                              // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                        // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                         // expect no errors
+
+    HeatBalanceManager::GetZoneData(errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    ASSERT_FALSE(errorsFound);
+    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+
+    DataZoneEquipment::GetZoneEquipmentData1(state);
+
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+
+    DataGlobals::ZoneSizingCalc = true;
+
+    Real64 tolerance = 1E-3;
+
+    // Calculate convection coefficient DeltaT and Height != 0
+    Real64 deltaTemp = 10.0;
+    Real64 height = 1.0;
+    Real64 surfTemp = 20.0;
+    int zoneNum = 1;
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedStableFloor(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 0.962, tolerance);
+
+    // DeltaT = 0 Error Path
+    deltaTemp = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedStableFloor(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+
+    // Height = 0 Error Path
+    deltaTemp = 10.0;
+    height = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedStableFloor(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+}
+
+TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
+{
+
+    std::string const idf_objects = this->getIDFString();
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    bool errorsFound(false);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                              // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                        // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                         // expect no errors
+
+    HeatBalanceManager::GetZoneData(errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    ASSERT_FALSE(errorsFound);
+    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+
+    DataZoneEquipment::GetZoneEquipmentData1(state);
+
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+
+    DataGlobals::ZoneSizingCalc = true;
+
+    Real64 tolerance = 1E-3;
+
+    // Calculate convection coefficient DeltaT and Height != 0
+    Real64 deltaTemp = 10.0;
+    Real64 height = 1.0;
+    Real64 surfTemp = 20.0;
+    int zoneNum = 1;
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 3.583, tolerance);
+
+    // DeltaT = 0 Error Path
+    deltaTemp = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+
+    // Height = 0 Error Path
+    deltaTemp = 10.0;
+    height = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+}
+
+TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
+{
+
+    std::string const idf_objects = this->getIDFString();
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    bool errorsFound(false);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                              // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                        // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                         // expect no errors
+
+    HeatBalanceManager::GetZoneData(errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    ASSERT_FALSE(errorsFound);
+    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+
+    DataZoneEquipment::GetZoneEquipmentData1(state);
+
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+
+    DataGlobals::ZoneSizingCalc = true;
+
+    Real64 tolerance = 1E-3;
+
+    // Calculate convection coefficient DeltaT and Height != 0
+    Real64 deltaTemp = 10.0;
+    Real64 height = 1.0;
+    Real64 surfTemp = 20.0;
+    int zoneNum = 1;
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 0.937, tolerance);
+
+    // DeltaT = 0 Error Path
+    deltaTemp = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+
+    // Height = 0 Error Path
+    deltaTemp = 10.0;
+    height = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+}
+
+TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling)
+{
+
+    std::string const idf_objects = this->getIDFString();
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    bool errorsFound(false);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                              // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                        // expect no errors
+
+    errorsFound = false;
+    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                         // expect no errors
+
+    HeatBalanceManager::GetZoneData(errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    ASSERT_FALSE(errorsFound);
+    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+
+    DataZoneEquipment::GetZoneEquipmentData1(state);
+
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+
+    DataGlobals::ZoneSizingCalc = true;
+
+    Real64 tolerance = 1E-3;
+
+    // Calculate convection coefficient DeltaT and Height != 0
+    Real64 deltaTemp = 10.0;
+    Real64 height = 1.0;
+    Real64 surfTemp = 20.0;
+    int zoneNum = 1;
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 3.581, tolerance);
+
+    // DeltaT = 0 Error Path
+    deltaTemp = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+
+    // Height = 0 Error Path
+    deltaTemp = 10.0;
+    height = 0.0;
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(deltaTemp, height, surfTemp, zoneNum);
+    EXPECT_NEAR(convCoeff, 9.999, tolerance);
+}
+
+
+TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpleIntConvCoeff)
+{
+    // Unit test for the function CalcASHRAESimpleIntConvCoeff, used to determine the Convection Coefficient
+    // for the Ashrae Simple algorithm setting
+
+    Real64 Tsurf;
+    Real64 Tamb;
+    Real64 CosTilt;
+    Real64 ConvectionCoefficient;
+    Real64 ExpectedCoefficient;
+
+    // Scenario: Vertical Surface
+    // Hcov expected = 3.076
+    // Delta_T is not relevant for this calculation
+
+    Tsurf = 30.0;
+    Tamb = 20.0;
+    CosTilt = 0.0; // cos(90 degrees)
+    ExpectedCoefficient = 3.076;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: Vertical Surface, CosTilt not exactly zero
+    // Hcov expected = 3.076
+
+    Tsurf = 19.0;
+    Tamb = 20.0;
+    CosTilt = 0.0001; // cos(90 degrees)
+    ExpectedCoefficient = 3.076;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: Vertical Surface, Zero Delta T
+    // Hcov expected = 3.076
+
+    Tsurf = 23.0;
+    Tamb = 23.0;
+    CosTilt = 0; // cos(90 degrees)
+    ExpectedCoefficient = 3.076;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    // Scenario: Horizontal Surface with reduced convection
+    // Hcov expected = 0.948
+    // A negative Delta_T is required for reduced convection
+
+    Tsurf = 30.0;
+    Tamb = 20.0;
+    CosTilt = 0.9239; // cos(22.5 degrees)
+    ExpectedCoefficient = 0.948;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+
+    //Scenario: Horizontal surface with enhanced convection:
+    // Hcov expected = 4.040
+    // A positive Delta_T is required for enhanced convection
+
+    Tsurf = 20.0;
+    Tamb = 30.0;
+    CosTilt = 0.9239; // cos(22.5 degrees)
+    ExpectedCoefficient = 4.040;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: horizontal surface, enhanced convection
+    // 180 degree surface, negative Delta_T
+    // Hcov expected = 4.040
+
+    Tsurf = 30.0;
+    Tamb = 20.0;
+    CosTilt = -1; // cos(180 degrees)
+    ExpectedCoefficient = 4.040;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: horizontal surface, reduced convection
+    // 180 degree surface, positive Delta_T
+    // Hcov expected = 0.948
+
+    Tsurf = 20.0;
+    Tamb = 30.0;
+    CosTilt = -1; // cos(180 degrees)
+    ExpectedCoefficient = 0.948;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: tilted surface with reduced convection
+    // Hcov expected = 2.281
+    // A negative Delta_T is required for reduced convection
+
+    Tsurf = 30.0;
+    Tamb = 20.0;
+    CosTilt = 0.707; // cos(45 degrees)
+    ExpectedCoefficient = 2.281;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: tilted surface with enhanced convection
+    // Hcov expected = 3.870
+
+    Tsurf = 20.0;
+    Tamb = 30.0;
+    CosTilt = 0.707; // cos(45 degrees)
+    ExpectedCoefficient = 3.870;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+}
+
+TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependence)
+{
+    Real64 ConvectionCoefficient;
+    Real64 ExpectedCoefficient = 3.076;
+
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).CosTilt = 0;
+
+    DataHeatBalance::HConvIn.allocate(1);
+
+    CalcASHRAESimpleIntConvCoeff(1, 20.0, 30.0);
+
+    ConvectionCoefficient = DataHeatBalance::HConvIn(1);
+
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 }

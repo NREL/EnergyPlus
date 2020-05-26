@@ -76,7 +76,7 @@ Comparisons were done with the Zone Group Loads values (Zone Group Sensible Heat
 
 For the purposes of dicussion, the buildings will be called: Multistory 1 -- the original 9 zone building (with multipliers and groups) ref: Figure~\ref{fig:original-multistory-idf}; Multistory 2 -- the building shown in Figure~\ref{fig:multistory-with-cloned-middle-zones.}. Multistory with cloned middle zones.; Multistory 3 -- the fully configured building -- ref Figure~\ref{fig:multistory-building-fully-cloned.}.
 
-The following table illustrates the regression testing for Multistory 2 and Multistory 3, group loads and meters versus Multistory 1 results.
+The following table illustrates the regression testing for Multistory 2 and Multistory 3, group loads and meters versus Multistory 1 results.  For these tables, the location indicators refer to the following EnergyPlus weather files: Chicago (USA IL Chicago-OHare.Intl.AP.725300 TMY3), San Francisco (USA CA San.Francisco.Intl.AP.724940 TMY3), Colorado(USA CO Golden-NREL.724666 TMY3), Tampa (USA FL Tampa.Intl.AP.722110 TMY3), and Washington DC(USA VA Sterling-Washington.Dulles.Intl.AP.724030 TMY3).
 
 % table 1
 \begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
@@ -92,11 +92,11 @@ LOCATION & MULTI-STORY 2 LOADS & MULTI-STORY 2 METER & MULTI-STORY 3 LOADS & MUL
 \midrule
 \endhead
 
-USA\_IL\_Chicago-OHare.Intl.AP.725300\_TMY3 & Small Diffs & Equal & Big Diffs* (76\%) & Big Diffs* (62\%) \tabularnewline
-USA\_CA\_San.Francisco.Intl.AP.724940\_TMY3 & Big Diffs* (2.43\%) & Big Diffs* (0.6\%) & Big Diffs* (49\%) & Big Diffs* (41\%) \tabularnewline
-USA\_CO\_GOLDEN-NREL.724666\_TMY3 & Small Diffs & Small Diffs & Big Diffs* (26\%) & Big Diffs* (24\%) \tabularnewline
-USA\_FL\_Tampa.Intl.AP.722110\_TMY3 & Small Diffs & Small Diffs & Big Diffs* (6\%) & Big Diffs* (2\%) \tabularnewline
-USA\_VA\_Sterling-Washington.Dulles.Intl.AP.724030\_TMY3 & Equal & Equal & Big Diffs* (91\%) & Big Diffs* (72\%) \tabularnewline
+Chicago & Small Diffs & Equal & Big Diffs* (76\%) & Big Diffs* (62\%) \tabularnewline
+San Francisco & Big Diffs* (2.43\%) & Big Diffs* (0.6\%) & Big Diffs* (49\%) & Big Diffs* (41\%) \tabularnewline
+Colorado & Small Diffs & Small Diffs & Big Diffs* (26\%) & Big Diffs* (24\%) \tabularnewline
+Tampa & Small Diffs & Small Diffs & Big Diffs* (6\%) & Big Diffs* (2\%) \tabularnewline
+Washington DC & Equal & Equal & Big Diffs* (91\%) & Big Diffs* (72\%) \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -137,11 +137,11 @@ Location & Multi-story 2 Loahs & Multi-story 2 Meter & Multi-story 3 Loahs & Mul
 \midrule
 \endhead
 
-USA\_IL\_Chicago-OHare.Intl.AP.725300\_TMY3 & Small diffs & Small diffs & Small diffs & Small diffs \tabularnewline
-USA\_CA\_San.Francisco.Intl.AP.724940\_TMY3 & Small diffs & Small diffs & Small diffs & Small diffs \tabularnewline
-USA\_CO\_GOLDEN-NREL.724666\_TMY3 & Small diffs & Small diffs & Small diffs & Small diffs \tabularnewline
-USA\_FL\_Tampa.Intl.AP.722110\_TMY3 & Small diffs & Small diffs & Small diffs & Small diffs \tabularnewline
-USA\_VA\_Sterling-Washington.Dulles.Intl.AP.724030\_TMY3 & Small diffs & Small diffs & Small diffs & Small diffs \tabularnewline
+Chicago & Small diffs & Small diffs & Small diffs & Small diffs \tabularnewline
+San Francisco & Small diffs & Small diffs & Small diffs & Small diffs \tabularnewline
+Colorado & Small diffs & Small diffs & Small diffs & Small diffs \tabularnewline
+Tampa & Small diffs & Small diffs & Small diffs & Small diffs \tabularnewline
+Washington DC & Small diffs & Small diffs & Small diffs & Small diffs \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -163,11 +163,11 @@ Location & Multi-story 1 (9 zones) (mm:ss) & Multi-story 2~ (18 zones) (MM:SS) &
 \midrule
 \endhead
 
-USA\_IL\_Chicago-OHare.Intl.AP.725300\_TMY3 & 1:05 & 2:14 & 13:15 \tabularnewline
-USA\_CA\_San.Francisco.Intl.AP.724940\_TMY3 & 1:04 & 2:05 & 13:20 \tabularnewline
-USA\_CO\_GOLDEN-NREL.724666\_TMY3 & 1:17 & 2:28 & 14:43 \tabularnewline
-USA\_FL\_Tampa.Intl.AP.722110\_TMY3 & 1:11 & 2:21 & 13:43 \tabularnewline
-USA\_VA\_Sterling-Washington.Dulles.Intl.AP.724030\_TMY3 & 1:05 & 2:15 & 13:18 \tabularnewline
+Chicago & 1:05 & 2:14 & 13:15 \tabularnewline
+San Francisco & 1:04 & 2:05 & 13:20 \tabularnewline
+Colorado & 1:17 & 2:28 & 14:43 \tabularnewline
+Tampa & 1:11 & 2:21 & 13:43 \tabularnewline
+Washington DC & 1:05 & 2:15 & 13:18 \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -187,11 +187,11 @@ Location & Multi-story 1 (9 zones) (mm:ss) & Multi-story 2 (18 zones) (MM:SS) & 
 \midrule
 \endhead
 
-USA\_IL\_Chicago-OHare.Intl.AP.725300\_TMY3 & 0:51 & 1:34 & 9:37 \tabularnewline
-USA\_CA\_San.Francisco.Intl.AP.724940\_TMY3 & 0:50 & 1:34 & 9:59 \tabularnewline
-USA\_CO\_GOLDEN-NREL.724666\_TMY3 & 0:51 & 1:40 & 10:31 \tabularnewline
-USA\_FL\_Tampa.Intl.AP.722110\_TMY3 & 0:51 & 1:36 & 10:05 \tabularnewline
-USA\_VA\_Sterling-Washington.Dulles.Intl.AP.724030\_TMY3 & 0:51 & 1:36 & 9:48 \tabularnewline
+Chicago & 0:51 & 1:34 & 9:37 \tabularnewline
+San Francisco & 0:50 & 1:34 & 9:59 \tabularnewline
+Colorado & 0:51 & 1:40 & 10:31 \tabularnewline
+Tampa & 0:51 & 1:36 & 10:05 \tabularnewline
+Washington DC & 0:51 & 1:36 & 9:48 \tabularnewline
 \bottomrule
 \end{longtable}
 

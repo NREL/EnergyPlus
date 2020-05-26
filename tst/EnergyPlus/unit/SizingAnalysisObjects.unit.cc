@@ -86,7 +86,7 @@ public:
     // constructor for test fixture class
     SizingAnalysisObjectsTest()
     {
-        OutputFiles::getSingleton().eio.open_as_stringstream();
+        outputFiles().eio.open_as_stringstream();
         // fill in test log data values
         lowLogVal = 50.0;
         midLogVal = 75.0;
@@ -152,6 +152,14 @@ public:
         PlantSizData.deallocate();
         TimeValue.clear();
     }
+
+    OutputFiles &outputFiles()
+    {
+        return m_outputFiles.get();
+    }
+
+    std::reference_wrapper<OutputFiles> m_outputFiles{OutputFiles::getSingleton()};
+
 };
 
 TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
@@ -366,7 +374,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
 
     EXPECT_DOUBLE_EQ(0.002, PlantLoop(1).MaxVolFlowRate); //  m3/s
 
-    TestAnalysisObj.ResolveDesignFlowRate(OutputFiles::getSingleton(), 1);
+    TestAnalysisObj.ResolveDesignFlowRate(outputFiles(), 1);
 
     EXPECT_DOUBLE_EQ(0.0015, PlantLoop(1).MaxVolFlowRate); //  m3/s
     EXPECT_DOUBLE_EQ(1.5, PlantLoop(1).MaxMassFlowRate);   //  m3/s
@@ -416,12 +424,12 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
                                                   numTimeStepsInHour); // call constructor
                 SystemTimestepObject tmpSysStepStamp;
                 tmpSysStepStamp.CurMinuteEnd = (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
-                                               (subTimeStp)*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * minutesPerHour;
+                                               (subTimeStp) * (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
                 if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
                     tmpSysStepStamp.CurMinuteEnd = minutesPerHour;
                 }
-                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * minutesPerHour;
-                tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
+                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
+                tmpSysStepStamp.TimeStepDuration = *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 
@@ -442,12 +450,12 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
                                                   numTimeStepsInHour); // call constructor
                 SystemTimestepObject tmpSysStepStamp;
                 tmpSysStepStamp.CurMinuteEnd = (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
-                                               (subTimeStp)*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * minutesPerHour;
+                                               (subTimeStp) * (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
                 if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
                     tmpSysStepStamp.CurMinuteEnd = minutesPerHour;
                 }
-                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * minutesPerHour;
-                tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
+                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * minutesPerHour;
+                tmpSysStepStamp.TimeStepDuration = *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 
@@ -522,7 +530,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTestNullMassFlowRateTim
 
     EXPECT_DOUBLE_EQ(0.002, PlantLoop(1).MaxVolFlowRate); //  m3/s
 
-    TestAnalysisObj.ResolveDesignFlowRate(OutputFiles::getSingleton(), 1);
+    TestAnalysisObj.ResolveDesignFlowRate(outputFiles(), 1);
 
     EXPECT_NEAR(0.00015, PlantLoop(1).MaxVolFlowRate, 0.00001); //  m3/s
     EXPECT_NEAR(0.15, PlantLoop(1).MaxMassFlowRate, 0.001);     //  m3/s

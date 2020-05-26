@@ -48,14 +48,12 @@
 #include <EnergyPlus/StateManagement.hh>
 
 #include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Properties.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
-#include <EnergyPlus/BoilerSteam.hh>
-#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
@@ -125,6 +123,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
@@ -150,6 +149,7 @@
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -157,6 +157,7 @@
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
+#include <EnergyPlus/MicroCHPElectricGenerator.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
@@ -235,23 +236,17 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
+void EnergyPlus::clearThisState(EnergyPlusData &state)
+{
+    state.clear_state();
+}
 void EnergyPlus::clearAllStates()
 {
     using namespace EnergyPlus;
     // A to Z order
     AirflowNetworkBalanceManager::clear_state();
-    BaseboardElectric::clear_state();
-    BaseboardRadiator::clear_state();
-    Boilers::clear_state();
-    BoilerSteam::clear_state();
     BranchInputManager::clear_state();
     CoolingPanelSimple::clear_state();
-    ChillerAbsorption::clear_state();
-    ChillerElectricEIR::clear_state();
-    ChillerExhaustAbsorption::clear_state();
-    ChillerGasAbsorption::clear_state();
-    ChillerIndirectAbsorption::clear_state();
-    ChillerReformulatedEIR::clear_state();
     CoilCoolingDX::clear_state();
     CondenserLoopTowers::clear_state();
     CoolTower::clear_state();
@@ -305,7 +300,7 @@ void EnergyPlus::clearAllStates()
     EMSManager::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
-    ExteriorEnergyUse::clear_state();
+    //ExteriorEnergyUse::clear_state();
     FanCoilUnits::clear_state();
     Fans::clear_state();
     FaultsManager::clear_state();
@@ -338,12 +333,14 @@ void EnergyPlus::clearAllStates()
     HVACUnitaryBypassVAV::clear_state();
     HVACVariableRefrigerantFlow::clear_state();
     HybridModel::clear_state();
+    HybridUnitaryAirConditioners::clear_state();
     HysteresisPhaseChange::clear_state();
     EnergyPlus::inputProcessor->clear_state();
     IceThermalStorage::clear_state();
     IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
+    MicroCHPElectricGenerator::clear_state();
     MixedAir::clear_state();
     MixerComponent::clear_state();
     MoistureBalanceEMPDManager::clear_state();
@@ -360,7 +357,6 @@ void EnergyPlus::clearAllStates()
     Pipes::clear_state();
     PipeHeatTransfer::clear_state();
     PlantCentralGSHP::clear_state();
-    PlantChillers::clear_state();
     PlantCondLoopOperation::clear_state();
     PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
@@ -401,6 +397,7 @@ void EnergyPlus::clearAllStates()
     UnitHeater::clear_state();
     UnitVentilator::clear_state();
     UserDefinedComponents::clear_state();
+    UtilityRoutines::clear_state();
     VariableSpeedCoils::clear_state();
     VentilatedSlab::clear_state();
     WaterCoils::clear_state();

@@ -199,3 +199,28 @@ TEST_F(TwoDFixture, normalize) {
   EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(1.0), testing::DoubleEq(8.832)));
   Btwxt::LOG_LEVEL = 1;
 }
+
+TEST_F(TwoDSimpleNormalizationFixture, normalization_return_scalar) {
+    std::vector<double> target {7.0, 3.0};
+    std::vector<double> normalization_target = {2.0, 3.0};
+    double expected_divisor {test_function(normalization_target)};
+    double expected_value_at_target {test_function(target)/expected_divisor};
+    double return_scalar = test_rgi.normalize_values_at_target(0, normalization_target, 1.0);
+    test_rgi.set_new_target(target);
+    std::vector<double> results = test_rgi.get_values_at_target();
+    EXPECT_THAT(return_scalar, testing::DoubleEq(expected_divisor));
+    EXPECT_THAT(results, testing::ElementsAre(expected_value_at_target));
+}
+
+TEST_F(TwoDSimpleNormalizationFixture, normalization_return_compound_scalar) {
+    std::vector<double> target {7.0, 3.0};
+    std::vector<double> normalization_target = {2.0, 3.0};
+    double normalization_divisor = 4.0;
+    double expected_compound_divisor {test_function(normalization_target)*normalization_divisor};
+    double expected_value_at_target {test_function(target)/expected_compound_divisor};
+    double return_scalar = test_rgi.normalize_values_at_target(0, normalization_target, normalization_divisor);
+    test_rgi.set_new_target(target);
+    std::vector<double> results = test_rgi.get_values_at_target();
+    EXPECT_THAT(return_scalar, testing::DoubleEq(expected_compound_divisor));
+    EXPECT_THAT(results, testing::ElementsAre(expected_value_at_target));
+}

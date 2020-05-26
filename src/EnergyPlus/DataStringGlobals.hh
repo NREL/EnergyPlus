@@ -62,13 +62,8 @@ namespace DataStringGlobals {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    extern std::string outputAuditFileName;
-    extern std::string outputBndFileName;
-    extern std::string outputDxfFileName;
-    extern std::string outputEioFileName;
     extern std::string outputEndFileName;
     extern std::string outputErrFileName;
-    extern std::string outputEsoFileName;
 
     extern std::string outputJsonFileName;
     extern std::string outputTSHvacJsonFileName;
@@ -100,7 +95,6 @@ namespace DataStringGlobals {
 
     extern std::string outputMtdFileName;
     extern std::string outputMddFileName;
-    extern std::string outputMtrFileName;
     extern std::string outputRddFileName;
     extern std::string outputShdFileName;
     extern std::string outputTblCsvFileName;
@@ -114,7 +108,6 @@ namespace DataStringGlobals {
     extern std::string inputEpJSONSchemaFileName;
     extern std::string inputWeatherFileName;
     extern std::string outputAdsFileName;
-    extern std::string outputDfsFileName;
     extern std::string outputGLHEFileName;
     extern std::string outputDelightInFileName;
     extern std::string outputDelightOutFileName;
@@ -125,17 +118,7 @@ namespace DataStringGlobals {
     extern std::string outputMapTxtFileName;
     extern std::string outputEddFileName;
     extern std::string outputIperrFileName;
-    extern std::string outputDbgFileName;
     extern std::string outputPerfLogFileName;
-    extern std::string outputSlnFileName;
-    extern std::string outputSciFileName;
-    extern std::string outputWrlFileName;
-    extern std::string outputZszCsvFileName;
-    extern std::string outputZszTabFileName;
-    extern std::string outputZszTxtFileName;
-    extern std::string outputSszCsvFileName;
-    extern std::string outputSszTabFileName;
-    extern std::string outputSszTxtFileName;
     extern std::string outputScreenCsvFileName;
     extern std::string outputSqlFileName;
     extern std::string outputSqliteErrFileName;

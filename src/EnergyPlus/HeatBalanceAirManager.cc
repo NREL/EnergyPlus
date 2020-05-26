@@ -66,6 +66,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -151,7 +152,7 @@ namespace HeatBalanceAirManager {
         UniqueInfiltrationNames.clear();
     }
 
-    void ManageAirHeatBalance()
+    void ManageAirHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -196,7 +197,7 @@ namespace HeatBalanceAirManager {
 
         // Obtains and Allocates heat balance related parameters from input file
         if (ManageAirHeatBalanceGetInputFlag) {
-            GetAirHeatBalanceInput();
+            GetAirHeatBalanceInput(state);
             ManageAirHeatBalanceGetInputFlag = false;
         }
 
@@ -204,7 +205,7 @@ namespace HeatBalanceAirManager {
 
         // Solve the zone heat balance 'Detailed' solution
         // Call the air surface heat balances
-        CalcHeatBalanceAir();
+        CalcHeatBalanceAir(state);
 
         ReportZoneMeanAirTemp();
     }
@@ -212,7 +213,7 @@ namespace HeatBalanceAirManager {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetAirHeatBalanceInput()
+    void GetAirHeatBalanceInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -253,7 +254,7 @@ namespace HeatBalanceAirManager {
 
         auto &outputFiles = OutputFiles::getSingleton();
 
-        GetAirFlowFlag(outputFiles, ErrorsFound);
+        GetAirFlowFlag(state, outputFiles, ErrorsFound);
 
         SetZoneMassConservationFlag();
 
@@ -265,7 +266,7 @@ namespace HeatBalanceAirManager {
         }
     }
 
-    void GetAirFlowFlag(OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors found
+    void GetAirFlowFlag(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors found
     {
 
         // SUBROUTINE INFORMATION:
@@ -290,7 +291,7 @@ namespace HeatBalanceAirManager {
 
         AirFlowFlag = UseSimpleAirFlow;
 
-        GetSimpleAirModelInputs(outputFiles, ErrorsFound);
+        GetSimpleAirModelInputs(state, outputFiles, ErrorsFound);
         if (TotInfiltration + TotVentilation + TotMixing + TotCrossMixing + TotRefDoorMixing > 0) {
             static constexpr auto Format_720("! <AirFlow Model>, Simple\n AirFlow Model, {}\n");
             print(outputFiles.eio, Format_720, "Simple");
@@ -330,7 +331,7 @@ namespace HeatBalanceAirManager {
         }
     }
 
-    void GetSimpleAirModelInputs(OutputFiles &outputFiles, bool &ErrorsFound) // IF errors found in input
+    void GetSimpleAirModelInputs(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound) // IF errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -679,7 +680,7 @@ namespace HeatBalanceAirManager {
             }
 
             // Check whether this zone is also controleld by hybrid ventilation object with ventilation control option or not
-            ControlFlag = GetHybridVentilationControlStatus(ZoneAirBalance(Loop).ZonePtr);
+            ControlFlag = GetHybridVentilationControlStatus(state, ZoneAirBalance(Loop).ZonePtr);
             if (ControlFlag && ZoneAirBalance(Loop).BalanceMethod == AirBalanceQuadrature) {
                 ZoneAirBalance(Loop).BalanceMethod = AirBalanceNone;
                 ShowWarningError(cCurrentModuleObject + " = " + ZoneAirBalance(Loop).Name + ": This Zone (" + cAlphaArgs(2) +
@@ -4182,7 +4183,7 @@ namespace HeatBalanceAirManager {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcHeatBalanceAir()
+    void CalcHeatBalanceAir(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4218,7 +4219,7 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        ManageHVAC();
+        ManageHVAC(state, OutputFiles::getSingleton());
 
         // Do Final Temperature Calculations for Heat Balance before next Time step
         SumHmAW = 0.0;

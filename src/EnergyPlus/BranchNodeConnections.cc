@@ -54,7 +54,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -74,7 +73,6 @@ namespace BranchNodeConnections {
     // needed in the branch-node data
 
     // Using/Aliasing
-    using DataGlobals::OutputFileDebug;
     using namespace DataLoopNode;
     using namespace DataBranchNodeConnections;
 
@@ -1193,12 +1191,12 @@ namespace BranchNodeConnections {
     void GetChildrenData(std::string const &ComponentType,
                          std::string const &ComponentName,
                          int &NumChildren,
-                         Array1S_string ChildrenCType,
-                         Array1S_string ChildrenCName,
-                         Array1S_string InletNodeName,
-                         Array1S_int InletNodeNum,
-                         Array1S_string OutletNodeName,
-                         Array1S_int OutletNodeNum,
+                         Array1D_string &ChildrenCType,
+                         Array1D_string &ChildrenCName,
+                         Array1D_string &InletNodeName,
+                         Array1D_int &InletNodeNum,
+                         Array1D_string &OutletNodeName,
+                         Array1D_int &OutletNodeNum,
                          bool &ErrorsFound)
     {
 
@@ -1825,7 +1823,7 @@ namespace BranchNodeConnections {
     }
 
     void FindAllNodeNumbersInList(int const WhichNumber,
-                                  Array1<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
+                                  Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
                                   int const NumItems,
                                   int &CountOfItems,            // Number of items found
                                   Array1D_int &AllNumbersInList // Index array to all numbers found

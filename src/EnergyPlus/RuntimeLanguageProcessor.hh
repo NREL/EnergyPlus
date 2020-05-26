@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -179,7 +178,7 @@ namespace RuntimeLanguageProcessor {
 
     void BeginEnvrnInitializeRuntimeLanguage();
 
-    void ParseStack(int const StackNum);
+    void ParseStack(OutputFiles &outputFiles, int const StackNum);
 
     int AddInstruction(int const StackNum,
                        int const LineNum,
@@ -206,13 +205,14 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(std::string const &InString, // String of expression text written in the Runtime Language
+    void ParseExpression(OutputFiles &outputFiles,
+                         std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
                          std::string const &Line      // Actual line from string
     );
 
-    int ProcessTokens(Array1S<TokenType> const TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
+    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
 
     int NewExpression();
 
@@ -221,8 +221,6 @@ namespace RuntimeLanguageProcessor {
     void GetRuntimeLanguageUserInput();
 
     void ReportRuntimeLanguage();
-
-    std::string IntegerToString(int const Number);
 
     ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue = _);
 

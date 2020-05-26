@@ -55,26 +55,44 @@
 #include <ostream>
 
 namespace EnergyPlus {
+class OutputFile
+{
+public:
+    void close();
+    void del();
+    bool good() const;
+
+    // opens the file if it is not currently open and returns
+    // a reference back to itself
+    OutputFile &ensure_open(const std::string &caller);
+
+    std::string fileName;
+    void open();
+    std::fstream::pos_type position() const noexcept;
+    std::vector<std::string> getLines();
+    void open_as_stringstream();
+    std::string get_output();
+
+private:
+    explicit OutputFile(std::string FileName);
+    std::unique_ptr<std::iostream> os;
+    template <typename... Args> friend void print(OutputFile &of, fmt::string_view format_str, const Args &... args);
+    friend class OutputFiles;
+};
+
+
 class OutputFiles
 {
 public:
-    class OutputFile
-    {
-    public:
-        void close();
-        bool good() const;
-        void open_at_end();
-        std::string fileName;
-        void open();
-        std::vector<std::string> getLines();
-        void open_as_stringstream();
-        std::string get_output();
 
-    private:
-        explicit OutputFile(std::string FileName);
-        std::unique_ptr<std::iostream> os;
-        template <typename... Args> friend void print(OutputFiles::OutputFile &of, fmt::string_view format_str, const Args &... args);
-        friend class OutputFiles;
+    struct OutputFileName
+    {
+        std::string fileName;
+        OutputFile open(const std::string &caller) {
+            OutputFile of{fileName};
+            of.ensure_open(caller);
+            return of;
+        }
     };
 
     class GIOOutputFile
@@ -92,7 +110,32 @@ public:
         friend class OutputFiles;
     };
 
+    OutputFile audit{"eplusout.audit"};
     OutputFile eio{"eplusout.eio"};
+    OutputFile eso{"eplusout.eso"}; // (hourly data only)
+
+    OutputFile zsz{""};
+    std::string outputZszCsvFileName{"epluszsz.csv"};
+    std::string outputZszTabFileName{"epluszsz.tab"};
+    std::string outputZszTxtFileName{"epluszsz.txt"};
+
+    OutputFile ssz{""};
+    std::string outputSszCsvFileName{"eplusssz.csv"};
+    std::string outputSszTabFileName{"eplusssz.tab"};
+    std::string outputSszTxtFileName{"eplusssz.txt"};
+
+    OutputFile mtr{"eplusout.mtr"};
+    OutputFile bnd{"eplusout.bnd"};
+
+    OutputFile debug{"eplusout.dbg"};
+
+    OutputFile dfs{"eplusout.dfs"};
+
+    OutputFileName sln{"eplusout.sln"};
+    OutputFileName dxf{"eplusout.dxf"};
+    OutputFileName sci{"eplusout.sci"};
+    OutputFileName wrl{"eplusout.wrl"};
+
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 
@@ -112,8 +155,14 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
 // on the value being printed.
 // This is necessary for parity with the old "RoundSigDigits" utility function
 //
+// Defines a custom formatting type 'S' that behaves like Fortran's G type, but stripped of whitespace
+// 'S' was chosen for "Stripped". It is implemented in terms of 'N'
+//
 // Defines a custom formatting type 'N' that behaves like Fortran's G type.
 // 'N' was chosen for "Number"
+//
+// Defines a custom formatting type 'Z' that behaves like Fortran's E type.
+// 'Z' was chosen because Fortran's 'E' format always starts with a Zero
 //
 // Defines a custom formatting type 'T' that that truncates the value
 // to match the behavior of TrimSigDigits utility function
@@ -128,7 +177,7 @@ template <typename... Args> void print(OutputFiles::GIOOutputFile &outputFile, f
     EnergyPlus::vprint(outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
-template <typename... Args> void print(OutputFiles::OutputFile &outputFile, fmt::string_view format_str, const Args &... args)
+template <typename... Args> void print(OutputFile &outputFile, fmt::string_view format_str, const Args &... args)
 {
     assert(outputFile.os);
     EnergyPlus::vprint(*outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));

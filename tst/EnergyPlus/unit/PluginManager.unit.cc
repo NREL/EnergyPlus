@@ -56,25 +56,25 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, TestTrendVariable)
 {
 
-#ifdef LINK_WITH_PYTHON
-#if LINK_WITH_PYTHON == 1
+// this file isn't included in the gtest source unless LINK_WITH_PYTHON is ON
+
     // create a plugin manager instance
     EnergyPlus::PluginManagement::PluginManager pluginManager;
 
     // first create a plugin variable
-    EnergyPlus::PluginManagement::PluginManager::addGlobalVariable("my_var");
+    pluginManager.addGlobalVariable("my_var");
     int globalVarIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle("my_var", true);
     EXPECT_EQ(0, globalVarIndex);
 
     // now create a trend variable to track it
-    size_t const numVals = 4;
-    PluginManagement::trends.emplace_back("TREND_VAR", numVals, globalVarIndex);
+    size_t const numValues = 4;
+    PluginManagement::trends.emplace_back("TREND_VAR", numValues, globalVarIndex);
     int trendVarIndex = pluginManager.getTrendVariableHandle("trend_var");
     EXPECT_EQ(0, trendVarIndex);
 
     // initially it should be filled with zeroes
-    EXPECT_EQ(numVals, pluginManager.getTrendVariableHistorySize(trendVarIndex));
-    for (size_t i = 0; i < numVals; i++) {
+    EXPECT_EQ(numValues, pluginManager.getTrendVariableHistorySize(trendVarIndex));
+    for (size_t i = 0; i < numValues; i++) {
         EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(trendVarIndex, i));
     }
 
@@ -90,8 +90,6 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_NEAR(fakeValues[1], pluginManager.getTrendVariableValue(trendVarIndex, 1), 0.001);
     EXPECT_NEAR(fakeValues[0], pluginManager.getTrendVariableValue(trendVarIndex, 2), 0.001);
     EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(trendVarIndex, 3));
-#endif
-#endif
 
 }
 } // namespace EnergyPlus

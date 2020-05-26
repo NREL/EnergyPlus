@@ -10,7 +10,7 @@ IF( WIN32 )
   LIST( APPEND SRC bcvtb.def )
 ENDIF()
 
-INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat/lib")
+INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/third_party/Expat/lib")
 
 ADD_LIBRARY( bcvtb STATIC ${SRC} )
 

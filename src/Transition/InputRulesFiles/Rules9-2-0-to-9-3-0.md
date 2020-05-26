@@ -248,5 +248,5 @@ For all `EnergyManagementSystem:Program` and `EnergyManagementSystem:Subroutine`
     SET cp_air = @CpAirFnWTdb HumRatAir TdbAir, !- Program Line
     
 ### After
-    SET cp_air = @CpAirFnTW HumRatAir, !- Program Line
+    SET cp_air = @CpAirFnW HumRatAir, !- Program Line
     

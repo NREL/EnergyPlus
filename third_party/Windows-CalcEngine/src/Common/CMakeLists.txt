@@ -5,7 +5,7 @@ set( target_name FenestrationCommon )
 # first include header files of this project itself
 
 # make sure to connect to header files of common variables
-# include_directories( src ${CMAKE_SOURCE_DIR}/Common/src )
+# include_directories( src ${PROJECT_SOURCE_DIR}/Common/src )
 
 # collect all source files and add them to the SOURCES list
 file( GLOB SOURCES_CPP "src/*.cpp" )

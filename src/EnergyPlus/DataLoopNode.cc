@@ -84,7 +84,7 @@ namespace DataLoopNode {
     int const NodeType_Steam(3);    // 'Steam'
     int const NodeType_Electric(4); // 'Electric'
     Array1D_string const ValidNodeFluidTypes({0, 4}, {"blank", "Air", "Water", "Steam", "Electric"});
-    int const NumValidNodeFluidTypes(4);
+    //int const NumValidNodeFluidTypes(4);
 
     // Valid Connection Types for Nodes
     Array1D_string const ValidConnectionTypes(15,
@@ -126,7 +126,7 @@ namespace DataLoopNode {
     bool const ObjectIsParent(true);
     bool const ObjectIsNotParent(false);
     bool const IncrementFluidStreamYes(true);
-    bool const IncrementFluidStreamNo(false);
+    //bool const IncrementFluidStreamNo(false);
     Real64 const SensedNodeFlagValue(-999.0);
     Real64 const SensedLoadFlagValue(-999.0);
 
@@ -192,6 +192,7 @@ namespace DataLoopNode {
                                0.0,
                                0.0,
                                0.0,
+                               false,
                                false); // Autodesk:Note If intent is default construction drop initializer to elim bug exposure | FluidType |
                                        // FluidIndex | Temp {C} | TempMin {C} | TempMax {C} | TempSetPoint {C} | TempLastTimeStep {C} |
                                        // MassFlowRateRequest {kg/s} | MassFlowRate {kg/s} | MassFlowRateMin {kg/s} | MassFlowRateMax {kg/s}
@@ -260,6 +261,7 @@ namespace DataLoopNode {
                                      0.0,
                                      0.0,
                                      0.0,
+                                     false,
                                      false);
         MoreNodeInfo.deallocate();
         MarkedNode.deallocate();

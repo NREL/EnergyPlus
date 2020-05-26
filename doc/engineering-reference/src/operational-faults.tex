@@ -97,12 +97,17 @@ When EMS is used to overwrite the ZoneControl:Thermostat/ZoneControl:Humidistat 
 
 Reduced overall heat transfer coefficient (UA) causes reduced coil capacity, resulting in unmet loads and/or increased water flow rate and decreased water side temperature difference (``low delta-T'' syndrome).
 
-\subsubsection{Modeling Approach}\label{modeling-approach-2}
+\subsubsection{Modeling Approach - General}\label{modeling-approach-2}
 
-The coil fouling fault is described in the object FaultModel:Fouling:Coil. The fault model currently applies only to the `simple' water coils: Coil:Heating:Water and Coil:Cooling:Water. The FaultModel:Fouling:Coil object allows the user to describe the fouling information in either of the two methods: FouledUARated or FoulingFactor. Using FouledUARated method, user specifies the value of UAfouled directly. Using FoulingFactor method user specifies air/water side fouling factor, and the UAfouled value is further calculated via the equations shown below.
+The coil fouling fault is described in the object \textbf{FaultModel:Fouling:Coil}. The fault model currently applies only to the `simple' water coils:
+\textbf{Coil:Heating:Water} and \textbf{Coil:Cooling:Water}. 
+
+The \lstinline!FaultModel:Fouling:Coil! object allows the user to describe the fouling information in either of the two methods: \textbf{FouledUARated} or \textbf{FoulingFactor}.
+
+Using \lstinline!FouledUARated! method, user specifies the value of UAfouled directly. Using \lstinline!FoulingFactor! method user specifies air/water side fouling factor, and the UAfouled value is further calculated via the equations shown below.
 
 \begin{equation}
-UA_{fouled} = [UA_{air} - 1  +  R_{foul}  + UA_{water} - 1]-1
+    UA_{fouled} = [\frac{1}{UA_{air}} + R_{foul} + \frac{1}{UA_{water}}]^{-1}
 \end{equation}
 
 where:
@@ -113,12 +118,12 @@ where:
 
 \(UA_{water}\) is the heat transfer coefficient of the coil on the water side, W/K
 
-\(R_{foul}\) is the fouling factor, K/W.
+\(R_{foul}\) is the fouling thermal insulance factor (the reciprocal of a heat transfer coefficient), K/W.
 
 \(R_{foul}\) is determined by:
 
 \begin{equation}
-R_{foul} = r_{air}/A_{air} + r_{water} / A_{water}
+    R_{foul} = \frac{r_{air}}{A_{air}} + \frac{r_{water}}{A_{water}}
 \end{equation}
 
 where:
@@ -131,7 +136,106 @@ where:
 
 \(A_{water}\) is the water side coil surface area, m\(^{2}\).
 
+Given the input of the object based on the outside coil surface area and the inside to outside coil surface area ratio, this results in:
+
+\begin{equation}
+    R_{foul} = \frac{r_{water}}{A_{out}*A_{ratio}} + \frac{r_{air}}{A_{out}}
+\end{equation}
+
+where:
+
+\(A_{out}\) is the Outside Coil Surface Area (in contact with the air), m\(^{2}\).
+
+\(A_{ratio}\) is the Inside to Outside Coil Surface Area Ratio.
+
 The pressure drop associated with the fouling is ignored in the current implementation.
+
+An Availability schedule is used to schedule the fault on or off.
+A Severity Schedule is also used to represent the severity of the fault, or Fault Fraction. Schedule value of 1 (default) means that the fault is applied as is.
+
+\subsubsection{Modeling Approach - Heating Coil}\label{modeling-approach-fouling-coil-heating}
+
+When applied to a \textbf{Coil:Heating:Water}, before the fault is applied, the current, non-fouled, UA (\lstinline!WaterCoil(CoilNum).UACoilVariable!) is first determined
+
+\textbf{FouledUARated}:
+If method \textbf{FouledUARated} is used, we try to set the new $UA'$ to the $UA_{fouled}$ entered in the Fouling Object, adjusting for Fault Severity $FaultFrac$
+
+\begin{equation}
+    UA' = [\frac{FaultFrac}{UA_{fouled}}+\frac{(1-FaultFrac)}{UA}]^{-1}
+\end{equation}
+
+\textbf{FoulingFactor}:
+If method \textbf{FoulingFactor} is used:
+
+\begin{equation}
+    R_{foul} = FaultFrac \cdot [ \frac{r_{water}}{A_{out}*A_{ratio}} + \frac{r_{air}}{A_{out}} ]
+\end{equation}
+
+\begin{equation}
+    UA' = [\frac{1}{UA} + R_{foul}]^{-1}
+\end{equation}
+
+Note that we do not allow bettering the coil UA, so the final result in either cases is $UA' = min(UA, UA')$
+
+
+\subsubsection{Modeling Approach - Cooling Coil}\label{modeling-approach-fouling-coil-cooling}
+
+When applied to a \textbf{Coil:Cooling:Water}, before the fault is applied, the current, non-fouled, $UA_{water}$ (\lstinline!WaterCoil(CoilNum).UACoilExternal!) and 
+$UA_{air}$ (\lstinline!WaterCoil(CoilNum).UACoilInternal!) are first determined.
+
+\textbf{FoulingFactor}:
+
+If method \textbf{FoulingFactor} is used, the air-side and water-side fouling are applied respectively:
+
+\begin{equation}
+    UA_{air}' = [\frac{1}{UA_{air}} + FaultFrac \cdot \frac{r_{air}}{A_{out}}]^{-1}
+\end{equation}
+\begin{equation}
+    UA_{water}' = [\frac{1}{UA_{water}} + FaultFrac \cdot \frac{r_{water}}{A_{out}*A_{ratio}}]^{-1}
+\end{equation}
+
+\textbf{FouledUARated}:
+
+If method \textbf{FouledUARated} is used, the total $UA_{fouled}$ of the coil is specified, but we still have to split the fouling between External (air) and Internal (water).
+
+So we start by calculating the current split ratio $S_R$ between internal and external, and will use it for the new split:
+
+\begin{equation}
+    S_R = UA_{water} / UA_{air}
+\end{equation}
+\begin{equation}
+\begin{array}{l}
+    UA_{water} = S_R \cdot UA_{air} \\
+    UA'_{water} = S_R \cdot UA'_{air}
+\end{array}
+\end{equation}
+
+\begin{equation}
+\begin{array}{l}
+    UA = [\frac{1}{UA_{air}} + \frac{1}{UA_{water}}]^{-1} \\
+    UA = [\frac{1}{UA_{air}} + \frac{1}{S_R \cdot UA_{air}}]^{-1} \\
+    UA = \frac{UA_{air} \cdot S_R}{1 + S_R}
+\end{array}
+\end{equation}
+
+\begin{equation}
+    UA' = [\frac{FaultFrac}{UA_{fouled}}+\frac{(1-FaultFrac)}{UA}]^{-1}
+\end{equation}
+
+
+\begin{equation}
+    \frac{UA'_{air} \cdot S_R}{S_R + 1} = [\frac{FaultFrac}{UA_{fouled}}+\frac{(1-FaultFrac)}{\frac{UA_{air} \cdot S_R}{S_R + 1}}]^{-1}
+\end{equation}
+
+\begin{equation}
+\begin{array}{l}
+    UA'_{air} = [\frac{FaultFrac \cdot S_R}{(S_R+1) \cdot UA_{fouled}}+\frac{(1-FaultFrac)}{UA}]^{-1} \\
+    UA'_{water} = S_R \cdot UA'_{air}
+\end{array}
+\end{equation}
+
+Note that we do not allow bettering the coil UA, so the final result in either cases is $UA' = min(UA, UA')$
+
 
 \subsection{Air Filter Fouling}\label{air-filter-fouling}
 
