@@ -1648,7 +1648,7 @@ namespace ConvectionCoefficients {
                         std::string equationName = Alphas(Ptr + 1);
                         if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
                             ExtValue = HcExt_ConvectionTypesMap.at(equationName);
-                            if (equationName == "SIMPLE") {
+                            if (equationName == "SIMPLE" || equationName == "TARP" || equationName == "MOWITT" || equationName == "DOE-2" || equationName == "ADAPTIVECONVECTIONALGORITHM" ) {
                                 ApplyConvectionValue(Alphas(1), "OUTSIDE", -ExtValue);
                             } else if (equationName == "VALUE") {
                                 // SimpleValueAssignment via UserExtConvectionCoeffs array
