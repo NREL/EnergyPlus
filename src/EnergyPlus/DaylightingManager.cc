@@ -718,7 +718,7 @@ namespace DaylightingManager {
                     // for first time that daylight factors are calculated and so is insensitive to possible variation
                     // due to change in ground reflectance from month to month, or change in storm window status.
                     static constexpr auto Format_700(
-                        "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Fac at Ref Pt\n");
+                        "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor\n");
                     print(outputFiles.eio, Format_700);
                     for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                         if (ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
@@ -731,13 +731,13 @@ namespace DaylightingManager {
                                 for (const SkyType& skyType: {SkyType::Clear, SkyType::ClearTurbid, SkyType::Intermediate, SkyType::Overcast}) {
                                     std::string skyTypeString;
                                     if (skyType == SkyType::Clear) {
-                                        skyTypeString = "Clear Sky Daylight Factors";
+                                        skyTypeString = "Clear Sky";
                                     } else if (skyType == SkyType::ClearTurbid) {
-                                        skyTypeString = "Clear Turbid Sky Daylight Factors";
+                                        skyTypeString = "Clear Turbid Sky";
                                     } else if (skyType == SkyType::Intermediate) {
-                                        skyTypeString = "Intermediate Sky Daylight Factors";
+                                        skyTypeString = "Intermediate Sky";
                                     } else if (skyType == SkyType::Overcast) {
-                                        skyTypeString = "Overcast Sky Daylight Factors";
+                                        skyTypeString = "Overcast Sky";
                                     //} else {
                                     //    // Should never happen
                                     //    skyTypeString = "ERROR_SKY_TYPE_NOT_HANDLED";
@@ -793,9 +793,8 @@ namespace DaylightingManager {
             print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
             print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
             print(dfs, "{}\n",
-                   "Hour,Reference Point,Daylight Factor for Clear Sky at Reference point,Daylight Factor for Clear Turbid Sky at "
-                   "Reference point,Daylight Factor for Intermediate Sky at Reference point,Daylight Factor for "
-                   "Overcast Sky at Reference point");
+                   "Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,"
+                   "Daylight Factor for Intermediate Sky,Daylight Factor for Overcast Sky");
             CreateDFSReportFile = false;
         }
 
