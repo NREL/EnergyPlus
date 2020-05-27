@@ -9064,6 +9064,10 @@
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;
 
+  Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,timestep;
+
+  Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,timestep;
+
 ! ***REPORT TABLES***
 
   OutputControl:Table:Style,
