@@ -4,7 +4,8 @@ Allow Different Units in SQL and HTML Tabular Reports
 **Jason Glazer, GARD Analytics**
 
  - May 12, 2020
- 
+ - May 27, 2020 - added the IOref text and Design Document portion 
+
 
 ## Justification for New Feature ##
 
@@ -24,7 +25,7 @@ https://github.com/NREL/OpenStudio/issues/2039
 
 ## E-mail and  Conference Call Conclusions ##
 
-None
+No changes were based on the feedback from the reviewers of the intial NFP.
 
 ## Overview ##
 
@@ -85,7 +86,49 @@ Will test that the unit conversion in the SQL file for tables is correct.
 
 ## Input Output Reference Documentation ##
 
-Add a description of the proposed field to the Output:SQLite input object.
+Add the following description of the proposed field to the Output:SQLite input object.
+
+```
+Field: Tabular Unit Conversion
+
+When the Option Type field is set to SimpleAndTabular so that the tabular reports are included in the SQL file, 
+this field is active. The Tabular Unit Conversion field determines if any unit conversions will be performed for 
+the values of the tabular reports that are included in the SQL file. This field only affects the unit conversions 
+for the tabular reports in the SQL file and does not convert the units of the time series data in the SQL file. It also
+has no impact on the unit conversions for the tabular reports in the HTML or other output formats.
+
+This field is optional and, if not specified, defaults to UseOutputControlTableStyle which is using the same unit
+conversion that appears in the OutputControl:Table:Style object. Five different input options
+are available:
+
+- UseOutputControlTableStyle - use the same unit conversion as in OutputControl:Table:Style
+- None – no conversions performed
+- JtoKWH – Joules converted into kWh (1 / 3,600,000)
+- JtoMJ – Joules converted into Megajoules (1 / 1,000,000)
+- JtoGJ – Joules converted into Gigajoules (1 / 1,000,000,000)
+- InchPound – convert all annual, monthly, economics and timebins tabular values to common InchPound
+equivalent
+
+When no unit conversions is selected the energy is reported in the form of Joules but since the magnitude of those numbers
+for many buildings is very large, these other conversion factors are available.
+
+The JtoKWH, JtoMJ and JtoGJ unit conversion input option applies only to the Output:Table:Monthly
+reports and partially to the ABUPS report. For ABUPS, the JtoKWH option changes the report but the
+JtoMJ and JtoGJ options do not change the report since they it is already in MJ/m2 and GJ. In addition,
+the JtoKWH option also changes results in the LEED Summary report changing GJ to kWh and MJW/m2
+to kWh/m2. The InchPound unit conversion input option applies to all annual, monthly, timebins and
+economic reports that appear in the SQL file. 
+
+An example IDF input object follows.
+
+Output:SQLite,
+   SimpleAndTabular,    !- Option Type
+   InchPound;           !- Unit Conversion
+
+```
+
+This text was modified from the existing text in the IOref for the Unit Conversion field of the 
+OutputControl:Table:Style input object.
 
 ## Engineering Reference ##
 
@@ -99,5 +142,57 @@ No transition changes expected. An example file will be modified to include this
 
 None
 
+## Design Document ##
+
+Currently, the structure to write the tabular reports to the SQL file is located within each function that writes different 
+groups of tabular reports. The list of functions called is in OutputReportTabular::WriteTabular():
+
+- WriteBEPSTable()
+- WriteTableOfContents();
+- WriteVeriSumTable(outputFiles);
+- WriteDemandEndUseSummary();
+- WriteSourceEnergyEndUseSummary();
+- WriteComponentSizing();
+- WriteSurfaceShadowing();
+- WriteCompCostTable();
+- WriteAdaptiveComfortTable();
+- WriteEioTables(OutputFiles::getSingleton());
+- WriteLoadComponentSummaryTables();
+- WriteHeatEmissionTable();
+- coilSelectionReportObj->finishCoilSummaryReportTable(state);
+- WritePredefinedTables();                        
+- WriteMonthlyTables();
+- WriteTimeBinTables();
+- OutputReportTabularAnnual::WriteAnnualTables();
+
+For each of these functions, unit conversions are performed as needed on numbers and then converted into arrays of strings 
+representing the row and column headings as well as the body of the subtable.  These arrays are then passed to routines that 
+either write the individual tabular report to the HTML (or TXT or other formats) by calling: 
+
+- OutputReportTabular::WriteTable()
+
+and then the same string arrays are also passed to 
+
+- SQLProcedures::CreateSQLiteDatabase() 
+
+and for producing JSON and related formats for the tabular reports they are also passed to
+
+- ResultsFramework::OutputSchema-\>TabularReportsCollection.addReportTable()
+
+Given this structure, to implement the features we will update: 
+
+- OutputReportsTabular::WriteTabularReports() 
+
+that calls all the specific reporting functions to loop through the list of calls twice. When the unit conversions match 
+(both the tabular HTML and tabular SQL are in IP units for example) it would go through the loop once as it does now. 
+If the unit conversions did not match, the loop would allow the reports to be produced twice, passing the correct unit 
+conversion with the creation of the appropriate file type. A parameter to be passed (the unit conversion needed) and 
+appropriate flags for which files need to be generated. Each indivdual routine would then use the passed flags to determine
+which types of outputs should be produced for a given iteration using specific unit conversions.
+
+Also, the SQLProcedures::CreateSQLiteDatabase() function will be modified to add the reading the additional field 
+"Unit Conversion."
+
+In addition, appropriate unit tests will be added.
 
 
