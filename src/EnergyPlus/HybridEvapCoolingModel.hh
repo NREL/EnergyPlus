@@ -240,6 +240,8 @@ namespace HybridEvapCoolingModel {
         int AvailStatus;
 
         Real64 SystemMaximumSupplyAirFlowRate;           // taken from IDF N1, the system max supply flow rate in m3/s.
+        std::string FanHeatGain;             // .TRUE. = fan heat gain is accounted for in the lookup tables
+        Real64 MotInAirFrac;             // the location of the fan motor to calculate fan heat gain if not in lookup tables
         Real64 ScalingFactor;                            // taken from IDF N3, linear scaling factor.
         Real64 ScaledSystemMaximumSupplyAirMassFlowRate; // the scaled system max supply mass flow rate in m3/s.
         Real64 ScaledSystemMaximumSupplyAirVolumeFlowRate; // the scaled system max supply volume flow rate in m3/s.
