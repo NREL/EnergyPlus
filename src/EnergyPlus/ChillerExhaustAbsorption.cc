@@ -113,19 +113,15 @@ namespace ChillerExhaustAbsorption {
     //    Development of the original(GasAbsoptionChiller) module was funded by the Gas Research Institute.
     //    (Please see copyright and disclaimer information at end of module)
 
-    // Object Data
-    Array1D<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
-    bool Sim_GetInput(true);                       // then TRUE, calls subroutine to read input file.
-
-    PlantComponent *ExhaustAbsorberSpecs::factory(std::string const &objectName)
+    PlantComponent *ExhaustAbsorberSpecs::factory(ChillerExhaustAbsorptionData &chillers, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (Sim_GetInput) {
-            GetExhaustAbsorberInput();
-            Sim_GetInput = false;
+        if (chillers.Sim_GetInput) {
+            GetExhaustAbsorberInput(chillers);
+            chillers.Sim_GetInput = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &comp : ExhaustAbsorber) {
+        for (auto &comp : chillers.ExhaustAbsorber) {
             if (comp.Name == objectName) {
                 return &comp;
             }
@@ -229,7 +225,7 @@ namespace ChillerExhaustAbsorption {
         TempDesCondIn = this->TempDesCondReturn;
     }
 
-    void GetExhaustAbsorberInput()
+    void GetExhaustAbsorberInput(ChillerExhaustAbsorptionData &chillers)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Jason Glazer
@@ -271,10 +267,10 @@ namespace ChillerExhaustAbsorption {
             Get_ErrorsFound = true;
         }
 
-        if (allocated(ExhaustAbsorber)) return;
+        if (allocated(chillers.ExhaustAbsorber)) return;
 
         // ALLOCATE ARRAYS
-        ExhaustAbsorber.allocate(NumExhaustAbsorbers);
+        chillers.ExhaustAbsorber.allocate(NumExhaustAbsorbers);
 
         // LOAD ARRAYS
 
@@ -295,23 +291,24 @@ namespace ChillerExhaustAbsorption {
             // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
-            ExhaustAbsorber(AbsorberNum).Name = cAlphaArgs(1);
-            ChillerName = cCurrentModuleObject + " Named " + ExhaustAbsorber(AbsorberNum).Name;
+            auto &thisChiller = chillers.ExhaustAbsorber(AbsorberNum);
+            thisChiller.Name = cAlphaArgs(1);
+            ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
 
             // Assign capacities
-            ExhaustAbsorber(AbsorberNum).NomCoolingCap = rNumericArgs(1);
-            if (ExhaustAbsorber(AbsorberNum).NomCoolingCap == AutoSize) {
-                ExhaustAbsorber(AbsorberNum).NomCoolingCapWasAutoSized = true;
+            thisChiller.NomCoolingCap = rNumericArgs(1);
+            if (thisChiller.NomCoolingCap == AutoSize) {
+                thisChiller.NomCoolingCapWasAutoSized = true;
             }
-            ExhaustAbsorber(AbsorberNum).NomHeatCoolRatio = rNumericArgs(2);
+            thisChiller.NomHeatCoolRatio = rNumericArgs(2);
             // Assign efficiencies
-            ExhaustAbsorber(AbsorberNum).ThermalEnergyCoolRatio = rNumericArgs(3);
-            ExhaustAbsorber(AbsorberNum).ThermalEnergyHeatRatio = rNumericArgs(4);
-            ExhaustAbsorber(AbsorberNum).ElecCoolRatio = rNumericArgs(5);
-            ExhaustAbsorber(AbsorberNum).ElecHeatRatio = rNumericArgs(6);
+            thisChiller.ThermalEnergyCoolRatio = rNumericArgs(3);
+            thisChiller.ThermalEnergyHeatRatio = rNumericArgs(4);
+            thisChiller.ElecCoolRatio = rNumericArgs(5);
+            thisChiller.ElecHeatRatio = rNumericArgs(6);
 
             // Assign Node Numbers to specified nodes
-            ExhaustAbsorber(AbsorberNum).ChillReturnNodeNum = GetOnlySingleNode(cAlphaArgs(2),
+            thisChiller.ChillReturnNodeNum = GetOnlySingleNode(cAlphaArgs(2),
                                                                                 Get_ErrorsFound,
                                                                                 cCurrentModuleObject,
                                                                                 cAlphaArgs(1),
@@ -319,7 +316,7 @@ namespace ChillerExhaustAbsorption {
                                                                                 DataLoopNode::NodeConnectionType_Inlet,
                                                                                 1,
                                                                                 DataLoopNode::ObjectIsNotParent);
-            ExhaustAbsorber(AbsorberNum).ChillSupplyNodeNum = GetOnlySingleNode(cAlphaArgs(3),
+            thisChiller.ChillSupplyNodeNum = GetOnlySingleNode(cAlphaArgs(3),
                                                                                 Get_ErrorsFound,
                                                                                 cCurrentModuleObject,
                                                                                 cAlphaArgs(1),
@@ -329,7 +326,7 @@ namespace ChillerExhaustAbsorption {
                                                                                 DataLoopNode::ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");
             // Condenser node processing depends on condenser type, see below
-            ExhaustAbsorber(AbsorberNum).HeatReturnNodeNum = GetOnlySingleNode(cAlphaArgs(6),
+            thisChiller.HeatReturnNodeNum = GetOnlySingleNode(cAlphaArgs(6),
                                                                                Get_ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
@@ -337,7 +334,7 @@ namespace ChillerExhaustAbsorption {
                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                3,
                                                                                DataLoopNode::ObjectIsNotParent);
-            ExhaustAbsorber(AbsorberNum).HeatSupplyNodeNum = GetOnlySingleNode(cAlphaArgs(7),
+            thisChiller.HeatSupplyNodeNum = GetOnlySingleNode(cAlphaArgs(7),
                                                                                Get_ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
@@ -352,74 +349,74 @@ namespace ChillerExhaustAbsorption {
             }
 
             // Assign Part Load Ratios
-            ExhaustAbsorber(AbsorberNum).MinPartLoadRat = rNumericArgs(7);
-            ExhaustAbsorber(AbsorberNum).MaxPartLoadRat = rNumericArgs(8);
-            ExhaustAbsorber(AbsorberNum).OptPartLoadRat = rNumericArgs(9);
+            thisChiller.MinPartLoadRat = rNumericArgs(7);
+            thisChiller.MaxPartLoadRat = rNumericArgs(8);
+            thisChiller.OptPartLoadRat = rNumericArgs(9);
             // Assign Design Conditions
-            ExhaustAbsorber(AbsorberNum).TempDesCondReturn = rNumericArgs(10);
-            ExhaustAbsorber(AbsorberNum).TempDesCHWSupply = rNumericArgs(11);
-            ExhaustAbsorber(AbsorberNum).EvapVolFlowRate = rNumericArgs(12);
-            if (ExhaustAbsorber(AbsorberNum).EvapVolFlowRate == AutoSize) {
-                ExhaustAbsorber(AbsorberNum).EvapVolFlowRateWasAutoSized = true;
+            thisChiller.TempDesCondReturn = rNumericArgs(10);
+            thisChiller.TempDesCHWSupply = rNumericArgs(11);
+            thisChiller.EvapVolFlowRate = rNumericArgs(12);
+            if (thisChiller.EvapVolFlowRate == AutoSize) {
+                thisChiller.EvapVolFlowRateWasAutoSized = true;
             }
             if (UtilityRoutines::SameString(cAlphaArgs(16), "AirCooled")) {
-                ExhaustAbsorber(AbsorberNum).CondVolFlowRate = 0.0011; // Condenser flow rate not used for this cond type
+                thisChiller.CondVolFlowRate = 0.0011; // Condenser flow rate not used for this cond type
             } else {
-                ExhaustAbsorber(AbsorberNum).CondVolFlowRate = rNumericArgs(13);
-                if (ExhaustAbsorber(AbsorberNum).CondVolFlowRate == AutoSize) {
-                    ExhaustAbsorber(AbsorberNum).CondVolFlowRateWasAutoSized = true;
+                thisChiller.CondVolFlowRate = rNumericArgs(13);
+                if (thisChiller.CondVolFlowRate == AutoSize) {
+                    thisChiller.CondVolFlowRateWasAutoSized = true;
                 }
             }
-            ExhaustAbsorber(AbsorberNum).HeatVolFlowRate = rNumericArgs(14);
-            if (ExhaustAbsorber(AbsorberNum).HeatVolFlowRate == AutoSize) {
-                ExhaustAbsorber(AbsorberNum).HeatVolFlowRateWasAutoSized = true;
+            thisChiller.HeatVolFlowRate = rNumericArgs(14);
+            if (thisChiller.HeatVolFlowRate == AutoSize) {
+                thisChiller.HeatVolFlowRateWasAutoSized = true;
             }
             // Assign Curve Numbers
-            ExhaustAbsorber(AbsorberNum).CoolCapFTCurve = GetCurveCheck(cAlphaArgs(8), Get_ErrorsFound, ChillerName);
-            ExhaustAbsorber(AbsorberNum).ThermalEnergyCoolFTCurve = GetCurveCheck(cAlphaArgs(9), Get_ErrorsFound, ChillerName);
-            ExhaustAbsorber(AbsorberNum).ThermalEnergyCoolFPLRCurve = GetCurveCheck(cAlphaArgs(10), Get_ErrorsFound, ChillerName);
-            ExhaustAbsorber(AbsorberNum).ElecCoolFTCurve = GetCurveCheck(cAlphaArgs(11), Get_ErrorsFound, ChillerName);
-            ExhaustAbsorber(AbsorberNum).ElecCoolFPLRCurve = GetCurveCheck(cAlphaArgs(12), Get_ErrorsFound, ChillerName);
-            ExhaustAbsorber(AbsorberNum).HeatCapFCoolCurve = GetCurveCheck(cAlphaArgs(13), Get_ErrorsFound, ChillerName);
-            ExhaustAbsorber(AbsorberNum).ThermalEnergyHeatFHPLRCurve = GetCurveCheck(cAlphaArgs(14), Get_ErrorsFound, ChillerName);
+            thisChiller.CoolCapFTCurve = GetCurveCheck(cAlphaArgs(8), Get_ErrorsFound, ChillerName);
+            thisChiller.ThermalEnergyCoolFTCurve = GetCurveCheck(cAlphaArgs(9), Get_ErrorsFound, ChillerName);
+            thisChiller.ThermalEnergyCoolFPLRCurve = GetCurveCheck(cAlphaArgs(10), Get_ErrorsFound, ChillerName);
+            thisChiller.ElecCoolFTCurve = GetCurveCheck(cAlphaArgs(11), Get_ErrorsFound, ChillerName);
+            thisChiller.ElecCoolFPLRCurve = GetCurveCheck(cAlphaArgs(12), Get_ErrorsFound, ChillerName);
+            thisChiller.HeatCapFCoolCurve = GetCurveCheck(cAlphaArgs(13), Get_ErrorsFound, ChillerName);
+            thisChiller.ThermalEnergyHeatFHPLRCurve = GetCurveCheck(cAlphaArgs(14), Get_ErrorsFound, ChillerName);
             if (Get_ErrorsFound) {
                 ShowFatalError("Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 Get_ErrorsFound = false;
             }
             if (UtilityRoutines::SameString(cAlphaArgs(15), "LeavingCondenser")) {
-                ExhaustAbsorber(AbsorberNum).isEnterCondensTemp = false;
+                thisChiller.isEnterCondensTemp = false;
             } else if (UtilityRoutines::SameString(cAlphaArgs(15), "EnteringCondenser")) {
-                ExhaustAbsorber(AbsorberNum).isEnterCondensTemp = true;
+                thisChiller.isEnterCondensTemp = true;
             } else {
-                ExhaustAbsorber(AbsorberNum).isEnterCondensTemp = true;
+                thisChiller.isEnterCondensTemp = true;
                 ShowWarningError("Invalid " + cAlphaFieldNames(15) + '=' + cAlphaArgs(15));
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError("resetting to ENTERING-CONDENSER, simulation continues");
             }
             // Assign Other Paramters
             if (UtilityRoutines::SameString(cAlphaArgs(16), "AirCooled")) {
-                ExhaustAbsorber(AbsorberNum).isWaterCooled = false;
+                thisChiller.isWaterCooled = false;
             } else if (UtilityRoutines::SameString(cAlphaArgs(16), "WaterCooled")) {
-                ExhaustAbsorber(AbsorberNum).isWaterCooled = true;
+                thisChiller.isWaterCooled = true;
             } else {
-                ExhaustAbsorber(AbsorberNum).isWaterCooled = true;
+                thisChiller.isWaterCooled = true;
                 ShowWarningError("Invalid " + cAlphaFieldNames(16) + '=' + cAlphaArgs(16));
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError("resetting to WATER-COOLED, simulation continues");
             }
-            if (!ExhaustAbsorber(AbsorberNum).isEnterCondensTemp && !ExhaustAbsorber(AbsorberNum).isWaterCooled) {
-                ExhaustAbsorber(AbsorberNum).isEnterCondensTemp = true;
+            if (!thisChiller.isEnterCondensTemp && !thisChiller.isWaterCooled) {
+                thisChiller.isEnterCondensTemp = true;
                 ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value");
                 ShowContinueError("Invalid to have both LeavingCondenser and AirCooled.");
                 ShowContinueError("resetting to EnteringCondenser, simulation continues");
             }
-            if (ExhaustAbsorber(AbsorberNum).isWaterCooled) {
+            if (thisChiller.isWaterCooled) {
                 if (lAlphaFieldBlanks(5)) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value");
                     ShowContinueError("For WaterCooled chiller the condenser outlet node is required.");
                     Get_ErrorsFound = true;
                 }
-                ExhaustAbsorber(AbsorberNum).CondReturnNodeNum = GetOnlySingleNode(cAlphaArgs(4),
+                thisChiller.CondReturnNodeNum = GetOnlySingleNode(cAlphaArgs(4),
                                                                                    Get_ErrorsFound,
                                                                                    cCurrentModuleObject,
                                                                                    cAlphaArgs(1),
@@ -427,7 +424,7 @@ namespace ChillerExhaustAbsorption {
                                                                                    DataLoopNode::NodeConnectionType_Inlet,
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
-                ExhaustAbsorber(AbsorberNum).CondSupplyNodeNum = GetOnlySingleNode(cAlphaArgs(5),
+                thisChiller.CondSupplyNodeNum = GetOnlySingleNode(cAlphaArgs(5),
                                                                                    Get_ErrorsFound,
                                                                                    cCurrentModuleObject,
                                                                                    cAlphaArgs(1),
@@ -437,7 +434,7 @@ namespace ChillerExhaustAbsorption {
                                                                                    DataLoopNode::ObjectIsNotParent);
                 TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Condenser Water Nodes");
             } else {
-                ExhaustAbsorber(AbsorberNum).CondReturnNodeNum = GetOnlySingleNode(cAlphaArgs(4),
+                thisChiller.CondReturnNodeNum = GetOnlySingleNode(cAlphaArgs(4),
                                                                                    Get_ErrorsFound,
                                                                                    cCurrentModuleObject,
                                                                                    cAlphaArgs(1),
@@ -447,22 +444,22 @@ namespace ChillerExhaustAbsorption {
                                                                                    DataLoopNode::ObjectIsNotParent);
                 // Condenser outlet node not used for air or evap cooled condenser so ingore cAlphaArgs( 5 )
                 // Connection not required for air or evap cooled condenser so no call to TestCompSet here
-                CheckAndAddAirNodeNumber(ExhaustAbsorber(AbsorberNum).CondReturnNodeNum, Okay);
+                CheckAndAddAirNodeNumber(thisChiller.CondReturnNodeNum, Okay);
                 if (!Okay) {
                     ShowWarningError(cCurrentModuleObject + ", Adding OutdoorAir:Node=" + cAlphaArgs(4));
                 }
             }
 
-            ExhaustAbsorber(AbsorberNum).CHWLowLimitTemp = rNumericArgs(15);
-            ExhaustAbsorber(AbsorberNum).SizFac = rNumericArgs(16);
-            ExhaustAbsorber(AbsorberNum).TypeOf = cAlphaArgs(17);
+            thisChiller.CHWLowLimitTemp = rNumericArgs(15);
+            thisChiller.SizFac = rNumericArgs(16);
+            thisChiller.TypeOf = cAlphaArgs(17);
 
             if (UtilityRoutines::SameString(cAlphaArgs(17), "Generator:MicroTurbine")) {
-                ExhaustAbsorber(AbsorberNum).CompType_Num = DataGlobalConstants::iGeneratorMicroturbine;
-                ExhaustAbsorber(AbsorberNum).ExhuastSourceName = cAlphaArgs(18);
+                thisChiller.CompType_Num = DataGlobalConstants::iGeneratorMicroturbine;
+                thisChiller.ExhuastSourceName = cAlphaArgs(18);
 
-                auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(ExhaustAbsorber(AbsorberNum).ExhuastSourceName);
-                ExhaustAbsorber(AbsorberNum).ExhaustAirInletNodeNum =
+                auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(thisChiller.ExhuastSourceName);
+                thisChiller.ExhaustAirInletNodeNum =
                     dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs *>(thisMTG)->CombustionAirOutletNodeNum;
             }
         }
@@ -2012,12 +2009,6 @@ namespace ChillerExhaustAbsorption {
         this->HeatThermalEnergy = this->HeatThermalEnergyUseRate * RptConstant;
         this->ElectricEnergy = this->ElectricPower * RptConstant;
         this->HeatElectricEnergy = this->HeatElectricPower * RptConstant;
-    }
-
-    void clear_state()
-    {
-        ExhaustAbsorber.deallocate();
-        Sim_GetInput = true;
     }
 
 } // namespace ChillerExhaustAbsorption

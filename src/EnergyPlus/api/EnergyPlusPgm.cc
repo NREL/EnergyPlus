@@ -187,15 +187,11 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
@@ -220,7 +216,6 @@
 #include <direct.h>
 #include <stdlib.h>
 #else // Mac or Linux
-#include <fmt-6.1.2/include/fmt/format.h>
 #include <unistd.h>
 #endif
 
@@ -257,7 +252,7 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
     epStartTime("EntireRun=");
 #endif
 
-    CreateCurrentDateTimeString(DataStringGlobals::CurrentDateTime);
+    DataStringGlobals::CurrentDateTime = CreateCurrentDateTimeString();
 
     ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
     ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
@@ -343,7 +338,7 @@ int initializeAsLibrary(EnergyPlus::EnergyPlusData &state) {
     epStartTime("EntireRun=");
 #endif
 
-    CreateCurrentDateTimeString(DataStringGlobals::CurrentDateTime);
+    DataStringGlobals::CurrentDateTime = CreateCurrentDateTimeString();
 
     ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
     ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
@@ -485,7 +480,7 @@ void StoreMessageCallback(void (*f)(std::string const &))
     fMessagePtr = f;
 }
 
-void CreateCurrentDateTimeString(std::string &CurrentDateTimeString)
+std::string CreateCurrentDateTimeString()
 {
 
     // SUBROUTINE INFORMATION:
@@ -499,7 +494,6 @@ void CreateCurrentDateTimeString(std::string &CurrentDateTimeString)
     // that one is always available.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    ObjexxFCL::gio::Fmt fmtDate("(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array1D_int value(8);
@@ -515,8 +509,8 @@ void CreateCurrentDateTimeString(std::string &CurrentDateTimeString)
 
     date_and_time(datestring, _, _, value);
     if (!datestring.empty()) {
-        ObjexxFCL::gio::write(CurrentDateTimeString, fmtDate) << value(1) << value(2) << value(3) << value(5) << value(6);
+        return EnergyPlus::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
     } else {
-        CurrentDateTimeString = " unknown date/time";
+        return " unknown date/time";
     }
 }

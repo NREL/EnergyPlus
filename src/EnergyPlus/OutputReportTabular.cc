@@ -67,18 +67,15 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
-#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataCostEstimate.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -86,7 +83,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -98,7 +94,6 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -172,7 +167,6 @@ namespace OutputReportTabular {
     //                                      |--> MonthlyTable --> MonthlyColumns
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BigNumber;
     using DataGlobals::CurrentTime;
     using DataGlobals::DisplayExtraWarnings;
@@ -723,7 +717,7 @@ namespace OutputReportTabular {
         OutputReportTabular::ResetTabularReports();
     }
 
-    void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
+    void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -792,7 +786,7 @@ namespace OutputReportTabular {
                 GatherSourceEnergyEndUseResultsForTimestep(t_timeStepType);
                 GatherPeakDemandForTimestep(t_timeStepType);
                 GatherHeatGainReport(t_timeStepType);
-                GatherHeatEmissionReport(t_timeStepType);
+                GatherHeatEmissionReport(state, t_timeStepType);
             }
         }
     }
@@ -4085,6 +4079,7 @@ namespace OutputReportTabular {
         static int curFirstColumn(0);
 
         if (!DoWeathSim) return;
+        assert(DataGlobals::TimeStepZoneSec > 0.0);
 
         // create temporary arrays to speed processing of these arrays
         if (GatherMonthlyResultsForTimestepRunOnce) {
@@ -4720,6 +4715,7 @@ namespace OutputReportTabular {
         int curMeterNumber;
         int minuteCalculated;
         int timestepTimeStamp;
+        assert(DataGlobals::TimeStepZoneSec > 0.0);
 
         if ((displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
@@ -4783,7 +4779,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType)
+    void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Gathers the data each zone timestep for the heat gain report.
@@ -4811,7 +4807,7 @@ namespace OutputReportTabular {
             return;
         }
 
-        CalcHeatEmissionReport();
+        CalcHeatEmissionReport(state);
         BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * convertJtoGJ;
         BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * convertJtoGJ;
         BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
@@ -4822,7 +4818,7 @@ namespace OutputReportTabular {
     }
 
 
-    void CalcHeatEmissionReport()
+    void CalcHeatEmissionReport(EnergyPlusData &state)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Gathers the data each zone timestep for the heat gain report.
@@ -4830,12 +4826,6 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using Boilers::Boiler;
-        using Boilers::NumBoilers;
-        using ChillerElectricEIR::ElectricEIRChiller;
-        using ChillerElectricEIR::NumElectricEIRChillers;
-        using ChillerReformulatedEIR::ElecReformEIRChiller;
-        using ChillerReformulatedEIR::NumElecReformEIRChillers;
         using CondenserLoopTowers::NumSimpleTowers;
         using CondenserLoopTowers::towers;
         using DataEnvironment::WeatherFileLocationTitle;
@@ -4866,14 +4856,6 @@ namespace OutputReportTabular {
         using MixedAir::OAController;
         using PackagedThermalStorageCoil::NumTESCoils;
         using PackagedThermalStorageCoil::TESCoil;
-        using PlantChillers::ConstCOPChiller;
-        using PlantChillers::ElectricChiller;
-        using PlantChillers::EngineDrivenChiller;
-        using PlantChillers::GTChiller;
-        using PlantChillers::NumConstCOPChillers;
-        using PlantChillers::NumElectricChillers;
-        using PlantChillers::NumEngineDrivenChillers;
-        using PlantChillers::NumGTChillers;
         using RefrigeratedCase::Condenser;
         using RefrigeratedCase::RefrigRack;
         using VariableSpeedCoils::NumVarSpeedCoils;
@@ -4912,40 +4894,40 @@ namespace OutputReportTabular {
         }
 
         // Air- and Evap-cooled chiller
-        for (iChiller = 1; iChiller <= NumElectricChillers; ++iChiller) {
-            if (ElectricChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
+        for (iChiller = 1; iChiller <= state.dataPlantChillers.NumElectricChillers; ++iChiller) {
+            if (state.dataPlantChillers.ElectricChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataPlantChillers.ElectricChiller(iChiller).CondenserEnergy;
             }
         }
-        for (iChiller = 1; iChiller <= NumEngineDrivenChillers; ++iChiller) {
-            if (EngineDrivenChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += EngineDrivenChiller(iChiller).CondenserEnergy;
+        for (iChiller = 1; iChiller <= state.dataPlantChillers.NumEngineDrivenChillers; ++iChiller) {
+            if (state.dataPlantChillers.EngineDrivenChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataPlantChillers.EngineDrivenChiller(iChiller).CondenserEnergy;
             }
         }
-        for (iChiller = 1; iChiller <= NumGTChillers; ++iChiller) {
-            if (GTChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += GTChiller(iChiller).CondenserEnergy;
+        for (iChiller = 1; iChiller <= state.dataPlantChillers.NumGTChillers; ++iChiller) {
+            if (state.dataPlantChillers.GTChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataPlantChillers.GTChiller(iChiller).CondenserEnergy;
             }
         }
-        for (iChiller = 1; iChiller <= NumConstCOPChillers; ++iChiller) {
-            if (ConstCOPChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ConstCOPChiller(iChiller).CondenserEnergy;
+        for (iChiller = 1; iChiller <= state.dataPlantChillers.NumConstCOPChillers; ++iChiller) {
+            if (state.dataPlantChillers.ConstCOPChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataPlantChillers.ConstCOPChiller(iChiller).CondenserEnergy;
             }
         }
-        for (iChiller = 1; iChiller <= NumElectricEIRChillers; ++iChiller) {
-            if (ElectricEIRChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
+        for (iChiller = 1; iChiller <= state.dataChillerElectricEIR.NumElectricEIRChillers; ++iChiller) {
+            if (state.dataChillerElectricEIR.ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataChillerElectricEIR.ElectricEIRChiller(iChiller).CondEnergy;
             }
         }
-        for (iChiller = 1; iChiller <= NumElecReformEIRChillers; ++iChiller) {
-            if (ElecReformEIRChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
+        for (iChiller = 1; iChiller <= state.dataChillerReformulatedEIR.NumElecReformEIRChillers; ++iChiller) {
+            if (state.dataChillerReformulatedEIR.ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataChillerReformulatedEIR.ElecReformEIRChiller(iChiller).CondEnergy;
             }
         }
 
         // Water / steam boiler
-        for (iBoiler = 1; iBoiler <= NumBoilers; ++iBoiler) {
-            SysTotalHVACRejectHeatLoss += Boiler(iBoiler).FuelConsumed + Boiler(iBoiler).ParasiticElecConsumption - Boiler(iBoiler).BoilerEnergy;
+        for (iBoiler = 1; iBoiler <= state.dataBoilers.numBoilers; ++iBoiler) {
+            SysTotalHVACRejectHeatLoss += state.dataBoilers.Boiler(iBoiler).FuelConsumed + state.dataBoilers.Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers.Boiler(iBoiler).BoilerEnergy;
         }
 
         // DX Coils air to air
@@ -5717,7 +5699,7 @@ namespace OutputReportTabular {
         }
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
-        outputFiles.audit.ensure_open();
+        outputFiles.audit.ensure_open("WriteTabularReports");
         print(outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
         print(outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
         print(outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
@@ -8600,7 +8582,7 @@ namespace OutputReportTabular {
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
 
                 Array1D_string rowHeadTemp(rowHead);
-                // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+                // Before outputing to SQL, we forward fill the End use column (rowHead)
                 // for better sql queries
                 FillRowHead(rowHeadTemp);
 
@@ -15661,33 +15643,12 @@ namespace OutputReportTabular {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static Array1D<ObjexxFCL::gio::Fmt> formDigits({0, 9},
-                                                       {"(F12.0)",
-                                                        "(F12.1)",
-                                                        "(F12.2)",
-                                                        "(F12.3)",
-                                                        "(F12.4)",
-                                                        "(F12.5)",
-                                                        "(F12.6)",
-                                                        "(F12.7)",
-                                                        "(F12.8)",
-                                                        "(F12.9)"}); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) |
-                                                                     // formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) |
-                                                                     // formDigits(8) | formDigits(9)
-        static Array1D<Real64> const maxvalDigits({0, 9},
-                                                  {9999999999.0,
-                                                   999999999.0,
-                                                   99999999.0,
-                                                   9999999.0,
-                                                   999999.0,
-                                                   99999.0,
-                                                   9999.0,
-                                                   999.0,
-                                                   99.0,
-                                                   9.0}); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) |
-                                                          // maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) |
-                                                          // maxvalDigits(8) | maxvalDigits(9)
-        static ObjexxFCL::gio::Fmt fmtd("(E12.6)");
+        static constexpr std::array<const char *, 10> formDigitsA{
+            "{:#12.0F}", "{:12.1F}", "{:12.2F}", "{:12.3F}", "{:12.4F}", "{:12.5F}", "{:12.6F}", "{:12.7F}", "{:12.8F}", "{:12.9F}"};
+
+        static constexpr std::array<Real64, 10> maxvalDigitsA(
+            {9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0, 9.0});
+
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -15696,17 +15657,15 @@ namespace OutputReportTabular {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int nDigits;
-
-        nDigits = numDigits;
+        int nDigits = numDigits;
         if (RealIn < 0.0) --nDigits;
         if (nDigits > 9) nDigits = 9;
         if (nDigits < 0) nDigits = 0;
 
-        if (std::abs(RealIn) > maxvalDigits(nDigits)) {
-            ObjexxFCL::gio::write(StringOut, fmtd) << RealIn;
+        if (std::abs(RealIn) > maxvalDigitsA.at(nDigits)) {
+            return format("{:12.6Z}", RealIn);
         } else {
-            ObjexxFCL::gio::write(StringOut, formDigits(nDigits)) << RealIn;
+            return format(formDigitsA.at(nDigits), RealIn);
         }
         //  WRITE(FMT=, UNIT=stringOut) RealIn
         // check if it did not fit
@@ -15715,7 +15674,6 @@ namespace OutputReportTabular {
         //  END IF
 
         // WRITE(FMT="(F10.4)", UNIT=stringOut, IOSTAT=status ) RealIn
-        return StringOut;
     }
 
     Real64 StrToReal(std::string const &stringIn)
@@ -15760,7 +15718,6 @@ namespace OutputReportTabular {
 
         // Locals
         // ((month*100 + day)*100 + hour)*100 + minute
-        static ObjexxFCL::gio::Fmt DateFmt("(I2.2,'-',A3,'-',I2.2,':',I2.2)");
 
         int Month;  // month in integer format (1-12)
         int Day;    // day in integer format (1-31)
@@ -15802,7 +15759,7 @@ namespace OutputReportTabular {
             } else {
                 monthName = "***";
             }
-            ObjexxFCL::gio::write(StringOut, DateFmt) << Day << monthName << Hour << Minute;
+            StringOut = format("{:02}-{:3}-{:02}:{:02}", Day, monthName, Hour, Minute);
             if (has(StringOut, "*")) {
                 StringOut = "-";
             }
