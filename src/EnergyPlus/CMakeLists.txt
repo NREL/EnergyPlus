@@ -25,6 +25,7 @@ SET( SRC
   AirLoopHVACDOAS.cc
   AirLoopHVACDOAS.hh
   AirTerminalUnit.hh
+  Autosizing/Base.cc
   Autosizing/Base.hh
   Autosizing/HeatingAirflowUASizing.cc
   Autosizing/HeatingAirflowUASizing.hh

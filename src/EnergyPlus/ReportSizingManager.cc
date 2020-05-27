@@ -2369,21 +2369,6 @@ namespace ReportSizingManager {
                         AutosizeDes = DataWaterFlowUsedForSizing;
                     }
                     bCheckForZero = false;
-                } else if (SizingType == HeatingAirflowUASizing) {
-                    if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
-                        AutosizeDes = StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
-                    } else if ((TermUnitPIU || TermUnitIU) && (CurTermUnitSizingNum > 0)) {
-                        AutosizeDes =
-                            StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow * TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult;
-                    } else if (ZoneEqFanCoil) {
-                        AutosizeDes = StdRhoAir * FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-                    } else if (ZoneEqSizing(CurZoneEqNum).SystemAirFlow) {
-                        AutosizeDes = ZoneEqSizing(CurZoneEqNum).AirVolFlow * StdRhoAir;
-                    } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
-                        AutosizeDes = ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow * StdRhoAir;
-                    } else {
-                        AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
-                    }
                 } else if (SizingType == WaterHeatingCoilUASizing) {
                     if (DataCapacityUsedForSizing > 0.0 && DataWaterFlowUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0) {
                         Par(1) = DataCapacityUsedForSizing;
@@ -3571,36 +3556,6 @@ namespace ReportSizingManager {
                 } else if (SizingType == HeatingWaterDesCoilWaterVolFlowUsedForUASizing) {
                     AutosizeDes = DataWaterFlowUsedForSizing;
                     bCheckForZero = false;
-                } else if (SizingType == HeatingAirflowUASizing) {
-                    if (CurOASysNum > 0) {
-                        if (DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum > -1) {
-                            AutosizeDes =
-                                AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum].SizingMassFlow / StdRhoAir;
-                        } else {
-                            AutosizeDes = FinalSysSizing(CurSysNum).DesOutAirVolFlow;
-                        }
-                    } else {
-                        if (CurDuctType == Main) {
-                            if (FinalSysSizing(CurSysNum).SysAirMinFlowRat > 0.0) {
-                                AutosizeDes = FinalSysSizing(CurSysNum).SysAirMinFlowRat * FinalSysSizing(CurSysNum).DesMainVolFlow;
-                            } else {
-                                AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
-                            }
-                        } else if (CurDuctType == Cooling) {
-                            if (FinalSysSizing(CurSysNum).SysAirMinFlowRat > 0.0) {
-                                AutosizeDes = FinalSysSizing(CurSysNum).SysAirMinFlowRat * FinalSysSizing(CurSysNum).DesCoolVolFlow;
-                            } else {
-                                AutosizeDes = FinalSysSizing(CurSysNum).DesCoolVolFlow;
-                            }
-                        } else if (CurDuctType == Heating) {
-                            AutosizeDes = FinalSysSizing(CurSysNum).DesHeatVolFlow;
-                        } else if (CurDuctType == Other) {
-                            AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
-                        } else {
-                            AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
-                        }
-                    }
-                    AutosizeDes *= StdRhoAir;
                 } else if (SizingType == WaterHeatingCoilUASizing) {
                     if (DataCapacityUsedForSizing >= SmallLoad && DataWaterFlowUsedForSizing > 0.0 && DataFlowUsedForSizing > 0.0) {
                         Par(1) = DataCapacityUsedForSizing;
@@ -4098,9 +4053,6 @@ namespace ReportSizingManager {
                 OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanDesDay, CompName, DDNameFanPeak);
                 OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanPkTime, CompName, dateTimeFanPeak);
             }
-        } else if (SizingType == HeatingAirflowUASizing) {
-
-            // do nothing
         } else if (SizingType == SystemAirflowSizing) {
             //  fill fan peak day and time here
             if (coilSelectionReportObj->isCompTypeFan(CompType)) {

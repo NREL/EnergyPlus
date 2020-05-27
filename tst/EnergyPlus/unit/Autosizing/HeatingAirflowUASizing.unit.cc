@@ -52,24 +52,30 @@
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/DataSizing.hh>
 
-TEST_F(AutosizingFixture, HeatingAirflowUASizingGauntlet) {
-    // this global state is what would be set up by E+ currently
-    Array1D<EnergyPlus::DataSizing::TermUnitSizingData> tmpTermUnitData;
-    tmpTermUnitData.allocate(1);
-    tmpTermUnitData(1).AirVolFlow = 5;
-    // there is definitely a better way to do this...
-    Array1D<EnergyPlus::DataSizing::ZoneSizingData> tmpFinalZoneSizing;
-    Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> tmpZoneEqSizing;
-    // set up the flags to specify the sizing configuration
-    HeatingAirflowUASizerFlags flags;
-    flags.termUnitSingDuct = true;
-    flags.curTermUnitSizingNum = 1;
-    // start with an auto-sized value as the user input
-    Real64 inputValue = EnergyPlus::DataSizing::AutoSize;
-    // create the sizer and do sizing
-    HeatingAirflowUASizer sizer;
-    bool result = sizer.size(inputValue, flags, tmpTermUnitData, tmpFinalZoneSizing, tmpZoneEqSizing);
-    EXPECT_TRUE(result);
-    EXPECT_TRUE(sizer.wasAutosized);
-    EXPECT_NEAR(5000, sizer.autosizedValue, 0.01);
+namespace EnergyPlus {
+
+    TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet) {
+        // this global state is what would be set up by E+ currently
+        Array1D<EnergyPlus::DataSizing::TermUnitSizingData> tmpTermUnitData;
+        tmpTermUnitData.allocate(1);
+        tmpTermUnitData(1).AirVolFlow = 5;
+        // there is definitely a better way to do this...
+        Array1D<EnergyPlus::DataSizing::ZoneSizingData> tmpFinalZoneSizing;
+        Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> tmpZoneEqSizing;
+        CommonFlags baseFlags;
+        // set up the flags to specify the sizing configuration
+        HeatingAirflowUASizerFlags flags;
+        flags.termUnitSingDuct = true;
+        flags.curTermUnitSizingNum = 1;
+        // start with an auto-sized value as the user input
+        Real64 inputValue = EnergyPlus::DataSizing::AutoSize;
+        // create the sizer and do sizing
+        HeatingAirflowUASizer sizer;
+        sizer.setParameters(baseFlags, flags, tmpTermUnitData, tmpFinalZoneSizing, tmpZoneEqSizing);
+        AutoSizingResultType result = sizer.size(inputValue);
+        EXPECT_EQ(AutoSizingResultType::NoError, result);
+        EXPECT_TRUE(sizer.wasAutoSized);
+        EXPECT_NEAR(0, sizer.autoSizedValue, 0.01);
+    }
+
 }

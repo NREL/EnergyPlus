@@ -49,22 +49,43 @@
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/DataSizing.hh>
 
-struct HeatingAirflowUASizerFlags {
-    // terminal units
-    bool termUnitSingDuct = false; // single duct terminal unit
-    bool termUnitPIU = false; // powered induction unit
-    bool termUnitIU = false; // induction terminal unit
-    // zone equipment
-    bool zoneEqFanCoil = false; // fan coil zone equipment
-    bool otherEqType = false; // this covers the ELSE type switch
-    // indexes
-    int curZoneEqNum = 0; // index in zone equipment vector - for all others
-    int curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
-};
+namespace EnergyPlus {
 
-struct HeatingAirflowUASizer : BaseSizer {
-    bool size(Real64 _originalValue, HeatingAirflowUASizerFlags &flags,
-              Array1D<EnergyPlus::DataSizing::TermUnitSizingData> &termUnitSizing,
-              Array1D<EnergyPlus::DataSizing::ZoneSizingData> &finalZoneSizing,
-              Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> &zoneEqSizing);
-};
+    struct HeatingAirflowUASizerFlags {
+        // terminal units
+        bool termUnitSingDuct = false; // single duct terminal unit
+        bool termUnitPIU = false; // powered induction unit
+        bool termUnitIU = false; // induction terminal unit
+        // zone equipment
+        bool zoneEqFanCoil = false; // fan coil zone equipment
+        bool otherEqType = false; // this covers the ELSE type switch
+        // indexes
+        int curZoneEqNum = 0; // index in zone equipment vector - for all others
+        int curSysNum = 0;
+        int curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
+        std::string sizingString = "";
+    };
+
+    struct HeatingAirflowUASizer : BaseSizer {
+        HeatingAirflowUASizerFlags flags;
+        Array1D<EnergyPlus::DataSizing::TermUnitSizingData> termUnitSizing;
+        Array1D<EnergyPlus::DataSizing::ZoneSizingData> finalZoneSizing;
+        Array1D<EnergyPlus::DataSizing::SystemSizingData> finalSysSizing;
+        Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> zoneEqSizing;
+
+        HeatingAirflowUASizer() {
+            this->sizingType = AutoSizingType::HeatingAirflowUASizing;
+        }
+
+        void setParameters(
+                CommonFlags &baseFlags,
+                HeatingAirflowUASizerFlags &flags,
+                Array1D<EnergyPlus::DataSizing::TermUnitSizingData> &termUnitSizing,
+                Array1D<EnergyPlus::DataSizing::ZoneSizingData> &finalZoneSizing,
+                Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> &zoneEqSizing
+        );
+
+        AutoSizingResultType size(Real64 originalValue) override;
+    };
+
+}

@@ -45,10 +45,65 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/TypeDefs.h>
+#include <EnergyPlus/api/TypeDefs.h>
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataSizing.hh>
 
-struct BaseSizer {
-    Real64 originalValue;
-    Real64 autosizedValue;
-    bool wasAutosized;
-};
+namespace EnergyPlus {
+
+    enum class AutoSizingType {
+        AutoCalculate,
+        HeatingAirflowUASizing,
+        Unknown
+    };
+
+    enum class AutoSizingResultType {
+        NoError,
+        ErrorType1
+    };
+
+    struct CommonFlags {
+        bool sysSizingRunDone = false;
+        bool zoneSizingRunDone = false;
+        int curSysNum = 0;
+        int curOASysNum = 0;
+        int curZoneEqNum = 0;
+        int curDuctType = 0;
+        int numPrimaryAirSys = 0;
+        int numSysSizInput = 0;
+        bool doSystemSizing = false;
+        int numZoneSizingInput = 0;
+        bool doZoneSizing = false;
+        std::string compType = "";
+        std::string compName = "";
+        bool printWarningFlag = false;
+    };
+
+    struct BaseSizer {
+        AutoSizingType sizingType = AutoSizingType::Unknown;
+        Real64 originalValue = 0.0;
+        Real64 autoSizedValue = 0.0;
+        bool wasAutoSized = false;
+        CommonFlags baseFlags;
+        bool hardSizeNoDesignRun = false;
+        bool sizingDesRunThisAirSys = false;
+        bool sizingDesRunThisZone = false;
+        bool sizingDesValueFromParent = false;
+        bool airLoopSysFlag = false;
+        bool oaSysFlag = false;
+
+        Array1D<DataSizing::SystemSizingInputData> sysSizingInputData;
+        Array1D<DataSizing::ZoneSizingInputData> zoneSizingInput;
+        Array1D<DataSizing::ZoneEqSizingData> unitarySysEqSizing;
+        Array1D<DataSizing::ZoneEqSizingData> oaSysEqSizing;
+        Array1D<DataSizing::ZoneEqSizingData> zoneEqSizing;
+        Array1D<DataAirLoop::OutsideAirSysProps> outsideAirSys;
+        std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
+
+        void preSize(CommonFlags & flags, Real64 originalValue);
+
+        virtual AutoSizingResultType size(Real64 originalValue) = 0;
+    };
+
+}

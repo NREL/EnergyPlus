@@ -45,35 +45,83 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/TypeDefs.h>
+#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 
 Real64 StdRhoAir = 1000;
+namespace EnergyPlus {
 
-bool HeatingAirflowUASizer::size(Real64 _originalValue, HeatingAirflowUASizerFlags &flags,
-                                 Array1D<EnergyPlus::DataSizing::TermUnitSizingData> &termUnitSizing,
-                                 Array1D<EnergyPlus::DataSizing::ZoneSizingData> &finalZoneSizing,
-                                 Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> &zoneEqSizing) {
-    this->originalValue = _originalValue;
-    this->wasAutosized = _originalValue == EnergyPlus::DataSizing::AutoSize;
-    if (flags.termUnitSingDuct && (flags.curTermUnitSizingNum > 0)) {
-        this->autosizedValue = StdRhoAir * termUnitSizing(flags.curTermUnitSizingNum).AirVolFlow;
-    } else if ((flags.termUnitPIU || flags.termUnitIU) && (flags.curTermUnitSizingNum > 0)) {
-        this->autosizedValue = StdRhoAir * termUnitSizing(flags.curTermUnitSizingNum).AirVolFlow *
-                               termUnitSizing(flags.curTermUnitSizingNum).ReheatAirFlowMult;
-    } else if (flags.zoneEqFanCoil) {
-        this->autosizedValue = StdRhoAir * finalZoneSizing(flags.curZoneEqNum).DesHeatVolFlow;
-    } else if (flags.otherEqType) {
-        if (zoneEqSizing(flags.curZoneEqNum).SystemAirFlow) {
-            this->autosizedValue = zoneEqSizing(flags.curZoneEqNum).AirVolFlow * StdRhoAir;
-        } else if (zoneEqSizing(flags.curZoneEqNum).HeatingAirFlow) {
-            this->autosizedValue = zoneEqSizing(flags.curZoneEqNum).HeatingAirVolFlow * StdRhoAir;
-        } else {
-            this->autosizedValue = finalZoneSizing(flags.curZoneEqNum).DesHeatMassFlow;
-        }
-    } else {
-        // did not specify a configuration type -- fatal developer error
+    void HeatingAirflowUASizer::setParameters(
+            CommonFlags &_baseFlags, HeatingAirflowUASizerFlags &_flags,
+            Array1D<EnergyPlus::DataSizing::TermUnitSizingData> &_termUnitSizing,
+            Array1D<EnergyPlus::DataSizing::ZoneSizingData> &_finalZoneSizing,
+            Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> &_zoneEqSizing) {
+        this->baseFlags = _baseFlags;
+        this->flags = _flags;
+        this->termUnitSizing = _termUnitSizing;
+        this->finalZoneSizing = _finalZoneSizing;
+        this->zoneEqSizing = _zoneEqSizing;
     }
-    return true;
+
+    AutoSizingResultType HeatingAirflowUASizer::size(Real64 _originalValue) {
+        this->preSize(this->baseFlags, _originalValue);
+        if (this->flags.curZoneEqNum > 0) {
+            if (this->flags.termUnitSingDuct && (this->flags.curTermUnitSizingNum > 0)) {
+                this->autoSizedValue = StdRhoAir * this->termUnitSizing(this->flags.curTermUnitSizingNum).AirVolFlow;
+            } else if ((this->flags.termUnitPIU || this->flags.termUnitIU) && (this->flags.curTermUnitSizingNum > 0)) {
+                this->autoSizedValue = StdRhoAir * this->termUnitSizing(this->flags.curTermUnitSizingNum).AirVolFlow *
+                        this->termUnitSizing(this->flags.curTermUnitSizingNum).ReheatAirFlowMult;
+            } else if (this->flags.zoneEqFanCoil) {
+                this->autoSizedValue = StdRhoAir * this->finalZoneSizing(this->flags.curZoneEqNum).DesHeatVolFlow;
+            } else if (this->flags.otherEqType) {
+                if (this->zoneEqSizing(this->flags.curZoneEqNum).SystemAirFlow) {
+                    this->autoSizedValue = this->zoneEqSizing(this->flags.curZoneEqNum).AirVolFlow * StdRhoAir;
+                } else if (this->zoneEqSizing(this->flags.curZoneEqNum).HeatingAirFlow) {
+                    this->autoSizedValue = this->zoneEqSizing(this->flags.curZoneEqNum).HeatingAirVolFlow * StdRhoAir;
+                } else {
+                    this->autoSizedValue = this->finalZoneSizing(this->flags.curZoneEqNum).DesHeatMassFlow;
+                }
+            } else {
+                // did not specify a configuration type -- fatal developer error
+            }
+        } else if (flags.curSysNum > 0) {
+            if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
+                if (this->baseFlags.printWarningFlag && this->originalValue > 0.0) {
+                    //TODO: ReportSizingOutput(this->baseFlags.compType, this->baseFlags.compName, "User-Specified " + this->flags.sizingString, this->originalValue);
+                }
+            } else {
+                Real64 autoSizeDesign = 0.0;
+                if (this->baseFlags.curOASysNum > 0) {
+                    if (this->outsideAirSys(this->baseFlags.curOASysNum).AirLoopDOASNum > -1) {
+                        autoSizeDesign = this->airloopDOAS[this->outsideAirSys(this->baseFlags.curOASysNum).AirLoopDOASNum].SizingMassFlow / StdRhoAir;
+                    } else {
+                        autoSizeDesign = this->finalSysSizing(flags.curSysNum).DesOutAirVolFlow;
+                    }
+                } else {
+                    if (this->baseFlags.curDuctType == DataHVACGlobals::Main) {
+                        if (this->finalSysSizing(flags.curSysNum).SysAirMinFlowRat > 0.0) {
+                            autoSizeDesign = this->finalSysSizing(flags.curSysNum).SysAirMinFlowRat * this->finalSysSizing(flags.curSysNum).DesMainVolFlow;
+                        } else {
+                            autoSizeDesign = this->finalSysSizing(flags.curSysNum).DesMainVolFlow;
+                        }
+                    } else if (this->baseFlags.curDuctType == DataHVACGlobals::Cooling) {
+                        if (this->finalSysSizing(flags.curSysNum).SysAirMinFlowRat > 0.0) {
+                            autoSizeDesign = this->finalSysSizing(flags.curSysNum).SysAirMinFlowRat * this->finalSysSizing(flags.curSysNum).DesCoolVolFlow;
+                        } else {
+                            autoSizeDesign = this->finalSysSizing(flags.curSysNum).DesCoolVolFlow;
+                        }
+                    } else if (this->baseFlags.curDuctType == DataHVACGlobals::Heating) {
+                        autoSizeDesign = this->finalSysSizing(flags.curSysNum).DesHeatVolFlow;
+                    } else {
+                        autoSizeDesign = this->finalSysSizing(flags.curSysNum).DesMainVolFlow;
+                    }
+                }
+                autoSizeDesign *= StdRhoAir;
+            }
+        }
+        return AutoSizingResultType::NoError;
+    }
+
 }
