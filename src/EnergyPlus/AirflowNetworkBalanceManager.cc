@@ -104,6 +104,8 @@
 
 namespace EnergyPlus {
 
+AirflowNetworkBalanceManagerData dataAirflowNetworkBalanceManager;
+
 namespace AirflowNetworkBalanceManager {
 
     // MODULE INFORMATION:
@@ -210,13 +212,13 @@ namespace AirflowNetworkBalanceManager {
         bool ValidateDistributionSystemFlag(true);
     } // namespace
 
-    // Report variables
-    Array1D<Real64> PZ;
-    // Inverse matrix
-    Array1D<Real64> MA;
-    Array1D<Real64> MV;
-    Array1D_int IVEC;
-    Array1D_int SplitterNodeNumbers;
+//    // Report variables
+//    Array1D<Real64> PZ;
+//    // Inverse matrix
+//    Array1D<Real64> MA;
+//    Array1D<Real64> MV;
+//    Array1D_int IVEC;
+//    Array1D_int SplitterNodeNumbers;
 
     bool AirflowNetworkGetInputFlag(true);
     int VentilationCtrl(0);  // Hybrid ventilation control type
@@ -245,7 +247,7 @@ namespace AirflowNetworkBalanceManager {
     int DisSysNumOfTermUnits(0);
     int DisSysNumOfLinks(0);
     int NumOfExtNodes(0);
-    int AirflowNetworkNumOfExtSurfaces(0);
+//    int AirflowNetworkNumOfExtSurfaces(0);
     Real64 IncAng(0.0);                     // Wind incidence angle relative to facade normal (deg)
     Array1D<Real64> FacadeAng(5);           // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
     int WindDirNum;                         // Wind direction number
@@ -275,11 +277,11 @@ namespace AirflowNetworkBalanceManager {
 
     void clear_state()
     {
-        PZ.deallocate();
-        MA.deallocate();
-        MV.deallocate();
-        IVEC.deallocate();
-        SplitterNodeNumbers.deallocate();
+//        PZ.deallocate();
+//        MA.deallocate();
+//        MV.deallocate();
+//        IVEC.deallocate();
+//        SplitterNodeNumbers.deallocate();
         AirflowNetworkGetInputFlag = true;
         ValidateDistributionSystemFlag = true;
         VentilationCtrl = 0;
@@ -307,7 +309,7 @@ namespace AirflowNetworkBalanceManager {
         DisSysNumOfTermUnits = 0;
         DisSysNumOfLinks = 0;
         NumOfExtNodes = 0;
-        AirflowNetworkNumOfExtSurfaces = 0;
+//        AirflowNetworkNumOfExtSurfaces = 0;
         IncAng = 0.0;
         FacadeAng = Array1D<Real64>(5);
         WindDirNum = 0; // added default value
@@ -2663,7 +2665,7 @@ namespace AirflowNetworkBalanceManager {
             if (Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond == ExternalEnvironment ||
                 (Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt &&
                  Surface(MultizoneSurfaceData(i).SurfNum).ExtWind)) {
-                ++AirflowNetworkNumOfExtSurfaces;
+                ++dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces;
             }
 
             // Outside face environment
@@ -2789,14 +2791,14 @@ namespace AirflowNetworkBalanceManager {
 
         // Ensure the number of external node = the number of external surface with HeightOption choice = OpeningHeight
         if (UtilityRoutines::SameString(AirflowNetworkSimu.HeightOption, "OpeningHeight") && AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
-            if (AirflowNetworkNumOfExtSurfaces != AirflowNetworkNumOfExtNode) {
+            if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces != AirflowNetworkNumOfExtNode) {
                 ShowSevereError(RoutineName +
                                 "When the choice of Height Selection for Local Wind Speed Calculation is OpeningHeight, the number of external "
                                 "surfaces defined in " +
                                 CurrentModuleObject + " objects ");
                 ShowContinueError("has to be equal to the number of AirflowNetwork:MultiZone:ExternalNode objects.");
                 ShowContinueError("The entered number of external nodes is " + RoundSigDigits(AirflowNetworkNumOfExtNode) +
-                                  ". The entered number of external surfaces is " + RoundSigDigits(AirflowNetworkNumOfExtSurfaces) + '.');
+                                  ". The entered number of external surfaces is " + RoundSigDigits(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces) + '.');
                 ErrorsFound = true;
             }
         }
@@ -5009,9 +5011,9 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        MA.allocate(AirflowNetworkNumOfNodes * AirflowNetworkNumOfNodes);
-        MV.allocate(AirflowNetworkNumOfNodes);
-        IVEC.allocate(AirflowNetworkNumOfNodes + 20);
+        dataAirflowNetworkBalanceManager.MA.allocate(AirflowNetworkNumOfNodes * AirflowNetworkNumOfNodes);
+        dataAirflowNetworkBalanceManager.MV.allocate(AirflowNetworkNumOfNodes);
+        dataAirflowNetworkBalanceManager.IVEC.allocate(AirflowNetworkNumOfNodes + 20);
 
         AirflowNetworkReportData.allocate(NumOfZones); // Report variables
         AirflowNetworkZnRpt.allocate(NumOfZones);      // Report variables
@@ -6114,9 +6116,9 @@ namespace AirflowNetworkBalanceManager {
 
         // Create AirflowNetwork external node objects -- one for each of the external surfaces
 
-        MultizoneExternalNodeData.allocate(AirflowNetworkNumOfExtSurfaces);
-        AirflowNetworkNumOfExtNode = AirflowNetworkNumOfExtSurfaces;
-        NumOfExtNodes = AirflowNetworkNumOfExtSurfaces;
+        MultizoneExternalNodeData.allocate(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces);
+        AirflowNetworkNumOfExtNode = dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces;
+        NumOfExtNodes = dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces;
         for (ExtNum = 1; ExtNum <= NumOfExtNodes; ++ExtNum) {
             MultizoneExternalNodeData(ExtNum).ExtNum = AirflowNetworkNumOfZones + ExtNum;
             MultizoneExternalNodeData(ExtNum).Name = format("ExtNode{:4}", ExtNum);
@@ -6583,8 +6585,8 @@ namespace AirflowNetworkBalanceManager {
         bool found;
         bool OANode;
 
-        MA = 0.0;
-        MV = 0.0;
+        dataAirflowNetworkBalanceManager.MA = 0.0;
+        dataAirflowNetworkBalanceManager.MV = 0.0;
 
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             CompNum = AirflowNetworkLinkageData(i).CompNum;
@@ -6794,18 +6796,18 @@ namespace AirflowNetworkBalanceManager {
                     } else {
                         Ei = 0.0;
                     }
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * Ei;
-                    MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Tsurr * (1.0 - Ei) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * Ei;
+                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Tsurr * (1.0 - Ei) * CpAir;
                 } else {
                     if (AirflowNetworkLinkSimu(i).FLOW > 0.0) {
                         Ei = General::epexp(-UThermal * DuctSurfArea / (DirSign * AirflowNetworkLinkSimu(i).FLOW * CpAir));
                     } else {
                         Ei = 0.0;
                     }
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir * Ei;
-                    MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Tsurr * (1.0 - Ei) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir * Ei;
+                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Tsurr * (1.0 - Ei) * CpAir;
                 }
             }
             if (CompTypeNum == CompTypeNum_TMU) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
@@ -6833,13 +6835,13 @@ namespace AirflowNetworkBalanceManager {
                         Ei = General::epexp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi /
                                             (AirflowNetworkLinkSimu(i).FLOW2 * CpAir));
                     }
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * Ei;
-                    MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Tamb * (1.0 - Ei) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * Ei;
+                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Tamb * (1.0 - Ei) * CpAir;
                 } else {
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir * Ei;
-                    MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Tamb * (1.0 - Ei) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir * Ei;
+                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Tamb * (1.0 - Ei) * CpAir;
                 }
             }
             if (CompTypeNum == CompTypeNum_COI) { // heating or cooling coil
@@ -6864,13 +6866,13 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                 }
                 if (!LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
                 } else {
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
                 }
-                MV(LT) = 0.0;
+                dataAirflowNetworkBalanceManager.MV(LT) = 0.0;
             }
             // Calculate return leak
             if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
@@ -6879,29 +6881,29 @@ namespace AirflowNetworkBalanceManager {
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
                 }
             }
             // Check reheat unit or coil
@@ -6928,7 +6930,7 @@ namespace AirflowNetworkBalanceManager {
                     load = Node(NF).Temp - Node(NT).Temp;
                 }
                 CpAir = PsyCpAirFnW(Node(NT).HumRat);
-                MV(LT) += AirflowNetworkLinkSimu(i).FLOW * CpAir * load;
+                dataAirflowNetworkBalanceManager.MV(LT) += AirflowNetworkLinkSimu(i).FLOW * CpAir * load;
             }
         }
 
@@ -6971,31 +6973,31 @@ namespace AirflowNetworkBalanceManager {
 
             if (j > 0 && (AirflowNetworkNodeData(i).EPlusZoneNum > 0 || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_FOU ||
                           AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_COU || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_HXO)) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).Temp * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).Temp * 1.0e10;
             }
             if (j > 0 && OANode) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).Temp * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).Temp * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = ANZT(ZoneNum) * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = ANZT(ZoneNum) * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).ExtNodeNum > 0 && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+            if (AirflowNetworkNodeData(i).ExtNodeNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
                 if (AirflowNetworkNodeData(i).OutAirNodeNum > 0) {
-                    MV(i) = Node(AirflowNetworkNodeData(i).OutAirNodeNum).OutAirDryBulb * 1.0e10;
+                    dataAirflowNetworkBalanceManager.MV(i) = Node(AirflowNetworkNodeData(i).OutAirNodeNum).OutAirDryBulb * 1.0e10;
                 } else {
-                    MV(i) = OutDryBulbTempAt(AirflowNetworkNodeData(i).NodeHeight) * 1.0e10;
+                    dataAirflowNetworkBalanceManager.MV(i) = OutDryBulbTempAt(AirflowNetworkNodeData(i).NodeHeight) * 1.0e10;
                 }
             }
-            if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+            if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirflowNetworkNodeID == i) {
-                    MV(i) = RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp * 1.0e10;
+                    dataAirflowNetworkBalanceManager.MV(i) = RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp * 1.0e10;
                 }
             }
         }
@@ -7003,22 +7005,22 @@ namespace AirflowNetworkBalanceManager {
         // Assign node value to distribution nodes with fan off
         for (i = 1 + NumOfNodesMultiZone; i <= AirflowNetworkNumOfNodes; ++i) {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
-            if (j > 0 && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).Temp * 1.0e10;
+            if (j > 0 && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).Temp * 1.0e10;
             }
             if (j == 0 && i > NumOfNodesMultiZone && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = AirflowNetworkNodeSimu(i).TZlast * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = AirflowNetworkNodeSimu(i).TZlast * 1.0e10;
             }
         }
 
         // Check singularity
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-            if (MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
+            if (dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
                 if (i > NumOfNodesMultiZone && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
-                    MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                    MV(i) = AirflowNetworkNodeSimu(i).TZlast * 1.0e10;
+                    dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                    dataAirflowNetworkBalanceManager.MV(i) = AirflowNetworkNodeSimu(i).TZlast * 1.0e10;
                 } else {
                     ShowFatalError("CalcAirflowNetworkHeatBalance: A diagonal entity is zero in AirflowNetwork matrix at node " +
                                    AirflowNetworkNodeData(i).Name);
@@ -7033,7 +7035,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             TZON = 0.0;
             for (j = 1; j <= AirflowNetworkNumOfNodes; ++j) {
-                TZON += MA((i - 1) * AirflowNetworkNumOfNodes + j) * MV(j);
+                TZON += dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + j) * dataAirflowNetworkBalanceManager.MV(j);
             }
             AirflowNetworkNodeSimu(i).TZ = TZON;
         }
@@ -7070,8 +7072,8 @@ namespace AirflowNetworkBalanceManager {
         bool found;
         bool OANode;
 
-        MA = 0.0;
-        MV = 0.0;
+        dataAirflowNetworkBalanceManager.MA = 0.0;
+        dataAirflowNetworkBalanceManager.MV = 0.0;
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             CompNum = AirflowNetworkLinkageData(i).CompNum;
             CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
@@ -7108,13 +7110,13 @@ namespace AirflowNetworkBalanceManager {
                         Ei = General::epexp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L *
                                             DisSysCompDuctData(TypeNum).hydraulicDiameter * Pi / (AirflowNetworkLinkSimu(i).FLOW2));
                     }
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
-                    MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Wamb * (1.0 - Ei);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
+                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Wamb * (1.0 - Ei);
                 } else {
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * Ei;
-                    MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Wamb * (1.0 - Ei);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * Ei;
+                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Wamb * (1.0 - Ei);
                 }
             }
             if (CompTypeNum == CompTypeNum_TMU) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
@@ -7142,13 +7144,13 @@ namespace AirflowNetworkBalanceManager {
                         Ei = General::epexp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi /
                                             (AirflowNetworkLinkSimu(i).FLOW2));
                     }
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
-                    MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Wamb * (1.0 - Ei);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
+                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Wamb * (1.0 - Ei);
                 } else {
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * Ei;
-                    MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Wamb * (1.0 - Ei);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * Ei;
+                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Wamb * (1.0 - Ei);
                 }
             }
             if (CompTypeNum == CompTypeNum_COI) { // heating or cooling coil
@@ -7173,13 +7175,13 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                 }
                 if (!LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 } else {
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
-                MV(LT) = 0.0;
+                dataAirflowNetworkBalanceManager.MV(LT) = 0.0;
             }
             // Calculate return leak
             if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
@@ -7188,29 +7190,29 @@ namespace AirflowNetworkBalanceManager {
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
             }
             // Check reheat unit
@@ -7236,7 +7238,7 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     load = Node(NF).HumRat - Node(NT).HumRat;
                 }
-                MV(LT) += AirflowNetworkLinkSimu(i).FLOW * load;
+                dataAirflowNetworkBalanceManager.MV(LT) += AirflowNetworkLinkSimu(i).FLOW * load;
             }
         }
 
@@ -7278,27 +7280,27 @@ namespace AirflowNetworkBalanceManager {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
             if (j > 0 && (AirflowNetworkNodeData(i).EPlusZoneNum > 0 || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_FOU ||
                           AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_COU || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_HXO)) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).HumRat * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).HumRat * 1.0e10;
             }
             if (j > 0 && OANode) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).HumRat * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).HumRat * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = ANZW(ZoneNum) * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = ANZW(ZoneNum) * 1.0e10;
             }
             if (AirflowNetworkNodeData(i).ExtNodeNum > 0) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = OutHumRat * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = OutHumRat * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+            if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirflowNetworkNodeID == i) {
-                    MV(i) = RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).HumRat * 1.0e10;
+                    dataAirflowNetworkBalanceManager.MV(i) = RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).HumRat * 1.0e10;
                 }
             }
         }
@@ -7306,19 +7308,19 @@ namespace AirflowNetworkBalanceManager {
         // Assign node value to distribution nodes with fan off
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
-            if (j > 0 && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).HumRat * 1.0e10;
+            if (j > 0 && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).HumRat * 1.0e10;
             }
             if (j == 0 && i > NumOfNodesMultiZone && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = AirflowNetworkNodeSimu(i).WZlast * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = AirflowNetworkNodeSimu(i).WZlast * 1.0e10;
             }
         }
 
         // Check singularity
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-            if (MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-8) {
+            if (dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-8) {
                 ShowFatalError("CalcAirflowNetworkMoisBalance: A diagonal entity is zero in AirflowNetwork matrix at node " +
                                AirflowNetworkNodeData(i).Name);
             }
@@ -7331,7 +7333,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             WZON = 0.0;
             for (j = 1; j <= AirflowNetworkNumOfNodes; ++j) {
-                WZON += MA((i - 1) * AirflowNetworkNumOfNodes + j) * MV(j);
+                WZON += dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + j) * dataAirflowNetworkBalanceManager.MV(j);
             }
             AirflowNetworkNodeSimu(i).WZ = WZON;
         }
@@ -7363,8 +7365,8 @@ namespace AirflowNetworkBalanceManager {
         bool found;
         bool OANode;
 
-        MA = 0.0;
-        MV = 0.0;
+        dataAirflowNetworkBalanceManager.MA = 0.0;
+        dataAirflowNetworkBalanceManager.MV = 0.0;
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             CompNum = AirflowNetworkLinkageData(i).CompNum;
             CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
@@ -7381,8 +7383,8 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
             }
             if (CompTypeNum == CompTypeNum_TMU) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
@@ -7395,8 +7397,8 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
             }
             if (CompTypeNum == CompTypeNum_COI) { // heating or cooling coil
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
@@ -7419,9 +7421,9 @@ namespace AirflowNetworkBalanceManager {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                 }
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                MV(LT) = 0.0;
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MV(LT) = 0.0;
             }
             // Calculate return leak
             if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
@@ -7430,29 +7432,29 @@ namespace AirflowNetworkBalanceManager {
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
             }
         }
@@ -7495,40 +7497,40 @@ namespace AirflowNetworkBalanceManager {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
             if (j > 0 && (AirflowNetworkNodeData(i).EPlusZoneNum > 0 || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_FOU ||
                           AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_COU || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_HXO)) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).CO2 * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).CO2 * 1.0e10;
             }
             if (j > 0 && OANode) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).CO2 * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).CO2 * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = ANCO(ZoneNum) * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = ANCO(ZoneNum) * 1.0e10;
             }
             if (AirflowNetworkNodeData(i).ExtNodeNum > 0) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = OutdoorCO2 * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = OutdoorCO2 * 1.0e10;
             }
         }
 
         // Assign node value to distribution nodes with fan off
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
-            if (j > 0 && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).CO2 * 1.0e10;
+            if (j > 0 && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).CO2 * 1.0e10;
             }
             if (j == 0 && i > NumOfNodesMultiZone && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = AirflowNetworkNodeSimu(i).CO2Zlast * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = AirflowNetworkNodeSimu(i).CO2Zlast * 1.0e10;
             }
         }
 
         // Check singularity
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-            if (MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
+            if (dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
                 ShowFatalError("CalcAirflowNetworkCO2Balance: A diagonal entity is zero in AirflowNetwork matrix at node " +
                                AirflowNetworkNodeData(i).Name);
             }
@@ -7541,7 +7543,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             COZN = 0.0;
             for (j = 1; j <= AirflowNetworkNumOfNodes; ++j) {
-                COZN += MA((i - 1) * AirflowNetworkNumOfNodes + j) * MV(j);
+                COZN += dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + j) * dataAirflowNetworkBalanceManager.MV(j);
             }
             AirflowNetworkNodeSimu(i).CO2Z = COZN;
         }
@@ -7573,8 +7575,8 @@ namespace AirflowNetworkBalanceManager {
         bool found;
         bool OANode;
 
-        MA = 0.0;
-        MV = 0.0;
+        dataAirflowNetworkBalanceManager.MA = 0.0;
+        dataAirflowNetworkBalanceManager.MV = 0.0;
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             CompNum = AirflowNetworkLinkageData(i).CompNum;
             CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
@@ -7591,8 +7593,8 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
             }
             if (CompTypeNum == CompTypeNum_TMU) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
@@ -7605,8 +7607,8 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
             }
             if (CompTypeNum == CompTypeNum_COI) { // heating or cooling coil
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
@@ -7629,9 +7631,9 @@ namespace AirflowNetworkBalanceManager {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                 }
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                MV(LT) = 0.0;
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                dataAirflowNetworkBalanceManager.MV(LT) = 0.0;
             }
             // Calculate return leak
             if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
@@ -7640,29 +7642,29 @@ namespace AirflowNetworkBalanceManager {
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
             }
         }
@@ -7705,40 +7707,40 @@ namespace AirflowNetworkBalanceManager {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
             if (j > 0 && (AirflowNetworkNodeData(i).EPlusZoneNum > 0 || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_FOU ||
                           AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_COU || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_HXO)) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).GenContam * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).GenContam * 1.0e10;
             }
             if (j > 0 && OANode) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).GenContam * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).GenContam * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = ANGC(ZoneNum) * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = ANGC(ZoneNum) * 1.0e10;
             }
             if (AirflowNetworkNodeData(i).ExtNodeNum > 0) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = OutdoorGC * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = OutdoorGC * 1.0e10;
             }
         }
 
         // Assign node value to distribution nodes with fan off
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
-            if (j > 0 && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = Node(j).GenContam * 1.0e10;
+            if (j > 0 && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = Node(j).GenContam * 1.0e10;
             }
             if (j == 0 && i > NumOfNodesMultiZone && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
-                MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                MV(i) = AirflowNetworkNodeSimu(i).GCZlast * 1.0e10;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                dataAirflowNetworkBalanceManager.MV(i) = AirflowNetworkNodeSimu(i).GCZlast * 1.0e10;
             }
         }
 
         // Check singularity
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-            if (MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
+            if (dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
                 ShowFatalError("CalcAirflowNetworkGCBalance: A diagonal entity is zero in AirflowNetwork matrix at node " +
                                AirflowNetworkNodeData(i).Name);
             }
@@ -7751,7 +7753,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             COZN = 0.0;
             for (j = 1; j <= AirflowNetworkNumOfNodes; ++j) {
-                COZN += MA((i - 1) * AirflowNetworkNumOfNodes + j) * MV(j);
+                COZN += dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + j) * dataAirflowNetworkBalanceManager.MV(j);
             }
             AirflowNetworkNodeSimu(i).GCZ = COZN;
         }
@@ -7777,57 +7779,57 @@ namespace AirflowNetworkBalanceManager {
         Real64 R1;
         Real64 S;
 
-        IVEC = 0;
+        dataAirflowNetworkBalanceManager.IVEC = 0;
         for (i = 1; i <= NORDER; ++i) {
-            IVEC(i + 20) = i;
+            dataAirflowNetworkBalanceManager.IVEC(i + 20) = i;
         }
         for (i = 1; i <= NORDER; ++i) {
             R1 = 0.0;
             M = i;
             for (j = i; j <= NORDER; ++j) {
-                if (std::abs(R1) < std::abs(MA((i - 1) * NORDER + j))) {
+                if (std::abs(R1) < std::abs(dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + j))) {
                     M = j;
-                    R1 = MA((i - 1) * NORDER + j);
+                    R1 = dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + j);
                 }
             }
             if (i != M) {
-                K = IVEC(M + 20);
-                IVEC(M + 20) = IVEC(i + 20);
-                IVEC(i + 20) = K;
+                K = dataAirflowNetworkBalanceManager.IVEC(M + 20);
+                dataAirflowNetworkBalanceManager.IVEC(M + 20) = dataAirflowNetworkBalanceManager.IVEC(i + 20);
+                dataAirflowNetworkBalanceManager.IVEC(i + 20) = K;
                 for (j = 1; j <= NORDER; ++j) {
-                    S = MA((j - 1) * NORDER + i);
-                    MA((j - 1) * NORDER + i) = MA((j - 1) * NORDER + M);
-                    MA((j - 1) * NORDER + M) = S;
+                    S = dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + i);
+                    dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + i) = dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + M);
+                    dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + M) = S;
                 }
             }
-            MA((i - 1) * NORDER + i) = 1.0;
+            dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + i) = 1.0;
             for (j = 1; j <= NORDER; ++j) {
-                MA((i - 1) * NORDER + j) /= R1;
+                dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + j) /= R1;
             }
             for (j = 1; j <= NORDER; ++j) {
                 if (i == j) continue;
-                R1 = MA((j - 1) * NORDER + i);
+                R1 = dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + i);
                 if (std::abs(R1) <= 1.0E-20) continue;
-                MA((j - 1) * NORDER + i) = 0.0;
+                dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + i) = 0.0;
                 for (K = 1; K <= NORDER; ++K) {
-                    MA((j - 1) * NORDER + K) -= R1 * MA((i - 1) * NORDER + K);
+                    dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + K) -= R1 * dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + K);
                 }
             }
         }
         for (i = 1; i <= NORDER; ++i) {
-            if (IVEC(i + 20) == i) continue;
+            if (dataAirflowNetworkBalanceManager.IVEC(i + 20) == i) continue;
             M = i;
             while (NORDER > M) {
                 ++M;
-                if (IVEC(M + 20) == i) break;
+                if (dataAirflowNetworkBalanceManager.IVEC(M + 20) == i) break;
             }
-            IVEC(M + 20) = IVEC(i + 20);
+            dataAirflowNetworkBalanceManager.IVEC(M + 20) = dataAirflowNetworkBalanceManager.IVEC(i + 20);
             for (j = 1; j <= NORDER; ++j) {
-                R1 = MA((i - 1) * NORDER + j);
-                MA((i - 1) * NORDER + j) = MA((M - 1) * NORDER + j);
-                MA((M - 1) * NORDER + j) = R1;
+                R1 = dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + j);
+                dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + j) = dataAirflowNetworkBalanceManager.MA((M - 1) * NORDER + j);
+                dataAirflowNetworkBalanceManager.MA((M - 1) * NORDER + j) = R1;
             }
-            IVEC(i + 20) = i;
+            dataAirflowNetworkBalanceManager.IVEC(i + 20) = i;
         }
     }
 
@@ -9862,19 +9864,19 @@ namespace AirflowNetworkBalanceManager {
             if (AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_SPL) {
                 LocalError = false;
                 j = GetSplitterOutletNumber("", 1, LocalError);
-                SplitterNodeNumbers.allocate(j + 2);
-                SplitterNodeNumbers = GetSplitterNodeNumbers("", 1, LocalError);
+                dataAirflowNetworkBalanceManager.SplitterNodeNumbers.allocate(j + 2);
+                dataAirflowNetworkBalanceManager.SplitterNodeNumbers = GetSplitterNodeNumbers("", 1, LocalError);
                 if (LocalError) ErrorsFound = true;
             }
         }
 
         // Assigning inlet and outlet nodes for a splitter
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-            if (AirflowNetworkNodeData(i).EPlusNodeNum == SplitterNodeNumbers(1)) {
+            if (AirflowNetworkNodeData(i).EPlusNodeNum == dataAirflowNetworkBalanceManager.SplitterNodeNumbers(1)) {
                 if (AirflowNetworkNodeData(i).EPlusTypeNum == 0) AirflowNetworkNodeData(i).EPlusTypeNum = EPlusTypeNum_SPI;
             }
-            for (j = 1; j <= SplitterNodeNumbers(2); ++j) {
-                if (AirflowNetworkNodeData(i).EPlusNodeNum == SplitterNodeNumbers(j + 2)) {
+            for (j = 1; j <= dataAirflowNetworkBalanceManager.SplitterNodeNumbers(2); ++j) {
+                if (AirflowNetworkNodeData(i).EPlusNodeNum == dataAirflowNetworkBalanceManager.SplitterNodeNumbers(j + 2)) {
                     if (AirflowNetworkNodeData(i).EPlusTypeNum == 0) AirflowNetworkNodeData(i).EPlusTypeNum = EPlusTypeNum_SPO;
                 }
             }

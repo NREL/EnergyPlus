@@ -98,9 +98,7 @@ namespace AirflowNetworkBalanceManager {
         USERASPECTRATIO     // Effective rectangle user input aspect ratio selection
     };
 
-    extern Array1D_int SplitterNodeNumbers;
     extern bool AirflowNetworkGetInputFlag;
-    extern int AirflowNetworkNumOfExtSurfaces;
 
     struct AirflowNetworkReportVars
     {
@@ -258,13 +256,26 @@ namespace AirflowNetworkBalanceManager {
     struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
 
         Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
+        Array1D_int SplitterNodeNumbers;
+//        bool AirflowNetworkGetInputFlag;
+        int AirflowNetworkNumOfExtSurfaces;
+        // Inverse matrix
+        Array1D<Real64> MA;
+        Array1D<Real64> MV;
+        Array1D_int IVEC;
 
         void clear_state() {
             OccupantVentilationControl.deallocate();
+            SplitterNodeNumbers.deallocate();
+//            AirflowNetworkGetInputFlag = true;
+            AirflowNetworkNumOfExtSurfaces = 0;
+            MA.deallocate();
+            MV.deallocate();
+            IVEC.deallocate();
         }
     };
 
-    AirflowNetworkBalanceManagerData dataAirflowNetworkBalanceManager;
+    extern AirflowNetworkBalanceManagerData dataAirflowNetworkBalanceManager;
 
 } // namespace EnergyPlus
 
