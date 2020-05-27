@@ -63,6 +63,14 @@ namespace EnergyPlus {
 
 namespace DataDaylighting {
 
+    enum class SkyType : int
+    {
+        Clear = 1,
+        ClearTurbid,
+        Intermediate,
+        Overcast
+    };
+
     // Using/Aliasing
 
     // Data
