@@ -222,8 +222,6 @@ namespace RuntimeLanguageProcessor {
 
     void ReportRuntimeLanguage();
 
-    std::string IntegerToString(int const Number);
-
     ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue = _);
 
     ErlValueType StringValue(std::string const &String);
