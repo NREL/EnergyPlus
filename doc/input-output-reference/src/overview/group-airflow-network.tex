@@ -2460,6 +2460,10 @@ The AirflowNetwork linkage used in following output variables includes surfaces 
 \item
   HVAC,Sum,AFN Zone Infiltration Sensible Heat Gain Energy {[}J{]}
 \item
+  HVAC,Average,AFN Zone Ventilation Sensible Heat Gain Rate {[}W{]}
+\item
+  HVAC,Sum,AFN Zone Ventilation Sensible Heat Gain Energy {[}J{]}
+\item
   HVAC,Average,AFN Zone Mixing Sensible Heat Gain Rate {[}W{]}
 \item
   HVAC,Sum,AFN Zone Mixing Sensible Heat Gain Energy {[}J{]}
@@ -2467,6 +2471,10 @@ The AirflowNetwork linkage used in following output variables includes surfaces 
   HVAC,Average,AFN Zone Infiltration Sensible Heat Loss Rate {[}W{]}
 \item
   HVAC,Sum,AFN Zone Infiltration Sensible Heat Loss Energy {[}J{]}
+\item
+  HVAC,Average,AFN Zone Ventilation Sensible Heat Loss Rate {[}W{]}
+\item
+  HVAC,Sum,AFN Zone Ventilation Sensible Heat Loss Energy {[}J{]}
 \item
   HVAC,Average,AFN Zone Mixing Sensible Heat Loss Rate {[}W{]}
 \item
@@ -2479,6 +2487,14 @@ The AirflowNetwork linkage used in following output variables includes surfaces 
   HVAC,Average,AFN Zone Infiltration Latent Heat Loss Rate {[}W{]}
 \item
   HVAC,Sum,AFN Zone Infiltration Latent Heat Loss Energy {[}J{]}
+\item
+  HVAC,Average,AFN Zone Ventilation Latent Heat Gain Rate {[}W{]}
+\item
+  HVAC,Sum,AFN Zone Ventilation Latent Heat Gain Energy {[}J{]}
+\item
+  HVAC,Average,AFN Zone Ventilation Latent Heat Loss Rate {[}W{]}
+\item
+  HVAC,Sum,AFN Zone Ventilation Latent Heat Loss Energy {[}J{]}
 \item
   HVAC,Average,AFN Zone Mixing Latent Heat Gain Rate {[}W{]}
 \item
@@ -2772,7 +2788,7 @@ A value of 1.0 means venting through the surface can occur if venting control co
 
 \paragraph{AFN Zone Infiltration Sensible Heat Gain Rate {[}W{]}}\label{afn-zone-infiltration-sensible-heat-gain-rate-w}
 
-The average convective sensible heat gain rate, in Watts, to the zone air corresponding to the Zone Infiltration Volume averaged over the reporting period. This value is calculated for each timestep when the outdoor dry-bulb temperature is higher than the zone temperature; otherwise, the sensible gain rate is set to 0.
+The average convective sensible heat gain rate, in Watts, to the zone air corresponding to the Zone Infiltration flows from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only averaged over the reporting period. This value is calculated for each timestep when the outdoor dry-bulb temperature is higher than the zone temperature; otherwise, the sensible gain rate is set to 0.
 
 When a Fan:OnOff object is used, this reported value is weighted by the system run time fraction using the calculated infiltration sensible gain rate during the system on and off cycles for the reporting period:
 
@@ -2780,7 +2796,7 @@ Infiltration Sensible Gain Rate = (Infiltration Sensible Gain Rate during on cyc
 
 \paragraph{AFN Zone Infiltration Sensible Heat Gain Energy {[}J{]}}\label{afn-zone-infiltration-sensible-heat-gain-energy-j}
 
-The average convective sensible heat gain, in Joules, to the zone air corresponding to the Zone Infiltration Volume averaged over the reporting period. This value is calculated for each timestep when the outdoor dry-bulb temperature is higher than the zone temperature; otherwise, the sensible gain rate is set to 0.
+The average convective sensible heat gain, in Joules, to the zone air corresponding to the Zone Infiltration flows from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only  averaged over the reporting period. This value is calculated for each timestep when the outdoor dry-bulb temperature is higher than the zone temperature; otherwise, the sensible gain rate is set to 0.
 
 When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated infiltration sensible gain during the system on and off cycles for the reporting period:
 
@@ -2788,7 +2804,7 @@ Infiltration Sensible Gain = (Infiltration Sensible Gain during on cycle * Run t
 
 \paragraph{AFN Zone Infiltration Sensible Heat Loss Rate {[}W{]}}\label{afn-zone-infiltration-sensible-heat-loss-rate-w}
 
-The average convective sensible heat loss rate, in Watts, to the zone air corresponding to the Zone Infiltration Volume averaged over the reporting period.
+The average convective sensible heat loss rate, in Watts, to the zone air corresponding to the Zone Infiltration flows from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only averaged over the reporting period.
 
 When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated infiltration sensible loss rate during the system on and off cycles for the reporting period:
 
@@ -2796,7 +2812,7 @@ Infiltration Sensible Loss Rate = (Infiltration Sensible Loss Rate during on cyc
 
 \paragraph{AFN Zone Infiltration Sensible Heat Loss Energy {[}J{]}}\label{afn-zone-infiltration-sensible-heat-loss-energy-j}
 
-The average convective sensible heat loss, in Joules, to the zone air corresponding to the Zone Infiltration Volume averaged over the reporting period.
+The average convective sensible heat loss, in Joules, to the zone air corresponding to the Zone Infiltration flows from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only averaged over the reporting period.
 
 When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated infiltration sensible loss rate during the system on and off cycles for the reporting period:
 
@@ -2804,7 +2820,7 @@ Infiltration Sensible Loss = (Infiltration Sensible Loss during on cycle * Run t
 
 \paragraph{AFN Zone Infiltration Latent Heat Gain Rate {[}W{]}}\label{afn-zone-infiltration-latent-heat-gain-rate-w}
 
-The average convective latent heat gain rate, in Watts, to the zone air corresponding to the Zone Infiltration Volume averaged over the reporting period, when the outdoor humidity ratio is higher than the zone air humidity ratio.
+The average convective latent heat gain rate, in Watts, to the zone air corresponding to the Zone Infiltration flows from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only averaged over the reporting period, when the outdoor humidity ratio is higher than the zone air humidity ratio.
 
 When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated infiltration latent gain rate during the system on and off cycles for the reporting period:
 
@@ -2812,7 +2828,7 @@ Infiltration Latent Gain Rate = (Infiltration Latent Gain Rate during on cycle *
 
 \paragraph{AFN Zone Infiltration Latent Heat Gain Energy {[}J{]}}\label{afn-zone-infiltration-latent-heat-gain-energy-j}
 
-The total convective latent heat gain, in Joules, to the zone air corresponding to the Zone Infiltration Volume summed over the reporting period.
+The total convective latent heat gain, in Joules, to the zone air corresponding to the Zone Infiltration flows from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only  summed over the reporting period.
 
 When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated infiltration latent gain during the system on and off cycles for the reporting period:
 
@@ -2820,7 +2836,7 @@ Infiltration Latent Gain = (Infiltration Latent Gain during on cycle * Run time 
 
 \paragraph{AFN Zone Infiltration Latent Heat Loss Rate {[}W{]}}\label{afn-zone-infiltration-latent-heat-loss-rate-w}
 
-The average convective latent heat loss rate, in Watts, to the zone air corresponding to the Zone Infiltration Volume averaged over the reporting period.
+The average convective latent heat loss rate, in Watts, to the zone air corresponding to the Zone Infiltration flows from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only  averaged over the reporting period.
 
 When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated infiltration latent loss rate during the system on and off cycles for the reporting period:
 
@@ -2828,11 +2844,75 @@ Infiltration Latent Loss Rate = (Infiltration Latent Gain Loss Rate during on cy
 
 \paragraph{AFN Zone Infiltration Latent Heat Loss Energy {[}J{]}}\label{afn-zone-infiltration-latent-heat-loss-energy-j}
 
-The total convective latent heat loss, in Joules, to the zone air corresponding to the Zone Infiltration Volume summed over the reporting period.
+The total convective latent heat loss, in Joules, to the zone air corresponding to the Zone Infiltration flows from both AirflowNetwork:MultiZone:Surface:Crack and AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea only  summed over the reporting period.
 
 When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated infiltration latent loss during the system on and off cycles for the reporting period:
 
 Infiltration Latent Loss = (Infiltration Latent Gain Loss during on cycle * Run time fraction) + Infiltration Latent Loss during off cycle * (1.0 -- Run time fraction)
+
+\paragraph{AFN Zone Ventilation Sensible Heat Gain Rate {[}W{]}}\label{afn-zone-ventilation-sensible-heat-gain-rate-w}
+
+The average convective sensible heat gain rate, in Watts, to the zone air corresponding to the Zone Ventilation flows from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only averaged over the reporting period. This value is calculated for each timestep when the outdoor dry-bulb temperature is higher than the zone temperature; otherwise, the sensible gain rate is set to 0.
+
+When a Fan:OnOff object is used, this reported value is weighted by the system run time fraction using the calculated ventilation sensible gain rate during the system on and off cycles for the reporting period:
+
+Ventilation Sensible Gain Rate = (Ventilation Sensible Gain Rate during on cycle * Run time fraction) + Ventilation Sensible Gain Rate during off cycle * (1.0 -- Run time fraction)
+
+\paragraph{AFN Zone Ventilation Sensible Heat Gain Energy {[}J{]}}\label{afn-zone-Ventilation-sensible-heat-gain-energy-j}
+
+The average convective sensible heat gain, in Joules, to the zone air corresponding to the Zone Ventilation flows from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only averaged over the reporting period. This value is calculated for each timestep when the outdoor dry-bulb temperature is higher than the zone temperature; otherwise, the sensible gain rate is set to 0.
+
+When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated ventilation sensible gain during the system on and off cycles for the reporting period:
+
+Ventilation Sensible Gain = (Ventilation Sensible Gain during on cycle * Run time fraction) + Ventilation Sensible Gain during off cycle * (1.0 -- Run time fraction)
+
+\paragraph{AFN Zone Ventilation Sensible Heat Loss Rate {[}W{]}}\label{afn-zone-ventilation-sensible-heat-loss-rate-w}
+
+The average convective sensible heat loss rate, in Watts, to the zone air corresponding to the Zone Ventilation flows from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only averaged over the reporting period.
+
+When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated ventilation sensible loss rate during the system on and off cycles for the reporting period:
+
+Ventilation Sensible Loss Rate = (Ventilation Sensible Loss Rate during on cycle * Run time fraction) + Ventilation Sensible Loss Rate during off cycle * (1.0 -- Run time fraction)
+
+\paragraph{AFN Zone Ventilation Sensible Heat Loss Energy {[}J{]}}\label{afn-zone-ventilation-sensible-heat-loss-energy-j}
+
+The average convective sensible heat loss, in Joules, to the zone air corresponding to the Zone Ventilation flows from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only averaged over the reporting period.
+
+When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated Ventilation sensible loss rate during the system on and off cycles for the reporting period:
+
+Ventilation Sensible Loss = (Ventilation Sensible Loss during on cycle * Run time fraction) + Ventilation Sensible Loss during off cycle * (1.0 -- Run time fraction)
+
+\paragraph{AFN Zone Ventilation Latent Heat Gain Rate {[}W{]}}\label{afn-zone-ventilation-latent-heat-gain-rate-w}
+
+The average convective latent heat gain rate, in Watts, to the zone air corresponding to the Zone Ventilation flows from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only averaged over the reporting period, when the outdoor humidity ratio is higher than the zone air humidity ratio.
+
+When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated Ventilation latent gain rate during the system on and off cycles for the reporting period:
+
+Ventilation Latent Gain Rate = (Ventilation Latent Gain Rate during on cycle * Run time fraction) + Ventilation Latent Gain Rate during off cycle * (1.0 -- Run time fraction)
+
+\paragraph{AFN Zone Ventilation Latent Heat Gain Energy {[}J{]}}\label{afn-zone-ventilation-latent-heat-gain-energy-j}
+
+The total convective latent heat gain, in Joules, to the zone air corresponding to the Zone Ventilation flows from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only  summed over the reporting period.
+
+When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated ventilation latent gain during the system on and off cycles for the reporting period:
+
+Ventilation Latent Gain = (Ventilation Latent Gain during on cycle * Run time fraction) + Ventilation Latent Gain during off cycle * (1.0 -- Run time fraction)
+
+\paragraph{AFN Zone Ventilation Latent Heat Loss Rate {[}W{]}}\label{afn-zone-ventilation-latent-heat-loss-rate-w}
+
+The average convective latent heat loss rate, in Watts, to the zone air corresponding to the Zone Ventilation flows from AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only  averaged over the reporting period.
+
+When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated Ventilation latent loss rate during the system on and off cycles for the reporting period:
+
+Ventilation Latent Loss Rate = (Ventilation Latent Gain Loss Rate during on cycle * Run time fraction) + Ventilation Latent Loss Rate during off cycle * (1.0 -- Run time fraction)
+
+\paragraph{AFN Zone Ventilation Latent Heat Loss Energy {[}J{]}}\label{afn-zone-ventilation-latent-heat-loss-energy-j}
+
+The total convective latent heat loss, in Joules, to the zone air corresponding to the Zone Ventilation flows from both AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:SimpleOpening, and AirflowNetwork:MultiZone:Component:HorizontalOpening only  summed over the reporting period.
+
+When a Fan:OnOff object is used, the reported value is weighted by the system run time fraction using the calculated Ventilation latent loss during the system on and off cycles for the reporting period:
+
+Ventilation Latent Loss = (Ventilation Latent Gain Loss during on cycle * Run time fraction) + Ventilation Latent Loss during off cycle * (1.0 -- Run time fraction)
 
 \paragraph{AFN Zone Mixing Sensible Heat Gain Rate {[}W{]}}\label{afn-zone-mixing-sensible-heat-gain-rate-w}
 
