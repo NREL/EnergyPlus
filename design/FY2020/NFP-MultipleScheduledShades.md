@@ -4,7 +4,8 @@ Allow Multiple Scheduled Shades to Reference a Single Window
 **Jason Glazer, GARD Analytics**
 
  - May 12, 2020
- 
+ - May 27, 2020 - added Design Document portion and remove 
+
 
 ## Justification for New Feature ##
 
@@ -32,7 +33,7 @@ will be also addressed.
 
 ## E-mail and  Conference Call Conclusions ##
 
-insert text
+No changes were based on the feedback from the reviewers of the intial NFP.
 
 ## Overview ##
 
@@ -60,25 +61,9 @@ overlap, errors if they overlap with different materials, warnings if two shadin
 Testing will also be conducted to see the difficulty if allowing WindowShadingControls to control shades in other zones that are 
 part of the same solar enclosure.
 
-## Testing/Validation/Data Sources ##
-
-insert text
-
 ## Input Output Reference Documentation ##
 
 No new fields or objects will be added but paragraphs will be added to WindowShadingControl describing this new capability.
-
-## Input Description ##
-
-insert text
-
-## Outputs Description ##
-
-insert text
-
-## Engineering Reference ##
-
-insert text
 
 ## Example File and Transition Changes ##
 
@@ -86,7 +71,48 @@ No transition is needed. A new example file that demonstrates this capability wi
 
 ## References ##
 
-insert text
+"ANSI/RESNET/ICC 301-2014 
+Standard for the Calculation and Labeling of the Energy Performance of Low-Rise Residential Buildings" 
+http://www.resnet.us/wp-content/uploads/archive/resblog/2016/01/ANSI-RESNET-ICC_301-2014-Second-Edition-Publish-Version.pdf
+
+## Design Document ##
+
+To implement the features described above, the following will be done:
+
+- Update SufaceGeometry::InitialAssociateWindowShadingControlFenestration() to remove the error message
+- Update unit test InitialAssociateWindowShadingControlFenestration_test() or add new unit test for overlapping controls
+- Modify the SurfaceData struct in DataSurfaces.hh to replace int WindowShadingControlPtr with std::vector \<int\> and add
+ActiveWindowShadingControlPtr
+
+Modify to support std::vector\<int\> version of WindowShadingControlPtr everywhere it appears: 
+
+- DaylightingManager::FigureDayltgCoeffsAtPointsSetupForWindow()
+- DaylightingManager::GetDaylightingParametersInput()
+- DaylightingManager::DayltgInteriorIllum()
+- DaylightingManager::DayltgInterReflectedIllum()
+- DaylightingManager::DayltgInteriorMapIllum()
+- EMSManager::SetupWindowShadingControlActuators()
+- SolarShading::AllocateModuleArrays()
+- SolarShading::WindowShadingManager()
+- SolarShading::ComputeWinShadeAbsorpFactors()
+- SurfaceGeometry::GetSurfaceData()
+- SurfaceGeometry::GetHTSubSurfaceData()
+- SurfaceGeometry::GetRectSubSurfaces()
+- SurfaceGeometry::CheckWindowShadingControlFrameDivider()
+- SurfaceGeometry::MakeMirrorSurface()
+- SurfaceGeometry::InitialAssociateWindowShadingControlFenestration()
+- SurfaceGeometry::FinalAssociateWindowShadingControlFenestration()
+- SurfaceGeometry::GetWindowGapAirflowControlData()
+- SurfaceGeometry::AddWindow()
+- WindowManager::W5InitGlassParameters()
+- WindowManager::CalcWindowScreenProperties()
+
+Plus unit tests in SurfaceGeometry.unit.cc and EMSManager.unit.cc.
+
+Each timestep the first active WindowShadingControl will be used and set as the ActiveWindowShadingControlPtr. 
+In many functions the ActiveWindowShadingControlPtr will simply replace the current use of the WindowShadingControlPtr.
+
+Additional changes may also be required to implement the feature.
 
 
 
