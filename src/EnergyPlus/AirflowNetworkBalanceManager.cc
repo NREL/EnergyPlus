@@ -55,7 +55,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
@@ -202,34 +201,7 @@ namespace AirflowNetworkBalanceManager {
     using ScheduleManager::GetScheduleIndex;
     using namespace AirflowNetwork;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    int const VentCtrNum_None(0);  // Wrong input
-    int const VentCtrNum_Temp(1);  // Temperature venting control
-    int const VentCtrNum_Enth(2);  // Enthalpy venting control
-    int const VentCtrNum_Const(3); // Constant venting control
-    int const VentCtrNum_ASH55(4);
-    int const VentCtrNum_CEN15251(5);
-    int const VentCtrNum_Novent(6);        // No venting
-    int const VentCtrNum_ZoneLevel(7);     // ZoneLevel control for a heat transfer subsurface
-    int const VentCtrNum_AdjTemp(8);       // Temperature venting control based on adjacent zone conditions
-    int const VentCtrNum_AdjEnth(9);       // Enthalpy venting control based on adjacent zone conditions
-    int const FreeOperation(0);            // Free operation
-    int const MinCheckForceOpen(1);        // Force open when opening elapsed time is less than minimum opening time
-    int const MinCheckForceClose(2);       // Force open when closing elapsed time is less than minimum closing time
-    int const ProbNoAction(0);             // No action from probability check
-    int const ProbForceChange(1);          // Force open or close from probability check
-    int const ProbKeepStatus(2);           // Keep status at the previous time step from probability check
-    int const NumOfVentCtrTypes(6);        // Number of zone level venting control types
-    int const EquivRec_Height(1);          // Effective rectangle polygonal height selection
-    int const EquivRec_BaseAspectRatio(2); // Effective rectangle base surface aspect ratio selection
-    int const EquivRec_UserAspectRatio(3); // Effective rectangle user input aspect ratio selection
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
-    // Report variables
-
-    // MODULE VARIABLE DECLARATIONS:
+    int constexpr NumOfVentCtrTypes(6);        // Number of zone level venting control types
 
     namespace {
         // These are purposefully not in the header file as an extern variable. No one outside of this should
@@ -297,16 +269,11 @@ namespace AirflowNetworkBalanceManager {
     Array1D<Real64> LoopOnOffFanRunTimeFraction;
     Array1D<bool> LoopOnOffFlag;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE AirflowNetworkBalanceManager:
-    // Name Public routines, optionally name Private routines within this module
-
     // Object Data
     Array1D<AirflowNetworkReportVars> AirflowNetworkZnRpt;
     std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
     Array1D<OccupantVentilationControlProp> OccupantVentilationControl;
-
-    // Functions
 
     void clear_state()
     {
@@ -1619,24 +1586,9 @@ namespace AirflowNetworkBalanceManager {
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Surface", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:ReferenceCrackConditions", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Surface:Crack", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Component:DetailedOpening", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Component:SimpleOpening", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:Component:ZoneExhaustFan", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:MultiZone:ExternalNode", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -1649,30 +1601,9 @@ namespace AirflowNetworkBalanceManager {
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Node", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Leak", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:LeakageRatio", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Duct", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:DuctViewFactors", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Fan", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:Coil", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:TerminalUnit", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:ConstantPressureDrop", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Linkage", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -1688,12 +1619,6 @@ namespace AirflowNetworkBalanceManager {
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:ZoneControl:PressureController", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:OutdoorAirFlow", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
-        // inputProcessor->getObjectDefMaxArgs("AirflowNetwork:Distribution:Component:ReliefAirFlow", TotalArgs, NumAlphas, NumNumbers);
-        // MaxNums = max(MaxNums, NumNumbers);
-        // MaxAlphas = max(MaxAlphas, NumAlphas);
 
         Alphas.allocate(MaxAlphas);
         cAlphaFields.allocate(MaxAlphas);
@@ -2121,7 +2046,7 @@ namespace AirflowNetworkBalanceManager {
                 // for Modulating the Venting Open Factor with Enthalpy control
                 MultizoneZoneData(i).UpValueEnth = Numbers(5); // Upper Value on Inside/Outside Temperature Difference
                 // for Modulating the Venting Open Factor with Enthalpy control
-                MultizoneZoneData(i).VentCtrNum = VentCtrNum_None;
+                MultizoneZoneData(i).VentCtrNum = VentCtrEnum::NONE;
                 MultizoneZoneData(i).SingleSidedCpType = Alphas(5);
                 MultizoneZoneData(i).BuildWidth = Numbers(6);
 
@@ -2136,14 +2061,14 @@ namespace AirflowNetworkBalanceManager {
                         ErrorsFound = true;
                     }
                 }
-                if (UtilityRoutines::SameString(MultizoneZoneData(i).VentControl, "Temperature")) MultizoneZoneData(i).VentCtrNum = VentCtrNum_Temp;
-                if (UtilityRoutines::SameString(MultizoneZoneData(i).VentControl, "Enthalpy")) MultizoneZoneData(i).VentCtrNum = VentCtrNum_Enth;
-                if (UtilityRoutines::SameString(MultizoneZoneData(i).VentControl, "Constant")) MultizoneZoneData(i).VentCtrNum = VentCtrNum_Const;
+                if (UtilityRoutines::SameString(MultizoneZoneData(i).VentControl, "Temperature")) MultizoneZoneData(i).VentCtrNum = VentCtrEnum::TEMP;
+                if (UtilityRoutines::SameString(MultizoneZoneData(i).VentControl, "Enthalpy")) MultizoneZoneData(i).VentCtrNum = VentCtrEnum::ENTH;
+                if (UtilityRoutines::SameString(MultizoneZoneData(i).VentControl, "Constant")) MultizoneZoneData(i).VentCtrNum = VentCtrEnum::CONST;
                 if (UtilityRoutines::SameString(MultizoneZoneData(i).VentControl, "ASHRAE55Adaptive"))
-                    MultizoneZoneData(i).VentCtrNum = VentCtrNum_ASH55;
+                    MultizoneZoneData(i).VentCtrNum = VentCtrEnum::ASH55;
                 if (UtilityRoutines::SameString(MultizoneZoneData(i).VentControl, "CEN15251Adaptive"))
-                    MultizoneZoneData(i).VentCtrNum = VentCtrNum_CEN15251;
-                if (UtilityRoutines::SameString(MultizoneZoneData(i).VentControl, "NoVent")) MultizoneZoneData(i).VentCtrNum = VentCtrNum_Novent;
+                    MultizoneZoneData(i).VentCtrNum = VentCtrEnum::CEN15251;
+                if (UtilityRoutines::SameString(MultizoneZoneData(i).VentControl, "NoVent")) MultizoneZoneData(i).VentCtrNum = VentCtrEnum::NOVENT;
 
                 if (MultizoneZoneData(i).VentCtrNum < NumOfVentCtrTypes) {
                     if (NumAlphas >= 4 && (!lAlphaBlanks(4))) {
@@ -2157,7 +2082,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                     }
                 } else {
-                    MultizoneZoneData(i).VentingSchName = BlankString;
+                    MultizoneZoneData(i).VentingSchName = std::string();
                     MultizoneZoneData(i).VentingSchNum = 0;
                 }
             }
@@ -2179,7 +2104,7 @@ namespace AirflowNetworkBalanceManager {
                 AirflowNetworkZoneFlag(MultizoneZoneData(i).ZoneNum) = true;
                 MultizoneZoneData(i).Height = Zone(MultizoneZoneData(i).ZoneNum).Centroid.z; // Nodal height
             }
-            if (MultizoneZoneData(i).VentCtrNum == VentCtrNum_None) {
+            if (MultizoneZoneData(i).VentCtrNum == VentCtrEnum::NONE) {
                 ShowSevereError(RoutineName + CurrentModuleObject + " object, invalid " + cAlphaFields(2) + " = " + MultizoneZoneData(i).VentControl);
                 ShowContinueError("Valid choices are Temperature, Enthalpy, Constant, or NoVent");
                 ShowContinueError(".. in " + cAlphaFields(1) + " = \"" + MultizoneZoneData(i).ZoneName + "\"");
@@ -2191,7 +2116,7 @@ namespace AirflowNetworkBalanceManager {
                 // UtilityRoutines::SameString(MultizoneZoneData(i)%VentControl,'ASHRAE55Adaptive') .or. &
                 // UtilityRoutines::SameString(MultizoneZoneData(i)%VentControl,'CEN15251Adaptive')) then
                 MultizoneZoneData(i).VentSchNum = GetScheduleIndex(MultizoneZoneData(i).VentSchName);
-                if (MultizoneZoneData(i).VentSchName == BlankString) {
+                if (MultizoneZoneData(i).VentSchName == std::string()) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " object, No " + cAlphaFields(3) + " was found, but is required when " +
                                     cAlphaFields(2) + " is Temperature or Enthalpy.");
                     ShowContinueError("..for " + cAlphaFields(1) + " = \"" + MultizoneZoneData(i).ZoneName + "\", with " + cAlphaFields(2) + " = \"" +
@@ -2214,7 +2139,7 @@ namespace AirflowNetworkBalanceManager {
                     ShowContinueError("..for " + cAlphaFields(1) + " = \"" + MultizoneZoneData(i).ZoneName + "\", with " + cAlphaFields(2) + " = \"" +
                                       MultizoneZoneData(i).VentControl + "\"");
                     MultizoneZoneData(i).VentSchNum = 0;
-                    MultizoneZoneData(i).VentSchName = BlankString;
+                    MultizoneZoneData(i).VentSchName = std::string();
                 }
             }
             if (MultizoneZoneData(i).OpenFactor > 1.0 || MultizoneZoneData(i).OpenFactor < 0.0) {
@@ -2469,31 +2394,31 @@ namespace AirflowNetworkBalanceManager {
                     {
                         auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(MultizoneSurfaceData(i).VentControl));
                         if (SELECT_CASE_var == "TEMPERATURE") {
-                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrNum_Temp;
+                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrEnum::TEMP;
                             MultizoneSurfaceData(i).IndVentControl = true;
                         } else if (SELECT_CASE_var == "ENTHALPY") {
-                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrNum_Enth;
+                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrEnum::ENTH;
                             MultizoneSurfaceData(i).IndVentControl = true;
                         } else if (SELECT_CASE_var == "CONSTANT") {
-                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrNum_Const;
+                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrEnum::CONST;
                             MultizoneSurfaceData(i).IndVentControl = true;
                         } else if (SELECT_CASE_var == "ASHRAE55ADAPTIVE") {
-                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrNum_ASH55;
+                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrEnum::ASH55;
                             MultizoneSurfaceData(i).IndVentControl = true;
                         } else if (SELECT_CASE_var == "CEN15251ADAPTIVE") {
-                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrNum_CEN15251;
+                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrEnum::CEN15251;
                             MultizoneSurfaceData(i).IndVentControl = true;
                         } else if (SELECT_CASE_var == "NOVENT") {
-                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrNum_Novent;
+                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrEnum::NOVENT;
                             MultizoneSurfaceData(i).IndVentControl = true;
                         } else if (SELECT_CASE_var == "ZONELEVEL") {
-                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrNum_ZoneLevel;
+                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrEnum::ZONELEVEL;
                             MultizoneSurfaceData(i).IndVentControl = false;
                         } else if (SELECT_CASE_var == "ADJACENTTEMPERATURE") {
-                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrNum_AdjTemp;
+                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrEnum::ADJTEMP;
                             MultizoneSurfaceData(i).IndVentControl = true;
                         } else if (SELECT_CASE_var == "ADJACENTENTHALPY") {
-                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrNum_AdjEnth;
+                            MultizoneSurfaceData(i).VentSurfCtrNum = VentCtrEnum::ADJENTH;
                             MultizoneSurfaceData(i).IndVentControl = true;
                         } else {
                             ShowSevereError(RoutineName + CurrentModuleObject + " object, Invalid " + cAlphaFields(4));
@@ -2510,8 +2435,8 @@ namespace AirflowNetworkBalanceManager {
                 MultizoneSurfaceData(i).UpValueTemp = Numbers(4);    // Upper temperature value for modulation of temperature control
                 MultizoneSurfaceData(i).LowValueEnth = Numbers(5);   // Lower Enthalpy value for modulation of Enthalpy control
                 MultizoneSurfaceData(i).UpValueEnth = Numbers(6);    // Lower Enthalpy value for modulation of Enthalpy control
-                if (MultizoneSurfaceData(i).VentSurfCtrNum < 4 || MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrNum_AdjTemp ||
-                    MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrNum_AdjEnth) {
+                if (MultizoneSurfaceData(i).VentSurfCtrNum < 4 || MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrEnum::ADJTEMP ||
+                    MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrEnum::ADJENTH) {
                     if (!lAlphaBlanks(6)) {
                         MultizoneSurfaceData(i).VentingSchName = Alphas(6); // Name of ventilation availability schedule
                     }
@@ -2530,11 +2455,11 @@ namespace AirflowNetworkBalanceManager {
                 // Get data of polygonal surface
                 if (!lAlphaBlanks(8)) {
                     if (Alphas(8) == "POLYGONHEIGHT") {
-                        MultizoneSurfaceData(i).EquivRecMethod = EquivRec_Height;
+                        MultizoneSurfaceData(i).EquivRecMethod = EquivRec::HEIGHT;
                     } else if (Alphas(8) == "BASESURFACEASPECTRATIO") {
-                        MultizoneSurfaceData(i).EquivRecMethod = EquivRec_BaseAspectRatio;
+                        MultizoneSurfaceData(i).EquivRecMethod = EquivRec::BASEASPECTRATIO;
                     } else if (Alphas(8) == "USERDEFINEDASPECTRATIO") {
-                        MultizoneSurfaceData(i).EquivRecMethod = EquivRec_UserAspectRatio;
+                        MultizoneSurfaceData(i).EquivRecMethod = EquivRec::USERASPECTRATIO;
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + " object, Invalid " + cAlphaFields(8));
                         ShowContinueError(".." + cAlphaFields(1) + " = " + MultizoneSurfaceData(i).SurfName + ", Specified " + cAlphaFields(8) +
@@ -2543,7 +2468,7 @@ namespace AirflowNetworkBalanceManager {
                         ErrorsFound = true;
                     }
                 } else {
-                    MultizoneSurfaceData(i).EquivRecMethod = EquivRec_Height;
+                    MultizoneSurfaceData(i).EquivRecMethod = EquivRec::HEIGHT;
                 }
                 if (!lNumericBlanks(7)) {
                     MultizoneSurfaceData(i).EquivRecUserAspectRatio = Numbers(7);
@@ -2645,7 +2570,7 @@ namespace AirflowNetworkBalanceManager {
             // Calculate equivalent width and height
             if (Surface(MultizoneSurfaceData(i).SurfNum).Sides != 4) {
                 MultizoneSurfaceData(i).NonRectangular = true;
-                if (MultizoneSurfaceData(i).EquivRecMethod == EquivRec_Height) {
+                if (MultizoneSurfaceData(i).EquivRecMethod == EquivRec::HEIGHT) {
                     if (Surface(MultizoneSurfaceData(i).SurfNum).Tilt < 1.0 ||
                         Surface(MultizoneSurfaceData(i).SurfNum).Tilt > 179.0) { // horizontal surface
                         // check base surface shape
@@ -2689,7 +2614,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                     }
                 }
-                if (MultizoneSurfaceData(i).EquivRecMethod == EquivRec_BaseAspectRatio) {
+                if (MultizoneSurfaceData(i).EquivRecMethod == EquivRec::BASEASPECTRATIO) {
                     if (Surface(Surface(MultizoneSurfaceData(i).SurfNum).BaseSurf).Sides == 4) {
                         baseratio = Surface(Surface(MultizoneSurfaceData(i).SurfNum).BaseSurf).Width /
                                     Surface(Surface(MultizoneSurfaceData(i).SurfNum).BaseSurf).Height;
@@ -2730,7 +2655,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                     }
                 }
-                if (MultizoneSurfaceData(i).EquivRecMethod == EquivRec_UserAspectRatio) {
+                if (MultizoneSurfaceData(i).EquivRecMethod == EquivRec::USERASPECTRATIO) {
                     MultizoneSurfaceData(i).Width =
                         sqrt(Surface(MultizoneSurfaceData(i).SurfNum).Area * MultizoneSurfaceData(i).EquivRecUserAspectRatio);
                     MultizoneSurfaceData(i).Height = Surface(MultizoneSurfaceData(i).SurfNum).Area / MultizoneSurfaceData(i).Width;
@@ -2849,14 +2774,14 @@ namespace AirflowNetworkBalanceManager {
 
         // Validate adjacent temperature and Enthalpy control for an interior surface only
         for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
-            if (MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrNum_AdjTemp) {
+            if (MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrEnum::ADJTEMP) {
                 if (!(Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond >= 1)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(1) + " = " + MultizoneSurfaceData(i).SurfName);
                     ShowContinueError("..AdjacentTemperature venting control must be defined for an interzone surface.");
                     ErrorsFound = true;
                 }
             }
-            if (MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrNum_AdjEnth) {
+            if (MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrEnum::ADJENTH) {
                 if (!(Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond >= 1)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(1) + " = " + MultizoneSurfaceData(i).SurfName);
                     ShowContinueError("..AdjacentEnthalpy venting control must be defined for an interzone surface.");
@@ -2931,9 +2856,9 @@ namespace AirflowNetworkBalanceManager {
                 }
                 {
                     auto const SELECT_CASE_var(MultizoneSurfaceData(i).VentSurfCtrNum);
-                    if ((SELECT_CASE_var == VentCtrNum_Temp) || (SELECT_CASE_var == VentCtrNum_AdjTemp)) {
+                    if ((SELECT_CASE_var == VentCtrEnum::TEMP) || (SELECT_CASE_var == VentCtrEnum::ADJTEMP)) {
                         MultizoneSurfaceData(i).VentSchNum = GetScheduleIndex(MultizoneSurfaceData(i).VentSchName);
-                        if (MultizoneSurfaceData(i).VentSchName == BlankString) {
+                        if (MultizoneSurfaceData(i).VentSchName == std::string()) {
                             ShowSevereError(RoutineName + CurrentModuleObject +
                                             " object, No Ventilation Schedule was found, but is required when ventilation control is Temperature.");
                             ShowContinueError("..for Surface = \"" + MultizoneSurfaceData(i).SurfName + "\"");
@@ -2967,9 +2892,9 @@ namespace AirflowNetworkBalanceManager {
                             MultizoneSurfaceData(i).UpValueTemp = 100.0;
                         }
 
-                    } else if ((SELECT_CASE_var == VentCtrNum_Enth) || (SELECT_CASE_var == VentCtrNum_AdjEnth)) {
+                    } else if ((SELECT_CASE_var == VentCtrEnum::ENTH) || (SELECT_CASE_var == VentCtrEnum::ADJENTH)) {
                         MultizoneSurfaceData(i).VentSchNum = GetScheduleIndex(MultizoneSurfaceData(i).VentSchName);
-                        if (MultizoneSurfaceData(i).VentSchName == BlankString) {
+                        if (MultizoneSurfaceData(i).VentSchName == std::string()) {
                             ShowSevereError(RoutineName + CurrentModuleObject +
                                             " object, No Ventilation Schedule was found, but is required when ventilation control is Enthalpy.");
                             ShowContinueError("..for Surface = \"" + MultizoneSurfaceData(i).SurfName + "\"");
@@ -3003,23 +2928,23 @@ namespace AirflowNetworkBalanceManager {
                             MultizoneSurfaceData(i).UpValueEnth = 300000.0;
                         }
 
-                    } else if (SELECT_CASE_var == VentCtrNum_Const) {
+                    } else if (SELECT_CASE_var == VentCtrEnum::CONST) {
                         MultizoneSurfaceData(i).VentSchNum = 0;
                         MultizoneSurfaceData(i).VentSchName = "";
 
-                    } else if (SELECT_CASE_var == VentCtrNum_ASH55) {
+                    } else if (SELECT_CASE_var == VentCtrEnum::ASH55) {
                         MultizoneSurfaceData(i).VentSchNum = 0;
                         MultizoneSurfaceData(i).VentSchName = "";
 
-                    } else if (SELECT_CASE_var == VentCtrNum_CEN15251) {
+                    } else if (SELECT_CASE_var == VentCtrEnum::CEN15251) {
                         MultizoneSurfaceData(i).VentSchNum = 0;
                         MultizoneSurfaceData(i).VentSchName = "";
 
-                    } else if (SELECT_CASE_var == VentCtrNum_Novent) {
+                    } else if (SELECT_CASE_var == VentCtrEnum::NOVENT) {
                         MultizoneSurfaceData(i).VentSchNum = 0;
                         MultizoneSurfaceData(i).VentSchName = "";
 
-                    } else if (SELECT_CASE_var == VentCtrNum_ZoneLevel) {
+                    } else if (SELECT_CASE_var == VentCtrEnum::ZONELEVEL) {
                         MultizoneSurfaceData(i).VentSchNum = 0;
                         MultizoneSurfaceData(i).VentSchName = "";
 
@@ -4938,11 +4863,11 @@ namespace AirflowNetworkBalanceManager {
             if (AirflowNetworkNumOfOccuVentCtrls > 0) {
                 for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
                     if (MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
-                        MultizoneSurfaceData(i).PrevOpeningstatus = 0;
+                        MultizoneSurfaceData(i).PrevOpeningstatus = OpenStatus::FREEOPERATION;
                         MultizoneSurfaceData(i).CloseElapsedTime = 0.0;
                         MultizoneSurfaceData(i).OpenElapsedTime = 0.0;
-                        MultizoneSurfaceData(i).OpeningStatus = 0;
-                        MultizoneSurfaceData(i).OpeningProbStatus = 0;
+                        MultizoneSurfaceData(i).OpeningStatus = OpenStatus::FREEOPERATION;
+                        MultizoneSurfaceData(i).OpeningProbStatus = ProbabilityCheck::NOACTION;
                         MultizoneSurfaceData(i).ClosingProbStatus = 0;
                     }
                 }
@@ -5036,17 +4961,15 @@ namespace AirflowNetworkBalanceManager {
                     j = MultizoneSurfaceData(i).SurfNum;
                     OccupantVentilationControl(MultizoneSurfaceData(i).OccupantVentilationControlNum)
                         .calc(Surface(j).Zone,
-                              j,
-                              MultizoneSurfaceData(i).PrevOpeningstatus,
                               MultizoneSurfaceData(i).OpenElapsedTime,
                               MultizoneSurfaceData(i).CloseElapsedTime,
                               MultizoneSurfaceData(i).OpeningStatus,
                               MultizoneSurfaceData(i).OpeningProbStatus,
                               MultizoneSurfaceData(i).ClosingProbStatus);
-                    if (MultizoneSurfaceData(i).OpeningStatus == MinCheckForceOpen) {
+                    if (MultizoneSurfaceData(i).OpeningStatus == OpenStatus::MINCHECKFORCEOPEN) {
                         MultizoneSurfaceData(i).OpenFactor = MultizoneSurfaceData(i).OpenFactorLast;
                     }
-                    if (MultizoneSurfaceData(i).OpeningStatus == MinCheckForceClose) {
+                    if (MultizoneSurfaceData(i).OpeningStatus == OpenStatus::MINCHECKFORCECLOSE) {
                         MultizoneSurfaceData(i).OpenFactor = 0.0;
                     }
                 }
@@ -5768,13 +5691,13 @@ namespace AirflowNetworkBalanceManager {
             if (SurfaceWindow(j).OriginalClass == SurfaceClass_Window || SurfaceWindow(j).OriginalClass == SurfaceClass_Door ||
                 SurfaceWindow(j).OriginalClass == SurfaceClass_GlassDoor) {
                 if (MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
-                    if (MultizoneSurfaceData(i).OpeningStatus == FreeOperation) {
-                        if (MultizoneSurfaceData(i).OpeningProbStatus == ProbForceChange) {
+                    if (MultizoneSurfaceData(i).OpeningStatus == OpenStatus::FREEOPERATION) {
+                        if (MultizoneSurfaceData(i).OpeningProbStatus == ProbabilityCheck::FORCECHANGE) {
                             MultizoneSurfaceData(i).OpenFactor = MultizoneSurfaceData(i).Factor;
-                        } else if (MultizoneSurfaceData(i).ClosingProbStatus == ProbForceChange) {
+                        } else if (MultizoneSurfaceData(i).ClosingProbStatus == ProbabilityCheck::FORCECHANGE) {
                             MultizoneSurfaceData(i).OpenFactor = 0.0;
-                        } else if (MultizoneSurfaceData(i).ClosingProbStatus == ProbKeepStatus ||
-                                   MultizoneSurfaceData(i).OpeningProbStatus == ProbKeepStatus) {
+                        } else if (MultizoneSurfaceData(i).ClosingProbStatus == ProbabilityCheck::KEEPSTATUS ||
+                                   MultizoneSurfaceData(i).OpeningProbStatus == ProbabilityCheck::KEEPSTATUS) {
                             MultizoneSurfaceData(i).OpenFactor = MultizoneSurfaceData(i).OpenFactorLast;
                         } else {
                             AirflowNetworkVentingControl(i, MultizoneSurfaceData(i).OpenFactor);
@@ -6674,7 +6597,7 @@ namespace AirflowNetworkBalanceManager {
                                  AirflowNetworkNodeSimu(AirflowNetworkLinkageData(i).NodeNums[1]).WZ) /
                                 2.0);
             // Calculate duct conduction loss
-            if (CompTypeNum == CompTypeNum_DWC && CompName == BlankString) { // Duct element only
+            if (CompTypeNum == CompTypeNum_DWC && CompName == std::string()) { // Duct element only
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
                 if (AirflowNetworkLinkSimu(i).FLOW > 0.0) { // flow direction is the same as input from node 1 to node 2
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
@@ -6933,16 +6856,9 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                //        Ei = exp(-0.001*DisSysCompCoilData(TypeNum)%L*DisSysCompCoilData(TypeNum)%D*pi/ &
-                //             (DirSign*AirflowNetworkLinkSimu(I)%FLOW*CpAir))
-                //        Tamb = AirflowNetworkNodeSimu(LT)%TZ
-                //        MA((LT-1)*AirflowNetworkNumOfNodes+LT) = MA((LT-1)*AirflowNetworkNumOfNodes+LT)+ &
-                //                                                 ABS(AirflowNetworkLinkSimu(I)%FLOW)*CpAir
-                //        MA((LT-1)*AirflowNetworkNumOfNodes+LF) = -ABS(AirflowNetworkLinkSimu(I)%FLOW)*CpAir*Ei
-                //        MV(LT) = MV(LT)+ABS(AirflowNetworkLinkSimu(I)%FLOW)*Tamb*(1.0-Ei)*CpAir
             }
             // Calculate temp in a constant pressure drop element
-            if (CompTypeNum == CompTypeNum_CPD && CompName == BlankString) { // constant pressure element only
+            if (CompTypeNum == CompTypeNum_CPD && CompName == std::string()) { // constant pressure element only
                 if (AirflowNetworkLinkSimu(i).FLOW > 0.0) {                  // flow direction is the same as input from node 1 to node 2
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
@@ -6960,7 +6876,7 @@ namespace AirflowNetworkBalanceManager {
                 MV(LT) = 0.0;
             }
             // Calculate return leak
-            if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == BlankString) {
+            if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
                 // Return leak element only
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
@@ -7164,7 +7080,7 @@ namespace AirflowNetworkBalanceManager {
             CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
             CompName = AirflowNetworkCompData(CompNum).EPlusName;
             // Calculate duct moisture diffusion loss
-            if (CompTypeNum == CompTypeNum_DWC && CompName == BlankString) { // Duct component only
+            if (CompTypeNum == CompTypeNum_DWC && CompName == std::string()) { // Duct component only
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
                 if (AirflowNetworkLinkSimu(i).FLOW > 0.0) { // flow direction is the same as input from node 1 to node 2
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
@@ -7251,7 +7167,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
             // Calculate temp in a constant pressure drop component
-            if (CompTypeNum == CompTypeNum_CPD && CompName == BlankString) { // constant pressure element only
+            if (CompTypeNum == CompTypeNum_CPD && CompName == std::string()) { // constant pressure element only
                 if (AirflowNetworkLinkSimu(i).FLOW > 0.0) {                  // flow direction is the same as input from node 1 to node 2
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
@@ -7269,7 +7185,7 @@ namespace AirflowNetworkBalanceManager {
                 MV(LT) = 0.0;
             }
             // Calculate return leak
-            if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == BlankString) {
+            if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
                 // Return leak component only
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
@@ -7457,7 +7373,7 @@ namespace AirflowNetworkBalanceManager {
             CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
             CompName = AirflowNetworkCompData(CompNum).EPlusName;
             // Calculate duct moisture diffusion loss
-            if (CompTypeNum == CompTypeNum_DWC && CompName == BlankString) { // Duct component only
+            if (CompTypeNum == CompTypeNum_DWC && CompName == std::string()) { // Duct component only
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
                 if (AirflowNetworkLinkSimu(i).FLOW > 0.0) { // flow direction is the same as input from node 1 to node 2
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
@@ -7498,7 +7414,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
             // Calculate temp in a constant pressure drop component
-            if (CompTypeNum == CompTypeNum_CPD && CompName == BlankString) { // constant pressure element only
+            if (CompTypeNum == CompTypeNum_CPD && CompName == std::string()) { // constant pressure element only
                 if (AirflowNetworkLinkSimu(i).FLOW > 0.0) {                  // flow direction is the same as input from node 1 to node 2
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
@@ -7511,7 +7427,7 @@ namespace AirflowNetworkBalanceManager {
                 MV(LT) = 0.0;
             }
             // Calculate return leak
-            if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == BlankString) {
+            if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
                 // Return leak component only
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
@@ -7667,7 +7583,7 @@ namespace AirflowNetworkBalanceManager {
             CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
             CompName = AirflowNetworkCompData(CompNum).EPlusName;
             // Calculate duct moisture diffusion loss
-            if (CompTypeNum == CompTypeNum_DWC && CompName == BlankString) { // Duct component only
+            if (CompTypeNum == CompTypeNum_DWC && CompName == std::string()) { // Duct component only
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
                 if (AirflowNetworkLinkSimu(i).FLOW > 0.0) { // flow direction is the same as input from node 1 to node 2
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
@@ -7708,7 +7624,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
             // Calculate temp in a constant pressure drop component
-            if (CompTypeNum == CompTypeNum_CPD && CompName == BlankString) { // constant pressure element only
+            if (CompTypeNum == CompTypeNum_CPD && CompName == std::string()) { // constant pressure element only
                 if (AirflowNetworkLinkSimu(i).FLOW > 0.0) {                  // flow direction is the same as input from node 1 to node 2
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
@@ -7721,7 +7637,7 @@ namespace AirflowNetworkBalanceManager {
                 MV(LT) = 0.0;
             }
             // Calculate return leak
-            if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == BlankString) {
+            if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
                 // Return leak component only
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
@@ -9132,7 +9048,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 LowerValInOutEnthalDiff; // Lower value of inside/outside enthalpy difference for opening factor modulation
         Real64 UpperValInOutEnthalDiff; // Upper value of inside/outside enthalpy difference for opening factor modulation
         bool VentingAllowed;            // True if venting schedule allows venting
-        int VentCtrlNum;                // Venting control strategy 1: Temperature contro; 2: Enthalpy control
+        int VentCtrlNum;                // Venting control strategy 1: Temperature control; 2: Enthalpy control
         Real64 VentingSchVal;           // Current time step value of venting schedule
         Real64 Tamb;                    // Outdoor dry bulb temperature at surface centroid height
         int PeopleInd;
@@ -9192,10 +9108,10 @@ namespace AirflowNetworkBalanceManager {
 
         // Venting based on inside-outside air temperature difference
 
-        if ((VentCtrlNum == VentCtrNum_Temp || VentCtrlNum == VentCtrNum_AdjTemp) && VentingAllowed) {
+        if ((VentCtrlNum == VentCtrEnum::TEMP || VentCtrlNum == VentCtrEnum::ADJTEMP) && VentingAllowed) {
             Tamb = Surface(SurfNum).OutDryBulbTemp;
             // Check whether this surface is an interior wall or not. If Yes, use adjacent zone conditions
-            if (VentCtrlNum == VentCtrNum_AdjTemp && MultizoneSurfaceData(i).IndVentControl) {
+            if (VentCtrlNum == VentCtrEnum::ADJTEMP && MultizoneSurfaceData(i).IndVentControl) {
                 Tamb = ANZT(MultizoneZoneData(MultizoneSurfaceData(i).NodeNums[1]).ZoneNum);
             }
             if (ANZT(ZoneNum) > Tamb && ANZT(ZoneNum) > VentTemp) {
@@ -9233,10 +9149,10 @@ namespace AirflowNetworkBalanceManager {
 
         // Venting based on inside-outside air enthalpy difference
 
-        if ((VentCtrlNum == VentCtrNum_Enth || VentCtrlNum == VentCtrNum_AdjEnth) && VentingAllowed) {
+        if ((VentCtrlNum == VentCtrEnum::ENTH || VentCtrlNum == VentCtrEnum::ADJENTH) && VentingAllowed) {
             ZoneAirEnthalpy = PsyHFnTdbW(ANZT(ZoneNum), ANZW(ZoneNum));
             // Check whether this surface is an interior wall or not. If Yes, use adjacent zone conditions
-            if (VentCtrlNum == VentCtrNum_AdjEnth && MultizoneSurfaceData(i).IndVentControl) {
+            if (VentCtrlNum == VentCtrEnum::ADJENTH && MultizoneSurfaceData(i).IndVentControl) {
                 OutEnthalpy = PsyHFnTdbW(ANZT(MultizoneZoneData(MultizoneSurfaceData(i).NodeNums[1]).ZoneNum),
                                          ANZW(MultizoneZoneData(MultizoneSurfaceData(i).NodeNums[1]).ZoneNum));
             }
@@ -9277,12 +9193,12 @@ namespace AirflowNetworkBalanceManager {
         // Constant venting (opening factor as specified in IDF) - C-PH - added by Philip Haves 3/8/01
         // subject to venting availability
 
-        if (VentCtrlNum == VentCtrNum_Const && VentingAllowed) { // Constant
+        if (VentCtrlNum == VentCtrEnum::CONST && VentingAllowed) { // Constant
             OpenFactor = MultizoneSurfaceData(i).Factor;
             SurfaceWindow(SurfNum).VentingOpenFactorMultRep = 1.0;
         }
 
-        if (VentCtrlNum == VentCtrNum_ASH55) {
+        if (VentCtrlNum == VentCtrEnum::ASH55) {
             if (VentingAllowed && (!BeginEnvrnFlag) && (!WarmupFlag)) {
                 PeopleInd = MultizoneZoneData(IZ).ASH55PeopleInd;
                 if (PeopleInd > 0 && ThermalComfortData(PeopleInd).ThermalComfortAdaptiveASH5590 != -1) {
@@ -9300,7 +9216,7 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        if (VentCtrlNum == VentCtrNum_CEN15251) {
+        if (VentCtrlNum == VentCtrEnum::CEN15251) {
             if (VentingAllowed && (!BeginEnvrnFlag) && (!WarmupFlag)) {
                 PeopleInd = MultizoneZoneData(IZ).CEN15251PeopleInd;
                 if (PeopleInd > 0 && ThermalComfortData(PeopleInd).ThermalComfortAdaptiveCEN15251CatI != -1) {
@@ -9320,7 +9236,7 @@ namespace AirflowNetworkBalanceManager {
 
         // No venting, i.e, window/door always closed - added YJH 8 Aug 02
 
-        if (VentCtrlNum == VentCtrNum_Novent) { // Novent
+        if (VentCtrlNum == VentCtrEnum::NOVENT) { // Novent
             OpenFactor = 0.0;
             SurfaceWindow(SurfNum).VentingOpenFactorMultRep = -1.0;
         }
@@ -11098,8 +11014,6 @@ namespace AirflowNetworkBalanceManager {
     }
 
     void OccupantVentilationControlProp::calc(int const ZoneNum,
-                                              int const EP_UNUSED(SurfNum),
-                                              int const EP_UNUSED(PrevOpeningstatus),
                                               Real64 const TimeOpenDuration,
                                               Real64 const TimeCloseDuration,
                                               int &OpeningStatus,
@@ -11117,16 +11031,16 @@ namespace AirflowNetworkBalanceManager {
 
         if (TimeOpenDuration > 0) {
             if (TimeOpenDuration >= MinOpeningTime) {
-                OpeningStatus = FreeOperation; // free operation
+                OpeningStatus = OpenStatus::FREEOPERATION; // free operation
             } else {
-                OpeningStatus = MinCheckForceOpen; // forced to open
+                OpeningStatus = OpenStatus::MINCHECKFORCEOPEN; // forced to open
             }
         }
         if (TimeCloseDuration > 0) {
             if (TimeCloseDuration >= MinClosingTime) {
-                OpeningStatus = FreeOperation; // free operation
+                OpeningStatus = OpenStatus::FREEOPERATION; // free operation
             } else {
-                OpeningStatus = MinCheckForceClose; // forced to close
+                OpeningStatus = OpenStatus::MINCHECKFORCECLOSE; // forced to close
             }
         }
 
@@ -11148,22 +11062,22 @@ namespace AirflowNetworkBalanceManager {
 
         if (Toperative > (Tcomfort + ComfortBand)) {
             if (openingProbability(ZoneNum, TimeCloseDuration)) {
-                OpeningProbStatus = ProbForceChange; // forced to open
+                OpeningProbStatus = ProbabilityCheck::FORCECHANGE; // forced to open
             } else {
-                OpeningProbStatus = ProbKeepStatus; // Keep previous status
+                OpeningProbStatus = ProbabilityCheck::KEEPSTATUS; // Keep previous status
             }
         } else {
-            OpeningProbStatus = ProbNoAction; // free operation
+            OpeningProbStatus = ProbabilityCheck::NOACTION; // free operation
         }
 
         if (Toperative < (Tcomfort - ComfortBand)) {
             if (closingProbability(TimeOpenDuration)) {
-                ClosingProbStatus = ProbForceChange; // forced to close
+                ClosingProbStatus = ProbabilityCheck::FORCECHANGE; // forced to close
             } else {
-                ClosingProbStatus = ProbKeepStatus; // Keep previous status
+                ClosingProbStatus = ProbabilityCheck::KEEPSTATUS; // Keep previous status
             }
         } else {
-            ClosingProbStatus = ProbNoAction; // free operation
+            ClosingProbStatus = ProbabilityCheck::NOACTION; // free operation
         }
     }
 

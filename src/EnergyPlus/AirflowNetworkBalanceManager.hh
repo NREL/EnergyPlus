@@ -61,6 +61,40 @@ namespace EnergyPlus {
 
 namespace AirflowNetworkBalanceManager {
 
+    enum VentCtrEnum  // TODO: make enum class
+    {
+        NONE = 0,           // Wrong input
+        TEMP = 1,           // Temperature venting control
+        ENTH = 2,           // Enthalpy venting control
+        CONST = 3,          // Constant venting control
+        ASH55 = 4,
+        CEN15251 = 5,
+        NOVENT = 6,         // No venting
+        ZONELEVEL = 7,      // ZoneLevel control for a heat transfer subsurface
+        ADJTEMP = 8,        // Temperature venting control based on adjacent zone conditions
+        ADJENTH = 9         // Enthalpy venting control based on adjacent zone conditions
+    };
+
+    enum OpenStatus  // TODO: make enum class
+    {
+        FREEOPERATION = 0,           // Free operation
+        MINCHECKFORCEOPEN = 1,      // Force open when opening elapsed time is less than minimum opening time
+        MINCHECKFORCECLOSE = 2      // Force open when closing elapsed time is less than minimum closing time
+    };
+
+    enum ProbabilityCheck  // TODO: make enum class
+    {
+        NOACTION = 0,               // No action from probability check
+        FORCECHANGE = 1,            // Force open or close from probability check
+        KEEPSTATUS = 2              // Keep status at the previous time step from probability check
+    };
+
+    enum class EquivRec {
+        HEIGHT,             // Effective rectangle polygonal height selection
+        BASEASPECTRATIO,    // Effective rectangle base surface aspect ratio selection
+        USERASPECTRATIO     // Effective rectangle user input aspect ratio selection
+    };
+
     extern Array1D_int SplitterNodeNumbers;
     extern bool AirflowNetworkGetInputFlag;
     extern int AirflowNetworkNumOfExtSurfaces;
@@ -204,8 +238,6 @@ namespace AirflowNetworkBalanceManager {
         }
 
         void calc(int ZoneNum,
-                  int SurfNum,
-                  int PrevOpeningstatus,
                   Real64 TimeOpenDuration,
                   Real64 TimeCloseDuration,
                   int &OpeningStatus,
