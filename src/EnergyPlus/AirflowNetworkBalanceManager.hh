@@ -53,11 +53,14 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+
+    // Forward declarations
     class OutputFiles;
+    struct EnergyPlusData;
 
 namespace AirflowNetworkBalanceManager {
 
@@ -250,9 +253,18 @@ namespace AirflowNetworkBalanceManager {
         bool closingProbability(Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
 
-    extern Array1D<OccupantVentilationControlProp> OccupantVentilationControl;
-
 } // namespace AirflowNetworkBalanceManager
+
+    struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
+
+        Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
+
+        void clear_state() {
+            OccupantVentilationControl.deallocate();
+        }
+    };
+
+    AirflowNetworkBalanceManagerData dataAirflowNetworkBalanceManager;
 
 } // namespace EnergyPlus
 
