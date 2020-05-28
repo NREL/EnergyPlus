@@ -229,8 +229,7 @@ namespace AirflowNetworkBalanceManager {
         Array1D<Real64> MV;
         Array1D_int IVEC;
         int VentilationCtrl;  // Hybrid ventilation control type
-
-     int NumOfExhaustFans; // Number of exhaust fans
+        int NumOfExhaustFans; // Number of exhaust fans
         int NumAirflowNetwork;
         int AirflowNetworkNumOfDetOpenings;
         int AirflowNetworkNumOfSimOpenings;
@@ -254,13 +253,22 @@ namespace AirflowNetworkBalanceManager {
         int DisSysNumOfTermUnits;
         int DisSysNumOfLinks;
         int NumOfExtNodes;
-        Real64 IncAng;                     // Wind incidence angle relative to facade normal (deg)
-        int SupplyFanType;                   // Supply air fan type
+        Real64 IncAng;                              // Wind incidence angle relative to facade normal (deg)
+        int SupplyFanType;                          // Supply air fan type
+        Real64 MaxOnOffFanRunTimeFraction;          // max Run time fraction for an On/Off fan flow rate among airloops
+        Real64 CurrentEndTimeLast;                  // last end time
+        Real64 TimeStepSysLast;                     // last system time step
+        int AirflowNetworkNumOfOccuVentCtrls;
+        int IntraZoneNumOfNodes;
+        int IntraZoneNumOfLinks;
+        int IntraZoneNumOfZones;
+        int NumOfPressureControllers;               // number of pressure controllers
+        int NumOfOAFans;                            // number of OutdoorAir fans
+        int NumOfReliefFans;                        // number of OutdoorAir relief fans
 
         void clear_state() {
             OccupantVentilationControl.deallocate();
             SplitterNodeNumbers.deallocate();
-//            AirflowNetworkGetInputFlag = true;
             AirflowNetworkNumOfExtSurfaces = 0;
             MA.deallocate();
             MV.deallocate();
@@ -292,6 +300,16 @@ namespace AirflowNetworkBalanceManager {
             NumOfExtNodes = 0;
             IncAng = 0.0;
             SupplyFanType = 0;
+            MaxOnOffFanRunTimeFraction = 0.0;
+            CurrentEndTimeLast = 0.0;
+            TimeStepSysLast = 0.0;
+            AirflowNetworkNumOfOccuVentCtrls = 0;
+            IntraZoneNumOfNodes = 0;
+            IntraZoneNumOfLinks = 0;
+            IntraZoneNumOfZones = 0;
+            NumOfPressureControllers = 0;
+            NumOfOAFans = 0;
+            NumOfReliefFans = 0;
         }
     };
 
