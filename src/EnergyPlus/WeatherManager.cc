@@ -3535,7 +3535,18 @@ namespace WeatherManager {
                     TomorrowTotalSkyCover(CurTimeStep, Hour) = TotalSkyCover;
                     TomorrowOpaqueSkyCover(CurTimeStep, Hour) = OpaqueSkyCover;
 
-                    ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
+                    //Trial 1: set up the temporary interpolation mechanism trial
+                    int tempLastHr = Hour - 1;
+                    if (tempLastHr < 1) tempLastHr = Hour;
+                    Real64 tempWtNow = Interpolation(CurTimeStep);
+                    Real64 tempWtPrevHour = 1.0 - tempWtNow;
+                    Real64 tempOpaqueSkyCover =TomorrowOpaqueSkyCover(CurTimeStep, tempLastHr) * tempWtPrevHour + OpaqueSkyCover * tempWtNow; 
+                    Real64 tempDryBulb = TomorrowOutDryBulbTemp(CurTimeStep, tempLastHr) * tempWtPrevHour + DryBulb * tempWtNow; 
+                    Real64 tempDewPoint = TomorrowOutDewPointTemp(CurTimeStep, tempLastHr) * tempWtPrevHour + DewPoint * tempWtNow; 
+                    Real64 tempRelHum = TomorrowOutRelHum(CurTimeStep, tempLastHr)*0.01 * tempWtPrevHour + RelHum * tempWtNow; 
+
+                    ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, tempOpaqueSkyCover, tempDryBulb, tempDewPoint, tempRelHum);
+                    // ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
                     if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
                         TomorrowHorizIRSky(CurTimeStep, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
                     } else {
