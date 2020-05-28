@@ -13455,7 +13455,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
 
     Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, outputFiles());
-    AirflowNetworkGetInputFlag = false;
+    dataAirflowNetworkBalanceManager.AirflowNetworkGetInputFlag = false;
     AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
     ManageAirflowNetworkBalance(state, First, iter, resimu);
     EXPECT_FALSE(resimu);

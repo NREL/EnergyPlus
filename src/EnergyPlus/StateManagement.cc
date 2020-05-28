@@ -244,8 +244,6 @@ void EnergyPlus::clearAllStates()
 {
     using namespace EnergyPlus;
     // A to Z order
-    AirflowNetworkBalanceManager::clear_state();
-    dataAirflowNetworkBalanceManager.clear_state();
     BranchInputManager::clear_state();
     CoolingPanelSimple::clear_state();
     CoilCoolingDX::clear_state();
@@ -255,6 +253,7 @@ void EnergyPlus::clearAllStates()
     CTElectricGenerator::clear_state();
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
+    dataAirflowNetworkBalanceManager.clear_state();
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();

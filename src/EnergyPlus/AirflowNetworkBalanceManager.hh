@@ -67,8 +67,6 @@ namespace EnergyPlus {
 
 namespace AirflowNetworkBalanceManager {
 
-    extern bool AirflowNetworkGetInputFlag;
-
     struct AirflowNetworkReportVars
     {
         // Members
@@ -98,8 +96,6 @@ namespace AirflowNetworkBalanceManager {
         {
         }
     };
-
-    void clear_state();
 
     void ManageAirflowNetworkBalance(EnergyPlusData &state,
                                      Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
@@ -228,43 +224,46 @@ namespace AirflowNetworkBalanceManager {
         Array1D<Real64> MA;
         Array1D<Real64> MV;
         Array1D_int IVEC;
-        int VentilationCtrl;  // Hybrid ventilation control type
-        int NumOfExhaustFans; // Number of exhaust fans
-        int NumAirflowNetwork;
-        int AirflowNetworkNumOfDetOpenings;
-        int AirflowNetworkNumOfSimOpenings;
-        int AirflowNetworkNumOfHorOpenings;
-        int AirflowNetworkNumOfSurCracks;
-        int AirflowNetworkNumOfSurELA;
-        int AirflowNetworkNumOfExtNode;
-        int AirflowNetworkNumOfOutAirNode;
-        int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
-        int DisSysNumOfNodes;
-        int DisSysNumOfLeaks;
-        int DisSysNumOfELRs;
-        int DisSysNumOfDucts;
-        int DisSysNumOfDuctViewFactors;
-        int DisSysNumOfDampers;
-        int DisSysNumOfCVFs;
-        int DisSysNumOfDetFans;
-        int DisSysNumOfCoils;
-        int DisSysNumOfHXs;
-        int DisSysNumOfCPDs;
-        int DisSysNumOfTermUnits;
-        int DisSysNumOfLinks;
-        int NumOfExtNodes;
-        Real64 IncAng;                              // Wind incidence angle relative to facade normal (deg)
-        int SupplyFanType;                          // Supply air fan type
-        Real64 MaxOnOffFanRunTimeFraction;          // max Run time fraction for an On/Off fan flow rate among airloops
-        Real64 CurrentEndTimeLast;                  // last end time
-        Real64 TimeStepSysLast;                     // last system time step
-        int AirflowNetworkNumOfOccuVentCtrls;
-        int IntraZoneNumOfNodes;
-        int IntraZoneNumOfLinks;
-        int IntraZoneNumOfZones;
-        int NumOfPressureControllers;               // number of pressure controllers
-        int NumOfOAFans;                            // number of OutdoorAir fans
-        int NumOfReliefFans;                        // number of OutdoorAir relief fans
+        int VentilationCtrl = 0;  // Hybrid ventilation control type
+        int NumOfExhaustFans = 0; // Number of exhaust fans
+        int NumAirflowNetwork = 0;
+        int AirflowNetworkNumOfDetOpenings = 0;
+        int AirflowNetworkNumOfSimOpenings = 0;
+        int AirflowNetworkNumOfHorOpenings = 0;
+        int AirflowNetworkNumOfSurCracks = 0;
+        int AirflowNetworkNumOfSurELA = 0;
+        int AirflowNetworkNumOfExtNode = 0;
+        int AirflowNetworkNumOfOutAirNode = 0;
+        int AirflowNetworkNumOfSingleSideZones = 0; // Total number of zones with advanced single sided wind pressure coefficient calculation
+        int DisSysNumOfNodes = 0;
+        int DisSysNumOfLeaks = 0;
+        int DisSysNumOfELRs = 0;
+        int DisSysNumOfDucts = 0;
+        int DisSysNumOfDuctViewFactors = 0;
+        int DisSysNumOfDampers = 0;
+        int DisSysNumOfCVFs = 0;
+        int DisSysNumOfDetFans = 0;
+        int DisSysNumOfCoils = 0;
+        int DisSysNumOfHXs = 0;
+        int DisSysNumOfCPDs = 0;
+        int DisSysNumOfTermUnits = 0;
+        int DisSysNumOfLinks = 0;
+        int NumOfExtNodes = 0;
+        Real64 IncAng = 0.0;                            // Wind incidence angle relative to facade normal (deg)
+        int SupplyFanType = 0;                          // Supply air fan type
+        Real64 MaxOnOffFanRunTimeFraction = 0.0;        // max Run time fraction for an On/Off fan flow rate among airloops
+        Real64 CurrentEndTimeLast = 0.0;                // last end time
+        Real64 TimeStepSysLast = 0.0;                   // last system time step
+        int AirflowNetworkNumOfOccuVentCtrls = 0;
+        int IntraZoneNumOfNodes = 0;
+        int IntraZoneNumOfLinks = 0;
+        int IntraZoneNumOfZones = 0;
+        int NumOfPressureControllers = 0;               // number of pressure controllers
+        int NumOfOAFans = 0;                            // number of OutdoorAir fans
+        int NumOfReliefFans = 0;                        // number of OutdoorAir relief fans
+        bool AirflowNetworkGetInputFlag = true;
+        bool ValidateDistributionSystemFlag = true;
+        Array1D<Real64> FacadeAng = Array1D<Real64>(5);  // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
         Array1D<Real64> LoopPartLoadRatio;
         Array1D<Real64> LoopOnOffFanRunTimeFraction;
         Array1D<bool> LoopOnOffFlag;
@@ -273,7 +272,7 @@ namespace AirflowNetworkBalanceManager {
         Array1D<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
         std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
-        void clear_state() {
+        void clear_state() override {
             OccupantVentilationControl.deallocate();
             SplitterNodeNumbers.deallocate();
             AirflowNetworkNumOfExtSurfaces = 0;
@@ -317,6 +316,9 @@ namespace AirflowNetworkBalanceManager {
             NumOfPressureControllers = 0;
             NumOfOAFans = 0;
             NumOfReliefFans = 0;
+            AirflowNetworkGetInputFlag = true;
+            ValidateDistributionSystemFlag = true;
+            FacadeAng = Array1D<Real64>(5);
             AirflowNetworkZnRpt.deallocate();
             LoopPartLoadRatio.deallocate();
             LoopOnOffFanRunTimeFraction.deallocate();

@@ -205,25 +205,6 @@ namespace AirflowNetworkBalanceManager {
 
     int constexpr NumOfVentCtrTypes(6);        // Number of zone level venting control types
 
-    // TODO: These variables cause diffs when moved to state data class
-    namespace {
-        // These are purposefully not in the header file as an extern variable. No one outside of this should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool ValidateDistributionSystemFlag(true);
-    } // namespace
-
-    bool AirflowNetworkGetInputFlag(true);
-    Array1D<Real64> FacadeAng(5);           // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
-    // TODO: END
-
-    void clear_state()
-    {
-        AirflowNetworkGetInputFlag = true;
-        ValidateDistributionSystemFlag = true;
-        FacadeAng = Array1D<Real64>(5);
-    }
-
     void ManageAirflowNetworkBalance(EnergyPlusData &state, Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
                                      Optional_int_const Iter,                // Iteration number
                                      Optional_bool ResimulateAirZone         // True when solution technique on third iteration
@@ -249,9 +230,9 @@ namespace AirflowNetworkBalanceManager {
         int i;
         int AFNSupplyFanType = 0;
 
-        if (AirflowNetworkGetInputFlag) {
+        if (dataAirflowNetworkBalanceManager.AirflowNetworkGetInputFlag) {
             GetAirflowNetworkInput(state, OutputFiles::getSingleton());
-            AirflowNetworkGetInputFlag = false;
+            dataAirflowNetworkBalanceManager.AirflowNetworkGetInputFlag = false;
             return;
         }
 
@@ -342,10 +323,10 @@ namespace AirflowNetworkBalanceManager {
         if (present(FirstHVACIteration) && FirstHVACIteration) VAVTerminalRatio = 0.0;
 
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-            if (ValidateDistributionSystemFlag) {
+            if (dataAirflowNetworkBalanceManager.ValidateDistributionSystemFlag) {
                 ValidateDistributionSystem(state);
                 ValidateFanFlowRate();
-                ValidateDistributionSystemFlag = false;
+                dataAirflowNetworkBalanceManager.ValidateDistributionSystemFlag = false;
             }
         }
         CalcAirflowNetworkAirBalance();
@@ -5919,13 +5900,13 @@ namespace AirflowNetworkBalanceManager {
 
         // Facade azimuth angle
         for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
-            FacadeAng(FacadeNum) = AirflowNetworkSimu.Azimuth + (FacadeNum - 1) * 90.0;
-            if (FacadeAng(FacadeNum) >= 360.0) {
-                FacadeAng(FacadeNum) -= 360.0;
+            dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum) = AirflowNetworkSimu.Azimuth + (FacadeNum - 1) * 90.0;
+            if (dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum) >= 360.0) {
+                dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum) -= 360.0;
             }
         }
 
-        FacadeAng(5) = AirflowNetworkSimu.Azimuth + 90.0;
+        dataAirflowNetworkBalanceManager.FacadeAng(5) = AirflowNetworkSimu.Azimuth + 90.0;
 
         // Create AirflowNetwork external node objects -- one for each of the external surfaces
 
@@ -5954,12 +5935,12 @@ namespace AirflowNetworkBalanceManager {
                 if (Surface(SurfNum).Tilt >= 45.0) { // "Vertical" surface
                     SurfAng = Surface(SurfNum).Azimuth;
                     FacadeNumThisSurf = 1;
-                    AngDiffMin = std::abs(SurfAng - FacadeAng(1));
+                    AngDiffMin = std::abs(SurfAng - dataAirflowNetworkBalanceManager.FacadeAng(1));
                     if (AngDiffMin > 359.0) {
                         AngDiffMin = std::abs(AngDiffMin - 360.0);
                     }
                     for (FacadeNum = 2; FacadeNum <= 4; ++FacadeNum) {
-                        AngDiff = std::abs(SurfAng - FacadeAng(FacadeNum));
+                        AngDiff = std::abs(SurfAng - dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum));
                         if (AngDiff > 359.0) {
                             AngDiff = std::abs(AngDiff - 360.0);
                         }
@@ -6007,7 +5988,7 @@ namespace AirflowNetworkBalanceManager {
                 std::vector<Real64> vals(13);
                 for (int windDirNum = 1; windDirNum <= 12; ++windDirNum) {
                     Real64 WindAng = (windDirNum - 1) * 30.0;
-                    dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                    dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum));
                     if (dataAirflowNetworkBalanceManager.IncAng > 180.0) dataAirflowNetworkBalanceManager.IncAng = 360.0 - dataAirflowNetworkBalanceManager.IncAng;
                     IAng = int(dataAirflowNetworkBalanceManager.IncAng / 30.0) + 1;
                     DelAng = mod(dataAirflowNetworkBalanceManager.IncAng, 30.0);
@@ -6088,7 +6069,7 @@ namespace AirflowNetworkBalanceManager {
                 SideRatioFac = std::log(SideRatio);
                 for (int windDirNum = 1; windDirNum <= 36; ++windDirNum) {
                     Real64 WindAng = (windDirNum - 1) * 10.0;
-                    dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                    dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum));
                     if (dataAirflowNetworkBalanceManager.IncAng > 180.0) dataAirflowNetworkBalanceManager.IncAng = 360.0 - dataAirflowNetworkBalanceManager.IncAng;
                     IAng = int(dataAirflowNetworkBalanceManager.IncAng / 10.0) + 1;
                     DelAng = mod(dataAirflowNetworkBalanceManager.IncAng, 10.0);
@@ -6113,7 +6094,7 @@ namespace AirflowNetworkBalanceManager {
             }
             for (int windDirNum = 1; windDirNum <= 12; ++windDirNum) {
                 Real64 WindAng = (windDirNum - 1) * 30.0;
-                dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum));
                 if (dataAirflowNetworkBalanceManager.IncAng > 180.0) dataAirflowNetworkBalanceManager.IncAng = 360.0 - dataAirflowNetworkBalanceManager.IncAng;
                 IAng = int(dataAirflowNetworkBalanceManager.IncAng / 30.0) + 1;
                 DelAng = mod(dataAirflowNetworkBalanceManager.IncAng, 30.0);
