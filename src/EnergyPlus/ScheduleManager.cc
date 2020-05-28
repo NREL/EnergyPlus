@@ -2907,24 +2907,6 @@ namespace ScheduleManager {
         } else { // ThisHour specified
             //  so, current date, but maybe TimeStep added
 
-            // Determine which Week Schedule is used
-            //  Cant use stored day of year because of leap year inconsistency
-            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
-
-            // Now, which day?
-            if (DayOfWeek <= 7 && HolidayIndex > 0) {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
-            } else {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
-            }
-
-            // Hourly Value
-            WhichHour = HourOfDay + DSTIndicator;
-            if (WhichHour <= 24) {
-                LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour);
-            } else {
-                LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour - 24);
-            }
             WhichHour = ThisHour;
             while (WhichHour < 1) {
                 WhichHour += 24;
