@@ -263,6 +263,32 @@ namespace AirflowNetworkBalanceManager {
         Array1D<Real64> MA;
         Array1D<Real64> MV;
         Array1D_int IVEC;
+        int VentilationCtrl;  // Hybrid ventilation control type
+
+     int NumOfExhaustFans; // Number of exhaust fans
+        int NumAirflowNetwork;
+        int AirflowNetworkNumOfDetOpenings;
+        int AirflowNetworkNumOfSimOpenings;
+        int AirflowNetworkNumOfHorOpenings;
+        int AirflowNetworkNumOfSurCracks;
+        int AirflowNetworkNumOfSurELA;
+        int AirflowNetworkNumOfExtNode;
+        int AirflowNetworkNumOfOutAirNode;
+        int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
+        int DisSysNumOfNodes;
+        int DisSysNumOfLeaks;
+        int DisSysNumOfELRs;
+        int DisSysNumOfDucts;
+        int DisSysNumOfDuctViewFactors;
+        int DisSysNumOfDampers;
+        int DisSysNumOfCVFs;
+        int DisSysNumOfDetFans;
+        int DisSysNumOfCoils;
+        int DisSysNumOfHXs;
+        int DisSysNumOfCPDs;
+        int DisSysNumOfTermUnits;
+        int DisSysNumOfLinks;
+        int NumOfExtNodes;
 
         void clear_state() {
             OccupantVentilationControl.deallocate();
@@ -272,6 +298,31 @@ namespace AirflowNetworkBalanceManager {
             MA.deallocate();
             MV.deallocate();
             IVEC.deallocate();
+            VentilationCtrl = 0;
+            NumOfExhaustFans = 0;
+            NumAirflowNetwork = 0;
+            AirflowNetworkNumOfDetOpenings = 0;
+            AirflowNetworkNumOfSimOpenings = 0;
+            AirflowNetworkNumOfHorOpenings = 0;
+            AirflowNetworkNumOfSurCracks = 0;
+            AirflowNetworkNumOfSurELA = 0;
+            AirflowNetworkNumOfExtNode = 0;
+            AirflowNetworkNumOfOutAirNode = 0;
+            AirflowNetworkNumOfSingleSideZones = 0;
+            DisSysNumOfNodes = 0;
+            DisSysNumOfLeaks = 0;
+            DisSysNumOfELRs = 0;
+            DisSysNumOfDucts = 0;
+            DisSysNumOfDuctViewFactors = 0;
+            DisSysNumOfDampers = 0;
+            DisSysNumOfCVFs = 0;
+            DisSysNumOfDetFans = 0;
+            DisSysNumOfCoils = 0;
+            DisSysNumOfHXs = 0;
+            DisSysNumOfCPDs = 0;
+            DisSysNumOfTermUnits = 0;
+            DisSysNumOfLinks = 0;
+            NumOfExtNodes = 0;
         }
     };
 
