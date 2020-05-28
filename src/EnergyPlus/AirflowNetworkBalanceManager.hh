@@ -48,6 +48,9 @@
 #ifndef AirflowNetworkBalanceManager_hh_INCLUDED
 #define AirflowNetworkBalanceManager_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -95,9 +98,6 @@ namespace AirflowNetworkBalanceManager {
         {
         }
     };
-
-    // Object Data
-    extern Array1D<AirflowNetworkReportVars> AirflowNetworkZnRpt;
 
     void clear_state();
 
@@ -265,6 +265,13 @@ namespace AirflowNetworkBalanceManager {
         int NumOfPressureControllers;               // number of pressure controllers
         int NumOfOAFans;                            // number of OutdoorAir fans
         int NumOfReliefFans;                        // number of OutdoorAir relief fans
+        Array1D<Real64> LoopPartLoadRatio;
+        Array1D<Real64> LoopOnOffFanRunTimeFraction;
+        Array1D<bool> LoopOnOffFlag;
+
+        // Object Data
+        Array1D<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
+        std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
         void clear_state() {
             OccupantVentilationControl.deallocate();
@@ -310,6 +317,11 @@ namespace AirflowNetworkBalanceManager {
             NumOfPressureControllers = 0;
             NumOfOAFans = 0;
             NumOfReliefFans = 0;
+            AirflowNetworkZnRpt.deallocate();
+            LoopPartLoadRatio.deallocate();
+            LoopOnOffFanRunTimeFraction.deallocate();
+            LoopOnOffFlag.deallocate();
+            UniqueAirflowNetworkSurfaceName.clear();
         }
     };
 
