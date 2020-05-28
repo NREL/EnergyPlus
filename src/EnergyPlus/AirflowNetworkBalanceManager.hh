@@ -64,40 +64,6 @@ namespace EnergyPlus {
 
 namespace AirflowNetworkBalanceManager {
 
-    enum VentCtrEnum  // TODO: make enum class
-    {
-        NONE = 0,           // Wrong input
-        TEMP = 1,           // Temperature venting control
-        ENTH = 2,           // Enthalpy venting control
-        CONST = 3,          // Constant venting control
-        ASH55 = 4,
-        CEN15251 = 5,
-        NOVENT = 6,         // No venting
-        ZONELEVEL = 7,      // ZoneLevel control for a heat transfer subsurface
-        ADJTEMP = 8,        // Temperature venting control based on adjacent zone conditions
-        ADJENTH = 9         // Enthalpy venting control based on adjacent zone conditions
-    };
-
-    enum OpenStatus  // TODO: make enum class
-    {
-        FREEOPERATION = 0,           // Free operation
-        MINCHECKFORCEOPEN = 1,      // Force open when opening elapsed time is less than minimum opening time
-        MINCHECKFORCECLOSE = 2      // Force open when closing elapsed time is less than minimum closing time
-    };
-
-    enum ProbabilityCheck  // TODO: make enum class
-    {
-        NOACTION = 0,               // No action from probability check
-        FORCECHANGE = 1,            // Force open or close from probability check
-        KEEPSTATUS = 2              // Keep status at the previous time step from probability check
-    };
-
-    enum class EquivRec {
-        HEIGHT,             // Effective rectangle polygonal height selection
-        BASEASPECTRATIO,    // Effective rectangle base surface aspect ratio selection
-        USERASPECTRATIO     // Effective rectangle user input aspect ratio selection
-    };
-
     extern bool AirflowNetworkGetInputFlag;
 
     struct AirflowNetworkReportVars
@@ -257,7 +223,6 @@ namespace AirflowNetworkBalanceManager {
 
         Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;
-//        bool AirflowNetworkGetInputFlag;
         int AirflowNetworkNumOfExtSurfaces;
         // Inverse matrix
         Array1D<Real64> MA;
@@ -289,6 +254,8 @@ namespace AirflowNetworkBalanceManager {
         int DisSysNumOfTermUnits;
         int DisSysNumOfLinks;
         int NumOfExtNodes;
+        Real64 IncAng;                     // Wind incidence angle relative to facade normal (deg)
+        int SupplyFanType;                   // Supply air fan type
 
         void clear_state() {
             OccupantVentilationControl.deallocate();
@@ -323,6 +290,8 @@ namespace AirflowNetworkBalanceManager {
             DisSysNumOfTermUnits = 0;
             DisSysNumOfLinks = 0;
             NumOfExtNodes = 0;
+            IncAng = 0.0;
+            SupplyFanType = 0;
         }
     };
 

@@ -205,6 +205,7 @@ namespace AirflowNetworkBalanceManager {
 
     int constexpr NumOfVentCtrTypes(6);        // Number of zone level venting control types
 
+// TODO: These variables cause diffs when moved to state data class
     namespace {
         // These are purposefully not in the header file as an extern variable. No one outside of this should
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
@@ -213,11 +214,10 @@ namespace AirflowNetworkBalanceManager {
     } // namespace
 
     bool AirflowNetworkGetInputFlag(true);
-    Real64 IncAng(0.0);                     // Wind incidence angle relative to facade normal (deg)
     Array1D<Real64> FacadeAng(5);           // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
-    int WindDirNum;                         // Wind direction number
-    Real64 WindAng;                         // Wind direction angle (degrees clockwise from North)
-    int SupplyFanType(0);                   // Supply air fan type
+    // TODO: END
+
+
     Real64 OnOffFanRunTimeFraction(0.0);    // Run time fraction for an On/Off fan flow rate
     Real64 MaxOnOffFanRunTimeFraction(0.0); // max Run time fraction for an On/Off fan flow rate among airloops
     Real64 CurrentEndTime(0.0);             // Current end time
@@ -244,11 +244,8 @@ namespace AirflowNetworkBalanceManager {
     {
         AirflowNetworkGetInputFlag = true;
         ValidateDistributionSystemFlag = true;
-        IncAng = 0.0;
         FacadeAng = Array1D<Real64>(5);
-        WindDirNum = 0; // added default value
-        WindAng = 0;    // added default value
-        SupplyFanType = 0;
+
         OnOffFanRunTimeFraction = 0.0;
         CurrentEndTime = 0.0;
         CurrentEndTimeLast = 0.0;
@@ -1251,7 +1248,7 @@ namespace AirflowNetworkBalanceManager {
                         } else {
                             fanType_Num = FanType_SimpleOnOff;
                         }
-                        SupplyFanType = fanType_Num;
+                        dataAirflowNetworkBalanceManager.SupplyFanType = fanType_Num;
                     }
 
                 } else {
@@ -1267,7 +1264,7 @@ namespace AirflowNetworkBalanceManager {
                     flowRate *= StdRhoAir;
 
                     GetFanType(state.fans, fan_name, fanType_Num, FanErrorFound);
-                    SupplyFanType = fanType_Num;
+                    dataAirflowNetworkBalanceManager.SupplyFanType = fanType_Num;
                 }
 
                 if (!(fanType_Num == FanType_SimpleConstVolume || fanType_Num == FanType_SimpleOnOff || fanType_Num == FanType_SimpleVAV)) {
@@ -4911,7 +4908,7 @@ namespace AirflowNetworkBalanceManager {
                                     "Average",
                                     AirflowNetworkNodeData(i).Name);
             }
-            if (!(SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfZones)) {
+            if (!(dataAirflowNetworkBalanceManager.SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfZones)) {
                 SetupOutputVariable("AFN Node Total Pressure",
                                     OutputProcessor::Unit::Pa,
                                     AirflowNetworkNodeSimu(i).PZ,
@@ -4930,7 +4927,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
-            if (!(SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfSurfaces)) {
+            if (!(dataAirflowNetworkBalanceManager.SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfSurfaces)) {
                 SetupOutputVariable("AFN Linkage Node 1 to Node 2 Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     AirflowNetworkLinkReport(i).FLOW,
@@ -6045,20 +6042,20 @@ namespace AirflowNetworkBalanceManager {
                 }
                 SideRatioFac = std::log(SideRatio);
                 std::vector<Real64> vals(13);
-                for (WindDirNum = 1; WindDirNum <= 12; ++WindDirNum) {
-                    WindAng = (WindDirNum - 1) * 30.0;
-                    IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
-                    if (IncAng > 180.0) IncAng = 360.0 - IncAng;
-                    IAng = int(IncAng / 30.0) + 1;
-                    DelAng = mod(IncAng, 30.0);
+                for (int windDirNum = 1; windDirNum <= 12; ++windDirNum) {
+                    Real64 WindAng = (windDirNum - 1) * 30.0;
+                    dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                    if (dataAirflowNetworkBalanceManager.IncAng > 180.0) dataAirflowNetworkBalanceManager.IncAng = 360.0 - dataAirflowNetworkBalanceManager.IncAng;
+                    IAng = int(dataAirflowNetworkBalanceManager.IncAng / 30.0) + 1;
+                    DelAng = mod(dataAirflowNetworkBalanceManager.IncAng, 30.0);
                     WtAng = 1.0 - DelAng / 30.0;
 
                     // Wind-pressure coefficients for vertical facades, low-rise building
 
                     if (UtilityRoutines::SameString(AirflowNetworkSimu.BldgType, "LowRise") && FacadeNum <= 4) {
-                        IncRad = IncAng * DegToRadians;
+                        IncRad = dataAirflowNetworkBalanceManager.IncAng * DegToRadians;
                         Real64 const cos_IncRad_over_2(std::cos(IncRad / 2.0));
-                        vals[WindDirNum - 1] = 0.6 * std::log(1.248 - 0.703 * std::sin(IncRad / 2.0) - 1.175 * pow_2(std::sin(IncRad)) +
+                        vals[windDirNum - 1] = 0.6 * std::log(1.248 - 0.703 * std::sin(IncRad / 2.0) - 1.175 * pow_2(std::sin(IncRad)) +
                                                               0.131 * pow_3(std::sin(2.0 * IncRad * SideRatioFac)) + 0.769 * cos_IncRad_over_2 +
                                                               0.07 * pow_2(SideRatioFac * std::sin(IncRad / 2.0)) + 0.717 * pow_2(cos_IncRad_over_2));
                     }
@@ -6074,7 +6071,7 @@ namespace AirflowNetworkBalanceManager {
                             ISR = 2;
                             WtSR = (4.0 - SR) / 3.0;
                         }
-                        vals[WindDirNum - 1] =
+                        vals[windDirNum - 1] =
                             WtSR * (WtAng * CPHighRiseWall(ISR, IAng) + (1.0 - WtAng) * CPHighRiseWall(ISR, IAng + 1)) +
                             (1.0 - WtSR) * (WtAng * CPHighRiseWall(ISR + 1, IAng) + (1.0 - WtAng) * CPHighRiseWall(ISR + 1, IAng + 1));
                     }
@@ -6092,7 +6089,7 @@ namespace AirflowNetworkBalanceManager {
                             ISR = 2;
                             WtSR = (1.0 - SR) / 0.5;
                         }
-                        vals[WindDirNum - 1] =
+                        vals[windDirNum - 1] =
                             WtSR * (WtAng * CPHighRiseRoof(ISR, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR, IAng + 1)) +
                             (1.0 - WtSR) * (WtAng * CPHighRiseRoof(ISR + 1, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR + 1, IAng + 1));
                     }
@@ -6126,16 +6123,16 @@ namespace AirflowNetworkBalanceManager {
                     SideRatio = 1.0 / SideRatio;
                 }
                 SideRatioFac = std::log(SideRatio);
-                for (WindDirNum = 1; WindDirNum <= 36; ++WindDirNum) {
-                    WindAng = (WindDirNum - 1) * 10.0;
-                    IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
-                    if (IncAng > 180.0) IncAng = 360.0 - IncAng;
-                    IAng = int(IncAng / 10.0) + 1;
-                    DelAng = mod(IncAng, 10.0);
+                for (int windDirNum = 1; windDirNum <= 36; ++windDirNum) {
+                    Real64 WindAng = (windDirNum - 1) * 10.0;
+                    dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                    if (dataAirflowNetworkBalanceManager.IncAng > 180.0) dataAirflowNetworkBalanceManager.IncAng = 360.0 - dataAirflowNetworkBalanceManager.IncAng;
+                    IAng = int(dataAirflowNetworkBalanceManager.IncAng / 10.0) + 1;
+                    DelAng = mod(dataAirflowNetworkBalanceManager.IncAng, 10.0);
                     WtAng = 1.0 - DelAng / 10.0;
                     // Wind-pressure coefficients for vertical facades, low-rise building
-                    IncRad = IncAng * DegToRadians;
-                    valsByFacade[FacadeNum - 1][WindDirNum - 1] =
+                    IncRad = dataAirflowNetworkBalanceManager.IncAng * DegToRadians;
+                    valsByFacade[FacadeNum - 1][windDirNum - 1] =
                         0.6 * std::log(1.248 - 0.703 * std::sin(IncRad / 2.0) - 1.175 * pow_2(std::sin(IncRad)) +
                                        0.131 * pow_3(std::sin(2.0 * IncRad * SideRatioFac)) + 0.769 * std::cos(IncRad / 2.0) +
                                        0.07 * pow_2(SideRatioFac * std::sin(IncRad / 2.0)) + 0.717 * pow_2(std::cos(IncRad / 2.0)));
@@ -6151,15 +6148,15 @@ namespace AirflowNetworkBalanceManager {
                 ISR = 2;
                 WtSR = (1.0 - SR) / 0.5;
             }
-            for (WindDirNum = 1; WindDirNum <= 12; ++WindDirNum) {
-                WindAng = (WindDirNum - 1) * 30.0;
-                IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
-                if (IncAng > 180.0) IncAng = 360.0 - IncAng;
-                IAng = int(IncAng / 30.0) + 1;
-                DelAng = mod(IncAng, 30.0);
+            for (int windDirNum = 1; windDirNum <= 12; ++windDirNum) {
+                Real64 WindAng = (windDirNum - 1) * 30.0;
+                dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                if (dataAirflowNetworkBalanceManager.IncAng > 180.0) dataAirflowNetworkBalanceManager.IncAng = 360.0 - dataAirflowNetworkBalanceManager.IncAng;
+                IAng = int(dataAirflowNetworkBalanceManager.IncAng / 30.0) + 1;
+                DelAng = mod(dataAirflowNetworkBalanceManager.IncAng, 30.0);
                 WtAng = 1.0 - DelAng / 30.0;
                 // Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
-                valsByFacade[FacadeNum - 1][WindDirNum - 1] =
+                valsByFacade[FacadeNum - 1][windDirNum - 1] =
                     WtSR * (WtAng * CPHighRiseRoof(ISR, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR, IAng + 1)) +
                     (1.0 - WtSR) * (WtAng * CPHighRiseRoof(ISR + 1, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR + 1, IAng + 1));
             }
@@ -9795,7 +9792,7 @@ namespace AirflowNetworkBalanceManager {
                 int fanIndex = HVACFan::getFanObjectVectorIndex(DisSysCompCVFData(i).Name);
                 if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff && HVACFan::fanObjs[fanIndex]->AirPathFlag) {
                     DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
-                    SupplyFanType = FanType_SimpleConstVolume;
+                    dataAirflowNetworkBalanceManager.SupplyFanType = FanType_SimpleConstVolume;
                     FanModelConstFlag = true;
                     break;
                 }
@@ -9803,7 +9800,7 @@ namespace AirflowNetworkBalanceManager {
         }
         if (FanModelConstFlag) {
             for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
-                if (SupplyFanType == FanType_SimpleConstVolume) {
+                if (dataAirflowNetworkBalanceManager.SupplyFanType == FanType_SimpleConstVolume) {
                     SetupOutputVariable("AFN Linkage Node 1 to Node 2 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         AirflowNetworkLinkReport(i).FLOW,
@@ -10187,7 +10184,7 @@ namespace AirflowNetworkBalanceManager {
         using namespace DataEnvironment;
 
         // Locals
-        int WindDirNum;
+        int windDirNum;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AFNZnNum; // counters
@@ -10398,9 +10395,9 @@ namespace AirflowNetworkBalanceManager {
         for (ZnNum = 1; ZnNum <= AirflowNetworkNumOfZones; ++ZnNum) {
             DeltaCp(ZnNum).WindDir.allocate(numWindDir);
             EPDeltaCP(ZnNum).WindDir.allocate(numWindDir);
-            for (WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum) {
-                DeltaCp(ZnNum).WindDir(WindDirNum) = 0.0;
-                EPDeltaCP(ZnNum).WindDir(WindDirNum) = 0.0;
+            for (windDirNum = 1; windDirNum <= numWindDir; ++windDirNum) {
+                DeltaCp(ZnNum).WindDir(windDirNum) = 0.0;
+                EPDeltaCP(ZnNum).WindDir(windDirNum) = 0.0;
             }
         }
         Sprime = 0.0;
@@ -10433,20 +10430,20 @@ namespace AirflowNetworkBalanceManager {
                 ZoneAng(ZnNum) = ZoneAng1;
                 Sprime(ZnNum) = std::sqrt(pow_2(X1 - X2) + pow_2(Y1 - Y2)) / MultizoneZoneData(ZnNum).BuildWidth;
                 // Calculate DeltaCp for each wind direction for each zone
-                for (WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum) {
-                    WindDir = (WindDirNum - 1) * 10.0;
-                    WindAng = (WindDirNum - 1) * 10.0;
-                    IncAng = std::abs(WindAng - ZoneAng(ZnNum));
-                    if (std::abs(IncAng) > 180.0) IncAng -= 360.0;
+                for (windDirNum = 1; windDirNum <= numWindDir; ++windDirNum) {
+                    WindDir = (windDirNum - 1) * 10.0;
+                    Real64 WindAng = (windDirNum - 1) * 10.0;
+                    dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - ZoneAng(ZnNum));
+                    if (std::abs(dataAirflowNetworkBalanceManager.IncAng) > 180.0) dataAirflowNetworkBalanceManager.IncAng -= 360.0;
                     if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
-                        if (std::abs(IncAng) <= 67.5) {
-                            PiFormula(WindDirNum) = 0.44 * sign(std::sin(2.67 * std::abs(IncAng) * Pi / 180.0), IncAng);
-                        } else if (std::abs(IncAng) <= 180.0) {
-                            PiFormula(WindDirNum) = -0.69 * sign(std::sin((288 - 1.6 * std::abs(IncAng)) * Pi / 180.0), IncAng);
+                        if (std::abs(dataAirflowNetworkBalanceManager.IncAng) <= 67.5) {
+                            PiFormula(windDirNum) = 0.44 * sign(std::sin(2.67 * std::abs(dataAirflowNetworkBalanceManager.IncAng) * Pi / 180.0), dataAirflowNetworkBalanceManager.IncAng);
+                        } else if (std::abs(dataAirflowNetworkBalanceManager.IncAng) <= 180.0) {
+                            PiFormula(windDirNum) = -0.69 * sign(std::sin((288 - 1.6 * std::abs(dataAirflowNetworkBalanceManager.IncAng)) * Pi / 180.0), dataAirflowNetworkBalanceManager.IncAng);
                         }
-                        SigmaFormula(WindDirNum) = 0.423 - 0.00163 * std::abs(IncAng);
-                        DeltaCp(ZnNum).WindDir(WindDirNum) =
-                            (0.02 + (0.346 * std::abs(PiFormula(WindDirNum)) + 0.084 * SigmaFormula(WindDirNum)) * Sprime(ZnNum));
+                        SigmaFormula(windDirNum) = 0.423 - 0.00163 * std::abs(dataAirflowNetworkBalanceManager.IncAng);
+                        DeltaCp(ZnNum).WindDir(windDirNum) =
+                            (0.02 + (0.346 * std::abs(PiFormula(windDirNum)) + 0.084 * SigmaFormula(windDirNum)) * Sprime(ZnNum));
                     }
                 }
             }
@@ -10468,10 +10465,10 @@ namespace AirflowNetworkBalanceManager {
                         Real64 const AFNEExtSurface_fac(0.5 * (1.0 / pow_2(AFNExtSurfaces(ExtOpenNum).DischCoeff)));
                         if (OpenNuminZone == 1) {
                             std::vector<Real64> cpvalues(numWindDir);
-                            for (WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum) {
-                                Real64 unmodifiedValue = valsByFacade[AFNExtSurfaces(ExtOpenNum).facadeNum - 1][WindDirNum - 1] +
-                                                         AFNEExtSurface_fac * DeltaCp(ZnNum).WindDir(WindDirNum);
-                                cpvalues[WindDirNum - 1] = CPV1(WindDirNum) = VelRatio_2 * unmodifiedValue;
+                            for (windDirNum = 1; windDirNum <= numWindDir; ++windDirNum) {
+                                Real64 unmodifiedValue = valsByFacade[AFNExtSurfaces(ExtOpenNum).facadeNum - 1][windDirNum - 1] +
+                                                         AFNEExtSurface_fac * DeltaCp(ZnNum).WindDir(windDirNum);
+                                cpvalues[windDirNum - 1] = CPV1(windDirNum) = VelRatio_2 * unmodifiedValue;
                             }
                             valsByFacade.push_back(cpvalues);
                             MultizoneExternalNodeData(AFNExtSurfaces(ExtOpenNum).ExtNodeNum - AirflowNetworkNumOfZones).facadeNum = SrfNum;
@@ -10479,11 +10476,11 @@ namespace AirflowNetworkBalanceManager {
                             ++SrfNum;
                         } else if (OpenNuminZone == 2) {
                             std::vector<Real64> cpvalues(numWindDir);
-                            for (WindDirNum = 1; WindDirNum <= numWindDir; ++WindDirNum) {
-                                Real64 unmodifiedValue = valsByFacade[AFNExtSurfaces(ExtOpenNum).facadeNum - 1][WindDirNum - 1] -
-                                                         AFNEExtSurface_fac * DeltaCp(ZnNum).WindDir(WindDirNum);
-                                cpvalues[WindDirNum - 1] = CPV2(WindDirNum) = VelRatio_2 * unmodifiedValue;
-                                EPDeltaCP(ZnNum).WindDir(WindDirNum) = std::abs(CPV2(WindDirNum) - CPV1(WindDirNum));
+                            for (windDirNum = 1; windDirNum <= numWindDir; ++windDirNum) {
+                                Real64 unmodifiedValue = valsByFacade[AFNExtSurfaces(ExtOpenNum).facadeNum - 1][windDirNum - 1] -
+                                                         AFNEExtSurface_fac * DeltaCp(ZnNum).WindDir(windDirNum);
+                                cpvalues[windDirNum - 1] = CPV2(windDirNum) = VelRatio_2 * unmodifiedValue;
+                                EPDeltaCP(ZnNum).WindDir(windDirNum) = std::abs(CPV2(windDirNum) - CPV1(windDirNum));
                             }
                             valsByFacade.push_back(cpvalues);
                             MultizoneExternalNodeData(AFNExtSurfaces(ExtOpenNum).ExtNodeNum - AirflowNetworkNumOfZones).facadeNum = SrfNum;
