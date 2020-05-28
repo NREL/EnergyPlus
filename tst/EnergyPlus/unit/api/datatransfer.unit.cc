@@ -249,7 +249,7 @@ public:
     void simulateTimeStepAndReport()
     {
         UpdateMeterReporting(state.outputFiles);
-        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
     }
 };
 
