@@ -131,6 +131,7 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
 
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfWeek = 1;
+    DataEnvironment::DayOfWeekTomorrow = 2;
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
 
@@ -784,6 +785,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
     DataEnvironment::DayOfMonth = 31;
     DataGlobals::HourOfDay = 24;
     DataEnvironment::DayOfWeek = 4;
+    DataEnvironment::DayOfWeekTomorrow = 5;
     DataEnvironment::HolidayIndex = 0;
     DataGlobals::TimeStep = 1;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
@@ -796,7 +798,9 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
 
     DataEnvironment::DSTIndicator = 1; // DST IS ON
     ScheduleManager::UpdateScheduleValues();
-    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
-    EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
-    EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(1));
+    // Since DST is on, you're actually on the next day, on 6/1 at 1:00
+    // so it **should** return 3.0
+    EXPECT_EQ(3.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(1));
+    EXPECT_EQ(3.0, ScheduleManager::LookUpScheduleValue(1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
 }
