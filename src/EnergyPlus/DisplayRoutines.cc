@@ -93,6 +93,8 @@ void DisplayString(std::string const &String) // String to be displayed
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // na
+    if (DataGlobals::fMessagePtr) DataGlobals::fMessagePtr(String);
+    if (DataGlobals::messageCallback) DataGlobals::messageCallback(String.c_str());
 
     if (KickOffSimulation && !DeveloperFlag) return;
     std::cout << String << std::endl;
@@ -135,6 +137,7 @@ void DisplayString(char const *String) // String to be displayed
     // na
 
     if (fMessagePtr) fMessagePtr(String);
+    if (DataGlobals::messageCallback) DataGlobals::messageCallback(String);
 
     if (KickOffSimulation && !DeveloperFlag) return;
     std::cout << String << std::endl;
@@ -181,6 +184,7 @@ void DisplayNumberAndString(int const Number,         // number to be displayed
     std::stringstream sstm;
     sstm << String << ' ' << Number;
     if (fMessagePtr) fMessagePtr(sstm.str());
+    if (DataGlobals::messageCallback) DataGlobals::messageCallback(sstm.str().c_str());
 
     if (KickOffSimulation && !DeveloperFlag) return;
     std::cout << String << ' ' << Number << std::endl;
@@ -237,6 +241,7 @@ void DisplaySimDaysProgress( // This doesn't do anything!
     }
 
     if (fProgressPtr) fProgressPtr(percent);
+    if (DataGlobals::progressCallback) DataGlobals::progressCallback(percent);
 }
 
 } // namespace EnergyPlus

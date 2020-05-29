@@ -60,9 +60,10 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -129,7 +130,7 @@ namespace CTElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CTGeneratorData::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+    void CTGeneratorData::simulate(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
                                    bool EP_UNUSED(FirstHVACIteration),
                                    Real64 &EP_UNUSED(CurLoad),
                                    bool EP_UNUSED(RunFlag))

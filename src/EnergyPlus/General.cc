@@ -52,7 +52,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -60,13 +59,12 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/OutputFiles.hh>
 // TODO: move DetermineMinuteForReporting to avoid bringing this one in
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -98,7 +96,6 @@ namespace General {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataHVACGlobals::Bisection;
     using DataHVACGlobals::HVACSystemRootFinding;
 
@@ -128,10 +125,10 @@ namespace General {
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
-                   std::function<Real64(Real64 const, Array1<Real64> const &)> f,
+                   std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
                    Real64 const X_0,         // 1st bound of interval that contains the solution
                    Real64 const X_1,         // 2nd bound of interval that contains the solution
-                   Array1<Real64> const &Par // array with additional parameters used for function evaluation
+                   Array1D<Real64> const &Par // array with additional parameters used for function evaluation
     )
     {
 
@@ -480,10 +477,10 @@ namespace General {
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
-                   std::function<Real64(Real64 const, Array1<Real64> const &)> f,
+                   std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
                    Real64 const X_0,           // 1st bound of interval that contains the solution
                    Real64 const X_1,           // 2nd bound of interval that contains the solution
-                   Array1<Real64> const &Par,  // array with additional parameters used for function evaluation
+                   Array1D<Real64> const &Par, // array with additional parameters used for function evaluation
                    int const AlgorithmTypeNum, // ALgorithm selection
                    Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
                    Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
@@ -1574,302 +1571,26 @@ namespace General {
 
     std::string TrimSigDigits(Real64 const RealValue, int const SigDigits)
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN ! Use IEEE_IS_NAN when GFortran supports it
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const NAN_string("NAN");
-        static std::string const ZEROOOO("0.000000000000000000000000000");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        if (std::isnan(RealValue)) return NAN_string;
-
-        std::string String; // Working string
-        if (RealValue != 0.0) {
-            ObjexxFCL::gio::write(String, fmtLD) << RealValue;
-        } else {
-            String = ZEROOOO;
-        }
-        std::string::size_type const EPos = index(String, 'E'); // Position of E in original string format xxEyy
-        std::string EString;                                    // E string retained from original string
-        if (EPos != std::string::npos) {
-            EString = String.substr(EPos);
-            String.erase(EPos);
-        }
-        std::string::size_type const DotPos = index(String, '.'); // Position of decimal point in original string
-        std::string::size_type const SLen = len(String);          // Length of String (w/o E part)
-        bool IncludeDot;                                          // True when decimal point output
-        if (SigDigits > 0 || EString != "") {
-            IncludeDot = true;
-        } else {
-            IncludeDot = false;
-        }
-        if (IncludeDot) {
-            String.erase(min(DotPos + SigDigits + 1, SLen));
-            String += EString;
-        } else {
-            String.erase(DotPos);
-        }
-        return stripped(String);
+        return format("{:.{}T}", RealValue, SigDigits);
     }
 
     std::string TrimSigDigits(int const IntegerValue,
                               Optional_int_const EP_UNUSED(SigDigits) // ignored
     )
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string String; // Working string
-
-        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
-        return stripped(String);
+        return format("{}", IntegerValue);
     }
 
     std::string RoundSigDigits(Real64 const RealValue, int const SigDigits)
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN ! Use IEEE_IS_NAN when GFortran supports it
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const DigitChar("01234567890");
-        static std::string const NAN_string("NAN");
-        static std::string const ZEROOOO("0.000000000000000000000000000");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        if (std::isnan(RealValue)) return NAN_string;
-
-        std::string String; // Working string
-        if (RealValue != 0.0) {
-            ObjexxFCL::gio::write(String, fmtLD) << RealValue;
-        } else {
-            String = ZEROOOO;
-        }
-
-        std::string::size_type const EPos = index(String, 'E'); // Position of E in original string format xxEyy
-        std::string EString;                                    // E string retained from original string
-        if (EPos != std::string::npos) {
-            EString = String.substr(EPos);
-            String.erase(EPos);
-        }
-
-        std::string::size_type const DotPos = index(String, '.'); // Position of decimal point in original string
-        assert(DotPos != std::string::npos);
-        assert(DotPos > 0); // Or SPos will not be valid
-        char TestChar(DotPos + SigDigits + 1 < String.length()
-                          ? String[DotPos + SigDigits + 1]
-                          : ' '); // Test character (digit) for rounding, if position in digit string >= 5 (digit is 5 or greater) then will round
-        std::string::size_type const TPos = index(DigitChar, TestChar); // Position of Testchar in Digit string
-
-        std::string::size_type SPos; // Actual string position being replaced
-        if (SigDigits == 0) {
-            SPos = DotPos - 1;
-        } else {
-            SPos = DotPos + SigDigits;
-        }
-
-        if ((TPos != std::string::npos) && (TPos >= 5)) {             // Must round to next Digit
-            char const Char2Rep = String[SPos];                       // Character (digit) to be replaced
-            std::string::size_type NPos = index(DigitChar, Char2Rep); // Position of "next" char in Digit String
-            std::string::size_type TPos1;
-            assert(NPos != std::string::npos);
-            String[SPos] = DigitChar[NPos + 1];
-            while (NPos == 9) { // Must change other char too
-                if (SigDigits == 1) {
-                    assert(SPos >= 2u);
-                    TestChar = String[SPos - 2];
-                    if (TestChar == '.') {
-                        assert(SPos >= 3u);
-                        TestChar = String[SPos - 3];
-                        SPos -= 2;
-                    }
-                    if (TestChar == ' ') {
-                        TestChar = '0';           // all 999s
-                    } else if (TestChar == '-') { // Autodesk Added to fix bug for values like -9.9999
-                        assert(SPos >= 3u);
-                        String[SPos - 3] = TestChar; // Shift sign left to avoid overwriting it
-                        TestChar = '0';              // all 999s
-                    }
-                    TPos1 = index(DigitChar, TestChar);
-                    assert(TPos1 != std::string::npos);
-                    assert(SPos >= 2u);
-                    String[SPos - 2] = DigitChar[TPos1 + 1];
-                } else {
-                    assert(SPos >= 1u);
-                    TestChar = String[SPos - 1];
-                    if (TestChar == '.') {
-                        assert(SPos >= 2u);
-                        TestChar = String[SPos - 2];
-                        --SPos;
-                    }
-                    if (TestChar == ' ') {
-                        TestChar = '0';           // all 999s
-                    } else if (TestChar == '-') { // Autodesk Added to fix bug for values like -9.9999
-                        assert(SPos >= 2u);
-                        String[SPos - 2] = TestChar; // Shift sign left to avoid overwriting it
-                        TestChar = '0';              // all 999s
-                    }
-                    TPos1 = index(DigitChar, TestChar);
-                    assert(TPos1 != std::string::npos);
-                    assert(SPos >= 1u);
-                    String[SPos - 1] = DigitChar[TPos1 + 1];
-                }
-                --SPos;
-                NPos = TPos1;
-            }
-        }
-
-        bool IncludeDot; // True when decimal point output
-        if (SigDigits > 0 || EString != "") {
-            IncludeDot = true;
-        } else {
-            IncludeDot = false;
-        }
-        if (IncludeDot) {
-            String.erase(min(DotPos + SigDigits + 1, len(String)));
-            String += EString;
-        } else {
-            String.erase(DotPos);
-        }
-
-        return stripped(String);
+        return format("{:.{}R}", RealValue, SigDigits);
     }
 
     std::string RoundSigDigits(int const IntegerValue,
                                Optional_int_const EP_UNUSED(SigDigits) // ignored
     )
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string String; // Working string
-
-        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
-        return stripped(String);
+        return format("{}", IntegerValue);
     }
 
     std::string RemoveTrailingZeros(std::string const &InputString)
@@ -2056,7 +1777,6 @@ namespace General {
         // the proper month and day for that date string.
 
         // Using/Aliasing
-        using namespace DataStringGlobals;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FstNum;
@@ -2552,8 +2272,7 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt TStmpFmt("(I2.2,':',F3.0)");
-        static ObjexxFCL::gio::Fmt TStmpFmti("(I2.2,':',I2.2)");
+
         Real64 const FracToMin(60.0);
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -2567,8 +2286,6 @@ namespace General {
         Real64 ActualTimeE; // End of current interval (HVAC time step)
         int ActualTimeHrS;
         //  INTEGER ActualTimeHrE
-        std::string TimeStmpS; // Character representation of start of interval
-        std::string TimeStmpE; // Character representation of end of interval
         int ActualTimeMinS;
 
         //  ActualTimeS=INT(CurrentTime)+(SysTimeElapsed+(CurrentTime - INT(CurrentTime)))
@@ -2584,13 +2301,15 @@ namespace General {
             ++ActualTimeHrS;
             ActualTimeMinS = 0;
         }
-        ObjexxFCL::gio::write(TimeStmpS, TStmpFmti) << ActualTimeHrS << ActualTimeMinS;
+        const auto TimeStmpS = format("{:02}:{:02}", ActualTimeHrS, ActualTimeMinS);
+        auto minutes = ((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin);
 
-        ObjexxFCL::gio::write(TimeStmpE, TStmpFmt) << int(ActualTimeE) << (ActualTimeE - int(ActualTimeE)) * FracToMin;
-        if (TimeStmpE[3] == ' ') TimeStmpE[3] = '0';
-        TimeStmpE[5] = ' ';
-        strip(TimeStmpE);
+        auto TimeStmpE = format(
+            "{:02}:{:2.0F}",
+            static_cast<int>(ActualTimeE),
+            minutes);
 
+        if (TimeStmpE[3] == ' ') { TimeStmpE[3] = '0'; }
         OutputString = TimeStmpS + " - " + TimeStmpE;
 
         return OutputString;
@@ -2725,9 +2444,6 @@ namespace General {
         // REFERENCES:
         // na
 
-        // Using/Aliasing
-        using DataGlobals::OutputFileStandard;
-
         // Argument array dimensioning
         A.dim(3, 3);
         InverseA.dim(3, 3);
@@ -2753,7 +2469,7 @@ namespace General {
                       A(1, 2) * A(2, 1) * A(3, 3) - A(1, 3) * A(2, 2) * A(3, 1);
 
         if (std::abs(Determinant) < .1E-12) {
-            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OutputFileStandard);
+            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{OutputFiles::getSingleton().eso});
         }
 
         // Compute Inverse
@@ -2798,7 +2514,6 @@ namespace General {
         // Linear Correction based on the RegulaFalsi routine in EnergyPlus
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         // unused0909  use dataglobals, only: outputfiledebug
 
         // Locals
@@ -2990,7 +2705,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using DataGlobals::CurrentTime;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;

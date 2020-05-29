@@ -59,7 +59,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
@@ -392,7 +392,7 @@ namespace HVACInterfaceManager {
     //***************
 
     // In-Place Right Shift by 1 of Array Elements
-    void rshift1(Array1<Real64> &a)
+    void rshift1(Array1D<Real64> &a)
     {
         assert(a.size_bounded());
         for (int i = a.u(), e = a.l(); i > e; --i) {

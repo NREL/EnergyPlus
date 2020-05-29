@@ -77,8 +77,6 @@ TEST_F(EnergyPlusFixture, CheckThreading)
 TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
-
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",
@@ -87,13 +85,77 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
         "    Yes;                     !- Run Simulation for Weather File Run Periods",
 
         "  PerformancePrecisionTradeoffs,",
-        "    Yes;       ! - Use Coil Direct Solutions",
+        "    No;       ! - Use Coil Direct Solutions",
     });
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
 
     // no error message from PerformancePrecisionTradeoffs objects
     EXPECT_TRUE(compare_err_stream("", true));
+
+}
+
+TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Message)
+{
+    // issue 7646
+    std::string const idf_objects = delimited_string({
+        "  PerformancePrecisionTradeoffs,",
+        "     Yes; ! - Use Coil Direct Solutions",
+
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects, false));
+
+    SimulationManager::GetProjectData(outputFiles());
+
+    std::string const error_string = delimited_string({
+        "   ** Warning ** PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, Simulationmanager_bool_to_string)
+{
+    EXPECT_EQ(SimulationManager::bool_to_string(true), "True");
+    EXPECT_EQ(SimulationManager::bool_to_string(false), "False");
+}
+
+TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
+{
+    DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
+
+    // start with no file
+    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+
+    // make sure the static variables are cleared
+    UtilityRoutines::appendPerfLog("RESET", "RESET");
+
+    DataStringGlobals::VerString = "EnergyPlus, Version 0.0.0-xxxx, August 14 1945";
+
+    // call the function to test
+    SimulationManager::writeIntialPerfLogValues("MODE193");
+
+    // force the file to be written
+    UtilityRoutines::appendPerfLog("lastHeader", "lastValue", true);
+
+    std::ifstream perfLogFile;
+    std::stringstream perfLogStrSteam;
+
+    perfLogFile.open(DataStringGlobals::outputPerfLogFileName);
+    perfLogStrSteam << perfLogFile.rdbuf();
+    perfLogFile.close();
+    std::string perfLogContents = perfLogStrSteam.str();
+
+    std::string expectedContents = "Program, Version, TimeStamp,Use Coil Direct Solution,Zone Radiant Exchange Algorithm,"
+        "Override Mode,Number of Timesteps per Hour,Minimum Number of Warmup Days,SuppressAllBeginEnvironmentResets,MaxZoneTempDiff,lastHeader,\n"
+        "EnergyPlus, Version 0.0.0-xxxx, August 14 1945,False,ScriptF,MODE193,0,1,False,0.30,lastValue,\n";
+
+    EXPECT_EQ(perfLogContents, expectedContents);
+
+    // clean up the file
+    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+
 }

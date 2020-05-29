@@ -67,11 +67,13 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -147,7 +149,7 @@ namespace UserDefinedComponents {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void UserPlantComponentStruct::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    void UserPlantComponentStruct::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation)
     {
         bool anyEMSRan;
         Real64 myLoad = 0.0;
@@ -164,6 +166,8 @@ namespace UserDefinedComponents {
         if (thisLoop > 0) {
             if (this->Loop(thisLoop).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
+            } else if (this->Loop(thisLoop).initPluginLocation > -1) {
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(this->Loop(thisLoop).initPluginLocation);
             }
 
             PlantUtilities::InitComponentNodes(this->Loop(thisLoop).MassFlowRateMin,
@@ -199,7 +203,7 @@ namespace UserDefinedComponents {
         OptLoad = this->Loop(thisLoop).OptLoad;
     }
 
-    void UserPlantComponentStruct::UserPlantComponentStruct::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
+    void UserPlantComponentStruct::UserPlantComponentStruct::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation,
                                                                       bool EP_UNUSED(FirstHVACIteration),
                                                                       Real64 &CurLoad,
                                                                       bool EP_UNUSED(RunFlag))
@@ -214,7 +218,7 @@ namespace UserDefinedComponents {
         // User Defined plant generic component
 
         if (DataGlobals::BeginEnvrnFlag) {
-            this->onInitLoopEquip(calledFromLocation);
+            this->onInitLoopEquip(state, calledFromLocation);
         }
 
         bool anyEMSRan;
@@ -231,11 +235,15 @@ namespace UserDefinedComponents {
         if (thisLoop > 0) {
             if (this->Loop(thisLoop).ErlSimProgramMngr > 0) {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlSimProgramMngr);
+            } else if (this->Loop(thisLoop).simPluginLocation > -1) {
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(this->Loop(thisLoop).simPluginLocation);
             }
         }
 
         if (this->ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->ErlSimProgramMngr);
+        } else if (this->simPluginLocation > -1) {
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(this->simPluginLocation);
         }
 
         this->report(thisLoop);
@@ -286,6 +294,8 @@ namespace UserDefinedComponents {
         if (DataGlobals::BeginEnvrnFlag) {
             if (UserCoil(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlInitProgramMngr);
+            } else if (UserCoil(CompNum).initPluginLocation > -1) {
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserCoil(CompNum).initPluginLocation);
             }
 
             if (UserCoil(CompNum).PlantIsConnected) {
@@ -307,6 +317,8 @@ namespace UserDefinedComponents {
 
         if (UserCoil(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlSimProgramMngr);
+        } else if (UserCoil(CompNum).simPluginLocation > -1) {
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserCoil(CompNum).simPluginLocation);
         }
 
         UserCoil(CompNum).report();
@@ -372,6 +384,8 @@ namespace UserDefinedComponents {
 
             if (UserZoneAirHVAC(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
+            } else if (UserZoneAirHVAC(CompNum).initPluginLocation > -1) {
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserZoneAirHVAC(CompNum).initPluginLocation);
             }
             if (UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
@@ -396,6 +410,8 @@ namespace UserDefinedComponents {
 
         if (UserZoneAirHVAC(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlSimProgramMngr);
+        } else if (UserZoneAirHVAC(CompNum).simPluginLocation > -1) {
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserZoneAirHVAC(CompNum).simPluginLocation);
         }
 
         UserZoneAirHVAC(CompNum).report();
@@ -462,6 +478,8 @@ namespace UserDefinedComponents {
 
             if (UserAirTerminal(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlInitProgramMngr);
+            } else if (UserAirTerminal(CompNum).initPluginLocation > -1) {
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserAirTerminal(CompNum).initPluginLocation);
             }
             if (UserAirTerminal(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
@@ -486,6 +504,8 @@ namespace UserDefinedComponents {
 
         if (UserAirTerminal(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlSimProgramMngr);
+        } else if (UserAirTerminal(CompNum).simPluginLocation > -1) {
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserAirTerminal(CompNum).simPluginLocation);
         }
 
         UserAirTerminal(CompNum).report();
@@ -505,7 +525,6 @@ namespace UserDefinedComponents {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        std::string LoopStr;
         static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
 
         cCurrentModuleObject = "PlantComponent:UserDefined";
@@ -535,10 +554,14 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         UserPlantComp(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Program Manager Name not found.");
-                        ErrorsFound = true;
+                        // check Python Plugins
+                        UserPlantComp(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
+                        if (UserPlantComp(CompLoop).simPluginLocation == -1) {
+                            ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ErrorsFound = true;
+                        }
                     }
                 }
 
@@ -548,7 +571,7 @@ namespace UserDefinedComponents {
                     UserPlantComp(CompLoop).Loop.allocate(NumPlantConnections);
                     UserPlantComp(CompLoop).NumPlantConnections = NumPlantConnections;
                     for (int ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
-                        LoopStr = General::RoundSigDigits(ConnectionLoop);
+                        const auto LoopStr = fmt::to_string(ConnectionLoop);
                         int aArgCount = (ConnectionLoop - 1) * 6 + 3;
                         UserPlantComp(CompLoop).Loop(ConnectionLoop).InletNodeNum =
                             NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount),
@@ -618,10 +641,13 @@ namespace UserDefinedComponents {
                             if (StackMngrNum > 0) { // found it
                                 UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlInitProgramMngr = StackMngrNum;
                             } else {
-                                ShowSevereError("Invalid " + cAlphaFieldNames(aArgCount + 4) + '=' + cAlphaArgs(aArgCount + 4));
-                                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                                ShowContinueError("Program Manager Name not found.");
-                                ErrorsFound = true;
+                                UserPlantComp(CompLoop).Loop(ConnectionLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(aArgCount + 4));
+                                if (UserPlantComp(CompLoop).Loop(ConnectionLoop).initPluginLocation == -1) {
+                                    ShowSevereError("Invalid " + cAlphaFieldNames(aArgCount + 4) + '=' + cAlphaArgs(aArgCount + 4));
+                                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                                    ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                                    ErrorsFound = true;
+                                }
                             }
                         }
 
@@ -631,10 +657,13 @@ namespace UserDefinedComponents {
                             if (StackMngrNum > 0) { // found it
                                 UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlSimProgramMngr = StackMngrNum;
                             } else {
-                                ShowSevereError("Invalid " + cAlphaFieldNames(aArgCount + 4) + '=' + cAlphaArgs(aArgCount + 4));
-                                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                                ShowContinueError("Program Manager Name not found.");
-                                ErrorsFound = true;
+                                UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(aArgCount + 5));
+                                if (UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation == -1) {
+                                    ShowSevereError("Invalid " + cAlphaFieldNames(aArgCount + 4) + '=' + cAlphaArgs(aArgCount + 4));
+                                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                                    ShowContinueError("Program Manager Name not found.");
+                                    ErrorsFound = true;
+                                }
                             }
                         }
                         // Setup Internal Variables
@@ -812,13 +841,13 @@ namespace UserDefinedComponents {
                                               cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainTypeOf_PlantComponentUserDefined,
-                                              UserPlantComp(CompLoop).Zone.ConvectionGainRate,
-                                              UserPlantComp(CompLoop).Zone.ReturnAirConvectionGainRate,
-                                              UserPlantComp(CompLoop).Zone.ThermalRadiationGainRate,
-                                              UserPlantComp(CompLoop).Zone.LatentGainRate,
-                                              UserPlantComp(CompLoop).Zone.ReturnAirLatentGainRate,
-                                              UserPlantComp(CompLoop).Zone.CarbonDioxideGainRate,
-                                              UserPlantComp(CompLoop).Zone.GenericContamGainRate);
+                                              &UserPlantComp(CompLoop).Zone.ConvectionGainRate,
+                                              &UserPlantComp(CompLoop).Zone.ReturnAirConvectionGainRate,
+                                              &UserPlantComp(CompLoop).Zone.ThermalRadiationGainRate,
+                                              &UserPlantComp(CompLoop).Zone.LatentGainRate,
+                                              &UserPlantComp(CompLoop).Zone.ReturnAirLatentGainRate,
+                                              &UserPlantComp(CompLoop).Zone.CarbonDioxideGainRate,
+                                              &UserPlantComp(CompLoop).Zone.GenericContamGainRate);
 
                         SetupEMSActuator("Component Zone Internal Gain",
                                          UserPlantComp(CompLoop).Name,
@@ -871,6 +900,8 @@ namespace UserDefinedComponents {
                 for (int ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
                     if (UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlInitProgramMngr > 0) ++MgrCountTest;
                     if (UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlSimProgramMngr > 0) ++MgrCountTest;
+                    if (UserPlantComp(CompLoop).Loop(ConnectionLoop).initPluginLocation >= 0) ++MgrCountTest;
+                    if (UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation >= 0) ++MgrCountTest;
                 }
                 if (MgrCountTest == 0) {
                     ShowSevereError("Invalid " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -913,10 +944,13 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         UserCoil(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Program Manager Name not found.");
-                        ErrorsFound = true;
+                        UserCoil(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
+                        if (UserCoil(CompLoop).simPluginLocation == -1) {
+                            ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ErrorsFound = true;
+                        }
                     }
                 }
 
@@ -926,10 +960,13 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         UserCoil(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Program Manager Name not found.");
-                        ErrorsFound = true;
+                        UserCoil(CompLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
+                        if (UserCoil(CompLoop).initPluginLocation == -1) {
+                            ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ErrorsFound = true;
+                        }
                     }
                 }
 
@@ -949,7 +986,7 @@ namespace UserDefinedComponents {
                                                                 1,
                                                                 DataLoopNode::ObjectIsNotParent);
 
-                        LoopStr = General::RoundSigDigits(ConnectionLoop);
+                        const auto LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables
                         SetupEMSInternalVariable("Inlet Temperature for Air Connection " + LoopStr,
                                                  UserCoil(CompLoop).Name,
@@ -1132,13 +1169,13 @@ namespace UserDefinedComponents {
                                                   cCurrentModuleObject,
                                                   cAlphaArgs(1),
                                                   DataHeatBalance::IntGainTypeOf_CoilUserDefined,
-                                                  UserCoil(CompLoop).Zone.ConvectionGainRate,
-                                                  UserCoil(CompLoop).Zone.ReturnAirConvectionGainRate,
-                                                  UserCoil(CompLoop).Zone.ThermalRadiationGainRate,
-                                                  UserCoil(CompLoop).Zone.LatentGainRate,
-                                                  UserCoil(CompLoop).Zone.ReturnAirLatentGainRate,
-                                                  UserCoil(CompLoop).Zone.CarbonDioxideGainRate,
-                                                  UserCoil(CompLoop).Zone.GenericContamGainRate);
+                                                  &UserCoil(CompLoop).Zone.ConvectionGainRate,
+                                                  &UserCoil(CompLoop).Zone.ReturnAirConvectionGainRate,
+                                                  &UserCoil(CompLoop).Zone.ThermalRadiationGainRate,
+                                                  &UserCoil(CompLoop).Zone.LatentGainRate,
+                                                  &UserCoil(CompLoop).Zone.ReturnAirLatentGainRate,
+                                                  &UserCoil(CompLoop).Zone.CarbonDioxideGainRate,
+                                                  &UserCoil(CompLoop).Zone.GenericContamGainRate);
 
                             SetupEMSActuator("Component Zone Internal Gain",
                                              UserCoil(CompLoop).Name,
@@ -1215,7 +1252,6 @@ namespace UserDefinedComponents {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        std::string LoopStr;
         static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
 
         if (GetPlantCompInput) {
@@ -1247,10 +1283,13 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         UserZoneAirHVAC(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Program Manager Name not found.");
-                        ErrorsFound = true;
+                        UserZoneAirHVAC(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
+                        if (UserZoneAirHVAC(CompLoop).simPluginLocation == -1) {
+                            ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ErrorsFound = true;
+                        }
                     }
                 }
 
@@ -1260,10 +1299,13 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         UserZoneAirHVAC(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Program Manager Name not found.");
-                        ErrorsFound = true;
+                        UserZoneAirHVAC(CompLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
+                        if (UserZoneAirHVAC(CompLoop).initPluginLocation == -1) {
+                            ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ErrorsFound = true;
+                        }
                     }
                 }
 
@@ -1440,8 +1482,7 @@ namespace UserDefinedComponents {
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
-                        ObjexxFCL::gio::write(LoopStr, fmtLD) << ConnectionLoop;
-                        strip(LoopStr);
+                        const auto LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables
                         SetupEMSInternalVariable("Inlet Temperature for Plant Connection " + LoopStr,
                                                  UserZoneAirHVAC(CompLoop).Name,
@@ -1539,13 +1580,13 @@ namespace UserDefinedComponents {
                                               cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainTypeOf_ZoneHVACForcedAirUserDefined,
-                                              UserZoneAirHVAC(CompLoop).Zone.ConvectionGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.ReturnAirConvectionGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.ThermalRadiationGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.LatentGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.ReturnAirLatentGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.CarbonDioxideGainRate,
-                                              UserZoneAirHVAC(CompLoop).Zone.GenericContamGainRate);
+                                              &UserZoneAirHVAC(CompLoop).Zone.ConvectionGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.ReturnAirConvectionGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.ThermalRadiationGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.LatentGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.ReturnAirLatentGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.CarbonDioxideGainRate,
+                                              &UserZoneAirHVAC(CompLoop).Zone.GenericContamGainRate);
 
                         SetupEMSActuator("Component Zone Internal Gain",
                                          UserZoneAirHVAC(CompLoop).Name,
@@ -1623,10 +1664,13 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         UserAirTerminal(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Program Manager Name not found.");
-                        ErrorsFound = true;
+                        UserAirTerminal(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
+                        if (UserAirTerminal(CompLoop).simPluginLocation == -1) {
+                            ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ErrorsFound = true;
+                        }
                     }
                 }
 
@@ -1636,10 +1680,13 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         UserAirTerminal(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Program Manager Name not found.");
-                        ErrorsFound = true;
+                        UserAirTerminal(CompLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
+                        if (UserAirTerminal(CompLoop).initPluginLocation == -1) {
+                            ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                            ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError("Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
+                            ErrorsFound = true;
+                        }
                     }
                 }
 
@@ -1862,7 +1909,7 @@ namespace UserDefinedComponents {
                         UserAirTerminal(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
                         UserAirTerminal(CompLoop).Loop(ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
-                        LoopStr = General::RoundSigDigits(ConnectionLoop);
+                        const auto LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables
                         SetupEMSInternalVariable("Inlet Temperature for Plant Connection " + LoopStr,
                                                  UserAirTerminal(CompLoop).Name,
@@ -1960,13 +2007,13 @@ namespace UserDefinedComponents {
                                               cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainTypeOf_AirTerminalUserDefined,
-                                              UserAirTerminal(CompLoop).Zone.ConvectionGainRate,
-                                              UserAirTerminal(CompLoop).Zone.ReturnAirConvectionGainRate,
-                                              UserAirTerminal(CompLoop).Zone.ThermalRadiationGainRate,
-                                              UserAirTerminal(CompLoop).Zone.LatentGainRate,
-                                              UserAirTerminal(CompLoop).Zone.ReturnAirLatentGainRate,
-                                              UserAirTerminal(CompLoop).Zone.CarbonDioxideGainRate,
-                                              UserAirTerminal(CompLoop).Zone.GenericContamGainRate);
+                                              &UserAirTerminal(CompLoop).Zone.ConvectionGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.ReturnAirConvectionGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.ThermalRadiationGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.LatentGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.ReturnAirLatentGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.CarbonDioxideGainRate,
+                                              &UserAirTerminal(CompLoop).Zone.GenericContamGainRate);
 
                         SetupEMSActuator("Component Zone Internal Gain",
                                          UserAirTerminal(CompLoop).Name,

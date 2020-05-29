@@ -52,7 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>

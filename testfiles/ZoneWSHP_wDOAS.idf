@@ -86,7 +86,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,4;
 
@@ -94,7 +94,7 @@
     Simple One Zone (Wireframe DXF),  !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    .04,                     !- Loads Convergence Tolerance Value
+    .04,                     !- Loads Convergence Tolerance Value {W}
     .004,                    !- Temperature Convergence Tolerance Value {deltaC}
     MinimalShadowing,        !- Solar Distribution
     30,                      !- Maximum Number of Warmup Days
@@ -260,7 +260,7 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter,!- Name
     Zone Equipment Inlet Node,  !- Inlet Node Name
-    Zone 1 OA Inlet Node;    !- Outlet 1 Node Name
+    Zone 1 OA Inlet Node ATInlet;  !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE MIXER ===========
 
@@ -365,12 +365,23 @@
     Mixed Air Node,          !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone1DirectAir,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    Zone 1 OA Inlet Node,    !- Zone Supply Air Node Name
+    Zone 1 OA Inlet Node ATInlet,  !- Air Inlet Node Name
+    Zone 1 OA Inlet Node,    !- Air Outlet Node Name
     0.0625,                  !- Maximum Air Flow Rate {m3/s}
-    SZ DSOA SPACE1-1;        !- Design Specification Outdoor Air Object Name
+    SZ DSOA SPACE1-1,        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone1DirectAir ADU,      !- Name
+    Zone 1 OA Inlet Node,    !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone1DirectAir,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   Schedule:Compact,
     OAFractionSched,         !- Name
@@ -425,7 +436,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
@@ -653,8 +669,8 @@
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone1DirectAir,          !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone1DirectAir ADU,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name

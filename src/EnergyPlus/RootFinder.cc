@@ -1885,8 +1885,8 @@ namespace RootFinder {
         RootFinderData.CurrentPoint.Y = Y;
     }
 
-    void SortHistory(int const N,               // Number of points to sort in history array
-                     Array1S<PointType> History // Array of PointType variables. At least N of them
+    void SortHistory(int const N,                // Number of points to sort in history array
+                     Array1D<PointType> &History // Array of PointType variables. At least N of them
     )
     {
         // SUBROUTINE INFORMATION:

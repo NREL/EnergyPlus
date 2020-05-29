@@ -124,7 +124,7 @@
 !
 !
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -141,7 +141,7 @@
     HAMT test 1,             !- Name
     0,                       !- North Axis {deg}
     ,                        !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     MinimalShadowing,        !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days

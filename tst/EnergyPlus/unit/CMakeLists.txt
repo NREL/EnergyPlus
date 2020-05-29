@@ -1,4 +1,3 @@
-
 set( test_src
   TestHelpers/IdfParser.cc
   TestHelpers/IdfParser.hh
@@ -30,6 +29,11 @@ set( test_src
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
   ChillerIndirectAbsorption.unit.cc
+  Coils/CoilCoolingDXFixture.hh
+  Coils/CoilCoolingDX.unit.cc
+  Coils/CoilCoolingDXCurveFitPerformance.unit.cc
+  Coils/CoilCoolingDXCurveFitOperatingMode.unit.cc
+  Coils/CoilCoolingDXCurveFitSpeed.unit.cc
   CondenserLoopTowers.unit.cc
   ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
@@ -58,6 +62,7 @@ set( test_src
   ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
+  EvaporativeFluidCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
   FanCoilUnits.unit.cc
   Fans.unit.cc
@@ -105,6 +110,7 @@ set( test_src
   JsonOutput.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
+  MicroCHPElectricGenerator.unit.cc
   MoistureBalanceEMPD.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
@@ -201,14 +207,25 @@ set( test_src
   XingGroundTemperatureModel.unit.cc
   ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
-  ZoneHVACEvaporativeCooler.unit
+  ZoneHVACEvaporativeCooler.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
 )
+
 set( test_dependencies
   energyplusapi
- )
+)
+
+if(LINK_WITH_PYTHON)
+  if (CMAKE_HOST_UNIX)
+    find_package(PythonLibs 3 REQUIRED)
+    include_directories(${PYTHON_INCLUDE_DIRS})
+    list(APPEND test_src api/datatransfer.unit.cc)
+    list(APPEND test_src PluginManager.unit.cc)
+    list(APPEND test_dependencies ${PYTHON_LIBRARIES} )
+  endif()
+endif()
 
 if(CMAKE_HOST_UNIX)
   if(NOT APPLE)

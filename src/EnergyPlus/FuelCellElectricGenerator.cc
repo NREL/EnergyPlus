@@ -64,11 +64,12 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneratorFuelSupply.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -1117,9 +1118,9 @@ namespace FuelCellElectricGenerator {
                                   "Generator:FuelCell",
                                   this->Name,
                                   DataHeatBalance::IntGainTypeOf_GeneratorFuelCell,
-                                  this->Report.SkinLossConvect,
-                                  _,
-                                  this->Report.SkinLossRadiat);
+                                  &this->Report.SkinLossConvect,
+                                  nullptr,
+                                  &this->Report.SkinLossRadiat);
         }
 
         if (DataGlobals::DisplayAdvancedReportVariables) { // show extra data originally needed for detailed comparative testing
@@ -2038,8 +2039,8 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    Real64 FCDataStruct::FuelCellProductGasEnthResidual(Real64 const TprodGas,    // temperature, this is "x" being searched
-                                                        Array1<Real64> const &Par // par(1) = Generator Number
+    Real64 FCDataStruct::FuelCellProductGasEnthResidual(Real64 const TprodGas,     // temperature, this is "x" being searched
+                                                        Array1D<Real64> const &Par // par(1) = Generator Number
     )
     {
 
@@ -3103,7 +3104,7 @@ namespace FuelCellElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void FCDataStruct::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void FCDataStruct::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                 bool FirstHVACIteration,
                                 Real64 &EP_UNUSED(CurLoad),
                                 bool EP_UNUSED(RunFlag))

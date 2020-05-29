@@ -56,11 +56,12 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -254,15 +255,15 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     GetOARequirements();      // get the OA requirements object
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
     WaterCoils::MyUAAndFlowCalcFlag(1) = false;
-    GetSysInput();
+    GetSysInput(state);
     DataSizing::TermUnitSingDuct = true;
     WaterCoil(1).WaterLoopNum = 1;
     WaterCoil(1).WaterLoopSide = 1;
@@ -276,9 +277,9 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoil_SimpleHeating;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WaterCoil(1).WaterInletNodeNum;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = WaterCoil(1).WaterOutletNodeNum;
-    Sys(1).HWLoopNum = 1;
-    Sys(1).HWLoopSide = 1;
-    Sys(1).HWBranchIndex = 1;
+    sd_airterminal(1).HWLoopNum = 1;
+    sd_airterminal(1).HWLoopSide = 1;
+    sd_airterminal(1).HWBranchIndex = 1;
     PlantSizData(1).DeltaT = 11.0;
     PlantSizData(1).ExitTemp = 82;
     PlantSizData(1).PlantLoopName = "HotWaterLoop";
@@ -319,10 +320,10 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
             max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) *
                 FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlowFrac);
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
-    Sys(1).ZoneFloorArea = Zone(1).FloorArea;
+    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
     OutputReportPredefined::SetPredefinedTables();
-    SizeSys(1);
-    SizeWaterCoil(1);
+    sd_airterminal(1).SizeSys();
+    SizeWaterCoil(state, 1);
     EXPECT_NEAR(WaterCoil(1).UACoil, 199.86, 0.01);
 
     Node.deallocate();
@@ -332,7 +333,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
-    Sys.deallocate();
+    sd_airterminal.deallocate();
     ZoneEqSizing.deallocate();
     PlantLoop.deallocate();
     PlantSizData.deallocate();
@@ -492,15 +493,15 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     GetOARequirements();      // get the OA requirements object
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
     WaterCoils::MyUAAndFlowCalcFlag(1) = false;
-    GetSysInput();
+    GetSysInput(state);
     DataSizing::TermUnitSingDuct = true;
     WaterCoil(1).WaterLoopNum = 1;
     WaterCoil(1).WaterLoopSide = 1;
@@ -514,9 +515,9 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoil_SimpleHeating;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WaterCoil(1).WaterInletNodeNum;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = WaterCoil(1).WaterOutletNodeNum;
-    Sys(1).HWLoopNum = 1;
-    Sys(1).HWLoopSide = 1;
-    Sys(1).HWBranchIndex = 1;
+    sd_airterminal(1).HWLoopNum = 1;
+    sd_airterminal(1).HWLoopSide = 1;
+    sd_airterminal(1).HWBranchIndex = 1;
     PlantSizData(1).DeltaT = 11.0;
     PlantSizData(1).ExitTemp = 82;
     PlantSizData(1).PlantLoopName = "HotWaterLoop";
@@ -556,9 +557,10 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
             max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) *
                 FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlowFrac);
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
-    Sys(1).ZoneFloorArea = Zone(1).FloorArea;
-    SizeSys(1);
-    SizeWaterCoil(1);
+    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
+    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
+    sd_airterminal(1).SizeSys();
+    SizeWaterCoil(state, 1);
     EXPECT_NEAR(WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
     EXPECT_NEAR(WaterCoil(1).UACoil, 85.97495, 0.01);
 
@@ -569,7 +571,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
-    Sys.deallocate();
+    sd_airterminal.deallocate();
     ZoneEqSizing.deallocate();
     PlantLoop.deallocate();
     PlantSizData.deallocate();
@@ -728,15 +730,15 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     GetOARequirements();      // get the OA requirements object
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
     WaterCoils::MyUAAndFlowCalcFlag(1) = false;
-    GetSysInput();
+    GetSysInput(state);
     DataSizing::TermUnitSingDuct = true;
     WaterCoil(1).WaterLoopNum = 1;
     WaterCoil(1).WaterLoopSide = 1;
@@ -750,9 +752,9 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoil_SimpleHeating;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WaterCoil(1).WaterInletNodeNum;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = WaterCoil(1).WaterOutletNodeNum;
-    Sys(1).HWLoopNum = 1;
-    Sys(1).HWLoopSide = 1;
-    Sys(1).HWBranchIndex = 1;
+    sd_airterminal(1).HWLoopNum = 1;
+    sd_airterminal(1).HWLoopSide = 1;
+    sd_airterminal(1).HWBranchIndex = 1;
     PlantSizData(1).DeltaT = 11.0;
     PlantSizData(1).ExitTemp = 82;
     PlantSizData(1).PlantLoopName = "HotWaterLoop";
@@ -792,9 +794,9 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
             max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) *
                 FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlowFrac);
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
-    Sys(1).ZoneFloorArea = Zone(1).FloorArea;
-    SizeSys(1);
-    SizeWaterCoil(1);
+    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
+    sd_airterminal(1).SizeSys();
+    SizeWaterCoil(state, 1);
     EXPECT_NEAR(WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
     EXPECT_NEAR(WaterCoil(1).UACoil, 85.97495, 0.01);
 
@@ -805,7 +807,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
-    Sys.deallocate();
+    sd_airterminal.deallocate();
     ZoneEqSizing.deallocate();
     PlantLoop.deallocate();
     PlantSizData.deallocate();
@@ -965,15 +967,15 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     GetOARequirements();      // get the OA requirements object
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
     WaterCoils::MyUAAndFlowCalcFlag(1) = false;
-    GetSysInput();
+    GetSysInput(state);
     DataSizing::TermUnitSingDuct = true;
     WaterCoil(1).WaterLoopNum = 1;
     WaterCoil(1).WaterLoopSide = 1;
@@ -987,9 +989,9 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoil_SimpleHeating;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WaterCoil(1).WaterInletNodeNum;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = WaterCoil(1).WaterOutletNodeNum;
-    Sys(1).HWLoopNum = 1;
-    Sys(1).HWLoopSide = 1;
-    Sys(1).HWBranchIndex = 1;
+    sd_airterminal(1).HWLoopNum = 1;
+    sd_airterminal(1).HWLoopSide = 1;
+    sd_airterminal(1).HWBranchIndex = 1;
     PlantSizData(1).DeltaT = 11.0;
     PlantSizData(1).ExitTemp = 82;
     PlantSizData(1).PlantLoopName = "HotWaterLoop";
@@ -1029,9 +1031,9 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
             max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) *
                 FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlowFrac);
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
-    Sys(1).ZoneFloorArea = Zone(1).FloorArea;
-    SizeSys(1);
-    SizeWaterCoil(1);
+    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
+    sd_airterminal(1).SizeSys();
+    SizeWaterCoil(state, 1);
     EXPECT_NEAR(WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
     EXPECT_NEAR(WaterCoil(1).UACoil, 300.00, 0.01);
 
@@ -1042,7 +1044,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
-    Sys.deallocate();
+    sd_airterminal.deallocate();
     ZoneEqSizing.deallocate();
     PlantLoop.deallocate();
     PlantSizData.deallocate();
@@ -1163,7 +1165,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     }
     GetZoneData(ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
@@ -1203,7 +1205,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     UnitarySysEqSizing(CurSysNum).CoolingCapacity = false;
     UnitarySysEqSizing(CurSysNum).HeatingCapacity = false;
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    SizeWaterCoil(1);
+    SizeWaterCoil(state, 1);
     EXPECT_NEAR(WaterCoil(1).MaxWaterMassFlowRate, .258323, 0.00001);
     EXPECT_NEAR(WaterCoil(1).UACoil, 239.835, 0.01);
 
@@ -1376,15 +1378,15 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     GetOARequirements();      // get the OA requirements object
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(outputFiles());
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
     WaterCoils::MyUAAndFlowCalcFlag(1) = false;
-    GetSysInput();
+    GetSysInput(state);
     DataSizing::TermUnitSingDuct = true;
     WaterCoil(1).WaterLoopNum = 1;
     WaterCoil(1).WaterLoopSide = 1;
@@ -1398,17 +1400,17 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoil_SimpleHeating;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WaterCoil(1).WaterInletNodeNum;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = WaterCoil(1).WaterOutletNodeNum;
-    Sys(1).HWLoopNum = 1;
-    Sys(1).HWLoopSide = 1;
-    Sys(1).HWBranchIndex = 1;
+    sd_airterminal(1).HWLoopNum = 1;
+    sd_airterminal(1).HWLoopSide = 1;
+    sd_airterminal(1).HWBranchIndex = 1;
     CurZoneEqNum = 1;
     CurTermUnitSizingNum = 1;
     CurSysNum = 0;
     Zone(1).FloorArea = 99.16;
-    Sys(1).ZoneFloorArea = Zone(1).FloorArea;
+    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
 
     OutputReportPredefined::SetPredefinedTables();
-    SizeSys(1);
+    sd_airterminal(1).SizeSys();
     DataGlobals::BeginEnvrnFlag = true;
 
     // water coil is user input for water flow and UA with performance input method = UFactorTimesAreaAndDesignWaterFlowRate and Rated Capacity =
@@ -1419,12 +1421,12 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     EXPECT_EQ(WaterCoil(1).DesWaterHeatingCoilRate, 0.0);                    // model output not yet set
 
     // sizing will be called and skipped with Init setting DesWaterHeatingCoilRate based on above inputs
-    InitWaterCoil(OutputFiles::getSingleton(), 1, false);
+    InitWaterCoil(state, outputFiles(), 1, false);
     EXPECT_NEAR(WaterCoil(1).DesWaterHeatingCoilRate, 7390.73, 0.01);
     // not set in Init for water heating coils and not used elsewhere other than sizing
     EXPECT_EQ(WaterCoil(1).DesTotWaterCoilLoad, DataSizing::AutoSize);
 
-    Sys.deallocate();
+    sd_airterminal.deallocate();
 }
 
 } // namespace EnergyPlus

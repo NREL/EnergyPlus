@@ -66,7 +66,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.3;
+  Version,9.4;
 
 !
 !- Run Controls sections
@@ -107,8 +107,10 @@
     20;                      !- Maximum HVAC Iterations
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    21;                      !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    21,                      !- Shading Calculation Update Frequency
+    15000;                   !- Maximum Figures in Shadow Overlap Calculations
 
   RunPeriod,
     Run Period 1,            !- Name

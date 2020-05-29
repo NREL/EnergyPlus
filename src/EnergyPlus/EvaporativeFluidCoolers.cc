@@ -51,8 +51,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -61,13 +59,14 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -978,16 +977,16 @@ namespace EvaporativeFluidCoolers {
 
             this->InitEvapFluidCooler();
             this->SizeEvapFluidCooler();
-            MinLoad = 0.0; // signifies non-load based model (i.e. forward
-            MaxLoad = 0.0; // heat exhanger model)
-            OptLoad = 0.0;
+            MinLoad = 0.0; // signifies non-load based model (i.e. forward heat exhanger model)
+            MaxLoad = this->HighSpeedStandardDesignCapacity * this->HeatRejectCapNomCapSizingRatio;
+            OptLoad = this->HighSpeedStandardDesignCapacity;
 
         } else {
             ShowFatalError("SimEvapFluidCoolers: Invalid evaporative fluid cooler Type Requested = " + EvapFluidCoolerType);
         }
     }
 
-    void EvapFluidCoolerSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void EvapFluidCoolerSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                         bool EP_UNUSED(FirstHVACIteration),
                                         Real64 &EP_UNUSED(CurLoad),
                                         bool RunFlag)
@@ -2211,7 +2210,7 @@ namespace EvaporativeFluidCoolers {
         // set water and air properties
         Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(this->inletConds.AirPress, InletAirTemp, this->inletConds.AirHumRat);
         Real64 AirMassFlowRate = AirFlowRate * AirDensity;
-        Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(this->inletConds.AirHumRat, InletAirTemp);
+        Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->inletConds.AirHumRat);
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(
             DataPlant::PlantLoop(this->LoopNum).FluidName, this->InletWaterTemp, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
         Real64 InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(InletAirWetBulb, 1.0, this->inletConds.AirPress);
@@ -2262,7 +2261,7 @@ namespace EvaporativeFluidCoolers {
         }
     }
 
-    Real64 EvapFluidCoolerSpecs::SimpleEvapFluidCoolerUAResidual(Real64 const UA, Array1<Real64> const &Par)
+    Real64 EvapFluidCoolerSpecs::SimpleEvapFluidCoolerUAResidual(Real64 const UA, Array1D<Real64> const &Par)
     {
 
         // FUNCTION INFORMATION:
@@ -2433,7 +2432,7 @@ namespace EvaporativeFluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for passing results to the outlet water node.
 
-        ObjexxFCL::gio::Fmt LowTempFmt("(' ',F6.2)");
+
         Real64 const TempAllowance(0.02); // Minimum difference b/w fluid cooler water outlet temp and
         std::string CharErrOut;
         std::string CharLowOutletTemp;
@@ -2468,13 +2467,9 @@ namespace EvaporativeFluidCoolers {
         Real64 TempDifference = DataPlant::PlantLoop(this->LoopNum).MinTemp - this->OutletWaterTemp;
         if (TempDifference > TempAllowance && this->WaterMassFlowRate > 0.0) {
             ++this->OutletWaterTempErrorCount;
-            ObjexxFCL::gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
-            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << this->OutletWaterTemp;
-            strip(CharErrOut);
             if (this->OutletWaterTempErrorCount < 2) {
                 ShowWarningError(this->EvapFluidCoolerType + " \"" + this->Name + "\"");
-                ShowContinueError("Evaporative fluid cooler water outlet temperature (" + CharErrOut +
-                                  " C) is below the specified minimum condenser loop temp of " + stripped(CharLowOutletTemp) + " C");
+                ShowContinueError(format("Evaporative fluid cooler water outlet temperature ({:6.2F} C) is below the specified minimum condenser loop temp of {:6.2F} C", this->OutletWaterTemp, LoopMinTemp));
                 ShowContinueErrorTimeStamp("");
             } else {
                 ShowRecurringWarningErrorAtEnd(

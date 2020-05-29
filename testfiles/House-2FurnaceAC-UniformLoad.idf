@@ -74,13 +74,13 @@
 ! Coils:                          Coil:Cooling:DX:SingleSpeed
 !                                 Coil:Heating:Fuel
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     House with 2 Furnace AC, !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.001,                   !- Loads Convergence Tolerance Value
+    0.001,                   !- Loads Convergence Tolerance Value {W}
     0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -1133,7 +1133,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    0;                       !- Heating Maximum Air Flow Fraction
+    0,                       !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:AirTerminal:Sizing,
     FurnaceAC1 75 Percent,   !- Name
@@ -1172,35 +1177,53 @@
   ZoneHVAC:EquipmentList,
     LIVING ZONE Equipment,   !- Name
     UniformLoad,             !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    LIVING ZONE Air Terminal 1,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    LIVING ZONE Air Terminal 1 ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
     ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
-    LIVING ZONE Air Terminal 2,  !- Zone Equipment 2 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
+    LIVING ZONE Air Terminal 2 ADU,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
     ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
     ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     LIVING ZONE Air Terminal 1,  !- Name
     ,                        !- Availability Schedule Name
-    LIVING ZONE Zone Equip Inlet 1,  !- Zone Supply Air Node Name
+    LIVING ZONE Zone Equip Inlet 1 ATInlet,  !- Air Inlet Node Name
+    LIVING ZONE Zone Equip Inlet 1,  !- Air Outlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     ,                        !- Design Specification Outdoor Air Object Name
-    ,                        !- Per Person Ventilation Rate Mode
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    LIVING ZONE Air Terminal 1 ADU,  !- Name
+    LIVING ZONE Zone Equip Inlet 1,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    LIVING ZONE Air Terminal 1,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
     FurnaceAC1 75 Percent;   !- Design Specification Air Terminal Sizing Object Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     LIVING ZONE Air Terminal 2,  !- Name
     ,                        !- Availability Schedule Name
-    LIVING ZONE Zone Equip Inlet 2,  !- Zone Supply Air Node Name
+    LIVING ZONE Zone Equip Inlet 2 ATInlet,  !- Air Inlet Node Name
+    LIVING ZONE Zone Equip Inlet 2,  !- Air Outlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     ,                        !- Design Specification Outdoor Air Object Name
-    ,                        !- Per Person Ventilation Rate Mode
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    LIVING ZONE Air Terminal 2 ADU,  !- Name
+    LIVING ZONE Zone Equip Inlet 2,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    LIVING ZONE Air Terminal 2,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
     FurnaceAC2 25 Percent;   !- Design Specification Air Terminal Sizing Object Name
 
   Sizing:System,
@@ -1275,7 +1298,7 @@
   AirLoopHVAC:ZoneSplitter,
     FurnaceAC1 Zone Splitter,!- Name
     FurnaceAC1 Supply Path Inlet,  !- Inlet Node Name
-    LIVING ZONE Zone Equip Inlet 1;  !- Outlet 1 Node Name
+    LIVING ZONE Zone Equip Inlet 1 ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     FurnaceAC1 Return Path,  !- Name
@@ -1501,7 +1524,7 @@
   AirLoopHVAC:ZoneSplitter,
     FurnaceAC2 Zone Splitter,!- Name
     FurnaceAC2 Supply Path Inlet,  !- Inlet Node Name
-    LIVING ZONE Zone Equip Inlet 2;  !- Outlet 1 Node Name
+    LIVING ZONE Zone Equip Inlet 2 ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     FurnaceAC2 Return Path,  !- Name

@@ -68,9 +68,11 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -213,12 +215,16 @@ namespace EMSManager {
         cCurrentModuleObject = "Output:EnergyManagementSystem";
         int NumOutputEMSs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
+        // Python plugin instances also count since actuators need to be set up for them
+        int numPythonPlugins = inputProcessor->getNumObjectsFound("PythonPlugin:Instance");
+        int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks();
+
         // added for FMU
         if ((NumSensors + numActuatorsUsed + NumProgramCallManagers + NumErlPrograms + NumErlSubroutines + NumUserGlobalVariables +
              NumEMSOutputVariables + NumEMSCurveIndices + NumExternalInterfaceGlobalVariables + NumExternalInterfaceActuatorsUsed +
              NumEMSConstructionIndices + NumEMSMeteredOutputVariables + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
              NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables + NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed +
-             NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables + NumOutputEMSs) > 0) {
+             NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables + NumOutputEMSs + numPythonPlugins + numActiveCallbacks) > 0) {
             AnyEnergyManagementSystemInModel = true;
         } else {
             AnyEnergyManagementSystemInModel = false;
@@ -273,7 +279,6 @@ namespace EMSManager {
 
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::emsCallFromBeginNewEvironment;
         using DataGlobals::emsCallFromExternalInterface;
         using DataGlobals::emsCallFromSetupSimulation;
         using DataGlobals::emsCallFromUserDefinedComponentModel;
@@ -299,9 +304,21 @@ namespace EMSManager {
         anyProgramRan = false;
         if (!AnyEnergyManagementSystemInModel) return; // quick return if nothing to do
 
-        if (iCalledFrom == emsCallFromBeginNewEvironment) BeginEnvrnInitializeRuntimeLanguage();
+        if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
+            BeginEnvrnInitializeRuntimeLanguage();
+            PluginManagement::onBeginEnvironment();
+        }
 
         InitEMS(iCalledFrom);
+
+        // also call plugins and callbacks here for convenience
+        bool anyPluginsOrCallbacksRan = false;
+        if (iCalledFrom != DataGlobals::emsCallFromUserDefinedComponentModel) { // don't run user-defined component plugins this way
+            PluginManagement::runAnyRegisteredCallbacks(iCalledFrom, anyPluginsOrCallbacksRan);
+            if (anyPluginsOrCallbacksRan) {
+                anyProgramRan = true;
+            }
+        }
 
         if (iCalledFrom == emsCallFromSetupSimulation) {
             ProcessEMSInput(true);
@@ -341,33 +358,33 @@ namespace EMSManager {
                                      NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed;
              ++ActuatorUsedLoop) {
             ErlVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
-            if (!(ErlVariableNum > 0)) continue; // this can happen for good reason during sizing
+            if (ErlVariableNum <= 0) continue; // this can happen for good reason during sizing
 
             EMSActuatorVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
-            if (!(EMSActuatorVariableNum > 0)) continue; // this can happen for good reason during sizing
+            if (EMSActuatorVariableNum <= 0) continue; // this can happen for good reason during sizing
 
             if (ErlVariable(ErlVariableNum).Value.Type == ValueNull) {
-                EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
+                *EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
             } else {
                 // Set the value and the actuated flag remotely on the actuated object via the pointer
                 {
                     auto const SELECT_CASE_var(EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed);
 
                     if (SELECT_CASE_var == PntrReal) {
-                        EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
-                        EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = ErlVariable(ErlVariableNum).Value.Number;
+                        *EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
+                        *EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = ErlVariable(ErlVariableNum).Value.Number;
                     } else if (SELECT_CASE_var == PntrInteger) {
-                        EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
+                        *EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
                         tmpInteger = std::floor(ErlVariable(ErlVariableNum).Value.Number);
-                        EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = tmpInteger;
+                        *EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = tmpInteger;
                     } else if (SELECT_CASE_var == PntrLogical) {
-                        EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
+                        *EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
                         if (ErlVariable(ErlVariableNum).Value.Number == 0.0) {
-                            EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
+                            *EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
                         } else if (ErlVariable(ErlVariableNum).Value.Number == 1.0) {
-                            EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = true;
+                            *EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = true;
                         } else {
-                            EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
+                            *EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
                         }
 
                     } else {
@@ -475,11 +492,11 @@ namespace EMSManager {
 
                     if (SELECT_CASE_var == PntrReal) {
 
-                        ErlVariable(ErlVariableNum).Value = SetErlValueNumber(EMSInternalVarsAvailable(InternVarAvailNum).RealValue);
+                        ErlVariable(ErlVariableNum).Value = SetErlValueNumber(*EMSInternalVarsAvailable(InternVarAvailNum).RealValue);
 
                     } else if (SELECT_CASE_var == PntrInteger) {
 
-                        tmpReal = double(EMSInternalVarsAvailable(InternVarAvailNum).IntValue);
+                        tmpReal = double(*EMSInternalVarsAvailable(InternVarAvailNum).IntValue);
                         ErlVariable(ErlVariableNum).Value = SetErlValueNumber(tmpReal);
                     }
                 }
@@ -549,7 +566,6 @@ namespace EMSManager {
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::emsCallFromAfterHVACManagers;
         using DataGlobals::emsCallFromBeforeHVACManagers;
-        using DataGlobals::emsCallFromBeginNewEvironment;
         using DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp;
         using DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
         using DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance;
@@ -950,7 +966,7 @@ namespace EMSManager {
                     auto const SELECT_CASE_var(cAlphaArgs(2));
 
                     if (SELECT_CASE_var == "BEGINNEWENVIRONMENT") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironment;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = DataGlobals::emsCallFromBeginNewEvironment;
                     } else if (SELECT_CASE_var == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironmentAfterWarmUp;
                     } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {
@@ -1797,6 +1813,7 @@ namespace EMSManager {
         using DataSurfaces::TotSurfaces;
         using DataSurfaces::WindowShadingControl;
         using DataSurfaces::WSC_ST_SwitchableGlazing;
+        using DataSurfaces::WSC_ST_ExteriorScreen;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1835,6 +1852,13 @@ namespace EMSManager {
                                      SurfaceWindow(loopSurfNum).SlatAngThisTSDegEMSon,
                                      SurfaceWindow(loopSurfNum).SlatAngThisTSDegEMSValue);
                 }
+            } else if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType == WSC_ST_ExteriorScreen) {
+                SetupEMSActuator("Window Shading Control",
+                                 Surface(loopSurfNum).Name,
+                                 "Control Status",
+                                 "[ShadeStatus]",
+                                 SurfaceWindow(loopSurfNum).ShadingFlagEMSOn,
+                                 SurfaceWindow(loopSurfNum).ShadingFlagEMSValue);
             } else {
                 if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType != WSC_ST_SwitchableGlazing) {
                     ShowSevereError("Missing shade or blind layer in window construction name = '" +
@@ -2293,8 +2317,8 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
         actuator.UniqueIDName = cUniqueIDName;
         actuator.ControlTypeName = cControlTypeName;
         actuator.Units = cUnits;
-        actuator.Actuated >>= lEMSActuated; // Pointer assigment
-        actuator.RealValue >>= rValue;      // Pointer assigment
+        actuator.Actuated = &lEMSActuated; // Pointer assigment
+        actuator.RealValue = &rValue;      // Pointer assigment
         actuator.PntrVarTypeUsed = PntrReal;
         EMSActuator_lookup.insert(key);
     }
@@ -2349,8 +2373,8 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
         actuator.UniqueIDName = cUniqueIDName;
         actuator.ControlTypeName = cControlTypeName;
         actuator.Units = cUnits;
-        actuator.Actuated >>= lEMSActuated; // Pointer assigment
-        actuator.IntValue >>= iValue;       // Pointer assigment
+        actuator.Actuated = &lEMSActuated; // Pointer assigment
+        actuator.IntValue = &iValue;       // Pointer assigment
         actuator.PntrVarTypeUsed = PntrInteger;
         EMSActuator_lookup.insert(key);
     }
@@ -2405,8 +2429,8 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
         actuator.UniqueIDName = cUniqueIDName;
         actuator.ControlTypeName = cControlTypeName;
         actuator.Units = cUnits;
-        actuator.Actuated >>= lEMSActuated; // Pointer assigment
-        actuator.LogValue >>= lValue;       // Pointer assigment
+        actuator.Actuated = &lEMSActuated; // Pointer assigment
+        actuator.LogValue = &lValue;       // Pointer assigment
         actuator.PntrVarTypeUsed = PntrLogical;
         EMSActuator_lookup.insert(key);
     }
@@ -2467,7 +2491,7 @@ void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string cons
         EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName = cDataTypeName;
         EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName = cUniqueIDName;
         EMSInternalVarsAvailable(InternalVarAvailNum).Units = cUnits;
-        EMSInternalVarsAvailable(InternalVarAvailNum).RealValue >>= rValue;
+        EMSInternalVarsAvailable(InternalVarAvailNum).RealValue = &rValue;
         EMSInternalVarsAvailable(InternalVarAvailNum).PntrVarTypeUsed = PntrReal;
     }
 }
@@ -2527,7 +2551,7 @@ void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string cons
         EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName = cDataTypeName;
         EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName = cUniqueIDName;
         EMSInternalVarsAvailable(InternalVarAvailNum).Units = cUnits;
-        EMSInternalVarsAvailable(InternalVarAvailNum).IntValue >>= iValue;
+        EMSInternalVarsAvailable(InternalVarAvailNum).IntValue = &iValue;
         EMSInternalVarsAvailable(InternalVarAvailNum).PntrVarTypeUsed = PntrInteger;
     }
 }

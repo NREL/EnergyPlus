@@ -23,7 +23,7 @@ This field is the name of a ControllerList object. A Controller List is simply a
 
 \paragraph{Field: Availability Manager List Name}\label{field-availability-manager-list-name}
 
-This field is the name of a AvailabilityManagerList object. A Availability Manager List is a list of Availability Managers giving both Availability Manager type and name. The availability managers in the list apply to this primary air loop. That is, they determine when and if this air loop is on or off, overriding the control provided by the central fan on/off schedule.
+This field is the name of a AvailabilityManagerList object. An Availability Manager List is a list of Availability Managers giving both Availability Manager type and name. The availability managers in the list apply to this primary air loop. That is, they determine when and if this air loop is on or off, overriding the control provided by the central fan on/off schedule.
 
 \paragraph{Field: Design Supply Air Flow Rate}\label{field-design-supply-air-flow-rate}
 
@@ -94,7 +94,7 @@ AirLoopHVAC,
 
 \paragraph{Air System Simulation Cycle On Off Status}\label{air-system-simulation-cycle-on-off-status}
 
-This field is the availability status of an AirLoopHVAC. This status flag is a result of the calculations made by the System Availability Manager(s) listed in a System Availability Manager List. When a single availability manager is used in a System Availability Manager List, this is also the availability status reported by the specific availability manager (Ref. System Availability Manager Outputs). When multiple availability managers are used in a System Availability Manager List, the loop availability status is determine by the rules associated with AirLoopHVACs (see rules described for Group -- System Availability Managers). The control status outputs are represented using integers 0 through 3.. These integers represent \emph{NoAction} (0), \emph{ForceOff} (1), \emph{CycleOn} (2), and \emph{CycleOnZoneFansOnly} (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
+This field is the availability status of an AirLoopHVAC. This status flag is a result of the calculations made by the System Availability Manager(s) listed in a System Availability Manager List. When a single availability manager is used in a System Availability Manager List, this is also the availability status reported by the specific availability manager (Ref. System Availability Manager Outputs). When multiple availability managers are used in a System Availability Manager List, the loop availability status is determined by the rules associated with AirLoopHVACs (see rules described for Group -- System Availability Managers). The control status outputs are represented using integers 0 through 3.. These integers represent \emph{NoAction} (0), \emph{ForceOff} (1), \emph{CycleOn} (2), and \emph{CycleOnZoneFansOnly} (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
 \paragraph{HVAC System Solver Iteration Count {[]}}\label{hvac-system-solver-iteration-count}
 This field reports the total number of HVAC System solver iterations in the current system time step or the maximum iterations possible for this solver if the simulation has not yet converged before it reached the maximum iterations.
@@ -130,7 +130,7 @@ The overall effect of outdoor air on the system shown above can be summarized by
 
 \paragraph{Ventilation Flow Outputs}\label{ventilation-flow-outputs}
 
-The fresh air flow into each zones are reported using the ventilation flow output variables. The total outdoor air flow in a primary air system is divided to each zone based on the fraction of flow each zone is supplied. There are six variables which deals with the mechanical ventilation flow reporting. Those six variables are:
+The fresh air flow into each zone are reported using the ventilation flow output variables. The total outdoor air flow in a primary air system is divided to each zone based on the fraction of flow each zone is supplied. There are six variables which deals with the mechanical ventilation flow reporting. Those six variables are:
 
 \paragraph{Zone Mechanical Ventilation Mass Flow Rate {[}kg/s{]}}\label{zone-mechanical-ventilation-mass-flow-rate-kgs}
 
@@ -142,7 +142,7 @@ Reports the total outdoor air mass that has been supplied to any zone over the r
 
 \paragraph{Zone Mechanical Ventilation Standard Density Volume Flow Rate {[}m3/s{]}}\label{zone-mechanical-ventilation-standard-density-volume-flow-rate-m3s}
 
-Reports the average outdoor air volume flow rate to any zone over the reporting interval, calculated using a standard density for air.~ Standard density in EnergyPlus corresponds to 20ºC drybulb, dry air, and nominally adjusted for elevation.
+Reports the average outdoor air volume flow rate to any zone over the reporting interval, calculated using a standard density for air. Standard density in EnergyPlus corresponds to 20ºC drybulb, dry air, and nominally adjusted for elevation.
 
 \paragraph{Zone Mechanical Ventilation Standard Density Volume {[}m3{]}}\label{zone-mechanical-ventilation-standard-density-volume-m3}
 
@@ -592,7 +592,7 @@ AirLoopHVAC:ControllerList,
 
 The AvailabilityManagerAssignmentList defines the applicable managers used for an \hyperref[airloophvac]{AirLoopHVAC} or \hyperref[plantloop]{PlantLoop}. The priority of availability managers is based on a set of rules and are specific to the type of loop. The output from each Availability Manager is an availability status flag. This flag can have the values \emph{NoAction}, \emph{ForceOff}, \emph{CycleOn}, or \emph{CycleOnZoneFansOnly} (used only for air loops). The availability status flags for the Availability Managers referenced by an air or plant loop are used to set the availability status flag for each loop. For the air loops, \emph{ForceOff} takes precedence: if any of the loop's availability managers are showing status \emph{ForceOff}, the loop status will be \emph{ForceOff}. Next in precedence is \emph{CycleOnZoneFansOnly,} followed by \emph{CycleOn}, and \emph{NoAction}. For the plant loops, there is no precedence among the Availability Manager status flag values. Instead, the first availability manager giving a status flag value other than \emph{NoAction} sets the status for the loop. The Availability Managers are executed in Availability Manager List order.
 
-Special rules also apply for which managers may be listed in a Availability Manager list. The Hybrid Ventilation Control Manager (object: \hyperref[availabilitymanagerhybridventilation]{AvailabilityManager:HybridVentilation}) is a special type of manager and is never specified in a Availability Manager List (it is used stand-alone for a specific air loop). All other types of availability managers may be listed in the Availability Manager List used for \hyperref[airloophvac]{AirLoopHVAC}s. For Plant Loops, the Night Cycle and Night Ventilation managers (objects: \hyperref[availabilitymanagernightcycle]{AvailabilityManager:NightCycle} ~and \hyperref[availabilitymanagernightventilation]{AvailabilityManager:NightVentilation}) are not allowed in the Availability Manager List.
+Special rules also apply for which managers may be listed in an Availability Manager list. The Hybrid Ventilation Control Manager (object: \hyperref[availabilitymanagerhybridventilation]{AvailabilityManager:HybridVentilation}) is a special type of manager and is never specified in an Availability Manager List (it is used stand-alone for a specific air loop). All other types of availability managers may be listed in the Availability Manager List used for \hyperref[airloophvac]{AirLoopHVAC}s. For Plant Loops, the Night Cycle and Night Ventilation managers (objects: \hyperref[availabilitymanagernightcycle]{AvailabilityManager:NightCycle} ~and \hyperref[availabilitymanagernightventilation]{AvailabilityManager:NightVentilation}) are not allowed in the Availability Manager List.
 
 \subsubsection{Inputs}\label{inputs-2-002}
 
@@ -634,7 +634,7 @@ The input for the Outside Air System consists of a system name, a controller lis
 
 The equipment inlet/outlet must be sequential with no loops - the simulation can only handle a straight-through air path, both on the primary air side and on the secondary air side, if any. Heat exchanger secondary air inlets need to be independent of the primary air stream -- usually relief air is used.
 
-The Outside Air System (object AirLoopHVAC:OutdoorAirSystem) can also be defined as a subsystem of an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}. When this subsystem is referred in AirLoopHVAC:DedicatedOutdoorAirSystem, the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} can not be listed in the \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList}, because the outdoor air flow rate will not be determined by Controller:OutdoorAir. Instead, the outdoor air flow rate will be specified by \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}.  In addition, the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} will not be allowed in the \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} as a component, because no mix is needed due to 100\% outdoor incoming airflow determined by AirLoopHVAC:DedicatedOutdoorAirSystem.     
+The Outside Air System (object AirLoopHVAC:OutdoorAirSystem) can also be defined as a subsystem of an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}. When this subsystem is referred in AirLoopHVAC:DedicatedOutdoorAirSystem, the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} can not be listed in the \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList}, because the outdoor air flow rate will not be determined by Controller:OutdoorAir. Instead, the outdoor air flow rate will be specified by \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}.  In addition, the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} will not be allowed in the \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} as a component, because no mix is needed due to 100\% outdoor incoming airflow determined by AirLoopHVAC:DedicatedOutdoorAirSystem.
 
 \subsubsection{Inputs}\label{inputs-3-001}
 
@@ -646,13 +646,13 @@ The unique, user assigned name for a single instance of an Outside Air System. A
 
 This field is the name of a \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList} object. A \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList} is simply a list of controllers giving both controller name and type. This Controller List specifies all the controllers that will act on this outside air system. The order of the controllers in the list is significant: controllers are simulated sequentially in the order given in the Controller List. Typically the Controller List would contain a \hyperref[controlleroutdoorair]{Controller:OutdoorAir}. If there are chilled water or hot water coils in the outdoor air system, each such coil will need a \hyperref[controllerwatercoil]{Controller:WaterCoil}.
 
-When this object is referred in \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}, the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} will not be allowed in the list, becauseAirLoopHVAC:DedicatedOutdoorAirSystem does not need Controller:OutdoorAir to determine the amount of outdoor air flow rate. 
+When this object is referred in \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}, the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} will not be allowed in the list, becauseAirLoopHVAC:DedicatedOutdoorAirSystem does not need Controller:OutdoorAir to determine the amount of outdoor air flow rate.
 
 \paragraph{Field: Outdoor Air Equipment List Name}\label{field-outdoor-air-equipment-list-name}
 
 This field is the name of an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} object. An \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} is simply a list of components giving both component name and type. This Outdoor Air Equipment List specifies all the components that will be simulated in this outside air system. The order of the components in the list is significant: components are simulated sequentially in the order given in the Outdoor Air Equipment List. Typically the equipment list would contain at least an \hyperref[outdoorairmixer]{OutdoorAir:Mixer}. If there is more than one component, the components must be listed in order from the outside air to the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} (the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} is last).
 
-When this object is referred in \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}, the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} will not be allowed as a component, because all the incoming airflow is from outdoor, and no mixing is needed. 
+When this object is referred in \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}, the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} will not be allowed as a component, because all the incoming airflow is from outdoor, and no mixing is needed.
 
 \paragraph{Field: Availability Manager List Name}\label{field-availability-manager-list-name-1}
 
@@ -666,7 +666,7 @@ AirLoopHVAC,Typical Terminal Reheat 1,
              Reheat System 1 Controllers,
              Reheat System 1 Avail List,
              1.3,
-             Air Loop Branches,,
+             Air Loop Branches,
              Air Loop Inlet Node, Return Air Mixer Outlet,
              Zone Equipment Inlet Node, Air Loop Outlet Node;
 
@@ -715,12 +715,12 @@ The impact of using outside air/mechanical ventilation is described in the secti
 
 Used to specify the components in the outdoor air system. The components will be simulated in the order in which they occur in the list.
 
-The following HVAC equipment types are allowed as outdoor air system equipment. The component matrix shows which coils and fans are allowed with which equipment models.
+The following HVAC equipment types are allowed as outdoor air system equipment. The component matrix (Figure~\ref{fig:outdoor-air-system-component-matrix}) shows which coils and fans are allowed with which equipment models.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/OASysComponentMatrix.png}
-\caption{}
+\caption{Outdoor Air System Component Matrix \protect \label{fig:outdoor-air-system-component-matrix}}
 \end{figure}
 
 \subsubsection{Inputs}\label{inputs-4-001}

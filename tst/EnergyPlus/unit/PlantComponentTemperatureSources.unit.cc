@@ -51,7 +51,8 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
 
@@ -107,13 +108,13 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     // Second call is on firstHVAC, no load at the moment
     firstHVACIteration = true;
     PlantLocation loc;
-    waterSource1.simulate(loc, firstHVACIteration, myLoad, runFlag);
+    waterSource1.simulate(state, loc, firstHVACIteration, myLoad, runFlag);
     EXPECT_NEAR(0.0, waterSource1.MassFlowRate, 0.00001);
 
     // Third call is no longer firstHVAC, and we now have a load
     firstHVACIteration = false;
     myLoad = 1696.55;
-    waterSource1.simulate(loc, firstHVACIteration, myLoad, runFlag);
+    waterSource1.simulate(state, loc, firstHVACIteration, myLoad, runFlag);
     EXPECT_NEAR(0.05, waterSource1.MassFlowRate, 0.001);
 
     // Do this for scheduled temperature

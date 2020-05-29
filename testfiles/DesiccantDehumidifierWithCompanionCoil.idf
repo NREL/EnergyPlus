@@ -104,13 +104,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.5,                     !- Loads Convergence Tolerance Value
+    0.5,                     !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     40,                      !- Maximum Number of Warmup Days
@@ -560,7 +560,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   BuildingSurface:Detailed,
     WALL-1PF,                !- Name
@@ -2388,8 +2388,8 @@
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    SPCAE5-1 Direct Air,     !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPCAE5-1 Direct Air ADU, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -2419,11 +2419,23 @@
     AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type
     SPACE4-1 VAV Reheat;     !- Air Terminal Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     SPCAE5-1 Direct Air,     !- Name
     Constant,                !- Availability Schedule Name
-    SPACE5-1 In Node,        !- Zone Supply Air Node Name
-    1.05;                    !- Maximum Air Flow Rate {m3/s}
+    SPACE5-1 In Node ATInlet,!- Air Inlet Node Name
+    SPACE5-1 In Node,        !- Air Outlet Node Name
+    1.05,                    !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    SPCAE5-1 Direct Air ADU, !- Name
+    SPACE5-1 In Node,        !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    SPCAE5-1 Direct Air,     !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System 1,!- Name
@@ -2653,7 +2665,7 @@
   AirLoopHVAC:ZoneSplitter,
     Desiccant DXSystem Zone Supply Air Splitter,  !- Name
     Desiccant DXSystem Zone Equipment Inlet Node,  !- Inlet Node Name
-    SPACE5-1 In Node;        !- Outlet 1 Node Name
+    SPACE5-1 In Node ATInlet;!- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneMixer,
     Desiccant DXSystem Zone Return Air Mixer,  !- Name

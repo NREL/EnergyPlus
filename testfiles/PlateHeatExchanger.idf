@@ -110,7 +110,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,4;
 
@@ -118,7 +118,7 @@
     NONE,                    !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -2527,37 +2527,37 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Heat Transfer Rate,timestep;
+  Output:Variable,*,Heat Pump Load Side Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Heat Transfer Rate,timestep;
+  Output:Variable,*,Heat Pump Source Side Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Inlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Load Side Inlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Outlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Load Side Outlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Inlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Source Side Inlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Outlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Source Side Outlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Heat Transfer Rate,timestep;
+  Output:Variable,*,Heat Pump Load Side Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Heat Transfer Rate,timestep;
+  Output:Variable,*,Heat Pump Source Side Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Inlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Load Side Inlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Outlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Load Side Outlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Inlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Source Side Inlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Outlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Source Side Outlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Mass Flow Rate,timestep;
+  Output:Variable,*,Heat Pump Load Side Mass Flow Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Mass Flow Rate,timestep;
+  Output:Variable,*,Heat Pump Source Side Mass Flow Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Electric Power,timestep;
+  Output:Variable,*,Heat Pump Electric Power,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Electric Power,timestep;
+  Output:Variable,*,Heat Pump Electric Power,timestep;
 
   Output:Variable,*,Ground Heat Exchanger Average Borehole Temperature,timestep;
 
@@ -2571,9 +2571,9 @@
 
   Output:Variable,*,Ground Heat Exchanger Average Fluid Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Heat Transfer Energy,timestep;
+  Output:Variable,*,Heat Pump Load Side Heat Transfer Energy,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Heat Transfer Energy,timestep;
+  Output:Variable,*,Heat Pump Source Side Heat Transfer Energy,timestep;
 
   Output:Variable,*,Pump Electric Power,timestep;
 

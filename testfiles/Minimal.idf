@@ -13,7 +13,7 @@
 ! HVAC: None.
 !
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,4;
 
@@ -21,7 +21,7 @@
     None,                    !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.40,                    !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days

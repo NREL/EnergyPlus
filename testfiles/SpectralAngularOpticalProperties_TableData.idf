@@ -122,13 +122,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Small Office,            !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.001,                   !- Loads Convergence Tolerance Value
+    0.001,                   !- Loads Convergence Tolerance Value {W}
     0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -2581,8 +2581,8 @@
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone3DirectAir,          !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone3DirectAir ADU,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -2625,11 +2625,23 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil 1;              !- Cooling Coil Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone3DirectAir,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    Zone 3 Inlet Node,       !- Zone Supply Air Node Name
-    0.74;                    !- Maximum Air Flow Rate {m3/s}
+    Zone 3 Inlet Node ATInlet,  !- Air Inlet Node Name
+    Zone 3 Inlet Node,       !- Air Outlet Node Name
+    0.74,                    !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone3DirectAir ADU,      !- Name
+    Zone 3 Inlet Node,       !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone3DirectAir,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:ConstantVolume:Reheat,
     Reheat Zone 1,           !- Name
@@ -2698,7 +2710,7 @@
     Zone Equipment Inlet Node,  !- Inlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Outlet 1 Node Name
     Zone 2 Reheat Air Inlet Node,  !- Outlet 2 Node Name
-    Zone 3 Inlet Node;       !- Outlet 3 Node Name
+    Zone 3 Inlet Node ATInlet;  !- Outlet 3 Node Name
 
   AirLoopHVAC:ZoneMixer,
     Zone Return Air Mixer,   !- Name

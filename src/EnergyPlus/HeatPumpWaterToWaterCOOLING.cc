@@ -58,10 +58,11 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -137,7 +138,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GshpPeCoolingSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+    void GshpPeCoolingSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                   bool EP_UNUSED(RunFlag)) {
         // Simulate the model for the Demand "MyLoad"
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
@@ -169,7 +170,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         OptLoad = this->NomCap * this->OptPartLoadRat;
     }
 
-    void GshpPeCoolingSpecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) {
+    void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;
@@ -416,13 +417,13 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         // CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Cooling'
         for (GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum) {
-            SetupOutputVariable("Water to Water Heat Pump Electric Power",
+            SetupOutputVariable("Heat Pump Electric Power",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).Power,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Electric Energy",
+            SetupOutputVariable("Heat Pump Electric Energy",
                                 OutputProcessor::Unit::J,
                                 GSHP(GSHPNum).Energy,
                                 "System",
@@ -434,63 +435,63 @@ namespace HeatPumpWaterToWaterCOOLING {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable("Water to Water Heat Pump Load Side Heat Transfer Rate",
+            SetupOutputVariable("Heat Pump Load Side Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).QLoad,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Load Side Heat Transfer Energy",
+            SetupOutputVariable("Heat Pump Load Side Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 GSHP(GSHPNum).QLoadEnergy,
                                 "System",
                                 "Sum",
                                 GSHP(GSHPNum).Name);
 
-            SetupOutputVariable("Water to Water Heat Pump Source Side Heat Transfer Rate",
+            SetupOutputVariable("Heat Pump Source Side Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).QSource,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Heat Transfer Energy",
+            SetupOutputVariable("Heat Pump Source Side Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 GSHP(GSHPNum).QSourceEnergy,
                                 "System",
                                 "Sum",
                                 GSHP(GSHPNum).Name);
 
-            SetupOutputVariable("Water to Water Heat Pump Load Side Outlet Temperature",
+            SetupOutputVariable("Heat Pump Load Side Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).LoadSideWaterOutletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Load Side Inlet Temperature",
+            SetupOutputVariable("Heat Pump Load Side Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).LoadSideWaterInletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Outlet Temperature",
+            SetupOutputVariable("Heat Pump Source Side Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).SourceSideWaterOutletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Inlet Temperature",
+            SetupOutputVariable("Heat Pump Source Side Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).SourceSideWaterInletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Load Side Mass Flow Rate",
+            SetupOutputVariable("Heat Pump Load Side Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 GSHP(GSHPNum).LoadSideWaterMassFlowRate,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Mass Flow Rate",
+            SetupOutputVariable("Heat Pump Source Side Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 GSHP(GSHPNum).SourceSideWaterMassFlowRate,
                                 "System",
@@ -600,7 +601,6 @@ namespace HeatPumpWaterToWaterCOOLING {
         static std::string const RoutineNameCompressInletTemp("CalcGSHPModel:CompressInletTemp");
         static std::string const RoutineNameSuctionPr("CalcGSHPModel:SuctionPr");
         static std::string const RoutineNameCompSuctionTemp("CalcGSHPModel:CompSuctionTemp");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SourceSideEffect;      // Source Side effectiveness
@@ -893,20 +893,13 @@ namespace HeatPumpWaterToWaterCOOLING {
                     ShowWarningError("HeatPump:WaterToWater:ParameterEstimation, Cooling did not converge");
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Heatpump Name = " + this->Name);
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << std::abs(100.0 * (this->QSource - initialQSource) / (initialQSource + SmallNum));
-                    ShowContinueError("Heat Inbalance (%)             = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->QLoad;
-                    ShowContinueError("Load-side heat transfer rate   = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->QSource;
-                    ShowContinueError("Source-side heat transfer rate = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->SourceSideWaterMassFlowRate;
-                    ShowContinueError("Source-side mass flow rate     = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->LoadSideWaterMassFlowRate;
-                    ShowContinueError("Load-side mass flow rate       = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->SourceSideWaterInletTemp;
-                    ShowContinueError("Source-side inlet temperature  = " + stripped(ErrString));
-                    ObjexxFCL::gio::write(ErrString, fmtLD) << this->LoadSideWaterInletTemp;
-                    ShowContinueError("Load-side inlet temperature    = " + stripped(ErrString));
+                    ShowContinueError(format("Heat Inbalance (%)             = {}", std::abs(100.0 * (this->QSource - initialQSource) / (initialQSource + SmallNum))));
+                    ShowContinueError(format("Load-side heat transfer rate   = {}", this->QLoad));
+                    ShowContinueError(format("Source-side heat transfer rate = {}", this->QSource));
+                    ShowContinueError(format("Source-side mass flow rate     = {}", this->SourceSideWaterMassFlowRate));
+                    ShowContinueError(format("Load-side mass flow rate       = {}", this->LoadSideWaterMassFlowRate));
+                    ShowContinueError(format("Source-side inlet temperature  = {}", this->SourceSideWaterInletTemp));
+                    ShowContinueError(format("Load-side inlet temperature    = {}", this->LoadSideWaterInletTemp));
                 }
                 goto LOOPSourceEnth_exit;
 

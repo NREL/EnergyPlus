@@ -59,6 +59,7 @@
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -2562,7 +2563,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "  Coil:Heating:Fuel,",
         "    SPACE1-1 Zone Coil,      !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    SPACE1-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
@@ -2571,7 +2572,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "  Coil:Heating:Fuel,",
         "    SPACE2-1 Zone Coil,      !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
@@ -2580,7 +2581,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "  Coil:Heating:Fuel,",
         "    SPACE3-1 Zone Coil,      !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    SPACE3-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
@@ -2589,7 +2590,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "  Coil:Heating:Fuel,",
         "    SPACE4-1 Zone Coil,      !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    SPACE4-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
@@ -2598,7 +2599,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "  Coil:Heating:Fuel,",
         "    Main heating Coil 1,     !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    Main Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name",
@@ -2701,7 +2702,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "  Coil:Heating:Fuel,",
         "    OA Desiccant Regen Coil, !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.80,                    !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    OA Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name",
@@ -2814,7 +2815,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -2823,19 +2824,19 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, outputFiles());
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 1;
 
-    GetDesiccantDehumidifierInput();
+    GetDesiccantDehumidifierInput(state);
     EXPECT_EQ(1, NumDesicDehums);
     EXPECT_EQ("OA DESICCANT SYSTEM", DesicDehum(DesicDehumNum).Name);
     EXPECT_EQ("OA DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
 
     CompName = DesicDehum(DesicDehumNum).Name;
     CompIndex = NumGenericDesicDehums;
-    SimDesiccantDehumidifier(CompName, FirstHVACIteration, CompIndex);
+    SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
 
     RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatRetTemp;
     RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
@@ -3843,7 +3844,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
         "  Coil:Heating:Fuel,",
         "    Desiccant Process Heating Coil,  !- Name",
         "    Constant,                !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    Desiccant Supply Fan Outlet Node,  !- Air Inlet Node Name",
@@ -3853,7 +3854,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
         "  Coil:Heating:Fuel,",
         "    Desiccant Regen Coil,    !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    1,                       !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    Regen Coil Inlet Node,   !- Air Inlet Node Name",
@@ -3994,7 +3995,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -4003,19 +4004,19 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, outputFiles());
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 0;
 
-    GetDesiccantDehumidifierInput();
+    GetDesiccantDehumidifierInput(state);
     EXPECT_EQ(1, NumDesicDehums);
     EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
     EXPECT_EQ("DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
 
     CompName = DesicDehum(DesicDehumNum).Name;
     CompIndex = NumGenericDesicDehums;
-    SimDesiccantDehumidifier(CompName, FirstHVACIteration, CompIndex);
+    SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
 
     RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatOutTemp;
     RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
@@ -5023,7 +5024,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
         "  Coil:Heating:Fuel,",
         "    Desiccant Process Heating Coil,  !- Name",
         "    Constant,                !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    Desiccant Supply Fan Outlet Node,  !- Air Inlet Node Name",
@@ -5412,7 +5413,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -5421,12 +5422,12 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, outputFiles());
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 0;
 
-    GetDesiccantDehumidifierInput();
+    GetDesiccantDehumidifierInput(state);
     EXPECT_EQ(1, NumDesicDehums);
     EXPECT_EQ(1, NumGenericDesicDehums);
     EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
@@ -5444,7 +5445,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     // simulate to determine HW coil design capacity
-    SimDesiccantDehumidifier(CompName, FirstHVACIteration, CompIndex);
+    SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
     for (loop = 1; loop <= NumWaterCoils; ++loop) {
         if (WaterCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
@@ -5471,8 +5472,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     Real64 RegCoilCapacity(0.0);
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Timestep,6;",
 
@@ -6451,7 +6450,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
         "  Coil:Heating:Fuel,",
         "    Desiccant Process Heating Coil,  !- Name",
         "    Constant,                !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    Desiccant Supply Fan Outlet Node,  !- Air Inlet Node Name",
@@ -6461,7 +6460,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
         "  Coil:Heating:Fuel,",
         "    Desiccant Regen Coil,    !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    1,                       !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    Regen Coil Inlet Node,   !- Air Inlet Node Name",
@@ -6657,7 +6656,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    SimulationManager::GetProjectData(outputFiles());
     OutputReportPredefined::SetPredefinedTables();
     createFacilityElectricPowerServiceObject();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -6666,12 +6665,12 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     SysSizingCalc = true;
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, outputFiles());
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 0;
 
-    GetDesiccantDehumidifierInput();
+    GetDesiccantDehumidifierInput(state);
     EXPECT_EQ(1, NumDesicDehums);
     EXPECT_EQ("DESICCANT 1", DesicDehum(DesicDehumNum).Name);
     EXPECT_EQ("DESICCANT REGEN COIL", DesicDehum(DesicDehumNum).RegenCoilName);
@@ -6682,7 +6681,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
 
     CompName = DesicDehum(DesicDehumNum).Name;
     CompIndex = NumGenericDesicDehums;
-    SimDesiccantDehumidifier(CompName, FirstHVACIteration, CompIndex);
+    SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
 
     RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatOutTemp;
     RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;

@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -254,30 +255,30 @@ namespace UnitVentilator {
 
     void clear_state();
 
-    void SimUnitVentilator(std::string const &CompName,   // name of the fan coil unit
+    void SimUnitVentilator(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
                            Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                            int &CompIndex);
 
-    void GetUnitVentilatorInput();
+    void GetUnitVentilatorInput(EnergyPlusData &state);
 
-    void InitUnitVentilator(int const UnitVentNum,         // index for the current unit ventilator
+    void InitUnitVentilator(EnergyPlusData &state, int const UnitVentNum,         // index for the current unit ventilator
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             int const ZoneNum              // number of zone being served
     );
 
-    void SizeUnitVentilator(int const UnitVentNum);
+    void SizeUnitVentilator(EnergyPlusData &state, int const UnitVentNum);
 
-    void CalcUnitVentilator(int &UnitVentNum,              // number of the current fan coil unit being simulated
+    void CalcUnitVentilator(EnergyPlusData &state, int &UnitVentNum,              // number of the current fan coil unit being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // Sensible power supplied (W)
                             Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void CalcUnitVentilatorComponents(int const UnitVentNum,                  // Unit index in unit ventilator array
+    void CalcUnitVentilatorComponents(EnergyPlusData &state, int const UnitVentNum,                  // Unit index in unit ventilator array
                                       bool const FirstHVACIteration,          // flag for 1st HVAV iteration in the time step
                                       Real64 &LoadMet,                        // load met by unit (watts)
                                       Optional_int_const OpMode = _,          // Fan Type
@@ -297,16 +298,16 @@ namespace UnitVentilator {
 
     void ReportUnitVentilator(int const UnitVentNum); // Unit index in unit ventilator array
 
-    int GetUnitVentilatorOutAirNode(int const UnitVentNum);
+    int GetUnitVentilatorOutAirNode(EnergyPlusData &state, int const UnitVentNum);
 
-    int GetUnitVentilatorZoneInletAirNode(int const UnitVentNum);
+    int GetUnitVentilatorZoneInletAirNode(EnergyPlusData &state, int const UnitVentNum);
 
-    int GetUnitVentilatorMixedAirNode(int const UnitVentNum);
+    int GetUnitVentilatorMixedAirNode(EnergyPlusData &state, int const UnitVentNum);
 
-    int GetUnitVentilatorReturnAirNode(int const UnitVentNum);
+    int GetUnitVentilatorReturnAirNode(EnergyPlusData &state, int const UnitVentNum);
 
-    Real64 CalcUnitVentilatorResidual(Real64 const PartLoadRatio, // Coil Part Load Ratio
-                                      Array1<Real64> const &Par   // Function parameters
+    Real64 CalcUnitVentilatorResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // Coil Part Load Ratio
+                                      Array1D<Real64> const &Par  // Function parameters
     );
     
     Real64 SetOAMassFlowRateForCoolingVariablePercent(int const UnitVentNum,        // Unit Ventilator index number

@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
@@ -144,7 +145,7 @@ namespace ZonePlenum {
         ZoneSupPlenCond.deallocate();
     }
 
-    void SimAirZonePlenum(std::string const &CompName,
+    void SimAirZonePlenum(EnergyPlusData &state, std::string const &CompName,
                           int const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration, // Autodesk:OPTIONAL Used without PRESENT check
@@ -197,7 +198,7 @@ namespace ZonePlenum {
 
         // Obtains and Allocates ZonePlenum related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetZonePlenumInput();
+            GetZonePlenumInput(state);
             GetInputFlag = false;
         }
 
@@ -277,7 +278,7 @@ namespace ZonePlenum {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetZonePlenumInput()
+    void GetZonePlenumInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -480,7 +481,7 @@ namespace ZonePlenum {
                             ShowContinueError("Occurs for ReturnPlenum = " + AlphArray(1));
                             ErrorsFound = true;
                         }
-                        PIUInducesPlenumAir(ZoneRetPlenCond(ZonePlenumNum).InducedNode(NodeNum));
+                        PIUInducesPlenumAir(state, ZoneRetPlenCond(ZonePlenumNum).InducedNode(NodeNum));
                     }
                 }
             } else {
@@ -1484,7 +1485,7 @@ namespace ZonePlenum {
     //        End of Reporting subroutines for the ZonePlenum Module
     // *****************************************************************************
 
-    int GetReturnPlenumIndex(int const &ExNodeNum)
+    int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum)
     {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1494,7 +1495,7 @@ namespace ZonePlenum {
 
         // Obtains and Allocates ZonePlenum related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetZonePlenumInput();
+            GetZonePlenumInput(state);
             GetInputFlag = false;
         }
 
@@ -1520,12 +1521,12 @@ namespace ZonePlenum {
         return WhichPlenum;
     }
 
-    void GetReturnPlenumName(int const &ReturnPlenumIndex, std::string &ReturnPlenumName)
+    void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName)
     {
 
         // Obtains and Allocates ZonePlenum related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetZonePlenumInput();
+            GetZonePlenumInput(state);
             GetInputFlag = false;
         }
 
@@ -1535,7 +1536,7 @@ namespace ZonePlenum {
         }
     }
 
-    int getReturnPlenumIndexFromInletNode(int const &InNodeNum)
+    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum)
     {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1545,7 +1546,7 @@ namespace ZonePlenum {
 
         // Obtains and Allocates ZonePlenum related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetZonePlenumInput();
+            GetZonePlenumInput(state);
             GetInputFlag = false;
         }
 

@@ -60,7 +60,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -1195,7 +1195,7 @@ namespace HVACCooledBeam {
     }
 
     Real64 CoolBeamResidual(Real64 const CWFlow, // cold water flow rate in kg/s
-                            Array1<Real64> const &Par)
+                            Array1D<Real64> const &Par)
     {
 
         // FUNCTION INFORMATION:

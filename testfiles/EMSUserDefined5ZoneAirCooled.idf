@@ -98,13 +98,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -121,7 +121,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -1716,7 +1716,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
@@ -1747,7 +1752,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE2-1,        !- Name
@@ -1778,7 +1788,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE3-1,        !- Name
@@ -1809,7 +1824,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
@@ -1840,7 +1860,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name
@@ -4338,7 +4363,7 @@
     Set HeatZoneSAT    = 50.0,  !- <none>
     Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space1ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space1ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space1ATU_HW_MdotMin = 0.0,  !- <none>
@@ -4537,7 +4562,7 @@
     Set HeatZoneSAT    = 50.0,  !- <none>
     Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space2ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space2ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space2ATU_HW_MdotMin = 0.0,  !- <none>
@@ -4736,7 +4761,7 @@
     Set HeatZoneSAT    = 50.0,  !- <none>
     Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space3ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space3ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space3ATU_HW_MdotMin = 0.0,  !- <none>
@@ -4935,7 +4960,7 @@
     Set HeatZoneSAT    = 50.0,  !- <none>
     Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space4ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space4ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space4ATU_HW_MdotMin = 0.0,  !- <none>
@@ -5134,7 +5159,7 @@
     Set HeatZoneSAT    = 50.0,  !- <none>
     Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space4ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space5ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space5ATU_HW_MdotMin = 0.0,  !- <none>

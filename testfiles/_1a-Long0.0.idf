@@ -10,7 +10,7 @@
 ! Plant:    None.
 ! Modified:
 
-  Version,9.3;
+  Version,9.4;
 
   Site:Location,
     UNKNOWN,                 !- Name
@@ -924,8 +924,9 @@
     0.0;                     !- Air Temperature Gradient Coefficient {K/m}
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    1;                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    1;                       !- Shading Calculation Update Frequency
 
 !  Ground temps according to Table 2 of specification is the mean monthly external air temp
 !  For June the temp ranges from 22C to 34 C, mean is 28C
@@ -938,7 +939,7 @@
     Test A-1a,               !- Name
     0.0,                     !- North Axis {deg}
     Country,                 !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     ,                        !- Maximum Number of Warmup Days
@@ -1377,8 +1378,6 @@
   Output:Variable,*,Surface Outside Face Sunlit Area,timestep;
 
   Output:Variable,*,Surface Outside Face Sunlit Fraction,timestep;
-
-  report variable dictionary;
 
   Output:Variable,*,Site Solar Azimuth Angle,timestep;
 

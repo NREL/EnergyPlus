@@ -59,13 +59,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Teste,                   !- Name
     45,                      !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExteriorWithReflections,  !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -80,8 +80,9 @@
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    20;                      !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    20;                      !- Shading Calculation Update Frequency
 
   SimulationControl,
     No,                      !- Do Zone Sizing Calculation
@@ -743,7 +744,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     ClockWise,               !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   BuildingSurface:Detailed,
     ZONAW,                   !- Name

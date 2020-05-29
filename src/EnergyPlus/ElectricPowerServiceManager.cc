@@ -60,12 +60,13 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -107,7 +108,7 @@ void initializeElectricPowerServiceZoneGains() // namespace routine for handling
     }
 }
 
-void ElectricPowerServiceManager::manageElectricPowerService(
+void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &state, 
     bool const firstHVACIteration,
     bool &SimElecCircuits,      // simulation convergence flag
     bool const UpdateMetersOnly // if true then don't resimulate generators, just update meters.
@@ -152,7 +153,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(
     }
 
     for (auto &e : elecLoadCenterObjs) {
-        e->manageElecLoadCenter(firstHVACIteration, wholeBldgRemainingLoad_);
+        e->manageElecLoadCenter(state, firstHVACIteration, wholeBldgRemainingLoad_);
     }
 
     updateWholeBuildingRecords();
@@ -1007,13 +1008,13 @@ ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
     }
 }
 
-void ElectPowerLoadCenter::manageElecLoadCenter(bool const firstHVACIteration, Real64 &remainingWholePowerDemand)
+void ElectPowerLoadCenter::manageElecLoadCenter(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingWholePowerDemand)
 {
     //
     subpanelFeedInRequest = remainingWholePowerDemand;
 
     if (generatorsPresent_) {
-        dispatchGenerators(firstHVACIteration, remainingWholePowerDemand);
+        dispatchGenerators(state, firstHVACIteration, remainingWholePowerDemand);
 
     } // if generators present
     updateLoadCenterGeneratorRecords();
@@ -1046,7 +1047,7 @@ void ElectPowerLoadCenter::manageElecLoadCenter(bool const firstHVACIteration, R
     updateLoadCenterGeneratorRecords();
 }
 
-void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
+void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const firstHVACIteration,
                                               Real64 &remainingWholePowerDemand // power request in, remaining unmet request out
 )
 {
@@ -1093,7 +1094,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             totalPowerRequest_ += g->powerRequestThisTimestep;
             remainingWholePowerDemand -= g->electProdRate; // Update whole building remaining load
@@ -1140,7 +1141,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalPowerRequest_ += max(g->eMSPowerRequest, 0.0);
@@ -1193,7 +1194,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalPowerRequest_ += max(g->eMSPowerRequest, 0.0);
@@ -1249,7 +1250,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalPowerRequest_ += max(g->eMSPowerRequest, 0.0);
@@ -1306,7 +1307,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalPowerRequest_ += max(g->eMSPowerRequest, 0.0);
@@ -1358,7 +1359,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
             }
 
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalThermalPowerRequest_ += (max(g->eMSPowerRequest, 0.0)) * g->nominalThermElectRatio;
@@ -1421,7 +1422,7 @@ void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
                 }
             }
             // Get generator's actual electrical and thermal power outputs
-            g->simGeneratorGetPowerOutput(g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
+            g->simGeneratorGetPowerOutput(state, g->onThisTimestep, g->powerRequestThisTimestep, firstHVACIteration, g->electProdRate, g->thermProdRate);
 
             if (g->eMSRequestOn) {
                 totalThermalPowerRequest_ += (max(g->eMSPowerRequest, 0.0)) * g->nominalThermElectRatio;
@@ -2086,7 +2087,7 @@ void GeneratorController::reinitAtBeginEnvironment()
     thermProdRate = 0.0;
 }
 
-void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
+void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool const runFlag,
                                                      Real64 const myElecLoadRequest,
                                                      bool const FirstHVACIteration, // Unused 2010 JANUARY
                                                      Real64 &electricPowerOutput,   // Actual generator electric power output
@@ -2123,7 +2124,7 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         Real64 tempLoad = myElecLoadRequest;
 
         // simulate
-        thisCTE->simulate(L, FirstHVACIteration, tempLoad, runFlag);
+        thisCTE->simulate(state, L, FirstHVACIteration, tempLoad, runFlag);
         dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->InitCTGenerators(runFlag, FirstHVACIteration);
         dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->CalcCTGeneratorModel(runFlag, tempLoad, FirstHVACIteration);
         electProdRate = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->ElecPowerGenerated;
@@ -2422,9 +2423,9 @@ DCtoACInverter::DCtoACInverter(std::string const &objectName)
                                       "ElectricLoadCenter:Inverter:Simple",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterSimple,
-                                      qdotConvZone_,
-                                      _,
-                                      qdotRadZone_);
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
                 break;
             }
             case InverterModelType::curveFuncOfPower: {
@@ -2432,9 +2433,9 @@ DCtoACInverter::DCtoACInverter(std::string const &objectName)
                                       "ElectricLoadCenter:Inverter:FunctionOfPower",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
-                                      qdotConvZone_,
-                                      _,
-                                      qdotRadZone_);
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
                 break;
             }
             case InverterModelType::cECLookUpTableModel: {
@@ -2442,9 +2443,9 @@ DCtoACInverter::DCtoACInverter(std::string const &objectName)
                                       "ElectricLoadCenter:Inverter:LookUpTable",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
-                                      qdotConvZone_,
-                                      _,
-                                      qdotRadZone_);
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
                 break;
             }
             case InverterModelType::notYetSet: {
@@ -2790,9 +2791,9 @@ ACtoDCConverter::ACtoDCConverter(std::string const &objectName)
                                   "ElectricLoadCenter:Storage:Converter",
                                   name_,
                                   DataHeatBalance::IntGainTypeOf_ElectricLoadCenterConverter,
-                                  qdotConvZone_,
-                                  _,
-                                  qdotRadZone_);
+                                  &qdotConvZone_,
+                                  nullptr,
+                                  &qdotRadZone_);
         }
     } else {
         ShowSevereError(routineName + " did not find power converter name = " + objectName);
@@ -3168,9 +3169,9 @@ ElectricStorage::ElectricStorage( // main constructor
                                       "ElectricLoadCenter:Storage:Simple",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageSimple,
-                                      qdotConvZone_,
-                                      _,
-                                      qdotRadZone_);
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
                 break;
             }
             case StorageModelType::kiBaMBattery: {
@@ -3178,9 +3179,9 @@ ElectricStorage::ElectricStorage( // main constructor
                                       "ElectricLoadCenter:Storage:Battery",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageBattery,
-                                      qdotConvZone_,
-                                      _,
-                                      qdotRadZone_);
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
                 break;
             }
             case StorageModelType::storageTypeNotSet: {
@@ -4109,9 +4110,9 @@ ElectricTransformer::ElectricTransformer(std::string const &objectName)
                                   "ElectricLoadCenter:Transformer",
                                   name_,
                                   DataHeatBalance::IntGainTypeOf_ElectricLoadCenterTransformer,
-                                  qdotConvZone_,
-                                  _,
-                                  qdotRadZone_);
+                                  &qdotConvZone_,
+                                  nullptr,
+                                  &qdotRadZone_);
         }
 
     } else {

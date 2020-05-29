@@ -54,7 +54,7 @@
 #include "OutputFiles.hh"
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -382,7 +382,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
         locDayOfSim,
         DataGlobals::HourOfDay,
         DataGlobals::TimeStep,
-        OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
+        *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
         DataGlobals::NumOfTimeStepInHour);
 
     return tmpztStepStamp;
@@ -412,8 +412,8 @@ void SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
     if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
         tmpSysStepStamp.CurMinuteEnd = MinutesPerHour;
     }
-    tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * MinutesPerHour;
-    tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
+    tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - (*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * MinutesPerHour;
+    tmpSysStepStamp.TimeStepDuration = *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
 
     for (auto &l : logObjs) {
         l.FillSysStep(tmpztStepStamp, tmpSysStepStamp);

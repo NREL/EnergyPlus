@@ -87,17 +87,16 @@ Number of People * People Schedule * People Activity * Carbon Dioxide Generation
 
 This field accepts either ``Yes'' or ``No'' as values. When ``Yes'' is specified, warnings are generated when the space conditions are outside of the ASHRAE 55 comfort range as discussed in the sections that follow titled ``Simplified ASHRAE 55-2004 Graph Related Outputs'' and ``Simplified ASHRAE 55 Warnings.'' The default is not to provide these warnings so if you want to know if your space is outside this comfort range you must set this field to Yes.
 
-% table 11
-\begin{longtable}[c]{p{2.0in}p{1.34in}p{1.33in}p{1.33in}}
+\begin{longtable}[c]{p{2.0in}p{2.0in}p{1.2in}p{0.8in}}
 \caption{Metabolic Rates for Various Activities \label{table:metabolic-rates-for-various-activities}} \tabularnewline
 \toprule
-Activity & Activity Level w/ Person EnergyPlus Schedule Value & Activity Level W/m\(^2\) & met* \tabularnewline
+    Activity & Activity Level \newline Schedule Value (W/Person) & Activity Level \newline (W/m\(^2\)) & met* \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Metabolic Rates for Various Activities} \tabularnewline
 \toprule
-Activity & Activity Level w/Person EnergyPlus Schedule Value & Activity Level W/m2 & met* \tabularnewline
+    Activity & Activity Level \newline Schedule Value (W/Person) & Activity Level \newline (W/m\(^2\)) & met* \tabularnewline
 \midrule
 \endhead
 
@@ -1572,6 +1571,15 @@ The Indoor Swimming Pool object is used to describe the indoor swimming pools th
 
 As pools attempt to achieve a particular water temperature and have a variety of heat losses, heating equipment is necessary to maintain the proper setpoint temperature. In EnergyPlus, the pool itself becomes part of the demand side of a plant loop with heating equipment on the supply side providing whatever heating is needed to maintain the desired temperature. This heating equipment as well as the loop connections must be entered separately and the input shown in this section only details what is needed to specify the pool itself.
 
+There are a variety of rules that limit the application of indoor swimming pools in EnergyPlus.  The following are a list of these rules:
+
+\begin{itemize}
+  \item The pool must reference a valid surface in the input file.  This surface must be a floor and cannot be other surface types like ceilings, walls, windows, etc.
+  \item The pool cannot refer to a surface that is also a radiant system, ventilated slab, or another pool.
+  \item The surface that the pool references must be modeled using conduction transfer functions (CTF).
+  \item The pool cannot utilize movable insulation or have a heat source or sink associated with it (something used to model low temperature radiant systems).
+\end{itemize}
+
 The following information is useful for defining and modeling an indoor pool in EnergyPlus. For more information on the algorithm used for this model or details on some of the input parameters, please reference the indoor pool section of the EnergyPlus Engineering Reference document.
 
 \subsubsection{Inputs}\label{inputs-7-012}
@@ -1582,7 +1590,7 @@ This is a unique name associated with the indoor swimming pool.
 
 \paragraph{Field: Surface Name}\label{field-surface-name-1-000}
 
-This is the name of the surface (floor) where the pool is located. Pools are not allowed on any surfaces other than a floor.
+This is the name of the surface (floor) where the pool is located. Pools are not allowed on any surfaces other than a floor.  For more rules on surfaces that can be used for pools, please see the information in this section on indoor pools above.
 
 \paragraph{Field: Average Depth}\label{field-average-depth}
 
@@ -2788,17 +2796,18 @@ ZoneContaminantSourceAndSink:CarbonDioxide,
 
 \subsubsection{Outputs}\label{outputs-6-004}
 
-HVAC,Average, Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}
-
-HVAC,Average, Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}
+\begin{lstlisting}
+HVAC,Average, Contaminant Source or Sink CO2 Gain Volume Flow Rate [m3/s]
+HVAC,Average, Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate [m3/s]
+\end{lstlisting}
 
 \paragraph{Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}}\label{contaminant-source-or-sink-co2-gain-volume-flow-rate-m3s}
 
-This output is the net carbon dioxide internal gain/loss in m3/s for an individual ZoneContaminantSourceAndSink:CarbonDioxide object.
+This output is the net carbon dioxide internal gain/loss in \si{\volumeFlowRate} for an individual ZoneContaminantSourceAndSink:CarbonDioxide object.
 
 \paragraph{Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate {[}m3/s{]}}\label{zone-contaminant-source-or-sink-co2-gain-volume-flow-rate-m3s}
 
-This output variable reports the total (net) carbon dioxide internal gains/losses in cubic meters per second for a zone, including impacts from three objects: ZoneContaminantSourceAndSink:CarbonDioxide, People, and GasEquipment. Positive values denote carbon dioxide generation (gain or source), while negative values denote carbon dioxide removal (loss or sink).
+This output is the net carbon dioxide internal gain/loss in \si{\volumeFlowRate} for all ZoneContaminantSourceAndSink:CarbonDioxide objects in a zone.
 
 \subsection{ZoneContaminantSourceAndSink:Generic:Constant}\label{zonecontaminantsourceandsinkgenericconstant}
 
