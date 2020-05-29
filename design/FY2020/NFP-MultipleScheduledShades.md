@@ -4,7 +4,7 @@ Allow Multiple Scheduled Shades to Reference a Single Window
 **Jason Glazer, GARD Analytics**
 
  - May 12, 2020
- - May 27, 2020 - added Design Document portion and remove 
+ - May 29, 2020 - added Design Document portion and remove unused sections.
 
 
 ## Justification for New Feature ##
@@ -81,10 +81,11 @@ To implement the features described above, the following will be done:
 
 - Update SufaceGeometry::InitialAssociateWindowShadingControlFenestration() to remove the error message
 - Update unit test InitialAssociateWindowShadingControlFenestration_test() or add new unit test for overlapping controls
-- Modify the SurfaceData struct in DataSurfaces.hh to replace int WindowShadingControlPtr with std::vector \<int\> and add
-ActiveWindowShadingControlPtr
+- Modify the SurfaceData struct in DataSurfaces.hh to replace int WindowShadingControlPtr with std::vector \<int\> called
+WindowShadingControlList and add ActiveWindowShadingControlPtr.
 
-Modify to support std::vector\<int\> version of WindowShadingControlPtr everywhere it appears: 
+The following list shows functions that currently reference WindowShadingControlPtr. For most functions, the only
+change will be to substitute ActiveWindowShadingControlPtr for places that WindowShadingControlPtr had been used previously. 
 
 - DaylightingManager::FigureDayltgCoeffsAtPointsSetupForWindow()
 - DaylightingManager::GetDaylightingParametersInput()
@@ -109,8 +110,9 @@ Modify to support std::vector\<int\> version of WindowShadingControlPtr everywhe
 
 Plus unit tests in SurfaceGeometry.unit.cc and EMSManager.unit.cc.
 
-Each timestep the first active WindowShadingControl will be used and set as the ActiveWindowShadingControlPtr. 
-In many functions the ActiveWindowShadingControlPtr will simply replace the current use of the WindowShadingControlPtr.
+For each timestep, the first active WindowShadingControl will be used and set as the ActiveWindowShadingControlPtr. A new
+function will be added to make this decision and will probably be called from the first function listed above that is 
+called each timestep.
 
 Additional changes may also be required to implement the feature.
 
