@@ -2911,17 +2911,7 @@ namespace ScheduleManager {
             while (WhichHour < 1) {
                 WhichHour += 24;
             }
-            if (WhichHour > 24) {
-                while (WhichHour > 24) {
-                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(General::OrdinalDay(MonthTomorrow, DayOfMonthTomorrow, 1));
-                    if (DayOfWeekTomorrow <= 7 && HolidayIndexTomorrow > 0) {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndexTomorrow);
-                    } else {
-                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeekTomorrow);
-                    }
-                    WhichHour -= 24;
-                }
-            } else {
+            if (WhichHour <= 24) {
                 // Determine which Week Schedule is used
                 //  Cant use stored day of year because of leap year inconsistency
                 WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
@@ -2931,6 +2921,16 @@ namespace ScheduleManager {
                     DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
                 } else {
                     DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
+                }
+            } else {
+                while (WhichHour > 24) {
+                    WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(General::OrdinalDay(MonthTomorrow, DayOfMonthTomorrow, 1));
+                    if (DayOfWeekTomorrow <= 7 && HolidayIndexTomorrow > 0) {
+                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndexTomorrow);
+                    } else {
+                        DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeekTomorrow);
+                    }
+                    WhichHour -= 24;
                 }
             }
             WhichHour += DSTIndicator;
