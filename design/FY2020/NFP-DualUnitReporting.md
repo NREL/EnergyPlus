@@ -4,7 +4,7 @@ Allow Different Units in SQL and HTML Tabular Reports
 **Jason Glazer, GARD Analytics**
 
  - May 12, 2020
- - May 27, 2020 - added the IOref text and Design Document portion 
+ - May 29, 2020 - added the IOref text and Design Document portion 
 
 
 ## Justification for New Feature ##
@@ -58,6 +58,7 @@ SQL file.
 Output:SQLite,
        \memo Output from EnergyPlus can be written to an SQLite format file.
        \unique-object
+       \min-fields 1
   A1 , \field Option Type
        \type choice
        \key Simple
@@ -73,6 +74,8 @@ Output:SQLite,
        \default UseOutputControlTableStyle
 
 ```
+
+Note: min-fields 1 needs to be added to the idd.
 
 The default of UseOutputControlTableStyle will let the tables in the SQL file follow the unit conversion 
 specified in the OutputControl:Table:Style just as it currently does but the other options would allow different 
