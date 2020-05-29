@@ -2865,7 +2865,7 @@ namespace ScheduleManager {
         using DataEnvironment::DayOfYear_Schedule;
 
         // Return value
-        Real64 LookUpScheduleValue(0.0);
+        Real64 scheduleValue(0.0);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -2891,18 +2891,18 @@ namespace ScheduleManager {
         }
 
         if (ScheduleIndex == -1) {
-            LookUpScheduleValue = 1.0;
-            return LookUpScheduleValue;
+            scheduleValue = 1.0;
+            return scheduleValue;
         } else if (ScheduleIndex == 0) {
-            LookUpScheduleValue = 0.0;
-            return LookUpScheduleValue;
+            scheduleValue = 0.0;
+            return scheduleValue;
         }
 
         if (ThisHour < 0) { // ThisHour unspecified
-            LookUpScheduleValue = GetCurrentScheduleValue(ScheduleIndex);
+            scheduleValue = GetCurrentScheduleValue(ScheduleIndex);
 
             //  ELSEIF (ThisHour == 0) THEN  ! odd answers when thishour=0 (initialization of shadowing)
-            //    LookUpScheduleValue=GetCurrentScheduleValue(ScheduleIndex)
+            //    scheduleValue=GetCurrentScheduleValue(ScheduleIndex)
 
         } else { // ThisHour specified
             //  so, current date, but maybe TimeStep added
@@ -2941,22 +2941,22 @@ namespace ScheduleManager {
                     WhichTimeStep = ThisTimeStep;
                 }
                 if (WhichHour <= 24) {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(WhichTimeStep, WhichHour);
+                    scheduleValue = DaySchedule(DaySchedulePointer).TSValue(WhichTimeStep, WhichHour);
                 } else if (ThisTimeStep <= NumOfTimeStepInHour) {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(WhichTimeStep, WhichHour - 24);
+                    scheduleValue = DaySchedule(DaySchedulePointer).TSValue(WhichTimeStep, WhichHour - 24);
                 } else {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
+                    scheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
                 }
             } else {
                 if (WhichHour <= 24) {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour);
+                    scheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour);
                 } else {
-                    LookUpScheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
+                    scheduleValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
                 }
             }
         }
 
-        return LookUpScheduleValue;
+        return scheduleValue;
     }
 
     int GetScheduleIndex(std::string const &ScheduleName)
