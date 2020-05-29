@@ -236,6 +236,7 @@ namespace AirflowNetworkBalanceManager {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool ValidateDistributionSystemFlag(true);
+        bool AssignFanAirLoopNumFlag(true);
     } // namespace
 
     // Report variables
@@ -319,6 +320,7 @@ namespace AirflowNetworkBalanceManager {
         SplitterNodeNumbers.deallocate();
         AirflowNetworkGetInputFlag = true;
         ValidateDistributionSystemFlag = true;
+        AssignFanAirLoopNumFlag = true;
         VentilationCtrl = 0;
         NumOfExhaustFans = 0;
         NumAirflowNetwork = 0;
@@ -492,7 +494,10 @@ namespace AirflowNetworkBalanceManager {
         if (present(FirstHVACIteration) && FirstHVACIteration) VAVTerminalRatio = 0.0;
 
         // Set AirLoop Number for fans
-        if (BeginEnvrnFlag) AssignFanAirLoopNum();
+        if (AssignFanAirLoopNumFlag) {
+            AssignFanAirLoopNum();
+            AssignFanAirLoopNumFlag = false;
+        }
 
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
             if (ValidateDistributionSystemFlag) {
