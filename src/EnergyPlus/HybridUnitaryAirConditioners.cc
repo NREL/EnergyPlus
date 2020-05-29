@@ -629,8 +629,8 @@ namespace HybridUnitaryAirConditioners {
                         ErrorsFound = true;
                     }
                 }
-                // N3, \field Fan Motor Location
-                ZoneHybridUnitaryAirConditioner(UnitLoop).MotInAirFrac = Numbers(3);
+                // N3, \field Fan Heat in Air Stream Fraction
+                ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatInAirFrac = Numbers(3);
                 // N4, \field Scaling Factor
                 ZoneHybridUnitaryAirConditioner(UnitLoop).ScalingFactor = Numbers(4);
                 // the two numbers above are used to generate a overall scaling factor
