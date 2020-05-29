@@ -74,7 +74,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 19
 
-  Version,9.3;
+  Version,9.4;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -9063,6 +9063,10 @@
   Output:Variable,*,Air System Fan Electric Energy,timestep;
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;
+
+  Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,timestep;
+
+  Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,timestep;
 
 ! ***REPORT TABLES***
 

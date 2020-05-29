@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -726,7 +727,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(outputFiles(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -735,7 +736,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(outputFiles(), Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -747,7 +748,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        DataGlobals::DayOfSimChr = "0";
+        state.dataGlobals.DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
@@ -787,7 +788,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance(outputFiles());
+                    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -1471,12 +1472,12 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     PlantManager::CheckIfAnyPlant();
 
     BranchInputManager::ManageBranchInput(); // just gets input and
-    SizingManager::ManageSizing(outputFiles());
+    SizingManager::ManageSizing(state, outputFiles());
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(outputFiles(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     // should be sized now

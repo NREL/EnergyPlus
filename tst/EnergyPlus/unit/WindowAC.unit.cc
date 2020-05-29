@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -69,8 +70,6 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // this unit test runs the window air conditioner with a Coil:Cooling:DX:VariableSpeed coil
     // set up minimal zone, zone equipment, and ZoneHVAC:WindowAirConditioner, check input processing, check sizing, check simulation results
     std::string const idf_objects = delimited_string({
-        " Version,9.3;",
-
         "  Timestep,6;",
 
         "  Site:Location,",
@@ -450,15 +449,15 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     DataGlobals::ZoneSizingCalc = true;
     EnergyPlus::createFacilityElectricPowerServiceObject();
 
-    SizingManager::ManageSizing(outputFiles());
+    SizingManager::ManageSizing(state, outputFiles());
 
-    SimulationManager::SetupSimulation(outputFiles(), errorsFound);
+    SimulationManager::SetupSimulation(state, outputFiles(), errorsFound);
     //
 
     Real64 qDotMet(0.0);    // Watts total cap
     Real64 lDotProvid(0.0); // latent removal kg/s
     int compIndex(0);
-    WindowAC::SimWindowAC("ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
+    WindowAC::SimWindowAC(state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check input processing
     EXPECT_EQ(compIndex, 1);
 
@@ -469,7 +468,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -295.0;
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
 
-    WindowAC::SimWindowAC("ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
+    WindowAC::SimWindowAC(state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check output
     EXPECT_NEAR(qDotMet, -295.0, 0.1);
 }
