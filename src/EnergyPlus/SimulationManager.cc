@@ -581,7 +581,7 @@ namespace SimulationManager {
                 }
                 // for simulations that last longer than a year, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
-                    DisplayString("Starting last year of environment at:  " + DayOfSimChr);
+                    DisplayString("Starting last year of environment at:  " + state.dataGlobals.DayOfSimChr);
                     ResetTabularReports();
                 }
 

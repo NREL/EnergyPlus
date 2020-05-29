@@ -588,7 +588,6 @@ namespace SolarShading {
         using DataSystemVariables::ShadingMethod;
         using DataSystemVariables::shadingMethod;
         using DataSystemVariables::SlaterBarsky;
-        using ScheduleManager::ScheduleFileShadingProcessed;
 
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -646,7 +645,7 @@ namespace SolarShading {
                 shadingMethod = ShadingMethod::Scheduled;
                 cAlphaArgs(aNum) = "Scheduled";
             } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Imported")) {
-                if (ScheduleFileShadingProcessed) {
+                if (DataGlobals::ScheduleFileShadingProcessed) {
                     shadingMethod = ShadingMethod::Imported;
                     cAlphaArgs(aNum) = "Imported";
                 } else {
@@ -800,7 +799,7 @@ namespace SolarShading {
             cAlphaArgs(aNum) = "No";
             ReportExtShadingSunlitFrac = false;
         }
-        int ExtShadingSchedNum;
+
         if (shadingMethod == ShadingMethod::Imported) {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 Surface(SurfNum).externalShadingSchedule = Scheduling::getScheduleReference(Surface(SurfNum).Name + "_shading");
