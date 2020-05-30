@@ -981,7 +981,6 @@ namespace WaterCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataSizing::CurSysNum;
         using General::Iterate;
         using General::RoundSigDigits;
         using General::SafeDivide;
@@ -991,7 +990,6 @@ namespace WaterCoils {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using PlantUtilities::ScanPlantLoopsForObject;
         using namespace FaultsManager;
-        using DataAirSystems::PrimaryAirSystem;
         using HVACControllers::GetControllerNameAndIndex;
         using SimAirServingZones::CheckWaterCoilIsOnAirLoop;
 
@@ -1407,11 +1405,8 @@ namespace WaterCoils {
                     //        DesSatEnthAtWaterInTemp =PsyHFnTdbW(WaterCoil(CoilNum)%DesInletWaterTemp, &
                     //                                             PsyWFnTdpPb(WaterCoil(CoilNum)%DesInletWaterTemp,StdBaroPress))
 
-                    // Total Coil Load from Inlet and Outlet Air States.
+                    // Total Coil Load from Inlet and Outlet Air States (which include fan heat as appropriate).
                     WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesAirMassFlowRate * (DesInletAirEnth - DesOutletAirEnth);
-                    if (CurSysNum > 0 && CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
-                        WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesTotWaterCoilLoad + PrimaryAirSystem(CurSysNum).FanDesCoolLoad;
-                    }
 
                     // Enthalpy of Water at Intlet design conditions
                     Cp = GetSpecificHeatGlycol(PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName,
@@ -2118,7 +2113,6 @@ namespace WaterCoils {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataAirSystems::PrimaryAirSystem;
         using DataEnvironment::StdBaroPress;
         using General::RoundSigDigits;
         using General::SolveRoot;
