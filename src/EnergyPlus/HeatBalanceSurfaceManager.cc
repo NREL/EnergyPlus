@@ -2612,7 +2612,8 @@ namespace HeatBalanceSurfaceManager {
             }
 
             for (int enclNum = 1; enclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclNum) {
-                QSDifSol(enclNum) *= VMULT(enclNum);
+                if (InterZoneWindow) QSDifSol(enclNum) *= FractDifShortZtoZ(enclNum, enclNum) * VMULT(enclNum);
+                else QSDifSol(enclNum) *= VMULT(enclNum);
             }
 
             //    RJH - 09-12-07 commented out report varariable calcs here since they refer to old distribution method
@@ -3310,9 +3311,15 @@ namespace HeatBalanceSurfaceManager {
 
         // COMPUTE CONVECTIVE GAINS AND ZONE FLUX DENSITY.
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
-            QS(enclosureNum) *= VMULT(enclosureNum);
-            // CR 8695, VMULT not based on visible
-            QSLights(enclosureNum) *= VMULT(enclosureNum);
+            if (InterZoneWindow) {
+                QS(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * VMULT(enclosureNum);
+                // CR 8695, VMULT not based on visible
+                QSLights(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * VMULT(enclosureNum);
+            } else {
+                QS(enclosureNum) *= VMULT(enclosureNum);
+                QSLights(enclosureNum) *= VMULT(enclosureNum);
+            }
+
         }
 
         // COMPUTE RADIANT GAINS ON SURFACES
