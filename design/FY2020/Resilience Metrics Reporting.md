@@ -6,6 +6,7 @@ Resilience Metrics Reporting
 **Lawrence Berkeley National Laboratory**
 
  - Original Date: May 19, 2020
+ - Updated Date: May 31, 2020
 
 ## Justification for New Feature ##
 
@@ -240,30 +241,30 @@ For: **Entire Facility**
 |Average   |      |      |      |      |
 |Sum       |      |      |      |      |
 
-**SET - Hours**
-|          |SET ≤ 12°C Hours |SET ∈ (12, 30°C] Hours |SET > 30°C Hours |SET ≤ 54°F Hours |SET ∈ (54, 86°F] Hours |SET > 86°F Hours |
-|----------|------|------|------|------|------|------|
-|Space_1   |      |      |      |      |      |      |
-|…         |      |      |      |      |      |      |
-|Space_N   |      |      |      |      |      |      |
-|Min       |      |      |      |      |      |      |
-|Max       |      |      |      |      |      |      |
-|Average   |      |      |      |      |      |      |
-|Sum       |      |      |      |      |      |      |
+**SET Hours**
+|          |SET ≤ 12.2°C Hours |SET ∈ (12.2, 30°C] Hours |SET > 30°C Hours |
+|----------|------|------|------|
+|Space_1   |      |      |      |
+|…         |      |      |      |
+|Space_N   |      |      |      |
+|Min       |      |      |      | 
+|Max       |      |      |      |
+|Average   |      |      |      |
+|Sum       |      |      |      |
 
-**SET - OccupantHours**
-|          |SET ≤ 12°C OccupantHours |SET ∈ (12, 30°C] OccupantHours |SET > 30°C OccupantHours |SET ≤ 54°F OccupantHours |SET ∈ (54, 86°F] OccupantHours |SET > 86°F OccupantHours |
-|----------|------|------|------|------|------|------|
-|Space_1   |      |      |      |      |      |      |
-|…         |      |      |      |      |      |      |
-|Space_N   |      |      |      |      |      |      |
-|Min       |      |      |      |      |      |      |
-|Max       |      |      |      |      |      |      |
-|Average   |      |      |      |      |      |      |
-|Sum       |      |      |      |      |      |      |
+**SET OccupantHours**
+|          |SET ≤ 12.2°C OccupantHours |SET ∈ (12.2, 30°C] OccupantHours |SET > 30°C OccupantHours |
+|----------|------|------|------|
+|Space_1   |      |      |      |
+|…         |      |      |      | 
+|Space_N   |      |      |      |
+|Min       |      |      |      |
+|Max       |      |      |      |
+|Average   |      |      |      |
+|Sum       |      |      |      |
 
-**SET - Longest Continuous Unmet Duration**
-|          |Longest SET ≤ 12°C Duration [Hours] |Time of Longest SET ≤ 12°C Duration |Longest SET >30°C Duration [Hours] |Time of Longest SET >30°C Duration |
+**SET Longest Continuous Unmet Duration**
+|          |Longest SET ≤ 12.2°C Duration [Hours] |Time of Longest SET ≤ 12.2°C Duration |Longest SET >30°C Duration [Hours] |Time of Longest SET >30°C Duration |
 |----------|------|------|------|------|
 |Space_1   |      |      |      |      |
 |…         |      |      |      |      |
@@ -308,7 +309,7 @@ For: **Entire Facility**
 
 **Illuminance Level Hours**
 
-|          |A bit Dark (<= 100 lux) (≤ 29) [Hours] |Dim (100, 300 lux] [Hours] |Adequate (300, 500 lux][Hours] |Bright (>500 lux) [Hours] |
+|          |A bit Dark (<= 100 lux) [Hours] |Dim (100, 300 lux] [Hours] |Adequate (300, 500 lux][Hours] |Bright (>500 lux) [Hours] |
 |----------|------|------|------|------|
 |Space_1   |      |      |      |      |
 |…         |      |      |      |      |
