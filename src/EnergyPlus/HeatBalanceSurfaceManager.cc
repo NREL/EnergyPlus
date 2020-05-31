@@ -4005,7 +4005,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         RecDifShortFromZ = false;
-        FractDifShortZtoZ = 0.0;
+        FractDifShortZtoZ.to_identity();
         D.to_identity();
 
         //      IF (.not. ANY(Zone%HasInterZoneWindow)) RETURN  ! this caused massive diffs
@@ -6612,7 +6612,8 @@ namespace HeatBalanceSurfaceManager {
                         OutputReportTabular::loadConvectedWithPulse(CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
                     } else {
                         OutputReportTabular::loadConvectedNormal(CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
-                        OutputReportTabular::netSurfRadSeq(CurOverallSimDay, TimeStepInDay, surfNum) = QdotRadNetSurfInRep(surfNum);
+                        OutputReportTabular::netSurfRadSeq(CurOverallSimDay, TimeStepInDay, surfNum) =
+                            NetLWRadToSurf(surfNum) * Surface(surfNum).Area;
                     }
                 }
             }

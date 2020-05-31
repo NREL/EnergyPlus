@@ -54,14 +54,12 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -150,15 +148,6 @@ namespace InternalHeatGains {
 
     static std::string const BlankString;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE InternalHeatGains
-    // PUBLIC  SumInternalConvectionGainsByIndices
-    // PUBLIC SumReturnAirConvectionGainsByIndices
-    // PUBLIC  SumInternalRadiationGainsByIndices
-    // PUBLIC  SumInternalLatentGainsByIndices
-    // PUBLIC
-    // PUBLIC  SumInternalCO2GainsByIndices
-    // PUBLIC  GetInternalGainDeviceIndex
-
     // Functions
     void clear_state()
     {
@@ -177,30 +166,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This is the main driver subroutine for the internal heat gains.
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // unused  INTEGER       :: ZoneNum              ! Zone number
 
         // FLOW:
         if (GetInternalHeatGainsInputFlag) {
@@ -265,7 +230,6 @@ namespace InternalHeatGains {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const RoutineName("GetInternalHeatGains: ");
-        int const noOtherFuelTypeZero = 0;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string AlphaName;
@@ -3291,7 +3255,7 @@ namespace InternalHeatGains {
 
                     std::string FuelTypeString("");
                     if (AlphaName(2) == "NONE") {
-                        ZoneOtherEq(Loop).OtherEquipFuelType = noOtherFuelTypeZero;
+                        ZoneOtherEq(Loop).OtherEquipFuelType = ExteriorEnergyUse::ExteriorFuelUsage::Unknown;
                         FuelTypeString = AlphaName(2);
                     } else {
                         ExteriorEnergyUse::ValidateFuelType(ZoneOtherEq(Loop).OtherEquipFuelType,
@@ -3300,8 +3264,8 @@ namespace InternalHeatGains {
                                                             CurrentModuleObject,
                                                             cAlphaFieldNames(2),
                                                             AlphaName(2));
-                        if (ZoneOtherEq(Loop).OtherEquipFuelType == noOtherFuelTypeZero ||
-                            ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::WaterUse) {
+                        if (ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::Unknown ||
+                            ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::WaterUse) {
                             ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered=" + AlphaName(2) +
                                             " for " + cAlphaFieldNames(1) + '=' + AlphaName(1));
                             ErrorsFound = true;
@@ -3381,7 +3345,7 @@ namespace InternalHeatGains {
                     }
 
                     // Throw an error if the design level is negative and we have a fuel type
-                    if (ZoneOtherEq(Loop).DesignLevel < 0.0 && ZoneOtherEq(Loop).OtherEquipFuelType != noOtherFuelTypeZero) {
+                    if (ZoneOtherEq(Loop).DesignLevel < 0.0 && ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                         cNumericFieldNames(DesignLevelFieldNumber) + " is not allowed to be negative");
                         ShowContinueError("... when a fuel type of " + FuelTypeString + " is specified.");
@@ -3428,7 +3392,7 @@ namespace InternalHeatGains {
                     if (ZoneOtherEq(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    if (ZoneOtherEq(Loop).OtherEquipFuelType > noOtherFuelTypeZero) {
+                    if (ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                         SetupOutputVariable("Other Equipment " + FuelTypeString + " Rate",
                                             OutputProcessor::Unit::W,
                                             ZoneOtherEq(Loop).Power,
@@ -3516,7 +3480,7 @@ namespace InternalHeatGains {
                     if (RepVarSet(ZoneOtherEq(Loop).ZonePtr)) {
                         RepVarSet(ZoneOtherEq(Loop).ZonePtr) = false;
 
-                        if (ZoneOtherEq(Loop).OtherEquipFuelType > noOtherFuelTypeZero) {
+                        if (ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                             SetupOutputVariable("Zone Other Equipment " + FuelTypeString + " Rate",
                                                 OutputProcessor::Unit::W,
                                                 ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherPower,
@@ -3880,12 +3844,35 @@ namespace InternalHeatGains {
                         ShowContinueError("For " + cAlphaFieldNames(3) + "= FlowControlWithApproachTemperatures, " + cAlphaFieldNames(14) +
                                           " is required, but this field is blank.");
                         ErrorsFound = true;
-                    } else {
-                        ZoneITEq(Loop).SupplyAirNodeNum = 0;
                     }
                 } else {
                     ZoneITEq(Loop).SupplyAirNodeNum = GetOnlySingleNode(
                         AlphaName(14), ErrorsFound, CurrentModuleObject, AlphaName(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                }
+
+                // check supply air node for matches with zone equipment supply air node
+                int zoneEqIndex = DataZoneEquipment::GetControlledZoneIndex(state, Zone(ZoneITEq(Loop).ZonePtr).Name);
+                auto itStart = DataZoneEquipment::ZoneEquipConfig(zoneEqIndex).InletNode.begin();
+                auto itEnd = DataZoneEquipment::ZoneEquipConfig(zoneEqIndex).InletNode.end();
+                auto key = ZoneITEq(Loop).SupplyAirNodeNum;
+                bool supplyNodeFound = false;
+                if (std::find(itStart, itEnd, key) != itEnd) {
+                    supplyNodeFound = true;
+                }
+
+                if (ZoneITEq(Loop).AirConnectionType == ITEInletAdjustedSupply && !supplyNodeFound) {
+                    // supply air node must match zone equipment supply air node for these conditions
+                    ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
+                    ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                    ErrorsFound = true;
+                } else if (ZoneITEq(Loop).FlowControlWithApproachTemps && !supplyNodeFound) {
+                    // supply air node must match zone equipment supply air node for these conditions
+                    ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
+                    ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                    ErrorsFound = true;
+                } else if (ZoneITEq(Loop).SupplyAirNodeNum != 0 && !supplyNodeFound) {
+                    // the given supply air node does not match any zone equipment supply air nodes
+                    ShowWarningError(CurrentModuleObject + "name: '" + AlphaName(1) + ". " + "Supply Air Node Name '" + AlphaName(14) + "' does not match any ZoneHVAC:EquipmentConnections objects.");
                 }
 
                 // End-Use subcategories
@@ -5151,12 +5138,6 @@ namespace InternalHeatGains {
         // This subroutine sets up the zone internal heat gains
         // that are independent of the zone air temperature.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace ScheduleManager;
         using DataHeatBalFanSys::MAT;
@@ -5591,7 +5572,7 @@ namespace InternalHeatGains {
                 // a small amount to create a "pulse" of heat that is used for the delayed loads
                 adjQL = curQL + DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
                 // ITABSF is the Inside Thermal Absorptance
-                // TMULT is a mulipliter for each zone
+                // TMULT is a multiplier for each zone
                 // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
                 QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                 // store the magnitude and time of the pulse
@@ -5669,7 +5650,7 @@ namespace InternalHeatGains {
         Real64 OperSchedFrac;                             // Operating schedule fraction
         Real64 CPULoadSchedFrac;                          // CPU loading schedule fraction
         Real64 AirConnection;                             // Air connection type
-        Real64 TSupply;                                   // Supply air temperature [C]
+        Real64 TSupply(0.0);                              // Supply air temperature [C]
         Real64 WSupply;                                   // Supply air humidity ratio [kgWater/kgDryAir]
         Real64 RecircFrac;                                // Recirulation fraction - current
         Real64 TRecirc;                                   // Recirulation air temperature [C]
@@ -5691,8 +5672,6 @@ namespace InternalHeatGains {
         Real64 UPSPartLoadRatio;                          // UPS part load ratio (current total power input / design total power input)
         Real64 UPSHeatGain;                               // UPS convective heat gain to zone [W]
         int EnvClass;                                     // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6)
-        Array1D<Real64> ZoneSumTinMinusTSup(NumOfZones);  // Numerator for zone-level sensible heat index (SHI)
-        Array1D<Real64> ZoneSumToutMinusTSup(NumOfZones); // Denominator for zone-level sensible heat index (SHI)
 
         std::map<int, std::vector<int>> ZoneITEMap;
 
@@ -5768,8 +5747,8 @@ namespace InternalHeatGains {
             ZnRpt(Loop).ITEqTimeAboveRH = 0.0;
             ZnRpt(Loop).ITEqTimeBelowRH = 0.0;
 
-            ZoneSumTinMinusTSup(Loop) = 0.0;
-            ZoneSumToutMinusTSup(Loop) = 0.0;
+            ZnRpt(Loop).SumTinMinusTSup = 0.0;
+            ZnRpt(Loop).SumToutMinusTSup = 0.0;
         } // Zone init loop
 
         for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
@@ -5783,14 +5762,8 @@ namespace InternalHeatGains {
             RecircFrac = 0.0;
             SupplyNodeNum = ZoneITEq(Loop).SupplyAirNodeNum;
             if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                if (SupplyNodeNum != 0) {
-                    TSupply = Node(SupplyNodeNum).Temp;
-                    WSupply = Node(SupplyNodeNum).HumRat;
-                } else {
-                    ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
-                    ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                    ShowFatalError("Program terminates due to above conditions.");
-                }
+                TSupply = Node(SupplyNodeNum).Temp;
+                WSupply = Node(SupplyNodeNum).HumRat;
                 if (ZoneITEq(Loop).SupplyApproachTempSch != 0) {
                     TAirIn = TSupply + GetCurrentScheduleValue(ZoneITEq(Loop).SupplyApproachTempSch);
                 } else {
@@ -5799,14 +5772,8 @@ namespace InternalHeatGains {
                 WAirIn = Node(SupplyNodeNum).HumRat;
             } else {
                 if (AirConnection == ITEInletAdjustedSupply) {
-                    if (SupplyNodeNum != 0) {
-                        TSupply = Node(SupplyNodeNum).Temp;
-                        WSupply = Node(SupplyNodeNum).HumRat;
-                    } else {
-                        ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
-                        ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                        ShowFatalError("Program terminates due to above conditions.");
-                    }
+                    TSupply = Node(SupplyNodeNum).Temp;
+                    WSupply = Node(SupplyNodeNum).HumRat;
                     if (ZoneITEq(Loop).RecircFLTCurve != 0) {
                         RecircFrac = ZoneITEq(Loop).DesignRecircFrac * CurveValue(ZoneITEq(Loop).RecircFLTCurve, CPULoadSchedFrac, TSupply);
                     } else {
@@ -5817,10 +5784,14 @@ namespace InternalHeatGains {
                     TAirIn = TRecirc * RecircFrac + TSupply * (1.0 - RecircFrac);
                     WAirIn = WRecirc * RecircFrac + WSupply * (1.0 - RecircFrac);
                 } else if (AirConnection == ITEInletRoomAirModel) {
-                    // Room air model option not implemented yet
+                    // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4
                     TAirIn = MAT(NZ);
+                    TSupply = TAirIn;
                     WAirIn = ZoneAirHumRat(NZ);
-                } else { // Default to ITEInletZoneAirNode
+                } else {
+                    // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
+                    int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
+                    TSupply = Node(ZoneAirInletNode).Temp;
                     TAirIn = MAT(NZ);
                     WAirIn = ZoneAirHumRat(NZ);
                 }
@@ -5860,7 +5831,7 @@ namespace InternalHeatGains {
             ZoneITEq(Loop).FanPowerAtDesign =
                 max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
 
-            // Calcaulate UPS net power input (power in less power to ITEquip) and UPS heat gain to zone
+            // Calculate UPS net power input (power in less power to ITEquip) and UPS heat gain to zone
             if (ZoneITEq(Loop).DesignTotalPower > 0.0) {
                 UPSPartLoadRatio = (CPUPower + FanPower) / ZoneITEq(Loop).DesignTotalPower;
             } else {
@@ -5953,8 +5924,8 @@ namespace InternalHeatGains {
 
             ZnRpt(NZ).ITEqAirVolFlowStdDensity += ZoneITEq(Loop).AirVolFlowStdDensity;
             ZnRpt(NZ).ITEqAirMassFlow += ZoneITEq(Loop).AirMassFlow;
-            ZoneSumTinMinusTSup(NZ) += (TAirIn - TSupply) * AirVolFlowRate;
-            ZoneSumToutMinusTSup(NZ) += (TAirOut - TSupply) * AirVolFlowRate;
+            ZnRpt(NZ).SumTinMinusTSup += (TAirIn - TSupply) * AirVolFlowRate;
+            ZnRpt(NZ).SumToutMinusTSup += (TAirOut - TSupply) * AirVolFlowRate;
 
             // Check environmental class operating range limits (defined as parameters in this subroutine)
             EnvClass = ZoneITEq(Loop).Class;
@@ -6007,9 +5978,10 @@ namespace InternalHeatGains {
         } // ZoneITEq calc loop
 
         // Zone-level sensible heat index
-        for (Loop = 1; Loop <= NumOfZones; ++Loop) {
-            if (ZoneSumToutMinusTSup(Loop) != 0.0) {
-                ZnRpt(Loop).ITEqSHI = ZoneSumTinMinusTSup(Loop) / ZoneSumToutMinusTSup(Loop);
+        for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
+            int ZN = ZoneITEq(Loop).ZonePtr;
+            if (ZnRpt(NZ).SumToutMinusTSup != 0.0) {
+                ZnRpt(ZN).ITEqSHI = ZnRpt(NZ).SumTinMinusTSup / ZnRpt(NZ).SumToutMinusTSup;
             }
         }
 
@@ -6062,19 +6034,6 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using OutputReportTabular::WriteTabularFiles;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -6311,30 +6270,12 @@ namespace InternalHeatGains {
         // Will issue a severe error for illegal zone.
         // Must be called after InternalHeatGains get input.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataHeatBalance;
         using namespace DataGlobals;
 
         // Return value
         Real64 DesignLightingLevelSum; // Sum of design lighting level for this zone
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -6386,23 +6327,8 @@ namespace InternalHeatGains {
         // Traverse the LIGHTS structure and get fraction replaceable - min/max as well as lighting
         // level for a zone.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataDaylighting;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -6467,32 +6393,11 @@ namespace InternalHeatGains {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataContaminantBalance::Contaminant;
         using DataContaminantBalance::ZoneGCGain;
         using DataHeatBalFanSys::ZoneLatentGain;
         using DataHeatBalFanSys::ZoneLatentGainExceptPeople; // Added for hybrid model
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -6552,27 +6457,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumConvGainRate;
         int DeviceNum;
@@ -6625,29 +6509,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfTypes;
@@ -6722,29 +6583,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfTypes;
         Real64 tmpSumRetAirConvGainRate;
@@ -6784,27 +6622,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumRadGainRate;
         int DeviceNum;
@@ -6836,29 +6653,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfTypes;
@@ -6898,27 +6692,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumLatentGainRate;
@@ -6967,29 +6740,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfTypes;
         Real64 tmpSumLatentGainRate;
@@ -7031,27 +6781,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumLatentGainRate;
         int DeviceNum;
@@ -7085,27 +6814,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumCO2GainRate;
@@ -7155,29 +6863,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfTypes;
         Real64 tmpSumCO2GainRate;
@@ -7217,27 +6902,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types based on the existing subrotine SumAllInternalCO2Gains
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumGCGainRate;
         int DeviceNum;
@@ -7270,11 +6934,6 @@ namespace InternalHeatGains {
         // METHODOLOGY EMPLOYED:
         //   Save sequence of values for report during sizing.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
         using namespace DataHeatBalance;
         using DataGlobals::CompLoadReportIsReq;
@@ -7299,19 +6958,6 @@ namespace InternalHeatGains {
         using OutputReportTabular::refrigRetAirSeq;
         using OutputReportTabular::waterUseInstantSeq;
         using OutputReportTabular::waterUseLatentSeq;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int iZone(0);
@@ -7417,30 +7063,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // utility to retrieve index pointer to a specific internal gain
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool Found;
         int DeviceNum;
@@ -7482,29 +7104,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gains by index
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfIndices;
@@ -7552,29 +7151,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gains by index
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfIndices;
         int NumberOfFractions;
@@ -7620,29 +7196,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gains by index
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfIndices;
