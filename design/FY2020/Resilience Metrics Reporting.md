@@ -120,7 +120,7 @@ LEED Passive Survivability defines the Thermal Safety Temperatures for Path 2 us
 - Cooling: Not to exceed 18 °F SET-days (432°F SET-hours) above 86°F SET for non-residential buildings. (Metric: Not to exceed 10°C SET-days (240 °C SET-hours) above 30°C SET for non-residential buildings.)
 - Heating: Not to exceed 9 °F SET-days (216 °F SET-hours) below 54° SET for all buildings. (Metric: Not to exceed 5°C SET-days (120 °C SET-hours) below 12°C SET for all buildings.)
 
-EnergyPlus calculates and reports SET as a time-step report variable. We propose to calculate the aggregated the SET-Hours and the SET-OccupantHours (at zone level) for both cooling and heating as one of the tabular reports for thermal resilience.
+EnergyPlus calculates and reports SET as a time-step report variable. We propose to calculate the aggregated the SET-Hours and the SET-OccupantHours (at zone level) for both cooling and heating as one of the tabular reports for thermal resilience. We would also report the longest continuous unmet time duration in hours and the time of their occurrences.
 
 2. Indoor Air Quality
 
@@ -240,8 +240,8 @@ For: **Entire Facility**
 |Average   |      |      |      |      |
 |Sum       |      |      |      |      |
 
-**SET-Hours**
-|          |SET (≤ 12°C) Hours |SET (12, 30°C] Hours |SET (>30°C) Hours |SET (≤ 54°F) Hours |SET (54, 86°F] Hours |SET (>86°F) Hours |
+**SET - Hours**
+|          |SET ≤ 12°C Hours |SET ∈ (12, 30°C] Hours |SET > 30°C Hours |SET ≤ 54°F Hours |SET ∈ (54, 86°F] Hours |SET > 86°F Hours |
 |----------|------|------|------|------|------|------|
 |Space_1   |      |      |      |      |      |      |
 |…         |      |      |      |      |      |      |
@@ -251,8 +251,8 @@ For: **Entire Facility**
 |Average   |      |      |      |      |      |      |
 |Sum       |      |      |      |      |      |      |
 
-**SET-OccupantHours**
-|          |SET (≤ 12°C) OccupantHours |SET (12, 30°C] OccupantHours |SET (>30°C) OccupantHours |SET (≤ 54°F) OccupantHours |SET (54, 86°F] OccupantHours |SET (>86°F) OccupantHours |
+**SET - OccupantHours**
+|          |SET ≤ 12°C OccupantHours |SET ∈ (12, 30°C] OccupantHours |SET > 30°C OccupantHours |SET ≤ 54°F OccupantHours |SET ∈ (54, 86°F] OccupantHours |SET > 86°F OccupantHours |
 |----------|------|------|------|------|------|------|
 |Space_1   |      |      |      |      |      |      |
 |…         |      |      |      |      |      |      |
@@ -262,6 +262,16 @@ For: **Entire Facility**
 |Average   |      |      |      |      |      |      |
 |Sum       |      |      |      |      |      |      |
 
+**SET - Longest Continuous Unmet Duration**
+|          |Longest SET ≤ 12°C Duration [Hours] |Time of Longest SET ≤ 12°C Duration |Longest SET >30°C Duration [Hours] |Time of Longest SET >30°C Duration |
+|----------|------|------|------|------|
+|Space_1   |      |      |      |      |
+|…         |      |      |      |      |
+|Space_N   |      |      |      |      |
+|Min       |      |      |      |      |
+|Max       |      |      |      |      |
+|Average   |      |      |      |      |
+|Sum       |      |      |      |      |
 
 
 Report: **Indoor Air Quality Resilience Summary**
@@ -357,35 +367,67 @@ No transition change is required.
 ## E-mail and  Conference Call Conclusions ##
 
 **May 2020**
-- From Paul Mathew:
+- *From Paul Mathew*:
 
 I took a quick look and I think these are good metrics to add to E+ reports. Couple things:
 1. I think it's good that you have occupant hours, but I think some people may just want hours, so perhaps that could be a report option.
 2. Is there a reason that SET is reported in hours? All the others are occ hours.
 
-- Reply:
+> Reply:
 
-On 1 - Indeed. We will see how to add this option.
+> On 1 - Indeed. We will see how to add this option.
 
-On 2 - SET-hours are targeted for LEED passive survivability, so we chose not to use occhours. This relates to Point 1. It makes sense to add an option.
+> On 2 - SET-hours are targeted for LEED passive survivability, so we chose not to use occhours. This relates to Point 1. It makes sense to add an option.
 
-- From Jessica Granderson:
+- *From Jessica Granderson*:
 
 Are nighttime ignored for the illuminance calc? And is the thought that these metrics get generated just when doing a ‘resilience run’ with reduced services, as opposed to a general run for a building?
 
-- Reply:
+> Reply: Good point. When we use OccupantHours, hours with no occupancy would not increase the aggregated values. However, there can be a need to just count the daytime or occupied hours. Depending on building use type, there may be occupied hours at night.
 
-Good point. When we use OccupantHours, hours with no occupancy would not increase the aggregated values. However, there can be a need to just count the daytime or occupied hours. Depending on building use type, there may be occupied hours at night.
+> Users/modelers would need to request these summary reports for EnergyPlus to produce them, which makes sense when they are doing resilience related runs.
 
-Users/modelers would need to request these summary reports for EnergyPlus to produce them, which makes sense when they are doing resilience related runs.
-
-- From Kaiyu Sun:
+- *From Kaiyu Sun*:
 
 I suggest we use “contaminant concentration” rather than “CO2 concentration” to be more general that can cover potentially more resilience scenarios like wild fire. The simulation method would be the same by assigning the contaminant concentration schedule. CO2 can be a good example for demonstrating the implementation and application.
 
-- Reply:
+> Reply: Indeed, CO2 is a proxy/indicator of IAQ. It does not apply to cases when IAQ issue is caused by specific contaminants such as ozone and/or PM2.5 due to outdoor pollution or wildfire events. However, modeling CO2 is more straightforward in EnergyPlus with input data broadly available. To model other contaminants, users can still use EnergyPlus but need to provide necessary input of outdoor air contaminant concentration and indoor contaminant generation rate.
 
-Indeed, CO2 is a proxy/indicator of IAQ. It does not apply to cases when IAQ issue is caused by specific contaminants such as ozone and/or PM2.5 due to outdoor pollution or wildfire events. However, modeling CO2 is more straightforward in EnergyPlus with input data broadly available. To model other contaminants, users can still use EnergyPlus but need to provide necessary input of outdoor air contaminant concentration and indoor contaminant generation rate.
+- *From Liam O'Brien*:
+
+If I understand correctly, the building is being tested under normal circumstances or by using extreme climate files. However, I recommend consider adding power failure scenarios (I suppose this could simply be tested by not allowing HVAC). In our work, we tried two things: 1) no HVAC all year (free-running) and 2) kill the HVAC at the worst possible times (extreme weeks).
+
+> Reply: Modeling thermal resilience depends upon details of the extreme weather events (e.g., heatwave, cold snaps, strong wind, flooding) and how specific buildings and systems operate (complete power outage, partial power loss to HVAC, or only limited power for critical services). We leave the definition and modeling details (creation of EnergyPlus IDF files) to the users, while focusing on reporting the resilience metrics (that cover 80% of use cases). Tools like CityBES or OpenStudio can provide a GUI to help users define extreme events and choose a specific epw weather file.
+
+In the documentation for SET-hours, the table is a bit confusing because it switches from C to F
+
+> Reply: Most EnergyPlus reports are easily converted bewteen SI and IP units. The SET-hours report is a bit tricky for conversion. So we think of including both units.
+
+A major gap in the literature we found was on choosing appropriate weather files, e.g., considering extreme events, climate change, etc. There is some recent work on this, but no consensus.
+
+> Reply: Indeed, choice of weather data (from historical, TMY, or future) is crucial for a resilience study as it determines the frequency and severity of the extreme weather events. It is a risk and probability issue.
+
+I recommend reading the LEED RELI documentation (not perfect, but interesting).
+
+> Reply: We read LEED's passive survibability - I think it has rooms to improve. It is very different between comfort (a small range around neutral temperature and humidity) and stretched health risk (e.g., heat index of danger or extreme dangerous conditions). Most of ASHRAE Standard 55 would not apply to thermal resilience.
+
+- *From Liam O'Brien*:
+
+Regarding the importance of being able to model the effects on indoor conditions due to electricity outages.
+
+> Reply: See the response to Liam.
+
+In a residential context, it is the long-duration nighttime temperatures that cause the most health problems for occupants. Think of the frog sitting in the slowly warming pot of water. I suggest reporting the temporal profile of indoor thermal conditions in a way that acknowledges the duration of high temperatures and not only the magnitude of the peak.
+
+> Reply: This is a great point. We currently plan to report accumulated hours or occupant-hours. But sometimes as you pointed out, the longest continuous duration can be the critical metrics. This is especially true for the nighttime sleep indoor environment. We will think of another metric for this.
+
+In case studies, we have seen that the competence of the building operator is a crucial determinant of building resilience. EnergyPlus has always assumed optimal building operations, but perhaps the time is right to allow modelers to assume some non-optimizing, satisficing operating decisions?
+
+> Reply: Modelers have to consider ways to model resilience scenarios by modifying the EnergyPlus models/files. In our case study, a hurricane caused power loss to the HVAC systems, and because windows cannot be open, the indoor heat accumulated leading to much higher indoor temperature than outdoor.
+
+Today's interest in resilience and adaptability replays a prior debate about robustness and flexibility. EnergyPlus so far helps mostly to model resilience/robustness, when the superior risk management strategy is often adaptability/flexibility. The attached shows how I adapted a similar type of engineering-economic model (for power systems) to handle such strategies, long ago.
+
+> Reply: Thanks for sharing your studies. We will learn from them in our coming project on resilience.
 
 ## Acknowledgments ##
 
