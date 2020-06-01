@@ -342,6 +342,20 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_GT(Electricpower, 4000 / NormalizationDivisor * MinFlowFraction);
     EXPECT_LT(Electricpower, 5000 / NormalizationDivisor);
 
+    // check fan heat calculation if not included in lookup tables
+    pZoneHybridUnitaryAirConditioner->FanHeatGain = true;
+    pZoneHybridUnitaryAirConditioner->FanHeatInAirFrac = 1.0;
+    pZoneHybridUnitaryAirConditioner->Initialize(1);
+    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+    pZoneHybridUnitaryAirConditioner->SecInletTemp = Tosa;
+    pZoneHybridUnitaryAirConditioner->SecInletHumRat = Wosa;
+    pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
+
+    // output results
+    Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
+    // checks
+    EXPECT_NEAR(Tsa, Tosa + 0.66, 0.1);
+
     // Scenario 6: Availability Manager Off
     Requestedheating = -122396.255;  // Watts (Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate
     RequestedCooling = -58469.99445; // Watts (Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate
