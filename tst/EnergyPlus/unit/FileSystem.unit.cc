@@ -51,11 +51,19 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <iostream>
 #include <fstream>
 
 
 TEST(Basic, Basic)
 {
-    std::ofstream ofs{"/tst/EnergyPlus/unit/FileSystem.txt"};
-    ofs << 'Version, 9.3;' << '\n';
+    std::string filename = "FileSystemTest.txt";
+    std::string line;
+    std::ofstream ofs(filename, std::ofstream::out);
+    ofs << "Version, 9.3;" << std::endl;
+    std::ifstream ofs(filename);
+    while (getline (filename, line)) {
+        std::cout << line << '\n';
+    }
+
 }
