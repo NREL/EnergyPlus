@@ -618,14 +618,14 @@ namespace HybridUnitaryAirConditioners {
                 // TableValue * SysMaxSupply * ScalingFactor
                 // A13, \field Fan Heat Included in Lookup Tables
                 ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain = false;
-                if (!lAlphaFieldBlanks(13)) {
-                    if (UtilityRoutines::SameString(cAlphaArgs(13), "No")) {
+                if (!lAlphaBlanks(13)) {
+                    if (UtilityRoutines::SameString(Alphas(13), "Yes")) {
                         ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain = false;
-                    } else if (UtilityRoutines::SameString(cAlphaArgs(13), "Yes")) {
+                    } else if (UtilityRoutines::SameString(Alphas(13), "No")) {
                         ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain = true;
                     } else {
                         ShowSevereError(cCurrentModuleObject + " = " + ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-                        ShowContinueError("Illegal " + cAlphaFieldNames(13) + " = " + cAlphaArgs(13));
+                        ShowContinueError("Illegal " + cAlphaFieldNames(13) + " = " + Alphas(13));
                         ErrorsFound = true;
                     }
                 }

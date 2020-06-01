@@ -851,7 +851,7 @@ namespace HybridEvapCoolingModel {
           RHsaMax_schedule_pointer(0), PrimaryMode(0), PrimaryModeRuntimeFraction(0.0), averageOSAF(0), ErrorCode(0), InletNode(0), OutletNode(0),
           SecondaryInletNode(0), SecondaryOutletNode(0), FinalElectricalPower(0.0), FinalElectricalEnergy(0.0), InletMassFlowRate(0.0),
           InletTemp(0.0), InletWetBulbTemp(0.0), InletHumRat(0.0), InletEnthalpy(0.0), InletPressure(0.0), InletRH(0.0),
-          OutletVolumetricFlowRate(0.0), OutletMassFlowRate(0.0), OutletTemp(0.0), OutletWetBulbTemp(0.0), OutletHumRat(0.0), OutletEnthalpy(0.0),
+          OutletVolumetricFlowRate(0.0), OutletMassFlowRate(0.0), PowerLossToAir(0.0), FanHeatTemp(0.0), OutletTemp(0.0), OutletWetBulbTemp(0.0), OutletHumRat(0.0), OutletEnthalpy(0.0),
           OutletPressure(0.0), OutletRH(0.0), SecInletMassFlowRate(0.0), SecInletTemp(0.0), SecInletWetBulbTemp(0.0), SecInletHumRat(0.0),
           SecInletEnthalpy(0.0), SecInletPressure(0.0), SecInletRH(0.0), SecOutletMassFlowRate(0.0), SecOutletTemp(0.0), SecOutletWetBulbTemp(0.0),
           SecOutletHumRat(0.0), SecOutletEnthalpy(0.0), SecOutletPressure(0.0), SecOutletRH(0.0), Wsa(0.0), SupplyVentilationAir(0.0),
@@ -1896,8 +1896,17 @@ namespace HybridEvapCoolingModel {
         } else {
             SupplyVentilationAir = SupplyVentilationVolume * 1.225;
         }
+        // calculate power loss to air from fan power determined by curve value and fraction of fan heat in air stream
+        if (FanHeatGain){
+            PowerLossToAir = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER) * FanHeatInAirFrac;
+        } else {
+            PowerLossToAir = 0.0;
+        }
         // set timestep average outlet condition, considering all operating conditions and runtimes.
-        OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP));
+        Real64 Outletcp = PsyCpAirFnW(OutletHumRat); // J/degreesK.kg
+        OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
+        FanHeatTemp = PowerLossToAir / (Outletcp * OutletMassFlowRate);
+        OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP) + FanHeatTemp);
         OutletHumRat = CheckVal_W(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_HR), OutletTemp, OutletPressure);
 
         OutletRH = PsyRhFnTdbWPb(OutletTemp, OutletHumRat, OutletPressure);
@@ -1905,7 +1914,6 @@ namespace HybridEvapCoolingModel {
         Real64 OperatingMixedAirW = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_HR);
         Real64 MixedAirEnthalpy = PsyHFnTdbW(OperatingAverageMixedAirTemperature, OperatingMixedAirW);
         OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure);
-        OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
 
         if (StdRhoAir > 1) {
             OutletVolumetricFlowRate = OutletMassFlowRate / StdRhoAir;
@@ -1927,7 +1935,6 @@ namespace HybridEvapCoolingModel {
             // Calculate timestep average unit and system
             PrimaryMode = CurrentPrimaryMode();
             PrimaryModeRuntimeFraction = CurrentPrimaryRuntimeFraction();
-            Real64 Outletcp = PsyCpAirFnW(OutletHumRat); // J/degreesK.kg
             Real64 Returncp = PsyCpAirFnW(Wra);          // J/degreesK.kg
             Real64 Outdoorcp = PsyCpAirFnW(Wosa);        // J/degreesK.kg
             // Zone Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA+cpSA) {kJ/kg-C} * (T_RA - T_SA) {C}
