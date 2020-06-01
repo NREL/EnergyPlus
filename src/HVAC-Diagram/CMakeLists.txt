@@ -6,7 +6,7 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 
 set(SRC HVAC-Diagram-Main.f90)
 
-set(STATIC_EXE TRUE) 
+set(STATIC_EXE TRUE)
 
 if(APPLE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")

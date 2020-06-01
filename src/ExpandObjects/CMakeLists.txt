@@ -8,7 +8,7 @@ if(WIN32)
   configure_file( ExpandObjects.rc.in "${CMAKE_CURRENT_BINARY_DIR}/ExpandObjects.rc" )
 endif()
 
-set(SRC epfilter.f90) 
+set(SRC epfilter.f90)
 
 set(STATIC_EXE FALSE)
 
