@@ -439,7 +439,7 @@ namespace RootFinder {
     void IterateRootFinder(RootFinderDataType &RootFinderData, // Data used by root finding algorithm
                            Real64 const X,                     // X value of current iterate
                            Real64 const Y,                     // Y value of current iterate
-                           Optional_bool IsDoneFlag            // If TRUE indicates that the iteration should be stopped
+                           bool &IsDoneFlag                    // If TRUE indicates that the iteration should be stopped
     )
     {
 
@@ -643,17 +643,8 @@ namespace RootFinder {
 
         // Check last as this was not done in the original implementation
         // Essentially we stop the iteration if:
-        // - the increment beween successive iterates is smaller than the user-specified
-        //   tolerance for the X variables.
         // - the distance between the lower and upper bounds is smaller than the user-specified
         //   tolerance for the X variables. (USING brackets from previous iteration)
-        if (CheckIncrementRoundOff(RootFinderData, X)) {
-            RootFinderData.StatusFlag = iStatusOKRoundOff;
-
-            // Solution found: No need to continue iterating
-            IsDoneFlag = true;
-            return;
-        }
         if (CheckBracketRoundOff(RootFinderData)) {
             RootFinderData.StatusFlag = iStatusOKRoundOff;
 
@@ -1371,42 +1362,6 @@ namespace RootFinder {
         CheckRootFinderConvergence = false;
 
         return CheckRootFinderConvergence;
-    }
-
-    bool CheckIncrementRoundOff(RootFinderDataType const &RootFinderData, // Data used by root finding algorithm
-                                Real64 const X                            // X value for current iterate
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Dimitri Curtil (LBNL)
-        //       DATE WRITTEN   February 2006
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function checks whether the current iterate X satisfies the
-        // round-off criterion or not.
-
-        bool CheckIncrementRoundOff;
-
-        // FLOW:
-
-        CheckIncrementRoundOff = false;
-        // If max and min have not been evaluated yet, return
-        if (!RootFinderData.MinPoint.DefinedFlag || !RootFinderData.MaxPoint.DefinedFlag) {
-            return CheckIncrementRoundOff;
-        }
-        // Check for round-off error in X increments since last iterate
-        if ((RootFinderData.CurrentPoint.DefinedFlag) && (X > 0.0)) {
-            // TODO: Use typical value for X averaged over successive iterations
-            Real64 TolX = RootFinderData.Controls.TolX * std::abs(X) + RootFinderData.Controls.ATolX;
-            Real64 DeltaX = X - RootFinderData.CurrentPoint.X;
-
-            if (std::abs(DeltaX) <= std::abs(TolX)) {
-                CheckIncrementRoundOff = true;
-                return CheckIncrementRoundOff;
-            }
-        }
-
-        return CheckIncrementRoundOff;
     }
 
     bool CheckBracketRoundOff(RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
