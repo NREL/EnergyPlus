@@ -40,6 +40,7 @@ endif()
 
 set(SKIP_BUILD_RPATH true)
 add_executable( HVAC-Diagram ${SRC} )
+set_target_properties(HVAC-Diagram PROPERTIES FOLDER Auxiliary)
 
 install( TARGETS HVAC-Diagram DESTINATION PostProcess )
 if(NOT ${STATIC_EXE})

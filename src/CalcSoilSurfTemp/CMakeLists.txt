@@ -43,6 +43,7 @@ endif()
 
 set(SKIP_BUILD_RPATH TRUE)
 ADD_EXECUTABLE( CalcSoilSurfTemp ${SRC} )
+set_target_properties(CalcSoilSurfTemp PROPERTIES FOLDER Auxiliary)
 
 install( TARGETS CalcSoilSurfTemp DESTINATION PreProcess/CalcSoilSurfTemp )
 if(NOT ${STATIC_EXE})

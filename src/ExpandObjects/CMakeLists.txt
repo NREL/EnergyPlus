@@ -52,6 +52,9 @@ else()  # windows
   add_executable( ExpandObjects ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/ExpandObjects.rc" )
 endif()
 
+set_target_properties(ExpandObjects PROPERTIES FOLDER Auxiliary)
+
+
 install( TARGETS ExpandObjects DESTINATION "./" )
 if(NOT ${STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
