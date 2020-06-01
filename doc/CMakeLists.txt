@@ -2,6 +2,8 @@ project(EnergyPlusDocs LANGUAGES NONE)
 
 cmake_minimum_required(VERSION 3.5.1)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 # this _should_ find the xelatex compiler, but for some reason it isn't populating for me
 find_package(LATEX)
 # so we'll create a cache variable which will be available to the add_subdirectory call below
@@ -23,6 +25,8 @@ if( EXISTS ${XELATEX} )
 
   # Add custom target to build only documentation
   add_custom_target(docs ALL)
+
+  set_target_properties(docs PROPERTIES FOLDER Documentation)
 
   include(cmake/doc-targets.cmake)
 

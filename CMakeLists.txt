@@ -17,6 +17,8 @@ set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} 
 
 set( CMAKE_POSITION_INDEPENDENT_CODE ON )
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 include(cmake/Version.cmake)
 
 set( OPENGL_REQUIRED ON CACHE BOOL "Require OpenGL in order to build" )
@@ -158,39 +160,63 @@ if( BUILD_TESTING )
   set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
   enable_testing()
-  include(CTest)
   ADD_SUBDIRECTORY(third_party/gtest)
+  set_target_properties(gtest PROPERTIES FOLDER ThirdParty/gtest)
+  set_target_properties(gtest_main PROPERTIES FOLDER ThirdParty/gtest)
+  set_target_properties(gmock PROPERTIES FOLDER ThirdParty/gtest)
+  set_target_properties(gmock_main PROPERTIES FOLDER ThirdParty/gtest)
 endif()
 
 # E+ required libraries
 ADD_SUBDIRECTORY(idd)
 
 ADD_SUBDIRECTORY(third_party/SQLite)
+set_target_properties(sqlite PROPERTIES FOLDER ThirdParty/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
+set_target_properties(objexx PROPERTIES FOLDER ThirdParty/ObjexxFCL)
 ADD_SUBDIRECTORY(third_party/BCVTB)
+set_target_properties(bcvtb PROPERTIES FOLDER ThirdParty/BCVTB)
 ADD_SUBDIRECTORY(third_party/Expat)
+set_target_properties(epexpat PROPERTIES FOLDER ThirdParty/Expat)
 ADD_SUBDIRECTORY(third_party/FMI)
+set_target_properties(epfmiimport PROPERTIES FOLDER ThirdParty/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
+set_target_properties(miniziplib PROPERTIES FOLDER ThirdParty/zlib)
 ADD_SUBDIRECTORY(third_party/DElight)
+set_target_properties(DElight PROPERTIES FOLDER ThirdParty/DElight)
 ADD_SUBDIRECTORY(third_party/re2)
+set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
 ADD_SUBDIRECTORY(third_party/fmt-6.1.2 )
+set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
 
 ADD_SUBDIRECTORY(scripts/dev/generate_embeddable_epJSON_schema)
+set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
+
 IF( NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
+  set_target_properties(parser PROPERTIES FOLDER ThirdParty/FMI)
 ENDIF()
+
 ADD_SUBDIRECTORY(third_party/Windows-CalcEngine)
+set_target_properties(Windows-CalcEngine PROPERTIES FOLDER ThirdParty/Windows-CalcEngine)
 
 # Btwxt
 INCLUDE_DIRECTORIES( ${gtest_SOURCE_DIR}/include/ SYSTEM )
 set(BUILD_BTWXT_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
 ADD_SUBDIRECTORY(third_party/btwxt)
+set_target_properties(btwxt PROPERTIES FOLDER ThirdParty/Btwxt)
 
 # Kiva
 INCLUDE(third_party/cmake/kiva.cmake)
+set_target_properties(libkiva PROPERTIES FOLDER ThirdParty/Kiva)
 
 if( OPENGL_FOUND )
   ADD_SUBDIRECTORY(third_party/penumbra)
+  set_target_properties(awning PROPERTIES FOLDER ThirdParty/Penumbra)
+  set_target_properties(glfw PROPERTIES FOLDER ThirdParty/Penumbra/GLFW)
+  set_target_properties(glad PROPERTIES FOLDER ThirdParty/Penumbra)
+  set_target_properties(penumbra PROPERTIES FOLDER ThirdParty/Penumbra)
+  set_target_properties(tess2 PROPERTIES FOLDER ThirdParty/Penumbra)
 endif()
 
 execute_process( COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
@@ -212,6 +238,9 @@ configure_file( "workflows/transition.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/wor
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
+set_target_properties(airflownetworklib PROPERTIES FOLDER "Internal")
+set_target_properties(GenerateEmbeddedEpJSONSchema PROPERTIES FOLDER "Internal")
+set_target_properties(energyplusparser PROPERTIES FOLDER "Internal")
 
 if( BUILD_TESTING )
   ADD_SUBDIRECTORY(testfiles)
@@ -226,26 +255,47 @@ if( BUILD_TESTING )
     endif()
     ADD_SUBDIRECTORY(performance_tests)
   endif()
+  set_target_properties(energyplus_tests PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_DataTransfer_C PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_Runtime_C PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_Functional_C PROPERTIES FOLDER Testing)
+  set_target_properties(TestEnergyPlusCallbacks PROPERTIES FOLDER Testing)
+
+  set_target_properties(btwxt_tests PROPERTIES FOLDER ThirdParty/Btwxt)
+  set_target_properties(kiva_tests PROPERTIES FOLDER ThirdParty/Kiva)
+  set_target_properties(penumbra_tests PROPERTIES FOLDER ThirdParty/Penumbra)
+ 
 endif()
 
 ADD_SUBDIRECTORY(src/ConvertInputFormat)
+set_target_properties(ConvertInputFormat PROPERTIES FOLDER Auxiliary)
 
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
   cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
+  set_target_properties(ExpandObjects_build PROPERTIES FOLDER Auxiliary)
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
+  set_target_properties(ReadVars_build PROPERTIES FOLDER Auxiliary)
   set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
   cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
   file( COPY "idd/V9-2-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
   configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-3-0-Energy+.idd" )
   file( COPY "src/Transition/SupportFiles/Report Variables 9-2-0 to 9-3-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  set_target_properties(Transition_build PROPERTIES FOLDER Auxiliary)
   cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
+  set_target_properties(Basement_build PROPERTIES FOLDER Auxiliary)
   cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
+  set_target_properties(HVAC-Diagram_build PROPERTIES FOLDER Auxiliary)
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
+  set_target_properties(ParametricPreprocessor_build PROPERTIES FOLDER Auxiliary)
   cmake_add_fortran_subdirectory(src/Slab PROJECT Slab NO_EXTERNAL_INSTALL )
+  set_target_properties(Slab_build PROPERTIES FOLDER Auxiliary)
   cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
+  set_target_properties(ConvertESOMTR_build PROPERTIES FOLDER Auxiliary)
   cmake_add_fortran_subdirectory(src/CalcSoilSurfTemp PROJECT CalcSoilSurfTemp NO_EXTERNAL_INSTALL )
+  set_target_properties(CalcSoilSurfTemp_build PROPERTIES FOLDER Auxiliary)
   cmake_add_fortran_subdirectory(src/AppGPostProcess PROJECT AppGPostProcess NO_EXTERNAL_INSTALL )
+  set_target_properties(AppGPostProcess_build PROPERTIES FOLDER Auxiliary)
 endif()
 
 if( BUILD_PACKAGE )
