@@ -1567,7 +1567,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     ASSERT_FALSE(ErrorsFound);
 }
 
@@ -1790,7 +1790,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    EXPECT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles()));
+    EXPECT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(state));
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesGoodInletNode)
@@ -2016,7 +2016,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesG
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     ASSERT_FALSE(ErrorsFound);
 }
 
@@ -2243,7 +2243,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    ASSERT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles()));
+    ASSERT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(state));
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
@@ -2469,6 +2469,6 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     ASSERT_FALSE(ErrorsFound);
 }
