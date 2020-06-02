@@ -1105,7 +1105,7 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetProjectControlData(outputFiles(), ErrorsFound);
+    GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneData(ErrorsFound);
@@ -1113,11 +1113,11 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    GetMaterialData(outputFiles(), ErrorsFound);
+    GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetConstructData(ErrorsFound);
@@ -1132,7 +1132,7 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     GetSurfaceListsInputs();
 
     ErrorsFound = false;
-    SetupZoneGeometry(state, outputFiles(), ErrorsFound);
+    SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetLowTempRadiantSystem();

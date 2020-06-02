@@ -154,7 +154,7 @@ namespace ConductionTransferFunctionCalc {
 
     // Functions
 
-    void InitConductionTransferFunctions()
+    void InitConductionTransferFunctions(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1221,7 +1221,7 @@ namespace ConductionTransferFunctionCalc {
 
         } // ... end of construction loop.
 
-        ReportCTFs(OutputFiles::getSingleton(),DoCTFErrorReport);
+        ReportCTFs(outputFiles, DoCTFErrorReport);
 
         if (ErrorsFound) {
             ShowFatalError("Program terminated for reasons listed (InitConductionTransferFunctions)");

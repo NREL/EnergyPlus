@@ -681,20 +681,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
@@ -1211,25 +1211,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);
 
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles());
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
     EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -1788,25 +1788,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);
 
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles());
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
     EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -1963,7 +1963,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     DataHeatBalance::Construct(1).CTFTUserSource(0) = 0.25;
 
     AllocateSurfaceHeatBalArrays(); // allocates a host of variables related to CTF calculations
-    OutputProcessor::GetReportVariableInput(outputFiles());
+    OutputProcessor::GetReportVariableInput(state.outputFiles);
 
     EXPECT_EQ(OutputProcessor::ReqRepVars(2).VarName, "SURFACE CONSTRUCTION INDEX");
 }
@@ -2352,26 +2352,26 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Clear schedule type warnings
     EXPECT_TRUE(has_err_output(true));
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles());
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
     EXPECT_TRUE(compare_err_stream(""));
     EXPECT_FALSE(has_err_output(true));
 

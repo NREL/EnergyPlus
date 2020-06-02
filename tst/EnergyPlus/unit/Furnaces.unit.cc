@@ -1169,7 +1169,7 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
     bool FirstHVACIteration(false);
 
     // OutputProcessor::TimeValue.allocate(2);
-    ManageSimulation(state, outputFiles());
+    ManageSimulation(state);
     // check the design max air outlet temperature
     EXPECT_DOUBLE_EQ(45.0, Furnace(1).DesignMaxOutletTemp);
 

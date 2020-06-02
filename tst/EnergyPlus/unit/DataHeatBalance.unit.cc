@@ -800,14 +800,14 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     // OutputProcessor::TimeValue.allocate(2);
 
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
     ErrorsFound = false;
-    GetProjectControlData(outputFiles(), ErrorsFound); // read project control data
+    GetProjectControlData(state.outputFiles, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(outputFiles(), ErrorsFound); // read material data
+    GetMaterialData(state.outputFiles, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
@@ -825,11 +825,11 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     ErrorsFound = false;
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(),
+    SurfaceGeometry::SetupZoneGeometry(state,
                                        ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer()
     EXPECT_FALSE(ErrorsFound);
 

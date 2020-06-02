@@ -367,7 +367,7 @@ namespace ZoneTempPredictorCorrector {
         // unused1208  INTEGER :: zoneloop
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints(OutputFiles::getSingleton());
+            GetZoneAirSetPoints(state.outputFiles);
             GetZoneAirStatsInputFlag = false;
         }
 
