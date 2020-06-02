@@ -64,11 +64,11 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 
@@ -130,6 +130,43 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
         "   Zone 2,                  !- Zone 2 Name",
         "   Zone 3;                  !- Zone 3 Name",
 
+        " ZoneControl:Thermostat,",
+        "   LIST_ZONES Thermostat,  !- Name",
+        "   LIST_ZONES,             !- Zone or ZoneList Name",
+        "   Dual Zone Control Type Sched,  !- Control Type Schedule Name",
+        "   ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+        "   Zone DualSPSched; !- Control 1 Name",
+
+        " Schedule:Compact,",
+        "   Dual Zone Control Type Sched,  !- Name",
+        "   Control Type,            !- Schedule Type Limits Name",
+        "   Through: 12/31,          !- Field 1",
+        "   For: AllDays,            !- Field 2",
+        "   Until: 24:00,4;          !- Field 3",
+
+        " ThermostatSetpoint:DualSetpoint,",
+        "   Zone DualSPSched, !- Name",
+        "   HTGSETP_SCH,             !- Heating Setpoint Temperature Schedule Name",
+        "   CLGSETP_SCH;             !- Cooling Setpoint Temperature Schedule Name",
+
+        " Schedule:Compact,",
+        "   CLGSETP_SCH,             !- Name",
+        "   Temperature,             !- Schedule Type Limits Name",
+        "   Through: 12/31,          !- Field 1",
+        "   For: AllDays,            !- Field 2",
+        "   Until: 7:00,29.4,       !- Field 3",
+        "   Until: 18:00,24.0,       !- Field 3",
+        "   Until: 24:00,29.4;       !- Field 3",
+
+        " Schedule:Compact,",
+        "   HTGSETP_SCH,             !- Name",
+        "   Temperature,             !- Schedule Type Limits Name",
+        "   Through: 12/31,          !- Field 1",
+        "   For: AllDays,            !- Field 2",
+        "   Until: 7:00,15.0,       !- Field 3",
+        "   Until: 18:00,19.0,       !- Field 3",
+        "   Until: 24:00,15.0;       !- Field 3",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -176,7 +213,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 1;
@@ -282,6 +319,19 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     EXPECT_EQ(1.5, SystemAvailabilityManager::OptStartSysAvailMgrData(1).NumHoursBeforeOccupancy); // 1.5 hours = 3C from SP divided by 2C/hour
 
     EXPECT_EQ(DataHVACGlobals::CycleOn, SystemAvailabilityManager::OptStartSysAvailMgrData(2).AvailStatus); // avail manager should be set at 6 AM
+
+    // Check that the system restores setpoints to unoccupied setpoints and don't use occupied setpoints post-occupancy
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.outputFiles);
+    DataHeatBalFanSys::TempControlType.allocate(DataGlobals::NumOfZones);
+    DataHeatBalFanSys::TempZoneThermostatSetPoint.allocate(DataGlobals::NumOfZones);
+
+    DataGlobals::CurrentTime = 19.0; // set the current time to 7 PM which is post-occupancy
+    SystemAvailabilityManager::ManageSystemAvailability();
+    ZoneTempPredictorCorrector::CalcZoneAirTempSetPoints();
+
+    EXPECT_EQ(DataHVACGlobals::NoAction, SystemAvailabilityManager::OptStartSysAvailMgrData(1).AvailStatus); // avail manager should be set to no action
+    EXPECT_EQ(15.0, DataHeatBalFanSys::ZoneThermostatSetPointLo(1)); // 15.0C is the unoccupied heating setpoint
+    EXPECT_EQ(29.4, DataHeatBalFanSys::ZoneThermostatSetPointHi(1)); // 29.4C is the unoccupied cooling setpoint
 }
 
 TEST_F(EnergyPlusFixture, SysAvailManager_NightCycle_ZoneOutOfTolerance)
@@ -531,7 +581,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleGetInput)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     // get system availability schedule
     SystemAvailabilityManager::GetSysAvailManagerInputs();
