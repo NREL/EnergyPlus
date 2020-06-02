@@ -50,6 +50,7 @@
 
 #include <ObjexxFCL/Array1D.hh>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
@@ -57,12 +58,14 @@ namespace EnergyPlus {
 
     TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet) {
         // this global state is what would be set up by E+ currently
+        DataEnvironment::StdRhoAir = 1.0;
         Array1D<EnergyPlus::DataSizing::TermUnitSizingData> tmpTermUnitData;
         tmpTermUnitData.allocate(1);
         tmpTermUnitData(1).AirVolFlow = 5;
         // there is definitely a better way to do this...
         Array1D<EnergyPlus::DataSizing::ZoneSizingData> tmpFinalZoneSizing;
         Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> tmpZoneEqSizing;
+        tmpFinalZoneSizing.allocate(1);
         tmpZoneEqSizing.allocate(1);
 
         CommonFlags baseFlags;
@@ -82,11 +85,101 @@ namespace EnergyPlus {
         Real64 inputValue = EnergyPlus::DataSizing::AutoSize;
         // create the sizer and do sizing
         HeatingAirflowUASizer sizer;
+        sizer.zoneSizingInput.allocate(1);
+        sizer.zoneSizingInput(1).ZoneNum = 1;
         sizer.setParameters(baseFlags, flags, tmpTermUnitData, tmpFinalZoneSizing, tmpZoneEqSizing);
         AutoSizingResultType result = sizer.size(inputValue);
         EXPECT_EQ(AutoSizingResultType::NoError, result);
         EXPECT_TRUE(sizer.wasAutoSized);
-        EXPECT_NEAR(5, sizer.autoSizedValue, 0.01);
+        EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01);
+        EXPECT_NEAR(5.0, tmpTermUnitData(1).AirVolFlow, 0.01);
+        EXPECT_NEAR(1.0, DataEnvironment::StdRhoAir, 0.01);
+
+        // Test 2 - Powered Induction TU
+        flags.termUnitSingDuct = false;
+        flags.termUnitPIU = true;
+        // start with an auto-sized value as the user input
+        inputValue = EnergyPlus::DataSizing::AutoSize;
+        // do sizing
+        sizer.wasAutoSized = false;
+        sizer.setParameters(baseFlags, flags, tmpTermUnitData, tmpFinalZoneSizing, tmpZoneEqSizing);
+        result = sizer.size(inputValue);
+        EXPECT_EQ(AutoSizingResultType::NoError, result);
+        EXPECT_TRUE(sizer.wasAutoSized);
+        EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01);
+
+        // Test 3 - Induction TU
+        flags.termUnitPIU = false;
+        flags.termUnitIU = true;
+        // start with an auto-sized value as the user input
+        inputValue = EnergyPlus::DataSizing::AutoSize;
+        // do sizing
+        sizer.wasAutoSized = false;
+        sizer.setParameters(baseFlags, flags, tmpTermUnitData, tmpFinalZoneSizing, tmpZoneEqSizing);
+        result = sizer.size(inputValue);
+        EXPECT_EQ(AutoSizingResultType::NoError, result);
+        EXPECT_TRUE(sizer.wasAutoSized);
+        EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01);
+
+        // Test 4 - Zone Eq Fan Coil
+        flags.termUnitIU = false;
+        flags.zoneEqFanCoil = true;
+        tmpTermUnitData(1).AirVolFlow = 0.0;
+        tmpFinalZoneSizing(1).DesHeatVolFlow = 5.0;
+        // start with an auto-sized value as the user input
+        inputValue = EnergyPlus::DataSizing::AutoSize;
+        // do sizing
+        sizer.wasAutoSized = false;
+        sizer.setParameters(baseFlags, flags, tmpTermUnitData, tmpFinalZoneSizing, tmpZoneEqSizing);
+        result = sizer.size(inputValue);
+        EXPECT_EQ(AutoSizingResultType::NoError, result);
+        EXPECT_TRUE(sizer.wasAutoSized);
+        EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01);
+
+        // Test 5 - Other Equipment
+        flags.zoneEqFanCoil = false;
+        flags.otherEqType = true;
+        tmpFinalZoneSizing(1).DesHeatVolFlow = 0.0;
+        tmpZoneEqSizing(1).AirVolFlow = 5.0;
+        tmpZoneEqSizing(1).SystemAirFlow = true;
+        // start with an auto-sized value as the user input
+        inputValue = EnergyPlus::DataSizing::AutoSize;
+        // do sizing
+        sizer.wasAutoSized = false;
+        sizer.setParameters(baseFlags, flags, tmpTermUnitData, tmpFinalZoneSizing, tmpZoneEqSizing);
+        result = sizer.size(inputValue);
+        EXPECT_EQ(AutoSizingResultType::NoError, result);
+        EXPECT_TRUE(sizer.wasAutoSized);
+        EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01);
+
+        // Test 6 - Other Equipment
+        tmpZoneEqSizing(1).AirVolFlow = 0.0;
+        tmpZoneEqSizing(1).HeatingAirVolFlow = 5.0;
+        tmpZoneEqSizing(1).SystemAirFlow = false;
+        tmpZoneEqSizing(1).HeatingAirFlow = true;
+        // start with an auto-sized value as the user input
+        inputValue = EnergyPlus::DataSizing::AutoSize;
+        // do sizing
+        sizer.wasAutoSized = false;
+        sizer.setParameters(baseFlags, flags, tmpTermUnitData, tmpFinalZoneSizing, tmpZoneEqSizing);
+        result = sizer.size(inputValue);
+        EXPECT_EQ(AutoSizingResultType::NoError, result);
+        EXPECT_TRUE(sizer.wasAutoSized);
+        EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01);
+
+        // Test 7 - Other Equipment
+        tmpZoneEqSizing(1).HeatingAirVolFlow = 0.0;
+        tmpZoneEqSizing(1).HeatingAirFlow = false;
+        tmpFinalZoneSizing(1).DesHeatMassFlow = 5.0;
+        // start with an auto-sized value as the user input
+        inputValue = EnergyPlus::DataSizing::AutoSize;
+        // do sizing
+        sizer.wasAutoSized = false;
+        sizer.setParameters(baseFlags, flags, tmpTermUnitData, tmpFinalZoneSizing, tmpZoneEqSizing);
+        result = sizer.size(inputValue);
+        EXPECT_EQ(AutoSizingResultType::NoError, result);
+        EXPECT_TRUE(sizer.wasAutoSized);
+        EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01);
     }
 
 }

@@ -45,12 +45,12 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 
-Real64 StdRhoAir = 1.0;
 namespace EnergyPlus {
 
     void HeatingAirflowUASizer::setParameters(
@@ -66,25 +66,26 @@ namespace EnergyPlus {
     }
 
     AutoSizingResultType HeatingAirflowUASizer::size(Real64 _originalValue) {
+        AutoSizingResultType errorsFound = AutoSizingResultType::NoError;
         this->preSize(this->baseFlags, _originalValue);
         if (this->flags.curZoneEqNum > 0) {
             if (this->flags.termUnitSingDuct && (this->flags.curTermUnitSizingNum > 0)) {
-                this->autoSizedValue = StdRhoAir * this->termUnitSizing(this->flags.curTermUnitSizingNum).AirVolFlow;
+                this->autoSizedValue = DataEnvironment::StdRhoAir * this->termUnitSizing(this->flags.curTermUnitSizingNum).AirVolFlow;
             } else if ((this->flags.termUnitPIU || this->flags.termUnitIU) && (this->flags.curTermUnitSizingNum > 0)) {
-                this->autoSizedValue = StdRhoAir * this->termUnitSizing(this->flags.curTermUnitSizingNum).AirVolFlow *
+                this->autoSizedValue = DataEnvironment::StdRhoAir * this->termUnitSizing(this->flags.curTermUnitSizingNum).AirVolFlow *
                         this->termUnitSizing(this->flags.curTermUnitSizingNum).ReheatAirFlowMult;
             } else if (this->flags.zoneEqFanCoil) {
-                this->autoSizedValue = StdRhoAir * this->finalZoneSizing(this->flags.curZoneEqNum).DesHeatVolFlow;
+                this->autoSizedValue = DataEnvironment::StdRhoAir * this->finalZoneSizing(this->flags.curZoneEqNum).DesHeatVolFlow;
             } else if (this->flags.otherEqType) {
                 if (this->zoneEqSizing(this->flags.curZoneEqNum).SystemAirFlow) {
-                    this->autoSizedValue = this->zoneEqSizing(this->flags.curZoneEqNum).AirVolFlow * StdRhoAir;
+                    this->autoSizedValue = this->zoneEqSizing(this->flags.curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
                 } else if (this->zoneEqSizing(this->flags.curZoneEqNum).HeatingAirFlow) {
-                    this->autoSizedValue = this->zoneEqSizing(this->flags.curZoneEqNum).HeatingAirVolFlow * StdRhoAir;
+                    this->autoSizedValue = this->zoneEqSizing(this->flags.curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
                 } else {
                     this->autoSizedValue = this->finalZoneSizing(this->flags.curZoneEqNum).DesHeatMassFlow;
                 }
             } else {
-                // did not specify a configuration type -- fatal developer error
+                errorsFound = AutoSizingResultType::ErrorType1;
             }
         } else if (flags.curSysNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
@@ -95,7 +96,7 @@ namespace EnergyPlus {
                 Real64 autoSizeDesign = 0.0;
                 if (this->baseFlags.curOASysNum > 0) {
                     if (this->outsideAirSys(this->baseFlags.curOASysNum).AirLoopDOASNum > -1) {
-                        autoSizeDesign = this->airloopDOAS[this->outsideAirSys(this->baseFlags.curOASysNum).AirLoopDOASNum].SizingMassFlow / StdRhoAir;
+                        autoSizeDesign = this->airloopDOAS[this->outsideAirSys(this->baseFlags.curOASysNum).AirLoopDOASNum].SizingMassFlow / DataEnvironment::StdRhoAir;
                     } else {
                         autoSizeDesign = this->finalSysSizing(flags.curSysNum).DesOutAirVolFlow;
                     }
@@ -118,10 +119,10 @@ namespace EnergyPlus {
                         autoSizeDesign = this->finalSysSizing(flags.curSysNum).DesMainVolFlow;
                     }
                 }
-                autoSizeDesign *= StdRhoAir;
+                autoSizeDesign *= DataEnvironment::StdRhoAir;
             }
         }
-        return AutoSizingResultType::NoError;
+        return errorsFound;
     }
 
 }
