@@ -1757,7 +1757,6 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
 
     int ZoneNodeNum = 1;
     int InletNodeNum = thisHeatCoolAT.InletNodeNum;
-    int OutletNodeNum = thisHeatCoolAT.OutletNodeNum;
     ZoneEquipConfig(thisHeatCoolAT.ActualZoneNum).InletNodeAirLoopNum(thisHeatCoolAT.CtrlZoneInNodeIndex) = 1;
     // set heating zone and AT unit inlet conditions
     DataLoopNode::Node(ZoneNodeNum).Temp = 20.0;
