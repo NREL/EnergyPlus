@@ -65,7 +65,10 @@
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <unordered_map>
+#include <string>
 
 namespace EnergyPlus {
 
@@ -300,8 +303,23 @@ namespace EnergyPlus {
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
         PipesData pipes;
+
         PlantChillersData dataPlantChillers;
         //OutputReportTabular outputReportTabular;
+
+        // todo: move this from a reference to an object value
+        // after we have eliminated all calls to getSingleton
+        // after we've plumbed enough of the functions to allow
+        OutputFiles outputFiles;
+
+        EnergyPlusData() {
+            OutputFiles::setSingleton(&outputFiles);
+        }
+
+        // Cannot safely copy or delete this until we eradicate all remaining
+        // calls to OutputFiles::getSingleton and OutputFiles::setSingleton
+        EnergyPlusData(const EnergyPlusData &) = delete;
+        EnergyPlusData(EnergyPlusData &&) = delete;
 
         // all clear states
         void clear_state() override {

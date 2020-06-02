@@ -334,7 +334,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients();
+            GetUserConvectionCoefficients(OutputFiles::getSingleton());
             GetUserSuppliedConvectionCoeffs = false;
         }
 
@@ -550,7 +550,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients();
+            GetUserConvectionCoefficients(OutputFiles::getSingleton());
             GetUserSuppliedConvectionCoeffs = false;
         }
 
@@ -862,6 +862,7 @@ namespace ConvectionCoefficients {
         return AgainstWind;
     }
 
+<<<<<<< HEAD
     bool SetAdaptiveConvectionAlgoCoefficient(const std::unordered_map<std::string, int>& HcInt_ConvectionTypesMap, int* const InsideFaceAdaptiveConvectionAlgoParam, const std::string equationName, const std::string curveName, const std::string sourceFieldName, const std::string curveFieldName, const std::string RoutineName, const std::string CurrentModuleObject){
 
         bool ErrorsFound = false;
@@ -885,7 +886,7 @@ namespace ConvectionCoefficients {
         return ErrorsFound;
     }
 
-    void GetUserConvectionCoefficients()
+    void GetUserConvectionCoefficients(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1995,7 +1996,7 @@ namespace ConvectionCoefficients {
             ShowFatalError(RoutineName + "Errors found getting input.  Program termination.");
         }
 
-        SetupAdaptiveConvectionStaticMetaData(OutputFiles::getSingleton());
+        SetupAdaptiveConvectionStaticMetaData(outputFiles);
     }
 
     void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int const Value)

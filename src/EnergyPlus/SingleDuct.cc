@@ -1154,6 +1154,14 @@ namespace SingleDuct {
             //  CALL SetupOutputVariable('Damper Position', Sys(SysNum)%DamperPosition, &
             //                        'System','Average',Sys(SysNum)%SysName)
 
+            // Setup output for the air terminal single duct constant volume no reheat.
+            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
+                OutputProcessor::Unit::m3_s,
+                sd_airterminal(SysNum).OutdoorAirFlowRate,
+                "System",
+                "Average",
+                sd_airterminal(SysNum).SysName);
+
         } // End Number of Sys Loop
 
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:NoReheat";
@@ -3688,9 +3696,6 @@ namespace SingleDuct {
             }
         }
 
-        //  set OA report variable
-        this->OutdoorAirFlowRate = (MassFlow / StdRhoAir) * AirLoopOAFrac;
-
         // push the flow rate history
         this->MassFlow3 = this->MassFlow2;
         this->MassFlow2 = this->MassFlow1;
@@ -5310,6 +5315,8 @@ namespace SingleDuct {
         if (Contaminant.GenericContamSimulation) {
             Node(OutletNode).GenContam = Node(InletNode).GenContam;
         }
+        // set OA volume flow rate report variable
+        this->CalcOutdoorAirVolumeFlowRate();
     }
 
     //        End of Update subroutines for the Sys Module
@@ -6232,6 +6239,16 @@ namespace SingleDuct {
         } else {
             // warn user that system sizing is needed to size coils when AT Mixer is used ?
             // if there were a message here then this function should only be called when SizingDesRunThisZone is true
+        }
+    }
+
+    void SingleDuctAirTerminal::CalcOutdoorAirVolumeFlowRate()
+    {
+        // calculates the amount of outdoor air volume flow rate using the supply air flow rate and OA fraction
+        if (this->AirLoopNum > 0) {
+            this->OutdoorAirFlowRate = (this->sd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+        } else {
+            // do nothing for now
         }
     }
 

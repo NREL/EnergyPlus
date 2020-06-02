@@ -128,11 +128,11 @@ public:
 
     Array1D<instanceOfWeatherData> weatherDataArray;
 
-    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(DataGlobal &dataGlobals, int objectType, std::string objectName);
+    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
-    void getWeatherData(DataGlobal &dataGlobals);
+    void getWeatherData(EnergyPlusData &state);
 
-    void initAndSim(DataGlobal &dataGlobals);
+    void initAndSim(EnergyPlusData &state);
 
     void developMesh();
 

@@ -452,7 +452,7 @@ namespace ConvectionCoefficients {
                   Real64 WindDirection // Wind direction measured clockwise from geographhic North
     );
 
-    void GetUserConvectionCoefficients();
+    void GetUserConvectionCoefficients(OutputFiles &outputFiles);
 
     void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int Value);
 
