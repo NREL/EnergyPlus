@@ -243,19 +243,13 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataAirLoop::AirToZoneNodeInfo(2).CoolCtrlZoneNums(1) = 4;
     DataAirLoop::AirToZoneNodeInfo(2).CoolCtrlZoneNums(2) = 5;
 
-<<<<<<< HEAD
     DataAirLoop::AirToZoneNodeInfo(3).NumZonesCooled = 1;
     DataAirLoop::AirToZoneNodeInfo(3).CoolCtrlZoneNums.allocate(1);
     DataAirLoop::AirToZoneNodeInfo(3).CoolCtrlZoneNums(1) = 6;
 
     DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
-=======
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
->>>>>>> 6c9ad3619c844ea3fb1df5c613067f3de5c0c423
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 1;
