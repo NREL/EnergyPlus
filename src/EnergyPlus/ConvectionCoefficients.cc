@@ -862,7 +862,6 @@ namespace ConvectionCoefficients {
         return AgainstWind;
     }
 
-<<<<<<< HEAD
     bool SetAdaptiveConvectionAlgoCoefficient(const std::unordered_map<std::string, int>& HcInt_ConvectionTypesMap, int* const InsideFaceAdaptiveConvectionAlgoParam, const std::string equationName, const std::string curveName, const std::string sourceFieldName, const std::string curveFieldName, const std::string RoutineName, const std::string CurrentModuleObject){
 
         bool ErrorsFound = false;

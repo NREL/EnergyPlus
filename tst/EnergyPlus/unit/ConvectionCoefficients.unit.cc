@@ -1772,7 +1772,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
     DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
     ConvectionCoefficients::InitInteriorConvectionCoeffs(DataHeatBalSurface::TempSurfInTmp);
-    ConvectionCoefficients::GetUserConvectionCoefficients();
+    ConvectionCoefficients::GetUserConvectionCoefficients(OutputFiles::getSingleton());
 
     int algorithm_identifier;
 
