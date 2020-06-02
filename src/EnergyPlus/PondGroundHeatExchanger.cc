@@ -77,8 +77,6 @@ namespace EnergyPlus {
 
 namespace PondGroundHeatExchanger {
 
-    std::ofstream file("pond.csv", std::ofstream::out);
-
     // Module containing the routines dealing with pond ground heat exchangers
 
     // MODULE INFORMATION:
