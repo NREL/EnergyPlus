@@ -62,5 +62,5 @@ int main(int argc, const char *argv[])
     EnergyPlus::EnergyPlusData state;
 
     ProcessArgs(state, argc, argv);
-    EnergyPlusPgm(state);
+    return EnergyPlusPgm(state);
 }

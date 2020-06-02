@@ -71,7 +71,7 @@ public:
     Real64 aveGroundTempAmplitude;
     Real64 phaseShiftInSecs;
 
-    static std::shared_ptr<KusudaGroundTempsModel> KusudaGTMFactory(DataGlobal &dataGlobals, int objectType, std::string objectName);
+    static std::shared_ptr<KusudaGroundTempsModel> KusudaGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
     Real64 getGroundTemp() override;
 
