@@ -836,13 +836,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());  // read schedules
+    ProcessScheduleInput(state.outputFiles);  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     SizingManager::GetOARequirements();
-    InternalHeatGains::GetInternalHeatGainsInput(state, outputFiles());
+    InternalHeatGains::GetInternalHeatGainsInput(state);
     GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
     GetSysInput(state);
@@ -851,7 +851,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
-    
+
     DataAirLoop::AirLoopFlow.allocate(1);
     int const SysNum(1);
     auto &thisAirTerminal = SingleDuct::sd_airterminal(SysNum);
