@@ -103,7 +103,7 @@ namespace AirflowNetworkBalanceManager {
                                      Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
     );
 
-    void GetAirflowNetworkInput(EnergyPlusData &state, EnergyPlus::OutputFiles &outputFiles);
+    void GetAirflowNetworkInput(EnergyPlusData &state);
 
     void InitAirflowNetwork();
 

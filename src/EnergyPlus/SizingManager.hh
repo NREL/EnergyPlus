@@ -92,7 +92,7 @@ namespace SizingManager {
     // Functions
     void clear_state();
 
-    void ManageSizing(EnergyPlusData &state, OutputFiles &outputFiles);
+    void ManageSizing(EnergyPlusData &state);
 
     bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
                                      bool const WarmupFlag,
@@ -140,7 +140,7 @@ namespace SizingManager {
 
     void GetPlantSizingInput();
 
-    void SetupZoneSizing(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound);
+    void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound);
 
     void ReportZoneSizing(OutputFiles &outputFiles,
                           std::string const &ZoneName,   // the name of the zone

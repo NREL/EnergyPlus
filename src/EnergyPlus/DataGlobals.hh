@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 
@@ -237,10 +238,7 @@ namespace DataGlobals {
     extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
     extern int OutputFilePerfLog;                    // Unit number for performance log outputs
-    extern int OutputFileShadingFrac;                // Unit number for shading output
     extern int StdMeterRecordCount;                  // Count of Meter output records
-    extern int OutputDElightIn;                      // Unit number for the DElight In file
-    extern std::ostream *delightin_stream;           // Internal stream used for DElight In file
     extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation
     extern bool SysSizingCalc;                       // TRUE if system sizing calculation
     extern bool DoZoneSizing;                        // User input in SimulationControl object
@@ -300,7 +298,7 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state();
+    void clear_state(EnergyPlus::OutputFiles &outputFiles);
 
 } // namespace DataGlobals
 
