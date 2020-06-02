@@ -51,6 +51,7 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
@@ -69,7 +70,7 @@ namespace EnergyPlus {
         tmpZoneEqSizing.allocate(1);
 
         CommonFlags baseFlags;
-        baseFlags.compType = WaterCoils::CoilType_Heating;
+        baseFlags.compType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
         baseFlags.compName = "MyWaterCoil";
         baseFlags.zoneSizingRunDone = true;
 

@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
@@ -2165,6 +2166,18 @@ namespace WaterCoils {
         DesCoilExitTemp = 0.0;
         LoopErrorsFound = false;
         CpAirStd = PsyCpAirFnW(0.0);
+        EnergyPlus::CommonFlags baseFlags;
+        baseFlags.sysSizingRunDone = DataSizing::SysSizingRunDone;
+        baseFlags.zoneSizingRunDone = DataSizing::ZoneSizingRunDone;
+        baseFlags.curSysNum = DataSizing::CurSysNum;
+        baseFlags.curOASysNum = DataSizing::CurOASysNum;
+        baseFlags.curZoneEqNum = DataSizing::CurZoneEqNum;
+        baseFlags.curDuctType = DataSizing::CurDuctType;
+        baseFlags.numPrimaryAirSys = DataHVACGlobals::NumPrimaryAirSys;
+        baseFlags.numSysSizInput = DataSizing::NumSysSizInput;
+        baseFlags.doSystemSizing = DataGlobals::DoSystemSizing;
+        baseFlags.numZoneSizingInput = DataSizing::NumZoneSizingInput;
+        baseFlags.doZoneSizing = DataGlobals::DoZoneSizing;
 
         // cooling coils
         if (WaterCoil(CoilNum).WaterCoilType == CoilType_Cooling && WaterCoil(CoilNum).RequestingAutoSize) {
@@ -2484,6 +2497,9 @@ namespace WaterCoils {
 
         if (WaterCoil(CoilNum).WaterCoilType == CoilType_Heating) {
 
+            baseFlags.compType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
+            baseFlags.compName = WaterCoil(CoilNum).Name;
+
             if (WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                 // use water design deltaT specified in the heating water coils
                 DataWaterCoilSizHeatDeltaT = WaterCoil(CoilNum).DesignWaterDeltaTemp;
@@ -2624,6 +2640,17 @@ namespace WaterCoils {
                     TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
                     //TODO: RequestSizing(state, CompType, CompName, HeatingAirflowUASizing, SizingString, TempSize, bPRINT, RoutineName);
                     // WaterCoil( CoilNum ).InletAirMassFlowRate = TempSize;
+                    EnergyPlus::HeatingAirflowUASizer sizer;
+                    EnergyPlus::HeatingAirflowUASizerFlags flags;
+                    flags.curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
+                    flags.curZoneEqNum = DataSizing::CurZoneEqNum;
+                    sizer.zoneSizingInput = DataSizing::ZoneSizingInput;
+                    flags.termUnitSingDuct = TermUnitSingDuct;
+                    flags.termUnitPIU = TermUnitPIU;
+                    flags.termUnitIU = TermUnitIU;
+                    sizer.setParameters(baseFlags, flags, DataSizing::TermUnitSizing, DataSizing::FinalZoneSizing, DataSizing::ZoneEqSizing);
+                    AutoSizingResultType result = sizer.size(TempSize);
+                    WaterCoil(CoilNum).InletAirMassFlowRate = sizer.autoSizedValue;
                     WaterCoil(CoilNum).DesAirVolFlowRate = DataAirFlowUsedForSizing;                // coil report
                     WaterCoil(CoilNum).InletAirMassFlowRate = DataAirFlowUsedForSizing * StdRhoAir; // this is stiil volume flow!
                 } else {
@@ -2636,8 +2663,20 @@ namespace WaterCoils {
                     WaterCoil(CoilNum).InletAirHumRat = TempSize;
                     TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
                     //TODO: RequestSizing(state, CompType, CompName, HeatingAirflowUASizing, SizingString, TempSize, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).DesAirMassFlowRate = TempSize; // coil report
-                    WaterCoil(CoilNum).InletAirMassFlowRate = TempSize;
+                    EnergyPlus::HeatingAirflowUASizer sizer;
+                    EnergyPlus::HeatingAirflowUASizerFlags flags;
+                    flags.curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
+                    flags.curZoneEqNum = DataSizing::CurZoneEqNum;
+                    sizer.zoneSizingInput = DataSizing::ZoneSizingInput;
+                    sizer.unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
+                    sizer.oaSysEqSizing = DataSizing::OASysEqSizing;
+                    flags.termUnitSingDuct = TermUnitSingDuct;
+                    flags.termUnitPIU = TermUnitPIU;
+                    flags.termUnitIU = TermUnitIU;
+                    sizer.setParameters(baseFlags, flags, DataSizing::TermUnitSizing, DataSizing::FinalZoneSizing, DataSizing::ZoneEqSizing);
+                    AutoSizingResultType result = sizer.size(TempSize);
+                    WaterCoil(CoilNum).DesAirMassFlowRate = sizer.autoSizedValue; // coil report
+                    WaterCoil(CoilNum).InletAirMassFlowRate = sizer.autoSizedValue;
                 }
 
                 // zone and air loop coils use different design coil load calculations, air loop coils use air side capacity,
