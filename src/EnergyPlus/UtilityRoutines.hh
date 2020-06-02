@@ -573,6 +573,12 @@ namespace UtilityRoutines {
 
     inline bool exists(const std::string& filename);
 
+    bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound);
+
+    bool ValidateFuelTypeWithFuelTypeNum(std::string const &FuelTypeInput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
+
+    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput, std::string &FuelTypeOutput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
+
 } // namespace UtilityRoutines
 
 } // namespace EnergyPlus
