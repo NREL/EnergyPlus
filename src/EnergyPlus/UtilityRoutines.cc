@@ -482,7 +482,7 @@ namespace UtilityRoutines {
 
         // PURPOSE OF THIS FUNCTION:
         // Validates fuel types and sets output strings
-        
+
         auto const SELECT_CASE_var(FuelTypeInput);
 
         if (SELECT_CASE_var == "ELECTRICITY") {
@@ -557,7 +557,7 @@ namespace UtilityRoutines {
 
         return FuelTypeErrorsFound;
     }
-    
+
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
                                                    int &FuelTypeNum,
@@ -692,17 +692,16 @@ namespace UtilityRoutines {
 
         AbortProcessing = true;
         if (AskForConnectionsReport) {
-            OutputFiles &outputFiles = OutputFiles::getSingleton();
             AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
 
             ShowMessage("Fatal error -- final processing.  More error messages may appear.");
-            SetupNodeVarsForReporting(outputFiles);
+            SetupNodeVarsForReporting(state.outputFiles);
 
             ErrFound = false;
             TerminalError = false;
-            TestBranchIntegrity(outputFiles, ErrFound);
+            TestBranchIntegrity(state.outputFiles, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(state, outputFiles, ErrFound);
+            TestAirPathIntegrity(state, state.outputFiles, ErrFound);
             if (ErrFound) TerminalError = true;
             CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;
@@ -712,8 +711,8 @@ namespace UtilityRoutines {
             if (ErrFound) TerminalError = true;
 
             if (!TerminalError) {
-                ReportAirLoopConnections(outputFiles);
-                ReportLoopConnections(outputFiles);
+                ReportAirLoopConnections(state.outputFiles);
+                ReportLoopConnections(state.outputFiles);
             }
 
         } else if (!ExitDuringSimulations) {
@@ -722,14 +721,14 @@ namespace UtilityRoutines {
         }
 
         if (AskForSurfacesReport) {
-            ReportSurfaces(OutputFiles::getSingleton());
+            ReportSurfaces(state.outputFiles);
         }
 
         ReportSurfaceErrors();
         CheckPlantOnAbort();
         ShowRecurringErrors();
         SummarizeErrors();
-        CloseMiscOpenFiles();
+        CloseMiscOpenFiles(state.outputFiles);
         NumWarnings = fmt::to_string(TotalWarningErrors);
         NumSevere = fmt::to_string(TotalSevereErrors);
         NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
@@ -804,7 +803,7 @@ namespace UtilityRoutines {
         return EXIT_FAILURE;
     }
 
-    void CloseMiscOpenFiles()
+    void CloseMiscOpenFiles(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -844,13 +843,13 @@ namespace UtilityRoutines {
         //      INTEGER :: UnitNumber
         //      INTEGER :: ios
 
-        CloseReportIllumMaps();
-        CloseDFSFile(OutputFiles::getSingleton());
+        CloseReportIllumMaps(outputFiles);
+        CloseDFSFile(outputFiles);
 
-        if (DebugOutput || OutputFiles::getSingleton().debug.position() > 0) {
-            OutputFiles::getSingleton().debug.close();
+        if (DebugOutput || outputFiles.debug.position() > 0) {
+            outputFiles.debug.close();
         } else {
-            OutputFiles::getSingleton().debug.del();
+            outputFiles.debug.del();
         }
     }
 
@@ -919,7 +918,7 @@ namespace UtilityRoutines {
         }
     }
 
-    int EndEnergyPlus()
+    int EndEnergyPlus(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -984,7 +983,7 @@ namespace UtilityRoutines {
         ReportSurfaceErrors();
         ShowRecurringErrors();
         SummarizeErrors();
-        CloseMiscOpenFiles();
+        CloseMiscOpenFiles(outputFiles);
         NumWarnings = RoundSigDigits(TotalWarningErrors);
         strip(NumWarnings);
         NumSevere = RoundSigDigits(TotalSevereErrors);
