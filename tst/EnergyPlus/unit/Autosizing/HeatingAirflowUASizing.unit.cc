@@ -51,6 +51,7 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 namespace EnergyPlus {
 
@@ -62,11 +63,21 @@ namespace EnergyPlus {
         // there is definitely a better way to do this...
         Array1D<EnergyPlus::DataSizing::ZoneSizingData> tmpFinalZoneSizing;
         Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> tmpZoneEqSizing;
+        tmpZoneEqSizing.allocate(1);
+
         CommonFlags baseFlags;
+        baseFlags.compType = WaterCoils::CoilType_Cooling;
+        baseFlags.compName = "MyWaterCoil";
+        baseFlags.zoneSizingRunDone = true;
+
         // set up the flags to specify the sizing configuration
         HeatingAirflowUASizerFlags flags;
-        flags.termUnitSingDuct = true;
         flags.curTermUnitSizingNum = 1;
+        flags.curZoneEqNum = 1;
+        baseFlags.curZoneEqNum = 1;
+
+        // Test 1 - Single Duct TU
+        flags.termUnitSingDuct = true;
         // start with an auto-sized value as the user input
         Real64 inputValue = EnergyPlus::DataSizing::AutoSize;
         // create the sizer and do sizing

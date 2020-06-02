@@ -50,7 +50,7 @@
 #include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 
-Real64 StdRhoAir = 1000;
+Real64 StdRhoAir = 1.0;
 namespace EnergyPlus {
 
     void HeatingAirflowUASizer::setParameters(
