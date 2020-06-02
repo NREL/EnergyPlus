@@ -66,7 +66,7 @@ namespace EnergyPlus {
         tmpZoneEqSizing.allocate(1);
 
         CommonFlags baseFlags;
-        baseFlags.compType = WaterCoils::CoilType_Cooling;
+        baseFlags.compType = WaterCoils::CoilType_Heating;
         baseFlags.compName = "MyWaterCoil";
         baseFlags.zoneSizingRunDone = true;
 
@@ -86,7 +86,7 @@ namespace EnergyPlus {
         AutoSizingResultType result = sizer.size(inputValue);
         EXPECT_EQ(AutoSizingResultType::NoError, result);
         EXPECT_TRUE(sizer.wasAutoSized);
-        EXPECT_NEAR(0, sizer.autoSizedValue, 0.01);
+        EXPECT_NEAR(5, sizer.autoSizedValue, 0.01);
     }
 
 }
