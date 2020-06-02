@@ -28,6 +28,7 @@ compilers:
       - ./scripts/dev/check_for_tabs_in_idfs.py
       - ./scripts/dev/check_for_bom_in_idfs.py
       - ./scripts/dev/verify_cmake_dirs.py
+      - ./scripts/dev/find_included_cc_files.py
 
   - name: "gcc"
     version: "7.5"

@@ -312,7 +312,7 @@ namespace DXFEarClipping {
         evert = 3;
         removed = false;
         while (nvertcur > 3) {
-            generate_ears(nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
+            generate_ears(OutputFiles::getSingleton(), nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
             if (!any_gt(ears, 0)) {
                 ShowWarningError("DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");
@@ -518,7 +518,8 @@ namespace DXFEarClipping {
         return inside;
     }
 
-    void generate_ears(int const nvert, // number of vertices in polygon
+    void generate_ears(OutputFiles &outputFiles,
+                       int const nvert, // number of vertices in polygon
                        Array1D<Vector_2d> &vertex,
                        Array1D_int &ears,       // number of ears possible (dimensioned to nvert)
                        int &nears,              // number of ears found
@@ -663,7 +664,7 @@ namespace DXFEarClipping {
                     earvert(3) = evert;
                 }
                 if (trackit) {
-                    print(OutputFiles::getSingleton().debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
+                    print(outputFiles.debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
                 }
             }
         }

@@ -1062,7 +1062,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.outputFiles);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -1076,7 +1076,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -1085,7 +1085,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -1137,7 +1137,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
+                    HeatBalanceManager::ManageHeatBalance(state);
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -2153,7 +2153,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.outputFiles);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -2167,7 +2167,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(state, outputFiles(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -2176,7 +2176,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -2228,7 +2228,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
+                    HeatBalanceManager::ManageHeatBalance(state);
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -2267,7 +2267,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     // get availability schedule to work
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -2366,7 +2366,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     // get availability schedule to work
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
