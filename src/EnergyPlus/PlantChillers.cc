@@ -2184,42 +2184,16 @@ namespace PlantChillers {
             thisChiller.MaxExhaustperPowerOutput = DataIPShortCuts::rNumericArgs(23);
             thisChiller.DesignMinExitGasTemp = DataIPShortCuts::rNumericArgs(24);
 
-            thisChiller.FuelType = DataIPShortCuts::cAlphaArgs(12);
-
-            {
-                auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(12));
-
-                if (SELECT_CASE_var == "NATURALGAS") {
-                    thisChiller.FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    thisChiller.FuelType = "Diesel";
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    thisChiller.FuelType = "Gasoline";
-
-                } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    thisChiller.FuelType = "FuelOil#1";
-
-                } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    thisChiller.FuelType = "FuelOil#2";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    thisChiller.FuelType = "Propane";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    thisChiller.FuelType = "OtherFuel1";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    thisChiller.FuelType = "OtherFuel2";
-
-                } else {
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + '=' + DataIPShortCuts::cAlphaArgs(12));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError(
-                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
-                    ErrorsFound = true;
-                }
+            // Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(12), thisChiller.FuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(12) + '=' + DataIPShortCuts::cAlphaArgs(12));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(
+                    "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
+                ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             thisChiller.FuelHeatingValue = DataIPShortCuts::rNumericArgs(25);
@@ -4059,39 +4033,15 @@ namespace PlantChillers {
             }
 
             // Fuel Type Case Statement
-            {
-                auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(10));
-                if (SELECT_CASE_var == "NATURALGAS") {
-                    thisChiller.FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    thisChiller.FuelType = "Diesel";
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    thisChiller.FuelType = "Gasoline";
-
-                } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    thisChiller.FuelType = "FuelOil#1";
-
-                } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    thisChiller.FuelType = "FuelOil#2";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    thisChiller.FuelType = "Propane";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    thisChiller.FuelType = "OtherFuel1";
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    thisChiller.FuelType = "OtherFuel2";
-
-                } else {
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + DataIPShortCuts::cAlphaArgs(10));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError(
-                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
-                    ErrorsFound = true;
-                }
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(10), thisChiller.FuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + DataIPShortCuts::cAlphaArgs(10));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(
+                    "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
+                ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             thisChiller.HeatRecMaxTemp = DataIPShortCuts::rNumericArgs(46);

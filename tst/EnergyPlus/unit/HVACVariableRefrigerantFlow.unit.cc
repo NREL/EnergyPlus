@@ -4716,6 +4716,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     EXPECT_EQ(0, VRFTU(VRFTUNum).TUListIndex);
     EXPECT_EQ(0, VRFTU(VRFTUNum).IndexToTUInTUList);
 
+    // Additional tests for fuel type input
+    EXPECT_EQ(VRF(VRFTUNum).FuelType, FuelTypeElectricity);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
