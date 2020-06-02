@@ -53,17 +53,40 @@
 // EnergyPlus Headers
 #include <iostream>
 #include <fstream>
+#include <EnergyPlus/FileSystem.hh>
 
 
-TEST(Basic, Basic)
+TEST(FileSystem, movefile_test)
 {
+    // test moveFile function, specifically on Windows
+
+    // create text file to be overridden by new file
     std::string filename = "FileSystemTest.txt";
     std::string line;
-    std::ofstream ofs(filename, std::ofstream::out);
+    std::stringstream buffer;
+    std::ofstream ofs(filename);
     ofs << "Version, 9.3;" << std::endl;
-    std::ifstream ofs(filename);
-    while (getline (filename, line)) {
-        std::cout << line << '\n';
-    }
+    // read text file
+    std::ifstream ifs(filename);
+    buffer << ifs.rdbuf();
+    // check that text file was created correctly
+    EXPECT_EQ(buffer.str(), "Version, 9.3;\n");
 
+    // create temporary text file to move to existing file created above
+    std::string filename_temp = "FileSystemTest_temp.txt";
+    std::stringstream buffer_temp;
+    std::ofstream ofs_temp(filename_temp);
+    ofs_temp << "Version, 9.4;" << std::endl;
+
+    // move temporary text file to
+    EnergyPlus::FileSystem::moveFile(filename_temp, filename);
+    // read original text file after using moveFile function
+    std::ifstream ifs_temp(filename);
+    buffer_temp << ifs_temp.rdbuf();
+    // check that original text file was overwritten by temporary text file
+    EXPECT_EQ(buffer_temp.str(), "Version, 9.4;\n");
+
+    // remove files
+    EnergyPlus::FileSystem::removeFile(filename);
+    EnergyPlus::FileSystem::removeFile(filename_temp);
 }
