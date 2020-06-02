@@ -243,6 +243,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataAirLoop::AirToZoneNodeInfo(2).CoolCtrlZoneNums(1) = 4;
     DataAirLoop::AirToZoneNodeInfo(2).CoolCtrlZoneNums(2) = 5;
 
+<<<<<<< HEAD
     DataAirLoop::AirToZoneNodeInfo(3).NumZonesCooled = 1;
     DataAirLoop::AirToZoneNodeInfo(3).CoolCtrlZoneNums.allocate(1);
     DataAirLoop::AirToZoneNodeInfo(3).CoolCtrlZoneNums(1) = 6;
@@ -250,6 +251,11 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+=======
+    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+>>>>>>> 6c9ad3619c844ea3fb1df5c613067f3de5c0c423
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 1;
@@ -370,8 +376,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     SystemAvailabilityManager::ManageSystemAvailability();
     EXPECT_TRUE(DataHVACGlobals::OptStartData.OptStartFlag(6)); // avail manager should be set to cycle on for Zone 6
 
-    // #7866 - Check that the system restores setpoints to unoccupied setpoints and don't use occupied setpoints post-occupancy
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(OutputFiles::getSingleton());
+    // Check that the system restores setpoints to unoccupied setpoints and don't use occupied setpoints post-occupancy
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.outputFiles);
     DataHeatBalFanSys::TempControlType.allocate(DataGlobals::NumOfZones);
     DataHeatBalFanSys::TempZoneThermostatSetPoint.allocate(DataGlobals::NumOfZones);
 
@@ -631,7 +637,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleGetInput)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     // get system availability schedule
     SystemAvailabilityManager::GetSysAvailManagerInputs();

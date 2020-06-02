@@ -136,7 +136,7 @@ namespace SizingManager {
         NumAirLoops = 0;
     }
 
-    void ManageSizing(EnergyPlusData &state, OutputFiles &outputFiles)
+    void ManageSizing(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -218,7 +218,7 @@ namespace SizingManager {
         GetZoneAirDistribution(); // get zone air distribution objects
         GetZoneHVACSizing();      // get zone HVAC sizing object
         GetAirTerminalSizing();   // get air terminal sizing object
-        GetSizingParams(outputFiles);        // get the building level sizing paramets
+        GetSizingParams(state.outputFiles);        // get the building level sizing paramets
         GetZoneSizingInput();     // get the Zone Sizing input
         GetSystemSizingInput();   // get the System Sizing input
         GetPlantSizingInput();    // get the Plant Sizing input
@@ -274,20 +274,20 @@ namespace SizingManager {
             Available = true;
 
             if (SizingFileColSep == CharComma) {
-                outputFiles.zsz.fileName = outputFiles.outputZszCsvFileName;
+                state.outputFiles.zsz.fileName = state.outputFiles.outputZszCsvFileName;
             } else if (SizingFileColSep == CharTab) {
-                outputFiles.zsz.fileName = outputFiles.outputZszTabFileName;
+                state.outputFiles.zsz.fileName = state.outputFiles.outputZszTabFileName;
             } else {
-                outputFiles.zsz.fileName = outputFiles.outputZszTxtFileName;
+                state.outputFiles.zsz.fileName = state.outputFiles.outputZszTxtFileName;
             }
 
-            outputFiles.zsz.ensure_open("ManageSizing");
+            state.outputFiles.zsz.ensure_open("ManageSizing");
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
             ResetEnvironmentCounter();
             KickOffSizing = true;
-            SetupZoneSizing(state, outputFiles, ErrorsFound); // Should only be done ONCE
+            SetupZoneSizing(state, ErrorsFound); // Should only be done ONCE
             KickOffSizing = false;
 
             for (iZoneCalcIter = 1; iZoneCalcIter <= numZoneSizeIter; ++iZoneCalcIter) { // normally this is performed once but if load component
@@ -307,7 +307,7 @@ namespace SizingManager {
                 NumSizingPeriodsPerformed = 0;
                 while (Available) { // loop over environments
 
-                    GetNextEnvironment(state.dataGlobals, outputFiles, Available, ErrorsFound); // get an environment
+                    GetNextEnvironment(state, Available, ErrorsFound); // get an environment
 
                     if (!Available) break;
                     if (ErrorsFound) break;
@@ -358,7 +358,7 @@ namespace SizingManager {
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
-                            UpdateZoneSizing(state.dataGlobals, outputFiles, BeginDay);
+                            UpdateZoneSizing(state, BeginDay);
                             UpdateFacilitySizing(state.dataGlobals, BeginDay);
                         }
 
@@ -403,7 +403,7 @@ namespace SizingManager {
                                     DesDayWeath(CurOverallSimDay).Press(TimeStepInDay) = OutBaroPress;
                                 }
 
-                                ManageHeatBalance(state, outputFiles);
+                                ManageHeatBalance(state);
 
                                 BeginHourFlag = false;
                                 BeginDayFlag = false;
@@ -417,7 +417,7 @@ namespace SizingManager {
                         } // ... End hour loop.
 
                         if (EndDayFlag) {
-                            UpdateZoneSizing(state.dataGlobals, outputFiles, EndDay);
+                            UpdateZoneSizing(state, EndDay);
                             UpdateFacilitySizing(state.dataGlobals, EndDay);
                         }
 
@@ -433,7 +433,7 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(state.dataGlobals, outputFiles, state.dataGlobals.EndZoneSizingCalc);
+                    UpdateZoneSizing(state, state.dataGlobals.EndZoneSizingCalc);
                     UpdateFacilitySizing(state.dataGlobals, state.dataGlobals.EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
@@ -450,7 +450,7 @@ namespace SizingManager {
             // both the pulse and normal zone sizing is complete so now post processing of the results is performed
             if (CompLoadReportIsReq) {
                 // call the routine that computes the decay curve
-                ComputeLoadComponentDecayCurve(OutputFiles::getSingleton());
+                ComputeLoadComponentDecayCurve(state.outputFiles);
                 // remove some of the arrays used to derive the decay curves
                 DeallocateLoadComponentArrays();
             }
@@ -474,13 +474,13 @@ namespace SizingManager {
             SysSizingCalc = true;
             Available = true;
             if (SizingFileColSep == CharComma) {
-                outputFiles.ssz.fileName = outputFiles.outputSszCsvFileName;
+                state.outputFiles.ssz.fileName = state.outputFiles.outputSszCsvFileName;
             } else if (SizingFileColSep == CharTab) {
-                outputFiles.ssz.fileName = outputFiles.outputSszTabFileName;
+                state.outputFiles.ssz.fileName = state.outputFiles.outputSszTabFileName;
             } else {
-                outputFiles.ssz.fileName = outputFiles.outputSszTxtFileName;
+                state.outputFiles.ssz.fileName = state.outputFiles.outputSszTxtFileName;
             }
-            outputFiles.ssz.ensure_open("ManageSizing");
+            state.outputFiles.ssz.ensure_open("ManageSizing");
 
             SimAir = true;
             SimZoneEquip = true;
@@ -495,7 +495,7 @@ namespace SizingManager {
             NumSizingPeriodsPerformed = 0;
             while (Available) { // loop over environments
 
-                GetNextEnvironment(state.dataGlobals, outputFiles, Available, ErrorsFound); // get an environment
+                GetNextEnvironment(state, Available, ErrorsFound); // get an environment
 
                 // check that environment is one of the design days
                 if (KindOfSim == ksRunPeriodWeather) {
@@ -540,7 +540,7 @@ namespace SizingManager {
                             DisplayString("Calculating System sizing");
                             DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                         }
-                        UpdateSysSizing(outputFiles, BeginDay);
+                        UpdateSysSizing(state.outputFiles, BeginDay);
                     }
 
                     for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -569,7 +569,7 @@ namespace SizingManager {
 
                             ManageWeather();
 
-                            UpdateSysSizing(outputFiles, DuringDay);
+                            UpdateSysSizing(state.outputFiles, DuringDay);
 
                             BeginHourFlag = false;
                             BeginDayFlag = false;
@@ -581,7 +581,7 @@ namespace SizingManager {
 
                     } // ... End hour loop.
 
-                    if (EndDayFlag) UpdateSysSizing(outputFiles, EndDay);
+                    if (EndDayFlag) UpdateSysSizing(state.outputFiles, EndDay);
 
                     if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
                         ++CurOverallSimDay;
@@ -592,7 +592,7 @@ namespace SizingManager {
             } // ... End environment loop
 
             if (NumSizingPeriodsPerformed > 0) {
-                UpdateSysSizing(outputFiles, EndSysSizingCalc);
+                UpdateSysSizing(state.outputFiles, EndSysSizingCalc);
                 SysSizingRunDone = true;
             } else {
                 ShowSevereError(RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
@@ -629,7 +629,7 @@ namespace SizingManager {
                         DOASHeatGainRateAtClPk = 0.0;
                         TStatSetPtAtPk = 0.0;
                     }
-                    ReportZoneSizing(outputFiles,
+                    ReportZoneSizing(state.outputFiles,
                                      FinalZoneSizing(CtrlZoneNum).ZoneName,
                                      "Cooling",
                                      CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad,
@@ -676,7 +676,7 @@ namespace SizingManager {
                         DOASHeatGainRateAtHtPk = 0.0;
                         TStatSetPtAtPk = 0.0;
                     }
-                    ReportZoneSizing(outputFiles,
+                    ReportZoneSizing(state.outputFiles,
                                      FinalZoneSizing(CtrlZoneNum).ZoneName,
                                      "Heating",
                                      CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad,
@@ -746,7 +746,7 @@ namespace SizingManager {
                     coolCap = FinalSysSizing(AirLoopNum).TotCoolCap;
                 }
                 if (coolPeakDD > 0) {
-                    ReportSysSizing(outputFiles,
+                    ReportSysSizing(state.outputFiles,
                                     curName,
                                     "Cooling",
                                     coolPeakLoadKind,
@@ -757,7 +757,7 @@ namespace SizingManager {
                                     coolPeakDDDate,
                                     SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(coolPeakDD));
                 } else {
-                    ReportSysSizing(outputFiles,
+                    ReportSysSizing(state.outputFiles,
                                     curName,
                                     "Cooling",
                                     coolPeakLoadKind,
@@ -770,7 +770,7 @@ namespace SizingManager {
                 }
                 int heatPeakDD = SysSizPeakDDNum(AirLoopNum).HeatPeakDD;
                 if (heatPeakDD > 0) {
-                    ReportSysSizing(outputFiles,
+                    ReportSysSizing(state.outputFiles,
                                     curName,
                                     "Heating",
                                     "Sensible",
@@ -781,7 +781,7 @@ namespace SizingManager {
                                     SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate,
                                     SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(heatPeakDD));
                 } else {
-                    ReportSysSizing(outputFiles,
+                    ReportSysSizing(state.outputFiles,
                                     curName,
                                     "Heating",
                                     "Sensible",
@@ -3852,7 +3852,7 @@ namespace SizingManager {
         }
     }
 
-    void SetupZoneSizing(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3883,7 +3883,7 @@ namespace SizingManager {
         CurOverallSimDay = 0;
         while (Available) { // do for each environment
 
-            GetNextEnvironment(state.dataGlobals, outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -3917,7 +3917,7 @@ namespace SizingManager {
 
             ManageWeather();
 
-            ManageHeatBalance(state, outputFiles);
+            ManageHeatBalance(state);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -3928,7 +3928,7 @@ namespace SizingManager {
             //          ! do another timestep=1
             ManageWeather();
 
-            ManageHeatBalance(state, outputFiles);
+            ManageHeatBalance(state);
 
             //         do an end of day, end of environment time step
 
@@ -3938,7 +3938,7 @@ namespace SizingManager {
 
             ManageWeather();
 
-            ManageHeatBalance(state, outputFiles);
+            ManageHeatBalance(state);
 
         } // ... End environment loop.
     }
