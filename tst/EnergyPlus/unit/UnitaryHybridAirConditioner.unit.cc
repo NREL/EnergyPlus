@@ -174,13 +174,13 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     DataHeatBalance::ZoneIntGain.allocate(1);
 
     SizingManager::GetOARequirements();
-    GetOAControllerInputs(state, outputFiles());
+    GetOAControllerInputs(state);
     using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
     // Setup performance tables
     using namespace EnergyPlus::DataEnvironment;
     // process schedules
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     UpdateScheduleValues();
     // Get Unitary system
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
@@ -397,7 +397,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     // Setup performance tables
     using namespace EnergyPlus::DataEnvironment;
     // process schedules
-    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     UpdateScheduleValues();
     // Get Unitary system
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);

@@ -435,11 +435,11 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(outputFiles(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -449,7 +449,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, outputFiles(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
@@ -903,7 +903,6 @@ TEST_F(ConvectionCoefficientsFixture, TestWindward)
 
 TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 {
-
     std::string const idf_objects = this->getIDFString();
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -911,11 +910,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -925,7 +924,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
@@ -968,11 +967,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -982,7 +981,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
@@ -1025,11 +1024,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1039,7 +1038,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
@@ -1082,11 +1081,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1096,7 +1095,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
@@ -1139,11 +1138,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1153,7 +1152,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
@@ -1196,11 +1195,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1210,7 +1209,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
