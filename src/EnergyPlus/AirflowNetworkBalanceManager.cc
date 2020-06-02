@@ -494,7 +494,7 @@ namespace AirflowNetworkBalanceManager {
         if (present(FirstHVACIteration) && FirstHVACIteration) VAVTerminalRatio = 0.0;
 
         // Set AirLoop Number for fans
-        if (AssignFanAirLoopNumFlag) {
+        if (FirstHVACIteration && AssignFanAirLoopNumFlag) {
             AssignFanAirLoopNum();
             AssignFanAirLoopNumFlag = false;
         }
