@@ -594,7 +594,6 @@ namespace MixedAir {
 
         // USE Statements
         // Using/Aliasing
-        using DataAirLoop::AirLoopInputsFilled;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
         using EvaporativeCoolers::SimEvapCooler;
         using HeatingCoils::SimulateHeatingCoilComponents;
@@ -766,12 +765,10 @@ namespace MixedAir {
                                                                              sensOut,
                                                                              latOut);
                 }
-                if (AirLoopInputsFilled) UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, OACoolingCoil, OAHeatingCoil, 0);
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
-                    if (AirLoopInputsFilled) {
-                        UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
-                        MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
-                    }
+                    UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, OACoolingCoil, OAHeatingCoil, 0);
+                    UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
+                    if (Sim) MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
                 }
             } else if (SELECT_CASE_var == DXHeatPumpSystem) {
                 if (Sim) {
