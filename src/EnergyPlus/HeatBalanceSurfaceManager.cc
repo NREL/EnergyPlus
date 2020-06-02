@@ -4002,7 +4002,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         RecDifShortFromZ = false;
-        FractDifShortZtoZ = 0.0;
+        FractDifShortZtoZ.to_identity();
         D.to_identity();
 
         //      IF (.not. ANY(Zone%HasInterZoneWindow)) RETURN  ! this caused massive diffs
