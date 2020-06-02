@@ -1340,11 +1340,7 @@ namespace HybridEvapCoolingModel {
 
         MinOA_Msa = StepIns.MinimumOA; // Set object version of minimum VR Kg/s
 
-        std::vector<CMode>::const_iterator iterator;
-        iterator = OperatingModes.begin();
-        // skip the first one because that is standby
-        ++iterator;
-        for (; iterator != OperatingModes.end(); ++iterator) // iterate though the modes.
+        for (std::vector<CMode>::const_iterator iterator = OperatingModes.begin()+1; iterator != OperatingModes.end(); ++iterator) // iterate though the modes.
         {
             CMode Mode = *iterator;
             bool SAHR_OC_MetinMode = false;
@@ -1352,10 +1348,6 @@ namespace HybridEvapCoolingModel {
             int solution_map_sizeX = Mode.sol.MassFlowRatio.size();
             int solution_map_sizeY = Mode.sol.OutdoorAirFraction.size();
 
-            if (solution_map_sizeX != solution_map_sizeY) {
-                ShowWarningError("Error in solution space mapping, suggest adjusting operating constraints.");
-                return -2;
-            }
             // Check that in this mode the //Outdoor Air Relative Humidity(0 - 100 % )	//Outdoor Air Humidity Ratio(g / g)//Outdoor Air
             // Temperature(degC)
             if (Mode.MeetsOAEnvConstraints(StepIns.Tosa, Wosa, 100 * StepIns.RHosa)) {
@@ -1365,72 +1357,74 @@ namespace HybridEvapCoolingModel {
             }
 
             if (EnvironmentConditionsMet) {
-                for (int point_number = 0; point_number < solution_map_sizeX;
-                     point_number++) // within each mode go though all the combinations of solution spaces.
+
+                for (int indexMassFlowRatio = 0; indexMassFlowRatio < solution_map_sizeX; indexMassFlowRatio++) // within each mode go though all the combinations of solution spaces.
                 {
-                    // Supply Air Mass Flow Rate(kg / s)
-                    // Outdoor Air Fraction(0 - 1)
+                    for (int indexOutdoorAirFraction = 0; indexOutdoorAirFraction < solution_map_sizeY; indexOutdoorAirFraction++) {
+                        // Supply Air Mass Flow Rate(kg / s)
+                        // Outdoor Air Fraction(0 - 1)
 
-                    Real64 MsaRatio =
-                        Mode.sol.MassFlowRatio[point_number]; // fractions of rated mass flow rate, so for some modes this might be low but others hi
-                    Real64 OSAF = Mode.sol.OutdoorAirFraction[point_number];
-                    Real64 ScaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate * MsaRatio;
-                    Real64 UnscaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate / ScalingFactor;
-                    Real64 Supply_Air_Ventilation_Volume = 0;
-                    // Calculate the ventilation mass flow rate
-                    Real64 Mvent = ScaledMsa * OSAF;
+                        Real64 MsaRatio = Mode.sol.MassFlowRatio[indexMassFlowRatio]; // fractions of rated mass flow rate, so for some modes this might be low but others hi
+                        Real64 OSAF = Mode.sol.OutdoorAirFraction[indexOutdoorAirFraction];
+                        Real64 ScaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate * MsaRatio;
+                        Real64 UnscaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate / ScalingFactor;
+                        Real64 Supply_Air_Ventilation_Volume = 0;
+                        // Calculate the ventilation mass flow rate
+                        Real64 Mvent = ScaledMsa * OSAF;
 
-                    if (StdRhoAir > 1) {
-                        Supply_Air_Ventilation_Volume = Mvent / StdRhoAir;
-                    } else {
-                        Supply_Air_Ventilation_Volume = Mvent / 1.225; // stored as volumetric flow for reporting
-                    }
-
-                    if (Mvent - MinOA_Msa > -0.000001) {
-                        MinVRMet = true;
-                    } else {
-                        MinVRMet = false;
-                    }
-
-                    if (MinVRMet) {
-                        // Calculate prospective supply air temperature
-                        Tsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, TEMP_CURVE);
-                        // Check it meets constraints
-                        if (MeetsSupplyAirTOC(Tsa)) {
-                            SAT_OC_Met = SAT_OC_MetOnce = SAT_OC_MetinMode = true;
+                        if (StdRhoAir > 1) {
+                            Supply_Air_Ventilation_Volume = Mvent / StdRhoAir;
                         } else {
-                            SAT_OC_Met = false;
-                        }
-                        // Calculate prospective supply air Humidity Ratio
-                        Wsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, W_CURVE);
-                        // Return Air Relative Humidity(0 - 100 % ) //Return Air Humidity Ratio(g / g)
-                        if (MeetsSupplyAirRHOC(Wsa)) {
-                            SARH_OC_Met = SAHR_OC_MetOnce = SAHR_OC_MetinMode = true;
-                        } else {
-                            SARH_OC_Met = false;
+                            Supply_Air_Ventilation_Volume = Mvent / 1.225; // stored as volumetric flow for reporting
                         }
 
-                        if (SARH_OC_Met && SAT_OC_Met) {
-                            CSetting CandidateSetting;
-                            CandidateSetting.Supply_Air_Ventilation_Volume = Supply_Air_Ventilation_Volume;
-                            CandidateSetting.Mode = Mode.ModeID;
-                            CandidateSetting.Outdoor_Air_Fraction = OSAF;
-                            CandidateSetting.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
-                            CandidateSetting.Unscaled_Supply_Air_Mass_Flow_Rate = UnscaledMsa;
-                            CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = ScaledMsa;
+                        if (Mvent - MinOA_Msa > -0.000001) {
+                            MinVRMet = true;
+                        } else {
+                            MinVRMet = false;
+                        }
 
-                            // If no load is requested but ventilation is required, set the supply air mass flow rate to the minimum of the required ventilation flow rate and the maximum supply air flow rate
-                            if (!CoolingRequested && !HeatingRequested && !DehumidificationRequested && !HumidificationRequested) {
-                                CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = min(MinOA_Msa, CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate);
-                                Tsa = StepIns.Tosa;
+                        if (MinVRMet) {
+                            // Calculate prospective supply air temperature
+                            Tsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, TEMP_CURVE);
+                            // Check it meets constraints
+                            if (MeetsSupplyAirTOC(Tsa)) {
+                                SAT_OC_Met = SAT_OC_MetOnce = SAT_OC_MetinMode = true;
+                            } else {
+                                SAT_OC_Met = false;
+                            }
+                            // Calculate prospective supply air Humidity Ratio
+                            Wsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, W_CURVE);
+                            // Return Air Relative Humidity(0 - 100 % ) //Return Air Humidity Ratio(g / g)
+                            if (MeetsSupplyAirRHOC(Wsa)) {
+                                SARH_OC_Met = SAHR_OC_MetOnce = SAHR_OC_MetinMode = true;
+                            } else {
+                                SARH_OC_Met = false;
                             }
 
-                            CandidateSetting.ScaledSupply_Air_Ventilation_Volume = CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate / StdRhoAir;
-                            CandidateSetting.oMode = Mode;
-                            CandidateSetting.SupplyAirTemperature = Tsa;
-                            CandidateSetting.SupplyAirW = CheckVal_W(Wsa, Tsa, OutletPressure);
-                            CandidateSetting.Mode = Mode.ModeID;
-                            Settings.push_back(CandidateSetting);
+                            if (SARH_OC_Met && SAT_OC_Met) {
+                                CSetting CandidateSetting;
+                                CandidateSetting.Supply_Air_Ventilation_Volume = Supply_Air_Ventilation_Volume;
+                                CandidateSetting.Mode = Mode.ModeID;
+                                CandidateSetting.Outdoor_Air_Fraction = OSAF;
+                                CandidateSetting.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
+                                CandidateSetting.Unscaled_Supply_Air_Mass_Flow_Rate = UnscaledMsa;
+                                CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = ScaledMsa;
+
+                                // If no load is requested but ventilation is required, set the supply air mass flow rate to the minimum of the required ventilation flow rate and the maximum supply air flow rate
+                                if (!CoolingRequested && !HeatingRequested && !DehumidificationRequested && !HumidificationRequested) {
+                                    CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate =
+                                        min(MinOA_Msa, CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate);
+                                    Tsa = StepIns.Tosa;
+                                }
+
+                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate / StdRhoAir;
+                                CandidateSetting.oMode = Mode;
+                                CandidateSetting.SupplyAirTemperature = Tsa;
+                                CandidateSetting.SupplyAirW = CheckVal_W(Wsa, Tsa, OutletPressure);
+                                CandidateSetting.Mode = Mode.ModeID;
+                                Settings.push_back(CandidateSetting);
+                            }
                         }
                     }
                 }
