@@ -61,30 +61,35 @@ TEST(FileSystem, movefile_test)
     // test moveFile function, specifically on Windows
 
     // create text file to be overridden by new file
-    std::string filename = "FileSystemTest.txt";
+    std::string filename = "FileSystemTest.idf";
     std::string line;
     std::stringstream buffer;
     std::ofstream ofs(filename);
     ofs << "Version, 9.3;" << std::endl;
+    ofs.close();
+
     // read text file
     std::ifstream ifs(filename);
     buffer << ifs.rdbuf();
     // check that text file was created correctly
     EXPECT_EQ(buffer.str(), "Version, 9.3;\n");
+    ifs.close();
 
     // create temporary text file to move to existing file created above
-    std::string filename_temp = "FileSystemTest_temp.txt";
-    std::stringstream buffer_temp;
+    std::string filename_temp = "FileSystemTest_temp.idf";
     std::ofstream ofs_temp(filename_temp);
     ofs_temp << "Version, 9.4;" << std::endl;
+    ofs_temp.close();
 
-    // move temporary text file to
+    // move temporary text file to overwrite existing file
     EnergyPlus::FileSystem::moveFile(filename_temp, filename);
     // read original text file after using moveFile function
-    std::ifstream ifs_temp(filename);
-    buffer_temp << ifs_temp.rdbuf();
+    std::stringstream buffer_new;
+    std::ifstream ifs_new(filename);
+    buffer_new << ifs_new.rdbuf();
     // check that original text file was overwritten by temporary text file
-    EXPECT_EQ(buffer_temp.str(), "Version, 9.4;\n");
+    EXPECT_EQ(buffer_new.str(), "Version, 9.4;\n");
+    ifs_new.close();
 
     // remove files
     EnergyPlus::FileSystem::removeFile(filename);
