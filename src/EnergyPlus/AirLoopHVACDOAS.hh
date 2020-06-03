@@ -60,10 +60,6 @@ struct EnergyPlusData;
 
 namespace AirLoopHVACDOAS {
 
-    void clear_state();
-
-    extern int numAirLoopDOAS;
-
     void CheckConvergence();
 
     struct AirLoopMixer
@@ -201,19 +197,33 @@ namespace AirLoopHVACDOAS {
         void GetDesignDayConditions();
     };
 
-    extern std::vector<AirLoopDOAS> airloopDOAS;
     int getAirLoopMixerIndex(std::string const &objectName);
     int getAirLoopSplitterIndex(std::string const &objectName);
     void getAirLoopHVACDOASInput(EnergyPlusData &state);
-    extern bool GetInputOnceFlag;
+
 } // namespace AirLoopHVACDOAS
 
     struct AirLoopHVACDOASData : BaseGlobalStruct
     {
+        bool GetInputOnceFlag = true;
+        bool getAirLoopMixerInputOnceFlag = true;
+        bool getAirLoopSplitterInputOnceFlag = true;
+
+        int numAirLoopDOAS = 0;
+
+        std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
+        std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
+        std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
 
         void clear_state() override
         {
-
+            GetInputOnceFlag = true;
+            getAirLoopMixerInputOnceFlag = true;
+            getAirLoopSplitterInputOnceFlag = true;
+            numAirLoopDOAS = 0;
+            airloopDOAS.clear();
+            airloopMixer.clear();
+            airloopSplitter.clear();
         }
     };
 

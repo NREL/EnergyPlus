@@ -88,38 +88,14 @@ AirLoopHVACDOASData dataAirLoopHVACDOAS;
 
 namespace AirLoopHVACDOAS {
 
-    int numAirLoopDOAS(0);
-
-    bool GetInputOnceFlag(true);
-    bool getAirLoopMixerInputOnceFlag(true);
-    bool getAirLoopSplitterInputOnceFlag(true);
-
-    std::vector<AirLoopDOAS> airloopDOAS;
-    std::vector<AirLoopMixer> airloopMixer;
-    std::vector<AirLoopSplitter> airloopSplitter;
-
-    // Clears the global data in AirLoopDOAS.
-    void clear_state()
-    {
-        GetInputOnceFlag = true;
-        getAirLoopMixerInputOnceFlag = true;
-        getAirLoopSplitterInputOnceFlag = true;
-
-        airloopDOAS.clear();
-        airloopMixer.clear();
-        airloopSplitter.clear();
-
-        numAirLoopDOAS = 0;
-    }
-
     void AirLoopDOAS::SimAirLoopHVACDOAS(EnergyPlusData &state, bool const FirstHVACIteration, int &CompIndex)
     {
 
         // Obtains and Allocates unitary system related parameters from input file
-        if (GetInputOnceFlag) {
+        if (dataAirLoopHVACDOAS.GetInputOnceFlag) {
             // Get the AirLoopHVACDOAS input
             getAirLoopDOASInput(state);
-            GetInputOnceFlag = false;
+            dataAirLoopHVACDOAS.GetInputOnceFlag = false;
         }
 
         if (CompIndex == -1) {
@@ -144,13 +120,13 @@ namespace AirLoopHVACDOAS {
     AirLoopMixer *AirLoopMixer::factory(int object_num, std::string const &objectName)
     {
 
-        if (getAirLoopMixerInputOnceFlag) {
+        if (dataAirLoopHVACDOAS.getAirLoopMixerInputOnceFlag) {
             AirLoopMixer::getAirLoopMixer();
-            getAirLoopMixerInputOnceFlag = false;
+            dataAirLoopHVACDOAS.getAirLoopMixerInputOnceFlag = false;
         }
 
         int MixerNum = -1;
-        for (auto &dSpec : airloopMixer) {
+        for (auto &dSpec : dataAirLoopHVACDOAS.airloopMixer) {
             ++MixerNum;
             if (UtilityRoutines::SameString(dSpec.name, objectName) && dSpec.m_AirLoopMixer_Num == object_num) {
                 return &dSpec;
@@ -216,7 +192,7 @@ namespace AirLoopHVACDOAS {
                     }
                 }
 
-                airloopMixer.push_back(thisMixer);
+                dataAirLoopHVACDOAS.airloopMixer.push_back(thisMixer);
             }
             if (errorsFound) {
                 ShowFatalError("getAirLoopMixer: Previous errors cause termination.");
@@ -256,14 +232,14 @@ namespace AirLoopHVACDOAS {
         std::string const &objectName // IDF name in input
     )
     {
-        if (getAirLoopMixerInputOnceFlag) {
+        if (dataAirLoopHVACDOAS.getAirLoopMixerInputOnceFlag) {
             AirLoopMixer::getAirLoopMixer();
-            getAirLoopMixerInputOnceFlag = false;
+            dataAirLoopHVACDOAS.getAirLoopMixerInputOnceFlag = false;
         }
 
         int index = -1;
-        for (std::size_t loop = 0; loop < airloopMixer.size(); ++loop) {
-            AirLoopMixer *thisAirLoopMixerObjec = &airloopMixer[loop];
+        for (std::size_t loop = 0; loop < dataAirLoopHVACDOAS.airloopMixer.size(); ++loop) {
+            AirLoopMixer *thisAirLoopMixerObjec = &dataAirLoopHVACDOAS.airloopMixer[loop];
             if (UtilityRoutines::SameString(objectName, thisAirLoopMixerObjec->name)) {
                 index = loop;
                 return index;
@@ -276,13 +252,13 @@ namespace AirLoopHVACDOAS {
     AirLoopSplitter *AirLoopSplitter::factory(int object_num, std::string const &objectName)
     {
 
-        if (getAirLoopSplitterInputOnceFlag) {
+        if (dataAirLoopHVACDOAS.getAirLoopSplitterInputOnceFlag) {
             AirLoopSplitter::getAirLoopSplitter();
-            getAirLoopSplitterInputOnceFlag = false;
+            dataAirLoopHVACDOAS.getAirLoopSplitterInputOnceFlag = false;
         }
 
         int SplitterNum = -1;
-        for (auto &dSpec : airloopSplitter) {
+        for (auto &dSpec : dataAirLoopHVACDOAS.airloopSplitter) {
             SplitterNum++;
             if (UtilityRoutines::SameString(dSpec.name, objectName) && dSpec.m_AirLoopSplitter_Num == object_num) {
                 return &dSpec;
@@ -306,14 +282,14 @@ namespace AirLoopHVACDOAS {
         std::string const &objectName // IDF name in input
     )
     {
-        if (getAirLoopSplitterInputOnceFlag) {
+        if (dataAirLoopHVACDOAS.getAirLoopSplitterInputOnceFlag) {
             AirLoopSplitter::getAirLoopSplitter();
-            getAirLoopSplitterInputOnceFlag = false;
+            dataAirLoopHVACDOAS.getAirLoopSplitterInputOnceFlag = false;
         }
 
         int index = -1;
-        for (std::size_t loop = 0; loop < airloopSplitter.size(); ++loop) {
-            AirLoopSplitter *thisAirLoopSplitterObjec = &airloopSplitter[loop];
+        for (std::size_t loop = 0; loop < dataAirLoopHVACDOAS.airloopSplitter.size(); ++loop) {
+            AirLoopSplitter *thisAirLoopSplitterObjec = &dataAirLoopHVACDOAS.airloopSplitter[loop];
             if (UtilityRoutines::SameString(objectName, thisAirLoopSplitterObjec->name)) {
                 index = loop;
                 return index;
@@ -372,7 +348,7 @@ namespace AirLoopHVACDOAS {
                     }
                 }
 
-                airloopSplitter.push_back(thisSplitter);
+                dataAirLoopHVACDOAS.airloopSplitter.push_back(thisSplitter);
             }
             if (errorsFound) {
                 ShowFatalError("getAirLoopSplitter: Previous errors cause termination.");
@@ -798,7 +774,7 @@ namespace AirLoopHVACDOAS {
                 }
 
                 thisDOAS.m_AirLoopDOASNum = AirLoopDOASNum - 1;
-                airloopDOAS.push_back(thisDOAS);
+                dataAirLoopHVACDOAS.airloopDOAS.push_back(thisDOAS);
             }
 
             // Check valid OA controller
@@ -828,7 +804,7 @@ namespace AirLoopHVACDOAS {
         bool ErrorsFound = false;
 
         if (MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(numAirLoopDOAS);
+            MyEnvrnFlag.allocate(dataAirLoopHVACDOAS.numAirLoopDOAS);
             MyEnvrnFlag = true;
             MyOneTimeFlag = false;
         }
@@ -987,9 +963,9 @@ namespace AirLoopHVACDOAS {
 
     void getAirLoopHVACDOASInput(EnergyPlusData &state)
     {
-        if (GetInputOnceFlag) {
+        if (dataAirLoopHVACDOAS.GetInputOnceFlag) {
             AirLoopDOAS::getAirLoopDOASInput(state);
-            GetInputOnceFlag = false;
+            dataAirLoopHVACDOAS.GetInputOnceFlag = false;
         }
     }
 
@@ -1039,7 +1015,7 @@ namespace AirLoopHVACDOAS {
         Real64 maxDiff;
         Real64 Diff;
         Real64 OldTemp;
-        for (auto & loop : airloopDOAS) {
+        for (auto & loop : dataAirLoopHVACDOAS.airloopDOAS) {
             maxDiff = 0.0;
             Diff = std::abs(loop.m_CompPointerAirLoopSplitter->InletTemp -
                             DataLoopNode::Node(loop.m_CompPointerAirLoopSplitter->OutletNodeNum[0]).Temp);
