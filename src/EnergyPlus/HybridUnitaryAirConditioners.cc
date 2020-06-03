@@ -629,6 +629,10 @@ namespace HybridUnitaryAirConditioners {
                         ErrorsFound = true;
                     }
                 }
+                // A14, \field Fan Heat Gain Location
+                if (!lAlphaBlanks(14)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGainLocation = Alphas(14);
+                }
                 // N3, \field Fan Heat in Air Stream Fraction
                 ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatInAirFrac = Numbers(3);
                 // N4, \field Scaling Factor
