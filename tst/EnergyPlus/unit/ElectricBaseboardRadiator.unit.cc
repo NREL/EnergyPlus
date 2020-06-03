@@ -265,14 +265,14 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(outputFiles(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -291,7 +291,7 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(outputFiles(), errorsFound);
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -556,14 +556,14 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(outputFiles(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -585,7 +585,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(outputFiles(), errorsFound);
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);

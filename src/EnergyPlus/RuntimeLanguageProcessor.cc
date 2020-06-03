@@ -164,8 +164,6 @@ namespace RuntimeLanguageProcessor {
     int ActualTimeNum(0);
     int WarmUpFlagNum(0);
 
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
-
     // SUBROUTINE SPECIFICATIONS:
 
     // Object Data
@@ -881,7 +879,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    ErlValueType EvaluateStack(int const StackNum)
+    ErlValueType EvaluateStack(OutputFiles &outputFiles, int const StackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -925,7 +923,7 @@ namespace RuntimeLanguageProcessor {
                     if (ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
                         ReturnValue = EvaluateExpression(ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
 
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     break; // RETURN always terminates an instruction stack
 
                 } else if (SELECT_CASE_var == KeywordSet) {
@@ -939,13 +937,13 @@ namespace RuntimeLanguageProcessor {
                         ErlVariable(VariableNum).Value.Error = ReturnValue.Error;
                     }
 
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordRun) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    ReturnValue = EvaluateStack(ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    ReturnValue = EvaluateStack(outputFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
 
                 } else if ((SELECT_CASE_var == KeywordIf) || (SELECT_CASE_var == KeywordElse)) { // same???
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
@@ -953,7 +951,7 @@ namespace RuntimeLanguageProcessor {
 
                     if (ExpressionNum > 0) { // could be 0 if this was an ELSE
                         ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
-                        WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                             // Eventually should handle strings and arrays too
                             InstructionNum = InstructionNum2;
@@ -963,7 +961,7 @@ namespace RuntimeLanguageProcessor {
                         // KeywordELSE  -- kind of a kludge
                         ReturnValue.Type = ValueNumber;
                         ReturnValue.Number = 1.0;
-                        WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     }
 
                 } else if (SELECT_CASE_var == KeywordGoto) {
@@ -979,14 +977,14 @@ namespace RuntimeLanguageProcessor {
                 } else if (SELECT_CASE_var == KeywordEndIf) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordWhile) {
                     // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
                     ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                         // Eventually should handle strings and arrays too
                         InstructionNum = InstructionNum2;
@@ -1000,7 +998,7 @@ namespace RuntimeLanguageProcessor {
                     ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
                     if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
                         // Eventually should handle strings and arrays too
-                        WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
+                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
                         InstructionNum = InstructionNum2;
                         ++WhileLoopExitCounter;
 
@@ -1010,11 +1008,11 @@ namespace RuntimeLanguageProcessor {
                             WhileLoopExitCounter = 0;
                             ReturnValue.Type = ValueError;
                             ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
-                            WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                            WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         } else {
                             ReturnValue.Type = ValueNumber;
                             ReturnValue.Number = 0.0;
-                            WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                            WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                             WhileLoopExitCounter = 0;
                         }
                     }
@@ -1029,7 +1027,8 @@ namespace RuntimeLanguageProcessor {
         return ReturnValue;
     }
 
-    void WriteTrace(int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound)
+    void
+    WriteTrace(OutputFiles &outputFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1072,8 +1071,8 @@ namespace RuntimeLanguageProcessor {
         }
 
         if (!MyOneTimeFlag) {
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "****  Begin EMS Language Processor Error and Trace Output  *** ";
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "<Erl program name, line #, line text, result, occurrence timing information ... >";
+            print(outputFiles.edd, "****  Begin EMS Language Processor Error and Trace Output  *** \n");
+            print(outputFiles.edd, "<Erl program name, line #, line text, result, occurrence timing information ... >\n");
             MyOneTimeFlag = true;
         }
         // if have not return'd yet then write out full trace
@@ -1101,8 +1100,7 @@ namespace RuntimeLanguageProcessor {
         TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
         if (OutputFullEMSTrace || (OutputEMSErrors && (ReturnValue.Type == ValueError))) {
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA)
-                << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
+            print(outputFiles.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
         }
 
         if (seriousErrorFound) { // throw EnergyPlus severe then fatal
