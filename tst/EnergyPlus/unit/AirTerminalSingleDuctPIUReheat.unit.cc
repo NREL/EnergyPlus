@@ -184,7 +184,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIUReheat_GetInputtest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());  // read schedules
+    ProcessScheduleInput(state.outputFiles);  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -293,7 +293,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());  // read schedules
+    ProcessScheduleInput(state.outputFiles);  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1477,7 +1477,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    ManageSimulation(state, outputFiles()); // run the design day over the warmup period (24 hrs, 25 days)
+    ManageSimulation(state); // run the design day over the warmup period (24 hrs, 25 days)
 
     int const PIUNum = 1;
     int const ADUNum = 1;

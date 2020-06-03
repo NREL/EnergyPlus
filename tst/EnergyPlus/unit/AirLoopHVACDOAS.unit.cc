@@ -92,8 +92,6 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 {
     // unit test for a new feature to model a central DOAS to serve multiple AirLoops
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
-
         "  SimulationControl,",
         "    YES,                     !- Do Zone Sizing Calculation",
         "    YES,                     !- Do System Sizing Calculation",
@@ -3953,17 +3951,17 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -3974,7 +3972,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SurfaceGeometry::SinZoneRelNorth = 0.0;
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ZoneEquipmentManager::GetZoneEquipment(state);
@@ -4032,7 +4030,6 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
 {
     // 7686
     std::string const idf_objects = delimited_string({
-        "  Version,9.3;",
         "  AirLoopHVAC:DedicatedOutdoorAirSystem,",
         "    AirLoopHVAC DOAS,        !- Name",
         "    AirLoopDOAS OA system,   !- AirLoopHVAC:OutdoorAirSystem Name",

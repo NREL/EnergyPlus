@@ -94,14 +94,16 @@ namespace WaterThermalTanks {
     // order of ControlTypeEnum and PriorityEnum must be enforced
     enum ControlTypeEnum
     {
-        Cycle,
+        Cycle = 0,
         Modulate
     };
 
     // order of ControlTypeEnum and PriorityEnum must be enforced
+    // WaterThermalTankData uses the same int ControlType to assign either ControlTypeEnum (WaterHeater:Mixed) or PriorityEnum
+    // (WaterHeater:Stratified), so in order to avoid problems, start the int value here as 2 so they don't risk collapsing.
     enum PriorityEnum
     {
-        MasterSlave, // water heater only, master-slave priority control of heater elements
+        MasterSlave = 2, // water heater only, master-slave priority control of heater elements
         Simultaneous // water heater only, simultaneous control of heater elements
     };
 
@@ -691,7 +693,7 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankMixed(); // Water Heater being simulated
 
-        void CalcStandardRatings(EnergyPlusData &state, OutputFiles &outputFiles);
+        void CalcStandardRatings(EnergyPlusData &state);
 
         void ReportCWTankInits(OutputFiles &outputFiles);
 
@@ -899,7 +901,7 @@ namespace WaterThermalTanks {
 
     bool getWaterTankStratifiedInput();
 
-    bool GetWaterThermalTankInput(EnergyPlusData &state, OutputFiles &outputFiles);
+    bool GetWaterThermalTankInput(EnergyPlusData &state);
 
     void CalcWaterThermalTankZoneGains(EnergyPlusData &state);
 

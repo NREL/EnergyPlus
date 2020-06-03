@@ -1118,7 +1118,7 @@ namespace ExternalInterface {
                                               cNumericFieldNames);
                 // Get the FMU name
                 FMU(Loop).Name = cAlphaArgs(1);
-                CheckForActualFileName(cAlphaArgs(1), fileExist, tempFullFileName);
+                CheckForActualFileName(OutputFiles::getSingleton(), cAlphaArgs(1), fileExist, tempFullFileName);
                 if (fileExist) {
                     pos = index(FMU(Loop).Name, pathChar, true); // look backwards
                     if (pos != std::string::npos) {

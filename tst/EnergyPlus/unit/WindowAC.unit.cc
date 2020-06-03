@@ -70,8 +70,6 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // this unit test runs the window air conditioner with a Coil:Cooling:DX:VariableSpeed coil
     // set up minimal zone, zone equipment, and ZoneHVAC:WindowAirConditioner, check input processing, check sizing, check simulation results
     std::string const idf_objects = delimited_string({
-        " Version,9.3;",
-
         "  Timestep,6;",
 
         "  Site:Location,",
@@ -434,15 +432,15 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
 
     DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedule data
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedule data
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.outputFiles);
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -451,9 +449,9 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     DataGlobals::ZoneSizingCalc = true;
     EnergyPlus::createFacilityElectricPowerServiceObject();
 
-    SizingManager::ManageSizing(state, outputFiles());
+    SizingManager::ManageSizing(state);
 
-    SimulationManager::SetupSimulation(state, outputFiles(), errorsFound);
+    SimulationManager::SetupSimulation(state, errorsFound);
     //
 
     Real64 qDotMet(0.0);    // Watts total cap

@@ -299,7 +299,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NoName) {
 
     std::string const error_string =
         delimited_string({
-            "   ** Severe  ** <root>[RunPeriod] - Object contains properties that could not be validated using 'properties' or 'additionalProperties' constraints",
+            "   ** Severe  ** <root>[RunPeriod] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: ''.",
             "   ** Severe  ** <root>[RunPeriod] - Object name is required and cannot be blank or whitespace"
         });
 

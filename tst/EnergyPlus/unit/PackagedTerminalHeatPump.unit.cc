@@ -490,6 +490,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 12.0;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.05;
     DataEnvironment::OutBaroPress = 101325;
+    DataEnvironment::StdRhoAir = 1.0;
     OutputReportPredefined::SetPredefinedTables();
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod.allocate(16);
@@ -519,6 +520,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).Name, "LOBBY_ZN_1_FLR_2 WSHP HEATING MODE");
 
     // expect coil air flow to equal PTUnit heating air flow
+    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).RatedAirVolFlowRate, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).RatedAirVolFlowRate, PTUnit(1).MaxHeatAirVolFlow);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).MSRatedAirVolFlowRate(9), PTUnit(1).MaxHeatAirVolFlow);
 
@@ -583,8 +585,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
-
         "Schedule:Compact,",
         "    FanAvailSched,           !- Name",
         "    Fraction,                !- Schedule Type Limits Name",
@@ -795,7 +795,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -1147,7 +1147,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 

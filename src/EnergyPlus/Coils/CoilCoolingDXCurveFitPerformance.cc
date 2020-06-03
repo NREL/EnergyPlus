@@ -766,7 +766,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilCOP, this->name, EER_TestPoint_SI[0], 2);
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilEERIP, this->name, EER_TestPoint_IP[0], 2);
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilIEERIP, this->name, IEER, 2);
-    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERIP, this->name, "N/A");
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERUserIP, this->name, "N/A");
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERStandardIP, this->name, "N/A");
     OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
 
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilType, this->name, "Coil:Cooling:DX");

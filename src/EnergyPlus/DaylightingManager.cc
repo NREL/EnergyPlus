@@ -568,7 +568,7 @@ namespace DaylightingManager {
 
         // FLOW:
         if (CalcDayltghCoefficients_firstTime) {
-            GetDaylightingParametersInput();
+            GetDaylightingParametersInput(outputFiles);
             CheckTDDsAndLightShelvesInDaylitZones();
             AssociateWindowShadingControlWithDaylighting();
             CalcDayltghCoefficients_firstTime = false;
@@ -812,20 +812,16 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-            try {
-                OutputFile &dfs = outputFiles.dfs.ensure_open();
-                print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
-                print(dfs, "{}\n", "If only one reference point the last 4 columns in the data will be zero.");
-                print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
-                print(dfs, "{}\n",
-                       "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at "
-                       "Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for "
-                       "Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight "
-                       "Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at "
-                       "Reference point 2,Daylight Factor for Overcast Sky at Reference point 2");
-            } catch (const std::exception &) {
-                ShowFatalError("CalcDayltgCoefficients: Could not open file " + OutputFiles::getSingleton().dfs.fileName + " for output (write).");
-            }
+            OutputFile &dfs = outputFiles.dfs.ensure_open("CalcDayltgCoefficients");
+            print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
+            print(dfs, "{}\n", "If only one reference point the last 4 columns in the data will be zero.");
+            print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
+            print(dfs, "{}\n",
+                   "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at "
+                   "Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for "
+                   "Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight "
+                   "Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at "
+                   "Reference point 2,Daylight Factor for Overcast Sky at Reference point 2");
             CreateDFSReportFile = false;
         }
 
@@ -4409,7 +4405,7 @@ namespace DaylightingManager {
         } // End of sky type loop, ISky
     }
 
-    void GetDaylightingParametersInput()
+    void GetDaylightingParametersInput(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4446,7 +4442,6 @@ namespace DaylightingManager {
         cCurrentModuleObject = "Daylighting:Controls";
         TotDaylightingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (TotDaylightingControls > 0) {
-            auto &outputFiles = OutputFiles::getSingleton();
             GetInputDayliteRefPt(ErrorsFound);
             GetDaylightingControls(TotDaylightingControls, ErrorsFound);
             GeometryTransformForDaylighting();
@@ -4642,7 +4637,7 @@ namespace DaylightingManager {
         if (doesDayLightingUseDElight()) {
             dLatitude = Latitude;
             DisplayString("Calculating DElight Daylighting Factors");
-            DElightInputGenerator();
+            DElightInputGenerator(outputFiles);
             // Init Error Flag to 0 (no Warnings or Errors)
             DisplayString("ReturnFrom DElightInputGenerator");
             iErrorFlag = 0;
@@ -5145,6 +5140,12 @@ namespace DaylightingManager {
         int NumAlpha;
         int NumNumber;
 
+        // Smallest deviation from unity for the sum of all fractions
+        // Accept approx 4 to 8 ULP error (technically abs(1.0 + sumFracs) should be close to 2)
+        //   constexpr Real64 FractionTolerance(4 * std::numeric_limits<Real64>::epsilon());
+        // Instead, we use a 0.001 = 0.1% tolerance
+        constexpr Real64 FractionTolerance(0.001);
+
         cCurrentModuleObject = "Daylighting:Controls";
         for (int iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl) {
             cAlphaArgs = "";
@@ -5322,17 +5323,18 @@ namespace DaylightingManager {
                 ErrorsFound = true;
             }
 
-            if (sum(zone_daylight.FracZoneDaylit) < 1.0) {
+            Real64 sumFracs = sum(zone_daylight.FracZoneDaylit);
+            if ( (1.0 - sumFracs) > FractionTolerance) {
                 ShowWarningError("GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is < 1.0.");
                 ShowContinueError("..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", only " +
-                                  RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 2) + " of the zone is controlled.");
-            }
-            if (sum(zone_daylight.FracZoneDaylit) > 1.0) {
+                        RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 3) + " of the zone is controlled.");
+            } else if ((sumFracs - 1.0) > FractionTolerance) {
                 ShowSevereError("GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.");
                 ShowContinueError("..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", trying to control " +
-                                  RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 2) + " of the zone.");
+                        RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 3) + " of the zone.");
                 ErrorsFound = true;
             }
+
             if (zone_daylight.LightControlType == Stepped && zone_daylight.LightControlSteps <= 0) {
                 ShowWarningError("GetDaylightingControls: For Stepped Control, the number of steps must be > 0");
                 ShowContinueError("..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", will use 1");
@@ -7367,7 +7369,7 @@ namespace DaylightingManager {
         } // PipeNum
     }
 
-    void DayltgElecLightingControl(int &ZoneNum) // Zone number
+    void DayltgElecLightingControl(OutputFiles &outputFiles, int &ZoneNum) // Zone number
     {
 
         // SUBROUTINE INFORMATION:
@@ -7518,7 +7520,7 @@ namespace DaylightingManager {
                         mapResultsReported = true;
                     }
                 }
-                ReportIllumMap(MapNum);
+                ReportIllumMap(outputFiles, MapNum);
                 if (TimeStep == NumOfTimeStepInHour) {
                     IllumMapCalc(MapNum).DaylIllumAtMapPtHr = 0.0;
                     IllumMapCalc(MapNum).DaylIllumAtMapPt = 0.0;
@@ -9993,7 +9995,7 @@ namespace DaylightingManager {
         }
     }
 
-    void ReportIllumMap(int const MapNum)
+    void ReportIllumMap(OutputFiles &outputFiles, int const MapNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10077,7 +10079,7 @@ namespace DaylightingManager {
                     IOFlags flags;
                     flags.ACTION("readwrite");
                     flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, DataStringGlobals::outputMapTabFileName + MapNoString, flags);
+                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, outputFiles.outputMapTabFileName + MapNoString, flags);
                     if (flags.err()) goto Label901;
                 }
                 //				CommaDelimited = false; //Unused Set but never used
@@ -10086,7 +10088,7 @@ namespace DaylightingManager {
                     IOFlags flags;
                     flags.ACTION("readwrite");
                     flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, DataStringGlobals::outputMapCsvFileName + MapNoString, flags);
+                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, outputFiles.outputMapCsvFileName + MapNoString, flags);
                     if (flags.err()) goto Label902;
                 }
                 //				CommaDelimited = true; //Unused Set but never used
@@ -10095,7 +10097,7 @@ namespace DaylightingManager {
                     IOFlags flags;
                     flags.ACTION("readwrite");
                     flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, DataStringGlobals::outputMapTxtFileName + MapNoString, flags);
+                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, outputFiles.outputMapTxtFileName + MapNoString, flags);
                     if (flags.err()) goto Label903;
                 }
                 //				CommaDelimited = false; //Unused Set but never used
@@ -10222,18 +10224,18 @@ namespace DaylightingManager {
         return;
 
     Label901:;
-        ShowFatalError("ReportIllumMap: Could not open file " + DataStringGlobals::outputMapTabFileName + MapNoString + "\" for output (write).");
+        ShowFatalError("ReportIllumMap: Could not open file " + outputFiles.outputMapTabFileName + MapNoString + "\" for output (write).");
         return;
 
     Label902:;
-        ShowFatalError("ReportIllumMap: Could not open file " + DataStringGlobals::outputMapCsvFileName + MapNoString + "\" for output (write).");
+        ShowFatalError("ReportIllumMap: Could not open file " + outputFiles.outputMapCsvFileName + MapNoString + "\" for output (write).");
         return;
 
     Label903:;
-        ShowFatalError("ReportIllumMap: Could not open file " + DataStringGlobals::outputMapTxtFileName + MapNoString + "\" for output (write).");
+        ShowFatalError("ReportIllumMap: Could not open file " + outputFiles.outputMapTxtFileName + MapNoString + "\" for output (write).");
     }
 
-    void CloseReportIllumMaps()
+    void CloseReportIllumMaps(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10273,41 +10275,21 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int MapOutputFile;
         int MapNum;
         static int ios(0);
         int NumLines;
 
         if (TotIllumMaps > 0) {
-
-            MapOutputFile = GetNewUnitNumber(); // can add this to DataGlobals with the others...
-
             // Write map header
             if (MapColSep == CharTab) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(MapOutputFile, DataStringGlobals::outputMapTabFileName, flags);
-                    if (flags.err()) goto Label901;
-                }
+                outputFiles.map.fileName = outputFiles.outputMapTabFileName;
             } else if (MapColSep == CharComma) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(MapOutputFile, DataStringGlobals::outputMapCsvFileName, flags);
-                    if (flags.err()) goto Label902;
-                }
+                outputFiles.map.fileName = outputFiles.outputMapCsvFileName;
             } else {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    flags.STATUS("UNKNOWN");
-                    ObjexxFCL::gio::open(MapOutputFile, DataStringGlobals::outputMapTxtFileName, flags);
-                    if (flags.err()) goto Label903;
-                }
+                outputFiles.map.fileName = outputFiles.outputMapTxtFileName;
             }
+
+            outputFiles.map.ensure_open("CloseReportIllumMaps");
 
             for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
                 if (IllumMap(MapNum).UnitNo == 0) continue; // fatal error processing
@@ -10329,7 +10311,7 @@ namespace DaylightingManager {
                         break;
                     }
                     ++NumLines;
-                    ObjexxFCL::gio::write(MapOutputFile, FmtA) << mapLine;
+                    print(outputFiles.map, "{}\n", mapLine);
                 }
                 {
                     IOFlags flags;
@@ -10339,26 +10321,13 @@ namespace DaylightingManager {
             }
 
             if (!mapResultsReported && !AbortProcessing) {
-                ShowSevereError("CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.");
-                ObjexxFCL::gio::write(MapOutputFile, FmtA)
-                    << "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
+                const auto message =
+                    "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
+                ShowSevereError(message);
+                print(outputFiles.map, "{}\n", message);
             }
 
-            ObjexxFCL::gio::close(MapOutputFile);
         }
-
-        return;
-
-    Label901:;
-        ShowFatalError("CloseReportIllumMaps: Could not open file " + DataStringGlobals::outputMapTabFileName + " for output (write).");
-        return;
-
-    Label902:;
-        ShowFatalError("CloseReportIllumMaps: Could not open file " + DataStringGlobals::outputMapCsvFileName + " for output (write).");
-        return;
-
-    Label903:;
-        ShowFatalError("CloseReportIllumMaps: Could not open file " + DataStringGlobals::outputMapTxtFileName + " for output (write).");
     }
 
     void CloseDFSFile(OutputFiles &outputFiles)

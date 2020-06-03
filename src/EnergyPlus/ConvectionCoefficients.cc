@@ -49,7 +49,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <limits>
 #include <string>
 
 // ObjexxFCL Headers
@@ -332,7 +331,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients();
+            GetUserConvectionCoefficients(OutputFiles::getSingleton());
             GetUserSuppliedConvectionCoeffs = false;
         }
 
@@ -548,7 +547,7 @@ namespace ConvectionCoefficients {
 
         // FLOW:
         if (GetUserSuppliedConvectionCoeffs) {
-            GetUserConvectionCoefficients();
+            GetUserConvectionCoefficients(OutputFiles::getSingleton());
             GetUserSuppliedConvectionCoeffs = false;
         }
 
@@ -860,7 +859,7 @@ namespace ConvectionCoefficients {
         return AgainstWind;
     }
 
-    void GetUserConvectionCoefficients()
+    void GetUserConvectionCoefficients(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3267,7 +3266,7 @@ namespace ConvectionCoefficients {
             ShowFatalError(RoutineName + "Errors found getting input.  Program termination.");
         }
 
-        SetupAdaptiveConvectionStaticMetaData(OutputFiles::getSingleton());
+        SetupAdaptiveConvectionStaticMetaData(outputFiles);
     }
 
     void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int const Value)
@@ -3831,42 +3830,52 @@ namespace ConvectionCoefficients {
         //     NBSSIR 83-2655, National Bureau of Standards, "Surface Inside Heat Balances", pp 79.
         // 2.  ASHRAE Handbook of Fundamentals 1985, p. 23.2, Table 1.
 
-        // USE STATEMENTS:
-        // na
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
+        //      +---------------------+-----------+---------------------------------------------+------------------+-----------------+-------------+
+        //      |      Situation      | DeltaTemp |                   CosTilt                   | cos(tilt)*deltaT | Convection Type | Coefficient |
+        //      +---------------------+-----------+---------------------------------------------+------------------+-----------------+-------------+
+        //      | Vertical Surface    | N/A       | -0.3827 to 0.3827 (67.5 to 112.5 degrees)   | N/A              | Normal          |       3.076 |
+        //      | Horizontal Surface  | Positive  | 0.9238 to 1.0 (0 to 22.5 degrees)           | Positive         | Enhanced        |       4.043 |
+        //      | Horizontal Surface  | Positive  | -0.9238 to -1.0 (157.5 to 180 degrees)      | Negative         | Reduced         |       0.948 |
+        //      | Horizontal Surface  | Negative  | 0.9239 to 1.0 (0 to 22.5 degrees)           | Negative         | Reduced         |       0.948 |
+        //      | Horizontal Surface  | Negative  | -0.9239 to -1.0 (157.5 to 180 degrees)      | Positive         | Enhanced        |       4.040 |
+        //      | Tilted Surface      | Positive  | 0.3827 to 0.9239 (22.5 to 67.5 degrees)     | Positive         | Enhanced        |       3.870 |
+        //      | Tilted Surface      | Negative  | -0.3827 to -0.9239 (157.5 to 157.5 degrees) | Positive         | Enhanced        |       3.870 |
+        //      | Tilted Surface      | Negative  | 0.3827 to 0.9239 (22.5 to 67.5 degrees)     | Negative         | Reduced         |       2.281 |
+        //      | Tilted Surface      | Positive  | -0.3827 to -0.9239 (157.5 to 157.5 degrees) | Negative         | Reduced         |       2.281 |
+        //      +---------------------+-----------+---------------------------------------------+------------------+-----------------+-------------+
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 DeltaTemp = Tamb - Tsurf;
 
         // Set HConvIn using the proper correlation based on DeltaTemp and Cosine of the Tilt of the Surface
-        if (std::abs(cosTilt) >= 0.9239) {   // Horizontal Surface
-            if (DeltaTemp * cosTilt < 0.0) { // Horizontal, Reduced Convection
-                return 0.948;
-            } else if (DeltaTemp * cosTilt == 0.0) { // Vertical Surface
-                return 3.076;
-            } else /*if (DeltaTemp * cosTilt > 0.0)*/ { // Horizontal, Enhanced Convection
-                return 4.040;
+        if (std::abs(cosTilt) < 0.3827) {  // Vertical Surface
+            return 3.076;
+        }
+        else {
+            Real64 DeltaTempCosTilt = (Tamb - Tsurf)*cosTilt;
+            if (std::abs(cosTilt) >= 0.9239) { // Horizontal Surface
+                if (DeltaTempCosTilt > 0.0){ //Enhanced Convection
+                    return 4.040;
+                }
+                else if (DeltaTempCosTilt < 0.0){ // Reduced Convection
+                    return 0.948;
+                }
+                else { // Zero DeltaTemp
+                    return 3.076;
+                }
             }
-        } else {                             // Tilted Surface
-            if (DeltaTemp * cosTilt < 0.0) { // Tilted, Reduced Convection
-                return 2.281;
-            } else if (DeltaTemp * cosTilt == 0.0) { // Vertical Surface
-                return 3.076;
-            } else /*if (DeltaTemp * cosTilt > 0.0)*/ { // Tilted, Enhanced Convection
-                return 3.870;
+            else { // tilted surface
+                if (DeltaTempCosTilt > 0.0){ // Enhanced Convection
+                    return 3.870;
+                }
+                else if (DeltaTempCosTilt < 0.0){ // Reduced Convection
+                    return 2.281;
+                }
+                else { // Zero DeltaTemp
+                    return 3.076;
+                }
             }
         }
+
     }
 
     void CalcASHRAESimpleIntConvCoeff(int const SurfNum,                  // surface number for which coefficients are being calculated
@@ -3874,19 +3883,17 @@ namespace ConvectionCoefficients {
                                       Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     )
     {
-
-        if (std::abs(Surface(SurfNum).CosTilt) >= 0.3827) { // Recalculate HConvIn
-            if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
-                    return CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, cosTilt);
-                };
-            } else {
-                HConvIn(SurfNum) = CalcASHRAESimpleIntConvCoeff(SurfaceTemperature, ZoneMeanAirTemperature, Surface(SurfNum).CosTilt);
-            }
+        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation){
+            SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+              return CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, cosTilt);
+            };
+        }
+        else {
+            HConvIn(SurfNum) = CalcASHRAESimpleIntConvCoeff(SurfaceTemperature, ZoneMeanAirTemperature, Surface(SurfNum).CosTilt);
         }
 
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-        if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
+        HConvIn(SurfNum) = max(HConvIn(SurfNum), LowHConvLimit);
     }
 
     Real64 CalcASHRAETARPNatural(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt)

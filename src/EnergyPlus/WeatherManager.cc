@@ -801,10 +801,7 @@ namespace WeatherManager {
         }
     }
 
-    bool GetNextEnvironment(DataGlobal &dataGlobals, OutputFiles &outputFiles,
-                            bool &Available,  // true if there is another environment, false if the end
-                            bool &ErrorsFound // will be set to true if severe errors are found in inputs
-    )
+    bool GetNextEnvironment(EnergyPlusData &state, bool &Available, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -892,7 +889,7 @@ namespace WeatherManager {
 
             PrintEndDataDictionary = true;
 
-            ReportOutputFileHeaders(outputFiles); // Write the output file header information
+            ReportOutputFileHeaders(state.outputFiles); // Write the output file header information
 
             // Setup Output Variables, CurrentModuleObject='All Simulations'
 
@@ -969,7 +966,7 @@ namespace WeatherManager {
             rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW(StdPressureSeaLevel, constant_twenty, constant_zero);
             OpenWeatherFile(ErrorsFound); // moved here because of possibility of special days on EPW file
             CloseWeatherFile();
-            ReadUserWeatherInput(dataGlobals, outputFiles);
+            ReadUserWeatherInput(state);
             AllocateWeatherData();
             if (NumIntervalsPerHour != 1) {
                 if (NumIntervalsPerHour != NumOfTimeStepInHour) {
@@ -981,7 +978,7 @@ namespace WeatherManager {
             GetBranchInputOneTimeFlag = false;
             Envrn = 0;
             if (NumOfEnvrn > 0) {
-                ResolveLocationInformation(outputFiles, ErrorsFound); // Obtain weather related info from input file
+                ResolveLocationInformation(state.outputFiles, ErrorsFound); // Obtain weather related info from input file
                 CheckLocationValidity();
                 if ((Environment(NumOfEnvrn).KindOfEnvrn != ksDesignDay) && (Environment(NumOfEnvrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
                     CheckWeatherFileValidity();
@@ -1054,7 +1051,7 @@ namespace WeatherManager {
                 }
             }
             if (Envrn > TotDesDays && WeatherFileExists) {
-                OpenEPlusWeatherFile(outputFiles, ErrorsFound, false);
+                OpenEPlusWeatherFile(state.outputFiles, ErrorsFound, false);
             }
             Available = true;
             if ((KindOfSim == ksRunPeriodWeather) && (!WeatherFileExists && DoWeathSim)) {
@@ -1084,7 +1081,7 @@ namespace WeatherManager {
                             "Values, Sky Temperature Model\n! <Environment:Special Days>, Special Day Name, Special Day Type, Source, Start Date, Duration {#days}\n! "
                             "<Environment:Daylight Saving>, Daylight Saving Indicator, Source, Start Date, End Date\n! <Environment:WarmupDays>, "
                             "NumberofWarmupDays");
-                        print(outputFiles.eio, "{}\n", EnvironFormat);
+                        print(state.outputFiles.eio, "{}\n", EnvironFormat);
                         PrntEnvHeaders = false;
                     }
 
@@ -1248,7 +1245,7 @@ namespace WeatherManager {
                                 cTotalEnvDays = RoundSigDigits(Environment(Envrn).TotalDays);
                                 skyTempModel = SkyTempModelNames(Environment(Envrn).SkyTempModel + 1);
 
-                                print(outputFiles.eio,
+                                print(state.outputFiles.eio,
                                       EnvNameFormat,
                                       Environment(Envrn).Title,
                                       kindOfRunPeriod,
@@ -1367,15 +1364,15 @@ namespace WeatherManager {
                                 if (DaylightSavingIsActive && DoWeatherInitReporting) {
                                     StDate = format(DateFormat, DSTActStMon, DSTActStDay);
                                     EnDate = format(DateFormat, DSTActEnMon, DSTActEnDay);
-                                    print(outputFiles.eio, EnvDSTYFormat, Source, StDate, EnDate);
+                                    print(state.outputFiles.eio, EnvDSTYFormat, Source, StDate, EnDate);
                                 } else if (DoOutputReporting) {
-                                    print(outputFiles.eio, EnvDSTNFormat, Source);
+                                    print(state.outputFiles.eio, EnvDSTNFormat, Source);
                                 }
                                 for (Loop = 1; Loop <= NumSpecialDays; ++Loop) {
                                     static constexpr auto EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}");
                                     if (SpecialDays(Loop).WthrFile && UseSpecialDays && DoWeatherInitReporting) {
                                         StDate = format(DateFormat, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay);
-                                        print(outputFiles.eio,
+                                        print(state.outputFiles.eio,
                                               EnvSpDyFormat,
                                               SpecialDays(Loop).Name,
                                               SpecialDayNames(SpecialDays(Loop).DayType),
@@ -1385,7 +1382,7 @@ namespace WeatherManager {
                                     }
                                     if (!SpecialDays(Loop).WthrFile && DoWeatherInitReporting) {
                                         StDate = format(DateFormat, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay);
-                                        print(outputFiles.eio,
+                                        print(state.outputFiles.eio,
                                               EnvSpDyFormat,
                                               SpecialDays(Loop).Name,
                                               SpecialDayNames(SpecialDays(Loop).DayType),
@@ -1402,7 +1399,7 @@ namespace WeatherManager {
                             EnDate = StDate;
                             if (DesDayInput(Environment(Envrn).DesignDayNum).DayType <= 7 && DoWeatherInitReporting) {
 
-                                print(outputFiles.eio,
+                                print(state.outputFiles.eio,
                                       EnvNameFormat,
                                       Environment(Envrn).Title,
                                       "SizingPeriod:DesignDay",
@@ -1418,7 +1415,7 @@ namespace WeatherManager {
                                       "N/A",
                                       SkyTempModelNames(Environment(Envrn).SkyTempModel + 1));
                             } else if (DoWeatherInitReporting) {
-                                print(outputFiles.eio,
+                                print(state.outputFiles.eio,
                                       EnvNameFormat,
                                       Environment(Envrn).Title,
                                       "SizingPeriod:DesignDay",
@@ -1435,9 +1432,9 @@ namespace WeatherManager {
                                       SkyTempModelNames(Environment(Envrn).SkyTempModel + 1));
                             }
                             if (DesDayInput(Environment(Envrn).DesignDayNum).DSTIndicator == 0 && DoWeatherInitReporting) {
-                                print(outputFiles.eio, EnvDSTNFormat, "SizingPeriod:DesignDay");
+                                print(state.outputFiles.eio, EnvDSTNFormat, "SizingPeriod:DesignDay");
                             } else if (DoWeatherInitReporting) {
-                                print(outputFiles.eio, EnvDSTYFormat, "SizingPeriod:DesignDay", StDate, EnDate);
+                                print(state.outputFiles.eio, EnvDSTYFormat, "SizingPeriod:DesignDay", StDate, EnDate);
                             }
                         }
                     }
@@ -5981,7 +5978,7 @@ namespace WeatherManager {
         } // ... end of .NOT.WarmupFlag IF-THEN block.
     }
 
-    void ReadUserWeatherInput(DataGlobal &dataGlobals, OutputFiles &outputFiles)
+    void ReadUserWeatherInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6075,15 +6072,15 @@ namespace WeatherManager {
 
         GetLocationInfo(ErrorsFound);
 
-        GetGroundTemps(dataGlobals, ErrorsFound);
+        GetGroundTemps(state, ErrorsFound);
 
-        GetGroundReflectances(outputFiles, ErrorsFound);
+        GetGroundReflectances(state.outputFiles, ErrorsFound);
 
-        GetSnowGroundRefModifiers(outputFiles, ErrorsFound);
+        GetSnowGroundRefModifiers(state.outputFiles, ErrorsFound);
 
         GetWaterMainsTemperatures(ErrorsFound);
 
-        GetWeatherStation(outputFiles, ErrorsFound);
+        GetWeatherStation(state.outputFiles, ErrorsFound);
 
         SetupEnvironmentTypes();
 
@@ -8177,7 +8174,7 @@ namespace WeatherManager {
         }
     }
 
-    void GetGroundTemps(DataGlobal &dataGlobals, bool &ErrorsFound)
+    void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8199,25 +8196,25 @@ namespace WeatherManager {
 
         // FLOW:
         // Initialize Site:GroundTemperature:BuildingSurface object
-        siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit(dataGlobals, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
+        siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
         if (siteBuildingSurfaceGroundTempsPtr) {
             ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:FCFactorMethod object
-        siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit(dataGlobals, "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
+        siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
         if (siteFCFactorMethodGroundTempsPtr) {
             ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Shallow object
-        siteShallowGroundTempsPtr = GetGroundTempModelAndInit(dataGlobals, "SITE:GROUNDTEMPERATURE:SHALLOW", "");
+        siteShallowGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:SHALLOW", "");
         if (siteShallowGroundTempsPtr) {
             ErrorsFound = siteShallowGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Deep object
-        siteDeepGroundTempsPtr = GetGroundTempModelAndInit(dataGlobals, "SITE:GROUNDTEMPERATURE:DEEP", "");
+        siteDeepGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:DEEP", "");
         if (siteDeepGroundTempsPtr) {
             ErrorsFound = siteDeepGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }

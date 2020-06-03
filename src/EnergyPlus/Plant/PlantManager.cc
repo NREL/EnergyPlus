@@ -880,23 +880,23 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Outdoor")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeExterior;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state.dataGlobals, TypeOf_PipeExterior,
+                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, TypeOf_PipeExterior,
                                                                                           CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Indoor")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeInterior;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state.dataGlobals, TypeOf_PipeInterior,
+                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, TypeOf_PipeInterior,
                                                                                           CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Underground")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeUnderground;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state.dataGlobals, TypeOf_PipeUnderground,
+                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, TypeOf_PipeUnderground,
                                                                                           CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "PipingSystem:Underground:PipeCircuit")) {
                                 this_comp.TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(state.dataGlobals, 
+                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(state,
                                         TypeOf_PipingSystemPipeCircuit, CompNames(CompNum));
                             } else if (has_prefixi(this_comp_type, "Pump") ||
                                        has_prefixi(this_comp_type, "HeaderedPumps")) {
@@ -949,11 +949,11 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ChillerHeater:Absorption:Directfired")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_DFAbsorption;
-                                this_comp.compPtr = ChillerGasAbsorption::GasAbsorberSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = ChillerGasAbsorption::GasAbsorberSpecs::factory(state.dataChillerGasAbsorption, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ChillerHeater:Absorption:DoubleEffect")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ExhFiredAbsorption;
-                                this_comp.compPtr = ChillerExhaustAbsorption::ExhaustAbsorberSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = ChillerExhaustAbsorption::ExhaustAbsorberSpecs::factory(state.dataChillerExhaustAbsorption, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ThermalStorage:ChilledWater:Mixed")) {
                                 this_comp.TypeOf_Num = TypeOf_ChilledWaterTankMixed;
@@ -1013,7 +1013,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:System")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgSystem;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
-                                this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(state.dataGlobals, TypeOf_GrndHtExchgSystem,
+                                this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(state, TypeOf_GrndHtExchgSystem,
                                                                                             CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:Surface")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
@@ -1029,7 +1029,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:Slinky")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
-                                this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(state.dataGlobals, TypeOf_GrndHtExchgSlinky,
+                                this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(state, TypeOf_GrndHtExchgSlinky,
                                                                                             CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Electric:EIR")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
@@ -1038,7 +1038,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = ChillerElectricEIR::ElectricEIRChillerSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = ChillerElectricEIR::ElectricEIRChillerSpecs::factory(state.dataChillerElectricEIR, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Chiller:Electric:ReformulatedEIR")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ElectricReformEIR;
@@ -1047,7 +1047,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = ChillerReformulatedEIR::ReformulatedEIRChillerSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = ChillerReformulatedEIR::ReformulatedEIRChillerSpecs::factory(state.dataChillerReformulatedEIR, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Electric")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Electric;
                                 if (LoopSideNum == DemandSide) {
@@ -1055,7 +1055,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = PlantChillers::ElectricChillerSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = PlantChillers::ElectricChillerSpecs::factory(state.dataPlantChillers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:EngineDriven")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_EngineDriven;
                                 if (LoopSideNum == DemandSide) {
@@ -1063,7 +1063,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = PlantChillers::EngineDrivenChillerSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = PlantChillers::EngineDrivenChillerSpecs::factory(state.dataPlantChillers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:CombustionTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_CombTurbine;
                                 if (LoopSideNum == DemandSide) {
@@ -1071,7 +1071,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = PlantChillers::GTChillerSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = PlantChillers::GTChillerSpecs::factory(state.dataPlantChillers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:ConstantCOP")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ConstCOP;
                                 if (LoopSideNum == DemandSide) {
@@ -1079,15 +1079,15 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = PlantChillers::ConstCOPChillerSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = PlantChillers::ConstCOPChillerSpecs::factory(state.dataPlantChillers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Boiler:HotWater")) {
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                                this_comp.compPtr = Boilers::BoilerSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = Boilers::BoilerSpecs::factory(state.dataBoilers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Boiler:Steam")) {
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Steam;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                                this_comp.compPtr = BoilerSteam::BoilerSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = BoilerSteam::BoilerSpecs::factory(state.dataSteamBoilers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Absorption:Indirect")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Indirect_Absorption;
                                 if (LoopSideNum == DemandSide) {
@@ -1095,7 +1095,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = ChillerIndirectAbsorption::IndirectAbsorberSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = ChillerIndirectAbsorption::IndirectAbsorberSpecs::factory(state.dataChillerIndirectAbsorption, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Absorption")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Absorption;
                                 if (LoopSideNum == DemandSide) {
@@ -1103,7 +1103,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = ChillerAbsorption::BLASTAbsorberSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = ChillerAbsorption::BLASTAbsorberSpecs::factory(state.dataChillerAbsorbers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_SingleSpd;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
@@ -1391,7 +1391,7 @@ namespace EnergyPlus {
                                                                    "GroundHeatExchanger:HorizontalTrench")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgHorizTrench;
                                 this_comp.CurOpSchemeType = TypeOf_GrndHtExchgHorizTrench;
-                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(state.dataGlobals, 
+                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(state,
                                         TypeOf_GrndHtExchgHorizTrench, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {

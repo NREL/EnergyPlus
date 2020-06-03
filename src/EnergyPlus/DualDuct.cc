@@ -1529,7 +1529,6 @@ namespace DualDuct {
         this->dd_airterminalOutlet.AirMassFlowRateMaxAvail = MassFlow;
         this->dd_airterminalOutlet.AirMassFlowRateMinAvail = this->ZoneMinAirFrac * this->dd_airterminalHotAirInlet.AirMassFlowRateMax;
         this->dd_airterminalOutlet.AirEnthalpy = Enthalpy;
-        this->OutdoorAirFlowRate = MassFlow * AirLoopOAFrac;
 
         // Calculate the hot and cold damper position in %
         if ((this->dd_airterminalHotAirInlet.AirMassFlowRateMax == 0.0) || (this->dd_airterminalColdAirInlet.AirMassFlowRateMax == 0.0)) {
@@ -2025,6 +2024,9 @@ namespace DualDuct {
                     Node(OutletNode).GenContam = max(Node(HotInletNode).GenContam, Node(ColdInletNode).GenContam);
                 }
             }
+
+            this->CalcOutdoorAirVolumeFlowRate();
+
         } else if ( this->DamperType == DualDuct_OutdoorAir) {
 
             OutletNode = this->OutletNodeNum;
@@ -2334,6 +2336,16 @@ namespace DualDuct {
         DamperIndex = UtilityRoutines::FindItemInList(CompName, DamperNamesARR, NumDualDuctVarVolOA);
         if (DamperIndex > 0) {
             RecircIsUsed = RecircIsUsedARR(DamperIndex);
+        }
+    }
+
+    void DualDuctAirTerminal::CalcOutdoorAirVolumeFlowRate()
+    {
+        // calculates the amount of outdoor air volume flow rate using the supply air flow rate and OA fraction
+        if (this->AirLoopNum > 0) {
+            this->OutdoorAirFlowRate = (this->dd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+        } else {
+            // do nothing for now
         }
     }
 
