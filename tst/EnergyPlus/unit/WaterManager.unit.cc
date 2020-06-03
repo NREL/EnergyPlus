@@ -70,40 +70,9 @@
 
 using namespace EnergyPlus;
 
-
-TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
-{
-//                ScaleFactor = RainFall.DesignAnnualRain / RainFall.NomAnnualRain;
-
-    std::string const idf_objects = delimited_string({
-        "Site:Precipitation,",
-        "ScheduleAndDesignLevel,  !- Precipitation Model Type",
-        "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
-        "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
-        "0.0;                     !- Average Total Annual Precipitation {m/yr}",
-
-        "Schedule:Constant,",
-        "PrecipitationSchd,",
-        ",",
-        "1;",
-    });
-    ASSERT_TRUE(process_idf(idf_objects));
-    WaterManager::GetWaterManagerInput();
-
-    ScheduleManager::Schedule.allocate(1);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
-
-    WaterManager::UpdatePrecipitation();
-
-    Real64 NomAnnualRain = DataWater::RainFall.NomAnnualRain;
-    EXPECT_NEAR(NomAnnualRain, 0.0, 0.000001);
-
-    Real64 CurrentRate = DataWater::RainFall.CurrentRate;
-    EXPECT_NEAR(CurrentRate, 0.0, 0.000001);
-}
-
 TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
 {
+    // This unit test ensures that the WaterManager correctly calculates the Rainfall CurrentRate
     std::string const idf_objects = delimited_string({
         "Site:Precipitation,",
         "ScheduleAndDesignLevel,  !- Precipitation Model Type",
@@ -133,4 +102,39 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
 
     Real64 CurrentRate = DataWater::RainFall.CurrentRate;
     EXPECT_NEAR(CurrentRate, ExpectedCurrentRate, 0.000001);
+
+    ScheduleManager::Schedule.deallocate();
+}
+
+TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
+{
+    // This unit test ensures that the WaterManager does not attempt a divide by zero error when
+    // the average total annual precipitation input is zero.
+    std::string const idf_objects = delimited_string({
+        "Site:Precipitation,",
+        "ScheduleAndDesignLevel,  !- Precipitation Model Type",
+        "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
+        "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
+        "0.0;                     !- Average Total Annual Precipitation {m/yr}",
+
+        "Schedule:Constant,",
+        "PrecipitationSchd,",
+        ",",
+        "1;",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+    WaterManager::GetWaterManagerInput();
+
+    ScheduleManager::Schedule.allocate(1);
+    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+
+    WaterManager::UpdatePrecipitation();
+
+    Real64 NomAnnualRain = DataWater::RainFall.NomAnnualRain;
+    EXPECT_NEAR(NomAnnualRain, 0.0, 0.000001);
+
+    Real64 CurrentRate = DataWater::RainFall.CurrentRate;
+    EXPECT_NEAR(CurrentRate, 0.0, 0.000001);
+
+    ScheduleManager::Schedule.deallocate();
 }

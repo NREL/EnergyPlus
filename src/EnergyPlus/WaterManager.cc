@@ -1000,7 +1000,7 @@ namespace WaterManager {
 
         if (RainFall.ModeID == RainSchedDesign) {
             schedRate = GetCurrentScheduleValue(RainFall.RainSchedID); // m/hr
-            if (RainFall.NomAnnualRain > 0.0){ //avoid divide by zero error and account for negative annual precipitation input
+            if (RainFall.NomAnnualRain > 0.0){
                 ScaleFactor = RainFall.DesignAnnualRain / RainFall.NomAnnualRain;
             }
             else {
