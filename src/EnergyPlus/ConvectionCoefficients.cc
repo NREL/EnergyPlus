@@ -112,100 +112,10 @@ namespace ConvectionCoefficients {
     using General::RoundSigDigits;
 
     // MODULE PARAMETER DEFINITIONS:
-    Real64 constexpr AdaptiveHcInsideLowLimit{0.5};  // W/m2-K
-    Real64 constexpr AdaptiveHcOutsideLowLimit{1.0}; // W/m2-K
-
     static std::string const BlankString;
-
-    Real64 constexpr OneThird{1.0 / 3.0};   // 1/3 in highest precision
-    Real64 constexpr OneFourth{1.0 / 4.0};  // 1/4 in highest precision
-    Real64 constexpr OneFifth{1.0 / 5.0};   // 1/5 in highest precision
-    Real64 constexpr OneSixth{1.0 / 6.0};   // 1/6 in highest precision
-    Real64 constexpr FourFifths{4.0 / 5.0}; // 4/5 in highest precision
 
     // Coefficients that modify the convection coeff based on surface roughness
     Array1D<Real64> const RoughnessMultiplier(6, {2.17, 1.67, 1.52, 1.13, 1.11, 1.0});
-
-    // parameters for identifying more specific hc model equations, inside face
-    int constexpr HcInt_UserValue{200};
-    int constexpr HcInt_UserSchedule{201};
-    int constexpr HcInt_UserCurve{202};
-    int constexpr HcInt_ASHRAEVerticalWall{203};
-    int constexpr HcInt_WaltonUnstableHorizontalOrTilt{204};
-    int constexpr HcInt_WaltonStableHorizontalOrTilt{205};
-    int constexpr HcInt_FisherPedersenCeilDiffuserFloor{206};
-    int constexpr HcInt_FisherPedersenCeilDiffuserCeiling{207};
-    int constexpr HcInt_FisherPedersenCeilDiffuserWalls{208};
-    int constexpr HcInt_AlamdariHammondStableHorizontal{209};
-    int constexpr HcInt_AlamdariHammondVerticalWall{210};
-    int constexpr HcInt_AlamdariHammondUnstableHorizontal{211};
-    int constexpr HcInt_KhalifaEq3WallAwayFromHeat{212};
-    int constexpr HcInt_KhalifaEq4CeilingAwayFromHeat{213};
-    int constexpr HcInt_KhalifaEq5WallNearHeat{214};
-    int constexpr HcInt_KhalifaEq6NonHeatedWalls{215};
-    int constexpr HcInt_KhalifaEq7Ceiling{216};
-    int constexpr HcInt_AwbiHattonHeatedFloor{217};
-    int constexpr HcInt_AwbiHattonHeatedWall{218};
-    int constexpr HcInt_BeausoleilMorrisonMixedAssistingWall{219};
-    int constexpr HcInt_BeausoleilMorrisonMixedOppossingWall{220};
-    int constexpr HcInt_BeausoleilMorrisonMixedStableCeiling{221};
-    int constexpr HcInt_BeausoleilMorrisonMixedUnstableCeiling{222};
-    int constexpr HcInt_BeausoleilMorrisonMixedStableFloor{223};
-    int constexpr HcInt_BeausoleilMorrisonMixedUnstableFloor{224};
-    int constexpr HcInt_FohannoPolidoriVerticalWall{225};
-    int constexpr HcInt_KaradagChilledCeiling{226};
-    int constexpr HcInt_ISO15099Windows{227};
-    int constexpr HcInt_GoldsteinNovoselacCeilingDiffuserWindow{228};
-    int constexpr HcInt_GoldsteinNovoselacCeilingDiffuserWalls{229};
-    int constexpr HcInt_GoldsteinNovoselacCeilingDiffuserFloor{230};
-
-    // parameters for identifying more specific hc model equations, outside face
-    int constexpr HcExt_None{300}; // none is allowed because Hn and Hf are split
-    int constexpr HcExt_UserValue{301};
-    int constexpr HcExt_UserSchedule{302};
-    int constexpr HcExt_UserCurve{303};
-    int constexpr HcExt_ASHRAESimpleCombined{304};
-    int constexpr HcExt_NaturalASHRAEVerticalWall{305};
-    int constexpr HcExt_NaturalWaltonUnstableHorizontalOrTilt{306};
-    int constexpr HcExt_NaturalWaltonStableHorizontalOrTilt{307};
-    int constexpr HcExt_SparrowWindward{308};
-    int constexpr HcExt_SparrowLeeward{309};
-    int constexpr HcExt_MoWiTTWindward{310};
-    int constexpr HcExt_MoWiTTLeeward{311};
-    int constexpr HcExt_DOE2Windward{312};
-    int constexpr HcExt_DOE2Leeward{313};
-    int constexpr HcExt_NusseltJurges{314};
-    int constexpr HcExt_McAdams{315};
-    int constexpr HcExt_Mitchell{316};
-    int constexpr HcExt_ClearRoof{317};
-    int constexpr HcExt_BlockenWindward{318};
-    int constexpr HcExt_EmmelVertical{319};
-    int constexpr HcExt_EmmelRoof{320};
-    int constexpr HcExt_AlamdariHammondVerticalWall{321};
-    int constexpr HcExt_FohannoPolidoriVerticalWall{322};
-    int constexpr HcExt_ISO15099Windows{323};
-    int constexpr HcExt_AlamdariHammondStableHorizontal{324};
-    int constexpr HcExt_AlamdariHammondUnstableHorizontal{325};
-
-    // parameters, by zone, for flow regimes for adaptive convection on inside face
-    int constexpr InConvFlowRegime_A1{1}; // In-floor heating or in-ceiling cooling
-    int constexpr InConvFlowRegime_A2{2}; // In-wall heating
-    int constexpr InConvFlowRegime_A3{3}; // no HVAC system, all bouyancy
-    int constexpr InConvFlowRegime_B{4};  // Convective heater in zone
-    int constexpr InConvFlowRegime_C{5};  // central mechanical air
-    int constexpr InConvFlowRegime_D{6};  // zone mechanical air
-    int constexpr InConvFlowRegime_E{7};  // mixed. mechancial air and bouyancy
-
-    // params for reference temperature type
-    int constexpr RefTempMeanAirTemp{1};
-    int constexpr RefTempAdjacentAirTemp{2};
-    int constexpr RefTempSupplyAirTemp{3};
-
-    // params for wind speed type
-    int constexpr RefWindWeatherFile{1};
-    int constexpr RefWindAtZ{2};
-    int constexpr RefWindParallComp{3};
-    int constexpr RefWindParallCompAtZ{4};
 
     bool GetUserSuppliedConvectionCoeffs{true}; // Get user input first call for Init
 
