@@ -104,7 +104,7 @@ namespace ConductionTransferFunctionCalc {
 
     // Functions
 
-    void InitConductionTransferFunctions();
+    void InitConductionTransferFunctions(OutputFiles &outputFiles);
 
     void CalculateExponentialMatrix(Real64 &delt); // Time step of the resulting CTFs
 

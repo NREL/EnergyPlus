@@ -1042,7 +1042,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(state);
 
     EXPECT_EQ(1, NumOASystems);
     EXPECT_EQ("OA SYS 1", OutsideAirSys(OASysNum).Name);
@@ -2020,7 +2020,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(state);
 
     EXPECT_EQ(1, NumOASystems);
     EXPECT_EQ("OA SYS 1", OutsideAirSys(OASysNum).Name);

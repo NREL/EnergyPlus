@@ -220,7 +220,7 @@ TEST_F(EnergyPlusFixture, TestZoneVentingSch)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput(state, outputFiles());
+    GetAirflowNetworkInput(state);
 
     // MultizoneZoneData has only 1 element so may be hardcoded
     auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
@@ -343,7 +343,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput(state, outputFiles());
+    GetAirflowNetworkInput(state);
     std::string const error_string = delimited_string({
         "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
         "   **   ~~~   ** The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent width and height.",
@@ -2235,26 +2235,26 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(state, outputFiles());
+    GetAirflowNetworkInput(state);
 
     Real64 PressureSet = 0.5;
 
@@ -2480,7 +2480,7 @@ TEST_F(EnergyPlusFixture, TestZoneVentingSchWithAdaptiveCtrl)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(state, outputFiles());
+    GetAirflowNetworkInput(state);
 
     // The original value before fix is zero. After the fix, the correct schedule number is assigned.
 
@@ -3022,7 +3022,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManagerTest_PolygonalWindows)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(state, outputFiles());
+    GetAirflowNetworkInput(state);
 
     // Choice: Height; Base Surface: Vertical Rectangular
     EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(1).Width, 0.0001);
@@ -4411,14 +4411,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(outputFiles());
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    SimulationManager::GetProjectData(state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -4426,16 +4426,16 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
     HeatBalanceManager::AllocateHeatBalArrays();
     DataEnvironment::OutBaroPress = 101000;
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(state, outputFiles());
+    GetAirflowNetworkInput(state);
     InitAirflowNetwork();
 
     // Check inputs
@@ -5687,8 +5687,8 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), errors); // read material data
-    EXPECT_FALSE(errors);                                       // expect no errors
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errors); // read material data
+    EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
@@ -5701,13 +5701,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(outputFiles(), errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                                   // expect no errors
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, errors); // setup zone geometry and get zone data
+    EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 2);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, outputFiles());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -6391,8 +6391,8 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), errors); // read material data
-    EXPECT_FALSE(errors);                                       // expect no errors
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errors); // read material data
+    EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
@@ -6405,13 +6405,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(outputFiles(), errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                                   // expect no errors
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, errors); // setup zone geometry and get zone data
+    EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 2);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, outputFiles());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -7014,8 +7014,8 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), errors); // read material data
-    EXPECT_FALSE(errors);                                       // expect no errors
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errors); // read material data
+    EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
@@ -7028,13 +7028,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(outputFiles(), errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                                   // expect no errors
-
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, errors); // setup zone geometry and get zone data
+    EXPECT_FALSE(errors);                    // expect no errors
+  
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, outputFiles());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
     EXPECT_EQ(CurveManager::NumCurves, 6);
 
@@ -7703,8 +7703,8 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), errors); // read material data
-    EXPECT_FALSE(errors);                                       // expect no errors
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errors); // read material data
+    EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
@@ -7717,13 +7717,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(outputFiles(), errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                                   // expect no errors
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, errors); // setup zone geometry and get zone data
+    EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, outputFiles());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -8337,8 +8337,8 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), errors); // read material data
-    EXPECT_FALSE(errors);                                       // expect no errors
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errors); // read material data
+    EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
@@ -8351,13 +8351,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(outputFiles(), errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                                   // expect no errors
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, errors); // setup zone geometry and get zone data
+    EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, outputFiles());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -9063,36 +9063,37 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(outputFiles());
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    SimulationManager::GetProjectData(state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays();
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(outputFiles(), errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                                   // expect no errors
+
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, errors); // setup zone geometry and get zone data
+    EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 2);
 
     DataGlobals::AnyLocalEnvironmentsInModel = true;
     OutAirNodeManager::SetOutAirNodes();
-    GetAirflowNetworkInput(state, outputFiles());
+    GetAirflowNetworkInput(state);
     // Issue 7656
     std::string const error_string = delimited_string({
         "   ** Warning ** No Timestep object found.  Number of TimeSteps in Hour defaulted to 4.",
@@ -9545,8 +9546,8 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), errors); // read material data
-    EXPECT_FALSE(errors);                                       // expect no errors
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errors); // read material data
+    EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
@@ -9559,13 +9560,13 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(outputFiles(), errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                                   // expect no errors
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, errors); // setup zone geometry and get zone data
+    EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(0, CurveManager::NumCurves);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, outputFiles());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
 
     // Check that the correct number of curves has been generated (5 facade directions + 2 windows)
     EXPECT_EQ(7, CurveManager::NumCurves);
@@ -13092,26 +13093,26 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(state, outputFiles());
+    GetAirflowNetworkInput(state);
 
     Real64 PresssureSet = 0.5;
     // Assign values
@@ -13636,8 +13637,8 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), errors); // read material data
-    EXPECT_FALSE(errors);                                       // expect no errors
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errors); // read material data
+    EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
     EXPECT_FALSE(errors);                         // expect no errors
@@ -13650,8 +13651,8 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(outputFiles(), errors); // setup zone geometry and get zone data
-    EXPECT_FALSE(errors);                                   // expect no errors
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, errors); // setup zone geometry and get zone data
+    EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(0, CurveManager::NumCurves);
@@ -13671,7 +13672,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
     bool resimu = false;
 
     Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, outputFiles());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
     AirflowNetworkGetInputFlag = false;
     AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
     ManageAirflowNetworkBalance(state, First, iter, resimu);
@@ -15566,26 +15567,26 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(state, outputFiles());
+    GetAirflowNetworkInput(state);
 
     Schedule(1).CurrentValue = 1.0;
     Schedule(2).CurrentValue = 100.0;
@@ -17144,14 +17145,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData(outputFiles());
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    SimulationManager::GetProjectData(state.outputFiles);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -17159,16 +17160,16 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     HeatBalanceManager::AllocateHeatBalArrays();
     DataEnvironment::OutBaroPress = 101000;
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(outputFiles(), ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    ASSERT_THROW(GetAirflowNetworkInput(state, outputFiles()), std::runtime_error);
+    ASSERT_THROW(GetAirflowNetworkInput(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.",

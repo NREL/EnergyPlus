@@ -80,7 +80,7 @@ Real64 iterationTempConvergenceCriteria = 0.00001;
 //******************************************************************************
 
 // Finite difference model factory
-std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(DataGlobal &dataGlobals, int objectType, std::string objectName)
+std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -135,7 +135,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
         groundTempModels.push_back(thisModel);
 
         // Simulate
-        thisModel->initAndSim(dataGlobals);
+        thisModel->initAndSim(state);
 
         // Return the pointer
         return thisModel;
@@ -147,7 +147,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::initAndSim(DataGlobal &dataGlobals)
+void FiniteDiffGroundTempsModel::initAndSim(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -158,7 +158,7 @@ void FiniteDiffGroundTempsModel::initAndSim(DataGlobal &dataGlobals)
     // PURPOSE OF THIS SUBROUTINE:
     // Initalizes and simulated finite difference ground temps model
 
-    FiniteDiffGroundTempsModel::getWeatherData(dataGlobals);
+    FiniteDiffGroundTempsModel::getWeatherData(state);
 
     FiniteDiffGroundTempsModel::developMesh();
 
@@ -167,7 +167,7 @@ void FiniteDiffGroundTempsModel::initAndSim(DataGlobal &dataGlobals)
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::getWeatherData(DataGlobal &dataGlobals)
+void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -211,7 +211,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(DataGlobal &dataGlobals)
     bool EndMonthFlag_reset = EndMonthFlag;
     bool WarmupFlag_reset = WarmupFlag;
     int DayOfSim_reset = DayOfSim;
-    std::string DayOfSimChr_reset = dataGlobals.DayOfSimChr;
+    std::string DayOfSimChr_reset = state.dataGlobals.DayOfSimChr;
     int NumOfWarmupDays_reset = NumOfWarmupDays;
     bool BeginDayFlag_reset = BeginDayFlag;
     bool EndDayFlag_reset = EndDayFlag;
@@ -242,7 +242,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(DataGlobal &dataGlobals)
     WeatherManager::Envrn = originalNumOfEnvn;
     Available = true;
     ErrorsFound = false;
-    GetNextEnvironment(dataGlobals, OutputFiles::getSingleton(), Available, ErrorsFound);
+    GetNextEnvironment(state, Available, ErrorsFound);
     if (ErrorsFound) {
         ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }
@@ -259,7 +259,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(DataGlobal &dataGlobals)
     EndMonthFlag = false;
     WarmupFlag = false;
     DayOfSim = 0;
-    dataGlobals.DayOfSimChr = "0";
+    state.dataGlobals.DayOfSimChr = "0";
     NumOfWarmupDays = 0;
 
     annualAveAirTemp_num = 0.0;
@@ -367,7 +367,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(DataGlobal &dataGlobals)
     EndMonthFlag = EndMonthFlag_reset;
     WarmupFlag = WarmupFlag_reset;
     DayOfSim = DayOfSim_reset;
-    dataGlobals.DayOfSimChr = DayOfSimChr_reset;
+    state.dataGlobals.DayOfSimChr = DayOfSimChr_reset;
     NumOfWarmupDays = NumOfWarmupDays_reset;
     BeginDayFlag = BeginDayFlag_reset;
     EndDayFlag = EndDayFlag_reset;

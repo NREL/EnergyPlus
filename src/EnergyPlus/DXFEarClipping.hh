@@ -53,6 +53,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace DXFEarClipping {
 
@@ -99,7 +100,8 @@ namespace DXFEarClipping {
                                    Vector_2d const &point       // point to be tested
     );
 
-    void generate_ears(int const nvert, // number of vertices in polygon
+    void generate_ears(OutputFiles &outputFiles,
+                       int const nvert, // number of vertices in polygon
                        Array1D<Vector_2d> &vertex,
                        Array1D_int &ears,       // number of ears possible (dimensioned to nvert)
                        int &nears,              // number of ears found
