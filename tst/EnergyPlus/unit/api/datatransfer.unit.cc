@@ -248,8 +248,8 @@ public:
 
     void simulateTimeStepAndReport()
     {
-        UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateMeterReporting(state.outputFiles);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
     }
 };
 

@@ -874,9 +874,16 @@ public:
         if (!additionalPropertiesSubschema) {
             if (propertiesMatched.size() != target.getObjectSize()) {
                 if (results) {
-                    results->pushError(context, "Object contains properties "
+                    std::string unwanted;
+                    for (const typename AdapterType::ObjectMember m : object) {
+                        if (propertiesMatched.find(m.first) == propertiesMatched.end()) {
+                            unwanted = m.first;
+                            break;
+                        }
+                    }
+                    results->pushError(context, "Object contains a property "
                             "that could not be validated using 'properties' "
-                            "or 'additionalProperties' constraints");
+                            "or 'additionalProperties' constraints: '" + unwanted + "'.");
                 }
 
                 return false;

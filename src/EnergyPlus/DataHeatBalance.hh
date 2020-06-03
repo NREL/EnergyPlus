@@ -343,7 +343,7 @@ namespace DataHeatBalance {
     extern int SolarDistribution;               // Solar Distribution Algorithm
     extern int InsideSurfIterations;            // Counts inside surface iterations
     extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
- 
+
    // Flags for HeatTransfer Algorithms Used
     extern bool AnyCTF;                     // CTF used
     extern bool AnyEMPD;                    // EMPD used
@@ -2565,6 +2565,9 @@ namespace DataHeatBalance {
         Real64 CO2Rate;
         Real64 GCRate;
 
+        Real64 SumTinMinusTSup;  // Numerator for zone-level sensible heat index (SHI)
+        Real64 SumToutMinusTSup; // Denominator for zone-level sensible heat index (SHI)
+
         // Default Constructor
         ZoneReportVars()
             : PeopleRadGain(0.0), PeopleConGain(0.0), PeopleSenGain(0.0), PeopleNumOcc(0.0), PeopleLatGain(0.0), PeopleTotGain(0.0),
@@ -2588,7 +2591,7 @@ namespace DataHeatBalance {
               ITEqTimeBelowDryBulbT(0.0), ITEqTimeAboveDewpointT(0.0), ITEqTimeBelowDewpointT(0.0), ITEqTimeAboveRH(0.0), ITEqTimeBelowRH(0.0),
               ITEAdjReturnTemp(0.0), TotRadiantGain(0.0), TotVisHeatGain(0.0), TotConvectiveGain(0.0), TotLatentGain(0.0), TotTotalHeatGain(0.0),
               TotRadiantGainRate(0.0), TotVisHeatGainRate(0.0), TotConvectiveGainRate(0.0), TotLatentGainRate(0.0), TotTotalHeatGainRate(0.0),
-              CO2Rate(0.0), GCRate(0.0)
+              CO2Rate(0.0), GCRate(0.0), SumTinMinusTSup(0.0), SumToutMinusTSup(0.0)
         {
         }
     };

@@ -240,7 +240,7 @@ void EnergyPlus::clearThisState(EnergyPlusData &state)
 {
     state.clear_state();
 }
-void EnergyPlus::clearAllStates()
+void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
 {
     using namespace EnergyPlus;
     // A to Z order
@@ -264,7 +264,7 @@ void EnergyPlus::clearAllStates()
     DataEnvironment::clear_state();
     DataErrorTracking::clear_state();
     DataGenerators::clear_state();
-    DataGlobals::clear_state();
+    DataGlobals::clear_state(outputFiles);
     DataHeatBalance::clear_state();
     DataHeatBalFanSys::clear_state();
     DataHeatBalSurface::clear_state();
