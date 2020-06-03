@@ -49,11 +49,14 @@
 #define ENERGYPLUS_AIRLOOPHVACDOAS_HH
 
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <string>
 #include <vector>
 
 namespace EnergyPlus {
+
+// forward declarations
+struct EnergyPlusData;
 
 namespace AirLoopHVACDOAS {
 
@@ -204,6 +207,17 @@ namespace AirLoopHVACDOAS {
     void getAirLoopHVACDOASInput(EnergyPlusData &state);
     extern bool GetInputOnceFlag;
 } // namespace AirLoopHVACDOAS
+
+    struct AirLoopHVACDOASData : BaseGlobalStruct
+    {
+
+        void clear_state() override
+        {
+
+        }
+    };
+
+    extern AirLoopHVACDOASData dataAirLoopHVACDOAS;
 
 } // namespace EnergyPlus
 #endif // ENERGYPLUS_AIRLOOPHVACDOAS_HH

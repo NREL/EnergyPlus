@@ -83,6 +83,9 @@
 #include <string> // std::string, std::to_string
 
 namespace EnergyPlus {
+
+AirLoopHVACDOASData dataAirLoopHVACDOAS;
+
 namespace AirLoopHVACDOAS {
 
     int numAirLoopDOAS(0);

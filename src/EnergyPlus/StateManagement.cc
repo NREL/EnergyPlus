@@ -50,6 +50,7 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <AirflowNetwork/Properties.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/BranchInputManager.hh>
@@ -254,6 +255,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
     dataAirflowNetworkBalanceManager.clear_state();
+    dataAirLoopHVACDOAS.clear_state();
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
