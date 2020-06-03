@@ -634,11 +634,18 @@ TEST_F(InputProcessorFixture, parse_latin1_json)
         "    intonaco int calce;      !- Outside Layer"
     }));
 
-    EXPECT_TRUE(process_idf(idf, false)); // No assertions
-    compare_err_stream("", true);
+    EXPECT_FALSE(process_idf(idf, false)); // No assertions
+    const std::string error_string = delimited_string({
+        "   ** Severe  ** <root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: '1\xB0piano'.",
+        "   ** Severe  ** <root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded"
+    });
+    compare_err_stream(error_string, true);
 
     auto const &errors = validationErrors();
-    EXPECT_EQ(errors.size(), 0ul);
+    EXPECT_EQ(errors.size(), 2ul);
+    EXPECT_EQ("<root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: '1\xB0piano'.", errors[0]);
+    EXPECT_EQ("<root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded", errors[1]);
+
 
     json &epJSON = getEpJSON();
 
