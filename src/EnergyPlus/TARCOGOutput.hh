@@ -58,41 +58,41 @@ namespace EnergyPlus {
 
 namespace TARCOGOutput {
 
-    // Data
-    // variables:
-    // bi...Debug files handles:
-    // character(len=1000) :: DebugDir
-    extern std::string DBGD;
-    extern std::string FileMode;
-    extern std::string FilePosition;
-    extern bool WriteDebugOutput;
-    extern int DebugMode;
+    struct Files {
+      std::string DBGD;
+      std::string FileMode;
+      std::string FilePosition;
+      bool WriteDebugOutput;
+      int DebugMode;
+      int InArgumentsFile;
+      int OutArgumentsFile;
+      int WINCogFile;
+
+      // Intermediate debug files
+      int IterationCSVFileNumber;
+      int TarcogIterationsFileNumber;
+
+      std::string IterationCSVName;
+
+      // integer, parameter :: IterationHHAT = 102
+      // character(len=1000)    :: IterationHHATName = 'IterationHHAT.csv'
+
+      std::string WinCogFileName;
+      // character(len=1000)    :: SHGCFileName = 'test.w7'
+      std::string DebugOutputFileName;
+    };
+
     extern int winID;
     extern int iguID;
 
-    extern int InArgumentsFile;
-    extern int OutArgumentsFile;
-    extern int WINCogFile;
-
-    // Intermediate debug files
-    extern int IterationCSVFileNumber;
-    extern int TarcogIterationsFileNumber;
-
-    extern std::string IterationCSVName;
-
-    // integer, parameter :: IterationHHAT = 102
-    // character(len=1000)    :: IterationHHATName = 'IterationHHAT.csv'
-
-    extern std::string WinCogFileName;
-    // character(len=1000)    :: SHGCFileName = 'test.w7'
-    extern std::string DebugOutputFileName;
 
     extern std::string const VersionNumber;
     extern std::string const VersionCompileDateCC;
 
     // Functions
 
-    void WriteInputArguments(Real64 const tout,
+    void WriteInputArguments(Files &files,
+                             Real64 const tout,
                              Real64 const tind,
                              Real64 const trmin,
                              Real64 const wso,
@@ -230,7 +230,8 @@ namespace TARCOGOutput {
                           const Array1D<Real64> &hs,
                           int &nperr);
 
-    void WriteTARCOGInputFile(std::string const &VerNum,
+    void WriteTARCOGInputFile(Files &files,
+                              std::string const &VerNum,
                               Real64 const tout,
                               Real64 const tind,
                               Real64 const trmin,
@@ -274,9 +275,9 @@ namespace TARCOGOutput {
                               const Array1D<Real64> &Al,
                               const Array1D<Real64> &Ar,
                               const Array1D<Real64> &Ah,
-                              const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
-                              const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-                              const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
+                              const Array1D_int &SupportPillar,
+                              const Array1D<Real64> &PillarSpacing,
+                              const Array1D<Real64> &PillarRadius,
                               const Array1D<Real64> &SlatThick,
                               const Array1D<Real64> &SlatWidth,
                               const Array1D<Real64> &SlatAngle,
@@ -298,10 +299,15 @@ namespace TARCOGOutput {
                               const Array1D<Real64> &xwght,
                               const Array1D<Real64> &gama);
 
-    void FinishDebugOutputFiles(int const nperr);
+    void FinishDebugOutputFiles(Files &files, int const nperr);
 
-    void PrepDebugFilesAndVariables(
-        std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID, int &nperr);
+    void PrepDebugFilesAndVariables(Files &files,
+                                    std::string const &Debug_dir,
+                                    std::string const &Debug_file,
+                                    int const Debug_mode,
+                                    int const win_ID,
+                                    int const igu_ID,
+                                    int &nperr);
 
 } // namespace TARCOGOutput
 

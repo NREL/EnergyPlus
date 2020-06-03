@@ -93,7 +93,8 @@ namespace TARCOGArgs {
 
     // Functions
 
-    int ArgCheck(int const nlayer,
+    int ArgCheck(Files &files,
+                 int const nlayer,
                  int const iwd,
                  Real64 const tout,
                  Real64 const tind,
@@ -135,9 +136,9 @@ namespace TARCOGArgs {
                  const Array1D<Real64> &xwght,
                  const Array1D<Real64> &gama,
                  const Array1D_int &nmix,
-                 const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
-                 const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-                 const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
+                 const Array1D_int &SupportPillar,
+                 const Array1D<Real64> &PillarSpacing,
+                 const Array1D<Real64> &PillarRadius,
                  Real64 &hin,
                  Real64 &hout,
                  const Array1D_int &ibc,
@@ -235,9 +236,10 @@ namespace TARCOGArgs {
 
         // bi...Write debug output files - if debug flag = 1:
 
-        if (WriteDebugOutput) {
+        if (files.WriteDebugOutput) {
 
-            WriteInputArguments(tout,
+            WriteInputArguments(files,
+                                tout,
                                 tind,
                                 trmin,
                                 wso,
@@ -296,7 +298,8 @@ namespace TARCOGArgs {
                                 xgcp,
                                 xwght);
 
-            WriteTARCOGInputFile(VersionNumber,
+            WriteTARCOGInputFile(files,
+                                 VersionNumber,
                                  tout,
                                  tind,
                                  trmin,

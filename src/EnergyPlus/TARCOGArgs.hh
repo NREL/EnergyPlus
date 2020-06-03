@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
+#include "TARCOGOutput.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -60,7 +61,8 @@ namespace TARCOGArgs {
 
     // Functions
 
-    int ArgCheck(int const nlayer,
+    int ArgCheck(EnergyPlus::TARCOGOutput::Files &files,
+                 int const nlayer,
                  int const iwd,
                  Real64 const tout,
                  Real64 const tind,
@@ -102,9 +104,9 @@ namespace TARCOGArgs {
                  const Array1D<Real64> &xwght,
                  const Array1D<Real64> &gama,
                  const Array1D_int &nmix,
-                 const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
-                 const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-                 const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
+                 const Array1D_int &SupportPillar,
+                 const Array1D<Real64> &PillarSpacing,
+                 const Array1D<Real64> &PillarRadius,
                  Real64 &hin,
                  Real64 &hout,
                  const Array1D_int &ibc,
