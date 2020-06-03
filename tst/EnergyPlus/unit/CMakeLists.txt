@@ -189,6 +189,7 @@ set( test_src
   Vector.unit.cc
   VentilatedSlab.unit.cc
   WaterCoils.unit.cc
+  WaterManager.unit.cc
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
