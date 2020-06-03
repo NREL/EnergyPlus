@@ -63,6 +63,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+
 #include "Fixtures/EnergyPlusFixture.hh"
 
 
@@ -78,13 +80,57 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
         "ScheduleAndDesignLevel,  !- Precipitation Model Type",
         "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
         "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
-        "0.0;                 !- Average Total Annual Precipitation {m/yr}",
+        "0.0;                     !- Average Total Annual Precipitation {m/yr}",
+
+        "Schedule:Constant,",
+        "PrecipitationSchd,",
+        ",",
+        "1;",
     });
     ASSERT_TRUE(process_idf(idf_objects));
+    WaterManager::GetWaterManagerInput();
+
+    ScheduleManager::Schedule.allocate(1);
+    ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
     WaterManager::UpdatePrecipitation();
 
+    Real64 NomAnnualRain = DataWater::RainFall.NomAnnualRain;
+    EXPECT_NEAR(NomAnnualRain, 0.0, 0.000001);
+
     Real64 CurrentRate = DataWater::RainFall.CurrentRate;
     EXPECT_NEAR(CurrentRate, 0.0, 0.000001);
+}
 
+TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
+{
+    std::string const idf_objects = delimited_string({
+        "Site:Precipitation,",
+        "ScheduleAndDesignLevel,  !- Precipitation Model Type",
+        "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
+        "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
+        "0.80771;                 !- Average Total Annual Precipitation {m/yr}",
+
+        "Schedule:Constant,",
+        "PrecipitationSchd,",
+        ",",
+        "1;",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    WaterManager::GetWaterManagerInput();
+
+    ScheduleManager::Schedule.allocate(1);
+    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+
+    WaterManager::UpdatePrecipitation();
+
+    Real64 ExpectedNomAnnualRain = 0.80771;
+    Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobals::SecInHour;
+
+    Real64 NomAnnualRain = DataWater::RainFall.NomAnnualRain;
+    EXPECT_NEAR(NomAnnualRain, ExpectedNomAnnualRain, 0.000001);
+
+    Real64 CurrentRate = DataWater::RainFall.CurrentRate;
+    EXPECT_NEAR(CurrentRate, ExpectedCurrentRate, 0.000001);
 }
