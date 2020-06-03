@@ -65,7 +65,7 @@ namespace CommandLineInterface {
                      std::string &DataOut                // Output from the retrieval
     );
 
-    int runReadVarsESO();
+    int runReadVarsESO(OutputFiles &outputFiles);
 
 } // namespace CommandLineInterface
 

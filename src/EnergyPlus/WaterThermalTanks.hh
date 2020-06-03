@@ -693,7 +693,7 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankMixed(); // Water Heater being simulated
 
-        void CalcStandardRatings(EnergyPlusData &state, OutputFiles &outputFiles);
+        void CalcStandardRatings(EnergyPlusData &state);
 
         void ReportCWTankInits(OutputFiles &outputFiles);
 
@@ -901,7 +901,7 @@ namespace WaterThermalTanks {
 
     bool getWaterTankStratifiedInput();
 
-    bool GetWaterThermalTankInput(EnergyPlusData &state, OutputFiles &outputFiles);
+    bool GetWaterThermalTankInput(EnergyPlusData &state);
 
     void CalcWaterThermalTankZoneGains(EnergyPlusData &state);
 

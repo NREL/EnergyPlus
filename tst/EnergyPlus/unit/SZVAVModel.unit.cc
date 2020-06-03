@@ -158,6 +158,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    DataEnvironment::StdRhoAir = 1.0;
 
     CurZoneEqNum = 0;
     CurSysNum = 0;

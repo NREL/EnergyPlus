@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -378,11 +378,11 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);
     GetZoneData(ErrorsFound);
     DataHeatBalFanSys::ZoneReOrder.allocate(NumOfZones);
 
-    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -514,7 +514,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, ErrorsFound);
 
     int ZoneNum = 1;
     for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -648,7 +648,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -748,7 +748,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(state, outputFiles(), ErrorsFound);
+    GetSimpleAirModelInputs(state, ErrorsFound);
 
     int ZoneNum = 1;
     for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
