@@ -56,7 +56,7 @@
 void cClearAllStates() {
     EnergyPlus::EnergyPlusData state;   //THIS IS TEMPORARY
     EnergyPlus::clearThisState(state);
-    EnergyPlus::clearAllStates();
+    EnergyPlus::clearAllStates(state.outputFiles);
 }
 
 int energyplus(int argc, const char *argv[]) {
