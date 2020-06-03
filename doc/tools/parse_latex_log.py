@@ -132,7 +132,7 @@ def find_locations(root_dir, target, target_ext='.tex', verbose=False):
             if target_ext is not None and ext != target_ext:
                 continue
             if verbose:
-                print(f"checking {path}...")
+                print("checking {}...".format(path))
             pp_path = pathlib.Path(path)
             try:
                 with open(path, encoding="utf8", errors="ignore") as f:
@@ -333,7 +333,7 @@ class LogParser:
                         err_start = parse_error_start(line)
                         if tex_file is not None:
                             self._current_tex_file = tex_file
-                            self._report(f"processing {tex_file} ...")
+                            self._report("processing {} ...".format(tex_file))
                         elif issue_start is not None:
                             if DEBUG:
                                 pdb.set_trace()
@@ -341,7 +341,7 @@ class LogParser:
                             self._in_tex_err = True
                             self._type = "TeX Error"
                             self._current_issue = issue_start
-                            self._report(f"- issue {issue_start}")
+                            self._report("- issue {}".format(issue_start))
                         elif err_start is not None:
                             if DEBUG:
                                 pdb.set_trace()
@@ -351,7 +351,7 @@ class LogParser:
                                     to_s(err_start[0]) +
                                     " " + to_s(err_start[1])).strip()
                             self._current_issue = err_start[2]
-                            self._report(f"- error {self._current_issue}")
+                            self._report("- error {}".format(self._current_issue))
                         elif warning_start is not None:
                             if DEBUG:
                                 pdb.set_trace()
@@ -361,7 +361,7 @@ class LogParser:
                                     to_s(warning_start[0]) +
                                     " " + to_s(warning_start[1])).strip()
                             self._current_issue = warning_start[2]
-                            self._report(f"- warning {self._current_issue}")
+                            self._report("- warning {}".format(self._current_issue))
                     self._previous_line = line
         except:
             return sys.exit(EXIT_CODE_ERROR)
@@ -399,13 +399,13 @@ def find_issues(log_path, json_error_path, src_dir):
         errs = parse_log(log_path, src_dir)
     except Exception as e:
         import traceback
-        print(f"issue encountered in parsing log: {e}")
+        print("issue encountered in parsing log: {}".format(e))
         traceback.print_tb(sys.last_traceback)
         sys.exit(EXIT_CODE_ERROR)
     num_issues = len(errs['issues'])
     if (num_issues > 0):
         if VERBOSE:
-            print(f"ISSUES: {num_issues}")
+            print("ISSUES: {}".format(num_issues))
         f = sys.stdout
         for issue in errs['issues']:
             f.write("[LATEX")
@@ -432,12 +432,12 @@ def run_tests():
             "[70] [71] [72] [73] [74] [75]) " +
             "(./src/overview/group-compliance-objects.tex [76",
             "/home/user/stuff/input-output-reference")
-    assert out == "src/overview/group-compliance-objects.tex", f"out = {out}"
+    assert out == "src/overview/group-compliance-objects.tex", "out = {}".format(out)
     out = parse_current_tex_file(
             "Underfull \\hbox (badness 10000) in paragraph at lines " +
             "1042--1043",
             "/home/user/stuff/input-output-reference")
-    assert out is None, f"out = {out}"
+    assert out is None, "out = {}".format(out)
     out = parse_current_tex_file(
             "]) (./src/overview/group-location-climate-weather-file-access" +
             ".tex [77] [78] [79",
@@ -452,14 +452,14 @@ def run_tests():
             "/home/user/stuff/input-output-reference")
     assert out == (
             "src/appendix-a-units-and-abbreviations/" +
-            "standard-energyplus-units.tex"), f"out == {out}"
+            "standard-energyplus-units.tex"), "out == {}".format(out)
     out = parse_tex_error("! Misplaced alignment tab character &.")
-    assert out == "Misplaced alignment tab character &.", f"out == {out}"
+    assert out == "Misplaced alignment tab character &.", "out == {}".format(out)
     out = parse_warning_start(
             "LaTeX Warning: Hyper reference " +
             "`airterminalsingleductuncontrolled' on page 2467")
     assert out[2] == (" Hyper reference `airterminalsingleductuncontrolled' " +
-                      "on page 2467"), f"out = {out}"
+                      "on page 2467"), "out = {}".format(out)
 
 
 if __name__ == "__main__":
@@ -488,12 +488,12 @@ if __name__ == "__main__":
                     pathlib.Path(tag + '.log')
                     ).resolve()
             assert log_path.exists()
-            json_err = f'{tag}-err.json'
+            json_err = '{}-err.json'.format(tag)
             src_dir = (
                     current_dir / pathlib.Path('..') / pathlib.Path(tag)
                     ).resolve()
             print("="*60)
-            print(f"Processing {tag}...")
+            print("Processing {}...".format(tag))
             if os.path.exists(json_err):
                 os.remove(json_err)
             find_issues(
@@ -516,15 +516,15 @@ if __name__ == "__main__":
               "file; only written if issues found")
         print("NOTE: no error file is written if no significant " +
               "errors/warnings found")
-        print(f"To run tests, call `python {sys.argv[0]} test'")
+        print("To run tests, call `python {} test'".format(sys.argv[0]))
         sys.exit(EXIT_CODE_ERROR)
     log_path = sys.argv[1]
     src_dir = sys.argv[2]
     json_err = sys.argv[3]
     if VERBOSE:
-        print(f"log_path: {log_path}")
-        print(f"src_dir : {src_dir}")
-        print(f"json_err: {json_err}")
+        print("log_path: {}".format(log_path))
+        print("src_dir : {}".format(src_dir))
+        print("json_err: {}".format(json_err))
     issues_found = find_issues(log_path, json_err, src_dir)
     if issues_found:
         sys.exit(EXIT_CODE_ISSUES_FOUND)
