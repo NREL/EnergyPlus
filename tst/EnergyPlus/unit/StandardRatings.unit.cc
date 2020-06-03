@@ -316,7 +316,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
-    CalcChillerIPLV(outputFiles(),
+    CalcChillerIPLV(state.outputFiles,
                     state.dataChillerElectricEIR.ElectricEIRChiller(1).Name,
                     TypeOf_Chiller_ElectricEIR,
                     state.dataChillerElectricEIR.ElectricEIRChiller(1).RefCap,

@@ -145,7 +145,6 @@ namespace AirflowNetwork {
 
     // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
     Array1D<Real64> SUMF;
-    int Unit11(0);
     int Unit21(0);
 
     // Large opening variables

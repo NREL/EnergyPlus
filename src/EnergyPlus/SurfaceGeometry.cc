@@ -210,7 +210,7 @@ namespace SurfaceGeometry {
         UniqueSurfaceNames.clear();
     }
 
-    void SetupZoneGeometry(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -285,7 +285,7 @@ namespace SurfaceGeometry {
             CosZoneRelNorth(ZoneNum) = std::cos(-Zone(ZoneNum).RelNorth * DegToRadians);
             SinZoneRelNorth(ZoneNum) = std::sin(-Zone(ZoneNum).RelNorth * DegToRadians);
         }
-        GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound);
+        GetSurfaceData(state.outputFiles, ErrorsFound);
 
         if (ErrorsFound) {
             CosZoneRelNorth.deallocate();
@@ -327,7 +327,7 @@ namespace SurfaceGeometry {
             if (Surface(SurfNum).Class == SurfaceClass_Detached_F) ++FixedShadingCount;
             if (Surface(SurfNum).Class == SurfaceClass_Detached_B) ++BuildingShadingCount;
 
-            if (Surface(SurfNum).Class != SurfaceClass_IntMass) ProcessSurfaceVertices(outputFiles, SurfNum, ErrorsFound);
+            if (Surface(SurfNum).Class != SurfaceClass_IntMass) ProcessSurfaceVertices(state.outputFiles, SurfNum, ErrorsFound);
         }
 
         for (auto &e : Zone) {
@@ -341,8 +341,8 @@ namespace SurfaceGeometry {
 
         DetailedWWR = (inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
         if (DetailedWWR) {
-            print(outputFiles.debug, "{}", "=======User Entered Classification =================");
-            print(outputFiles.debug, "{}", "Surface,Class,Area,Tilt");
+            print(state.outputFiles.debug, "{}", "=======User Entered Classification =================");
+            print(state.outputFiles.debug, "{}", "Surface,Class,Area,Tilt");
         }
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces to find windows...
@@ -364,7 +364,7 @@ namespace SurfaceGeometry {
                         Zone(ZoneNum).ExtGrossWallArea_Multiplied +=
                             Surface(SurfNum).GrossArea * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
                         if (DetailedWWR) {
-                            print(outputFiles.debug,
+                            print(state.outputFiles.debug,
                                   "{},Wall,{:.2R},{:.1R}\n",
                                   Surface(SurfNum).Name,
                                   Surface(SurfNum).GrossArea * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier,
@@ -379,7 +379,7 @@ namespace SurfaceGeometry {
                         Zone(ZoneNum).ExtGrossGroundWallArea_Multiplied +=
                             Surface(SurfNum).GrossArea * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
                         if (DetailedWWR) {
-                            print(outputFiles.debug,
+                            print(state.outputFiles.debug,
                                   "{},Wall-GroundContact,{:.2R},{:.1R}\n",
                                   Surface(SurfNum).Name,
                                   Surface(SurfNum).GrossArea * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier,
@@ -402,7 +402,7 @@ namespace SurfaceGeometry {
                             Zone(Surface(SurfNum).Zone).ExtWindowArea +
                             Surface(SurfNum).GrossArea * Surface(SurfNum).Multiplier * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
                         if (DetailedWWR) {
-                            print(outputFiles.debug,
+                            print(state.outputFiles.debug,
                                   "{},Window,{:.2R},{:.1R}\n",
                                   Surface(SurfNum).Name,
                                   Surface(SurfNum).GrossArea * Surface(SurfNum).Multiplier * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier,
@@ -415,8 +415,8 @@ namespace SurfaceGeometry {
         } // ...end of surfaces windows DO loop
 
         if (DetailedWWR) {
-            print(outputFiles.debug, "{}\n", "========================");
-            print(outputFiles.debug, "{}\n", "Zone,ExtWallArea,ExtWindowArea");
+            print(state.outputFiles.debug, "{}\n", "========================");
+            print(state.outputFiles.debug, "{}\n", "Zone,ExtWallArea,ExtWindowArea");
         }
 
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -429,7 +429,7 @@ namespace SurfaceGeometry {
             ZMax = -99999.0;
             ZMin = 99999.0;
             if (DetailedWWR) {
-                print(outputFiles.debug, "{},{:.2R},{:.2R}\n", Zone(ZoneNum).Name, Zone(ZoneNum).ExtGrossWallArea,
+                print(state.outputFiles.debug, "{},{:.2R},{:.2R}\n", Zone(ZoneNum).Name, Zone(ZoneNum).ExtGrossWallArea,
                                                                     Zone(ZoneNum).ExtWindowArea);
             }
             for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
@@ -493,7 +493,7 @@ namespace SurfaceGeometry {
             if ((Zone(ZoneNum).CeilingHeight <= 0.0) && (AverageHeight > 0.0)) Zone(ZoneNum).CeilingHeight = AverageHeight;
         }
 
-        CalculateZoneVolume(outputFiles, ZoneCeilingHeightEntered); // Calculate Zone Volumes
+        CalculateZoneVolume(state.outputFiles, ZoneCeilingHeightEntered); // Calculate Zone Volumes
 
         // Calculate zone centroid (and min/max x,y,z for zone)
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -605,14 +605,14 @@ namespace SurfaceGeometry {
         } // surfaces
 
         // Write number of shadings to initialization output file
-        print(outputFiles.eio, "! <Shading Summary>, Number of Fixed Detached Shades, Number of Building Detached Shades, Number of Attached Shades\n");
+        print(state.outputFiles.eio, "! <Shading Summary>, Number of Fixed Detached Shades, Number of Building Detached Shades, Number of Attached Shades\n");
 
-        print(outputFiles.eio, " Shading Summary,{},{},{}\n", FixedShadingCount, BuildingShadingCount, AttachedShadingCount);
+        print(state.outputFiles.eio, " Shading Summary,{},{},{}\n", FixedShadingCount, BuildingShadingCount, AttachedShadingCount);
 
         // Write number of zones header to initialization output file
-        print(outputFiles.eio, "! <Zone Summary>, Number of Zones, Number of Zone Surfaces, Number of SubSurfaces\n");
+        print(state.outputFiles.eio, "! <Zone Summary>, Number of Zones, Number of Zone Surfaces, Number of SubSurfaces\n");
 
-        print(outputFiles.eio,
+        print(state.outputFiles.eio,
               " Zone Summary,{},{},{}\n",
               NumOfZones,
               TotSurfaces - FixedShadingCount - BuildingShadingCount - AttachedShadingCount,
@@ -626,7 +626,7 @@ namespace SurfaceGeometry {
             "{m3},Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},Zone Outside Convection Algorithm "
             "{Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST}, Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window "
             "Area {m2}, Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces,  Part of Total Building Area");
-        print(outputFiles.eio, "{}\n", Format_721);
+        print(state.outputFiles.eio, "{}\n", Format_721);
 
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             // Write Zone Information to the initialization output file
@@ -675,7 +675,7 @@ namespace SurfaceGeometry {
                                              "{},{:.1R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},"
                                              "{:.2R},{:.2R},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{},{}\n");
 
-            print(outputFiles.eio,
+            print(state.outputFiles.eio,
                   Format_720,
                   Zone(ZoneNum).Name,
                   Zone(ZoneNum).RelNorth,
@@ -1048,12 +1048,12 @@ namespace SurfaceGeometry {
         AddedSubSurfaces = 0;
         AskForSurfacesReport = true;
 
-        GetDetShdSurfaceData(OutputFiles::getSingleton(), ErrorsFound, SurfNum, TotDetachedFixed, TotDetachedBldg);
+        GetDetShdSurfaceData(outputFiles, ErrorsFound, SurfNum, TotDetachedFixed, TotDetachedBldg);
 
         GetRectDetShdSurfaceData(ErrorsFound, SurfNum, TotRectDetachedFixed, TotRectDetachedBldg);
 
-        GetHTSurfaceData(OutputFiles::getSingleton(),
-                      ErrorsFound,
+        GetHTSurfaceData(outputFiles,
+                         ErrorsFound,
                          SurfNum,
                          TotHTSurfs,
                          TotDetailedWalls,

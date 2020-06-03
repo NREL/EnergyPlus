@@ -653,7 +653,7 @@ namespace HeatBalanceKivaManager {
         bool ErrorsFound = false;
 
         if (DataZoneControls::GetZoneAirStatsInputFlag) {
-            ZoneTempPredictorCorrector::GetZoneAirSetPoints(OutputFiles::getSingleton());
+            ZoneTempPredictorCorrector::GetZoneAirSetPoints(outputFiles);
             DataZoneControls::GetZoneAirStatsInputFlag = false;
         }
 

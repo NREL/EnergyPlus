@@ -795,7 +795,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -1147,7 +1147,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
