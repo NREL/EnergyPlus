@@ -78,6 +78,7 @@ namespace EnergyPlus {
         std::string compType = "";
         std::string compName = "";
         bool printWarningFlag = false;
+        std::string callingRoutine = "";
     };
 
     struct BaseSizer {
@@ -104,6 +105,14 @@ namespace EnergyPlus {
         void preSize(CommonFlags & flags, Real64 originalValue);
 
         virtual AutoSizingResultType size(Real64 originalValue) = 0;
+
+        void reportSizerOutput(std::string const& CompType,
+            std::string const& CompName,
+            std::string const& VarDesc,
+            Real64 const VarValue,
+            Optional_string_const UsrDesc = _,
+            Optional<Real64 const> UsrValue = _
+            );
     };
 
 }

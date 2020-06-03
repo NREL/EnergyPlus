@@ -47,6 +47,9 @@
 
 #include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -114,6 +117,46 @@ namespace EnergyPlus {
                     ShowFatalError("Program terminates due to previously shown condition(s).");
                 }
             }
+        }
+    }
+
+    void BaseSizer::reportSizerOutput(std::string const &CompType,
+                           std::string const &CompName,
+                           std::string const &VarDesc,
+                           Real64 const VarValue,
+                           Optional_string_const UsrDesc,
+                           Optional<Real64 const> UsrValue)
+    {
+
+        static bool MyOneTimeFlag(true);
+
+        // Formats
+        static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
+
+        // to do, make this a parameter. Unfortunately this function is used in MANY
+        // places so it involves touching most of E+
+        auto &outputFiles = EnergyPlus::OutputFiles::getSingleton();
+        if (MyOneTimeFlag) {
+            static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
+            print(outputFiles.eio, Format_990);
+            MyOneTimeFlag = false;
+        }
+
+        print(outputFiles.eio, Format_991, CompType, CompName, VarDesc, VarValue);
+        // add to tabular output reports
+        OutputReportPredefined::AddCompSizeTableEntry(CompType, CompName, VarDesc, VarValue);
+
+        if (present(UsrDesc) && present(UsrValue)) {
+            print(outputFiles.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
+            OutputReportPredefined::AddCompSizeTableEntry(CompType, CompName, UsrDesc, UsrValue);
+        } else if (present(UsrDesc) || present(UsrValue)) {
+            ShowFatalError("ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");
+        }
+
+        // add to SQL output
+        if (sqlite) sqlite->addSQLiteComponentSizingRecord(CompType, CompName, VarDesc, VarValue);
+        if (present(UsrDesc) && present(UsrValue)) {
+            if (sqlite) sqlite->addSQLiteComponentSizingRecord(CompType, CompName, UsrDesc, UsrValue);
         }
     }
 

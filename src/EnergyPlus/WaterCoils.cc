@@ -2166,6 +2166,7 @@ namespace WaterCoils {
         DesCoilExitTemp = 0.0;
         LoopErrorsFound = false;
         CpAirStd = PsyCpAirFnW(0.0);
+
         EnergyPlus::CommonFlags baseFlags;
         baseFlags.sysSizingRunDone = DataSizing::SysSizingRunDone;
         baseFlags.zoneSizingRunDone = DataSizing::ZoneSizingRunDone;
@@ -2638,16 +2639,20 @@ namespace WaterCoils {
                     WaterCoil(CoilNum).DesInletAirHumRat = TempSize; // coil report
                     WaterCoil(CoilNum).InletAirHumRat = TempSize;
                     TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-                    //TODO: RequestSizing(state, CompType, CompName, HeatingAirflowUASizing, SizingString, TempSize, bPRINT, RoutineName);
-                    // WaterCoil( CoilNum ).InletAirMassFlowRate = TempSize;
+
                     EnergyPlus::HeatingAirflowUASizer sizer;
+                    sizer.zoneSizingInput = DataSizing::ZoneSizingInput;
+                    sizer.unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
+                    sizer.oaSysEqSizing = DataSizing::OASysEqSizing;
+
                     EnergyPlus::HeatingAirflowUASizerFlags flags;
                     flags.curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
                     flags.curZoneEqNum = DataSizing::CurZoneEqNum;
-                    sizer.zoneSizingInput = DataSizing::ZoneSizingInput;
-                    flags.termUnitSingDuct = TermUnitSingDuct;
-                    flags.termUnitPIU = TermUnitPIU;
-                    flags.termUnitIU = TermUnitIU;
+                    flags.termUnitSingDuct = DataSizing::TermUnitSingDuct;
+                    flags.termUnitPIU = DataSizing::TermUnitPIU;
+                    flags.termUnitIU = DataSizing::TermUnitIU;
+                    baseFlags.printWarningFlag = false;
+
                     sizer.setParameters(baseFlags, flags, DataSizing::TermUnitSizing, DataSizing::FinalZoneSizing, DataSizing::ZoneEqSizing);
                     AutoSizingResultType result = sizer.size(TempSize);
                     WaterCoil(CoilNum).InletAirMassFlowRate = sizer.autoSizedValue;
@@ -2662,17 +2667,21 @@ namespace WaterCoils {
                     WaterCoil(CoilNum).DesInletAirHumRat = TempSize; // coil report
                     WaterCoil(CoilNum).InletAirHumRat = TempSize;
                     TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-                    //TODO: RequestSizing(state, CompType, CompName, HeatingAirflowUASizing, SizingString, TempSize, bPRINT, RoutineName);
+
                     EnergyPlus::HeatingAirflowUASizer sizer;
-                    EnergyPlus::HeatingAirflowUASizerFlags flags;
-                    flags.curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
-                    flags.curZoneEqNum = DataSizing::CurZoneEqNum;
                     sizer.zoneSizingInput = DataSizing::ZoneSizingInput;
                     sizer.unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
                     sizer.oaSysEqSizing = DataSizing::OASysEqSizing;
-                    flags.termUnitSingDuct = TermUnitSingDuct;
-                    flags.termUnitPIU = TermUnitPIU;
-                    flags.termUnitIU = TermUnitIU;
+
+                    EnergyPlus::HeatingAirflowUASizerFlags flags;
+                    flags.curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
+                    flags.curZoneEqNum = DataSizing::CurZoneEqNum;
+                    flags.termUnitSingDuct = DataSizing::TermUnitSingDuct;
+                    flags.termUnitPIU = DataSizing::TermUnitPIU;
+                    flags.termUnitIU = DataSizing::TermUnitIU;
+                    baseFlags.printWarningFlag = true;
+                    flags.sizingString = "Test my coil UA air flow";
+
                     sizer.setParameters(baseFlags, flags, DataSizing::TermUnitSizing, DataSizing::FinalZoneSizing, DataSizing::ZoneEqSizing);
                     AutoSizingResultType result = sizer.size(TempSize);
                     WaterCoil(CoilNum).DesAirMassFlowRate = sizer.autoSizedValue; // coil report

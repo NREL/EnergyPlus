@@ -71,7 +71,6 @@ namespace EnergyPlus {
         Array1D<EnergyPlus::DataSizing::TermUnitSizingData> termUnitSizing;
         Array1D<EnergyPlus::DataSizing::ZoneSizingData> finalZoneSizing;
         Array1D<EnergyPlus::DataSizing::SystemSizingData> finalSysSizing;
-//        Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> zoneEqSizing;
 
         HeatingAirflowUASizer() {
             this->sizingType = AutoSizingType::HeatingAirflowUASizing;
