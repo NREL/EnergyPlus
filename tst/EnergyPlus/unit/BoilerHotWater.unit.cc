@@ -182,4 +182,6 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
     EXPECT_EQ(1, state.dataBoilers.numBoilers);
     EXPECT_EQ(AutoSize, state.dataBoilers.Boiler(1).VolFlowRate);
 
+    // Additional tests for fuel type input
+    EXPECT_EQ(state.dataBoilers.Boiler(1).BoilerFuelTypeForOutputVariable, "Gas");
 }

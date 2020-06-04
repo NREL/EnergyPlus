@@ -62,7 +62,7 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
 
 int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state);
 
-void ENERGYPLUSLIB_API EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());
+int ENERGYPLUSLIB_API EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());
 
 int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath = std::string());
 

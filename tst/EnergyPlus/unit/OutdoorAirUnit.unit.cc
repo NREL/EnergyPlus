@@ -304,7 +304,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput(outputFiles());   // read schedules
+    ProcessScheduleInput(state.outputFiles);   // read schedules
     GetCurveInput();          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
@@ -563,7 +563,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     Fans::GetFanInput(state.fans);
 
@@ -869,7 +869,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     Fans::GetFanInput(state.fans);
 

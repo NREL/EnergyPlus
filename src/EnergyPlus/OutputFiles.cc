@@ -52,6 +52,7 @@
 
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
+#include <stdexcept>
 
 namespace EnergyPlus {
 
@@ -66,24 +67,6 @@ OutputFile &OutputFile::ensure_open(const std::string &caller)
     return *this;
 }
 
-std::ostream &open_out_stream(int const fileID, const std::string &fileName)
-{
-    IOFlags flags;
-    flags.ACTION("write");
-    flags.STATUS("UNKNOWN");
-    flags.POSITION("APPEND");
-    ObjexxFCL::gio::open(fileID, fileName, flags);
-    return *ObjexxFCL::gio::out_stream(fileID);
-}
-
-std::ostream &get_out_stream(int const FileID, const std::string &fileName)
-{
-    if (!ObjexxFCL::gio::out_stream(FileID)) {
-        return open_out_stream(FileID, fileName);
-    } else {
-        return *ObjexxFCL::gio::out_stream(FileID);
-    }
-}
 
 bool OutputFile::good() const
 {
@@ -136,6 +119,7 @@ void OutputFile::open()
     os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc));
 }
 
+
 std::vector<std::string> OutputFile::getLines()
 {
     if (os) {
@@ -158,34 +142,24 @@ std::vector<std::string> OutputFile::getLines()
     return std::vector<std::string>();
 }
 
-OutputFiles::GIOOutputFile::GIOOutputFile(int const FileID, std::string FileName)
-    : fileID{FileID}, fileName{std::move(FileName)}, os{get_out_stream(FileID, FileName)}
-{
-}
-
-void OutputFiles::GIOOutputFile::close()
-{
-    ObjexxFCL::gio::close(fileID);
-}
-
-void OutputFiles::GIOOutputFile::open_at_end()
-{
-    os = open_out_stream(fileID, fileName);
-}
-
-OutputFiles OutputFiles::makeOutputFiles()
-{
-    return OutputFiles();
-}
-
-OutputFiles::OutputFiles()
-{
-}
-
 OutputFiles &OutputFiles::getSingleton()
 {
-    static OutputFiles ofs{makeOutputFiles()};
-    return ofs;
+    assert(getSingletonInternal() != nullptr);
+
+    if (getSingletonInternal() == nullptr) {
+        throw std::runtime_error("Invalid impossible state of no outputfiles!?!?!");
+    }
+    return *getSingletonInternal();
+}
+
+void OutputFiles::setSingleton(OutputFiles *newSingleton) noexcept
+{
+    getSingletonInternal() = newSingleton;
+}
+
+OutputFiles *&OutputFiles::getSingletonInternal() {
+    static OutputFiles *singleton{nullptr};
+    return singleton;
 }
 
 using arg_formatter = fmt::arg_formatter<fmt::buffer_range<char>>;
@@ -433,7 +407,7 @@ void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args
         // Pass custom argument formatter as a template arg to vformat_to.
         fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
     } catch (const fmt::format_error &) {
-        throw fmt::format_error(fmt::format("Error with format, '{}', passed {} args", format_str, count));
+        ShowWarningError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
     }
     os.write(buffer.data(), buffer.size());
 }
@@ -445,7 +419,7 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
         // Pass custom argument formatter as a template arg to vformat_to.
         fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
     } catch (const fmt::format_error &) {
-        throw fmt::format_error(fmt::format("Error with format, '{}', passed {} args", format_str, count));
+        ShowWarningError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
     }
     return fmt::to_string(buffer);
 }

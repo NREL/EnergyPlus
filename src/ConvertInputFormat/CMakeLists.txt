@@ -40,5 +40,6 @@ if (WIN32)
 endif()
 
 set_target_properties(ConvertInputFormat PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+set_target_properties(ConvertInputFormat PROPERTIES FOLDER Auxiliary)
 
 install( TARGETS ConvertInputFormat DESTINATION ./ )
