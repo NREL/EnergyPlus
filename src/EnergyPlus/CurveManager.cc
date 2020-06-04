@@ -2153,7 +2153,7 @@ namespace CurveManager {
         filePath = path;
         bool fileFound;
         std::string fullPath;
-        DataSystemVariables::CheckForActualFileName(path, fileFound, fullPath);
+        DataSystemVariables::CheckForActualFileName(OutputFiles::getSingleton(), path, fileFound, fullPath);
         if (!fileFound) {
             ShowFatalError("File \"" + filePath + "\" : File not found.");
         }

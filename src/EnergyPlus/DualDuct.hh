@@ -219,6 +219,8 @@ namespace DualDuct {
         // Beginning of Update subroutines for the Damper Module
         // *****************************************************************************
 
+        void CalcOutdoorAirVolumeFlowRate();
+
         void UpdateDualDuct();
 
         //        End of Update subroutines for the Damper Module
