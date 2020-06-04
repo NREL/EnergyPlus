@@ -914,52 +914,53 @@ namespace AirflowNetwork {
             } else {
                 DP = PZ(n) - PZ(m) + DpL(i, 1) + PW(i);
             }
+            Real64 multiplier = 1.0;
+            Real64 control = 1.0;
             //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
             j = AirflowNetworkLinkageData(i).CompNum;
             {
                 auto const SELECT_CASE_var(AirflowNetworkCompData(j).CompTypeNum);
                 if (SELECT_CASE_var == CompTypeNum_PLR) { // Distribution system crack component
-                    NF = DisSysCompLeakData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompLeakData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_DWC) { // Distribution system duct component
-                    NF = DisSysCompDuctData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompDuctData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_CVF) { // Distribution system constant volume fan component
-                    NF = DisSysCompCVFData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompCVFData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_FAN) { // Distribution system detailed fan component
-                    NF = DisSysCompDetFanData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompDetFanData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                     //           Case (CompTypeNum_CPF) ! not currently used in EnergyPlus code -- left for compatibility with AirNet
                     //              CALL AFECPF(J,LFLAG,DP,I,N,M,F,DF,NF)
                 } else if (SELECT_CASE_var == CompTypeNum_DMP) { // Distribution system damper component
-                    NF = DisSysCompDamperData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompDamperData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_ELR) { // Distribution system effective leakage ratio component
-                    NF = DisSysCompELRData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompELRData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_CPD) { // Distribution system constant pressure drop component
-                    NF = DisSysCompCPDData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompCPDData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                     if (DP != 0.0) {
                         DP = DisSysCompCPDData(AirflowNetworkCompData(j).TypeNum).DP;
                     }
                 } else if (SELECT_CASE_var == CompTypeNum_DOP) { // Detailed opening
-                    NF = MultizoneCompDetOpeningData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = MultizoneCompDetOpeningData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_SOP) { // Simple opening
-                    NF = MultizoneCompSimpleOpeningData(AirflowNetworkCompData(j).TypeNum)
-                             .calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = MultizoneCompSimpleOpeningData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_SCR) { // Surface crack component
-                    NF = MultizoneSurfaceCrackData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = MultizoneSurfaceCrackData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_SEL) { // Surface effective leakage ratio component
-                    NF = MultizoneSurfaceELAData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = MultizoneSurfaceELAData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_COI) { // Distribution system coil component
-                    NF = DisSysCompCoilData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompCoilData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_TMU) { // Distribution system terminal unit component
-                    NF = DisSysCompTermUnitData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompTermUnitData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_EXF) { // Exhaust fan component
-                    NF = MultizoneCompExhaustFanData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = MultizoneCompExhaustFanData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_HEX) { // Distribution system heat exchanger component
-                    NF = DisSysCompHXData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompHXData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_HOP) { // Horizontal opening
-                    NF = MultizoneCompHorOpeningData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = MultizoneCompHorOpeningData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_OAF) { // OA supply fan
-                    NF = DisSysCompOutdoorAirData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompOutdoorAirData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else if (SELECT_CASE_var == CompTypeNum_REL) { // Relief fan
-                    NF = DisSysCompReliefAirData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, properties[n], properties[m], F, DF);
+                    NF = DisSysCompReliefAirData(AirflowNetworkCompData(j).TypeNum).calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
                 } else {
                     continue;
                 }
