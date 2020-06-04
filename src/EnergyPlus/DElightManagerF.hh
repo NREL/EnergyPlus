@@ -52,13 +52,14 @@
 #include <string>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DElightManagerF {
 
-    void DElightInputGenerator();
+    void DElightInputGenerator(EnergyPlus::OutputFiles &outputFiles);
 
     void GenerateDElightDaylightCoefficients(Real64 &dLatitude, int &iErrorFlag);
 

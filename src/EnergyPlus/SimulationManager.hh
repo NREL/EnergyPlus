@@ -76,7 +76,7 @@ namespace SimulationManager {
     // Functions
     void clear_state();
 
-    void ManageSimulation(EnergyPlusData &state, OutputFiles &outputFiles);
+    void ManageSimulation(EnergyPlusData &state);
 
     void GetProjectData(OutputFiles &outputFiles);
 
@@ -90,13 +90,13 @@ namespace SimulationManager {
 
     void OpenStreamFile(const std::string &fileName, int &unitNumber, std::ostream *&out_stream);
 
-    void OpenOutputFiles();
+    void OpenOutputFiles(OutputFiles &outputFiles);
 
     void OpenOutputJsonFiles();
 
     void CloseOutputFiles(OutputFiles &outputFiles);
 
-    void SetupSimulation(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound);
+    void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
     void ReportNodeConnections(OutputFiles &outputFiles);
 

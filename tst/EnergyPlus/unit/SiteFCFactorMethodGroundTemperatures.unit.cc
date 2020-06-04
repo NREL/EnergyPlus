@@ -82,7 +82,7 @@ TEST_F(EnergyPlusFixture, SiteFCFactorMethodGroundTempTest)
 
     std::string const CurrentModuleObject = CurrentModuleObjects(objectType_SiteFCFactorMethodGroundTemp);
 
-    auto thisModel = GetGroundTempModelAndInit(state.dataGlobals, CurrentModuleObject, "TEST");
+    auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
 
     EXPECT_NEAR(21.0, thisModel->getGroundTempAtTimeInMonths(0.0, 1), 0.1);  // January
     EXPECT_NEAR(32.0, thisModel->getGroundTempAtTimeInMonths(0.0, 12), 0.1); // December

@@ -380,7 +380,7 @@ namespace HVACControllers {
 
     void DumpAirLoopStatistics();
 
-    void WriteAirLoopStatistics(int const FileUnit, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats);
+    void WriteAirLoopStatistics(OutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats);
 
     // Beginning of Tracing subroutines for the Controller Module
     // *****************************************************************************
