@@ -62,7 +62,7 @@ using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
 using namespace AirflowNetwork;
 
-TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
+TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
 {
 
     int i = 1;
@@ -119,7 +119,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_HorizontalOpening)
     AirflowNetworkCompData.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_Coil)
+TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
 {
 
     int NF;
