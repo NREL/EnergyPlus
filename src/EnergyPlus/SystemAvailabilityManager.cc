@@ -2633,8 +2633,6 @@ namespace SystemAvailabilityManager {
         Real64 PreStartTime;
         Real64 PreStartTimeTmr;
         Real64 DeltaTime;
-        int I;
-        int J;
         Real64 TempDiff;
         Real64 TempDiffHi;
         Real64 TempDiffLo;
@@ -2719,12 +2717,14 @@ namespace SystemAvailabilityManager {
             }
             if (!allocated(OptStartData.ActualZoneNum)) OptStartData.ActualZoneNum.allocate(NumOfZones);
 
+            // OptStartFlag needs to be reset each timestep to not stay set to true post-occupancy
+            OptStartData.OptStartFlag = false;
+
             // reset OptStartData once per beginning of day
             if (BeginDayFlag) {
                 NumHoursBeforeOccupancy = 0.0; // Initialize the hours of optimum start period. This variable is for reporting purpose.
                 if (BeginOfDayResetFlag) {
                     OptStartData.OccStartTime = 22.99; // initialize the zone occupancy start time
-                    OptStartData.OptStartFlag = false;
                     BeginOfDayResetFlag = false;
                 }
             }
@@ -2736,10 +2736,10 @@ namespace SystemAvailabilityManager {
             FanStartTime = 0.0;
             FanStartTimeTmr = 0.0;
             exitLoop = false;
-            for (I = 1; I <= 24; ++I) {
-                for (J = 1; J <= NumOfTimeStepInHour; ++J) {
+            for (int I = 1; I <= 24; ++I) {
+                for (int J = 1; J <= NumOfTimeStepInHour; ++J) {
                     if (DayValues(J, I) <= 0.0) continue;
-                    FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
+                    FanStartTime = I - 1 + 1.0 / NumOfTimeStepInHour * J - 0.01;
                     exitLoop = true;
                     break;
                 }
@@ -2747,10 +2747,10 @@ namespace SystemAvailabilityManager {
             }
 
             exitLoop = false;
-            for (I = 1; I <= 24; ++I) {
-                for (J = 1; J <= NumOfTimeStepInHour; ++J) {
+            for (int I = 1; I <= 24; ++I) {
+                for (int J = 1; J <= NumOfTimeStepInHour; ++J) {
                     if (DayValuesTmr(J, I) <= 0.0) continue;
-                    FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
+                    FanStartTimeTmr = I - 1 + 1.0 / NumOfTimeStepInHour * J - 0.01;
                     exitLoop = true;
                     break;
                 }

@@ -3928,31 +3928,16 @@ namespace DXCoils {
                 }
             }
 
-            // A12; \field Fuel type
-            if (UtilityRoutines::SameString(Alphas(12), "Electricity")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeElectricity;
-            } else if (UtilityRoutines::SameString(Alphas(12), "NaturalGas")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeNaturalGas;
-            } else if (UtilityRoutines::SameString(Alphas(12), "Propane")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypePropaneGas;
-            } else if (UtilityRoutines::SameString(Alphas(12), "Diesel")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeDiesel;
-            } else if (UtilityRoutines::SameString(Alphas(12), "Gasoline")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeGasoline;
-            } else if (UtilityRoutines::SameString(Alphas(12), "FuelOilNo1")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil1;
-            } else if (UtilityRoutines::SameString(Alphas(12), "FuelOilNo2")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil2;
-            } else if (UtilityRoutines::SameString(Alphas(12), "OtherFuel1")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeOtherFuel1;
-            } else if (UtilityRoutines::SameString(Alphas(12), "OtherFuel2")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeOtherFuel2;
-            } else {
+            // A12; \field Fuel type, Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelTypeWithFuelTypeNum(Alphas(12), DXCoil(DXCoilNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(12) + ".  Entered choice = " + Alphas(12));
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             DXCoil(DXCoilNum).NumOfSpeeds = Numbers(6); // Number of speeds
@@ -4421,31 +4406,16 @@ namespace DXCoils {
                 ErrorsFound = true;
             }
 
-            // A10; \field Fuel type
-            if (UtilityRoutines::SameString(Alphas(9), "Electricity")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeElectricity;
-            } else if (UtilityRoutines::SameString(Alphas(9), "NaturalGas")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeNaturalGas;
-            } else if (UtilityRoutines::SameString(Alphas(9), "Propane")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypePropaneGas;
-            } else if (UtilityRoutines::SameString(Alphas(9), "Diesel")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeDiesel;
-            } else if (UtilityRoutines::SameString(Alphas(9), "Gasoline")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeGasoline;
-            } else if (UtilityRoutines::SameString(Alphas(9), "FuelOilNo1")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil1;
-            } else if (UtilityRoutines::SameString(Alphas(9), "FuelOilNo2")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil2;
-            } else if (UtilityRoutines::SameString(Alphas(9), "OtherFuel1")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeOtherFuel1;
-            } else if (UtilityRoutines::SameString(Alphas(9), "OtherFuel2")) {
-                DXCoil(DXCoilNum).FuelType = FuelTypeOtherFuel2;
-            } else {
+            // A9; \field Fuel type, Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelTypeWithFuelTypeNum(Alphas(9), DXCoil(DXCoilNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(9) + ".  Entered choice = " + Alphas(9));
                 ShowContinueError(
                     "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             DXCoil(DXCoilNum).RegionNum = Numbers(8);   // Region Number for HSPF Calc
@@ -6505,7 +6475,7 @@ namespace DXCoils {
 
                 // call for standard ratings for two-speeed DX coil
                 if (DXCoil(DXCoilNum).CondenserType(1) == AirCooled) {
-                    CalcTwoSpeedDXCoilStandardRating(state, OutputFiles::getSingleton(), DXCoilNum);
+                    CalcTwoSpeedDXCoilStandardRating(state, DXCoilNum);
                 }
             }
 
@@ -7882,7 +7852,7 @@ namespace DXCoils {
         // Call routine that computes AHRI certified rating for single-speed DX Coils
         if ((DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingSingleSpeed && DXCoil(DXCoilNum).CondenserType(1) == AirCooled) ||
             DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
-            CalcDXCoilStandardRating(OutputFiles::getSingleton(),
+            CalcDXCoilStandardRating(state.outputFiles,
                                      DXCoil(DXCoilNum).Name,
                                      DXCoil(DXCoilNum).DXCoilType,
                                      DXCoil(DXCoilNum).DXCoilType_Num,
@@ -7905,7 +7875,7 @@ namespace DXCoils {
         }
         // Call routine that computes AHRI certified rating for multi-speed DX cooling Coils
         if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) {
-            CalcDXCoilStandardRating(OutputFiles::getSingleton(),
+            CalcDXCoilStandardRating(state.outputFiles,
                                      DXCoil(DXCoilNum).Name,
                                      DXCoil(DXCoilNum).DXCoilType,
                                      DXCoil(DXCoilNum).DXCoilType_Num,
@@ -13408,7 +13378,7 @@ namespace DXCoils {
         }
     }
 
-    void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, OutputFiles &outputFiles, int const DXCoilNum)
+    void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, (Derived from CalcDXCoilStandardRating by Bereket Nigusse & Chandan Sharma)
@@ -13795,7 +13765,7 @@ namespace DXCoils {
 
         // begin output
         if (OneTimeEIOHeaderWrite) {
-            print(outputFiles.eio, Header);
+            print(state.outputFiles.eio, Header);
             OneTimeEIOHeaderWrite = false;
             pdstVAVDXCoolCoil = newPreDefSubTable(pdrEquip, "VAV DX Cooling Standard Rating Details");
             pdchVAVDXCoolCoilType = newPreDefColumn(pdstVAVDXCoolCoil, "DX Cooling Coil Type");
@@ -13845,7 +13815,7 @@ namespace DXCoils {
           }
         }();
 
-        print(outputFiles.eio, Format_891
+        print(state.outputFiles.eio, Format_891
             , "Coil:Cooling:DX:TwoSpeed" , DXCoil(DXCoilNum).Name , fan_type_name.first, fan_type_name.second
             , NetCoolingCapRated , (NetCoolingCapRated * ConvFromSIToIP) , IEER
             , EER_TestPoint_SI(1) , EER_TestPoint_SI(2) , EER_TestPoint_SI(3)

@@ -77,7 +77,7 @@ TEST_F(EnergyPlusFixture, KusudaAchenbachGroundTempModelTest1)
 
     std::string const CurrentModuleObject = CurrentModuleObjects(objectType_KusudaGroundTemp);
 
-    auto thisModel = GetGroundTempModelAndInit(state.dataGlobals, CurrentModuleObject, "TEST");
+    auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
 
     EXPECT_NEAR(10.0, thisModel->getGroundTempAtTimeInSeconds(0.0, 0.0), 0.01);      // Jan 1
     EXPECT_NEAR(20.0, thisModel->getGroundTempAtTimeInSeconds(0.0, 15768000), 0.01); // June 1
@@ -119,7 +119,7 @@ TEST_F(EnergyPlusFixture, KusudaAchenbachGroundTempModelTest2) // lNumericFieldB
 
     std::string const CurrentModuleObject = CurrentModuleObjects(objectType_KusudaGroundTemp);
 
-    auto thisModel = GetGroundTempModelAndInit(state.dataGlobals, CurrentModuleObject, "TEST");
+    auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
 
     EXPECT_NEAR(16.46, thisModel->getGroundTempAtTimeInSeconds(0.0, 0.0), 0.01);      // Jan 1
     EXPECT_NEAR(17.17, thisModel->getGroundTempAtTimeInSeconds(0.0, 11664000), 0.01); // May 15
