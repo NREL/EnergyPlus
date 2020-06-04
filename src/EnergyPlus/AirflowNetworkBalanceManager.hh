@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include "AirflowNetwork/Solver.hpp"
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -161,6 +162,8 @@ namespace AirflowNetworkBalanceManager {
 
     // Object Data
     extern Array1D<AirflowNetworkReportVars> AirflowNetworkZnRpt;
+
+    extern AirflowNetwork::Solver solver;
 
     // Functions
 

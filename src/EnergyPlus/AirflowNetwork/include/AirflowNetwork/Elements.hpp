@@ -427,7 +427,6 @@ namespace AirflowNetwork {
     struct DetailedOpening : public AirflowElement // Large detailed opening component
     {
         // Members
-        std::string Name;     // Name of large detailed opening component
         Real64 FlowCoef;      // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 FlowExpo;      // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
         std::string TypeName; // Name of Large vertical opening type
@@ -490,7 +489,6 @@ namespace AirflowNetwork {
     struct SimpleOpening : public AirflowElement // Large simple opening component
     {
         // Members
-        std::string Name;  // Name of large simple opening component
         Real64 FlowCoef;   // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 FlowExpo;   // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
         Real64 MinRhoDiff; // Minimum density difference for two-way flow
@@ -522,7 +520,6 @@ namespace AirflowNetwork {
     struct HorizontalOpening : public AirflowElement // Large horizontal opening component
     {
         // Members
-        std::string Name;  // Name of large horizontal opening component
         Real64 FlowCoef;   // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 FlowExpo;   // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
         Real64 Slope;      // Sloping plane angle
@@ -572,7 +569,6 @@ namespace AirflowNetwork {
     struct SurfaceCrack : public AirflowElement // Surface crack component
     {
         // Members
-        std::string Name; // Name of crack component
         // std::string ExternalNodeNames; // Name of external node.Not required for internal surface
         Real64 FlowCoef;  // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 FlowExpo;  // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
@@ -614,7 +610,6 @@ namespace AirflowNetwork {
     struct EffectiveLeakageArea : public AirflowElement // Surface effective leakage area component
     {
         // Members
-        std::string Name;   // Name of effective leakage area component
         Real64 ELA;         // Effective leakage area
         Real64 DischCoeff;  // Discharge coefficient
         Real64 RefDeltaP;   // Reference pressure difference
@@ -656,7 +651,6 @@ namespace AirflowNetwork {
     struct ZoneExhaustFan : public AirflowElement // Zone exhaust fan component
     {
         // Members
-        std::string Name; // Name of exhaust fan component
         Real64 FlowRate;  // mass flow rate
         int SchedPtr;     // Schedule pointer
         Real64 FlowCoef;  // Air Mass Flow Coefficient [kg/s at 1Pa]
@@ -759,11 +753,15 @@ namespace AirflowNetwork {
         int CompNum;                          // Element Number
         std::array<int, 2> NodeNums;          // Node numbers
         int LinkNum;                          // Linkage number
+        AirflowElement *element;              // Pointer to airflow element
 
         // Default Constructor
         AirflowNetworkLinkage() : NodeHeights{{0.0, 0.0}}, CompNum(0), NodeNums{{0, 0}}, LinkNum(0)
         {
         }
+
+        virtual ~AirflowNetworkLinkage()
+        {}
     };
 
     struct IntraZoneLinkageProp : public AirflowNetworkLinkage // Intra zone linkage data
@@ -796,7 +794,6 @@ namespace AirflowNetwork {
     struct DuctLeak : public AirflowElement // duct leak component
     {
         // Members
-        std::string Name; // Name of component leak
         Real64 FlowCoef;  // Air Mass Flow Coefficient [kg/s at 1Pa]
         Real64 FlowExpo;  // Air Mass Flow exponent [dimensionless]
 
@@ -834,7 +831,6 @@ namespace AirflowNetwork {
     struct EffectiveLeakageRatio : public AirflowElement // effective leakage ratio component
     {
         // Members
-        std::string Name; // Name of component leak
         Real64 ELR;       // Value of effective leakage ratio
         Real64 FlowRate;  // Maximum airflow rate
         Real64 RefPres;   // Reference pressure difference
@@ -874,7 +870,6 @@ namespace AirflowNetwork {
     struct Duct : public AirflowElement // Duct component
     {
         // Members
-        std::string Name;         // Name of duct component
         Real64 L;                 // Duct length [m]
         Real64 hydraulicDiameter; // Hydraulic diameter [m]
         Real64 A;                 // Cross section area [m2]
@@ -931,7 +926,6 @@ namespace AirflowNetwork {
     struct Damper : public AirflowElement // Damper component
     {
         // Members
-        std::string Name; // Name of damper component
         Real64 LTP;       // Value for laminar turbulent transition
         Real64 LamFlow;   // Laminar flow coefficient
         Real64 TurFlow;   // Turbulent flow coefficient
@@ -977,7 +971,6 @@ namespace AirflowNetwork {
     struct ConstantVolumeFan : public AirflowElement // Constant volume fan component
     {
         // Members
-        std::string Name;          // Name of detailed fan component
         Real64 FlowRate;           // Air volume flow rate
         Real64 Ctrl;               // Control ratio
         int FanTypeNum;            // Fan type: Constant volume or ONOFF
@@ -1014,7 +1007,6 @@ namespace AirflowNetwork {
     struct DetailedFan : public AirflowElement // Detailed fan component
     {
         // Members
-        std::string Name;      // Name of constant volume fan component
         Real64 FlowCoef;       // Coefficient for linear initialization [kg/s at 1Pa]
         Real64 FlowExpo;       // Turbulent flow coefficient [dimensionless]
         Real64 RhoAir;         // Reference air density
@@ -1059,7 +1051,6 @@ namespace AirflowNetwork {
     struct DisSysCompCoilProp : public AirflowElement // Coil component
     {
         // Members
-        std::string Name;         // Name of coil component
         std::string EPlusType;    // EnergyPlus coil type
         Real64 L;                 // Air path length
         Real64 hydraulicDiameter; // Air path hydraulic diameter
@@ -1099,7 +1090,6 @@ namespace AirflowNetwork {
     struct DisSysCompHXProp : public AirflowElement // Coil component
     {
         // Members
-        std::string Name;         // Name of coil component
         std::string EPlusType;    // EnergyPlus coil type
         Real64 L;                 // Air path length
         Real64 hydraulicDiameter; // Air path hydraulic diameter
@@ -1139,7 +1129,6 @@ namespace AirflowNetwork {
     struct DisSysCompTermUnitProp : public AirflowElement // Terminal unit component
     {
         // Members
-        std::string Name;         // Name of coil component
         std::string EPlusType;    // EnergyPlus coil type
         Real64 L;                 // Air path length
         Real64 hydraulicDiameter; // Air path hydraulic diameter
@@ -1172,7 +1161,6 @@ namespace AirflowNetwork {
     struct ConstantPressureDrop : public AirflowElement // Constant pressure drop component
     {
         // Members
-        std::string Name; // Name of constant pressure drop component
         Real64 A;         // cross section area
         Real64 DP;        // Pressure difference across the component
 
@@ -1303,7 +1291,6 @@ namespace AirflowNetwork {
     struct OutdoorAirFan : public AirflowElement // OA fan component
     {
         // Members
-        std::string Name; // Name of exhaust fan component
         int SchedPtr;     // Schedule pointer
         Real64 FlowCoef;  // Air Mass Flow Coefficient [kg/s at 1Pa]
         Real64 FlowExpo;  // Air Mass Flow exponent [dimensionless]

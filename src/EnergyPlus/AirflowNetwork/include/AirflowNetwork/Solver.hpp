@@ -70,8 +70,24 @@ namespace AirflowNetwork {
         Real64 viscosity{AIRDYNAMICVISCOSITY(20.0)};
     };
 
+    // Forward declaration
+    struct AirflowElement;
+
     struct Solver
     {
+        Solver()
+        {}
+
+        void clear()
+        {
+            elements.clear();
+            compnum.clear();
+        }
+
+        std::unordered_map<std::string, AirflowElement *> elements;
+        std::unordered_map<std::string, int> compnum; // Stopgap until all the introspection is dealt with
+
+        /*
         std::vector<AirProperties> properties;
 
         int NetworkNumOfLinks;
@@ -112,6 +128,7 @@ namespace AirflowNetwork {
 
         // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
         Array1D<Real64> SUMF;
+        */
     };
 
     extern std::vector<AirProperties> properties;
