@@ -139,7 +139,7 @@ class TowerDispatchValues(EnergyPlusPlugin):
                     "TowerWaterSys Operation Scheme:TowerWaterSys CoolTower"
                 )
                 self.need_to_get_handles = False
-                
+
             # calculation
             tower_water_sys_loop_demand = self.api.exchange.get_internal_variable_value(
                 self.tower_water_sys_loop_demand_handle
