@@ -2,6 +2,11 @@ project(EnergyPlusDocs LANGUAGES NONE)
 
 cmake_minimum_required(VERSION 3.5.1)
 
+if(NOT EXISTS ${PYTHON_EXECUTABLE})
+  # we are making *a Python 3.6 Interpreter* a required dependency, so find it here
+  find_package(PythonInterp 3.6 REQUIRED)
+endif()
+
 option( DOCS_TESTING "Test the docs for issues" OFF )
 # this _should_ find the xelatex compiler, but for some reason it isn't populating for me
 find_package(LATEX)
