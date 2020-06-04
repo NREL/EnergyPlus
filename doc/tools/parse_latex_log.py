@@ -4,8 +4,6 @@ Parse the LaTeX log file.
 import json
 import os
 import os.path
-import pathlib
-import pdb
 import re
 import sys
 
@@ -63,11 +61,12 @@ def parse_current_tex_file(line, root_dir):
     """
     m = LINE_RE.search(line)
     if m is not None:
-        pp_dir = pathlib.Path(root_dir)
-        pp_file = pp_dir / pathlib.Path(m.group(1))
+        pp_dir = root_dir
+        pp_file = os.path.join(pp_dir, m.group(1))
         try:
-            return str(pp_file.relative_to(pp_dir))
-        except ValueError:
+            return os.path.relpath(pp_file, start=pp_dir)
+        except Exception:
+            print("Exception...")
             # not a file under root_dir -- ignore
             return None
     return None
@@ -124,7 +123,7 @@ def find_locations(root_dir, target, target_ext='.tex', verbose=False):
     RETURN: Array of {'file': string, 'line': int} values
     """
     locations = []
-    pp_dir = pathlib.Path(root_dir)
+    pp_dir = root_dir
     for dir_name, subdirs, files in os.walk(root_dir):
         for file_name in files:
             path = os.path.join(dir_name, file_name)
@@ -133,16 +132,20 @@ def find_locations(root_dir, target, target_ext='.tex', verbose=False):
                 continue
             if verbose:
                 print("checking {}...".format(path))
-            pp_path = pathlib.Path(path)
+            pp_path = path
             try:
                 with open(path, encoding="utf8", errors="ignore") as f:
                     for line_number, line in enumerate(f.readlines()):
                         if target in line:
-                            path_to_log = str(pp_path.relative_to(pp_dir))
+                            path_to_log = os.path.relpath(
+                                    pp_path, start=pp_dir)
                             locations.append({
                                 'file': path_to_log,
                                 'line': line_number + 1})
-            except:
+            except Exception as e:
+                import traceback
+                print("issue encountered in finding locations: {}".format(e))
+                traceback.print_tb(sys.last_traceback)
                 sys.exit(EXIT_CODE_ERROR)
     return locations
 
@@ -320,8 +323,6 @@ class LogParser:
                 self._init_state()
                 for line in rd.readlines():
                     if (self._in_tex_err or self._in_warn or self._in_err):
-                        if DEBUG:
-                            pdb.set_trace()
                         self._read_issue(line)
                     else:
                         self._issue_line = None
@@ -335,35 +336,31 @@ class LogParser:
                             self._current_tex_file = tex_file
                             self._report("processing {} ...".format(tex_file))
                         elif issue_start is not None:
-                            if DEBUG:
-                                pdb.set_trace()
                             self._issue_line = 1
                             self._in_tex_err = True
                             self._type = "TeX Error"
                             self._current_issue = issue_start
                             self._report("- issue {}".format(issue_start))
                         elif err_start is not None:
-                            if DEBUG:
-                                pdb.set_trace()
                             self._issue_line = 1
                             self._in_err = True
                             self._type = (
                                     to_s(err_start[0]) +
                                     " " + to_s(err_start[1])).strip()
                             self._current_issue = err_start[2]
-                            self._report("- error {}".format(self._current_issue))
+                            self._report("- error {}".format(
+                                self._current_issue))
                         elif warning_start is not None:
-                            if DEBUG:
-                                pdb.set_trace()
                             self._issue_line = 1
                             self._in_warn = True
                             self._type = (
                                     to_s(warning_start[0]) +
                                     " " + to_s(warning_start[1])).strip()
                             self._current_issue = warning_start[2]
-                            self._report("- warning {}".format(self._current_issue))
+                            self._report("- warning {}".format(
+                                self._current_issue))
                     self._previous_line = line
-        except:
+        except Exception:
             return sys.exit(EXIT_CODE_ERROR)
         return self._issues
 
@@ -432,7 +429,8 @@ def run_tests():
             "[70] [71] [72] [73] [74] [75]) " +
             "(./src/overview/group-compliance-objects.tex [76",
             "/home/user/stuff/input-output-reference")
-    assert out == "src/overview/group-compliance-objects.tex", "out = {}".format(out)
+    msg = "out = {}".format(out)
+    assert out == "src/overview/group-compliance-objects.tex", msg
     out = parse_current_tex_file(
             "Underfull \\hbox (badness 10000) in paragraph at lines " +
             "1042--1043",
@@ -454,7 +452,8 @@ def run_tests():
             "src/appendix-a-units-and-abbreviations/" +
             "standard-energyplus-units.tex"), "out == {}".format(out)
     out = parse_tex_error("! Misplaced alignment tab character &.")
-    assert out == "Misplaced alignment tab character &.", "out == {}".format(out)
+    msg = "out == {}".format(out)
+    assert out == "Misplaced alignment tab character &.", msg
     out = parse_warning_start(
             "LaTeX Warning: Hyper reference " +
             "`airterminalsingleductuncontrolled' on page 2467")
@@ -481,17 +480,14 @@ if __name__ == "__main__":
                 'tips-and-tricks-using-energyplus',
                 'using-energyplus-for-compliance',
                 ]
-        current_dir = pathlib.Path('.')
+        current_dir = os.path.abspath('.')
         for tag in doc_tags:
-            log_path = (
-                    current_dir / pathlib.Path('..') / pathlib.Path(tag) /
-                    pathlib.Path(tag + '.log')
-                    ).resolve()
-            assert log_path.exists()
+            log_path = os.path.abspath(
+                    os.path.join(current_dir, '..', tag, tag + '.log'))
+            assert os.path.exists(log_path)
             json_err = '{}-err.json'.format(tag)
-            src_dir = (
-                    current_dir / pathlib.Path('..') / pathlib.Path(tag)
-                    ).resolve()
+            src_dir = os.path.abspath(
+                    os.path.join(current_dir, '..', tag))
             print("="*60)
             print("Processing {}...".format(tag))
             if os.path.exists(json_err):
