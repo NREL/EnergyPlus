@@ -62,15 +62,15 @@ namespace TARCOGOutput {
       std::string DBGD;
       std::string FileMode;
       std::string FilePosition;
-      bool WriteDebugOutput;
-      int DebugMode;
-      int InArgumentsFile;
-      int OutArgumentsFile;
-      int WINCogFile;
+      bool WriteDebugOutput{false};
+      int DebugMode{};
+      int InArgumentsFile{};
+      int OutArgumentsFile{};
+      int WINCogFile{};
 
       // Intermediate debug files
-      int IterationCSVFileNumber;
-      int TarcogIterationsFileNumber;
+      int IterationCSVFileNumber{};
+      int TarcogIterationsFileNumber{};
 
       std::string IterationCSVName;
 
