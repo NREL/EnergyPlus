@@ -11,4 +11,5 @@ macro( CREATE_DOC_TARGET SOURCE_FILENAME OUTPUT_FILENAME )
     )
 
   add_dependencies(docs zPDF_${OUTPUT_FILENAME})
+  set_target_properties(zPDF_${OUTPUT_FILENAME} PROPERTIES FOLDER Documentation)
 endmacro()
