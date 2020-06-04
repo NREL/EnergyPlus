@@ -25,22 +25,23 @@ The old format looked like the following, and when no second Reference Point exi
  Overcast Sky Daylight Factors,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,1.4127E-002,1.3127E-002
 ```
 
-The new format looks like the following, and specifies the name of the reference point in question:
+The new format looks like the following, and specifies the name of the reference point in question,
+as well as conforming to EIO format by adding the section name `Sky Daylight Factors` to each record:
 
 ```
 ! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor
- Clear Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT1,1.9074E-002
- Clear Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT2,1.8074E-002
- Clear Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT3,1.7074E-002
- Clear Turbid Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT1,1.4830E-002
- Clear Turbid Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT2,1.4700E-002
- Clear Turbid Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT3,1.4230E-002
- Intermediate Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT1,1.0647E-002
- Intermediate Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT2,1.0547E-002
- Intermediate Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT3,1.0347E-002
- Overcast Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT1,1.4127E-002
- Overcast Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT2,1.3127E-002
- Overcast Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT3,1.2127E-002
+ Sky Daylight Factors,Clear Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT1,1.9074E-002
+ Sky Daylight Factors,Clear Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT2,1.8074E-002
+ Sky Daylight Factors,Clear Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT3,1.7074E-002
+ Sky Daylight Factors,Clear Turbid Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT1,1.4830E-002
+ Sky Daylight Factors,Clear Turbid Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT2,1.4700E-002
+ Sky Daylight Factors,Clear Turbid Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT3,1.4230E-002
+ Sky Daylight Factors,Intermediate Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT1,1.0647E-002
+ Sky Daylight Factors,Intermediate Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT2,1.0547E-002
+ Sky Daylight Factors,Intermediate Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT3,1.0347E-002
+ Sky Daylight Factors,Overcast Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT1,1.4127E-002
+ Sky Daylight Factors,Overcast Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT2,1.3127E-002
+ Sky Daylight Factors,Overcast Sky,01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,ZN_1_DAYLREFPT3,1.2127E-002
 ```
 
 #### DFS

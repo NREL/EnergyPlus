@@ -746,7 +746,7 @@ namespace DaylightingManager {
                                     for (int refPtNum = 1; refPtNum <= ZoneDaylight(ZoneNum).TotalDaylRefPoints; ++refPtNum) {
                                         DaylFac = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, static_cast<int>(skyType), refPtNum, loop);
                                         print(outputFiles.eio,
-                                              " {},{},{},{},{},{:.4R}\n",
+                                              " Sky Daylight Factors,{},{},{},{},{},{:.4R}\n",
                                               skyTypeString,
                                               CurMnDy,
                                               Zone(ZoneNum).Name,
