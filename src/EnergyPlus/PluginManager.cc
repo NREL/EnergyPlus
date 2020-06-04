@@ -905,21 +905,9 @@ namespace PluginManagement {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
-                // TODO: Make this an extensible object
-                if (fields.find("variable_name_1") != fields.end()) {
-                    this->addGlobalVariable(fields.at("variable_name_1"));
-                }
-                if (fields.find("variable_name_2") != fields.end()) {
-                    this->addGlobalVariable(fields.at("variable_name_2"));
-                }
-                if (fields.find("variable_name_3") != fields.end()) {
-                    this->addGlobalVariable(fields.at("variable_name_3"));
-                }
-                if (fields.find("variable_name_4") != fields.end()) {
-                    this->addGlobalVariable(fields.at("variable_name_4"));
-                }
-                if (fields.find("variable_name_5") != fields.end()) {
-                    this->addGlobalVariable(fields.at("variable_name_5"));
+                auto const vars = fields.at("global_py_vars");
+                for (const auto &var : vars) {
+                    this->addGlobalVariable(var.at("variable_name"));
                 }
             }
         }
