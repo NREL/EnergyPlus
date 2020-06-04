@@ -83,15 +83,6 @@ namespace BranchInputManager {
     // "Connector:Splitter", and "Connector:Mixer".  Also, to supply other modules/routines with
     // information about these objects.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using DataGlobals::DisplayExtraWarnings;
     using namespace DataLoopNode;
@@ -99,13 +90,10 @@ namespace BranchInputManager {
     using namespace NodeInputManager;
     using namespace BranchNodeConnections;
 
-    // Data
     // MODULE PARAMETER DEFINITIONS
     std::string const cMIXER("Connector:Mixer");
     std::string const cSPLITTER("Connector:Splitter");
     static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
     int NumOfBranchLists(0);    // Number of Branch Lists found in IDF
@@ -131,11 +119,6 @@ namespace BranchInputManager {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool GetBranchInputOneTimeFlag(true);
     } // namespace
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BranchInputManager
-    // PUBLIC  TestAirPathIntegrity
-    // PRIVATE TestSupplyAirPathIntegrity
-    // PRIVATE TestReturnAirPathIntegrity
-    // PUBLIC  MyPlantSizingIndex
 
     // Object Data
     Array1D<BranchListData> BranchList;    // Branch List data for each Branch List
@@ -178,30 +161,6 @@ namespace BranchInputManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is called from HVACManager to make sure that branch input is
         // gathered prior to need.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (GetBranchInputFlag) {
             GetBranchInput();
@@ -343,28 +302,8 @@ namespace BranchInputManager {
         // This routine gets the Branch Data (internal structure) for the requested
         // Branch Name and returns it in "list structure" to the calling routine.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::TrimSigDigits;
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count; // Loop Counter
@@ -412,28 +351,8 @@ namespace BranchInputManager {
         // This function returns the number of components in a branch so that the calling
         // routine can allocate arrays before calling GetBranchData.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
         // Return value
         int NumCompsInBranch;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Found;
@@ -467,28 +386,8 @@ namespace BranchInputManager {
         // This function returns the branch index so that the calling
         // routine can search for a fan on this branch or use branch flow for sizing.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Return value
         int GetAirBranchIndex(0);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int BranchNum;
@@ -537,27 +436,8 @@ namespace BranchInputManager {
         // This function returns the branch fan flow rate so that the calling
         // routine can either use this flow or use then branch flow for sizing.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::TrimSigDigits;
-
-        // Locals
-        // na
-
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int CompNum;
@@ -618,29 +498,6 @@ namespace BranchInputManager {
         // Branch Name and returns it to the calling routine.  This is used internally
         // in the module.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Found; // Pointer to requested Branch Name
 
@@ -686,8 +543,8 @@ namespace BranchInputManager {
 
     void GetNumSplitterMixerInConntrList(std::string const &LoopName,          // Loop Name for this Splitter (used in error message)
                                          std::string const &ConnectorListName, // Requested Connector List Name
-                                         int &NumSplitters,                    // Number of splitters in the loop
-                                         int &NumMixers,                       // Number of mixers in the loop
+                                         int &numSplitters,                    // Number of splitters in the loop
+                                         int &numMixers,                       // Number of mixers in the loop
                                          bool &ErrorsFound                     // if no connector list
     )
     {
@@ -702,27 +559,6 @@ namespace BranchInputManager {
         // This subroutine returns the number of splitter and mixers in a connector list item
         // The data is filled from the idd object 'ConnectorList'
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ConnNum;
 
@@ -731,13 +567,13 @@ namespace BranchInputManager {
             GetConnectorListInputFlag = false;
         }
 
-        NumSplitters = 0;
-        NumMixers = 0;
+        numSplitters = 0;
+        numMixers = 0;
         ConnNum = UtilityRoutines::FindItemInList(ConnectorListName, ConnectorLists);
 
         if (ConnNum > 0) {
-            NumSplitters = ConnectorLists(ConnNum).NumOfSplitters;
-            NumMixers = ConnectorLists(ConnNum).NumOfMixers;
+            numSplitters = ConnectorLists(ConnNum).NumOfSplitters;
+            numMixers = ConnectorLists(ConnNum).NumOfMixers;
         } else {
             ShowSevereError("Ref: Loop=" + LoopName + ", Connector List not found=" + ConnectorListName);
             ErrorsFound = true;
@@ -775,26 +611,6 @@ namespace BranchInputManager {
         //         \key Connector:Splitter
         //         \key Connector:Mixer
         //     A5; \field Connector 2 Name
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count; // Loop Counter
@@ -851,28 +667,8 @@ namespace BranchInputManager {
         // This routine gets the data for the requested Connector List and returns values indicating
         // if this connector list name is a mixer or not.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::TrimSigDigits;
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;    // Loop Counter
@@ -1011,28 +807,8 @@ namespace BranchInputManager {
         // This routine gets the data for the requested Connector List and returns values indicating
         // if this connector list name is a splitter or not.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::TrimSigDigits;
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;    // Loop Counter
@@ -1163,29 +939,8 @@ namespace BranchInputManager {
         // This function uses the branch structure to obtain the inlet node
         // of the first branch from referenced Branch List.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         std::string InletNodeName; // Inlet node name of first branch in branch list
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Found1; // Pointer to Branch List Name
@@ -1227,29 +982,8 @@ namespace BranchInputManager {
         // This function uses the branch structure to obtain the outlet node
         // of the last branch from referenced Branch List.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         std::string OutletNodeName; // Outlet node name of last branch in branch list
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Found1; // Pointer to Branch List Name
@@ -1411,7 +1145,7 @@ namespace BranchInputManager {
         }
     }
 
-    void GetSingleBranchInput(std::string const RoutineName,
+    void GetSingleBranchInput(std::string const &RoutineName,
                               int const BCount,
                               Array1D_string &Alphas,
                               Array1D_string &cAlphaFields,
@@ -1587,27 +1321,11 @@ namespace BranchInputManager {
         //        \type object-list
         //        \object-list Branches
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::TrimSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetBranchListInput: ");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;     // Loop Counter
@@ -2010,27 +1728,8 @@ namespace BranchInputManager {
         //         \type object-list
         //         \object-list Branches
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::TrimSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;           // Used to retrieve names from IDF
@@ -2255,27 +1954,8 @@ namespace BranchInputManager {
         //         \type object-list
         //         \object-list Branches
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::TrimSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;           // Used to retrieve names from IDF
@@ -2490,24 +2170,6 @@ namespace BranchInputManager {
         // METHODOLOGY EMPLOYED:
         // Calls GetObject for PLANT LOOP
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Num;
         int NumPlantLoops;
@@ -2566,27 +2228,6 @@ namespace BranchInputManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // An auxiliary routine locate a condenser loop and type from a BranchListName
-
-        // METHODOLOGY EMPLOYED:
-        // calls GetObject for CONDENSER LOOP
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Num;
@@ -2650,24 +2291,6 @@ namespace BranchInputManager {
         // METHODOLOGY EMPLOYED:
         // calls GetObject for PRIMARY AIR LOOP
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Num;
         int NumAirLoops;
@@ -2721,24 +2344,6 @@ namespace BranchInputManager {
         // METHODOLOGY EMPLOYED:
         // Call two previously written subroutines that match a Branch List Name to
         // Plant or Condenser Loop
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string FoundLoopName;
@@ -2801,27 +2406,9 @@ namespace BranchInputManager {
         // This routine will point out any "dangling branches" that are not included on a BranchList.
         // Warnings are produced as the user might clutter up the input file with unused branches.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataErrorTracking::TotalSevereErrors;
         using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumDanglingCount;        // when mustprint not true, count and report
@@ -2888,24 +2475,8 @@ namespace BranchInputManager {
         // This subroutine tests branch integrity and displays the loop for each branch.
         // Also, input and output nodes.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;

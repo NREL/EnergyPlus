@@ -53,48 +53,16 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputFiles.hh>
 
 namespace EnergyPlus {
 
 namespace BranchInputManager {
 
-    // Using/Aliasing
-    using DataLoopNode::NodeType_Unknown;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const cMIXER;
-    extern std::string const cSPLITTER;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumOfBranchLists;    // Number of Branch Lists found in IDF
-    extern int NumOfBranches;       // Number of Branches found in IDF
-    extern int NumOfConnectorLists; // Number of Connector Lists found in IDF
-    extern int NumSplitters;        // Number of Splitters found in IDF
-    extern int NumMixers;           // Number of Mixers found in IDF
-
-    extern bool GetBranchInputFlag;        // Flag used to retrieve Input
-    extern bool GetBranchListInputFlag;    // Flag used to retrieve Input
-    extern bool GetSplitterInputFlag;      // Flag used to retrieve Input
-    extern bool GetMixerInputFlag;         // Flag used to retrieve Input
-    extern bool GetConnectorListInputFlag; // Flag used to retrieve Input
     extern bool InvalidBranchDefinitions;
-
-    extern std::string CurrentModuleObject; // for ease in getting objects
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BranchInputManager
-    // PUBLIC  TestAirPathIntegrity
-    // PRIVATE TestSupplyAirPathIntegrity
-    // PRIVATE TestReturnAirPathIntegrity
-    // PUBLIC  MyPlantSizingIndex
-
-    // Types
 
     struct ConnectorData
     {
@@ -158,7 +126,7 @@ namespace BranchInputManager {
         Array1D<ComponentData> Component; // Component definitions for each component
 
         // Default Constructor
-        BranchData() : PressureCurveType(0), PressureCurveIndex(0), FluidType(NodeType_Unknown), NumOfComponents(0)
+        BranchData() : PressureCurveType(0), PressureCurveIndex(0), FluidType(DataLoopNode::NodeType_Unknown), NumOfComponents(0)
         {
         }
     };
@@ -233,7 +201,7 @@ namespace BranchInputManager {
 
     int GetAirBranchIndex(std::string const &CompType, std::string const &CompName);
 
-    void GetBranchFanTypeName(int const BranchNum, std::string &FanType,
+    void GetBranchFanTypeName(int BranchNum, std::string &FanType,
                               std::string &FanName,
                               bool &ErrFound               // Set to true if error found, false otherwise
     );
@@ -249,8 +217,8 @@ namespace BranchInputManager {
 
     void GetNumSplitterMixerInConntrList(std::string const &LoopName,          // Loop Name for this Splitter (used in error message)
                                          std::string const &ConnectorListName, // Requested Connector List Name
-                                         int &NumSplitters,                    // Number of splitters in the loop
-                                         int &NumMixers,                       // Number of mixers in the loop
+                                         int &numSplitters,                    // Number of splitters in the loop
+                                         int &numMixers,                       // Number of mixers in the loop
                                          bool &ErrorsFound                     // if no connector list
     );
 
@@ -297,11 +265,11 @@ namespace BranchInputManager {
 
     void GetBranchInput();
 
-    void GetSingleBranchInput(std::string const RoutineName,
-                              int const BCount,
+    void GetSingleBranchInput(std::string const &RoutineName,
+                              int BCount,
                               Array1D_string &Alphas,
                               Array1D_string &cAlphaFields,
-                              int const NumAlphas,
+                              int NumAlphas,
                               Array1D_int &NodeNums,
                               Array1D_bool &lAlphaBlanks);
 
@@ -344,7 +312,7 @@ namespace BranchInputManager {
     //   Routines that test branch integrity
     //==================================================================================
 
-    void AuditBranches(bool const mustprint,               // true if the warning should be printed.
+    void AuditBranches(bool mustprint,               // true if the warning should be printed.
                        Optional_string_const CompType = _, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
                        Optional_string_const CompName = _  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     );
