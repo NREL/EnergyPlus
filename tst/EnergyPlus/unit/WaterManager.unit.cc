@@ -45,17 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::WaterCoils Unit Tests
-// FUNCTION INFORMATION:
-//       AUTHOR         R Raustad
-//       DATE WRITTEN   March 2015
-//       MODIFIED
-//       RE-ENGINEERED  na
-
-// PURPOSE OF THIS FUNCTION:
-// This function performs the sizing calculation on a chilled water coil.
-// The water coil should size to use sizing data or Data* globals. After a coil is sized, the Data* variables should all be reset.
-// Defect file showed a second coil in the input that autosized the same as the first (incorrect based on zone flow rates).
 
 // Google Test Headers
 #include <gtest/gtest.h>
