@@ -1137,8 +1137,8 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     // No EMS
     ThermalChimney::GetThermalChimney(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    //ThermalChimney::CalcThermalChimney();
-    //EXPECT_NEAR(ThermalChimney::ThermalChimneyReport(1).OverallTCVolumeFlow, 0.015668, 0.0001);
+    ThermalChimney::CalcThermalChimney();
+    EXPECT_NEAR(ThermalChimney::ThermalChimneyReport(1).OverallTCVolumeFlow, 0.015668, 0.0001);
     // EMS Override
     ThermalChimney::ThermalChimneySys(1).EMSOverrideOn = true;
     ThermalChimney::ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
