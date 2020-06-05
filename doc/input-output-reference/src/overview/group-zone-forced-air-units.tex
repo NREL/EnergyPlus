@@ -4255,8 +4255,17 @@ This numeric input field specifies the maximum standard density supply air volum
 \paragraph{Field: External Static Pressure at System Maximum Supply Air Flow Rate}
 This optional numeric input field specifies the external static pressure at the system maximum supply air flow rate specified in the previous field. Fan affinity laws are used to scale supply fan power from the scenario used to create the performance data included in each \hyperref[tablelookup]{Table:Lookup} object, to a scenario that corresponds to the value specified in this field. The result is also used to adjust the system electric power accordingly. If this field is blank, the supply fan power is not scaled from the values specified in lookup tables.
 
+\paragraph{Field: Fan Heat Included in Lookup Tables}
+This alpha field specifies if the fan heat gain was taken into account in the lookup tables specified for each mode. Valid choices are \textbf{\emph{Yes}} and \textbf{\emph{No}}. If No, the fan heat is calculated based on the fan power and the next two fields specify the location and fraction of the fan heat gain to the air stream, otherwise the fan heat gain is not calculated.
+
+\paragraph{Field: Fan Heat Gain Location}
+This optional alpha field specifies the location that the fan heat gain should be applied if not included in the lookup tables. Valid choices include: \textbf{\emph{MixedAirStream}} and \textbf{\emph{SupplyAirStream}}. MixedAirStream is upstream of the cooling medium while SupplyAirStream is downstream of the cooling medium.
+
+\paragraph{Field: Fan Heat Gain in Airstream Fraction}
+This optional numeric field is the fraction of the fan heat that is added to the air stream if not included in the lookup tables. A value of 0 means that the fan heat is completely outside the air stream. A value of 1 means that all of the fan heat loss will go into the air stream and act to cause a temperature rise. Must be between 0 and 1. The default is 1.0.
+
 \paragraph{Field: Scaling Factor}
-This optional numeric field  scales all extensive dependent variables including: supply air mass flow rate, electricity use, fuel uses, and water use. The value in this field acts together with the value in field System Maximum Standard Density Supply Air Volume Flow Rate to allow custom resizing of the hybrid unit.
+This optional numeric field scales all extensive dependent variables including: supply air mass flow rate, electricity use, fuel uses, and water use. The value in this field acts together with the value in field System Maximum Standard Density Supply Air Volume Flow Rate to allow custom resizing of the hybrid unit.
 
 \paragraph{Field: Number of Operating Modes}
 This numeric field specifies the number of discrete operating modes for the hybrid unit. Supply air mass flow rate ratio and outdoor air fraction are treated as continuous controlled independent variables within each discrete operating mode. All other independent parameters, such as compressor speed, must be described by discrete operating modes.  Mode 0 always describes standby operation. Mode 1 - Mode 25 describe active operating modes that provide ventilation, heating, cooling, humidification or dehumidification. 26 modes are allowed (including Mode 0). If the value input to this field is 1, only Mode 0 will be considered when the model choses setting to satisfy sensible loads, latent loads, or scheduled ventilation volume. If this field is blank, the default number of operating modes is 1.
