@@ -2166,6 +2166,9 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     // zone 2 has 2 daylighting reference points and will crash if not dimensioned appropriately.
     DayltgInteriorIllum(zoneNum);
 
+    // EIO/DFS output uses specifically newline `\n`, so pass that in or on Windows it'll use '\r\n`
+    std::string const delim = "\n";
+
     std::string const eiooutput = delimited_string({
         "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones",
         "Zone/Window Adjacency Daylighting Counts, WEST ZONE,2,-1",
@@ -2190,7 +2193,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
         " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
         " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-    });
+    }, delim);
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -2297,7 +2300,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "24,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
         "24,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
         "24,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-    });
+    }, delim);
 
     EXPECT_TRUE(compare_dfs_stream(dfsoutput, true));
 }
