@@ -6,7 +6,7 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 
 set(SRC HVAC-Diagram-Main.f90)
 
-set(STATIC_EXE TRUE) 
+set(STATIC_EXE TRUE)
 
 if(APPLE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")
@@ -40,6 +40,7 @@ endif()
 
 set(SKIP_BUILD_RPATH true)
 add_executable( HVAC-Diagram ${SRC} )
+set_target_properties(HVAC-Diagram PROPERTIES FOLDER Auxiliary)
 
 install( TARGETS HVAC-Diagram DESTINATION PostProcess )
 if(NOT ${STATIC_EXE})

@@ -8,7 +8,7 @@ if(WIN32)
   configure_file( ExpandObjects.rc.in "${CMAKE_CURRENT_BINARY_DIR}/ExpandObjects.rc" )
 endif()
 
-set(SRC epfilter.f90) 
+set(SRC epfilter.f90)
 
 set(STATIC_EXE FALSE)
 
@@ -51,6 +51,9 @@ if (APPLE OR UNIX)
 else()  # windows
   add_executable( ExpandObjects ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/ExpandObjects.rc" )
 endif()
+
+set_target_properties(ExpandObjects PROPERTIES FOLDER Auxiliary)
+
 
 install( TARGETS ExpandObjects DESTINATION "./" )
 if(NOT ${STATIC_EXE})

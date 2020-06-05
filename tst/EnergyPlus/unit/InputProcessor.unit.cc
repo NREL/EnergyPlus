@@ -623,6 +623,39 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
     EXPECT_EQ( expected, input_file );
 }
 
+TEST_F(InputProcessorFixture, parse_latin1_json)
+{
+
+    // Test for #7388 -  Non UTF-8 characters throwing false blank name error
+
+    std::string const idf(delimited_string({
+        "  Construction,",
+        "    \x31\xB0\x70\x69\x61\x6E\x6F,  !- Name",
+        "    intonaco int calce;      !- Outside Layer"
+    }));
+
+    EXPECT_FALSE(process_idf(idf, false)); // No assertions
+    const std::string error_string = delimited_string({
+        "   ** Severe  ** <root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: '1\xB0piano'.",
+        "   ** Severe  ** <root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded"
+    });
+    compare_err_stream(error_string, true);
+
+    auto const &errors = validationErrors();
+    EXPECT_EQ(errors.size(), 2ul);
+    EXPECT_EQ("<root>[Construction] - Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints: '1\xB0piano'.", errors[0]);
+    EXPECT_EQ("<root>[Construction] - Object name is required and cannot be blank or whitespace, and must be UTF-8 encoded", errors[1]);
+
+
+    json &epJSON = getEpJSON();
+
+    auto it = epJSON.find("Construction");
+    ASSERT_NE(it, epJSON.end());
+    auto iit = it->begin();
+    EXPECT_EQ("1\xB0piano", iit.key());
+}
+
+
 TEST_F(InputProcessorFixture, parse_malformed_idf)
 {
     std::string const idf(delimited_string({
