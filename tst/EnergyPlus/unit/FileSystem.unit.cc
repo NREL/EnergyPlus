@@ -45,43 +45,53 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ENERGYPLUS_BASEBOARDDATA_HH
-#define ENERGYPLUS_BASEBOARDDATA_HH
+// EnergyPlus::DataVectorTypes::Vector Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/BaseboardElectric.hh>
-#include <EnergyPlus/BaseboardRadiator.hh>
+#include <iostream>
+#include <fstream>
+#include <EnergyPlus/FileSystem.hh>
 
-namespace EnergyPlus{
 
-    struct BaseboardElectricData : BaseGlobalStruct {
-        int NumBaseboards = 0;
-        Array1D<BaseboardElectric::BaseboardParams> Baseboard;
-        Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
+TEST(FileSystem, movefile_test)
+{
+    // test moveFile function, specifically on Windows
 
-        void clear_state()
-        {
-            NumBaseboards = 0;
-            Baseboard.deallocate();
-            BaseboardNumericFields.deallocate();
-        }
-    };
+    // create text file to be overridden by new file
+    std::string filename = "FileSystemTest.idf";
+    std::string line;
+    std::stringstream buffer;
+    std::ofstream ofs(filename);
+    ofs << "Version, 9.3;" << std::endl;
+    ofs.close();
 
-    struct BaseboardRadiatorData : BaseGlobalStruct {
+    // read text file
+    std::ifstream ifs(filename);
+    buffer << ifs.rdbuf();
+    // check that text file was created correctly
+    EXPECT_EQ(buffer.str(), "Version, 9.3;\n");
+    ifs.close();
 
-        int NumBaseboards = 0;
-        Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
-        Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
+    // create temporary text file to move to existing file created above
+    std::string filename_temp = "FileSystemTest_temp.idf";
+    std::ofstream ofs_temp(filename_temp);
+    ofs_temp << "Version, 9.4;" << std::endl;
+    ofs_temp.close();
 
-        void clear_state()
-        {
-            NumBaseboards = 0;
-            Baseboard.deallocate();
-            BaseboardParamsNumericFields.deallocate();
-        }
-    };
+    // move temporary text file to overwrite existing file
+    EnergyPlus::FileSystem::moveFile(filename_temp, filename);
+    // read original text file after using moveFile function
+    std::stringstream buffer_new;
+    std::ifstream ifs_new(filename);
+    buffer_new << ifs_new.rdbuf();
+    // check that original text file was overwritten by temporary text file
+    EXPECT_EQ(buffer_new.str(), "Version, 9.4;\n");
+    ifs_new.close();
 
-}  // namespace EnergyPlus
-
-#endif // ENERGYPLUS_BASEBOARDDATA_HH
+    // remove files
+    EnergyPlus::FileSystem::removeFile(filename);
+    EnergyPlus::FileSystem::removeFile(filename_temp);
+}

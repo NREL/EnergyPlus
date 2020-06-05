@@ -601,7 +601,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_EMSPressureRiseResetTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
     EMSManager::FinishProcessingUserInput = true;
 
     std::string fanName = "TEST FAN";
