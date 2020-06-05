@@ -53,6 +53,7 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include "OutputFiles.hh"
 
@@ -300,6 +301,22 @@ namespace DataGlobals {
     void clear_state(EnergyPlus::OutputFiles &outputFiles);
 
 } // namespace DataGlobals
+
+    struct DataGlobal : BaseGlobalStruct {
+        // Data
+        bool AnnualSimulation = false;
+
+        // MODULE VARIABLE DECLARATIONS:
+        std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
+
+        // MODULE PARAMETER DEFINITIONS
+        static constexpr int EndZoneSizingCalc = 4;
+
+        void clear_state() override {
+            AnnualSimulation = false;
+            DayOfSimChr = "0";
+        }
+    };
 
 } // namespace EnergyPlus
 
