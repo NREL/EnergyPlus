@@ -412,11 +412,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(1:14)=InArgs(1:14)
                   ! insert Fan Heat Included in Lookup Tables field
                   OutArgs(15)='Yes'
-                  ! insert Motor In Airstream Fraction field
+                  ! insert Fan Heat Gain Location
                   OutArgs(16)=Blank
+                  ! insert Fan Heat Gain In Airstream Fraction field
+                  OutArgs(17)=Blank
                   ! all others equal
-                  OutArgs(17:CurArgs+2)=InArgs(15:CurArgs)
-                  CurArgs = CurArgs + 2
+                  OutArgs(18:CurArgs+3)=InArgs(15:CurArgs)
+                  CurArgs = CurArgs + 3
                   NoDiff = .false.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

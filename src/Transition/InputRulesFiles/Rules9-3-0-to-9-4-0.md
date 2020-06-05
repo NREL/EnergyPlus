@@ -10,6 +10,8 @@ Fields 1-14 remain the same.
 
 Insert field 15, Fan Heat Included in Lookup Tables.
 
-Insert field 16, Motor In Airstream Fraction.
+Insert field 16, Fan Heat Gain Location.
 
-Remaining fields 17 onward are the same as previous fields 15 onwards. No other changes.
+Insert field 17, Fan Heat Gain In Airstream Fraction.
+
+Remaining fields 18 onward are the same as previous fields 15 onwards. No other changes.
