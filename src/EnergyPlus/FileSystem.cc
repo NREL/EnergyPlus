@@ -240,7 +240,12 @@ namespace FileSystem {
 
     void moveFile(std::string const &filePath, std::string const &destination)
     {
+#ifdef _WIN32
+        //Note: on Windows, rename function doesn't always replace the existing file so MoveFileExA is used
+        MoveFileExA(filePath.c_str(), destination.c_str(), MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
+#else
         rename(filePath.c_str(), destination.c_str());
+#endif
     }
 
     int systemCall(std::string const &command)
