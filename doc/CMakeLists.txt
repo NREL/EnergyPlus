@@ -2,12 +2,15 @@ project(EnergyPlusDocs LANGUAGES NONE)
 
 cmake_minimum_required(VERSION 3.5.1)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 if(NOT EXISTS ${PYTHON_EXECUTABLE})
   # we are making *a Python 3.6 Interpreter* a required dependency, so find it here
   find_package(PythonInterp 3.6 REQUIRED)
 endif()
 
 option( DOCS_TESTING "Test the docs for issues" OFF )
+
 # this _should_ find the xelatex compiler, but for some reason it isn't populating for me
 find_package(LATEX)
 # so we'll create a cache variable which will be available to the add_subdirectory call below
@@ -38,6 +41,8 @@ if( EXISTS ${XELATEX} )
     # message(STATUS "The target `docs` was added to the default build rule")
     add_custom_target(docs ALL)
   endif()
+
+  set_target_properties(docs PROPERTIES FOLDER Documentation)
 
   if (DOCS_TESTING)
     enable_testing()
