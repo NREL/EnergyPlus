@@ -133,7 +133,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_FanSizing1)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-
+    DataEnvironment::StdRhoAir = 1.0;
     std::string fanName = "TEST FAN";
     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
@@ -601,7 +601,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_EMSPressureRiseResetTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EMSManager::CheckIfAnyEMS();
+    EMSManager::CheckIfAnyEMS(state.outputFiles);
     EMSManager::FinishProcessingUserInput = true;
 
     std::string fanName = "TEST FAN";

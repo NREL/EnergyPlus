@@ -2,6 +2,8 @@ project(EnergyPlusDocs LANGUAGES NONE)
 
 cmake_minimum_required(VERSION 3.5.1)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 # this _should_ find the xelatex compiler, but for some reason it isn't populating for me
 find_package(LATEX)
 # so we'll create a cache variable which will be available to the add_subdirectory call below
@@ -21,8 +23,19 @@ if( EXISTS ${XELATEX} )
   # add a configure rule to the header file though
   configure_file(${PROJECT_SOURCE_DIR}/title.tex.in ${PROJECT_SOURCE_DIR}/title.tex)
 
-  # Add custom target to build only documentation
-  add_custom_target(docs ALL)
+  # Add custom target to build only documentation, this target will depend on all individual PDFs
+  get_directory_property(hasParent PARENT_DIRECTORY)
+  if(hasParent AND BUILD_DOCS_ONLY_WITH_PACKAGE)
+    # Because we don't want to rebuild doc automatically, we do not add it to the 'ALL' rule
+    message(STATUS "The target `docs` was added, but not to the default build rule. It will be triggered by `make docs` or `make package`")
+    add_custom_target(docs)
+  else()
+    # Building standalone, so add to ALL
+    # message(STATUS "The target `docs` was added to the default build rule")
+    add_custom_target(docs ALL)
+  endif()
+
+  set_target_properties(docs PROPERTIES FOLDER Documentation)
 
   include(cmake/doc-targets.cmake)
 

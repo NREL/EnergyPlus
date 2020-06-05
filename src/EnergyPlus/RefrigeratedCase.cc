@@ -6338,7 +6338,7 @@ namespace RefrigeratedCase {
         }     // NumSimulationGasCooler > 0
 
         // echo input to eio file.
-        ReportRefrigerationComponents(OutputFiles::getSingleton());
+        ReportRefrigerationComponents(state.outputFiles);
 
         if (ErrorsFound) {
             ShowFatalError(RoutineName + " Previous errors cause program termination");

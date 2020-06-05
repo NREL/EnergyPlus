@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
 
     int VBMatNum(0);
@@ -522,7 +522,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2); //
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(state);
     // re-set the hour of the day to mide day
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 12;
@@ -877,7 +877,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(state);
     // re-set the hour of the day to noon
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 12;
@@ -930,7 +930,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotMaterials);
     EXPECT_EQ(DataHeatBalance::Material(1).Group, DataHeatBalance::WindowSimpleGlazing);
@@ -1227,7 +1227,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(state);
 
     int EQLNum(1);
     Array1D<Real64> T({1, CFSMAXNL}, 0.0);
@@ -1549,7 +1549,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(state);
 
     int EQLNum(1);
     Array1D<Real64> T({1, CFSMAXNL}, 0.0);
@@ -1935,7 +1935,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(state);
 
     int EQLNum(0);
     int SurfNum(0);

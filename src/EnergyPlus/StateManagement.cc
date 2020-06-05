@@ -241,11 +241,10 @@ void EnergyPlus::clearThisState(EnergyPlusData &state)
 {
     state.clear_state();
 }
-void EnergyPlus::clearAllStates()
+void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
 {
     using namespace EnergyPlus;
     // A to Z order
-    AirflowNetworkBalanceManager::clear_state();
     BranchInputManager::clear_state();
     CoolingPanelSimple::clear_state();
     CoilCoolingDX::clear_state();
@@ -255,6 +254,7 @@ void EnergyPlus::clearAllStates()
     CTElectricGenerator::clear_state();
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
+    dataAirflowNetworkBalanceManager.clear_state();
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
@@ -265,7 +265,7 @@ void EnergyPlus::clearAllStates()
     DataEnvironment::clear_state();
     DataErrorTracking::clear_state();
     DataGenerators::clear_state();
-    DataGlobals::clear_state();
+    DataGlobals::clear_state(outputFiles);
     DataHeatBalance::clear_state();
     DataHeatBalFanSys::clear_state();
     DataHeatBalSurface::clear_state();

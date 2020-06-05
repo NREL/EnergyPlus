@@ -328,7 +328,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(outputFiles(), errorsFound);
+    SurfaceGeometry::GetOSCMData(state.outputFiles, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -352,7 +352,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(outputFiles(), errorsFound);
+    SurfaceGeometry::GetOSCMData(state.outputFiles, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -689,7 +689,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     bool Available{false};
     bool ErrorsFound{false};
-    ASSERT_THROW(WeatherManager::GetNextEnvironment(state.dataGlobals, outputFiles(), Available, ErrorsFound), std::runtime_error);
+    ASSERT_THROW(WeatherManager::GetNextEnvironment(state, Available, ErrorsFound), std::runtime_error);
     ASSERT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
@@ -755,7 +755,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::OpenOutputFiles();
+    SimulationManager::OpenOutputFiles(state.outputFiles);
     // reset eio stream
     has_eio_output(true);
 
@@ -778,7 +778,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     WeatherManager::GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    WeatherManager::SetUpDesignDay(outputFiles(), 1);
+    WeatherManager::SetUpDesignDay(state.outputFiles, 1);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType_Enthalpy);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndValue, 90500.0);
 
@@ -805,11 +805,11 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, false));
 
-    OutputReportTabular::WriteEioTables(outputFiles());
+    OutputReportTabular::WriteEioTables(state.outputFiles);
 
 
     // Close output files *after* the EIO has been written to
-    SimulationManager::CloseOutputFiles(outputFiles());
+    SimulationManager::CloseOutputFiles(state.outputFiles);
 
     EnergyPlus::sqlite->sqliteCommit();
 
