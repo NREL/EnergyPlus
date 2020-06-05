@@ -588,7 +588,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
 
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
     ExteriorEnergyUse::ManageExteriorEnergyUse(state.exteriorEnergyUse);
     EXPECT_EQ(1, state.exteriorEnergyUse.NumExteriorLights);
     EXPECT_EQ(1000, state.exteriorEnergyUse.ExteriorLights(1).DesignLevel);
