@@ -2187,9 +2187,7 @@ namespace WaterCoils {
         baseFlags.termUnitPIU = DataSizing::TermUnitPIU;
         baseFlags.termUnitIU = DataSizing::TermUnitIU;
         baseFlags.zoneEqFanCoil = DataSizing::ZoneEqFanCoil;
-        baseFlags.otherEqType = DataSizing::ZoneEqUnitHeater || DataSizing::ZoneEqUnitVent || DataSizing::ZoneEqVentedSlab ||
-                                DataSizing::ZoneEqDXCoil || DataSizing::ZoneEqUnitarySys || DataSizing::ZoneEqOutdoorAirUnit;
-
+        baseFlags.otherEqType = !(baseFlags.termUnitSingDuct || baseFlags.termUnitPIU || baseFlags.termUnitIU || baseFlags.zoneEqFanCoil);
 
         // cooling coils
         if (WaterCoil(CoilNum).WaterCoilType == CoilType_Cooling && WaterCoil(CoilNum).RequestingAutoSize) {
@@ -2649,29 +2647,6 @@ namespace WaterCoils {
                     RequestSizing(state, CompType, CompName, HeatingCoilDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
                     WaterCoil(CoilNum).DesInletAirHumRat = TempSize; // coil report
                     WaterCoil(CoilNum).InletAirHumRat = TempSize;
-                    TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-
-                    EnergyPlus::HeatingAirflowUASizer sizer;
-                    sizer.zoneSizingInput = DataSizing::ZoneSizingInput;
-                    sizer.unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
-                    sizer.oaSysEqSizing = DataSizing::OASysEqSizing;
-
-                    EnergyPlus::HeatingAirflowUASizerFlags flags;
-                    baseFlags.printWarningFlag = false;
-                    flags.sizingString.clear(); // not reporting
-
-                    sizer.setParameters(baseFlags,
-                                        flags,
-                                        DataSizing::TermUnitSizing,
-                                        DataSizing::FinalZoneSizing,
-                                        DataSizing::ZoneEqSizing,
-                                        DataSizing::SysSizInput,
-                                        DataSizing::FinalSysSizing,
-                                        DataAirLoop::OutsideAirSys,
-                                        DataSizing::OASysEqSizing,
-                                        AirLoopHVACDOAS::airloopDOAS);
-                    AutoSizingResultType result = sizer.size(TempSize);
-                    WaterCoil(CoilNum).InletAirMassFlowRate = sizer.autoSizedValue;
                     WaterCoil(CoilNum).DesAirVolFlowRate = DataAirFlowUsedForSizing;                // coil report
                     WaterCoil(CoilNum).InletAirMassFlowRate = DataAirFlowUsedForSizing * StdRhoAir; // this is stiil volume flow!
                 } else {

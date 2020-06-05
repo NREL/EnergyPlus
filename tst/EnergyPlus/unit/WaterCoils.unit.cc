@@ -279,7 +279,6 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     CurZoneEqNum = 0;
     CurSysNum = 1;
     CurOASysNum = 0;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
     FinalSysSizing(1).DesMainVolFlow = 0.00359;
     FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * StdRhoAir;
     AirLoopControlInfo(1).UnitarySys = true;
@@ -344,7 +343,6 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
 
     // size zone water heating coil
     CurZoneEqNum = 1;
-    DataSizing::ZoneEqUnitarySys = true;
     CurSysNum = 0;
     PlantSizData(1).ExitTemp = 60.0;
     DataSizing::NumZoneSizingInput = 1;
