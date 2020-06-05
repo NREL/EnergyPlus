@@ -10,6 +10,7 @@ set(STATIC_EXE FALSE)
 
 set(SKIP_BUILD_RPATH TRUE)
 add_executable( convertESOMTR ${SRC} )
+set_target_properties(convertESOMTR PROPERTIES FOLDER Auxiliary)
 
 if(APPLE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")
