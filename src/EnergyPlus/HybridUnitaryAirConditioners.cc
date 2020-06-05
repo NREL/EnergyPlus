@@ -657,19 +657,19 @@ namespace HybridUnitaryAirConditioners {
                     Numberofoperatingmodes = Numbers(5) - 1; // zero based count
                 }
                 // N6, \field Minimum Time Between Mode Change
-                // A14, \field First fuel type
-                ZoneHybridUnitaryAirConditioner(UnitLoop).FirstFuelType = Alphas(14);
-                // A15, \field Second fuel type
-                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondFuelType = Alphas(15);
-                // A16, \field Third fuel type
-                ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelType = Alphas(16);
-                // A17, \field Objective Function Minimizes
+                // A15, \field First fuel type
+                ZoneHybridUnitaryAirConditioner(UnitLoop).FirstFuelType = Alphas(15);
+                // A16, \field Second fuel type
+                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondFuelType = Alphas(16);
+                // A17, \field Third fuel type
+                ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelType = Alphas(17);
+                // A18, \field Objective Function Minimizes
 
-                // A18, \ OA requirement pointer
-                ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(18), OARequirements);
+                // A19, \ OA requirement pointer
+                ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(19), OARequirements);
                 if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Alphas(1) + " invalid data");
-                    ShowContinueError("Invalid-not found" + cAlphaFieldNames(17) + "=\"" + Alphas(18) + "\".");
+                    ShowContinueError("Invalid-not found" + cAlphaFieldNames(18) + "=\"" + Alphas(19) + "\".");
                     ErrorsFound = true;
                 } else {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).OutdoorAir = true;

@@ -604,7 +604,8 @@ ZoneHVAC:HybridUnitaryHVAC,
     2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}
     ,                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}
     Yes,                     !- Fan Heat Included in Lookup Tables
-    ,                        !- Motor In Airstream Fraction
+    ,                        !- Fan Heat Gain Location
+    ,                        !- Fan Heat Gain in Airstream Fraction
     1,                       !- Scaling Factor
     6,                       !- Number of Operating Modes
     10,                      !- Minimum Time Between Mode Change {minutes}

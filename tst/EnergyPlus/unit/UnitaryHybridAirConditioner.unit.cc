@@ -342,8 +342,25 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_GT(Electricpower, 4000 / NormalizationDivisor * MinFlowFraction);
     EXPECT_LT(Electricpower, 5000 / NormalizationDivisor);
 
-    // check fan heat calculation if not included in lookup tables
+    // check fan heat calculation in supply air stream if not included in lookup tables
     pZoneHybridUnitaryAirConditioner->FanHeatGain = true;
+    pZoneHybridUnitaryAirConditioner->FanHeatGainLocation = "SupplyAirStream";
+    pZoneHybridUnitaryAirConditioner->FanHeatInAirFrac = 1.0;
+    pZoneHybridUnitaryAirConditioner->Initialize(1);
+    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+    pZoneHybridUnitaryAirConditioner->SecInletTemp = Tosa;
+    pZoneHybridUnitaryAirConditioner->SecInletHumRat = Wosa;
+    pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
+
+    // output results
+
+    Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
+    // check that supply air temperature increases due to fan heat
+    EXPECT_NEAR(Tsa, Tosa + 0.36, 0.1);
+
+    // check fan heat calculation in mixed air stream if not included in lookup tables
+    pZoneHybridUnitaryAirConditioner->FanHeatGain = true;
+    pZoneHybridUnitaryAirConditioner->FanHeatGainLocation = "MixedAirStream";
     pZoneHybridUnitaryAirConditioner->FanHeatInAirFrac = 1.0;
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
@@ -353,8 +370,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     // output results
     Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
-    // checks
-    EXPECT_NEAR(Tsa, Tosa + 0.66, 0.1);
+    // check that supply air stream is increased due to fan heat added to the mixed air stream and passing through to the supply air stream
+    EXPECT_NEAR(Tsa, Tosa + 0.36, 0.1);
 
     // Scenario 6: Availability Manager Off
     Requestedheating = -122396.255;  // Watts (Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate
@@ -509,7 +526,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing
                                                          "2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}",
                                                          ",                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}",
                                                          "Yes,                     !- Fan Heat Included in Lookup Tables",
-                                                         ",                        !- Motor In Airstream Fraction",
+                                                         ",                        !- Fan Heat Gain Location",
+                                                         ",                        !- Fan Heat Gain In Airstream Fraction",
                                                          "1,                       !- Scaling Factor",
                                                          "2,                       !- Number of Operating Modes",
                                                          "10,                      !- Minimum Time Between Mode Change {minutes}",
@@ -588,7 +606,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInp
                                        "2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}",
                                        ",                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}",
                                        "Yes,                     !- Fan Heat Included in Lookup Tables",
-                                       ",                        !- Motor In Airstream Fraction",
+                                       ",                        !- Fan Heat Gain Location",
+                                       ",                        !- Fan Heat Gain In Airstream Fraction",
                                        "1,                       !- Scaling Factor",
                                        "1,                       !- Number of Operating Modes",
                                        "10,                      !- Minimum Time Between Mode Change {minutes}",
@@ -631,7 +650,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
                                                          "2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}",
                                                          ",                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}",
                                                          "Yes,                     !- Fan Heat Included in Lookup Tables",
-                                                         ",                        !- Motor In Airstream Fraction",
+                                                         ",                        !- Fan Heat Gain Location",
+                                                         ",                        !- Fan Heat Gain In Airstream Fraction",
                                                          "2.0,                     !- Scaling Factor",
                                                          "1,                       !- Number of Operating Modes",
                                                          "10,                      !- Minimum Time Between Mode Change {minutes}",

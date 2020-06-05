@@ -122,7 +122,7 @@ namespace HybridEvapCoolingModel {
           Maximum_Outdoor_Air_Temperature(0.0), Minimum_Outdoor_Air_Humidity_Ratio(0.0), Maximum_Outdoor_Air_Humidity_Ratio(0.0), ModelScalingFactor(0.0)
     {
         MODE_BLOCK_OFFSET_Alpha = 9;
-        BLOCK_HEADER_OFFSET_Alpha = 20;
+        BLOCK_HEADER_OFFSET_Alpha = 21;
         MODE1_BLOCK_OFFSET_Number = 2;
         MODE_BLOCK_OFFSET_Number = 16;
         BLOCK_HEADER_OFFSET_Number = 7;
@@ -1393,16 +1393,44 @@ namespace HybridEvapCoolingModel {
                     }
 
                     if (MinVRMet) {
+                        // reset outside air temp and return air temp before calculating curve values for each mode
+                        StepIns.Tosa = SecInletTemp;
+                        StepIns.Tra = InletTemp;
+                        Real64 FanPower = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, SUPPLY_FAN_POWER) * ScalingFactor;
+
+                        // calculate power loss to air if in mixed air stream and divide fan heat between outside air stream and return air stream
+                        if (FanHeatGain && FanHeatGainLocation == "MixedAirStream") {
+                            PowerLossToAir = FanPower * FanHeatInAirFrac;
+                        } else {
+                            PowerLossToAir = 0.0;
+                        }
+                        Real64 FanHeatTempOA = PowerLossToAir / (PsyCpAirFnW(Wosa) * (ScaledMsa * OSAF));
+                        StepIns.Tosa = StepIns.Tosa + FanHeatTempOA;
+                        if (OSAF < 1.0) {
+                            Real64 FanHeatTempRA = PowerLossToAir / (PsyCpAirFnW(Wra) * (ScaledMsa * (1 - OSAF)));
+                            StepIns.Tra = StepIns.Tra + FanHeatTempRA;
+                        }
+
                         // Calculate prospective supply air temperature
                         Tsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, TEMP_CURVE);
+                        // Calculate prospective supply air Humidity Ratio
+                        Wsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, W_CURVE);
+
+                        // calculate power loss to supply air stream from fan power determined by curve value and fraction of fan heat in air stream
+                        if (FanHeatGain && FanHeatGainLocation == "SupplyAirStream") {
+                            PowerLossToAir = FanPower * FanHeatInAirFrac;
+                        } else {
+                            PowerLossToAir = 0.0;
+                        }
+                        FanHeatTemp = PowerLossToAir / (PsyCpAirFnW(Wsa) * ScaledMsa);
+                        Tsa = Tsa + FanHeatTemp;
+
                         // Check it meets constraints
                         if (MeetsSupplyAirTOC(Tsa)) {
                             SAT_OC_Met = SAT_OC_MetOnce = SAT_OC_MetinMode = true;
                         } else {
                             SAT_OC_Met = false;
                         }
-                        // Calculate prospective supply air Humidity Ratio
-                        Wsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, W_CURVE);
                         // Return Air Relative Humidity(0 - 100 % ) //Return Air Humidity Ratio(g / g)
                         if (MeetsSupplyAirRHOC(Wsa)) {
                             SARH_OC_Met = SAHR_OC_MetOnce = SAHR_OC_MetinMode = true;
@@ -1422,7 +1450,8 @@ namespace HybridEvapCoolingModel {
                             // If no load is requested but ventilation is required, set the supply air mass flow rate to the minimum of the required ventilation flow rate and the maximum supply air flow rate
                             if (!CoolingRequested && !HeatingRequested && !DehumidificationRequested && !HumidificationRequested) {
                                 CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = min(MinOA_Msa, CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate);
-                                Tsa = StepIns.Tosa;
+                                // add fan heat if not included in lookup tables for supply air stream
+                                Tsa = StepIns.Tosa + FanHeatTemp;
                             }
 
                             CandidateSetting.ScaledSupply_Air_Ventilation_Volume = CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate / StdRhoAir;
@@ -1896,17 +1925,10 @@ namespace HybridEvapCoolingModel {
         } else {
             SupplyVentilationAir = SupplyVentilationVolume * 1.225;
         }
-        // calculate power loss to air from fan power determined by curve value and fraction of fan heat in air stream
-        if (FanHeatGain){
-            PowerLossToAir = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER) * FanHeatInAirFrac;
-        } else {
-            PowerLossToAir = 0.0;
-        }
         // set timestep average outlet condition, considering all operating conditions and runtimes.
         Real64 Outletcp = PsyCpAirFnW(OutletHumRat); // J/degreesK.kg
         OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
-        FanHeatTemp = PowerLossToAir / (Outletcp * OutletMassFlowRate);
-        OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP) + FanHeatTemp);
+        OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP));
         OutletHumRat = CheckVal_W(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_HR), OutletTemp, OutletPressure);
 
         OutletRH = PsyRhFnTdbWPb(OutletTemp, OutletHumRat, OutletPressure);
