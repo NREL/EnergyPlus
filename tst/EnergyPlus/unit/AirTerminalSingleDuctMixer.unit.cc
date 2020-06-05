@@ -54,7 +54,6 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -7670,8 +7669,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     finalZoneSizing.CoolDesHumRat = 0.0085;
     finalZoneSizing.HeatDesTemp = 40.0;
     finalZoneSizing.HeatDesHumRat = 0.0075;
-    ZoneSizingInput.allocate(1);
-    ZoneSizingInput(1).ZoneNum = 1;
 
     // heating mode tests
     FanCoilUnits::CoolingLoad = false;
