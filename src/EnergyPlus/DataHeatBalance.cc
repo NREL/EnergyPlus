@@ -2469,7 +2469,7 @@ namespace DataHeatBalance {
 
     void ConstructionData::setNodeSourceAndUserTemp(int &sourceNodeLocation,
                                   int &userTempNodeLocation,
-                                  Array1D_int Nodes,
+                                  Array1D_int & Nodes,
                                   int NumOfPerpendNodes)
     {
         sourceNodeLocation = 0;
@@ -2480,14 +2480,14 @@ namespace DataHeatBalance {
             sourceNodeLocation += Nodes(Layer);
         }
         
-        if ((sourceNodeLocation > 0) && (this->SolutionDimensions > 1)) sourceNodeLocation = ((sourceNodeLocation - 1) * NumOfPerpendNodes) + 1;
+        if ((sourceNodeLocation > 0) && (this->SolutionDimensions > 1)) sourceNodeLocation = (sourceNodeLocation - 1) * NumOfPerpendNodes + 1;
 
         for (int Layer = 1; Layer <= this->TempAfterLayer; ++Layer) {
             userTempNodeLocation += Nodes(Layer);
         }
         
         if ((userTempNodeLocation > 0) && (this->SolutionDimensions > 1))
-            userTempNodeLocation = ((userTempNodeLocation - 1) * NumOfPerpendNodes)
+            userTempNodeLocation = (userTempNodeLocation - 1) * NumOfPerpendNodes
                                     + round(this->userTemperatureLocationPerpendicular * (NumOfPerpendNodes - 1)) + 1;
             
     }

@@ -1091,7 +1091,7 @@ namespace DataHeatBalance {
         
         void setNodeSourceAndUserTemp(int &sourceNodeLocation,
                                       int &userTempNodeLocation,
-                                      Array1D_int Nodes,
+                                      Array1D_int & Nodes,
                                       int NumOfPerpendNodes);
     };
 
