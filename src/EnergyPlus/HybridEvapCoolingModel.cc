@@ -125,7 +125,7 @@ namespace HybridEvapCoolingModel {
         BLOCK_HEADER_OFFSET_Alpha = 21;
         MODE1_BLOCK_OFFSET_Number = 2;
         MODE_BLOCK_OFFSET_Number = 16;
-        BLOCK_HEADER_OFFSET_Number = 7;
+        BLOCK_HEADER_OFFSET_Number = 6;
     }
 
     bool CMode::InitializeOutdoorAirTemperatureConstraints(Real64 min, Real64 max)
@@ -654,8 +654,8 @@ namespace HybridEvapCoolingModel {
             (*OperatingModes).push_back(*this);
             return ErrorsFound;
         }
-        // N9, \field Mode1  Minimum Outdoor Air Temperature
-        // N10, \field Mode1  Maximum Outdoor Air Temperature
+        // N8, \field Mode1  Minimum Outdoor Air Temperature
+        // N9, \field Mode1  Maximum Outdoor Air Temperature
         bool ok = InitializeOutdoorAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
@@ -663,8 +663,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N11, \field Mode1  Minimum Outdoor Air Humidity Ratio
-        // N12, \field Mode1  Maximum Outdoor Air Humidity Ratio
+        // N10, \field Mode1  Minimum Outdoor Air Humidity Ratio
+        // N11, \field Mode1  Maximum Outdoor Air Humidity Ratio
         ok = InitializeOutdoorAirHumidityRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
@@ -672,8 +672,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N13, \field Mode1 Minimum Outdoor Air Relative Humidity
-        // N14, \field Mode1 Maximum Outdoor Air Relative Humidity
+        // N12, \field Mode1 Minimum Outdoor Air Relative Humidity
+        // N13, \field Mode1 Maximum Outdoor Air Relative Humidity
         ok = InitializeOutdoorAirRelativeHumidityConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
@@ -681,8 +681,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N15, \field Mode1 Minimum Return Air Temperature
-        // N16, \field Mode1 Maximum Return Air Temperature
+        // N14, \field Mode1 Minimum Return Air Temperature
+        // N15, \field Mode1 Maximum Return Air Temperature
         ok = InitializeReturnAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
@@ -690,8 +690,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N17, \field Mode1 Minimum Return Air Humidity Ratio
-        // N18, \field Mode1 Maximum Return Air Humidity Ratio
+        // N16, \field Mode1 Minimum Return Air Humidity Ratio
+        // N17, \field Mode1 Maximum Return Air Humidity Ratio
         ok = InitializeReturnAirHumidityRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
@@ -699,8 +699,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N19, \field Mode1 Minimum Return Air Relative HumidityInitialize
-        // N20, \field Mode1 Maximum Return Air Relative Humidity
+        // N18, \field Mode1 Minimum Return Air Relative HumidityInitialize
+        // N19, \field Mode1 Maximum Return Air Relative Humidity
         ok = InitializeReturnAirRelativeHumidityConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cAlphaFields(inter_Number) + '=' + Alphas(inter_Number) + "Or Invalid" + cAlphaFields(inter_Number + 1) +
@@ -709,8 +709,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N21, \field Mode1 Minimum Outdoor Air Fraction
-        // N22, \field Mode1 Maximum Outdoor Air Fraction
+        // N20, \field Mode1 Minimum Outdoor Air Fraction
+        // N21, \field Mode1 Maximum Outdoor Air Fraction
 
         ok = InitializeOSAFConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
@@ -718,8 +718,8 @@ namespace HybridEvapCoolingModel {
             ShowContinueError("Entered in " + cCurrentModuleObject);
             ErrorsFound = true;
         }
-        // N23, \field Mode1 Minimum Supply Air Mass Flow Rate Ratio
-        // N24, \field Mode1 Maximum Supply Air Mass Flow Rate Ratio
+        // N22, \field Mode1 Minimum Supply Air Mass Flow Rate Ratio
+        // N23, \field Mode1 Maximum Supply Air Mass Flow Rate Ratio
         inter_Number = inter_Number + 2;
         ok = InitializeMsaRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {

@@ -14,4 +14,8 @@ Insert field 16, Fan Heat Gain Location.
 
 Insert field 17, Fan Heat Gain In Airstream Fraction.
 
-Remaining fields 18 onward are the same as previous fields 15 onwards. No other changes.
+Field 18, previous field 15. No other changes.
+
+Field 19, previous field 17. No other changes.
+
+Remaining fields 20 onward are the same as previous fields 18 onwards. No other changes.

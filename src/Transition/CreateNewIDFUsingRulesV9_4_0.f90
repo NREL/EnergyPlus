@@ -416,9 +416,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(16)=Blank
                   ! insert Fan Heat Gain In Airstream Fraction field
                   OutArgs(17)=Blank
+                  ! same Scaling Factor
+                  OutArgs(18)=InArgs(15)
+                  ! remove Number of Operating Modes
+                  OutArgs(19)=InArgs(17)
                   ! all others equal
-                  OutArgs(18:CurArgs+3)=InArgs(15:CurArgs)
-                  CurArgs = CurArgs + 3
+                  OutArgs(20:CurArgs+2)=InArgs(18:CurArgs)
+                  CurArgs = CurArgs + 2
                   NoDiff = .false.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

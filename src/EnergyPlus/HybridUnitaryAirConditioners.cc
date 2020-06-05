@@ -647,16 +647,16 @@ namespace HybridUnitaryAirConditioners {
                 }
 
                 // N5, \field Number of Operating Modes
-                int Numberofoperatingmodes = 0;
-                if (lNumericBlanks(5)) {
-                    ShowSevereError("Invalid number of operating modes" + cNumericFields(5));
-                    ShowFatalError(RoutineName + "Errors found in getting input.");
-                    ShowContinueError(
-                        "... Preceding condition causes terminascaler*1.2041*pZoneHybridUnitaryAirConditioner->SystemMaximumSupplyAirFlowRatetion.");
-                } else {
-                    Numberofoperatingmodes = Numbers(5) - 1; // zero based count
-                }
-                // N6, \field Minimum Time Between Mode Change
+//                int Numberofoperatingmodes = 0;
+//                if (lNumericBlanks(5)) {
+//                    ShowSevereError("Invalid number of operating modes" + cNumericFields(5));
+//                    ShowFatalError(RoutineName + "Errors found in getting input.");
+//                    ShowContinueError(
+//                        "... Preceding condition causes terminascaler*1.2041*pZoneHybridUnitaryAirConditioner->SystemMaximumSupplyAirFlowRatetion.");
+//                } else {
+//                    Numberofoperatingmodes = Numbers(5) - 1; // zero based count
+//                }
+                // N5, \field Minimum Time Between Mode Change
                 // A15, \field First fuel type
                 ZoneHybridUnitaryAirConditioner(UnitLoop).FirstFuelType = Alphas(15);
                 // A16, \field Second fuel type
@@ -674,6 +674,8 @@ namespace HybridUnitaryAirConditioners {
                 } else {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).OutdoorAir = true;
                 }
+
+                int Numberofoperatingmodes = 0;
 
                 for (int modeIter = 0; modeIter <= Numberofoperatingmodes; ++modeIter) {
                     ErrorsFound = ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(
