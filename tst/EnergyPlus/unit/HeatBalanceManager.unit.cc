@@ -2245,7 +2245,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(state);
     EXPECT_EQ(DataSurfaces::Surface(2).Construction, DataSurfaces::Surface(2).EMSConstructionOverrideValue);
 }
 
