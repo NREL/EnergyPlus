@@ -60,7 +60,10 @@ namespace EnergyPlus {
 
 namespace ReportSizingManager {
 
+    extern bool MyOneTimeFlag;
     // Functions
+
+    void clear_state();
 
     void ReportSizingOutput(std::string const &CompType,        // the type of the component
                             std::string const &CompName,        // the name of the component

@@ -120,7 +120,13 @@ namespace ReportSizingManager {
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
+    bool MyOneTimeFlag(true);
     // Functions
+
+    void clear_state()
+    {
+        MyOneTimeFlag = true;
+    }
 
     void ReportSizingOutput(std::string const &CompType,    // the type of the component
                             std::string const &CompName,    // the name of the component
@@ -150,21 +156,6 @@ namespace ReportSizingManager {
         using namespace DataPrecisionGlobals;
         using namespace OutputReportPredefined;
         using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
 
         // Formats
         static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");

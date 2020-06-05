@@ -53,8 +53,10 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -62,7 +64,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataWater.hh>
@@ -72,7 +73,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -80,6 +80,7 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
@@ -246,7 +247,8 @@ namespace WaterCoils {
         WaterCoilControllerCheckOneTimeFlag = true;
     }
 
-    void SimulateWaterCoilComponents(EnergyPlusData &state, std::string const &CompName,
+    void SimulateWaterCoilComponents(EnergyPlusData &state,
+                                     std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64> QActual,
@@ -960,7 +962,8 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(EnergyPlusData &state, OutputFiles &outputFiles,
+    void InitWaterCoil(EnergyPlusData &state,
+                       OutputFiles &outputFiles,
                        int const CoilNum,
                        bool const FirstHVACIteration // unused1208
     )
@@ -1103,7 +1106,10 @@ namespace WaterCoils {
 
             for (tempCoilNum = 1; tempCoilNum <= NumWaterCoils; ++tempCoilNum) {
                 GetControllerNameAndIndex(state,
-                    WaterCoil(tempCoilNum).WaterInletNodeNum, WaterCoil(tempCoilNum).ControllerName, WaterCoil(tempCoilNum).ControllerIndex, errFlag);
+                                          WaterCoil(tempCoilNum).WaterInletNodeNum,
+                                          WaterCoil(tempCoilNum).ControllerName,
+                                          WaterCoil(tempCoilNum).ControllerIndex,
+                                          errFlag);
             }
         }
 
@@ -1686,7 +1692,9 @@ namespace WaterCoils {
                     auto const SELECT_CASE_var(WaterCoil(CoilNum).WaterCoilType_Num);
                     if (SELECT_CASE_var == WaterCoil_SimpleHeating) {
                         if (RptCoilHeaderFlag(1)) {
-                            print(outputFiles.eio, "{}", "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}\n");
+                            print(outputFiles.eio,
+                                  "{}",
+                                  "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}\n");
                             RptCoilHeaderFlag(1) = false;
                         }
                         PreDefTableEntry(pdchHeatCoilType, WaterCoil(CoilNum).Name, "Coil:Heating:Water");
@@ -1953,8 +1961,7 @@ namespace WaterCoils {
                 // The fault shouldn't apply during sizing.
                 (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 // This was preexisting
-                !(MyUAAndFlowCalcFlag(CoilNum)))
-            {
+                !(MyUAAndFlowCalcFlag(CoilNum))) {
                 // Store original value
                 WaterCoil(CoilNum).OriginalUACoilVariable = WaterCoil(CoilNum).UACoilVariable;
 
@@ -1969,15 +1976,15 @@ namespace WaterCoils {
                     // R' = R + Rfoul
                     // Rfoul = r_air/A_air + r_water/A_water (FoulingFactor = thermal insulance [K/W, A] = Area [m2], r=fouling factor [m2.K/W]
                     Real64 FoulingFactor = FaultFrac * (fouling.Rfw / (fouling.Aratio * fouling.Aout) + fouling.Rfa / fouling.Aout);
-                    WaterCoil(CoilNum).UACoilVariable = 1.0 / ( (1.0 / WaterCoil(CoilNum).UACoilVariable) + FoulingFactor);
+                    WaterCoil(CoilNum).UACoilVariable = 1.0 / ((1.0 / WaterCoil(CoilNum).UACoilVariable) + FoulingFactor);
                 }
 
                 // Do not allow improving coil performance
                 WaterCoil(CoilNum).UACoilVariable = min(WaterCoil(CoilNum).UACoilVariable, WaterCoil(CoilNum).OriginalUACoilVariable);
 
                 // Only for reporting purposes
-                WaterCoil(CoilNum).FaultyCoilFoulingFactor = (1.0 / WaterCoil(CoilNum).UACoilVariable) -
-                                                             (1.0 / WaterCoil(CoilNum).OriginalUACoilVariable);
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor =
+                    (1.0 / WaterCoil(CoilNum).UACoilVariable) - (1.0 / WaterCoil(CoilNum).OriginalUACoilVariable);
             } else {
                 WaterCoil(CoilNum).FaultyCoilFoulingFactor = 0;
             }
@@ -2015,12 +2022,10 @@ namespace WaterCoils {
                 // The fault shouldn't apply during sizing.
                 (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 // This was preexisting
-                !(MyUAAndFlowCalcFlag(CoilNum)))
-            {
+                !(MyUAAndFlowCalcFlag(CoilNum))) {
                 // Store original value
                 // This is really UACoilTotal technically, but I don't see the point of declaring another Real on the struct just for that
-                WaterCoil(CoilNum).OriginalUACoilVariable = 1.0 /
-                    (1.0 / WaterCoil(CoilNum).UACoilExternal + 1.0 / WaterCoil(CoilNum).UACoilInternal);
+                WaterCoil(CoilNum).OriginalUACoilVariable = 1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + 1.0 / WaterCoil(CoilNum).UACoilInternal);
 
                 WaterCoil(CoilNum).OriginalUACoilExternal = WaterCoil(CoilNum).UACoilExternal;
                 WaterCoil(CoilNum).OriginalUACoilInternal = WaterCoil(CoilNum).UACoilInternal;
@@ -2058,16 +2063,14 @@ namespace WaterCoils {
 
                     Real64 splitRatio = WaterCoil(CoilNum).UACoilInternal / WaterCoil(CoilNum).UACoilExternal;
 
-                    WaterCoil(CoilNum).UACoilExternal =   1.0 /
-                        ( (FaultFrac * splitRatio) / ((1 + splitRatio) * fouling.UAFouled) +
-                          (1-FaultFrac) / WaterCoil(CoilNum).UACoilExternal);
+                    WaterCoil(CoilNum).UACoilExternal = 1.0 / ((FaultFrac * splitRatio) / ((1 + splitRatio) * fouling.UAFouled) +
+                                                               (1 - FaultFrac) / WaterCoil(CoilNum).UACoilExternal);
 
-                    //WaterCoil(CoilNum).UACoilInternal =   1.0 /
-                        //( FaultFrac / ((1 + splitRatio) * fouling.UAFouled) +
-                          //(1-FaultFrac) / WaterCoil(CoilNum).UACoilInternal);
+                    // WaterCoil(CoilNum).UACoilInternal =   1.0 /
+                    //( FaultFrac / ((1 + splitRatio) * fouling.UAFouled) +
+                    //(1-FaultFrac) / WaterCoil(CoilNum).UACoilInternal);
 
                     WaterCoil(CoilNum).UACoilInternal = splitRatio * WaterCoil(CoilNum).UACoilExternal;
-
                 }
 
                 // Do not allow improving coil performance
@@ -2075,16 +2078,14 @@ namespace WaterCoils {
                 WaterCoil(CoilNum).UACoilInternal = min(WaterCoil(CoilNum).UACoilInternal, WaterCoil(CoilNum).OriginalUACoilInternal);
 
                 // Only for reporting purposes
-                WaterCoil(CoilNum).FaultyCoilFoulingFactor = (1.0 / WaterCoil(CoilNum).UACoilExternal) -
-                                                             (1.0 / WaterCoil(CoilNum).OriginalUACoilExternal) +
-                                                             (1.0 / WaterCoil(CoilNum).UACoilInternal) -
-                                                             (1.0 / WaterCoil(CoilNum).OriginalUACoilInternal);
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor =
+                    (1.0 / WaterCoil(CoilNum).UACoilExternal) - (1.0 / WaterCoil(CoilNum).OriginalUACoilExternal) +
+                    (1.0 / WaterCoil(CoilNum).UACoilInternal) - (1.0 / WaterCoil(CoilNum).OriginalUACoilInternal);
             } else {
                 WaterCoil(CoilNum).FaultyCoilFoulingFactor = 0;
             }
 
-            WaterCoil(CoilNum).UACoilTotal = 1.0 /
-                (1.0 / WaterCoil(CoilNum).UACoilExternal + 1.0 / WaterCoil(CoilNum).UACoilInternal);
+            WaterCoil(CoilNum).UACoilTotal = 1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + 1.0 / WaterCoil(CoilNum).UACoilInternal);
 
             WaterCoil(CoilNum).UACoilInternalPerUnitArea = WaterCoil(CoilNum).UACoilInternal / WaterCoil(CoilNum).TotCoilOutsideSurfArea;
             WaterCoil(CoilNum).UAWetExtPerUnitArea = WaterCoil(CoilNum).UACoilExternal / WaterCoil(CoilNum).TotCoilOutsideSurfArea;
@@ -2092,8 +2093,7 @@ namespace WaterCoils {
         }
     }
 
-    void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
-    {
+    void SizeWaterCoil(EnergyPlusData& state, int const CoilNum) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -2179,6 +2179,17 @@ namespace WaterCoils {
         baseFlags.doSystemSizing = DataGlobals::DoSystemSizing;
         baseFlags.numZoneSizingInput = DataSizing::NumZoneSizingInput;
         baseFlags.doZoneSizing = DataGlobals::DoZoneSizing;
+        baseFlags.curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
+        baseFlags.curZoneEqNum = DataSizing::CurZoneEqNum;
+        baseFlags.curSysNum = DataSizing::CurSysNum;
+        baseFlags.curOASysNum = DataSizing::CurOASysNum;
+        baseFlags.termUnitSingDuct = DataSizing::TermUnitSingDuct;
+        baseFlags.termUnitPIU = DataSizing::TermUnitPIU;
+        baseFlags.termUnitIU = DataSizing::TermUnitIU;
+        baseFlags.zoneEqFanCoil = DataSizing::ZoneEqFanCoil;
+        baseFlags.otherEqType = DataSizing::ZoneEqUnitHeater || DataSizing::ZoneEqUnitVent || DataSizing::ZoneEqVentedSlab ||
+                                DataSizing::ZoneEqDXCoil || DataSizing::ZoneEqUnitarySys || DataSizing::ZoneEqOutdoorAirUnit;
+
 
         // cooling coils
         if (WaterCoil(CoilNum).WaterCoilType == CoilType_Cooling && WaterCoil(CoilNum).RequestingAutoSize) {
@@ -2283,7 +2294,7 @@ namespace WaterCoils {
                     } else {
                         FieldNum = 6; //  N6 , \field Design Inlet Air Humidity Ratio
                         bPRINT = true;
-                        TempSize = WaterCoil(CoilNum).DesInletAirHumRat;                     // preserve input if entered
+                        TempSize = WaterCoil(CoilNum).DesInletAirHumRat; // preserve input if entered
                         SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [kgWater/kgDryAir]";
                     }
                     RequestSizing(state, CompType, CompName, CoolingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
@@ -2329,7 +2340,7 @@ namespace WaterCoils {
                 } else {
                     FieldNum = 7; //  N7 , \field Design Outlet Air Humidity Ratio
                     bPRINT = true;
-                    TempSize = WaterCoil(CoilNum).DesOutletAirHumRat;                    // preserve input if entered
+                    TempSize = WaterCoil(CoilNum).DesOutletAirHumRat; // preserve input if entered
                     SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [kgWater/kgDryAir]";
                 }
                 RequestSizing(state, CompType, CompName, CoolingWaterDesAirOutletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName);
@@ -2646,14 +2657,19 @@ namespace WaterCoils {
                     sizer.oaSysEqSizing = DataSizing::OASysEqSizing;
 
                     EnergyPlus::HeatingAirflowUASizerFlags flags;
-                    flags.curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
-                    flags.curZoneEqNum = DataSizing::CurZoneEqNum;
-                    flags.termUnitSingDuct = DataSizing::TermUnitSingDuct;
-                    flags.termUnitPIU = DataSizing::TermUnitPIU;
-                    flags.termUnitIU = DataSizing::TermUnitIU;
                     baseFlags.printWarningFlag = false;
+                    flags.sizingString.clear(); // not reporting
 
-                    sizer.setParameters(baseFlags, flags, DataSizing::TermUnitSizing, DataSizing::FinalZoneSizing, DataSizing::ZoneEqSizing);
+                    sizer.setParameters(baseFlags,
+                                        flags,
+                                        DataSizing::TermUnitSizing,
+                                        DataSizing::FinalZoneSizing,
+                                        DataSizing::ZoneEqSizing,
+                                        DataSizing::SysSizInput,
+                                        DataSizing::FinalSysSizing,
+                                        DataAirLoop::OutsideAirSys,
+                                        DataSizing::OASysEqSizing,
+                                        AirLoopHVACDOAS::airloopDOAS);
                     AutoSizingResultType result = sizer.size(TempSize);
                     WaterCoil(CoilNum).InletAirMassFlowRate = sizer.autoSizedValue;
                     WaterCoil(CoilNum).DesAirVolFlowRate = DataAirFlowUsedForSizing;                // coil report
@@ -2672,17 +2688,42 @@ namespace WaterCoils {
                     sizer.zoneSizingInput = DataSizing::ZoneSizingInput;
                     sizer.unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
                     sizer.oaSysEqSizing = DataSizing::OASysEqSizing;
+                    sizer.outsideAirSys = DataAirLoop::OutsideAirSys;
 
                     EnergyPlus::HeatingAirflowUASizerFlags flags;
-                    flags.curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
-                    flags.curZoneEqNum = DataSizing::CurZoneEqNum;
-                    flags.termUnitSingDuct = DataSizing::TermUnitSingDuct;
-                    flags.termUnitPIU = DataSizing::TermUnitPIU;
-                    flags.termUnitIU = DataSizing::TermUnitIU;
-                    baseFlags.printWarningFlag = true;
-                    flags.sizingString = "Test my coil UA air flow";
+                    baseFlags.printWarningFlag = false;
+                    flags.sizingString = "Heating Coil Airflow For UA";
 
-                    sizer.setParameters(baseFlags, flags, DataSizing::TermUnitSizing, DataSizing::FinalZoneSizing, DataSizing::ZoneEqSizing);
+                    flags.sizingString.clear(); // not reporting
+                    // if (DataSizing::TermUnitSingDuct || DataSizing::TermUnitPIU || DataSizing::TermUnitIU) {
+                    // CurZoneEqNum - identifies whether zone or air loop coil (curSysNum should be 0)
+                    // TermUnitSingDuct - identifies coil type/location (only 1 of these is true)
+                    // TermUnitPIU - identifies coil type/location (only 1 of these is true)
+                    // TermUnitIU - identifies coil type/location (only 1 of these is true)
+                    // TermUnitSizing - sizing array for TUs
+                    // ZoneEqSizing - array set by parent - e.g., DesignSizeFromParent
+                    // ZoneSizingRunDone - zone sizing was requested (zone unknown)
+                    // ZoneSizingInput - zone sizing inputs (w/ zone number)
+                    // printFlag - output reporting (false for this sizing call)
+                    // sizingString - coil field name being sized (not needed for this sizing call)
+                    //} else if (DataSizing::ZoneEqFanCoil) {
+                    // curZoneEqNum - identifies whether zone or air loop coil (curSysNum should be 0)
+                    // ZoneEqFanCoil - identifies coil type/location
+                    // FinalZoneSizing - zone sizing array
+                    //} else if (ZoneEqSizing(CurZoneEqNum).SystemAirFlow || ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
+                    //} else {
+                    //}
+                    sizer.setParameters(baseFlags,
+                                        flags,
+                                        DataSizing::TermUnitSizing,
+                                        DataSizing::FinalZoneSizing,
+                                        DataSizing::ZoneEqSizing,
+                                        DataSizing::SysSizInput,
+                                        DataSizing::FinalSysSizing,
+                                        DataAirLoop::OutsideAirSys,
+                                        DataSizing::OASysEqSizing,
+                                        AirLoopHVACDOAS::airloopDOAS);
+
                     AutoSizingResultType result = sizer.size(TempSize);
                     WaterCoil(CoilNum).DesAirMassFlowRate = sizer.autoSizedValue; // coil report
                     WaterCoil(CoilNum).InletAirMassFlowRate = sizer.autoSizedValue;
@@ -2699,7 +2740,8 @@ namespace WaterCoils {
                     RequestSizing(state, CompType, CompName, HeatingWaterDesCoilLoadUsedForUASizing, SizingString, TempSize, bPRINT, RoutineName);
                     DataCapacityUsedForSizing = TempSize;
                     TempSize = AutoSize; // get the water volume flow rate used to size UA
-                    RequestSizing(state, CompType, CompName, HeatingWaterDesCoilWaterVolFlowUsedForUASizing, SizingString, TempSize, bPRINT, RoutineName);
+                    RequestSizing(
+                        state, CompType, CompName, HeatingWaterDesCoilWaterVolFlowUsedForUASizing, SizingString, TempSize, bPRINT, RoutineName);
                     DataWaterFlowUsedForSizing = TempSize;
                     WaterCoil(CoilNum).InletWaterTemp = PlantSizData(PltSizHeatNum).ExitTemp;
                     WaterCoil(CoilNum).InletWaterMassFlowRate = rho * DataWaterFlowUsedForSizing;
@@ -5755,7 +5797,8 @@ namespace WaterCoils {
         return MaxWaterFlowRate;
     }
 
-    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state),
+                         std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -5806,7 +5849,8 @@ namespace WaterCoils {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state),
+                          std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )
@@ -6105,7 +6149,8 @@ namespace WaterCoils {
         }
     }
 
-    void CheckForSensorAndSetPointNode(EnergyPlusData &state, int const SensorNodeNum, // controller sensor node number
+    void CheckForSensorAndSetPointNode(EnergyPlusData &state,
+                                       int const SensorNodeNum, // controller sensor node number
                                        int const ControlledVar, // controlled variable type
                                        bool &NodeNotFound       // true if matching air outlet node not found
     )

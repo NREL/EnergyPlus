@@ -115,9 +115,9 @@ public:
         WaterCoil.allocate(NumWaterCoils);
         WaterCoilNumericFields.allocate(NumWaterCoils);
         WaterCoilNumericFields(NumWaterCoils).FieldNames.allocate(17); // max N fields for water coil
-        TotNumLoops = 1;
+        TotNumLoops = 2;
         PlantLoop.allocate(TotNumLoops);
-        PlantSizData.allocate(1);
+        PlantSizData.allocate(2);
         ZoneEqSizing.allocate(1);
         UnitarySysEqSizing.allocate(1);
         OASysEqSizing.allocate(1);
@@ -220,8 +220,10 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     CurSysNum = 1;
     CurOASysNum = 0;
     SysSizInput(1).CoolCapControl = VAV;
+    SysSizInput(1).AirLoopNum = 1;
     PlantSizData(1).ExitTemp = 5.7;
     PlantSizData(1).DeltaT = 5.0;
+    PlantSizData(2).DeltaT = 5.0;
     FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * StdRhoAir;
     DataWaterLoopNum = 1;
     NumOfGlycols = 1;
@@ -279,9 +281,11 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     CurZoneEqNum = 0;
     CurSysNum = 1;
     CurOASysNum = 0;
+    DataHVACGlobals::NumPrimaryAirSys = 1;
     FinalSysSizing(1).DesMainVolFlow = 0.00359;
     FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * StdRhoAir;
     AirLoopControlInfo(1).UnitarySys = true;
+    DataSizing::ZoneEqUnitarySys = true;
 
     WaterCoil(CoilNum).Name = "Test Water Heating Coil";
     WaterCoil(CoilNum).WaterCoilType = CoilType_Heating;

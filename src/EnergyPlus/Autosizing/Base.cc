@@ -45,119 +45,164 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
 
-    void BaseSizer::preSize(CommonFlags & flags, Real64 const _originalValue) {
-        if (this->sizingType == AutoSizingType::Unknown) {
-            // TODO: FATAL ERROR, DERIVED CLASSES MUST SET THE SIZING TYPE MEMBER VARIABLE PRIOR TO CALLING
-        }
-        this->originalValue = _originalValue;
-        this->hardSizeNoDesignRun = !(flags.sysSizingRunDone || flags.zoneSizingRunDone);
+void BaseSizer::preSize(CommonFlags &flags, Real64 const _originalValue)
+{
+    if (this->sizingType == AutoSizingType::Unknown) {
+        ShowSevereError("Sizing Library Base Class: preSize");
+        ShowFatalError("Developer Error: SizingType not defined.");
+    }
+    this->originalValue = _originalValue;
+    this->hardSizeNoDesignRun = !(flags.sysSizingRunDone || flags.zoneSizingRunDone);
 
-        if (flags.curSysNum > 0 && flags.curSysNum <= flags.numPrimaryAirSys) {
-            if (flags.sysSizingRunDone) {
-                for (auto & sizingInput : this->sysSizingInputData) {
-                    if (sizingInput.AirLoopNum == flags.curSysNum) {
-                        this->sizingDesRunThisAirSys = true;
-                        break;
-                    }
+    if (flags.curSysNum > 0 && flags.curSysNum <= flags.numPrimaryAirSys) {
+        if (flags.sysSizingRunDone) {
+            for (auto &sizingInput : this->sysSizingInputData) {
+                if (sizingInput.AirLoopNum == flags.curSysNum) {
+                    this->sizingDesRunThisAirSys = true;
+                    break;
                 }
             }
-            this->airLoopSysFlag = this->unitarySysEqSizing(flags.curSysNum).CoolingCapacity || this->unitarySysEqSizing(flags.curSysNum).HeatingCapacity;
-            if (flags.curOASysNum > 0) {
-                this->oaSysFlag = this->oaSysEqSizing(flags.curOASysNum).CoolingCapacity || this->oaSysEqSizing(flags.curOASysNum).HeatingCapacity;
-            }
         }
+        if (this->unitarySysEqSizing.allocated())
+            this->airLoopSysFlag =
+                this->unitarySysEqSizing(flags.curSysNum).CoolingCapacity || this->unitarySysEqSizing(flags.curSysNum).HeatingCapacity;
+        if (flags.curOASysNum > 0) {
+            this->oaSysFlag = this->oaSysEqSizing(flags.curOASysNum).CoolingCapacity || this->oaSysEqSizing(flags.curOASysNum).HeatingCapacity;
+        }
+    }
 
-        if (flags.curZoneEqNum > 0) {
+    if (flags.curZoneEqNum > 0) {
+
+        if (this->zoneEqSizing.allocated()) {
             this->sizingDesValueFromParent = this->zoneEqSizing(flags.curZoneEqNum).DesignSizeFromParent;
-            if (flags.zoneSizingRunDone) {
-                for (auto & sizingInput : this->zoneSizingInput) {
-                    if (sizingInput.ZoneNum == flags.curZoneEqNum) {
-                        this->sizingDesRunThisZone = true;
-                        break;
-                    }
+        }
+        if (flags.zoneSizingRunDone) {
+            for (auto &sizingInput : this->zoneSizingInput) {
+                if (sizingInput.ZoneNum == flags.curZoneEqNum) {
+                    this->sizingDesRunThisZone = true;
+                    break;
                 }
             }
-
-            hardSizeNoDesignRun = false;
         }
 
-        if (this->originalValue == DataSizing::AutoSize) {
-            this->wasAutoSized = true;
-            hardSizeNoDesignRun = false;
-            if (!this->sizingDesRunThisAirSys && flags.curSysNum > 0 && this->sizingType != AutoSizingType::AutoCalculate) {
-                if (!flags.sysSizingRunDone) {
-                    ShowSevereError("For autosizing of " + flags.compType + ' ' + flags.compName + ", a system sizing run must be done.");
-                    if (flags.numSysSizInput == 0) {
-                        ShowContinueError("No \"Sizing:System\" objects were entered.");
-                    }
-                    if (!flags.doSystemSizing) {
-                        ShowContinueError(R"(The "SimulationControl" object did not have the field "Do System Sizing Calculation" set to Yes.)");
-                    }
-                    ShowFatalError("Program terminates due to previously shown condition(s).");
+        hardSizeNoDesignRun = false;
+    }
+
+    if (this->originalValue == DataSizing::AutoSize) {
+        this->wasAutoSized = true;
+        hardSizeNoDesignRun = false;
+        if (!this->sizingDesRunThisAirSys && flags.curSysNum > 0 && this->sizingType != AutoSizingType::AutoCalculate) {
+            if (!flags.sysSizingRunDone) {
+                ShowSevereError("For autosizing of " + flags.compType + ' ' + flags.compName + ", a system sizing run must be done.");
+                if (flags.numSysSizInput == 0) {
+                    ShowContinueError("No \"Sizing:System\" objects were entered.");
                 }
+                if (!flags.doSystemSizing) {
+                    ShowContinueError(R"(The "SimulationControl" object did not have the field "Do System Sizing Calculation" set to Yes.)");
+                }
+                ShowFatalError("Program terminates due to previously shown condition(s).");
             }
-            if (!this->sizingDesRunThisZone && flags.curZoneEqNum > 0 && !this->sizingDesValueFromParent && this->sizingType != AutoSizingType::AutoCalculate) {
-                if (!flags.zoneSizingRunDone) {
-                    ShowSevereError("For autosizing of " + flags.compType + ' ' + flags.compName + ", a zone sizing run must be done.");
-                    if (flags.numZoneSizingInput == 0) {
-                        ShowContinueError("No \"Sizing:Zone\" objects were entered.");
-                    }
-                    if (!flags.doZoneSizing) {
-                        ShowContinueError(R"(The "SimulationControl" object did not have the field "Do Zone Sizing Calculation" set to Yes.)");
-                    }
-                    ShowFatalError("Program terminates due to previously shown condition(s).");
+        }
+        if (!this->sizingDesRunThisZone && flags.curZoneEqNum > 0 && !this->sizingDesValueFromParent &&
+            this->sizingType != AutoSizingType::AutoCalculate) {
+            if (!flags.zoneSizingRunDone) {
+                ShowSevereError("For autosizing of " + flags.compType + ' ' + flags.compName + ", a zone sizing run must be done.");
+                if (flags.numZoneSizingInput == 0) {
+                    ShowContinueError("No \"Sizing:Zone\" objects were entered.");
                 }
+                if (!flags.doZoneSizing) {
+                    ShowContinueError(R"(The "SimulationControl" object did not have the field "Do Zone Sizing Calculation" set to Yes.)");
+                }
+                ShowFatalError("Program terminates due to previously shown condition(s).");
             }
         }
     }
-
-    void BaseSizer::reportSizerOutput(std::string const &CompType,
-                           std::string const &CompName,
-                           std::string const &VarDesc,
-                           Real64 const VarValue,
-                           Optional_string_const UsrDesc,
-                           Optional<Real64 const> UsrValue)
-    {
-
-        static bool MyOneTimeFlag(true);
-
-        // Formats
-        static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
-
-        // to do, make this a parameter. Unfortunately this function is used in MANY
-        // places so it involves touching most of E+
-        auto &outputFiles = EnergyPlus::OutputFiles::getSingleton();
-        if (MyOneTimeFlag) {
-            static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
-            print(outputFiles.eio, Format_990);
-            MyOneTimeFlag = false;
-        }
-
-        print(outputFiles.eio, Format_991, CompType, CompName, VarDesc, VarValue);
-        // add to tabular output reports
-        OutputReportPredefined::AddCompSizeTableEntry(CompType, CompName, VarDesc, VarValue);
-
-        if (present(UsrDesc) && present(UsrValue)) {
-            print(outputFiles.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
-            OutputReportPredefined::AddCompSizeTableEntry(CompType, CompName, UsrDesc, UsrValue);
-        } else if (present(UsrDesc) || present(UsrValue)) {
-            ShowFatalError("ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");
-        }
-
-        // add to SQL output
-        if (sqlite) sqlite->addSQLiteComponentSizingRecord(CompType, CompName, VarDesc, VarValue);
-        if (present(UsrDesc) && present(UsrValue)) {
-            if (sqlite) sqlite->addSQLiteComponentSizingRecord(CompType, CompName, UsrDesc, UsrValue);
-        }
-    }
-
 }
+
+void BaseSizer::reportSizerOutput(std::string const &CompType,
+                                  std::string const &CompName,
+                                  std::string const &VarDesc,
+                                  Real64 const VarValue,
+                                  Optional_string_const UsrDesc,
+                                  Optional<Real64 const> UsrValue)
+{
+
+    static bool MyOneTimeFlag(true);
+
+    // Formats
+    static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
+
+    // to do, make this a parameter. Unfortunately this function is used in MANY
+    // places so it involves touching most of E+
+    auto &outputFiles = EnergyPlus::OutputFiles::getSingleton();
+    if (MyOneTimeFlag) {
+        static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
+        if (ReportSizingManager::MyOneTimeFlag) print(outputFiles.eio, Format_990);
+        ReportSizingManager::MyOneTimeFlag = false;
+        MyOneTimeFlag = false;
+    }
+
+    print(outputFiles.eio, Format_991, CompType, CompName, VarDesc, VarValue);
+    // add to tabular output reports
+    OutputReportPredefined::AddCompSizeTableEntry(CompType, CompName, VarDesc, VarValue);
+
+    if (present(UsrDesc) && present(UsrValue)) {
+        print(outputFiles.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
+        OutputReportPredefined::AddCompSizeTableEntry(CompType, CompName, UsrDesc, UsrValue);
+    } else if (present(UsrDesc) || present(UsrValue)) {
+        ShowFatalError("ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");
+    }
+
+    // add to SQL output
+    if (sqlite) sqlite->addSQLiteComponentSizingRecord(CompType, CompName, VarDesc, VarValue);
+    if (present(UsrDesc) && present(UsrValue)) {
+        if (sqlite) sqlite->addSQLiteComponentSizingRecord(CompType, CompName, UsrDesc, UsrValue);
+    }
+}
+
+void BaseSizer::selectSizerOutput(std::string &sizingString)
+{
+    if (this->baseFlags.printWarningFlag) {
+        if (this->wasAutoSized && this->autoSizedValue > 0.0) {
+            this->reportSizerOutput(this->baseFlags.compType, this->baseFlags.compName, "Design Size " + sizingString, this->autoSizedValue);
+        } else if (this->autoSizedValue > 0.0) {
+            if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
+                this->reportSizerOutput(this->baseFlags.compType,
+                                        this->baseFlags.compName,
+                                        "Design Size " + sizingString,
+                                        this->autoSizedValue,
+                                        "User-Specified " + sizingString,
+                                        this->originalValue);
+            } else {
+                this->reportSizerOutput(this->baseFlags.compType, this->baseFlags.compName, "User-Specified " + sizingString, this->originalValue);
+            }
+            if (DataGlobals::DisplayExtraWarnings) {
+                if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
+                    ShowMessage(this->baseFlags.callingRoutine + ": Potential issue with equipment sizing for " + this->baseFlags.compType + ' ' +
+                                this->baseFlags.compName);
+                    ShowContinueError("User-Specified " + sizingString + " = " + General::RoundSigDigits(this->originalValue, 5));
+                    ShowContinueError("differs from Design Size " + sizingString + " = " + General::RoundSigDigits(this->autoSizedValue, 5));
+                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
+                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                }
+            }
+            this->autoSizedValue = this->originalValue;
+        } else {
+            ShowSevereError(this->baseFlags.callingRoutine + ' ' + this->baseFlags.compType + ' ' + this->baseFlags.compName +
+                            ", Developer Error: Component sizing incomplete.");
+            ShowContinueError("SizingString = " + sizingString + ", SizingResult = " + General::TrimSigDigits(this->originalValue, 1));
+        }
+    }
+}
+} // namespace EnergyPlus
