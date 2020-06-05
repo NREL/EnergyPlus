@@ -78,7 +78,6 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
 
     WaterManager::GetWaterManagerInput();
 
-    ScheduleManager::Schedule.allocate(1);
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
     WaterManager::UpdatePrecipitation();
@@ -91,8 +90,6 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
 
     Real64 CurrentRate = DataWater::RainFall.CurrentRate;
     EXPECT_NEAR(CurrentRate, ExpectedCurrentRate, 0.000001);
-
-    ScheduleManager::Schedule.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
@@ -114,7 +111,6 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
     ASSERT_TRUE(process_idf(idf_objects));
     WaterManager::GetWaterManagerInput();
 
-    ScheduleManager::Schedule.allocate(1);
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
     WaterManager::UpdatePrecipitation();
@@ -124,6 +120,4 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
 
     Real64 CurrentRate = DataWater::RainFall.CurrentRate;
     EXPECT_NEAR(CurrentRate, 0.0, 0.000001);
-
-    ScheduleManager::Schedule.deallocate();
 }
