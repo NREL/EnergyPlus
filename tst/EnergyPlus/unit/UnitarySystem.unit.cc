@@ -387,7 +387,6 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     DataSizing::FinalSysSizing(1).SysAirMinFlowRat = 0.3;
     Real64 heatFlowRat = 0.3;
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VAV;
-//    DataSizing::SysSizInput(1).AirLoopNum = 1;
     DataSizing::PlantSizData(1).ExitTemp = 5.7;
     DataSizing::PlantSizData(1).DeltaT = 5.0;
     DataSizing::FinalSysSizing(1).MassFlowAtCoolPeak = DataSizing::FinalSysSizing(1).DesMainVolFlow * DataEnvironment::StdRhoAir;
