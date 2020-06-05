@@ -1,6 +1,7 @@
 """
 Parse the LaTeX log file.
 """
+import copy
 import json
 import os
 import os.path
@@ -379,6 +380,28 @@ def parse_log(log_path, src_dir, verbose=VERBOSE):
     return log_parser()
 
 
+def update_paths_to_be_from_repo_root(issues, repo_root_to_src):
+    """
+    - issues: (Array {'file': string, ...})
+    - repo_root_to_src: string, path from repository root to directory where
+      src/ folder is.
+    RETURN: (Array {'file': string, ...})
+    """
+    updated = []
+    for issue in issues:
+        update = copy.deepcopy(issue)
+        if 'locations' in update:
+            new_locs = []
+            for location in update['locations']:
+                loc = copy.deepcopy(location)
+                if 'file' in location:
+                    loc['file'] = os.path.join(repo_root_to_src, location['file'])
+                new_locs.append(loc)
+            update['locations'] = new_locs
+        updated.append(update)
+    return updated
+
+
 def find_issues(log_path, json_error_path, src_dir):
     """
     - log_path: string, path to LaTeX log file to read
@@ -394,6 +417,13 @@ def find_issues(log_path, json_error_path, src_dir):
     """
     try:
         errs = parse_log(log_path, src_dir)
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(log_path), '..', '..'))
+        repo_root_to_src = os.path.relpath(src_dir, start=repo_root)
+        print(f"repo_root = {repo_root}")
+        print(f"repo_root_to_src = {repo_root_to_src}")
+        errs['issues'] = update_paths_to_be_from_repo_root(
+                errs['issues'],
+                repo_root_to_src)
     except Exception as e:
         import traceback
         print("issue encountered in parsing log: {}".format(e))
