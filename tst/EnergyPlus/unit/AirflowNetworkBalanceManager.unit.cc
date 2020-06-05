@@ -98,7 +98,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestOtherSideCoefficients
 
     int i = 2;
 
-    AirflowNetworkNumOfExtSurfaces = 2;
+    dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces = 2;
     AirflowNetwork::AirflowNetworkNumOfSurfaces = 2;
 
     AirflowNetwork::MultizoneSurfaceData.allocate(i);
@@ -13455,7 +13455,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
 
     Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
-    AirflowNetworkGetInputFlag = false;
+    dataAirflowNetworkBalanceManager.AirflowNetworkGetInputFlag = false;
     AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
     ManageAirflowNetworkBalance(state, First, iter, resimu);
     EXPECT_FALSE(resimu);
@@ -15579,9 +15579,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     AirflowNetwork::AirflowNetworkNodeData(1).Name = "ATTIC ZONE";
     AirflowNetwork::AirflowNetworkNodeData(1).EPlusZoneNum = 1;
 
-    AirflowNetworkBalanceManager::SplitterNodeNumbers.allocate(2);
-    AirflowNetworkBalanceManager::SplitterNodeNumbers(1) = 0;
-    AirflowNetworkBalanceManager::SplitterNodeNumbers(2) = 0;
+    dataAirflowNetworkBalanceManager.SplitterNodeNumbers.allocate(2);
+    dataAirflowNetworkBalanceManager.SplitterNodeNumbers(1) = 0;
+    dataAirflowNetworkBalanceManager.SplitterNodeNumbers(2) = 0;
 
 
     // MixedAir::NumOAMixers.allocate(1);

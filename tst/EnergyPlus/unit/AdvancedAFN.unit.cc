@@ -86,28 +86,28 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     int CurveNum;
 
     AirflowNetworkNumOfOccuVentCtrls = 1;
-    OccupantVentilationControl.allocate(AirflowNetworkNumOfOccuVentCtrls);
-    OccupantVentilationControl(1).MinOpeningTime = 4;
-    OccupantVentilationControl(1).MinClosingTime = 4;
-    OccupantVentilationControl(1).MinTimeControlOnly = true;
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl.allocate(AirflowNetworkNumOfOccuVentCtrls);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).MinOpeningTime = 4;
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).MinClosingTime = 4;
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).MinTimeControlOnly = true;
 
     TimeOpenElapsed = 3.0;
     TimeCloseElapsed = 0.0;
-    OccupantVentilationControl(1).calc(1, 2, 0, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(1, OpenStatus);
 
     TimeOpenElapsed = 5.0;
-    OccupantVentilationControl(1).calc(1, 2, 0, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenStatus);
 
     TimeOpenElapsed = 0.0;
     TimeCloseElapsed = 3.0;
-    OccupantVentilationControl(1).calc(1, 2, 0, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(2, OpenStatus);
 
     TimeOpenElapsed = 0.0;
     TimeCloseElapsed = 5.0;
-    OccupantVentilationControl(1).calc(1, 2, 0, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenStatus);
 
     OutDryBulbTemp = 15.0;
@@ -119,10 +119,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
 
     TimeOpenElapsed = 5.0;
     TimeCloseElapsed = 0.0;
-    OccupantVentilationControl(1).MinTimeControlOnly = false;
-    OccupantVentilationControl(1).ComfortBouPoint = 10.0;
-    OccupantVentilationControl(1).ComfortLowTempCurveNum = 1;
-    OccupantVentilationControl(1).ComfortHighTempCurveNum = 2;
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).MinTimeControlOnly = false;
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).ComfortBouPoint = 10.0;
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).ComfortLowTempCurveNum = 1;
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).ComfortHighTempCurveNum = 2;
 
     NumCurves = 2;
     PerfCurve.allocate(NumCurves);
@@ -157,13 +157,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     PerfCurve(CurveNum).Var2Min = 0.0;
     PerfCurve(CurveNum).Var2Max = 2.0;
 
-    OccupantVentilationControl(1).calc(1, 2, 0, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenProbStatus);
     EXPECT_EQ(1, CloseProbStatus);
 
     MAT(1) = 26.0;
     MRT(1) = 26.0;
-    OccupantVentilationControl(1).calc(1, 2, 0, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(2, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 
@@ -176,14 +176,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     ZoneThermostatSetPointLo.allocate(1);
     ZoneThermostatSetPointHi.allocate(1);
 
-    OccupantVentilationControl(1).calc(1, 2, 0, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(1, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 
     TempControlType(1) = 4;
     ZoneThermostatSetPointLo(1) = 22.0;
     ZoneThermostatSetPointHi(1) = 28.0;
-    OccupantVentilationControl(1).calc(1, 2, 0, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(1, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 }

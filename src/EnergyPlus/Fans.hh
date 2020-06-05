@@ -53,12 +53,15 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+
+    struct EnergyPlusData;
+    struct FansData;
 
 namespace Fans {
 
@@ -333,7 +336,7 @@ namespace Fans {
     int getFanInNodeIndex(FansData &fans, int const &FanIndex, // fan index
                           bool &ErrorsFound    // set to true if problem
     );
-        
+
     int GetFanOutletNode(FansData &fans, std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem
@@ -381,6 +384,30 @@ namespace Fans {
     // *****************************************************************************
 
 } // namespace Fans
+
+    struct FansData : BaseGlobalStruct {
+        // constants
+        static constexpr int ExhaustFanCoupledToAvailManagers = 150;
+        static constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
+
+        // members
+        int NumFans;
+        int NumNightVentPerf;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
+        bool GetFanInputFlag;      // Flag set to make sure you get input once
+        bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
+        bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
+
+        FansData() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false),
+                     LocalTurnFansOff(false) {}
+
+        void clear_state() override {
+            NumFans = 0;
+            NumNightVentPerf = 0;
+            GetFanInputFlag = true;
+            LocalTurnFansOn = false;
+            LocalTurnFansOff = false;
+        }
+    };
 
 } // namespace EnergyPlus
 
