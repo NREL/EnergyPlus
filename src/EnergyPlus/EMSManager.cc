@@ -1844,7 +1844,7 @@ namespace EMSManager {
                                      SurfaceWindow(loopSurfNum).SlatAngThisTSDegEMSon,
                                      SurfaceWindow(loopSurfNum).SlatAngThisTSDegEMSValue);
                 }
-            } else if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType == WSC_ST_ExteriorScreen) {
+            } else if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WSC_ST_ExteriorScreen) {
                 SetupEMSActuator("Window Shading Control",
                                  Surface(loopSurfNum).Name,
                                  "Control Status",
@@ -1852,7 +1852,7 @@ namespace EMSManager {
                                  SurfaceWindow(loopSurfNum).ShadingFlagEMSOn,
                                  SurfaceWindow(loopSurfNum).ShadingFlagEMSValue);
             } else {
-                if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType != WSC_ST_SwitchableGlazing) {
+                if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
                     ShowSevereError("Missing shade or blind layer in window construction name = '" +
                                     Construct(SurfaceWindow(loopSurfNum).ShadedConstruction).Name + "', surface name = '" +
                                     Surface(loopSurfNum).Name + "'.");

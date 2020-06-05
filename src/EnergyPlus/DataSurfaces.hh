@@ -697,7 +697,9 @@ namespace DataSurfaces {
         Plane plane;         // Plane
         Surface2D surface2d; // 2D projected surface for efficient intersection testing
         // Window Parameters (when surface is Window)
-        int WindowShadingControlPtr;    // Pointer to shading control (windows only)
+        int activeWindowShadingControl;    // Active window shading control (windows only)
+        std::vector<int> windowShadingControlList; // List of possible window shading controls
+
         bool HasShadeControl;           // True if the surface is listed in a WindowShadingControl object
         int ShadedConstruction;         // Shaded construction (windows only)
         int StormWinConstruction;       // Construction with storm window (windows only)
@@ -795,7 +797,7 @@ namespace DataSurfaces {
               MovInsulIntPresent(false), MovInsulIntPresentPrevTS(false), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0),
-              WindowShadingControlPtr(0), HasShadeControl(false), ShadedConstruction(0), StormWinConstruction(0), StormWinShadedConstruction(0),
+              activeWindowShadingControl(0), HasShadeControl(false), ShadedConstruction(0), StormWinConstruction(0), StormWinShadedConstruction(0),
               FrameDivider(0), Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp), OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false),
               OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0), OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0),
               WindSpeed(0.0), WindSpeedEMSOverrideOn(false), WindSpeedEMSOverrideValue(0.0),

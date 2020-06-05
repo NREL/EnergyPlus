@@ -1921,7 +1921,7 @@ namespace DaylightingManager {
             IConst = Construct(IConst).TCMasterConst;
         }
 
-        ICtrl = Surface(IWin).WindowShadingControlPtr;
+        ICtrl = Surface(IWin).activeWindowShadingControl;
         ShType = WSC_ST_NoShade; // 'NOSHADE'
         BlNum = 0;
         //		ScNum = 0; //Unused Set but never used
@@ -4517,7 +4517,7 @@ namespace DaylightingManager {
 
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
 
-                int WindowShadingControlPtr = Surface(SurfNum).WindowShadingControlPtr;
+                int WindowShadingControlPtr = Surface(SurfNum).activeWindowShadingControl;
                 if (Surface(SurfNum).HasShadeControl) {
                     auto & thisSurfEnclosure(DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNum).SolarEnclIndex));
                     if (WindowShadingControl(WindowShadingControlPtr).GlareControlIsActive) {
@@ -6725,7 +6725,7 @@ namespace DaylightingManager {
 
         for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
             IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
-            ICtrl = Surface(IWin).WindowShadingControlPtr;
+            ICtrl = Surface(IWin).activeWindowShadingControl;
             if (Surface(IWin).HasShadeControl && ISWFLG == 0) {
                 if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                     SurfaceWindow(IWin).ShadingFlag == GlassConditionallyLightened)
@@ -6781,7 +6781,7 @@ namespace DaylightingManager {
                     // need to map back to the original order of the "loop" to not change all the other data structures
                     loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
 
-                    ICtrl = Surface(IWin).WindowShadingControlPtr;
+                    ICtrl = Surface(IWin).activeWindowShadingControl;
                     IS = 1;
                     if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
                         ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
@@ -6827,7 +6827,7 @@ namespace DaylightingManager {
                     loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
                     if (ASETIL(igroup) < 1.0) {
 
-                        ICtrl = Surface(IWin).WindowShadingControlPtr;
+                        ICtrl = Surface(IWin).activeWindowShadingControl;
                         if (!Surface(IWin).HasShadeControl) {
                             continueOuterLoop = true;
                             continue;
@@ -6953,7 +6953,7 @@ namespace DaylightingManager {
                         continueOuterLoop = false;
                         continue;
                     }
-                    ICtrl = Surface(IWin).WindowShadingControlPtr;
+                    ICtrl = Surface(IWin).activeWindowShadingControl;
                     if (!Surface(IWin).HasShadeControl) {
                         continueOuterLoop = false;
                         continue;
@@ -7062,7 +7062,7 @@ namespace DaylightingManager {
                     loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
                     if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) continue;
 
-                    ICtrl = Surface(IWin).WindowShadingControlPtr;
+                    ICtrl = Surface(IWin).activeWindowShadingControl;
                     if (!Surface(IWin).HasShadeControl) continue;
                     if (WindowShadingControl(ICtrl).GlareControlIsActive) {
 
@@ -8126,7 +8126,7 @@ namespace DaylightingManager {
                 }     // End of check if TDD:DOME or bare window
 
                 // Check if window has shade or blind
-                ICtrl = Surface(IWin).WindowShadingControlPtr;
+                ICtrl = Surface(IWin).activeWindowShadingControl;
                 if (Surface(IWin).HasShadeControl) {
                     ShType = WindowShadingControl(ICtrl).ShadingType;
                     BlNum = SurfaceWindow(IWin).BlindNumber;
@@ -9923,7 +9923,7 @@ namespace DaylightingManager {
                 // Switchable windows may be in partially switched state rather than fully dark state
                 VTMULT = 1.0;
 
-                ICtrl = Surface(IWin).WindowShadingControlPtr;
+                ICtrl = Surface(IWin).activeWindowShadingControl;
                 if (Surface(IWin).HasShadeControl) {
                     if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                         SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
@@ -9960,7 +9960,7 @@ namespace DaylightingManager {
                     // CR 8057. 3/17/2010
                     VTMULT = 1.0;
 
-                    ICtrl = Surface(IWin).WindowShadingControlPtr;
+                    ICtrl = Surface(IWin).activeWindowShadingControl;
                     if (Surface(IWin).HasShadeControl) {
                         if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                             SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {

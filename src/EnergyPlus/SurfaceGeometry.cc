@@ -1849,7 +1849,7 @@ namespace SurfaceGeometry {
                 //      SurfaceWindow(SurfNum)%MovableSlats = .FALSE.
 
                 // TH 2/9/2010. Fixed for CR 8010 for speed up purpose rather than fixing the problem
-                WinShadingControlPtr = Surface(SurfNum).WindowShadingControlPtr;
+                WinShadingControlPtr = Surface(SurfNum).activeWindowShadingControl;
                 if (Surface(SurfNum).HasShadeControl) {
                     if (WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle)
                         SurfaceWindow(SurfNum).MovableSlats = true;
@@ -4091,7 +4091,7 @@ namespace SurfaceGeometry {
             GetVertices(outputFiles, SurfNum, SurfaceTmp(SurfNum).Sides, rNumericArgs({4, _}));
 
             CheckConvexity(SurfNum, SurfaceTmp(SurfNum).Sides);
-            SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
+            SurfaceTmp(SurfNum).activeWindowShadingControl = 0;
             SurfaceTmp(SurfNum).HasShadeControl = false;
 
             if (SurfaceTmp(SurfNum).Class == SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass_GlassDoor ||
@@ -4412,7 +4412,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
 
-                SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
+                SurfaceTmp(SurfNum).activeWindowShadingControl = 0;
                 SurfaceTmp(SurfNum).HasShadeControl = false;
                 InitialAssociateWindowShadingControlFenestration(ErrorsFound, SurfNum);
 
@@ -4481,7 +4481,7 @@ namespace SurfaceGeometry {
         // Otherwise, create shaded construction if WindowShadingControl for this window has
         // interior or exterior shade/blind (but not between-glass shade/blind) specified.
 
-        WSCPtr = SurfaceTmp(SurfNum).WindowShadingControlPtr;
+        WSCPtr = SurfaceTmp(SurfNum).activeWindowShadingControl;
         ConstrNumSh = 0;
         if (!ErrorsFound && SurfaceTmp(SurfNum).HasShadeControl) {
             ConstrNumSh = WindowShadingControl(WSCPtr).ShadedConstruction;
@@ -7723,7 +7723,7 @@ namespace SurfaceGeometry {
         SurfaceTmp(SurfNum + 1).MaterialMovInsulInt = SurfaceTmp(SurfNum).MaterialMovInsulInt;
         SurfaceTmp(SurfNum + 1).SchedMovInsulExt = SurfaceTmp(SurfNum).SchedMovInsulExt;
         SurfaceTmp(SurfNum + 1).SchedMovInsulInt = SurfaceTmp(SurfNum).SchedMovInsulInt;
-        SurfaceTmp(SurfNum + 1).WindowShadingControlPtr = SurfaceTmp(SurfNum).WindowShadingControlPtr;
+        SurfaceTmp(SurfNum + 1).activeWindowShadingControl = SurfaceTmp(SurfNum).activeWindowShadingControl;
         SurfaceTmp(SurfNum + 1).HasShadeControl = SurfaceTmp(SurfNum).HasShadeControl;
         SurfaceTmp(SurfNum + 1).ShadedConstruction = SurfaceTmp(SurfNum).ShadedConstruction;
         SurfaceTmp(SurfNum + 1).FrameDivider = SurfaceTmp(SurfNum).FrameDivider;
@@ -8307,12 +8307,12 @@ namespace SurfaceGeometry {
 
     void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound, int &SurfNum)
     {
-        // J.Glazer 2018 - operates on SurfaceTmp array before final indices are known for windows and sets the WindowShadingControlPtr
+        // J.Glazer 2018 - operates on SurfaceTmp array before final indices are known for windows and sets the activeWindowShadingControl
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
             for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
                 if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), SurfaceTmp(SurfNum).Name)) {
-                    if (SurfaceTmp(SurfNum).WindowShadingControlPtr == 0) {
-                        SurfaceTmp(SurfNum).WindowShadingControlPtr = iShadeCtrl;
+                    if (SurfaceTmp(SurfNum).activeWindowShadingControl == 0) {
+                        SurfaceTmp(SurfNum).activeWindowShadingControl = iShadeCtrl;
                         SurfaceTmp(SurfNum).HasShadeControl = true;
                         // check to make the window refenced is an exterior window
                         if (SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
@@ -8329,7 +8329,7 @@ namespace SurfaceGeometry {
                             ShowContinueError(".. equivalent layer window model does not use shading control object.");
                             ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
                             ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
-                            SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
+                            SurfaceTmp(SurfNum).activeWindowShadingControl = 0;
                         }
                     } else {
                         ErrorsFound = true;
@@ -8350,7 +8350,7 @@ namespace SurfaceGeometry {
             for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
                 int fenestrationIndex =
                     UtilityRoutines::FindItemInList(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), Surface, TotSurfaces);
-                if (Surface(fenestrationIndex).WindowShadingControlPtr == iShadeCtrl) {
+                if (Surface(fenestrationIndex).activeWindowShadingControl == iShadeCtrl) {
                     WindowShadingControl(iShadeCtrl).FenestrationIndex(jFeneRef) = fenestrationIndex;
                 } else {
                     // this error condition should not occur since the rearrangement of Surface() from SurfureTmp() is reliable.
@@ -8750,7 +8750,7 @@ namespace SurfaceGeometry {
                                         Construct(ConstrNum).Name);
                     }
                     // Require that gas be air in airflow gaps on either side of a between glass shade/blind
-                    WSCPtr = Surface(SurfNum).WindowShadingControlPtr;
+                    WSCPtr = Surface(SurfNum).activeWindowShadingControl;
                     if (Surface(SurfNum).HasShadeControl) {
                         if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
                             WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
@@ -11930,7 +11930,7 @@ namespace SurfaceGeometry {
         SurfaceTmp(TotSurfaces).MaterialMovInsulExt = SurfaceTmp(SurfNum).MaterialMovInsulExt;
         SurfaceTmp(TotSurfaces).MaterialMovInsulInt = SurfaceTmp(SurfNum).MaterialMovInsulInt;
         SurfaceTmp(TotSurfaces).SchedMovInsulExt = SurfaceTmp(SurfNum).SchedMovInsulExt;
-        SurfaceTmp(TotSurfaces).WindowShadingControlPtr = SurfaceTmp(SurfNum).WindowShadingControlPtr;
+        SurfaceTmp(TotSurfaces).activeWindowShadingControl = SurfaceTmp(SurfNum).activeWindowShadingControl;
         SurfaceTmp(TotSurfaces).HasShadeControl = SurfaceTmp(SurfNum).HasShadeControl;
         SurfaceTmp(TotSurfaces).ShadedConstruction = SurfaceTmp(SurfNum).ShadedConstruction;
         SurfaceTmp(TotSurfaces).FrameDivider = SurfaceTmp(SurfNum).FrameDivider;

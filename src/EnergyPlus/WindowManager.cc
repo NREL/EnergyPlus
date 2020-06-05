@@ -1838,7 +1838,7 @@ namespace WindowManager {
         //       DATE WRITTEN   October 1999
         //       MODIFIED       Aug 2001 (FW): add blinds
         //                      Oct 2002 (FW): change ConstrNumSh =
-        //         WindowShadingControl(Surface(SurfNum)%WindowShadingControlPtr)%ShadedConstruction
+        //         WindowShadingControl(Surface(SurfNum)%activeWindowShadingControl)%ShadedConstruction
         //         to Surface(SurfNum)%ShadedConstruction
         //                      Jul 2003 (FW): remove unneeded warning if center-of-glass area < 0
         //       RE-ENGINEERED  na
@@ -1913,7 +1913,7 @@ namespace WindowManager {
             //  in SurfaceGeometry module, because for blinds with variable slats new blinds were created and assigned
             if (Surface(SurfNum).HasShadeControl) {
                 //  ConstrNumSh = Surface(SurfNum)%ShadedConstruction
-                ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
+                ShadingType = WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType;
                 //  IF(ShadingType == WSC_ST_ExteriorBlind) THEN
                 //    MatNum = Construct(ConstrNumSh)%LayerPoint(1)
                 //    SurfaceWindow(SurfNum)%BlindNumber = Material(MatNum)%BlindDataPtr
@@ -1996,7 +1996,7 @@ namespace WindowManager {
                     if (!Surface(SurfNum).HasShadeControl) {
                         SurfaceWindow(SurfNum).SolarDiffusing = true;
                     } else { // There is a shading control
-                        if (WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType == SwitchableGlazing) {
+                        if (WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType == SwitchableGlazing) {
                             SurfaceWindow(SurfNum).SolarDiffusing = true;
                         } else {
                             SurfaceWindow(SurfNum).SolarDiffusing = false;
@@ -8367,7 +8367,7 @@ namespace WindowManager {
             if (Surface(SurfNum).HasShadeControl) {
                 ConstrNumSh = Surface(SurfNum).ShadedConstruction;
                 MatNum = Construct(ConstrNumSh).LayerPoint(1);
-                ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
+                ShadingType = WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType;
                 if (ShadingType == WSC_ST_ExteriorScreen) {
 
                     if (Material(MatNum).ScreenMapResolution > 0) PrintTransMap = true;
@@ -8439,7 +8439,7 @@ namespace WindowManager {
                     Material(MatNum).ReflectSolBeamBack = SurfaceScreens(ScreenNum).DifReflect;
 
                 } // (ShadingType == 'EXTERIORSCREEN')
-            }     //(Surface(SurfNum)%WindowShadingControlPtr /= 0)
+            }     //(Surface(SurfNum)%activeWindowShadingControl /= 0)
 
         } // End of screen surface initialization
 

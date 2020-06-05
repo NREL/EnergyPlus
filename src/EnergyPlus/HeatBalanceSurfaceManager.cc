@@ -1043,7 +1043,7 @@ namespace HeatBalanceSurfaceManager {
                                 PreDefTableEntry(pdchFenDir, surfName, "W");
                             }
                         }
-                        curWSC = Surface(iSurf).WindowShadingControlPtr;
+                        curWSC = Surface(iSurf).activeWindowShadingControl;
                         // compute totals for area weighted averages
                         fenTotArea += windowAreaWMult;
                         ufactArea += nomUfact * windowAreaWMult;
