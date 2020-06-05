@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -61,8 +62,6 @@
 namespace EnergyPlus {
 
 namespace BranchInputManager {
-
-    extern bool InvalidBranchDefinitions;
 
     struct ConnectorData
     {
@@ -80,6 +79,9 @@ namespace BranchInputManager {
         ConnectorData() : NumOfConnectors(0), NumOfSplitters(0), NumOfMixers(0)
         {
         }
+
+        // Destructor
+        ~ConnectorData() = default;
     };
 
     struct BranchListData
@@ -95,6 +97,9 @@ namespace BranchInputManager {
         BranchListData() : NumOfBranchNames(0)
         {
         }
+
+        // Destructor
+        ~BranchListData() = default;
     };
 
     struct ComponentData
@@ -112,6 +117,9 @@ namespace BranchInputManager {
         ComponentData() : CtrlType(0), InletNode(0), OutletNode(0)
         {
         }
+
+        // Destructor
+        ~ComponentData() = default;
     };
 
     struct BranchData
@@ -129,6 +137,9 @@ namespace BranchInputManager {
         BranchData() : PressureCurveType(0), PressureCurveIndex(0), FluidType(DataLoopNode::NodeType_Unknown), NumOfComponents(0)
         {
         }
+
+        // Destructor
+        ~BranchData() = default;
     };
 
     struct SplitterData
@@ -157,18 +168,12 @@ namespace BranchInputManager {
         MixerData() : NumInletBranches(0)
         {
         }
+
+        // Destructor
+        ~MixerData() = default;
     };
 
-    // Object Data
-    extern Array1D<BranchListData> BranchList;    // Branch List data for each Branch List
-    extern Array1D<BranchData> Branch;            // Branch Data for each Branch
-    extern Array1D<ConnectorData> ConnectorLists; // Connector List data for each Connector List
-    extern Array1D<SplitterData> Splitters;       // Splitter Data for each Splitter
-    extern Array1D<MixerData> Mixers;             // Mixer Data for each Mixer
-
     // Functions
-    void clear_state();
-
     void ManageBranchInput();
 
     //==================================================================================
@@ -320,6 +325,54 @@ namespace BranchInputManager {
     void TestBranchIntegrity(EnergyPlus::OutputFiles &outputFiles, bool &ErrFound);              // ErrFound is a return value, true or false
 
 } // namespace BranchInputManager
+
+struct BranchInputManagerData : BaseGlobalStruct
+{
+    int NumOfBranchLists = 0;                                   // Number of Branch Lists found in IDF
+    int NumOfBranches = 0;                                      // Number of Branches found in IDF
+    int NumOfConnectorLists = 0;                                // Number of Connector Lists found in IDF
+    int NumSplitters = 0;                                       // Number of Splitters found in IDF
+    int NumMixers = 0;                                          // Number of Mixers found in IDF
+
+    bool GetBranchInputFlag = true;                             // Flag used to retrieve Input
+    bool GetBranchListInputFlag = true;                         // Flag used to retrieve Input
+    bool GetSplitterInputFlag = true;                           // Flag used to retrieve Input
+    bool GetMixerInputFlag = true;                              // Flag used to retrieve Input
+    bool GetConnectorListInputFlag = true;                      // Flag used to retrieve Input
+    bool InvalidBranchDefinitions = false;
+    bool GetBranchInputOneTimeFlag = true;
+
+    Array1D<BranchInputManager::BranchListData> BranchList;     // Branch List data for each Branch List
+    Array1D<BranchInputManager::BranchData> Branch;             // Branch Data for each Branch
+    Array1D<BranchInputManager::ConnectorData> ConnectorLists;  // Connector List data for each Connector List
+    Array1D<BranchInputManager::SplitterData> Splitters;        // Splitter Data for each Splitter
+    Array1D<BranchInputManager::MixerData> Mixers;              // Mixer Data for each Mixer
+
+    void clear_state() override
+    {
+        NumOfBranchLists = 0;
+        NumOfBranches = 0;
+        NumOfConnectorLists = 0;
+        NumSplitters = 0;
+        NumMixers = 0;
+
+        GetBranchInputFlag = true;
+        GetBranchListInputFlag = true;
+        GetSplitterInputFlag = true;
+        GetMixerInputFlag = true;
+        GetConnectorListInputFlag = true;
+        InvalidBranchDefinitions = false;
+        GetBranchInputOneTimeFlag = true;
+
+        BranchList.deallocate();
+        Branch.deallocate();
+        ConnectorLists.deallocate();
+        Splitters.deallocate();
+        Mixers.deallocate();
+    }
+};
+
+extern BranchInputManagerData dataBranchInputManager;
 
 } // namespace EnergyPlus
 

@@ -245,7 +245,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     using namespace EnergyPlus;
     // A to Z order
     AirflowNetworkBalanceManager::clear_state();
-    BranchInputManager::clear_state();
     CoolingPanelSimple::clear_state();
     CoilCoolingDX::clear_state();
     CondenserLoopTowers::clear_state();
@@ -257,6 +256,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
+    dataBranchInputManager.clear_state();
     DataBranchNodeConnections::clear_state();
     DataContaminantBalance::clear_state();
     DataConvergParams::clear_state();

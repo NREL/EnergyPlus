@@ -237,7 +237,6 @@ namespace SimulationManager {
         using DataEnvironment::TotRunDesPersDays;
         using DataHVACGlobals::TimeStepSys;
 
-        using BranchInputManager::InvalidBranchDefinitions;
         using BranchInputManager::ManageBranchInput;
         using BranchInputManager::TestBranchIntegrity;
         using BranchNodeConnections::CheckNodeConnections;
@@ -384,7 +383,7 @@ namespace SimulationManager {
         }
         Available = true;
 
-        if (InvalidBranchDefinitions) {
+        if (dataBranchInputManager.InvalidBranchDefinitions) {
             ShowFatalError("Preceding error(s) in Branch Input cause termination.");
         }
 
