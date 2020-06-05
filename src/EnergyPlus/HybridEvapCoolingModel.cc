@@ -538,7 +538,7 @@ namespace HybridEvapCoolingModel {
 
         inter_Alpha = inter_Alpha + 1;
 
-        // A21, \field Mode0 Supply Air Humidity Ratio Lookup Table Name
+        // A22, \field Mode0 Supply Air Humidity Ratio Lookup Table Name
         curveID = -1;
         if (lAlphaBlanks(inter_Alpha)) {
             InitializeCurve(W_CURVE, curveID); // as this is invalid curve id CalculateCurveVal will return a default  when called
@@ -554,7 +554,7 @@ namespace HybridEvapCoolingModel {
             }
         }
         inter_Alpha = inter_Alpha + 1;
-        // A22, \field Mode0 System Electric Power Lookup Table Name
+        // A23, \field Mode0 System Electric Power Lookup Table Name
         curveID = -1;
         if (lAlphaBlanks(inter_Alpha)) {
             InitializeCurve(POWER_CURVE, curveID); // as this is invalid curve id CalculateCurveVal will return a default
@@ -569,7 +569,7 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(POWER_CURVE, curveID);
             }
         }
-        // A23, \field Mode0 Supply Fan Electric Power Lookup Table Name
+        // A24, \field Mode0 Supply Fan Electric Power Lookup Table Name
         inter_Alpha = inter_Alpha + 1;
         curveID = -1;
         if (lAlphaBlanks(inter_Alpha)) {
@@ -585,7 +585,7 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(SUPPLY_FAN_POWER, curveID);
             }
         }
-        // A24, \field Mode0 External Static Pressure Lookup Table Name
+        // A25, \field Mode0 External Static Pressure Lookup Table Name
         inter_Alpha = inter_Alpha + 1;
         curveID = -1;
         if (lAlphaBlanks(inter_Alpha)) {
@@ -602,7 +602,7 @@ namespace HybridEvapCoolingModel {
             }
         }
         //
-        // A25, \field Mode0 System Second Fuel Consumption Lookup Table Nam
+        // A26, \field Mode0 System Second Fuel Consumption Lookup Table Nam
         inter_Alpha = inter_Alpha + 1;
         curveID = -1;
         if (lAlphaBlanks(inter_Alpha)) {
@@ -618,7 +618,7 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(SECOND_FUEL_USE, curveID);
             }
         }
-        // A26, \field Mode0 System Third Fuel Consumption Lookup Table Name
+        // A27, \field Mode0 System Third Fuel Consumption Lookup Table Name
         inter_Alpha = inter_Alpha + 1;
         curveID = -1;
         if (lAlphaBlanks(inter_Alpha)) {
@@ -634,7 +634,7 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(THIRD_FUEL_USE, curveID);
             }
         }
-        // A27, \field Mode0 System Water Use Lookup Table Name
+        // A28, \field Mode0 System Water Use Lookup Table Name
         inter_Alpha = inter_Alpha + 1;
         curveID = -1;
         if (lAlphaBlanks(inter_Alpha)) {
@@ -654,8 +654,8 @@ namespace HybridEvapCoolingModel {
             (*OperatingModes).push_back(*this);
             return ErrorsFound;
         }
-        // N9, \field Mode0  Minimum Outdoor Air Temperature
-        // N10, \field Mode0  Maximum Outdoor Air Temperature
+        // N9, \field Mode1  Minimum Outdoor Air Temperature
+        // N10, \field Mode1  Maximum Outdoor Air Temperature
         bool ok = InitializeOutdoorAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
@@ -663,8 +663,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N11, \field Mode0  Minimum Outdoor Air Humidity Ratio
-        // N12, \field Mode0  Maximum Outdoor Air Humidity Ratio
+        // N11, \field Mode1  Minimum Outdoor Air Humidity Ratio
+        // N12, \field Mode1  Maximum Outdoor Air Humidity Ratio
         ok = InitializeOutdoorAirHumidityRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
@@ -672,8 +672,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N13, \field Mode0 Minimum Outdoor Air Relative Humidity
-        // N14, \field Mode0 Maximum Outdoor Air Relative Humidity
+        // N13, \field Mode1 Minimum Outdoor Air Relative Humidity
+        // N14, \field Mode1 Maximum Outdoor Air Relative Humidity
         ok = InitializeOutdoorAirRelativeHumidityConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
@@ -681,8 +681,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N15, \field Mode0 Minimum Return Air Temperature
-        // N16, \field Mode0 Maximum Return Air Temperature
+        // N15, \field Mode1 Minimum Return Air Temperature
+        // N16, \field Mode1 Maximum Return Air Temperature
         ok = InitializeReturnAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
@@ -690,8 +690,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N17, \field Mode0 Minimum Return Air Humidity Ratio
-        // N18, \field Mode0 Maximum Return Air Humidity Ratio
+        // N17, \field Mode1 Minimum Return Air Humidity Ratio
+        // N18, \field Mode1 Maximum Return Air Humidity Ratio
         ok = InitializeReturnAirHumidityRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
@@ -699,8 +699,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N19, \field Mode0 Minimum Return Air Relative HumidityInitialize
-        // N20, \field Mode0 Maximum Return Air Relative Humidity
+        // N19, \field Mode1 Minimum Return Air Relative HumidityInitialize
+        // N20, \field Mode1 Maximum Return Air Relative Humidity
         ok = InitializeReturnAirRelativeHumidityConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cAlphaFields(inter_Number) + '=' + Alphas(inter_Number) + "Or Invalid" + cAlphaFields(inter_Number + 1) +
@@ -709,8 +709,8 @@ namespace HybridEvapCoolingModel {
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
-        // N21, \field Mode0 Minimum Outdoor Air Fraction
-        // N22, \field Mode0 Maximum Outdoor Air Fraction
+        // N21, \field Mode1 Minimum Outdoor Air Fraction
+        // N22, \field Mode1 Maximum Outdoor Air Fraction
 
         ok = InitializeOSAFConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
@@ -718,8 +718,8 @@ namespace HybridEvapCoolingModel {
             ShowContinueError("Entered in " + cCurrentModuleObject);
             ErrorsFound = true;
         }
-        // N23, \field Mode0 Minimum Supply Air Mass Flow Rate Ratio
-        // N24, \field Mode0 Maximum Supply Air Mass Flow Rate Ratio
+        // N23, \field Mode1 Minimum Supply Air Mass Flow Rate Ratio
+        // N24, \field Mode1 Maximum Supply Air Mass Flow Rate Ratio
         inter_Number = inter_Number + 2;
         ok = InitializeMsaRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
@@ -1926,8 +1926,6 @@ namespace HybridEvapCoolingModel {
             SupplyVentilationAir = SupplyVentilationVolume * 1.225;
         }
         // set timestep average outlet condition, considering all operating conditions and runtimes.
-        Real64 Outletcp = PsyCpAirFnW(OutletHumRat); // J/degreesK.kg
-        OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
         OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP));
         OutletHumRat = CheckVal_W(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_HR), OutletTemp, OutletPressure);
 
@@ -1936,6 +1934,7 @@ namespace HybridEvapCoolingModel {
         Real64 OperatingMixedAirW = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_HR);
         Real64 MixedAirEnthalpy = PsyHFnTdbW(OperatingAverageMixedAirTemperature, OperatingMixedAirW);
         OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure);
+        OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
 
         if (StdRhoAir > 1) {
             OutletVolumetricFlowRate = OutletMassFlowRate / StdRhoAir;
@@ -1957,6 +1956,7 @@ namespace HybridEvapCoolingModel {
             // Calculate timestep average unit and system
             PrimaryMode = CurrentPrimaryMode();
             PrimaryModeRuntimeFraction = CurrentPrimaryRuntimeFraction();
+            Real64 Outletcp = PsyCpAirFnW(OutletHumRat); // J/degreesK.kg
             Real64 Returncp = PsyCpAirFnW(Wra);          // J/degreesK.kg
             Real64 Outdoorcp = PsyCpAirFnW(Wosa);        // J/degreesK.kg
             // Zone Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA+cpSA) {kJ/kg-C} * (T_RA - T_SA) {C}
