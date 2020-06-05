@@ -335,6 +335,7 @@ namespace AirflowNetworkBalanceManager {
             LoopOnOffFanRunTimeFraction.deallocate();
             LoopOnOffFlag.deallocate();
             UniqueAirflowNetworkSurfaceName.clear();
+            AirflowNetworkBalanceManager::solver.clear();
         }
     };
 
