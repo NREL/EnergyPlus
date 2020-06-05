@@ -46,6 +46,7 @@ endif()
 
 set(SKIP_BUILD_RPATH TRUE)
 add_executable( Slab ${SRC} )
+set_target_properties(Slab PROPERTIES FOLDER Auxiliary)
 
 set_target_properties(Slab PROPERTIES
   COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}"
