@@ -1092,25 +1092,25 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     cAlphaArgs = " ";
     rNumericArgs = 0.0;
 
-    bool ErrorsFound = false;
+    bool localErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, localErrorsFound);
+    EXPECT_FALSE(localErrorsFound);
+    HeatBalanceManager::GetZoneData(localErrorsFound);
+    EXPECT_FALSE(localErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(localErrorsFound);
+    EXPECT_FALSE(localErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, localErrorsFound);
+    EXPECT_FALSE(localErrorsFound);
+    HeatBalanceManager::GetConstructData(localErrorsFound);
+    EXPECT_FALSE(localErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, localErrorsFound);
+    EXPECT_FALSE(localErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(outputFiles(), ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, localErrorsFound);
+    EXPECT_FALSE(localErrorsFound);
     ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleManager::ScheduleInputProcessed = true;
 
@@ -1135,8 +1135,8 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
     DataHeatBalance::ZnAirRpt.allocate(DataGlobals::NumOfZones);
     // No EMS
-    ThermalChimney::GetThermalChimney(ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
+    ThermalChimney::GetThermalChimney(localErrorsFound);
+    EXPECT_FALSE(localErrorsFound);
     ThermalChimney::CalcThermalChimney();
     EXPECT_NEAR(ThermalChimney::ThermalChimneyReport(1).OverallTCVolumeFlow, 0.015668, 0.0001);
     // EMS Override
