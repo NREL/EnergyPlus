@@ -96,8 +96,6 @@ namespace BranchInputManager {
     std::string const cMIXER("Connector:Mixer");
     std::string const cSPLITTER("Connector:Splitter");
 
-    std::string CurrentModuleObject; // for ease in getting objects
-
     void ManageBranchInput()
     {
 
@@ -164,7 +162,7 @@ namespace BranchInputManager {
         }
 
         // Set data
-        if (dataBranchInputManager.BranchList(Found).LoopName == std::string()) {
+        if (dataBranchInputManager.BranchList(Found).LoopName.empty()) {
             dataBranchInputManager.BranchList(Found).LoopName = LoopName;
             dataBranchInputManager.BranchList(Found).LoopType = LoopType;
         } else if (dataBranchInputManager.BranchList(Found).LoopName != LoopName) {
@@ -418,7 +416,7 @@ namespace BranchInputManager {
                         break;
                     }
                 }
-                if (FanType == std::string()) ErrFound = true;
+                if (FanType.empty()) ErrFound = true;
             } else {
                 ShowSevereError("GetBranchFanTypeName:  Branch index not found = " + TrimSigDigits(BranchNum));
                 ErrFound = true;
@@ -461,7 +459,7 @@ namespace BranchInputManager {
             ErrorsFound = true;
             NumComps = 0;
         } else {
-            if (dataBranchInputManager.Branch(Found).AssignedLoopName == std::string()) {
+            if (dataBranchInputManager.Branch(Found).AssignedLoopName.empty()) {
                 dataBranchInputManager.Branch(Found).AssignedLoopName = LoopName;
                 PressCurveType = dataBranchInputManager.Branch(Found).PressureCurveType;
                 PressCurveIndex = dataBranchInputManager.Branch(Found).PressureCurveIndex;
@@ -771,7 +769,7 @@ namespace BranchInputManager {
             dataBranchInputManager.GetSplitterInputFlag = false;
         }
 
-        if (ConnectorListName == std::string()) {
+        if (ConnectorListName.empty()) {
             ShowSevereError("GetLoopSplitter: ConnectorListName is blank.  LoopName=" + LoopName);
             ShowFatalError("Program terminates due to previous condition.");
         }
@@ -1033,6 +1031,7 @@ namespace BranchInputManager {
         int NumParams;
 
         if (dataBranchInputManager.GetBranchInputOneTimeFlag) {
+            std::string CurrentModuleObject = "Branch";
             dataBranchInputManager.NumOfBranches = inputProcessor->getNumObjectsFound(CurrentModuleObject);
             if (dataBranchInputManager.NumOfBranches > 0) {
                 dataBranchInputManager.Branch.allocate(dataBranchInputManager.NumOfBranches);
@@ -1106,6 +1105,8 @@ namespace BranchInputManager {
         int NumInComps;     // Number of components actually verified (no SPLITTER or MIXER allowed)
         int ConnectionType; // Used to pass variable node connection type to GetNodeNums
         int NumNodes;       // Number of Nodes from NodeInputManager
+
+        std::string CurrentModuleObject = "Branch";
 
         dataBranchInputManager.Branch(BCount).Name = Alphas(1);
         GetPressureCurveTypeAndIndex(Alphas(2), PressureCurveType, PressureCurveIndex);
@@ -1288,7 +1289,7 @@ namespace BranchInputManager {
         std::string TestName;
 
         ErrFound = false;
-        CurrentModuleObject = "BranchList";
+        std::string CurrentModuleObject = "BranchList";
         dataBranchInputManager.NumOfBranchLists = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         dataBranchInputManager.BranchList.allocate(dataBranchInputManager.NumOfBranchLists);
         for (auto &e : dataBranchInputManager.BranchList) {
@@ -1456,7 +1457,7 @@ namespace BranchInputManager {
 
         if (!dataBranchInputManager.GetConnectorListInputFlag) return;
         ErrorsFound = false;
-        CurrentModuleObject = "ConnectorList";
+        std::string CurrentModuleObject = "ConnectorList";
         dataBranchInputManager.NumOfConnectorLists = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         dataBranchInputManager.ConnectorLists.allocate(dataBranchInputManager.NumOfConnectorLists);
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
@@ -1696,7 +1697,7 @@ namespace BranchInputManager {
         bool MatchedLoop;
 
         if (!dataBranchInputManager.GetSplitterInputFlag) return;
-        CurrentModuleObject = cSPLITTER;
+        std::string CurrentModuleObject = cSPLITTER;
         dataBranchInputManager.NumSplitters = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         dataBranchInputManager.Splitters.allocate(dataBranchInputManager.NumSplitters);
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
@@ -1923,7 +1924,7 @@ namespace BranchInputManager {
 
         if (!dataBranchInputManager.GetMixerInputFlag) return;
 
-        CurrentModuleObject = cMIXER;
+        std::string CurrentModuleObject = cMIXER;
 
         dataBranchInputManager.NumMixers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         dataBranchInputManager.Mixers.allocate(dataBranchInputManager.NumMixers);
@@ -2121,7 +2122,7 @@ namespace BranchInputManager {
         int IOStat;
 
         // Get Inputs
-        CurrentModuleObject = "PlantLoop";
+        std::string CurrentModuleObject = "PlantLoop";
 
         NumPlantLoops = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
@@ -2180,7 +2181,7 @@ namespace BranchInputManager {
         int IOStat;
 
         // Get Inputs
-        CurrentModuleObject = "CondenserLoop";
+        std::string CurrentModuleObject = "CondenserLoop";
 
         NumCondLoops = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
@@ -2242,7 +2243,7 @@ namespace BranchInputManager {
         int IOStat;
 
         // Get Inputs
-        CurrentModuleObject = "AirLoopHVAC";
+        std::string CurrentModuleObject = "AirLoopHVAC";
         NumAirLoops = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
@@ -2382,7 +2383,7 @@ namespace BranchInputManager {
             if (DisplayExtraWarnings || mustprint) {
                 if (mustprint) {
                     ShowContinueError("AuditBranches: Branch=\"" + dataBranchInputManager.Branch(BrN).Name + "\" not found on any BranchLists.");
-                    if (FoundBranchName != "") {
+                    if (!FoundBranchName.empty()) {
                         ShowContinueError("Branch contains component, type=\"" + CompType + "\", name=\"" + CompName + "\"");
                     }
                 } else {
@@ -2578,7 +2579,7 @@ namespace BranchInputManager {
                 }
                 dataBranchInputManager.Branch(Found).FluidType = BranchFluidType;
                 BranchOutletNodeName = MatchNodeName;
-                if (dataBranchInputManager.Branch(Found).AssignedLoopName == std::string()) {
+                if (dataBranchInputManager.Branch(Found).AssignedLoopName.empty()) {
                     BranchLoopName = "**Unknown**";
                     BranchLoopType = "**Unknown**";
                 } else if (dataBranchInputManager.Branch(Found).AssignedLoopName == dataBranchInputManager.BranchList(BCount).LoopName) {
@@ -2600,7 +2601,7 @@ namespace BranchInputManager {
             if (MixedFluidTypesOnBranchList) {
                 ShowSevereError("BranchList=" + dataBranchInputManager.BranchList(BCount).Name + " has mixed fluid types in its nodes.");
                 ErrFound = true;
-                if (OriginalBranchFluidType == std::string()) OriginalBranchFluidType = "**Unknown**";
+                if (OriginalBranchFluidType.empty()) OriginalBranchFluidType = "**Unknown**";
                 ShowContinueError("Initial Node=" + NodeID(InitialBranchFluidNode) + ", Fluid Type=" + OriginalBranchFluidType);
                 ShowContinueError("BranchList Topology - Note nodes which do not match that fluid type:");
                 Ptr = 1;
@@ -2614,7 +2615,7 @@ namespace BranchInputManager {
                     }
                     for (Loop2 = Ptr; Loop2 <= EndPtr; ++Loop2) {
                         cBranchFluidType = ValidNodeFluidTypes(Node(BranchFluidNodes(Loop2)).FluidType);
-                        if (cBranchFluidType == std::string()) cBranchFluidType = "**Unknown**";
+                        if (cBranchFluidType.empty()) cBranchFluidType = "**Unknown**";
                         ShowContinueError("....Node=" + NodeID(BranchFluidNodes(Loop2)) + ", Fluid Type=" + cBranchFluidType);
                     }
                     Ptr = EndPtr + 1;
@@ -2704,7 +2705,7 @@ namespace BranchInputManager {
                     }
                 }
                 BranchOutletNodeName = MatchNodeName;
-                if (dataBranchInputManager.Branch(Count).AssignedLoopName == std::string()) {
+                if (dataBranchInputManager.Branch(Count).AssignedLoopName.empty()) {
                     BranchLoopName = "**Unknown**";
                     BranchLoopType = "**Unknown**";
                 } else {
