@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 
@@ -61,25 +62,25 @@ namespace TARCOGOutput {
     struct Files {
       std::string DBGD;
       std::string FileMode;
-      std::string FilePosition;
+      std::string FilePosition{"ASIS"};
       bool WriteDebugOutput{false};
-      int DebugMode{};
-      int InArgumentsFile{};
-      int OutArgumentsFile{};
-      int WINCogFile{};
+      int DebugMode{0};
+      int InArgumentsFile{0};
+      int OutArgumentsFile{0};
+      OutputFile WINCogFile{"test.w7"};
+      std::string WINCogFileName{"test.w7"};
 
       // Intermediate debug files
-      int IterationCSVFileNumber{};
-      int TarcogIterationsFileNumber{};
+      int IterationCSVFileNumber{0};
+      int TarcogIterationsFileNumber{0};
 
-      std::string IterationCSVName;
+      std::string IterationCSVName{"IterationResults.csv"};
 
       // integer, parameter :: IterationHHAT = 102
       // character(len=1000)    :: IterationHHATName = 'IterationHHAT.csv'
 
-      std::string WinCogFileName;
       // character(len=1000)    :: SHGCFileName = 'test.w7'
-      std::string DebugOutputFileName;
+      std::string DebugOutputFileName{"Tarcog.dbg"};
     };
 
     extern int winID;
