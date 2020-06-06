@@ -523,9 +523,9 @@ namespace CoolingPanelSimple {
             }
 
             ThisCP.ColdSetptSched = cAlphaArgs(7);
-            ThisCP.ColdSetptSchedPtr = GetScheduleIndex(cAlphaArgs(7));
+            ThisCP.ColdSetptSchedPtr = GetScheduleIndex(ThisCP.ColdSetptSched);
             if ((ThisCP.ColdSetptSchedPtr == 0) && (!lAlphaFieldBlanks(7))) {
-                ShowSevereError(cAlphaFieldNames(7) + " not found: " + cAlphaArgs(7));
+                ShowSevereError(cAlphaFieldNames(7) + " not found: " + ThisCP.ColdSetptSched);
                 ShowContinueError("Occurs in " + RoutineName + " = " + cAlphaArgs(1));
                 ErrorsFound = true;
             }
@@ -1254,10 +1254,10 @@ namespace CoolingPanelSimple {
         int iter;
         Real64 RadHeat;
         Real64 CoolingPanelCool;
-        Real64 WaterInletTemp;
-        Real64 WaterOutletTemp;
-        Real64 WaterMassFlowRate;
-        Real64 WaterMassFlowRateMax;
+        Real64 waterInletTemp;
+        Real64 waterOutletTemp;
+        Real64 waterMassFlowRate;
+        Real64 waterMassFlowRateMax;
         Real64 CapacitanceWater;
         Real64 NTU;
         Real64 Effectiveness;
@@ -1286,9 +1286,9 @@ namespace CoolingPanelSimple {
         ModifiedWaterInletTemp = false;
         ZoneNum = this->ZonePtr;
         QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-        WaterInletTemp = this->WaterInletTemp;
-        WaterOutletTemp = WaterInletTemp;
-        WaterMassFlowRateMax = this->WaterMassFlowRateMax;
+        waterInletTemp = this->WaterInletTemp;
+        waterOutletTemp = waterInletTemp;
+        waterMassFlowRateMax = this->WaterMassFlowRateMax;
         Xr = this->FracRadiant;
 
         if (GetCurrentScheduleValue(this->SchedPtr) > 0) {
@@ -1300,7 +1300,7 @@ namespace CoolingPanelSimple {
         Tzone = Xr * MRT(ZoneNum) + ((1.0 - Xr) * MAT(ZoneNum));
 
         // Logical controls: if the WaterInletTemperature is higher than Tzone, do not run the panel
-        if (WaterInletTemp >= Tzone) CoolingPanelOn = false;
+        if (waterInletTemp >= Tzone) CoolingPanelOn = false;
 
         // Condensation Controls based on dewpoint temperature of the zone.
         // The assumption here is that condensation might take place if the inlet water temperature
@@ -1314,7 +1314,7 @@ namespace CoolingPanelSimple {
         // iteration.
         DewPointTemp = PsyTdpFnWPb(ZoneAirHumRat(ZoneNum), OutBaroPress);
 
-        if (WaterInletTemp < (DewPointTemp + this->CondDewPtDeltaT) && (CoolingPanelOn)) {
+        if (waterInletTemp < (DewPointTemp + this->CondDewPtDeltaT) && (CoolingPanelOn)) {
 
             // Condensation is possible so invoke the three possible ways of handling this based on the user's choice...
 
@@ -1322,7 +1322,7 @@ namespace CoolingPanelSimple {
                 // Condensation control is "off" which means don't do anything, simply let it run and ignore condensation
             } else if (this->CondCtrlType == CondCtrlSimpleOff) {
                 // For "simple off", simply turn the simple cooling panel off to avoid condensation
-                WaterMassFlowRate = 0.0;
+                waterMassFlowRate = 0.0;
                 CoolingPanelOn = false;
                 // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                 if (!WarmupFlag) {
@@ -1330,7 +1330,7 @@ namespace CoolingPanelSimple {
                         ShowWarningMessage(cCMO_CoolingPanel_Simple + " [" + this->EquipID +
                                            "] inlet water temperature below dew-point temperature--potential for condensation exists");
                         ShowContinueError("Flow to the simple cooling panel will be shut-off to avoid condensation");
-                        ShowContinueError("Water inlet temperature = " + RoundSigDigits(WaterInletTemp, 2));
+                        ShowContinueError("Water inlet temperature = " + RoundSigDigits(waterInletTemp, 2));
                         ShowContinueError("Zone dew-point temperature + safety delta T= " + RoundSigDigits(DewPointTemp + this->CondDewPtDeltaT, 2));
                         ShowContinueErrorTimeStamp("");
                         ShowContinueError("Note that a " + RoundSigDigits(this->CondDewPtDeltaT, 4) +
@@ -1350,7 +1350,7 @@ namespace CoolingPanelSimple {
                 // As a result of this, there is some bypass/recirculation that has to take place.
                 // We might not have enough flow rate to meet whatever load we have, but at least
                 // the system is still running at some partial load and avoiding condensation.
-                WaterInletTemp = DewPointTemp + this->CondDewPtDeltaT;
+                waterInletTemp = DewPointTemp + this->CondDewPtDeltaT;
                 ModifiedWaterInletTemp = true;
             }
         }
@@ -1363,7 +1363,7 @@ namespace CoolingPanelSimple {
 
             if (QZnReq < -SmallLoad && !CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
-                Cp = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, WaterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
                 // Find the actual load: this parameter modifies what the response of the system should be.  For total load control, the system tries
                 // to meet the QZnReq.  For convective load control, the convective output of the device equals QZnReq which means that the load on
@@ -1375,20 +1375,20 @@ namespace CoolingPanelSimple {
 
                 // Now for a small amount of iteration.  Try to find the value of mass flow rate that will come the closest to giving
                 // the proper value for MCpEpsAct.  Limit iterations to avoid too much time wasting.
-                MCpEpsAct = QZnReq / (WaterInletTemp - Tzone);
+                MCpEpsAct = QZnReq / (waterInletTemp - Tzone);
                 MCpEpsLow = 0.0;
                 MdotLow = 0.0;
-                MCpEpsHigh = WaterMassFlowRateMax * Cp * (1.0 - exp(-this->UA / (WaterMassFlowRateMax * Cp)));
-                MdotHigh = WaterMassFlowRateMax;
+                MCpEpsHigh = waterMassFlowRateMax * Cp * (1.0 - exp(-this->UA / (waterMassFlowRateMax * Cp)));
+                MdotHigh = waterMassFlowRateMax;
                 if (MCpEpsAct <= MCpEpsLow) {
                     MCpEpsAct = MCpEpsLow;
-                    WaterMassFlowRate = 0.0;
+                    waterMassFlowRate = 0.0;
                     Node(this->WaterInletNode).MassFlowRate = 0.0;
                     CoolingPanelOn = false;
                 } else if (MCpEpsAct >= MCpEpsHigh) {
                     MCpEpsAct = MCpEpsHigh;
-                    WaterMassFlowRate = WaterMassFlowRateMax;
-                    Node(this->WaterInletNode).MassFlowRate = WaterMassFlowRateMax;
+                    waterMassFlowRate = waterMassFlowRateMax;
+                    Node(this->WaterInletNode).MassFlowRate = waterMassFlowRateMax;
                 } else {
                     for (iter = 1; iter <= Maxiter; ++iter) {
                         FracGuess = (MCpEpsAct - MCpEpsLow) / (MCpEpsHigh - MCpEpsLow);
@@ -1402,8 +1402,8 @@ namespace CoolingPanelSimple {
                             MdotHigh = MdotGuess;
                         }
                         if (((MCpEpsAct - MCpEpsGuess) / MCpEpsAct) <= IterTol) {
-                            WaterMassFlowRate = MdotGuess;
-                            Node(this->WaterInletNode).MassFlowRate = WaterMassFlowRate;
+                            waterMassFlowRate = MdotGuess;
+                            Node(this->WaterInletNode).MassFlowRate = waterMassFlowRate;
                             break;
                         }
                     }
@@ -1433,27 +1433,27 @@ namespace CoolingPanelSimple {
                     if (MassFlowFrac < MinFrac) MassFlowFrac = MinFrac;
                 }
 
-                WaterMassFlowRate = MassFlowFrac * WaterMassFlowRateMax;
+                waterMassFlowRate = MassFlowFrac * waterMassFlowRateMax;
             }
         }
 
         if (CoolingPanelOn) {
             SetComponentFlowRate(
-                WaterMassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
-            if (WaterMassFlowRate <= 0.0) CoolingPanelOn = false;
+                waterMassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+            if (waterMassFlowRate <= 0.0) CoolingPanelOn = false;
         }
 
         if (CoolingPanelOn) {
             // Now simulate the system...
-            Cp = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, WaterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
-            Effectiveness = 1.0 - exp(-this->UA / (WaterMassFlowRate * Cp));
+            Cp = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            Effectiveness = 1.0 - exp(-this->UA / (waterMassFlowRate * Cp));
             if (Effectiveness <= 0.0) {
                 Effectiveness = 0.0;
             } else if (Effectiveness >= 1.0) {
                 Effectiveness = 1.0;
             }
-            CoolingPanelCool = (Effectiveness)*WaterMassFlowRate * Cp * (WaterInletTemp - Tzone);
-            WaterOutletTemp = this->WaterInletTemp - (CoolingPanelCool / (WaterMassFlowRate * Cp));
+            CoolingPanelCool = (Effectiveness)*waterMassFlowRate * Cp * (waterInletTemp - Tzone);
+            waterOutletTemp = this->WaterInletTemp - (CoolingPanelCool / (waterMassFlowRate * Cp));
             RadHeat = CoolingPanelCool * this->FracRadiant;
             CoolingPanelSource(CoolingPanelNum) = RadHeat;
 
@@ -1479,23 +1479,23 @@ namespace CoolingPanelSimple {
                 LoadMet = (SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum)) + (CoolingPanelCool * this->FracConvect) +
                           (RadHeat * this->FracDistribPerson);
             }
-            this->WaterOutletEnthalpy = this->WaterInletEnthalpy - CoolingPanelCool / WaterMassFlowRate;
+            this->WaterOutletEnthalpy = this->WaterInletEnthalpy - CoolingPanelCool / waterMassFlowRate;
 
         } else { // cooling panel off
             CapacitanceWater = 0.0;
             NTU = 0.0;
             Effectiveness = 0.0;
-            WaterOutletTemp = WaterInletTemp;
+            waterOutletTemp = waterInletTemp;
             CoolingPanelCool = 0.0;
             LoadMet = 0.0;
             RadHeat = 0.0;
-            WaterMassFlowRate = 0.0;
+            waterMassFlowRate = 0.0;
             CoolingPanelSource(CoolingPanelNum) = 0.0;
             this->WaterOutletEnthalpy = this->WaterInletEnthalpy;
         }
 
-        this->WaterOutletTemp = WaterOutletTemp;
-        this->WaterMassFlowRate = WaterMassFlowRate;
+        this->WaterOutletTemp = waterOutletTemp;
+        this->WaterMassFlowRate = waterMassFlowRate;
         this->TotPower = LoadMet;
         this->Power = CoolingPanelCool;
         this->ConvPower = CoolingPanelCool - RadHeat;

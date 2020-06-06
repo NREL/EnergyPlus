@@ -172,9 +172,9 @@ namespace CoolingPanelSimple {
         {
         }
 
-        void CalcCoolingPanel(int const CoolingPanelNum);
+        void CalcCoolingPanel(int CoolingPanelNum);
 
-        void SetCoolingPanelControlTemp(Real64 &ControlTemp, int const ZoneNum);
+        void SetCoolingPanelControlTemp(Real64 &ControlTemp, int ZoneNum);
 
         bool SizeCoolingPanelUA();
 
@@ -187,9 +187,10 @@ namespace CoolingPanelSimple {
         Array1D_string FieldNames;
 
         // Default Constructor
-        CoolingPanelSysNumericFieldData()
-        {
-        }
+        CoolingPanelSysNumericFieldData() = default;
+
+        // Destructor
+        ~CoolingPanelSysNumericFieldData() = default;
     };
 
     // Object Data
@@ -201,25 +202,25 @@ namespace CoolingPanelSimple {
     void clear_state();
 
     void SimCoolingPanel(EnergyPlusData &state, std::string const &EquipName,
-                         int const ActualZoneNum,
-                         int const ControlledZoneNum,
-                         bool const FirstHVACIteration,
+                         int ActualZoneNum,
+                         int ControlledZoneNum,
+                         bool FirstHVACIteration,
                          Real64 &PowerMet,
                          int &CompIndex);
 
     void GetCoolingPanelInput();
 
-    void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitCoolingPanel(EnergyPlusData &state, int CoolingPanelNum, int ControlledZoneNumSub, bool FirstHVACIteration);
 
-    void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum);
+    void SizeCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
 
-    void UpdateCoolingPanel(int const CoolingPanelNum);
+    void UpdateCoolingPanel(int CoolingPanelNum);
 
     void UpdateCoolingPanelSourceValAvg(bool &CoolingPanelSysOn); // .TRUE. if the radiant system has run this zone time step
 
     void DistributeCoolingPanelRadGains();
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(int ZoneNum); // Zone number
 
 } // namespace CoolingPanelSimple
 
