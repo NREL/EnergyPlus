@@ -68,6 +68,7 @@ set( test_src
   FanCoilUnits.unit.cc
   Fans.unit.cc
   FaultsManager.unit.cc
+  FileSystem.unit.cc
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   FluidProperties.unit.cc
@@ -176,6 +177,7 @@ set( test_src
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
   SZVAVModel.unit.cc
+  ThermalChimney.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
