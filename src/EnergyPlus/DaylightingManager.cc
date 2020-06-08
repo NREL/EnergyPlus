@@ -5581,13 +5581,13 @@ namespace DaylightingManager {
                     }
                 }
                 if (!daylightControlFound) {
-                    ShowSevereError("DaylightingDevice:Tubular = " + TDDPipe(PipeNum).Name + ":  is not connected to a Zone that has Daylighting.  ");
-                    ShowContinueError("Add Daylighting:Controls one of the following zones in the same enclosure:  ");
-                    for (int const zoneNum2 : DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNum).SolarEnclSurfIndex).ZoneNums) {
-                        ShowContinueError(Zone(zoneNum2).Name);
-                    }
-                    ErrorsFound = true;
-                    CheckTDDZone(Surface(SurfNum).Zone) = false;
+                    ShowWarningError("DaylightingDevice:Tubular = " + TDDPipe(PipeNum).Name + ":  is not connected to a Zone that has Daylighting.  ");
+//                    ShowContinueError("Add Daylighting:Controls one of the following zones in the same enclosure:  ");
+//                    for (int const zoneNum2 : DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNum).SolarEnclSurfIndex).ZoneNums) {
+//                        ShowContinueError(Zone(zoneNum2).Name);
+//                    }
+//                    ErrorsFound = true;
+//                    CheckTDDZone(Surface(SurfNum).Zone) = false;
                 }
 
             } else { // SurfNum == 0
