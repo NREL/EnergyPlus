@@ -112,8 +112,7 @@ namespace EnergyPlus {
                         ShowContinueError("No \"Sizing:System\" objects were entered.");
                     }
                     if (!this->doSystemSizing) {
-                        ShowContinueError(
-                                R"(The "SimulationControl" object did not have the field "Do System Sizing Calculation" set to Yes.)");
+                        ShowContinueError(R"(The "SimulationControl" object did not have the field "Do System Sizing Calculation" set to Yes.)");
                     }
                     ShowFatalError("Program terminates due to previously shown condition(s).");
                 }
@@ -127,8 +126,7 @@ namespace EnergyPlus {
                         ShowContinueError("No \"Sizing:Zone\" objects were entered.");
                     }
                     if (!this->doZoneSizing) {
-                        ShowContinueError(
-                                R"(The "SimulationControl" object did not have the field "Do Zone Sizing Calculation" set to Yes.)");
+                        ShowContinueError(R"(The "SimulationControl" object did not have the field "Do Zone Sizing Calculation" set to Yes.)");
                     }
                     ShowFatalError("Program terminates due to previously shown condition(s).");
                 }
