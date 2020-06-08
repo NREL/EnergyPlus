@@ -246,15 +246,24 @@ Output:Constructions,Materials;
 
 \subsection{Output:DaylightFactors}\label{outputdaylightfactors}
 
+This report content is added to the \textbf{eplusout.dfs} file.
+
 Daylight factors are ratios of interior illuminance at a specific location to exterior horizontal illuminance. In EnergyPlus, they are pre-calculated hourly for every shadow calculation day for every exterior window of a daylight zone. The pre-calculated daylight factors are interpolated between hours and for the actual sky conditions in the time-step calculation of the daylighting performance of daylight zones.
 
-EnergyPlus reports the daylight factors for four sky types (clear, turbid clear, intermediate, and overcast) at noon time (12:00pm) for each exterior windows (base window without shading) in the eio file when the daylight factors are first calculated. This new object can report all hourly pre-calculated daylight factors. Details of the report are shown in the Output Details document.
+EnergyPlus reports the daylight factors for four CIE sky types (clear, turbid clear, intermediate, and overcast) at noon time (12:00pm) for each exterior windows (base window without shading) in the \textbf{eio} file when the daylight factors are first calculated. This new object can report all hourly pre-calculated daylight factors. Details of the report are shown in the Output Details document.
 
 \subsubsection{Inputs}\label{inputs-4-027}
 
 \paragraph{Field: Reporting Days}\label{field-reporting-days}
 
-This field is used to select days to report the daylight factors. Two choices are ``SizingDays'' and ``All\hyperref[shadowcalculation]{ShadowCalculation}Days''. The SizingDays choice will output the daylight factors for only the sizing calculation days, while the All\hyperref[shadowcalculation]{ShadowCalculation}Days choice will output daylight factors for all shadow calculation days.
+This field is used to select days to report the daylight factors. Two choices are ``\textbf{SizingDays}'' and ``\textbf{AllShadowCalculationDays}''. The ``\textbf{SizingDays}'' choice will output the daylight factors for only the sizing calculation days, while the ``\textbf{AllShadowCalculationDays}'' choice will output daylight factors for all shadow calculation days.
+
+An example of this object follows.
+
+\begin{lstlisting}
+Output:DaylightFactors,
+  SizingDays;    !- Reporting Days
+\end{lstlisting}
 
 \subsection{Output:EnergyManagementSystem}\label{outputenergymanagementsystem}
 
