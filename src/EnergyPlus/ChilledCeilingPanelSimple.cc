@@ -82,6 +82,8 @@
 
 namespace EnergyPlus {
 
+ChilledCeilingPanelSimpleData dataChilledCeilingPanelSimple;
+
 namespace CoolingPanelSimple {
 
     // Module -- (ref: Object: ZoneHVAC:CoolingPanel:RadiantConvective:Water)
@@ -107,14 +109,7 @@ namespace CoolingPanelSimple {
     // Data
     // MODULE PARAMETER DEFINITIONS
     std::string const cCMO_CoolingPanel_Simple("ZoneHVAC:CoolingPanel:RadiantConvective:Water");
-    // Control types:
-    int const MATControl(1);                // Controls system using mean air temperature
-    int const MRTControl(2);                // Controls system using mean radiant temperature
-    int const OperativeControl(3);          // Controls system using operative temperature
-    int const ODBControl(4);                // Controls system using outside air dry-bulb temperature
-    int const OWBControl(5);                // Controls system using outside air wet-bulb temperature
-    int const ZoneTotalLoadControl(6);      // controls system using zone total remaining load
-    int const ZoneConvectiveLoadControl(7); // controls system using zone convective remaining load
+
     // Condensation control types:
     int const CondCtrlNone(0);      // Condensation control--none, so system never shuts down
     int const CondCtrlSimpleOff(1); // Condensation control--simple off, system shuts off when condensation predicted
@@ -495,24 +490,24 @@ namespace CoolingPanelSimple {
 
             // Process the temperature control type
             if (UtilityRoutines::SameString(cAlphaArgs(6), MeanAirTemperature)) {
-                ThisCP.ControlType = MATControl;
+                ThisCP.ControlType = Control::MAT;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), MeanRadiantTemperature)) {
-                ThisCP.ControlType = MRTControl;
+                ThisCP.ControlType = Control::MRT;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), OperativeTemperature)) {
-                ThisCP.ControlType = OperativeControl;
+                ThisCP.ControlType = Control::Operative;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), OutsideAirDryBulbTemperature)) {
-                ThisCP.ControlType = ODBControl;
+                ThisCP.ControlType = Control::ODB;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), OutsideAirWetBulbTemperature)) {
-                ThisCP.ControlType = OWBControl;
+                ThisCP.ControlType = Control::OWB;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), ZoneTotalLoad)) {
-                ThisCP.ControlType = ZoneTotalLoadControl;
+                ThisCP.ControlType = Control::ZoneTotalLoad;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), ZoneConvectiveLoad)) {
-                ThisCP.ControlType = ZoneConvectiveLoadControl;
+                ThisCP.ControlType = Control::ZoneConvectiveLoad;
             } else {
                 ShowWarningError("Invalid " + cAlphaFieldNames(6) + " =" + cAlphaArgs(6));
                 ShowContinueError("Occurs in " + RoutineName + " = " + cAlphaArgs(1));
                 ShowContinueError("Control reset to MAT control for this Simple Cooling Panel.");
-                ThisCP.ControlType = MATControl;
+                ThisCP.ControlType = Control::MAT;
             }
 
             ThisCP.ColdThrottlRange = rNumericArgs(8);
@@ -1359,7 +1354,7 @@ namespace CoolingPanelSimple {
         // vary the flow to meet the zone load calculated by the user-defined thermostat.  Temperature based controls vary the flow
         // based on a comparison between the control temperature and the setpoint schedule and throttling range.
 
-        if ((this->ControlType == ZoneTotalLoadControl) || (this->ControlType == ZoneConvectiveLoadControl)) {
+        if ((this->ControlType == Control::ZoneTotalLoad) || (this->ControlType == Control::ZoneConvectiveLoad)) {
 
             if (QZnReq < -SmallLoad && !CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
@@ -1369,7 +1364,7 @@ namespace CoolingPanelSimple {
                 // to meet the QZnReq.  For convective load control, the convective output of the device equals QZnReq which means that the load on
                 // the panel is higher as is its output.  Total load control will miss the setpoint temperature but will likely get there with time.
                 // Convective load control will hit the setpoint short term better but will result in overcooling in the long run probably.
-                if (this->ControlType == ZoneConvectiveLoadControl) {
+                if (this->ControlType == Control::ZoneConvectiveLoad) {
                     QZnReq = QZnReq / this->FracConvect;
                 }
 
@@ -1519,15 +1514,15 @@ namespace CoolingPanelSimple {
 
         {
             auto const SELECT_CASE_var(this->ControlType);
-            if (SELECT_CASE_var == MATControl) {
+            if (SELECT_CASE_var == Control::MAT) {
                 ControlTemp = MAT(ZoneNum);
-            } else if (SELECT_CASE_var == MRTControl) {
+            } else if (SELECT_CASE_var == Control::MRT) {
                 ControlTemp = MRT(ZoneNum);
-            } else if (SELECT_CASE_var == OperativeControl) {
+            } else if (SELECT_CASE_var == Control::Operative) {
                 ControlTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
-            } else if (SELECT_CASE_var == ODBControl) {
+            } else if (SELECT_CASE_var == Control::ODB) {
                 ControlTemp = Zone(ZoneNum).OutDryBulbTemp;
-            } else if (SELECT_CASE_var == OWBControl) {
+            } else if (SELECT_CASE_var == Control::OWB) {
                 ControlTemp = Zone(ZoneNum).OutWetBulbTemp;
             } else { // Should never get here
                 ControlTemp = MAT(ZoneNum);

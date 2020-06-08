@@ -84,23 +84,23 @@ TEST_F(EnergyPlusFixture, SetCoolingPanelControlTemp)
     DataHeatBalance::Zone(1).OutDryBulbTemp = 10.0;
     DataHeatBalance::Zone(1).OutWetBulbTemp = 5.0;
 
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::MATControl;
+    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MAT;
     CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 22.0);
 
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::MRTControl;
+    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MRT;
     CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 20.0);
 
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::OperativeControl;
+    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::Operative;
     CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 21.0);
 
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::ODBControl;
+    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::ODB;
     CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 10.0);
 
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::OWBControl;
+    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::OWB;
     CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 5.0);
 }
