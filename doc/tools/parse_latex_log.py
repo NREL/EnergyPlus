@@ -419,8 +419,6 @@ def find_issues(log_path, json_error_path, src_dir):
         errs = parse_log(log_path, src_dir)
         repo_root = os.path.abspath(os.path.join(os.path.dirname(log_path), '..', '..'))
         repo_root_to_src = os.path.relpath(src_dir, start=repo_root)
-        print(f"repo_root = {repo_root}")
-        print(f"repo_root_to_src = {repo_root_to_src}")
         errs['issues'] = update_paths_to_be_from_repo_root(
                 errs['issues'],
                 repo_root_to_src)
