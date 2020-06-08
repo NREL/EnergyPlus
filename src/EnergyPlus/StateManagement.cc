@@ -50,6 +50,7 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <AirflowNetwork/Properties.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/BranchInputManager.hh>
@@ -246,6 +247,7 @@ void EnergyPlus::clearAllStates()
     using namespace EnergyPlus;
     // A to Z order
     AirflowNetworkBalanceManager::clear_state();
+    AirLoopHVACDOAS::clear_state();
     BranchInputManager::clear_state();
     CoolingPanelSimple::clear_state();
     CoilCoolingDX::clear_state();

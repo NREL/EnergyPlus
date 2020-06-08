@@ -73,9 +73,9 @@ namespace EnergyPlus {
         this->airloopDOAS = _airloopDOAS;
     }
 
-    void HeatingAirflowUASizer::initializeWithinEP(EnergyPlusData &EP_UNUSED(state), std::string const &_compName, std::string const &_compType, bool const printWarningFlag) {
+    void HeatingAirflowUASizer::initializeWithinEP(EnergyPlusData &EP_UNUSED(state), std::string const &_compType, std::string const &_compName, bool const printWarningFlag) {
         this->sizingString = "Heating Coil Airflow For UA";  // TODO: Is this fixed for each sizer?
-        this->printWarningFlag = false;  // TODO: How is this set?
+        this->printWarningFlag = printWarningFlag;
         this->compType = _compType;
         this->compName = _compName;
         this->sysSizingRunDone = DataSizing::SysSizingRunDone;
@@ -90,9 +90,6 @@ namespace EnergyPlus {
         this->numZoneSizingInput = DataSizing::NumZoneSizingInput;
         this->doZoneSizing = DataGlobals::DoZoneSizing;
         this->curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
-        this->curZoneEqNum = DataSizing::CurZoneEqNum;
-        this->curSysNum = DataSizing::CurSysNum;
-        this->curOASysNum = DataSizing::CurOASysNum;
         this->termUnitSingDuct = DataSizing::TermUnitSingDuct;
         this->termUnitPIU = DataSizing::TermUnitPIU;
         this->termUnitIU = DataSizing::TermUnitIU;
@@ -107,8 +104,6 @@ namespace EnergyPlus {
         this->zoneEqSizing = DataSizing::ZoneEqSizing;
         this->sysSizingInputData = DataSizing::SysSizInput;
         this->finalSysSizing = DataSizing::FinalSysSizing;
-        this->outsideAirSys = DataAirLoop::OutsideAirSys;
-        this->oaSysEqSizing = DataSizing::OASysEqSizing;
         this->airloopDOAS = AirLoopHVACDOAS::airloopDOAS;
     }
 
