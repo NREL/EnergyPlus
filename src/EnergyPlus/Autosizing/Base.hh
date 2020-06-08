@@ -52,84 +52,79 @@
 
 namespace EnergyPlus {
 
-enum class AutoSizingType
-{
-    AutoCalculate,
-    HeatingAirflowUASizing,
-    Unknown
-};
+    enum class AutoSizingType {
+        AutoCalculate,
+        HeatingAirflowUASizing,
+        Unknown
+    };
 
-enum class AutoSizingResultType
-{
-    NoError,
-    ErrorType1
-};
+    enum class AutoSizingResultType {
+        NoError,
+        ErrorType1
+    };
 
-struct CommonFlags
-{
-    bool sysSizingRunDone = false;
-    bool zoneSizingRunDone = false;
-    int curSysNum = 0;
-    int curOASysNum = 0;
-    int curZoneEqNum = 0;
-    int curDuctType = 0;
-    int curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
-    int numPrimaryAirSys = 0;
-    int numSysSizInput = 0;
-    bool doSystemSizing = false;
-    int numZoneSizingInput = 0;
-    bool doZoneSizing = false;
+    struct BaseSizer {
+        AutoSizingType sizingType = AutoSizingType::Unknown;
+        std::string sizingString = "";
+        Real64 originalValue = 0.0;
+        Real64 autoSizedValue = 0.0;
+        bool wasAutoSized = false;
+        bool hardSizeNoDesignRun = false;
+        bool sizingDesRunThisAirSys = false;
+        bool sizingDesRunThisZone = false;
+        bool sizingDesValueFromParent = false;
+        bool airLoopSysFlag = false;
+        bool oaSysFlag = false;
+        std::string compType = "";
+        std::string compName = "";
 
-    // terminal units
-    bool termUnitSingDuct = false; // single duct terminal unit
-    bool termUnitPIU = false;      // powered induction unit
-    bool termUnitIU = false;       // induction terminal unit
-    bool zoneEqFanCoil = false;    // fan coil zone equipment
-    bool otherEqType = false;      // this covers the ELSE type switch
+        bool sysSizingRunDone = false;
+        bool zoneSizingRunDone = false;
+        int curSysNum = 0;
+        int curOASysNum = 0;
+        int curZoneEqNum = 0;
+        int curDuctType = 0;
+        int curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
+        int numPrimaryAirSys = 0;
+        int numSysSizInput = 0;
+        bool doSystemSizing = false;
+        int numZoneSizingInput = 0;
+        bool doZoneSizing = false;
 
-    std::string compType = "";
-    std::string compName = "";
-    bool printWarningFlag = false;
-    std::string callingRoutine = "";
-};
+        // terminal units
+        bool termUnitSingDuct = false; // single duct terminal unit
+        bool termUnitPIU = false;      // powered induction unit
+        bool termUnitIU = false;       // induction terminal unit
+        bool zoneEqFanCoil = false;    // fan coil zone equipment
+        bool otherEqType = false;      // this covers the ELSE type switch
 
-struct BaseSizer
-{
-    AutoSizingType sizingType = AutoSizingType::Unknown;
-    Real64 originalValue = 0.0;
-    Real64 autoSizedValue = 0.0;
-    bool wasAutoSized = false;
-    CommonFlags baseFlags;
-    bool hardSizeNoDesignRun = false;
-    bool sizingDesRunThisAirSys = false;
-    bool sizingDesRunThisZone = false;
-    bool sizingDesValueFromParent = false;
-    bool airLoopSysFlag = false;
-    bool oaSysFlag = false;
+        bool printWarningFlag = false;
+        std::string callingRoutine = "";
+        Array1D<DataSizing::SystemSizingInputData> sysSizingInputData;
+        Array1D<DataSizing::ZoneSizingInputData> zoneSizingInput;
+        Array1D<DataSizing::ZoneEqSizingData> unitarySysEqSizing;
+        Array1D<DataSizing::ZoneEqSizingData> oaSysEqSizing;
+        Array1D<DataSizing::ZoneEqSizingData> zoneEqSizing;
+        Array1D<DataAirLoop::OutsideAirSysProps> outsideAirSys;
+        Array1D<EnergyPlus::DataSizing::TermUnitSizingData> termUnitSizing;
+        Array1D<EnergyPlus::DataSizing::ZoneSizingData> finalZoneSizing;
+        Array1D<EnergyPlus::DataSizing::SystemSizingData> finalSysSizing;
+        std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
 
-    Array1D<DataSizing::SystemSizingInputData> sysSizingInputData;
-    Array1D<DataSizing::ZoneSizingInputData> zoneSizingInput;
-    Array1D<DataSizing::ZoneEqSizingData> unitarySysEqSizing;
-    Array1D<DataSizing::ZoneEqSizingData> oaSysEqSizing;
-    Array1D<DataSizing::ZoneEqSizingData> zoneEqSizing;
-    Array1D<DataAirLoop::OutsideAirSysProps> outsideAirSys;
-    Array1D<EnergyPlus::DataSizing::TermUnitSizingData> termUnitSizing;
-    Array1D<EnergyPlus::DataSizing::ZoneSizingData> finalZoneSizing;
-    Array1D<EnergyPlus::DataSizing::SystemSizingData> finalSysSizing;
-    std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
+        virtual void initializeWithinEP(EnergyPlusData &state, std::string const &_compName, std::string const &_compType, bool printWarningFlag) = 0;
 
-    void preSize(EnergyPlusData &state, CommonFlags &flags, Real64 originalValue);
+        void preSize(EnergyPlusData &state, Real64 originalValue);
 
-    virtual AutoSizingResultType size(EnergyPlusData &state, Real64 originalValue) = 0;
+        virtual AutoSizingResultType size(EnergyPlusData &state, Real64 originalValue) = 0;
 
-    void reportSizerOutput(std::string const &CompType,
-                           std::string const &CompName,
-                           std::string const &VarDesc,
-                           Real64 const VarValue,
-                           Optional_string_const UsrDesc = _,
-                           Optional<Real64 const> UsrValue = _);
+        static void reportSizerOutput(std::string const &CompType,
+                               std::string const &CompName,
+                               std::string const &VarDesc,
+                               Real64 VarValue,
+                               Optional_string_const UsrDesc = _,
+                               Optional<Real64 const> UsrValue = _);
 
-    void selectSizerOutput(std::string &sizingString);
-};
+        void selectSizerOutput();
+    };
 
 } // namespace EnergyPlus

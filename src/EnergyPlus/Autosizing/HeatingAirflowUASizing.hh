@@ -51,33 +51,25 @@
 
 namespace EnergyPlus {
 
-struct HeatingAirflowUASizerFlags
-{
-    std::string sizingString = "";
-};
+    struct HeatingAirflowUASizer : BaseSizer {
 
-struct HeatingAirflowUASizer : BaseSizer
-{
-    HeatingAirflowUASizerFlags flags;
+        HeatingAirflowUASizer() {
+            this->sizingType = AutoSizingType::HeatingAirflowUASizing;
+        }
 
-    HeatingAirflowUASizer()
-    {
-        this->sizingType = AutoSizingType::HeatingAirflowUASizing;
-    }
+        void initializeWithinEP(EnergyPlusData &state, std::string const &_compName, std::string const &_compType, bool printWarningFlag) override;
 
-    void setParameters(EnergyPlusData &state,
-                       CommonFlags &baseFlags,
-                       HeatingAirflowUASizerFlags &flags,
-                       Array1D<EnergyPlus::DataSizing::TermUnitSizingData> &termUnitSizing,
-                       Array1D<EnergyPlus::DataSizing::ZoneSizingData> &finalZoneSizing,
-                       Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> &zoneEqSizing,
-                       Array1D<EnergyPlus::DataSizing::SystemSizingInputData> &_sysSizingInputData,
-                       Array1D<EnergyPlus::DataSizing::SystemSizingData> &finalSysSizing,
-                       Array1D<DataAirLoop::OutsideAirSysProps> &outsideAirSys,
-                       Array1D<DataSizing::ZoneEqSizingData> &oaSysEqSizing,
-                       std::vector<AirLoopHVACDOAS::AirLoopDOAS> &airloopDOAS);
+        void initializeForAPI(EnergyPlusData &state,
+                              Array1D<EnergyPlus::DataSizing::TermUnitSizingData> &termUnitSizing,
+                              Array1D<EnergyPlus::DataSizing::ZoneSizingData> &finalZoneSizing,
+                              Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> &zoneEqSizing,
+                              Array1D<EnergyPlus::DataSizing::SystemSizingInputData> &_sysSizingInputData,
+                              Array1D<EnergyPlus::DataSizing::SystemSizingData> &finalSysSizing,
+                              Array1D<DataAirLoop::OutsideAirSysProps> &outsideAirSys,
+                              Array1D<DataSizing::ZoneEqSizingData> &oaSysEqSizing,
+                              std::vector<AirLoopHVACDOAS::AirLoopDOAS> &airloopDOAS);
 
-    AutoSizingResultType size(EnergyPlusData &state, Real64 originalValue) override;
-};
+        AutoSizingResultType size(EnergyPlusData &state, Real64 originalValue) override;
+    };
 
 } // namespace EnergyPlus
