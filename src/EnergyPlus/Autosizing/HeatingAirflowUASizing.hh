@@ -65,7 +65,8 @@ struct HeatingAirflowUASizer : BaseSizer
         this->sizingType = AutoSizingType::HeatingAirflowUASizing;
     }
 
-    void setParameters(CommonFlags &baseFlags,
+    void setParameters(EnergyPlusData &state,
+                       CommonFlags &baseFlags,
                        HeatingAirflowUASizerFlags &flags,
                        Array1D<EnergyPlus::DataSizing::TermUnitSizingData> &termUnitSizing,
                        Array1D<EnergyPlus::DataSizing::ZoneSizingData> &finalZoneSizing,
@@ -76,7 +77,7 @@ struct HeatingAirflowUASizer : BaseSizer
                        Array1D<DataSizing::ZoneEqSizingData> &oaSysEqSizing,
                        std::vector<AirLoopHVACDOAS::AirLoopDOAS> &airloopDOAS);
 
-    AutoSizingResultType size(Real64 originalValue) override;
+    AutoSizingResultType size(EnergyPlusData &state, Real64 originalValue) override;
 };
 
 } // namespace EnergyPlus

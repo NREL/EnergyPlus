@@ -2688,7 +2688,8 @@ namespace WaterCoils {
                     //} else if (ZoneEqSizing(CurZoneEqNum).SystemAirFlow || ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
                     //} else {
                     //}
-                    sizer.setParameters(baseFlags,
+                    sizer.setParameters(state,
+                                        baseFlags,
                                         flags,
                                         DataSizing::TermUnitSizing,
                                         DataSizing::FinalZoneSizing,
@@ -2699,7 +2700,7 @@ namespace WaterCoils {
                                         DataSizing::OASysEqSizing,
                                         AirLoopHVACDOAS::airloopDOAS);
 
-                    AutoSizingResultType result = sizer.size(TempSize);
+                    AutoSizingResultType result = sizer.size(state, TempSize);
                     WaterCoil(CoilNum).DesAirMassFlowRate = sizer.autoSizedValue; // coil report
                     WaterCoil(CoilNum).InletAirMassFlowRate = sizer.autoSizedValue;
                 }

@@ -55,7 +55,8 @@
 
 namespace EnergyPlus {
 
-    void HeatingAirflowUASizer::setParameters(CommonFlags &_baseFlags,
+    void HeatingAirflowUASizer::setParameters(EnergyPlusData &state,
+                                          CommonFlags &_baseFlags,
                                           HeatingAirflowUASizerFlags &_flags,
                                           Array1D<EnergyPlus::DataSizing::TermUnitSizingData> &_termUnitSizing,
                                           Array1D<EnergyPlus::DataSizing::ZoneSizingData> &_finalZoneSizing,
@@ -79,10 +80,10 @@ namespace EnergyPlus {
 }
 
 
-AutoSizingResultType HeatingAirflowUASizer::size(Real64 _originalValue)
+AutoSizingResultType HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue)
 {
     AutoSizingResultType errorsFound = AutoSizingResultType::NoError;
-    this->preSize(this->baseFlags, _originalValue);
+    this->preSize(state, this->baseFlags, _originalValue);
     if (this->baseFlags.curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             if (this->baseFlags.printWarningFlag && this->originalValue > 0.0) {

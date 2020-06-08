@@ -56,7 +56,7 @@
 
 namespace EnergyPlus {
 
-void BaseSizer::preSize(CommonFlags &flags, Real64 const _originalValue)
+void BaseSizer::preSize(EnergyPlusData &state, CommonFlags &flags, Real64 const _originalValue)
 {
     if (this->sizingType == AutoSizingType::Unknown) {
         ShowSevereError("Sizing Library Base Class: preSize");

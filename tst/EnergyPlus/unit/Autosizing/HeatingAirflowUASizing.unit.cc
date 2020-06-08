@@ -49,6 +49,7 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -91,7 +92,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // Test #1 - Zone Equipment, no autosizing
     baseFlags.termUnitSingDuct = true;
     Real64 inputValue = 5;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -101,14 +103,15 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    AutoSizingResultType result = sizer.size(inputValue);
+    AutoSizingResultType result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01); // hard-sized value
     sizer.autoSizedValue = 0.0;                   // reset for next test
 
     baseFlags.printWarningFlag = true; // this field isn't reported to eio, only for unit testing
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -118,7 +121,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01); // hard-sized value
@@ -146,7 +149,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // do sizing
     sizer.zoneSizingInput.allocate(1);
     sizer.zoneSizingInput(1).ZoneNum = 1;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -156,7 +160,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizer.autoSizedValue, 0.01);
@@ -171,7 +175,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -181,7 +186,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizer.autoSizedValue, 0.01);
@@ -194,7 +199,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -204,7 +210,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizer.autoSizedValue, 0.01);
@@ -219,7 +225,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -229,7 +236,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizer.autoSizedValue, 0.01);
@@ -245,7 +252,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -255,7 +263,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizer.autoSizedValue, 0.01);
@@ -270,7 +278,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -280,7 +289,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizer.autoSizedValue, 0.01);
@@ -294,7 +303,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -304,7 +314,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01); // uses a mass flow rate for sizing
@@ -333,7 +343,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     inputValue = 5.0;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -343,7 +354,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01); // hard-sized value
@@ -366,7 +377,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -376,7 +388,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizer.autoSizedValue, 0.01);
@@ -398,7 +410,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -408,7 +421,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizer.autoSizedValue, 0.01);
@@ -421,7 +434,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -431,7 +445,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(3.0, sizer.autoSizedValue, 0.01);
@@ -448,7 +462,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -458,7 +473,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizer.autoSizedValue, 0.01);
@@ -471,7 +486,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -481,7 +497,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(3.0, sizer.autoSizedValue, 0.01);
@@ -498,7 +514,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -508,7 +525,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizer.autoSizedValue, 0.01);
@@ -526,7 +543,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -536,7 +554,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizer.autoSizedValue, 0.01);
@@ -553,7 +571,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -563,7 +582,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01); // uses a mass flow rate for sizing
@@ -580,7 +599,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.setParameters(baseFlags,
+    sizer.setParameters(state,
+                        baseFlags,
                         flags,
                         tmpTermUnitData,
                         tmpFinalZoneSizing,
@@ -590,7 +610,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
                         tmpOutsideAirSys,
                         tmpOASysEqSizing,
                         tmpAirloopDOAS);
-    result = sizer.size(inputValue);
+    result = sizer.size(state, inputValue);
     EXPECT_EQ(AutoSizingResultType::NoError, result);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizer.autoSizedValue, 0.01); // hard-sized value

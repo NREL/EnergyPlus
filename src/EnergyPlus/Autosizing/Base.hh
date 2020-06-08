@@ -118,9 +118,9 @@ struct BaseSizer
     Array1D<EnergyPlus::DataSizing::SystemSizingData> finalSysSizing;
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
 
-    void preSize(CommonFlags &flags, Real64 originalValue);
+    void preSize(EnergyPlusData &state, CommonFlags &flags, Real64 originalValue);
 
-    virtual AutoSizingResultType size(Real64 originalValue) = 0;
+    virtual AutoSizingResultType size(EnergyPlusData &state, Real64 originalValue) = 0;
 
     void reportSizerOutput(std::string const &CompType,
                            std::string const &CompName,
