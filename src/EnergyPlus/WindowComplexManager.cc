@@ -3609,7 +3609,7 @@ namespace WindowComplexManager {
         }
 
         // ThermalMod = 0
-        Debug_mode = 3;
+        Debug_mode = 0;
         CalcSHGC = 0;
 
         Window_ID = ConstrNum;
