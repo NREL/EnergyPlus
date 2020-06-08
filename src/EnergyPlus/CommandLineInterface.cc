@@ -464,7 +464,6 @@ namespace CommandLineInterface {
         outputDelightDfdmpFileName = "eplusout.delightdfdmp";
         EnergyPlusIniFileName = "Energy+.ini";
         inStatFileName = weatherFilePathWithoutExtension + ".stat";
-        TarcogIterationsFileName = "TarcogIterations.dbg";
         eplusADSFileName = inputDirPathName + "eplusADS.inp";
 
         // Readvars files

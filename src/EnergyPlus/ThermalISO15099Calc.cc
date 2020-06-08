@@ -589,7 +589,7 @@ namespace ThermalISO15099Calc {
 
         // bi...Write intermediate results to output file:
         if (files.WriteDebugOutput) {
-            WriteModifiedArguments(files.InArgumentsFile,
+            WriteModifiedArguments(files.DebugOutputFile,
                                    files.DBGD,
                                    esky,
                                    trmout,
@@ -960,12 +960,13 @@ namespace ThermalISO15099Calc {
 
                     // if (nperr.ne.0)  open(unit=InArgumentsFile,  file=DebugOutputFileName,  status='unknown', position=FilePosition, &
                     //    form='formatted', iostat=nperr)
-                    ObjexxFCL::gio::write(files.InArgumentsFile, fmtLD);
-                    ObjexxFCL::gio::write(files.InArgumentsFile, fmtLD) << "UNSHADED RUN:";
-                    ObjexxFCL::gio::write(files.InArgumentsFile, fmtLD);
+                    print(files.DebugOutputFile, "\n");
+                    print(files.DebugOutputFile, "UNSHADED RUN:\n");
+                    print(files.DebugOutputFile, "\n");
                     // close(InArgumentsFile)
 
-                    WriteInputArguments(files,
+                    WriteInputArguments(files.DebugOutputFile,
+                                        files.DBGD,
                                         tout,
                                         tind,
                                         trmin,
@@ -1129,7 +1130,7 @@ namespace ThermalISO15099Calc {
 
                 // bi...unshaded results:
                 if (files.WriteDebugOutput && (UnshadedDebug == 1)) {
-                    WriteOutputArguments(files.OutArgumentsFile,
+                    WriteOutputArguments(files.DebugOutputFile,
                                          files.DBGD,
                                          nlayer_NOSD,
                                          tamb,
@@ -1246,7 +1247,7 @@ namespace ThermalISO15099Calc {
 
         // bi...  Write results to debug output file:
         if (files.WriteDebugOutput) {
-            WriteOutputArguments(files.OutArgumentsFile,
+            WriteOutputArguments(files.DebugOutputFile,
                                  files.DBGD,
                                  nlayer,
                                  tamb,
@@ -1509,9 +1510,6 @@ namespace ThermalISO15099Calc {
         bool updateGapTemperature;
         // logical :: TurnOnNewton
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_1111("('Outdoor: ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)");
-        static ObjexxFCL::gio::Fmt Format_1112("('Indoor:  ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)");
 
         int SDLayerIndex = -1;
 
@@ -3370,11 +3368,9 @@ namespace ThermalISO15099Calc {
 
         // localy used
         static std::string dynFormat;
-        std::string a;
         int i;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_1000("(I3)");
 
         // open(unit=InArgumentsFile,  file=TRIM(DBGD)//'TarcogIterations.dbg',  status='unknown', position='APPEND',  &
         //          &  form='formatted', iostat=nperr)
@@ -3395,123 +3391,114 @@ namespace ThermalISO15099Calc {
         //          &  form='formatted', iostat=nperr)
 
         // write(a,1000) index
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber,
-                   "('*************************************************************************************************')");
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('Iteration number: ', i5)") << index;
+        print(files.TarcogIterationsFile, "*************************************************************************************************\n");
+        print(files.TarcogIterationsFile, "Iteration number: {:5}\n" , index);
 
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('Trmin = ', f8.4)") << trmin - KelvinConv;
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('Troom = ', f12.6)") << troom - KelvinConv;
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('Trmout = ', f8.4)") << trmout - KelvinConv;
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('Tamb = ', f12.6)") << tamb - KelvinConv;
+        print(files.TarcogIterationsFile, "Trmin = {:8.4F}\n" , trmin - KelvinConv);
+        print(files.TarcogIterationsFile, "Troom = {:12.6F}\n" , troom - KelvinConv);
+        print(files.TarcogIterationsFile, "Trmout = {:8.4F}\n" , trmout - KelvinConv);
+        print(files.TarcogIterationsFile, "Tamb = {:12.6F}\n" , tamb - KelvinConv);
 
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('Ebsky = ', f8.4)") << ebsky;
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('Ebroom = ', f8.4)") << ebroom;
+        print(files.TarcogIterationsFile, "Ebsky = {:8.4F}\n" , ebsky);
+        print(files.TarcogIterationsFile, "Ebroom = {:8.4F}\n" , ebroom);
 
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('hcin = ', f8.4)") << hcin;
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('hcout = ', f8.4)") << hcout;
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('hrin = ', f8.4)") << hrin;
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('hrout = ', f8.4)") << hrout;
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('hin = ', f8.4)") << hin;
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('hout = ', f8.4)") << hout;
+        print(files.TarcogIterationsFile, "hcin = {:8.4F}\n" , hcin);
+        print(files.TarcogIterationsFile, "hcout = {:8.4F}\n" , hcout);
+        print(files.TarcogIterationsFile, "hrin = {:8.4F}\n" , hrin);
+        print(files.TarcogIterationsFile, "hrout = {:8.4F}\n" , hrout);
+        print(files.TarcogIterationsFile, "hin = {:8.4F}\n", hin);
+        print(files.TarcogIterationsFile, "hout = {:8.4F}\n" , hout);
 
         // Write headers for Ebb and Ebf
         for (i = 1; i <= 2 * nlayer; ++i) {
-
-            ObjexxFCL::gio::write(a, Format_1000) << (i + 1) / 2; // this is just to simulate correct integer in brackets
             if (i == 1) {
-                dynFormat = "('";
+                dynFormat = "";
             }
             if (mod(i, 2) == 1) {
-                dynFormat += "Ebf(" + a + ')';
+                dynFormat += fmt::format("Ebf({:3})", (i+1)/2);
             } else {
-                dynFormat += "Ebb(" + a + ')';
+                dynFormat += fmt::format("Ebb({:3})", (i + 1) / 2);
             }
-            if (i == 2 * nlayer) {
-                dynFormat += "')";
-            } else {
+            if (i != 2 * nlayer) {
                 dynFormat += "===";
             }
         }
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, dynFormat);
+        print(files.TarcogIterationsFile, dynFormat);
+        print(files.TarcogIterationsFile, "\n");
 
         // write Ebb and Ebf
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "(f16.8,'   ',f16.8,$)") << Ebf(1) << Ebb(1);
+        print(files.TarcogIterationsFile, "{:16.8F}   {:16.8F}", Ebf(1), Ebb(1));
         for (i = 2; i <= nlayer; ++i) {
-            ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('   ',f16.8,'   ',f16.8,$)") << Ebf(i) << Ebb(i);
+            print(files.TarcogIterationsFile, "   {:16.8F}   {:16.8F}", Ebf(i), Ebb(i));
         }
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber);
+        print(files.TarcogIterationsFile, "\n");
 
         // Write headers for Rb and Rf
         for (i = 1; i <= 2 * nlayer; ++i) {
-
-            ObjexxFCL::gio::write(a, Format_1000) << (i + 1) / 2; // this is just to simulate correct integer in brackets
+            const auto a = fmt::format("{:3}",(i + 1) / 2); // this is just to simulate correct integer in brackets
             if (i == 1) {
-                dynFormat = "('";
+                dynFormat = "";
             }
             if (mod(i, 2) == 1) {
                 dynFormat += "Rf(" + a + ')';
             } else {
                 dynFormat += "Rb(" + a + ')';
             }
-            if (i == 2 * nlayer) {
-                dynFormat += "')";
-            } else {
+            if (i != 2 * nlayer) {
                 dynFormat += "===";
             }
         }
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, dynFormat);
-
+        print(files.TarcogIterationsFile, dynFormat);
+        print(files.TarcogIterationsFile, "\n");
         // write Rb and Rf
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "(f16.8,'   ',f16.8,$)") << Rf(1) << Rb(1);
+        print(files.TarcogIterationsFile, "{:16.8F}   {:16.8F}", Rf(1), Rb(1));
         for (i = 1; i <= nlayer; ++i) {
-            ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('   ',f16.8,'   ',f16.8,$)") << Rf(i) << Rb(i);
+            print(files.TarcogIterationsFile, "   {:16.8F}   {:16.8F}", Rf(i), Rb(i));
         }
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber);
+        print(files.TarcogIterationsFile, "\n");
 
         // Write header for temperatures
         for (i = 1; i <= 2 * nlayer; ++i) {
-
-            ObjexxFCL::gio::write(a, Format_1000) << i;
+            const auto a = fmt::format("{:3}", i);
             if (i == 1) {
-                dynFormat = "('";
+                dynFormat = "";
             }
             dynFormat += "theta(" + a + ')';
-            if (i == (2 * nlayer)) {
-                dynFormat += "')";
-            } else {
+            if (i != (2 * nlayer)) {
                 dynFormat += "==";
             }
         }
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, dynFormat);
+        print(files.TarcogIterationsFile, dynFormat);
+        print(files.TarcogIterationsFile, "\n");
 
         // write temperatures
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "(f16.8,'   ',f16.8,$)") << theta(1) - KelvinConv;
+        print(files.TarcogIterationsFile, "{:16.8F}   \n", theta(1) - KelvinConv);
         for (i = 2; i <= 2 * nlayer; ++i) {
-            ObjexxFCL::gio::write(files.TarcogIterationsFileNumber, "('   ',f16.8,'   ',f16.8,$)") << theta(i) - KelvinConv;
+            print(files.TarcogIterationsFile, "   {:16.8F}   \n", theta(i) - KelvinConv);
         }
-        ObjexxFCL::gio::write(files.TarcogIterationsFileNumber);
+        print(files.TarcogIterationsFile, "\n");
 
         // close(TarcogIterationsFileNumber)
 
         // write results in csv file
         if (index == 0) {
-            dynFormat = "('  ";
+            dynFormat = "  ";
             for (i = 1; i <= 2 * nlayer; ++i) {
-                ObjexxFCL::gio::write(a, Format_1000) << i; // this is just to simulate correct integer in brackets
+                const auto a = fmt::format("{:3}", i);
                 if (i != 2 * nlayer) {
                     dynFormat += "theta(" + a + "),";
                 } else {
                     dynFormat += "theta(" + a + ')';
                 }
             }
-            dynFormat += "')";
-            ObjexxFCL::gio::write(files.IterationCSVFileNumber, dynFormat);
+            print(files.IterationCSVFile, dynFormat);
+            print(files.IterationCSVFile, "\n");
         }
-        ObjexxFCL::gio::write(files.IterationCSVFileNumber, "(f16.8,'   ',f16.8,$)") << theta(1) - KelvinConv;
+        print(files.IterationCSVFile, "{:16.8F}   \n", theta(1) - KelvinConv);
         for (i = 2; i <= 2 * nlayer; ++i) {
-            ObjexxFCL::gio::write(files.IterationCSVFileNumber, "('   ',f16.8,'   ',f16.8,$)") << theta(i) - KelvinConv;
+            print(files.IterationCSVFile, "   {:16.8F}   \n", theta(i) - KelvinConv);
         }
-        ObjexxFCL::gio::write(files.IterationCSVFileNumber);
+        print(files.IterationCSVFile, "\n");
 
         // close(IterationCSVFileNumber)
     }

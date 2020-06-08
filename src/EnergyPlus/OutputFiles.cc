@@ -114,9 +114,17 @@ std::ostream::pos_type OutputFile::position() const noexcept
     return os->tellg();
 }
 
-void OutputFile::open()
+void OutputFile::open(const bool forAppend)
 {
-    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc));
+    auto appendMode = [=]() {
+        if (forAppend) {
+            return std::ios_base::app;
+        } else {
+            return std::ios_base::trunc;
+        }
+    }();
+
+    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode ));
 }
 
 

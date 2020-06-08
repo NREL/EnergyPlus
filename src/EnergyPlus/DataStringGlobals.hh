@@ -117,7 +117,6 @@ namespace DataStringGlobals {
     extern std::string outputSqliteErrFileName;
     extern std::string EnergyPlusIniFileName;
     extern std::string inStatFileName;
-    extern std::string TarcogIterationsFileName;
     extern std::string eplusADSFileName;
     extern std::string outputCsvFileName;
     extern std::string outputMtrCsvFileName;

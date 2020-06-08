@@ -238,7 +238,8 @@ namespace TARCOGArgs {
 
         if (files.WriteDebugOutput) {
 
-            WriteInputArguments(files,
+            WriteInputArguments(files.DebugOutputFile,
+                                files.DBGD,
                                 tout,
                                 tind,
                                 trmin,

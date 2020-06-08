@@ -65,22 +65,24 @@ namespace TARCOGOutput {
       std::string FilePosition{"ASIS"};
       bool WriteDebugOutput{false};
       int DebugMode{0};
-      int InArgumentsFile{0};
-      int OutArgumentsFile{0};
-      OutputFile WINCogFile{"test.w7"};
-      std::string WINCogFileName{"test.w7"};
 
-      // Intermediate debug files
-      int IterationCSVFileNumber{0};
-      int TarcogIterationsFileNumber{0};
+      std::string WINCogFileName{"test.w7"};
+      OutputFile WINCogFile{WINCogFileName};
+
+     // Intermediate debug files
+      std::string TarcogIterationsFileName{"TarcogIterations.dbg"};
+      OutputFile TarcogIterationsFile{TarcogIterationsFileName};
 
       std::string IterationCSVName{"IterationResults.csv"};
+      OutputFile IterationCSVFile{IterationCSVName};
+
 
       // integer, parameter :: IterationHHAT = 102
       // character(len=1000)    :: IterationHHATName = 'IterationHHAT.csv'
 
       // character(len=1000)    :: SHGCFileName = 'test.w7'
       std::string DebugOutputFileName{"Tarcog.dbg"};
+      OutputFile DebugOutputFile{DebugOutputFileName};
     };
 
     extern int winID;
@@ -92,7 +94,8 @@ namespace TARCOGOutput {
 
     // Functions
 
-    void WriteInputArguments(Files &files,
+    void WriteInputArguments(OutputFile &InArgumentsFile,
+                             const std::string &DBGD,
                              Real64 const tout,
                              Real64 const tind,
                              Real64 const trmin,
@@ -152,7 +155,7 @@ namespace TARCOGOutput {
                              Array2A<Real64> const xgcp,
                              const Array1D<Real64> &xwght);
 
-    void WriteModifiedArguments(int const InArgumentsFile,
+    void WriteModifiedArguments(OutputFile &InArgumentsFile,
                                 std::string const &DBGD,
                                 Real64 const esky,
                                 Real64 const trmout,
@@ -173,7 +176,7 @@ namespace TARCOGOutput {
                                 Array2A<Real64> const xgcp,
                                 const Array1D<Real64> &xwght);
 
-    void WriteOutputArguments(int &OutArgumentsFile,
+    void WriteOutputArguments(OutputFile &OutArgumentsFile,
                               std::string const &DBGD,
                               int const nlayer,
                               Real64 const tamb,
@@ -218,7 +221,7 @@ namespace TARCOGOutput {
                               Real64 const AchievedErrorTolerance,
                               int const NumOfIter);
 
-    void WriteOutputEN673(int &OutArgumentsFile,
+    void WriteOutputEN673(OutputFile &OutArgumentsFile,
                           std::string const &DBGD,
                           int const nlayer,
                           Real64 const ufactor,

@@ -66,7 +66,7 @@ public:
     OutputFile &ensure_open(const std::string &caller);
 
     std::string fileName;
-    void open();
+    void open(const bool forAppend = false);
     std::fstream::pos_type position() const noexcept;
     std::vector<std::string> getLines();
     void open_as_stringstream();
