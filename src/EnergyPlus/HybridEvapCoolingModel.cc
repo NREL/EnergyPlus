@@ -122,7 +122,7 @@ namespace HybridEvapCoolingModel {
           Maximum_Outdoor_Air_Temperature(0.0), Minimum_Outdoor_Air_Humidity_Ratio(0.0), Maximum_Outdoor_Air_Humidity_Ratio(0.0), ModelScalingFactor(0.0)
     {
         MODE_BLOCK_OFFSET_Alpha = 9;
-        BLOCK_HEADER_OFFSET_Alpha = 21;
+        BLOCK_HEADER_OFFSET_Alpha = 20;
         MODE1_BLOCK_OFFSET_Number = 2;
         MODE_BLOCK_OFFSET_Number = 16;
         BLOCK_HEADER_OFFSET_Number = 6;
@@ -403,46 +403,6 @@ namespace HybridEvapCoolingModel {
         }
         return true;
     }
-    bool CMode::ValidateArrays(Array1D_string Alphas,
-                               Array1D_string EP_UNUSED(cAlphaFields),
-                               Array1D<Real64> Numbers,
-                               Array1D_string EP_UNUSED(cNumericFields),
-                               std::string EP_UNUSED(cCurrentModuleObject))
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Spencer Maxwell Dutton
-        //       DATE WRITTEN   October 2017
-        //       MODIFIED
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Check to make sure that there is not a misalignment between the number of modes spcified in the idf, and the number of mode objects
-        // generated.
-
-        // METHODOLOGY EMPLOYED:
-        // Each mode has a fixed number of Numbers and Alphas inputs to process. So the total number of inputs for all the operating modes
-        // should be less than total number of parameters. Also the ModeID increment should never exceed the number the maximum number of modes
-        // specified in the idf (OpperatingModes)
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        int alphas_len = Alphas.size();
-        int numbers_len = Numbers.size();
-        int OpperatingModes = Numbers(5);
-        int parmsnumber = alphas_len + numbers_len;
-        int minHeaderFieldsLength = BLOCK_HEADER_OFFSET_Alpha + BLOCK_HEADER_OFFSET_Number;
-        int minimumOperatingFieldsLength = ((OpperatingModes-1) * (MODE_BLOCK_OFFSET_Number + MODE_BLOCK_OFFSET_Alpha)) + 1;
-
-        int MinimumExpectedLength = minimumOperatingFieldsLength + minHeaderFieldsLength;
-        if (MinimumExpectedLength > parmsnumber) {
-            return false;
-        }
-        if (OpperatingModes < ModeID) {
-            return false;
-        }
-        return true;
-    }
 
     bool Model::ParseMode(Array1D_string Alphas,
                           Array1D_string cAlphaFields,
@@ -496,13 +456,6 @@ namespace HybridEvapCoolingModel {
         ModeID = ModeCounter;
         ModelScalingFactor = ScalingFactor;
 
-        if (!ValidateArrays(Alphas, cAlphaFields, Numbers, cNumericFields, cCurrentModuleObject)) {
-            ShowSevereError(
-                "There was a misalignment between the number of modes specified in the idf, and the number of mode objects generated, in" +
-                cCurrentModuleObject);
-            return false;
-        }
-
         int inter_Number;
         bool ErrorsFound = false;
         int inter_Alpha = BLOCK_HEADER_OFFSET_Alpha + MODE_BLOCK_OFFSET_Alpha * ModeID;
@@ -515,13 +468,14 @@ namespace HybridEvapCoolingModel {
         strs << ModeID;
 
         int curveID = -1;
-        if (lAlphaBlanks(inter_Alpha - 1)) {
+        if (lAlphaBlanks(inter_Alpha)) {
             ModeName = "Mode" + strs.str();
         } else {
-            ModeName = Alphas(inter_Alpha - 1);
+            ModeName = Alphas(inter_Alpha);
         }
 
         curveID = -1;
+        inter_Alpha = inter_Alpha + 1;
         if (lAlphaBlanks(inter_Alpha)) {
             InitializeCurve(TEMP_CURVE, curveID); // as this is invalid curve id CalculateCurveVal will return a default when called
         } else {

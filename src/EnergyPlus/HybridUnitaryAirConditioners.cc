@@ -646,16 +646,6 @@ namespace HybridUnitaryAirConditioners {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * 1.225;
                 }
 
-                // N5, \field Number of Operating Modes
-//                int Numberofoperatingmodes = 0;
-//                if (lNumericBlanks(5)) {
-//                    ShowSevereError("Invalid number of operating modes" + cNumericFields(5));
-//                    ShowFatalError(RoutineName + "Errors found in getting input.");
-//                    ShowContinueError(
-//                        "... Preceding condition causes terminascaler*1.2041*pZoneHybridUnitaryAirConditioner->SystemMaximumSupplyAirFlowRatetion.");
-//                } else {
-//                    Numberofoperatingmodes = Numbers(5) - 1; // zero based count
-//                }
                 // N5, \field Minimum Time Between Mode Change
                 // A15, \field First fuel type
                 ZoneHybridUnitaryAirConditioner(UnitLoop).FirstFuelType = Alphas(15);
@@ -675,9 +665,18 @@ namespace HybridUnitaryAirConditioners {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).OutdoorAir = true;
                 }
 
+                int FirstModeAlphaNumber = 20;
+                int NumberOfAlphasPerMode = 9;
                 int Numberofoperatingmodes = 0;
+                for (int i = FirstModeAlphaNumber; i <= NumAlphas; i = i + NumberOfAlphasPerMode) {
+                    if (!lAlphaBlanks(i)) {
+                        ++Numberofoperatingmodes;
+                    } else {
+                        break;
+                    }
+                }
 
-                for (int modeIter = 0; modeIter <= Numberofoperatingmodes; ++modeIter) {
+                for (int modeIter = 0; modeIter <= Numberofoperatingmodes - 1; ++modeIter) {
                     ErrorsFound = ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(
                         Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
                     if (ErrorsFound) {

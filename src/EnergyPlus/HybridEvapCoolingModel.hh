@@ -135,11 +135,6 @@ namespace HybridEvapCoolingModel {
         int MODE_BLOCK_OFFSET_Number;
         int BLOCK_HEADER_OFFSET_Number;
         bool ValidPointer(int curve_pointer);
-        bool ValidateArrays(Array1D_string Alphas,
-                            Array1D_string cAlphaFields,
-                            Array1D<Real64> Numbers,
-                            Array1D_string cNumericFields,
-                            std::string cCurrentModuleObject);
         bool ParseMode(int ModeCounter,
                        std::vector<CMode> *OperatingModes,
                        Real64 ScalingFactor,

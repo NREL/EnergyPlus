@@ -4323,7 +4323,7 @@ This optional numeric field specifies the supply air mass flow rate ratio for Mo
 The definition of each operating mode is given as inputs to 25 fields. The first field specifies a unique name for the mode. The following eight fields specify the names of \hyperref[tablelookup]{Table:Lookup} objects that describe hybrid unit performance parameters. The remaining sixteen fields specify constraints on controlled independent variables, and constraints to describe the indoor and outdoor psychrometric conditions at which the mode is allowed. The definition of operating modes is extensible. To define multiple modes, repeat the following 25 fields with appropriate input values for each mode. The object does not require that modes be defined in a particular order. Up to 25 modes can be defined in this way.
 
 \paragraph{Field: Mode \# Name}
-This alpha input field specifies a unique user-assigned descriptive name for Mode \#.
+This alpha input field specifies a unique user-assigned descriptive name for Mode \#. Each desired mode must have a mode name in order for that mode to be included in the simulation.
 
 \paragraph{Field: Mode \# Supply Air Temperature Lookup Table Name}
 This optional alpha input field specifies the name of a \hyperref[tablelookup]{Table:Lookup} object that describes supply air temperature for Mode \# as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode \# will not be considered for any time step that requires ventilation, heating, cooling, humidification, or dehumidification.
