@@ -779,7 +779,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
 
-    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
 
     DataEnvironment::Month = 5;
     DataEnvironment::DayOfMonth = 31;
