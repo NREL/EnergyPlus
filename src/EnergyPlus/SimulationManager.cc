@@ -1298,11 +1298,10 @@ namespace SimulationManager {
                     if (overrideMaxAllowedDelTemp) {
                         // To do: Set the values for the MaxAllowedDelTemp
                         ///////
-                        // To do: override MaxAllowDelTemp, some local to glocal propagations are needed.
+                        // To do: override MaxAllowDelTemp, some local to global propagations are needed.
+                        DataConvergParams::MaxAllowedDelTemp = 0.1;
                         ///////
                     }
-
-
                 }
             }
         }
