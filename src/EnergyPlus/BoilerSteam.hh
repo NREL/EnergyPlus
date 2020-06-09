@@ -78,7 +78,7 @@ namespace BoilerSteam {
         Real64 MassFlowRate;           // kg/s - Boiler water mass flow rate
         Real64 NomCap;                 // W - design nominal capacity of Boiler
         bool NomCapWasAutoSized;       // true if Nominal capacity was autosize on input
-        Real64 Effic;                  // boiler efficiency at design conditions
+        Real64 NomEffic;               // boiler efficiency at design conditions
         Real64 MinPartLoadRat;         // Minimum allowed operating part load ratio
         Real64 MaxPartLoadRat;         // Maximum allowed operating part load ratio
         Real64 OptPartLoadRat;         // Optimal operating part load ratio
@@ -103,6 +103,7 @@ namespace BoilerSteam {
 
         Real64 FuelUsed;           // W - Boiler fuel used
         Real64 BoilerLoad;         // W - Boiler Load
+        Real64 BoilerEff;          // Boiler efficiency
         Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
         Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
 
@@ -115,10 +116,10 @@ namespace BoilerSteam {
         // Default Constructor
         BoilerSpecs()
             : FuelType(0), Available(false), ON(false), MissingSetPointErrDone(false), UseLoopSetPoint(false), DesMassFlowRate(0.0),
-              MassFlowRate(0.0), NomCap(0.0), NomCapWasAutoSized(false), Effic(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0),
+              MassFlowRate(0.0), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0),
               OperPartLoadRat(0.0), TempUpLimitBoilerOut(0.0), BoilerMaxOperPress(0.0), BoilerPressCheck(0.0), SizFac(0.0), BoilerInletNodeNum(0),
               BoilerOutletNodeNum(0), FullLoadCoef(3, 0.0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PressErrIndex(0),
-              FluidIndex(0), myFlag(true), myEnvrnFlag(true), FuelUsed(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0),
+              FluidIndex(0), myFlag(true), myEnvrnFlag(true), FuelUsed(0.0), BoilerLoad(0.0), BoilerEff(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0),
               BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }

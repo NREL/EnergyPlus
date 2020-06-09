@@ -214,7 +214,7 @@ namespace BoilerSteam {
                 ShowWarningMessage(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Field: Maximum Operation Pressure units are Pa. Verify units.");
             }
-            thisBoiler.Effic = DataIPShortCuts::rNumericArgs(2);
+            thisBoiler.NomEffic = DataIPShortCuts::rNumericArgs(2);
             thisBoiler.TempUpLimitBoilerOut = DataIPShortCuts::rNumericArgs(3);
             thisBoiler.NomCap = DataIPShortCuts::rNumericArgs(4);
             if (thisBoiler.NomCap == DataSizing::AutoSize) {
@@ -354,6 +354,7 @@ namespace BoilerSteam {
             this->BoilerPressCheck = 0.0;
             this->FuelUsed = 0.0;
             this->BoilerLoad = 0.0;
+            this->BoilerEff = 0.0;
             this->BoilerOutletTemp = 0.0;
 
             if ((DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -448,6 +449,7 @@ namespace BoilerSteam {
                             "Heating",
                             this->EndUseSubcategory,
                             "Plant");
+        SetupOutputVariable("Boiler Steam Efficiency", OutputProcessor::Unit::None, this->BoilerEff, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Steam Inlet Temperature", OutputProcessor::Unit::C, this->BoilerInletTemp, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Steam Outlet Temperature", OutputProcessor::Unit::C, this->BoilerOutletTemp, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, "System", "Average", this->Name);
@@ -539,7 +541,7 @@ namespace BoilerSteam {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, this->Name, "Boiler:Steam");
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, this->Name, this->Effic);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, this->Name, this->NomEffic);
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->Name, this->NomCap);
         }
 
@@ -771,10 +773,12 @@ namespace BoilerSteam {
         Real64 OperPLR = this->BoilerLoad / this->NomCap;
         OperPLR = min(OperPLR, this->MaxPartLoadRat);
         OperPLR = max(OperPLR, this->MinPartLoadRat);
-        Real64 TheorFuelUse = this->BoilerLoad / this->Effic;
+        Real64 TheorFuelUse = this->BoilerLoad / this->NomEffic;
 
         // Calculate fuel used
         this->FuelUsed = TheorFuelUse / (this->FullLoadCoef(1) + this->FullLoadCoef(2) * OperPLR + this->FullLoadCoef(3) * pow_2(OperPLR));
+        // Calculate boiler efficiency
+        this->BoilerEff = this->BoilerLoad / this->FuelUsed;
     }
 
     // Beginning of Record Keeping subroutines for the BOILER:SIMPLE Module
@@ -804,6 +808,7 @@ namespace BoilerSteam {
             this->BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp;
             this->BoilerLoad = 0.0;
             this->FuelUsed = 0.0;
+            this->BoilerEff = 0.0;
             DataLoopNode::Node(BoilerInletNode).Press = this->BoilerPressCheck;
             DataLoopNode::Node(BoilerOutletNode).Press = DataLoopNode::Node(BoilerInletNode).Press;
             DataLoopNode::Node(BoilerInletNode).Quality = 0.0;

@@ -4300,6 +4300,8 @@ Outputs available from the steam boiler:
 \item
   HVAC,Sum,Boiler Heating Energy {[}J{]}
 \item
+  HVAC,Average,Boiler Steam Efficiency
+\item
   Zone,Meter,Boilers:EnergyTransfer {[}J{]}
 \item
   HVAC,Average,Boiler Steam Inlet Temperature {[}C{]}
@@ -4406,6 +4408,10 @@ OtherFuel2:
 \paragraph{Boiler Heating Energy {[}J{]}}\label{boiler-heating-energy-j-1}
 
 These outputs are the heating output (load) of the boiler. Energy is metered on Boilers:EnergyTransfer, EnergyTransfer:Plant, and EnergyTransfer:Facility.
+
+\paragraph{Boiler Steam Efficiency {[]}}\label{boiler-steam-efficiency}
+
+\emph{Note that this variable is reported as zero when the boiler is not operating. When reported for frequencies longer than ``detailed'' (such as timestep, hourly, daily, monthly or environment), this output will only be meaningful when the boiler is operating for the entire reporting period. To determine an efficiency for a longer time period, compute the efficiency based on boiler heating rate divided by boiler \textless{}Fuel Type\textgreater{} rate over the desired period.}
 
 \paragraph{Boiler Steam Inlet Temperature {[}C{]}}\label{boiler-steam-inlet-temperature-c}
 
