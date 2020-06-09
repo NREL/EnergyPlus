@@ -140,7 +140,6 @@ namespace SurfaceGroundHeatExchanger {
 
     // utility variables initialized once
     bool NoSurfaceGroundTempObjWarning(true); // This will cause a warning to be issued if no "surface" ground
-    // temperature object was input.
     Real64 FlowRate(0.0);       // water mass flow rate
     Real64 TopSurfTemp(0.0);    // Top  surface temperature
     Real64 BtmSurfTemp(0.0);    // Bottom  surface temperature
@@ -664,16 +663,9 @@ namespace SurfaceGroundHeatExchanger {
         int iter;
         int iter1;
         static bool InitializeTempTop(false);
-        int loopNum;
-        int loopSideNum;
-
-        loopNum = this->LoopNum;
-        loopSideNum = this->LoopSideNum;
 
         // check if we are in very first call for this zone time step
-        if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && this->firstTimeThrough) {
-            this->firstTimeThrough = false;
-
+        if (BeginTimeStepFlag && FirstHVACIteration && PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 1) { // DSU
             // calc temps and fluxes with past env. conditions and average source flux
             SourceFlux = this->QSrcAvg;
             // starting values for the surface temps
@@ -754,7 +746,7 @@ namespace SurfaceGroundHeatExchanger {
             CalcSourceTempCoefficents(PastTempBtm, PastTempTop);
             this->SourceTemp = this->TsrcConstCoef + this->TsrcVarCoef * SourceFlux;
             // update histories
-            UpdateHistories(PastFluxTop, PastFluxBtm, SourceFlux, SourceTemp);
+            UpdateHistories(PastFluxTop, PastFluxBtm, SourceFlux, this->SourceTemp);
 
             // At the beginning of a time step, reset to zero so average calculation can start again
             this->QSrcAvg = 0.0;
@@ -850,11 +842,10 @@ namespace SurfaceGroundHeatExchanger {
                 }
             } // end surface heat balance iteration
 
-        } else if (!FirstHVACIteration) { // end source flux iteration
+        } else { // end source flux iteration
 
             // For the rest of the system time steps ...
             // update source flux from Twi
-            this->firstTimeThrough = true;
             SourceFlux = this->CalcSourceFlux();
         }
     }
@@ -1021,9 +1012,9 @@ namespace SurfaceGroundHeatExchanger {
 
         // Effectiveness * Modot * specific heat
         if (FlowRate > 0.0) {
-            EpsMdotCp = CalcHXEffectTerm(InletTemp, FlowRate);
+            EpsMdotCp = CalcHXEffectTerm(this->InletTemp, FlowRate);
             // calc flux
-            CalcSourceFlux = (InletTemp - this->TsrcConstCoef) / (this->SurfaceArea / EpsMdotCp + this->TsrcVarCoef);
+            CalcSourceFlux = (this->InletTemp - this->TsrcConstCoef) / (this->SurfaceArea / EpsMdotCp + this->TsrcVarCoef);
         } else {
             CalcSourceFlux = 0.0;
         }
@@ -1179,17 +1170,17 @@ namespace SurfaceGroundHeatExchanger {
             if (PlantLoop(this->LoopNum).FluidIndex == WaterIndex) {
                 if (this->FrozenErrIndex1 == 0) {
                     ShowWarningMessage("GroundHeatExchanger:Surface=\"" + this->Name +
-                                       "\", water is frozen; Model not valid. Calculated Water Temperature=[" + RoundSigDigits(InletTemp, 2) + "] C");
+                                       "\", water is frozen; Model not valid. Calculated Water Temperature=[" + RoundSigDigits(this->InletTemp, 2) + "] C");
                     ShowContinueErrorTimeStamp("");
                 }
                 ShowRecurringWarningErrorAtEnd("GroundHeatExchanger:Surface=\"" + this->Name + "\", water is frozen",
                                                this->FrozenErrIndex1,
-                                               InletTemp,
-                                               InletTemp,
+                                               this->InletTemp,
+                                               this->InletTemp,
                                                _,
                                                "[C]",
                                                "[C]");
-                InletTemp = max(InletTemp, 0.0);
+                this->InletTemp = max(this->InletTemp, 0.0);
             }
         }
         CpWater = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, Temperature, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
@@ -1263,9 +1254,7 @@ namespace SurfaceGroundHeatExchanger {
         // make a surface heat balance and solve for temperature
 
         // set appropriate external temp
-        if (ThisIsSnow) {
-            ExternalTemp = ThisWetBulb;
-        } else if (ThisIsRain) {
+        if (ThisIsSnow || ThisIsRain) {
             ExternalTemp = ThisWetBulb;
         } else { // normal dry conditions
             ExternalTemp = ThisDryBulb;
@@ -1278,16 +1267,16 @@ namespace SurfaceGroundHeatExchanger {
         SkyTempAbs = ThisSkyTemp + KelvinConv;
 
         // ASHRAE simple convection coefficient model for external surfaces.
-        ConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, ThisWindSpeed);
+        ConvCoef = CalcASHRAESimpExtConvectCoeff(this->TopRoughness, ThisWindSpeed);
         // radiation coefficient using surf temp from past time step
         if (std::abs(SurfTempAbs - SkyTempAbs) > SmallNum) {
-            RadCoef = StefBoltzmann * TopThermAbs * (pow_4(SurfTempAbs) - pow_4(SkyTempAbs)) / (SurfTempAbs - SkyTempAbs);
+            RadCoef = StefBoltzmann * this->TopThermAbs * (pow_4(SurfTempAbs) - pow_4(SkyTempAbs)) / (SurfTempAbs - SkyTempAbs);
         } else {
             RadCoef = 0.0;
         }
 
         // total absorbed solar - no ground solar
-        QSolAbsorbed = TopSolarAbs * (max(ThisSolarDirCosVert, 0.0) * ThisBeamSolarRad + ThisDifSolarRad);
+        QSolAbsorbed = this->TopSolarAbs * (max(ThisSolarDirCosVert, 0.0) * ThisBeamSolarRad + ThisDifSolarRad);
 
         // solve for temperature
         TempTop = (FluxTop + ConvCoef * ExternalTemp + RadCoef * ThisSkyTemp + QSolAbsorbed) / (ConvCoef + RadCoef);
@@ -1331,11 +1320,11 @@ namespace SurfaceGroundHeatExchanger {
             ExtTempAbs = ThisDryBulb + KelvinConv;
 
             // ASHRAE simple convection coefficient model for external surfaces.
-            ConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, ThisWindSpeed);
+            ConvCoef = CalcASHRAESimpExtConvectCoeff(this->TopRoughness, ThisWindSpeed);
 
             // radiation coefficient using surf temp from past time step
             if (std::abs(SurfTempAbs - ExtTempAbs) > SmallNum) {
-                RadCoef = StefBoltzmann * TopThermAbs * (pow_4(SurfTempAbs) - pow_4(ExtTempAbs)) / (SurfTempAbs - ExtTempAbs);
+                RadCoef = StefBoltzmann * this->TopThermAbs * (pow_4(SurfTempAbs) - pow_4(ExtTempAbs)) / (SurfTempAbs - ExtTempAbs);
             } else {
                 RadCoef = 0.0;
             }
@@ -1387,19 +1376,16 @@ namespace SurfaceGroundHeatExchanger {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpFluid; // Specific heat of working fluid
-        int loopNum;
-        int loopSideNum;
 
         // update flux
         this->QSrc = SourceFlux;
 
-        loopNum = this->LoopNum;
-        loopSideNum = this->LoopSideNum;
-        if (this->LastSysTimeElapsed == SysTimeElapsed) {
-            // Still iterating or reducing system time step, so subtract old values which were
-            // not valid
-            this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / TimeStepZone;
-        } else {
+        if (PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock > 0) { // only update in normal mode !DSU
+            if (this->LastSysTimeElapsed == SysTimeElapsed) {
+                // Still iterating or reducing system time step, so subtract old values which were
+                // not valid
+                this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / TimeStepZone;
+            }
 
             // Update the running average and the "last" values with the current values of the appropriate variables
             this->QSrcAvg += this->QSrc * TimeStepSys / TimeStepZone;
@@ -1414,17 +1400,17 @@ namespace SurfaceGroundHeatExchanger {
         if (PlantLoop(this->LoopNum).FluidName == "WATER") {
             if (InletTemp < 0.0) {
                 ShowRecurringWarningErrorAtEnd(
-                    "UpdateSurfaceGroundHeatExchngr: Water is frozen in Surf HX=" + this->Name, this->FrozenErrIndex2, InletTemp, InletTemp);
+                    "UpdateSurfaceGroundHeatExchngr: Water is frozen in Surf HX=" + this->Name, this->FrozenErrIndex2, this->InletTemp, this->InletTemp);
             }
-            InletTemp = max(InletTemp, 0.0);
+            this->InletTemp = max(this->InletTemp, 0.0);
         }
 
-        CpFluid = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, InletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+        CpFluid = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, this->InletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
         SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum);
         // check for flow
         if ((CpFluid > 0.0) && (FlowRate > 0.0)) {
-            Node(this->OutletNodeNum).Temp = InletTemp - this->SurfaceArea * SourceFlux / (FlowRate * CpFluid);
+            Node(this->OutletNodeNum).Temp = this->InletTemp - this->SurfaceArea * SourceFlux / (FlowRate * CpFluid);
             Node(this->OutletNodeNum).Enthalpy = Node(this->OutletNodeNum).Temp * CpFluid;
         }
     }

@@ -66,23 +66,10 @@ namespace SurfaceGroundHeatExchanger {
                                       // to avoid static initialization order bug: Keep them in sync
     }                                 // namespace loc
 
-    // get input flag
-    extern bool GetInputFlag;
-
-    // time keeping variables used for keeping track of average flux over each time step
-    extern Array1D<Real64> QRadSysSrcAvg;      // Average source over the time step
-    extern Array1D<Real64> LastSysTimeElapsed; // record of system time
-    extern Array1D<Real64> LastTimeStepSys;    // previous time step size
-
     struct SurfaceGroundHeatExchangerData : PlantComponent
     {
+        ~SurfaceGroundHeatExchangerData() = default;
 
-        virtual ~SurfaceGroundHeatExchangerData()
-        {
-        }
-
-        // Members
-        // Input data
         std::string Name;             // name of surface GHE
         std::string ConstructionName; // name of the associated construction
         std::string InletNode;        // surface GHE inlet fluid node
@@ -164,7 +151,6 @@ namespace SurfaceGroundHeatExchanger {
         bool InitQTF;
         bool MyEnvrnFlag;
         Real64 SurfaceArea; // surface GHE surface area
-        bool firstTimeThrough;
 
         // Default Constructor
         SurfaceGroundHeatExchangerData()
@@ -184,37 +170,37 @@ namespace SurfaceGroundHeatExchanger {
               InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0), TopSurfaceTemp(0.0), BtmSurfaceTemp(0.0), TopSurfaceFlux(0.0), BtmSurfaceFlux(0.0),
               HeatTransferRate(0.0), SurfHeatTransferRate(0.0), Energy(0.0), SurfEnergy(0.0), SourceTemp(0.0),
 
-              MyFlag(true), InitQTF(true), MyEnvrnFlag(true), SurfaceArea(0.0), firstTimeThrough(true)
+              MyFlag(true), InitQTF(true), MyEnvrnFlag(true), SurfaceArea(0.0)
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        static PlantComponent *factory(int const objectType, std::string const objectName);
+        static PlantComponent *factory(int objectType, std::string objectName);
 
         void InitSurfaceGroundHeatExchanger();
 
         //==============================================================================
 
-        void CalcSurfaceGroundHeatExchanger(bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+        void CalcSurfaceGroundHeatExchanger(bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
         );
 
         //==============================================================================
 
-        void CalcBottomFluxCoefficents(Real64 const Tbottom, // current bottom (lower) surface temperature
-                                       Real64 const Ttop     // current top (upper) surface temperature
+        void CalcBottomFluxCoefficents(Real64 Tbottom, // current bottom (lower) surface temperature
+                                       Real64 Ttop     // current top (upper) surface temperature
         );
 
         //==============================================================================
 
-        void CalcTopFluxCoefficents(Real64 const Tbottom, // current bottom (lower) surface temperature
-                                    Real64 const Ttop     // current top (upper) surface temperature
+        void CalcTopFluxCoefficents(Real64 Tbottom, // current bottom (lower) surface temperature
+                                    Real64 Ttop     // current top (upper) surface temperature
         );
 
         //==============================================================================
 
-        void CalcSourceTempCoefficents(Real64 const Tbottom, // current bottom (lower) surface temperature
-                                       Real64 const Ttop     // current top (upper) surface temperature
+        void CalcSourceTempCoefficents(Real64 Tbottom, // current bottom (lower) surface temperature
+                                       Real64 Ttop     // current top (upper) surface temperature
         );
 
         //==============================================================================
@@ -223,40 +209,40 @@ namespace SurfaceGroundHeatExchanger {
 
         //==============================================================================
 
-        void UpdateHistories(Real64 const TopFlux,    // current top (top) surface flux
-                             Real64 const BottomFlux, // current bottom (bottom) surface flux
-                             Real64 const sourceFlux, // current source surface flux
-                             Real64 const sourceTemp  // current source temperature
+        void UpdateHistories(Real64 TopFlux,    // current top (top) surface flux
+                             Real64 BottomFlux, // current bottom (bottom) surface flux
+                             Real64 SourceFlux, // current source surface flux
+                             Real64 SourceTemp  // current source temperature
         );
 
         //==============================================================================
 
-        Real64 CalcHXEffectTerm(Real64 const Temperature,  // Temperature of water entering the surface, in C
-                                Real64 const WaterMassFlow // Mass flow rate, in kg/s
+        Real64 CalcHXEffectTerm(Real64 Temperature,  // Temperature of water entering the surface, in C
+                                Real64 WaterMassFlow // Mass flow rate, in kg/s
         );
 
         //==============================================================================
 
-        void CalcTopSurfTemp(Real64 const FluxTop,             // top surface flux
+        void CalcTopSurfTemp(Real64 FluxTop,             // top surface flux
                              Real64 &TempTop,                  // top surface temperature
-                             Real64 const ThisDryBulb,         // dry bulb temperature
-                             Real64 const ThisWetBulb,         // wet bulb temperature
-                             Real64 const ThisSkyTemp,         // sky temperature
-                             Real64 const ThisBeamSolarRad,    // beam solar radiation
-                             Real64 const ThisDifSolarRad,     // diffuse solar radiation
-                             Real64 const ThisSolarDirCosVert, // vertical component of solar normal
-                             Real64 const ThisWindSpeed,       // wind speed
-                             bool const ThisIsRain,            // rain flag
-                             bool const ThisIsSnow             // snow flag
+                             Real64 ThisDryBulb,         // dry bulb temperature
+                             Real64 ThisWetBulb,         // wet bulb temperature
+                             Real64 ThisSkyTemp,         // sky temperature
+                             Real64 ThisBeamSolarRad,    // beam solar radiation
+                             Real64 ThisDifSolarRad,     // diffuse solar radiation
+                             Real64 ThisSolarDirCosVert, // vertical component of solar normal
+                             Real64 ThisWindSpeed,       // wind speed
+                             bool ThisIsRain,            // rain flag
+                             bool ThisIsSnow             // snow flag
         );
 
         //==============================================================================
 
-        void CalcBottomSurfTemp(Real64 const FluxBtm,       // bottom surface flux
+        void CalcBottomSurfTemp(Real64 FluxBtm,       // bottom surface flux
                                 Real64 &TempBtm,            // bottom surface temperature
-                                Real64 const ThisDryBulb,   // dry bulb temperature
-                                Real64 const ThisWindSpeed, // wind speed
-                                Real64 const ThisGroundTemp // ground temperature
+                                Real64 ThisDryBulb,   // dry bulb temperature
+                                Real64 ThisWindSpeed, // wind speed
+                                Real64 ThisGroundTemp // ground temperature
         );
 
         //==============================================================================
