@@ -305,20 +305,18 @@ namespace SimulationManager {
         bool AnyUnderwaterBoundaries = false;
         int EnvCount;
 
-<<<<<<< HEAD
-        outputFiles.outputControl.getInput();
-        if (DataGlobals::runReadVars) {
-            outputFiles.outputControl.csv = true;
-        }
-        ResultsFramework::resultsFramework->setupOutputOptions();
-
-        outputFiles.debug.ensure_open("OpenOutputFiles", outputFiles.outputControl.dbg);
-=======
         // Windows: ensure that EnergyPlusAPI.dll's notion of the "static singleton OutputFiles" matches
         // the exe's notion.
         // TODO: Remove this after we have eliminated all remaining calls to OutputFiles::getSingleton
         OutputFiles::setSingleton(&state.outputFiles);
->>>>>>> origin/develop
+
+        state.outputFiles.outputControl.getInput();
+        if (DataGlobals::runReadVars) {
+            state.outputFiles.outputControl.csv = true;
+        }
+        ResultsFramework::resultsFramework->setupOutputOptions();
+
+        state.outputFiles.debug.ensure_open("OpenOutputFiles", state.outputFiles.outputControl.dbg);
 
         // CreateSQLiteDatabase();
         sqlite = EnergyPlus::CreateSQLiteDatabase();
@@ -1420,27 +1418,27 @@ namespace SimulationManager {
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
         if (DataGlobals::createPerfLog) {
-            writeIntialPerfLogValues(overrideModeValue);
+            writeIntialPerfLogValues(outputFiles, overrideModeValue);
         }
     }
 
-    void writeIntialPerfLogValues(std::string const &currentOverrideModeValue)
+    void writeIntialPerfLogValues(OutputFiles &outputFiles, std::string const &currentOverrideModeValue)
     // write the input related portions of the .perflog
     // J.Glazer February 2020
     {
-        UtilityRoutines::appendPerfLog("Program, Version, TimeStamp",
+        UtilityRoutines::appendPerfLog(outputFiles, "Program, Version, TimeStamp",
                                        DataStringGlobals::VerString); // this string already includes three portions and has commas
-        UtilityRoutines::appendPerfLog("Use Coil Direct Solution", bool_to_string(DoCoilDirectSolutions));
+        UtilityRoutines::appendPerfLog(outputFiles, "Use Coil Direct Solution", bool_to_string(DoCoilDirectSolutions));
         if (HeatBalanceIntRadExchange::CarrollMethod) {
-            UtilityRoutines::appendPerfLog("Zone Radiant Exchange Algorithm", "CarrollMRT");
+            UtilityRoutines::appendPerfLog(outputFiles, "Zone Radiant Exchange Algorithm", "CarrollMRT");
         } else {
-            UtilityRoutines::appendPerfLog("Zone Radiant Exchange Algorithm", "ScriptF");
+            UtilityRoutines::appendPerfLog(outputFiles, "Zone Radiant Exchange Algorithm", "ScriptF");
         }
-        UtilityRoutines::appendPerfLog("Override Mode", currentOverrideModeValue);
-        UtilityRoutines::appendPerfLog("Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
-        UtilityRoutines::appendPerfLog("Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
-        UtilityRoutines::appendPerfLog("SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
-        UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
+        UtilityRoutines::appendPerfLog(outputFiles, "Override Mode", currentOverrideModeValue);
+        UtilityRoutines::appendPerfLog(outputFiles, "Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
+        UtilityRoutines::appendPerfLog(outputFiles, "Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
+        UtilityRoutines::appendPerfLog(outputFiles, "SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
+        UtilityRoutines::appendPerfLog(outputFiles, "MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
     }
 
     std::string bool_to_string(bool logical)
@@ -1793,37 +1791,20 @@ namespace SimulationManager {
 
         // FLOW:
         StdOutputRecordCount = 0;
-<<<<<<< HEAD
-        OutputFiles::getSingleton().eso.ensure_open("OpenOutputFiles", OutputFiles::getSingleton().outputControl.eso);
-        print(OutputFiles::getSingleton().eso, "Program Version,{}\n", VerString);
-
-        // Open the Initialization Output File
-        OutputFiles::getSingleton().eio.ensure_open("OpenOutputFiles", OutputFiles::getSingleton().outputControl.eio);
-        print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
-
-        // Open the Meters Output File
-        OutputFiles::getSingleton().mtr.ensure_open("OpenOutputFiles", OutputFiles::getSingleton().outputControl.mtr);
-        print(OutputFiles::getSingleton().mtr, "Program Version,{}\n", VerString);
-
-        // Open the Branch-Node Details Output File
-        OutputFiles::getSingleton().bnd.ensure_open("OpenOutputFiles", OutputFiles::getSingleton().outputControl.bnd);
-        print(OutputFiles::getSingleton().bnd, "Program Version,{}\n", VerString);
-=======
-        outputFiles.eso.ensure_open("OpenOutputFiles");
+        outputFiles.eso.ensure_open("OpenOutputFiles", outputFiles.outputControl.eso);
         print(outputFiles.eso, "Program Version,{}\n", VerString);
 
         // Open the Initialization Output File
-        outputFiles.eio.ensure_open("OpenOutputFiles");
+        outputFiles.eio.ensure_open("OpenOutputFiles", outputFiles.outputControl.eio);
         print(outputFiles.eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        outputFiles.mtr.ensure_open("OpenOutputFiles");
+        outputFiles.mtr.ensure_open("OpenOutputFiles", outputFiles.outputControl.mtr);
         print(outputFiles.mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
-        outputFiles.bnd.ensure_open("OpenOutputFiles");
+        outputFiles.bnd.ensure_open("OpenOutputFiles", outputFiles.outputControl.bnd);
         print(outputFiles.bnd, "Program Version,{}\n", VerString);
->>>>>>> origin/develop
     }
 
     void CloseOutputFiles(OutputFiles &outputFiles)
@@ -1895,11 +1876,7 @@ namespace SimulationManager {
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
 
-<<<<<<< HEAD
-        OutputFiles::getSingleton().audit.ensure_open("CloseOutputFiles", OutputFiles::getSingleton().outputControl.audit);
-=======
-        outputFiles.audit.ensure_open("CloseOutputFiles");
->>>>>>> origin/develop
+        outputFiles.audit.ensure_open("CloseOutputFiles", OutputFiles::getSingleton().outputControl.audit);
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
         print(outputFiles.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);

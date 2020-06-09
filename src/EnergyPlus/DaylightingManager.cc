@@ -4605,7 +4605,6 @@ namespace DaylightingManager {
             DisplayString("ReturnFrom DElight DaylightCoefficients Calc");
             if (iErrorFlag != 0) {
                 // Open DElight Daylight Factors Error File for reading
-                auto & outputFiles = OutputFiles::getSingleton();
                 ////  Change to following once delightdfdmp is converted to OutputFiles
                 //    outputFiles.delightdfdmp.ensure_open(outputFiles.outputControl.delightdfdmp);
                 iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "ReadWrite", true);
@@ -4660,7 +4659,6 @@ namespace DaylightingManager {
                 }
             } else {
                 // Open, Close, and Delete DElight Daylight Factors Error File for reading
-                auto & outputFiles = OutputFiles::getSingleton();
                 ////  Change to following once delightdfdmp is converted to OutputFiles
                 //    outputFiles.delightdfdmp.ensure_open(outputFiles.outputControl.delightdfdmp);
                 iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "ReadWrite", true);

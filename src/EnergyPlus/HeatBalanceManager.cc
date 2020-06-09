@@ -6009,21 +6009,8 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
 
-<<<<<<< HEAD
-        auto & outputFiles = OutputFiles::getSingleton();
-////  Change to following once extshd is converted to OutputFiles
-//    outputFiles.extshd.ensure_open(outputFiles.outputControl.extshd);
-        OutputFileShadingFrac = outputFiles.open_gio(DataStringGlobals::outputExtShdFracFileName, "OpenOutputFiles", outputFiles.outputControl.extshd);
-
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(OutputFileShadingFrac, fmtA, flags) << "Surface Name,";
-        }
-=======
-        outputFiles.shade.ensure_open("OpenOutputFiles");
+        outputFiles.shade.ensure_open("OpenOutputFiles", outputFiles.outputControl.extshd);
         print(outputFiles.shade, "Surface Name,");
->>>>>>> origin/develop
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             print(outputFiles.shade, "{},", Surface(SurfNum).Name);
         }

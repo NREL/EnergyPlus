@@ -232,14 +232,7 @@ namespace EMSManager {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
                 // open up output file for EMS EDD file  EMS Data and Debug
-<<<<<<< HEAD
-                auto & outputFiles = OutputFiles::getSingleton();
-                ////  Change to following once edd is converted to OutputFiles
-                //    outputFiles.edd.ensure_open(outputFiles.outputControl.edd);
-                OutputEMSFileUnitNum = outputFiles.open_gio(DataStringGlobals::outputEddFileName, "CheckIFAnyEMS", outputFiles.outputControl.edd);
-=======
-                outputFiles.edd.ensure_open("CheckIFAnyEMS");
->>>>>>> origin/develop
+                outputFiles.edd.ensure_open("CheckIFAnyEMS", outputFiles.outputControl.edd);
             }
         } else {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);

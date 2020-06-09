@@ -214,15 +214,8 @@ namespace DElightManagerF {
         // Init the counter for Window Construction types for writing to Library Data section of DElight input file
         int iNumWndoConsts = 0;
 
-<<<<<<< HEAD
-        auto & outputFiles = OutputFiles::getSingleton();
-        ////  Change to following once delightin is converted to OutputFiles
-        //    outputFiles.delightin.ensure_open(outputFiles.outputControl.delightin);
-        unit = outputFiles.open_gio(outputDelightInFileName, "DElightInputGenerator", outputFiles.outputControl.delightin);
-=======
         // Open a file for writing DElight input from EnergyPlus data
-        auto delightInFile = outputFiles.delightIn.open("DElightInputGenerator");
->>>>>>> origin/develop
+        auto delightInFile = outputFiles.delightIn.open("DElightInputGenerator", outputFiles.outputControl.delightin);
 
         // Start of DElight input file
         print(delightInFile, Format_901, CurrentDateTime);

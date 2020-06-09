@@ -569,11 +569,7 @@ namespace UtilityRoutines {
         bool operator()(const std::string& a, const std::string& b) const noexcept;
     };
 
-    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
-
-<<<<<<< HEAD
-=======
-    inline bool exists(const std::string& filename);
+    void appendPerfLog(OutputFiles &outputFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
 
     bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound);
 
@@ -581,7 +577,6 @@ namespace UtilityRoutines {
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput, std::string &FuelTypeOutput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
 
->>>>>>> origin/develop
 } // namespace UtilityRoutines
 
 } // namespace EnergyPlus

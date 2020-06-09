@@ -48,11 +48,7 @@
 #ifndef OutputFiles_hh_INCLUDED
 #define OutputFiles_hh_INCLUDED
 
-<<<<<<< HEAD
-#include "DataGlobals.hh"
 #include "nlohmann/json.hpp"
-=======
->>>>>>> origin/develop
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -102,7 +98,6 @@ public:
             return of;
         }
     };
-
 
 ////  Remove once all gio are converted to OutputFiles
 ////  Use following example at each calling location

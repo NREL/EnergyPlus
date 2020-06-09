@@ -5675,7 +5675,7 @@ namespace OutputReportTabular {
 
         if (WriteTabularFiles) {
             // call each type of report in turn
-            WriteBEPSTable();
+            WriteBEPSTable(state.outputFiles);
             WriteTableOfContents();
             WriteVeriSumTable(state.outputFiles);
             WriteDemandEndUseSummary();
@@ -5699,26 +5699,7 @@ namespace OutputReportTabular {
         }
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
-<<<<<<< HEAD
-        outputFiles.audit.ensure_open("WriteTabularReports", outputFiles.outputControl.audit);
-        print(outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
-        print(outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
-        print(outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
-        print(outputFiles.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
-        print(outputFiles.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
-        print(outputFiles.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
-        print(outputFiles.audit, variable_fmt, "sizeReportName", sizeReportName);
-        print(outputFiles.audit, variable_fmt, "numReportName", numReportName);
-        print(outputFiles.audit, variable_fmt, "sizeSubTable", sizeSubTable);
-        print(outputFiles.audit, variable_fmt, "numSubTable", numSubTable);
-        print(outputFiles.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
-        print(outputFiles.audit, variable_fmt, "numColumnTag", numColumnTag);
-        print(outputFiles.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
-        print(outputFiles.audit, variable_fmt, "numTableEntry", numTableEntry);
-        print(outputFiles.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
-        print(outputFiles.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
-=======
-        state.outputFiles.audit.ensure_open("WriteTabularReports");
+        state.outputFiles.audit.ensure_open("WriteTabularReports", state.outputFiles.outputControl.audit);
         print(state.outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
         print(state.outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
         print(state.outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
@@ -5735,7 +5716,6 @@ namespace OutputReportTabular {
         print(state.outputFiles.audit, variable_fmt, "numTableEntry", numTableEntry);
         print(state.outputFiles.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
         print(state.outputFiles.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
->>>>>>> origin/develop
     }
 
     void parseStatLine(const std::string &lineIn,
@@ -7495,7 +7475,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteBEPSTable()
+    void WriteBEPSTable(OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -7654,25 +7634,25 @@ namespace OutputReportTabular {
             collapsedTotal(13) = gatherTotalsBEPS(7);                       // water
 
             if (DataGlobals::createPerfLog) {
-                UtilityRoutines::appendPerfLog("Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
-                UtilityRoutines::appendPerfLog("Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
-                UtilityRoutines::appendPerfLog("Gasoline ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
-                UtilityRoutines::appendPerfLog("Diesel ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(4), 3));
-                UtilityRoutines::appendPerfLog("Coal ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(5), 3));
-                UtilityRoutines::appendPerfLog("Fuel Oil No 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(6), 3));
-                UtilityRoutines::appendPerfLog("Fuel Oil No 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(7), 3));
-                UtilityRoutines::appendPerfLog("Propane ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(8), 3));
-                UtilityRoutines::appendPerfLog("Other Fuel 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(9), 3));
-                UtilityRoutines::appendPerfLog("Other Fuel 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(10), 3));
-                UtilityRoutines::appendPerfLog("District Cooling ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(11), 3));
-                UtilityRoutines::appendPerfLog("District Heating ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(12), 3));
-                UtilityRoutines::appendPerfLog("Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(13), 3));
-                UtilityRoutines::appendPerfLog("Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
-                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures Time [hours]",
+                UtilityRoutines::appendPerfLog(outputFiles, "Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "Gasoline ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "Diesel ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(4), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "Coal ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(5), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "Fuel Oil No 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(6), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "Fuel Oil No 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(7), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "Propane ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(8), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "Other Fuel 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(9), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "Other Fuel 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(10), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "District Cooling ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(11), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "District Heating ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(12), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(13), 3));
+                UtilityRoutines::appendPerfLog(outputFiles, "Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
+                UtilityRoutines::appendPerfLog(outputFiles, "Facility Any Zone Oscillating Temperatures Time [hours]",
                                                General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillate, 2));
-                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
+                UtilityRoutines::appendPerfLog(outputFiles, "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
                                                General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillateDuringOccupancy, 2));
-                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
+                UtilityRoutines::appendPerfLog(outputFiles, "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
                                                General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillateInDeadband, 2));
             }
             for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {

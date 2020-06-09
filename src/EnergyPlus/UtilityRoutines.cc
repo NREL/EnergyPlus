@@ -431,7 +431,7 @@ namespace UtilityRoutines {
         return SameString(a, b);
     }
 
-    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn)
+    void appendPerfLog(OutputFiles &outputFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn)
     // Add column to the performance log file (comma separated) which is appended to existing log.
     // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
     // J.Glazer February 2020
@@ -449,117 +449,26 @@ namespace UtilityRoutines {
 
         if (finalColumn) {
             std::fstream fsPerfLog;
-<<<<<<< HEAD
-            auto & outputFiles = OutputFiles::getSingleton();
             if (!FileSystem::fileExists(DataStringGlobals::outputPerfLogFileName)) {
                 if (outputFiles.outputControl.perflog) {
                     fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
                     if (!fsPerfLog) {
                         ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
                     }
-=======
-            if (!exists(DataStringGlobals::outputPerfLogFileName)) {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); // open file normally
-                if (!fsPerfLog.fail()) {
->>>>>>> origin/develop
                     fsPerfLog << appendPerfLog_headerRow << std::endl;
                     fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             } else {
-<<<<<<< HEAD
                 if (outputFiles.outputControl.perflog) {
                     fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
                     if (!fsPerfLog) {
                         ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
                     }
-=======
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); // append to already existing file
-                if (!fsPerfLog.fail()) {
->>>>>>> origin/develop
                     fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             }
             fsPerfLog.close();
         }
-    }
-
-<<<<<<< HEAD
-} // namespace UtilityRoutines
-
-int AbortEnergyPlus(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   December 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine causes the program to halt due to a fatal error.
-
-    // METHODOLOGY EMPLOYED:
-    // Puts a message on output files.
-    // Closes files.
-    // Stops the program.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using namespace DataSystemVariables;
-    using namespace DataTimings;
-    using namespace DataErrorTracking;
-    using BranchInputManager::TestBranchIntegrity;
-    using BranchNodeConnections::CheckNodeConnections;
-    using BranchNodeConnections::TestCompSetInletOutletNodes;
-    using ExternalInterface::CloseSocket;
-    using ExternalInterface::NumExternalInterfaces;
-    using General::RoundSigDigits;
-    using NodeInputManager::CheckMarkedNodes;
-    using NodeInputManager::SetupNodeVarsForReporting;
-    using PlantManager::CheckPlantOnAbort;
-    using SimulationManager::ReportLoopConnections;
-    using SolarShading::ReportSurfaceErrors;
-    using SystemReports::ReportAirLoopConnections;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr auto fmtLD("*");
-    static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
-
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int tempfl;
-    std::string NumWarnings;
-    std::string NumSevere;
-    std::string NumWarningsDuringWarmup;
-    std::string NumSevereDuringWarmup;
-    std::string NumWarningsDuringSizing;
-    std::string NumSevereDuringSizing;
-    int Hours;      // Elapsed Time Hour Reporting
-    int Minutes;    // Elapsed Time Minute Reporting
-    Real64 Seconds; // Elapsed Time Second Reporting
-    bool ErrFound;
-    bool TerminalError;
-
-    if (sqlite) {
-        sqlite->updateSQLiteSimulationRecord(true, false);
-    }
-=======
-    inline bool exists(const std::string &filename)
-    {
-        // https://stackoverflow.com/questions/25225948/how-to-check-if-a-file-exists-in-c-with-fstreamopen/51300933
-        struct stat buffer;
-        return (stat(filename.c_str(), &buffer) == 0);
     }
 
     bool ValidateFuelType(std::string const &FuelTypeInput,
@@ -572,63 +481,12 @@ int AbortEnergyPlus(EnergyPlusData &state)
 
         // PURPOSE OF THIS FUNCTION:
         // Validates fuel types and sets output strings
->>>>>>> origin/develop
 
         auto const SELECT_CASE_var(FuelTypeInput);
 
         if (SELECT_CASE_var == "ELECTRICITY") {
             FuelTypeOutput = "Electric";
 
-<<<<<<< HEAD
-    ReportSurfaceErrors();
-    CheckPlantOnAbort();
-    ShowRecurringErrors();
-    SummarizeErrors();
-    CloseMiscOpenFiles();
-    NumWarnings = fmt::to_string(TotalWarningErrors);
-    NumSevere = fmt::to_string(TotalSevereErrors);
-    NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
-    NumSevereDuringWarmup = fmt::to_string(TotalSevereErrorsDuringWarmup);
-    NumWarningsDuringSizing = fmt::to_string(TotalWarningErrorsDuringSizing);
-    NumSevereDuringSizing = fmt::to_string(TotalSevereErrorsDuringSizing);
-
-    // catch up with timings if in middle
-    Time_Finish = epElapsedTime();
-    if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
-    Elapsed_Time = Time_Finish - Time_Start;
-#ifdef EP_Detailed_Timings
-    epStopTime("EntireRun=");
-#endif
-    if (Elapsed_Time < 0.0) Elapsed_Time = 0.0;
-    Hours = Elapsed_Time / 3600.0;
-    Elapsed_Time -= Hours * 3600.0;
-    Minutes = Elapsed_Time / 60.0;
-    Elapsed_Time -= Minutes * 60.0;
-    Seconds = Elapsed_Time;
-    if (Seconds < 0.0) Seconds = 0.0;
-    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
-    const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
-
-    ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
-    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
-
-    ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
-                " Severe Errors.");
-    ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
-                " Severe Errors.");
-    ShowMessage("EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
-    DisplayString("EnergyPlus Run Time=" + Elapsed);
-
-    auto & outputFiles = OutputFiles::getSingleton();
-    ////  Change to following once end is converted to OutputFiles
-    //    outputFiles.end.ensure_open(outputFiles.outputControl.end);
-    tempfl = outputFiles.open_gio(DataStringGlobals::outputEndFileName, "AbortEnergyPlus", outputFiles.outputControl.end);
-
-    ObjexxFCL::gio::write(tempfl, fmtLD) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
-                                     " Severe Errors; Elapsed Time=" + Elapsed;
-=======
         } else if (SELECT_CASE_var == "NATURALGAS") {
             FuelTypeOutput = "Gas";
 
@@ -652,7 +510,6 @@ int AbortEnergyPlus(EnergyPlusData &state)
 
         } else if (SELECT_CASE_var == "OTHERFUEL1") {
             FuelTypeOutput = "OtherFuel1";
->>>>>>> origin/develop
 
         } else if (SELECT_CASE_var == "OTHERFUEL2") {
             FuelTypeOutput = "OtherFuel2";
@@ -661,9 +518,6 @@ int AbortEnergyPlus(EnergyPlusData &state)
             FuelTypeErrorsFound = true;
         }
 
-<<<<<<< HEAD
-    ResultsFramework::resultsFramework->writeOutputs();
-=======
         return FuelTypeErrorsFound;
     }
 
@@ -702,7 +556,6 @@ int AbortEnergyPlus(EnergyPlusData &state)
 
         return FuelTypeErrorsFound;
     }
->>>>>>> origin/develop
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
@@ -809,7 +662,7 @@ int AbortEnergyPlus(EnergyPlusData &state)
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
+        static constexpr auto fmtLD("*");
         static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -830,7 +683,6 @@ int AbortEnergyPlus(EnergyPlusData &state)
         Real64 Seconds; // Elapsed Time Second Reporting
         bool ErrFound;
         bool TerminalError;
-        int write_stat;
 
         if (sqlite) {
             sqlite->updateSQLiteSimulationRecord(true, false);
@@ -899,10 +751,10 @@ int AbortEnergyPlus(EnergyPlusData &state)
         static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
@@ -911,133 +763,21 @@ int AbortEnergyPlus(EnergyPlusData &state)
         ShowMessage("EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
                     " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
-        tempfl = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-            DisplayString("AbortEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
-        }
+
+        tempfl = state.outputFiles.open_gio(DataStringGlobals::outputEndFileName, "AbortEnergyPlus", state.outputFiles.outputControl.end);
+
         ObjexxFCL::gio::write(tempfl, fmtLD) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
-                                                    " Severe Errors; Elapsed Time=" + Elapsed;
-
-<<<<<<< HEAD
-int EndEnergyPlus()
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   December 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine causes the program to terminate when complete (no errors).
-
-    // METHODOLOGY EMPLOYED:
-    // Puts a message on output files.
-    // Closes files.
-    // Stops the program.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using namespace DataSystemVariables;
-    using namespace DataTimings;
-    using namespace DataErrorTracking;
-    using ExternalInterface::CloseSocket;
-    using ExternalInterface::haveExternalInterfaceBCVTB;
-    using ExternalInterface::NumExternalInterfaces;
-    using General::RoundSigDigits;
-    using SolarShading::ReportSurfaceErrors;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
-    static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int tempfl;
-    std::string NumWarnings;
-    std::string NumSevere;
-    std::string NumWarningsDuringWarmup;
-    std::string NumSevereDuringWarmup;
-    std::string NumWarningsDuringSizing;
-    std::string NumSevereDuringSizing;
-    std::string Elapsed;
-    int Hours;      // Elapsed Time Hour Reporting
-    int Minutes;    // Elapsed Time Minute Reporting
-    Real64 Seconds; // Elapsed Time Second Reporting
-
-    if (sqlite) {
-        sqlite->updateSQLiteSimulationRecord(true, true);
-    }
-=======
+                                                " Severe Errors; Elapsed Time=" + Elapsed;
         ObjexxFCL::gio::close(tempfl);
 
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles();
 
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports();
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport();
-        }
->>>>>>> origin/develop
+        ResultsFramework::resultsFramework->writeOutputs();
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
 #endif
-<<<<<<< HEAD
-    Hours = Elapsed_Time / 3600.0;
-    Elapsed_Time -= Hours * 3600.0;
-    Minutes = Elapsed_Time / 60.0;
-    Elapsed_Time -= Minutes * 60.0;
-    Seconds = Elapsed_Time;
-    if (Seconds < 0.0) Seconds = 0.0;
-    ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
-
-    ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
-    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-    ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
-
-    if (DataGlobals::createPerfLog) {
-        UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
-        UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
-        UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); //last item so write the perfLog file
-    }
-    ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
-                " Severe Errors.");
-    ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
-                " Severe Errors.");
-    ShowMessage("EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
-    DisplayString("EnergyPlus Run Time=" + Elapsed);
-
-    auto & outputFiles = OutputFiles::getSingleton();
-    ////  Change to following once end is converted to OutputFiles
-    //    outputFiles.end.ensure_open(outputFiles.outputControl.end);
-    tempfl = outputFiles.open_gio(DataStringGlobals::outputEndFileName, "EndEnergyPlus", outputFiles.outputControl.end);
-
-    ObjexxFCL::gio::write(tempfl, fmtA) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere +
-                                    " Severe Errors; Elapsed Time=" + Elapsed;
-    ObjexxFCL::gio::close(tempfl);
-=======
         std::cerr << "Program terminated: "
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
         CloseOutOpenFiles();
@@ -1049,7 +789,6 @@ int EndEnergyPlus()
 
     void CloseMiscOpenFiles(OutputFiles &outputFiles)
     {
->>>>>>> origin/develop
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
@@ -1061,15 +800,11 @@ int EndEnergyPlus()
         // This subroutine scans potential unit numbers and closes
         // any that are still open.
 
-<<<<<<< HEAD
-    ResultsFramework::resultsFramework->writeOutputs();
-=======
         // METHODOLOGY EMPLOYED:
         // Use INQUIRE to determine if file is open.
 
         // REFERENCES:
         // na
->>>>>>> origin/develop
 
         // Using/Aliasing
         using DataReportingFlags::DebugOutput;
@@ -1203,7 +938,7 @@ int EndEnergyPlus()
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static constexpr auto fmtA("(A)");
         static ObjexxFCL::gio::Fmt ETimeFmt("(I2.2,'hr ',I2.2,'min ',F5.2,'sec')");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -1223,7 +958,6 @@ int EndEnergyPlus()
         int Hours;      // Elapsed Time Hour Reporting
         int Minutes;    // Elapsed Time Minute Reporting
         Real64 Seconds; // Elapsed Time Second Reporting
-        int write_stat;
 
         if (sqlite) {
             sqlite->updateSQLiteSimulationRecord(true, true);
@@ -1250,7 +984,7 @@ int EndEnergyPlus()
         if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
         Elapsed_Time = Time_Finish - Time_Start;
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
+            UtilityRoutines::appendPerfLog(outputFiles, "Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
         }
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
@@ -1263,15 +997,15 @@ int EndEnergyPlus()
         if (Seconds < 0.0) Seconds = 0.0;
         ObjexxFCL::gio::write(Elapsed, ETimeFmt) << Hours << Minutes << Seconds;
 
-        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
-            UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
-            UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); // last item so write the perfLog file
+            UtilityRoutines::appendPerfLog(outputFiles, "Run Time [string]", Elapsed);
+            UtilityRoutines::appendPerfLog(outputFiles, "Number of Warnings", NumWarnings);
+            UtilityRoutines::appendPerfLog(outputFiles, "Number of Severe", NumSevere, true); // last item so write the perfLog file
         }
         ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
@@ -1279,30 +1013,17 @@ int EndEnergyPlus()
                     " Severe Errors.");
         ShowMessage("EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
-        tempfl = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(tempfl, DataStringGlobals::outputEndFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-            DisplayString("EndEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write).");
-        }
+
+        tempfl = outputFiles.open_gio(DataStringGlobals::outputEndFileName, "EndEnergyPlus", outputFiles.outputControl.end);
+
         ObjexxFCL::gio::write(tempfl, fmtA) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere +
-                                                   " Severe Errors; Elapsed Time=" + Elapsed;
+                                               " Severe Errors; Elapsed Time=" + Elapsed;
         ObjexxFCL::gio::close(tempfl);
 
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles();
 
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports();
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport();
-        }
+        ResultsFramework::resultsFramework->writeOutputs();
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
@@ -1343,52 +1064,52 @@ int EndEnergyPlus()
         // USE STATEMENTS:
         // na
 
-        //	// Return value
-        //	int UnitNumber; // Result from scanning currently open files
+        //  // Return value
+        //  int UnitNumber; // Result from scanning currently open files
         //
-        //	// Locals
-        //	// FUNCTION ARGUMENT DEFINITIONS:
+        //  // Locals
+        //  // FUNCTION ARGUMENT DEFINITIONS:
         //
-        //	// FUNCTION PARAMETER DEFINITIONS:
-        //	//  IO Status Values:
+        //  // FUNCTION PARAMETER DEFINITIONS:
+        //  //  IO Status Values:
         //
-        //	int const END_OF_RECORD( -2 );
-        //	int const END_OF_FILE( -1 );
+        //  int const END_OF_RECORD( -2 );
+        //  int const END_OF_FILE( -1 );
         //
-        //	//  Indicate default input and output units:
+        //  //  Indicate default input and output units:
         //
-        //	int const DEFAULT_INPUT_UNIT( 5 );
-        //	int const DEFAULT_OUTPUT_UNIT( 6 );
+        //  int const DEFAULT_INPUT_UNIT( 5 );
+        //  int const DEFAULT_OUTPUT_UNIT( 6 );
         //
-        //	//  Indicate number and value of preconnected units
+        //  //  Indicate number and value of preconnected units
         //
-        //	int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
-        //	static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
+        //  int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
+        //  static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
         //
-        //	//  Largest allowed unit number (or a large number, if none)
-        //	int const MaxUnitNumber( 1000 );
+        //  //  Largest allowed unit number (or a large number, if none)
+        //  int const MaxUnitNumber( 1000 );
         //
-        //	// INTERFACE BLOCK SPECIFICATIONS
-        //	// na
+        //  // INTERFACE BLOCK SPECIFICATIONS
+        //  // na
         //
-        //	// DERIVED TYPE DEFINITIONS
-        //	// na
+        //  // DERIVED TYPE DEFINITIONS
+        //  // na
         //
-        //	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-        //	bool exists; // File exists
-        //	bool opened; // Unit is open
-        //	int ios; // return value from Inquire intrinsic
+        //  // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        //  bool exists; // File exists
+        //  bool opened; // Unit is open
+        //  int ios; // return value from Inquire intrinsic
         //
-        //	for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
-        //		if ( UnitNumber == DEFAULT_INPUT_UNIT || UnitNumber == DEFAULT_OUTPUT_UNIT ) continue;
-        //		if ( any_eq( UnitNumber, PRECONNECTED_UNITS ) ) continue;
-        //		{ IOFlags flags; ObjexxFCL::gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios =
-        //flags.ios(); } 		if ( exists && ! opened && ios == 0 ) return UnitNumber; // result is set in UnitNumber
-        //	}
+        //  for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
+        //      if ( UnitNumber == DEFAULT_INPUT_UNIT || UnitNumber == DEFAULT_OUTPUT_UNIT ) continue;
+        //      if ( any_eq( UnitNumber, PRECONNECTED_UNITS ) ) continue;
+        //      { IOFlags flags; ObjexxFCL::gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios =
+        //flags.ios(); }        if ( exists && ! opened && ios == 0 ) return UnitNumber; // result is set in UnitNumber
+        //  }
         //
-        //	UnitNumber = -1;
+        //  UnitNumber = -1;
         //
-        //	return UnitNumber;
+        //  return UnitNumber;
 
         return ObjexxFCL::gio::get_unit(); // Autodesk:Note ObjexxFCL::gio system provides this (and protects the F90+ preconnected units
                                            // {100,101,102})

@@ -1352,15 +1352,8 @@ namespace OutputProcessor {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-<<<<<<< HEAD
-        auto & outputFiles = OutputFiles::getSingleton();
-        ////  Change to following once mtd is converted to OutputFiles
-        //    outputFiles.mtd.ensure_open(outputFiles.outputControl.mtd);
-        OutputFileMeterDetails = outputFiles.open_gio(DataStringGlobals::outputMtdFileName, "InitializeMeters", outputFiles.outputControl.mtd);
-=======
 
-        outputFiles.mtd.ensure_open("InitializeMeters");
->>>>>>> origin/develop
+        outputFiles.mtd.ensure_open("InitializeMeters", outputFiles.outputControl.mtd);
     }
 
     void GetCustomMeterInput(bool &ErrorsFound)
@@ -3175,16 +3168,12 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccTS) {
-<<<<<<< HEAD
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).TSAccRptNum, fmt::to_string(EnergyMeters(Loop).TSAccRptNum), EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccTSFO);
-                ResultsFramework::resultsFramework->TSMeters.pushVariableValue(EnergyMeters(Loop).TSAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(state.outputFiles,
                                                EnergyMeters(Loop).TSAccRptNum,
                                                fmt::to_string(EnergyMeters(Loop).TSAccRptNum),
                                                EnergyMeters(Loop).SMValue,
                                                EnergyMeters(Loop).RptAccTSFO);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->TSMeters.pushVariableValue(EnergyMeters(Loop).TSAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
 
@@ -3288,17 +3277,12 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccHR) {
-<<<<<<< HEAD
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).HRAccRptNum, fmt::to_string(EnergyMeters(Loop).HRAccRptNum), EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccHRFO);
-                ResultsFramework::resultsFramework->HRMeters.pushVariableValue(EnergyMeters(Loop).HRAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(state.outputFiles,
                                                EnergyMeters(Loop).HRAccRptNum,
                                                fmt::to_string(EnergyMeters(Loop).HRAccRptNum),
                                                EnergyMeters(Loop).SMValue,
                                                EnergyMeters(Loop).RptAccHRFO);
-                ResultsFramework::OutputSchema->HRMeters.pushVariableValue(EnergyMeters(Loop).HRAccRptNum, EnergyMeters(Loop).SMValue);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->HRMeters.pushVariableValue(EnergyMeters(Loop).HRAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3395,17 +3379,12 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccDY) {
-<<<<<<< HEAD
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).DYAccRptNum, fmt::to_string(EnergyMeters(Loop).DYAccRptNum), EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccDYFO);
-                ResultsFramework::resultsFramework->DYMeters.pushVariableValue(EnergyMeters(Loop).DYAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(state.outputFiles,
                                                EnergyMeters(Loop).DYAccRptNum,
                                                fmt::to_string(EnergyMeters(Loop).DYAccRptNum),
                                                EnergyMeters(Loop).SMValue,
                                                EnergyMeters(Loop).RptAccDYFO);
-                ResultsFramework::OutputSchema->DYMeters.pushVariableValue(EnergyMeters(Loop).DYAccRptNum, EnergyMeters(Loop).SMValue);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->DYMeters.pushVariableValue(EnergyMeters(Loop).DYAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3492,17 +3471,12 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccMN) {
-<<<<<<< HEAD
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).MNAccRptNum, fmt::to_string(EnergyMeters(Loop).MNAccRptNum), EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccMNFO);
-                ResultsFramework::resultsFramework->MNMeters.pushVariableValue(EnergyMeters(Loop).MNAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(state.outputFiles,
                                                EnergyMeters(Loop).MNAccRptNum,
                                                fmt::to_string(EnergyMeters(Loop).MNAccRptNum),
                                                EnergyMeters(Loop).SMValue,
                                                EnergyMeters(Loop).RptAccMNFO);
-                ResultsFramework::OutputSchema->MNMeters.pushVariableValue(EnergyMeters(Loop).MNAccRptNum, EnergyMeters(Loop).SMValue);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->MNMeters.pushVariableValue(EnergyMeters(Loop).MNAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3552,14 +3526,10 @@ namespace OutputProcessor {
             if (!EnergyMeters(Loop).RptYR && !EnergyMeters(Loop).RptAccYR) continue;
             if (PrintTimeStamp) {
                 WriteYearlyTimeStamp(
-<<<<<<< HEAD
-                    OutputFiles::getSingleton().mtr, YearlyStampReportChr, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
+                    outputFiles.mtr, YearlyStampReportChr, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
                 if (ResultsFramework::resultsFramework->YRMeters.rDataFrameEnabled()) {
                     ResultsFramework::resultsFramework->YRMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
                 }
-=======
-                    outputFiles.mtr, YearlyStampReportChr, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
->>>>>>> origin/develop
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
             }
@@ -3582,16 +3552,12 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccYR) {
-<<<<<<< HEAD
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).YRAccRptNum, fmt::to_string(EnergyMeters(Loop).YRAccRptNum), EnergyMeters(Loop).YRValue, EnergyMeters(Loop).RptAccYRFO);
-                ResultsFramework::resultsFramework->YRMeters.pushVariableValue(EnergyMeters(Loop).YRAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(outputFiles,
                                                EnergyMeters(Loop).YRAccRptNum,
                                                fmt::to_string(EnergyMeters(Loop).YRAccRptNum),
                                                EnergyMeters(Loop).YRValue,
                                                EnergyMeters(Loop).RptAccYRFO);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->YRMeters.pushVariableValue(EnergyMeters(Loop).YRAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3638,13 +3604,8 @@ namespace OutputProcessor {
         if (!ResultsFramework::resultsFramework->SMMeters.rVariablesScanned()) {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Simulation);
         }
-<<<<<<< HEAD
         if (ResultsFramework::resultsFramework->SMMeters.rDataFrameEnabled()) {
             ResultsFramework::resultsFramework->SMMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
-=======
-        if (ResultsFramework::OutputSchema->SMMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->SMMeters.newRow(state.dataGlobals.DayOfSimChr);
->>>>>>> origin/develop
         }
 
         PrintTimeStamp = true;
@@ -3685,17 +3646,12 @@ namespace OutputProcessor {
             }
 
             if (EnergyMeters(Loop).RptAccSM) {
-<<<<<<< HEAD
-                WriteCumulativeReportMeterData(EnergyMeters(Loop).SMAccRptNum, fmt::to_string(EnergyMeters(Loop).SMAccRptNum), EnergyMeters(Loop).SMValue, EnergyMeters(Loop).RptAccSMFO);
-                ResultsFramework::resultsFramework->SMMeters.pushVariableValue(EnergyMeters(Loop).SMAccRptNum, EnergyMeters(Loop).SMValue);
-=======
                 WriteCumulativeReportMeterData(state.outputFiles,
                                                EnergyMeters(Loop).SMAccRptNum,
                                                fmt::to_string(EnergyMeters(Loop).SMAccRptNum),
                                                EnergyMeters(Loop).SMValue,
                                                EnergyMeters(Loop).RptAccSMFO);
-                ResultsFramework::OutputSchema->SMMeters.pushVariableValue(EnergyMeters(Loop).SMAccRptNum, EnergyMeters(Loop).SMValue);
->>>>>>> origin/develop
+                ResultsFramework::resultsFramework->SMMeters.pushVariableValue(EnergyMeters(Loop).SMAccRptNum, EnergyMeters(Loop).SMValue);
             }
         }
 

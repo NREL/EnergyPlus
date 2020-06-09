@@ -8446,16 +8446,9 @@ namespace WindowManager {
         // Write transmittance versus direct normal angle to csv file
 
         if (PrintTransMap) {
-<<<<<<< HEAD
-            auto & outputFiles = OutputFiles::getSingleton();
-            ////  Change to following once screen is converted to OutputFiles
-            //    outputFiles.screen.ensure_open(outputFiles.outputControl.screen);
-            ScreenTransUnitNo = outputFiles.open_gio(DataStringGlobals::outputScreenCsvFileName, "Screen", outputFiles.outputControl.screen);
-=======
             // Fortran version did not have error handling in case of file open failure. This one does.
             // Which is correct?
-            auto screenCsvFile = outputFiles.screenCsv.open("CalcWindowScreenComponents");
->>>>>>> origin/develop
+            auto screenCsvFile = outputFiles.screenCsv.open("CalcWindowScreenComponents", outputFiles.outputControl.screen);
 
             //  WRITE(ScreenTransUnitNo,*)' '
             for (ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum) {
@@ -8523,10 +8516,6 @@ namespace WindowManager {
                     print(screenCsvFile, "\n\n");
                 }
             }
-<<<<<<< HEAD
-            ObjexxFCL::gio::close(ScreenTransUnitNo);
-=======
->>>>>>> origin/develop
         }
         ScreenTrans.deallocate();
     }

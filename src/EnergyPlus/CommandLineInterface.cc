@@ -421,17 +421,10 @@ namespace CommandLineInterface {
         outputHRMsgPackFileName = outputFilePrefix + normalSuffix + "_hourly.msgpack";
         outputSMMsgPackFileName = outputFilePrefix + normalSuffix + "_runperiod.msgpack";
 
-<<<<<<< HEAD
-        outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
-        OutputFiles::getSingleton().mdd.fileName = outputFilePrefix + normalSuffix + ".mdd";
-        OutputFiles::getSingleton().mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
-        OutputFiles::getSingleton().rdd.fileName = outputFilePrefix + normalSuffix + ".rdd";
-=======
         state.outputFiles.mtd.fileName = outputFilePrefix + normalSuffix + ".mtd";
-        outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
+        state.outputFiles.mdd.fileName = outputFilePrefix + normalSuffix + ".mdd";
         state.outputFiles.mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
-        outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
->>>>>>> origin/develop
+        state.outputFiles.rdd.fileName = outputFilePrefix + normalSuffix + ".rdd";
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         state.outputFiles.dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
         outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
@@ -578,11 +571,6 @@ namespace CommandLineInterface {
             }
         }
 
-<<<<<<< HEAD
-=======
-        state.outputFiles.debug.ensure_open("OpenOutputFiles");
-
->>>>>>> origin/develop
         // TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 
         // Preprocessors (These will likely move to a new file)

@@ -799,7 +799,7 @@ namespace OutputReportTabular {
 
     void WriteTimeBinTables();
 
-    void WriteBEPSTable();
+    void WriteBEPSTable(OutputFiles &outputFiles);
 
     std::string ResourceWarningMessage(std::string resource);
 
