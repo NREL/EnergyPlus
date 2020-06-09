@@ -53,8 +53,11 @@ namespace EnergyPlus {
 
     struct HeatingWaterDesAirInletTempSizer: BaseSizer {
 
+        Array1D<DataSizing::ZoneSizingData>termUnitFinalZoneSizing;
+        Real64 dataFlowUsedForSizing = 0.0;
+
         HeatingWaterDesAirInletTempSizer() {
-            this->sizingType = AutoSizingType::HeatingWaterDesAirInletTempSizing;
+            this->sizingType = EnergyPlus::AutoSizingType::HeatingWaterDesAirInletTempSizing;
         }
 
         void initializeWithinEP(EnergyPlusData &state, std::string const &_compName, std::string const &_compType, bool printWarningFlag) override;

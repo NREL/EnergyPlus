@@ -107,13 +107,13 @@ namespace EnergyPlus {
         this->airloopDOAS = AirLoopHVACDOAS::airloopDOAS;
     }
 
-    AutoSizingResultType HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue) {
-        AutoSizingResultType errorsFound = AutoSizingResultType::NoError;
+    EnergyPlus::AutoSizingResultType HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue) {
+        EnergyPlus::AutoSizingResultType errorsFound = EnergyPlus::AutoSizingResultType::NoError;
         this->preSize(state, _originalValue);
         if (this->curZoneEqNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
                 if (this->printWarningFlag && this->originalValue > 0.0) {
-                    HeatingAirflowUASizer::reportSizerOutput(
+                    this->reportSizerOutput(
                             this->compType, this->compName, "User-Specified " + this->sizingString,
                             _originalValue);
                 }
@@ -147,7 +147,7 @@ namespace EnergyPlus {
         } else if (this->curSysNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
                 if (this->printWarningFlag && this->originalValue > 0.0) {
-                    HeatingAirflowUASizer::reportSizerOutput(
+                    this->reportSizerOutput(
                             this->compType, this->compName, "User-Specified " + this->sizingString,
                             _originalValue);
                 }

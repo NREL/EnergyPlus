@@ -54,7 +54,7 @@ namespace EnergyPlus {
     struct HeatingAirflowUASizer : BaseSizer {
 
         HeatingAirflowUASizer() {
-            this->sizingType = AutoSizingType::HeatingAirflowUASizing;
+            this->sizingType = EnergyPlus:: AutoSizingType::HeatingAirflowUASizing;
         }
 
         void initializeWithinEP(EnergyPlusData &state, std::string const &_compName, std::string const &_compType, bool printWarningFlag) override;

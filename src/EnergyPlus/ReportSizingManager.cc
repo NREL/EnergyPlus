@@ -1771,32 +1771,32 @@ namespace ReportSizingManager {
                         }
                     }
                     bCheckForZero = false;
-                } else if (SizingType == HeatingWaterDesAirInletTempSizing) {
-                    if (TermUnitPIU && (CurTermUnitSizingNum > 0)) {
-                        MinFlowFrac = TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac;
-                        if (TermUnitSizing(CurTermUnitSizingNum).InducesPlenumAir) {
-                            AutosizeDes = (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac) +
-                                          (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneRetTempAtHeatPeak * (1.0 - MinFlowFrac));
-                        } else {
-                            AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac +
-                                          FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak * (1.0 - MinFlowFrac);
-                        }
-                    } else if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
-                        AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
-                    } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
-                        AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
-                    } else {
-                        if (ZoneEqSizing(CurZoneEqNum).SystemAirFlow) {
-                            DesMassFlow = ZoneEqSizing(CurZoneEqNum).AirVolFlow * StdRhoAir;
-                        } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
-                            DesMassFlow = ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow * StdRhoAir;
-                        } else {
-                            DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
-                        }
-                        AutosizeDes =
-                            setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
-                    }
-                    bCheckForZero = false;
+                //} else if (SizingType == HeatingWaterDesAirInletTempSizing) {
+                //    if (TermUnitPIU && (CurTermUnitSizingNum > 0)) {
+                //        MinFlowFrac = TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac;
+                //        if (TermUnitSizing(CurTermUnitSizingNum).InducesPlenumAir) {
+                //            AutosizeDes = (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac) +
+                //                          (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneRetTempAtHeatPeak * (1.0 - MinFlowFrac));
+                //        } else {
+                //            AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * MinFlowFrac +
+                //                          FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak * (1.0 - MinFlowFrac);
+                //        }
+                //    } else if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
+                //        AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
+                //    } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
+                //        AutosizeDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
+                //    } else {
+                //        if (ZoneEqSizing(CurZoneEqNum).SystemAirFlow) {
+                //            DesMassFlow = ZoneEqSizing(CurZoneEqNum).AirVolFlow * StdRhoAir;
+                //        } else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
+                //            DesMassFlow = ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow * StdRhoAir;
+                //        } else {
+                //            DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
+                //        }
+                //        AutosizeDes =
+                //            setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
+                //    }
+                //    bCheckForZero = false;
                 } else if (SizingType == HeatingWaterDesAirInletHumRatSizing) {
                     if (TermUnitPIU && (CurTermUnitSizingNum > 0)) {
                         MinFlowFrac = TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac;
@@ -2790,28 +2790,28 @@ namespace ReportSizingManager {
                         // Warning about zero design coil load is issued elsewhere.
                     }
                     bCheckForZero = false;
-                } else if (SizingType == HeatingWaterDesAirInletTempSizing) {
-                    if (CurOASysNum > 0) {
-                        OutAirFrac = 1.0;
-                    } else if (FinalSysSizing(CurSysNum).HeatOAOption == MinOA) {
-                        if (DataFlowUsedForSizing > 0.0) {
-                            OutAirFrac = FinalSysSizing(CurSysNum).DesOutAirVolFlow / DataFlowUsedForSizing;
-                        } else {
-                            OutAirFrac = 1.0;
-                        }
-                        OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-                    } else {
-                        OutAirFrac = 1.0;
-                    }
-                    // coil inlet temperature
-                    if (CurOASysNum == 0 && PrimaryAirSystem(CurSysNum).NumOAHeatCoils > 0) {
-                        AutosizeDes = OutAirFrac * FinalSysSizing(CurSysNum).PreheatTemp + (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).HeatRetTemp;
-                    } else if (CurOASysNum > 0 && DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum > -1) {
-                        AutosizeDes = AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum].HeatOutTemp;
-                    } else {
-                        AutosizeDes = OutAirFrac * FinalSysSizing(CurSysNum).HeatOutTemp + (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).HeatRetTemp;
-                    }
-                    bCheckForZero = false;
+                //} else if (SizingType == HeatingWaterDesAirInletTempSizing) {
+                //    if (CurOASysNum > 0) {
+                //        OutAirFrac = 1.0;
+                //    } else if (FinalSysSizing(CurSysNum).HeatOAOption == MinOA) {
+                //        if (DataFlowUsedForSizing > 0.0) {
+                //            OutAirFrac = FinalSysSizing(CurSysNum).DesOutAirVolFlow / DataFlowUsedForSizing;
+                //        } else {
+                //            OutAirFrac = 1.0;
+                //        }
+                //        OutAirFrac = min(1.0, max(0.0, OutAirFrac));
+                //    } else {
+                //        OutAirFrac = 1.0;
+                //    }
+                //    // coil inlet temperature
+                //    if (CurOASysNum == 0 && PrimaryAirSystem(CurSysNum).NumOAHeatCoils > 0) {
+                //        AutosizeDes = OutAirFrac * FinalSysSizing(CurSysNum).PreheatTemp + (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).HeatRetTemp;
+                //    } else if (CurOASysNum > 0 && DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum > -1) {
+                //        AutosizeDes = AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum].HeatOutTemp;
+                //    } else {
+                //        AutosizeDes = OutAirFrac * FinalSysSizing(CurSysNum).HeatOutTemp + (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).HeatRetTemp;
+                //    }
+                //    bCheckForZero = false;
                 } else if (SizingType == HeatingWaterDesAirInletHumRatSizing) {
                     if (CurOASysNum > 0) {
                         OutAirFrac = 1.0;
@@ -4012,8 +4012,8 @@ namespace ReportSizingManager {
             coilSelectionReportObj->setCoilLvgAirHumRat(CompName, CompType, SizingResult);
         } else if (SizingType == CoolingWaterNumofTubesPerRowSizing) {
             // do nothing
-        } else if (CurSysNum <= NumPrimaryAirSys && SizingType == HeatingWaterDesAirInletTempSizing) {
-            coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, SizingResult, CurSysNum, CurZoneEqNum);
+        //} else if (CurSysNum <= NumPrimaryAirSys && SizingType == HeatingWaterDesAirInletTempSizing) {
+        //    coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, SizingResult, CurSysNum, CurZoneEqNum);
         } else if (SizingType == HeatingWaterDesAirInletHumRatSizing) {
             coilSelectionReportObj->setCoilEntAirHumRat(CompName, CompType, SizingResult);
         } else if (CurSysNum <= NumPrimaryAirSys && SizingType == HeatingWaterDesCoilLoadUsedForUASizing) {
