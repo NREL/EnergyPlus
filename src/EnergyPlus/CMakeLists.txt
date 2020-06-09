@@ -29,6 +29,8 @@ SET( SRC
   Autosizing/Base.hh
   Autosizing/HeatingAirflowUASizing.cc
   Autosizing/HeatingAirflowUASizing.hh
+  Autosizing/HeatingWaterDesAirInletTempSizing.cc
+  Autosizing/HeatingWaterDesAirInletTempSizing.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc

@@ -18,6 +18,7 @@ set( test_src
   AirTerminalSingleDuctPIUReheat.unit.cc
   Autosizing/AutosizingFixture.hh
   Autosizing/HeatingAirflowUASizing.unit.cc
+  Autosizing/HeatingWaterDesAirInletTempSizing.unit.cc
   BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc

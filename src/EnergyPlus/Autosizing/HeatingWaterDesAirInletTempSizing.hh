@@ -46,7 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef HeatingWaterDesAirInletTempSizing_hh_INCLUDED
-#define HeatingAirflowUASizing_hh_INCLUDED
+#define HeatingWaterDesAirInletTempSizing_hh_INCLUDED
 
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -62,7 +62,7 @@ namespace EnergyPlus {
         HeatingWaterDesAirInletTempSizer() {
             this->sizingType = AutoSizingType::HeatingWaterDesAirInletTempSizing;
         }
-        ~HeatingWaterDesAirInletTempSizer() {};
+        ~HeatingWaterDesAirInletTempSizer() = default;
 
         void initializeWithinEP(EnergyPlusData &state, std::string const &_compName, std::string const &_compType, bool printWarningFlag) override;
 
