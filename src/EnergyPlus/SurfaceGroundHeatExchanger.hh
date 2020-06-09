@@ -151,6 +151,7 @@ namespace SurfaceGroundHeatExchanger {
         bool InitQTF;
         bool MyEnvrnFlag;
         Real64 SurfaceArea; // surface GHE surface area
+        bool firstTimeThrough;
 
         // Default Constructor
         SurfaceGroundHeatExchangerData()
@@ -170,7 +171,7 @@ namespace SurfaceGroundHeatExchanger {
               InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0), TopSurfaceTemp(0.0), BtmSurfaceTemp(0.0), TopSurfaceFlux(0.0), BtmSurfaceFlux(0.0),
               HeatTransferRate(0.0), SurfHeatTransferRate(0.0), Energy(0.0), SurfEnergy(0.0), SourceTemp(0.0),
 
-              MyFlag(true), InitQTF(true), MyEnvrnFlag(true), SurfaceArea(0.0)
+              MyFlag(true), InitQTF(true), MyEnvrnFlag(true), SurfaceArea(0.0), firstTimeThrough(true)
         {
         }
 

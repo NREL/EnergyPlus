@@ -665,7 +665,8 @@ namespace SurfaceGroundHeatExchanger {
         static bool InitializeTempTop(false);
 
         // check if we are in very first call for this zone time step
-        if (BeginTimeStepFlag && FirstHVACIteration && PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 1) { // DSU
+        if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && this->firstTimeThrough) {
+            this->firstTimeThrough = false;
             // calc temps and fluxes with past env. conditions and average source flux
             SourceFlux = this->QSrcAvg;
             // starting values for the surface temps
@@ -842,10 +843,10 @@ namespace SurfaceGroundHeatExchanger {
                 }
             } // end surface heat balance iteration
 
-        } else { // end source flux iteration
-
+        } else if (!FirstHVACIteration) { // end source flux iteration
             // For the rest of the system time steps ...
             // update source flux from Twi
+            this->firstTimeThrough = true;
             SourceFlux = this->CalcSourceFlux();
         }
     }
@@ -1380,7 +1381,7 @@ namespace SurfaceGroundHeatExchanger {
         // update flux
         this->QSrc = SourceFlux;
 
-        if (PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock > 0) { // only update in normal mode !DSU
+        if (this->LastSysTimeElapsed == SysTimeElapsed) { // only update in normal mode !DSU
             if (this->LastSysTimeElapsed == SysTimeElapsed) {
                 // Still iterating or reducing system time step, so subtract old values which were
                 // not valid
