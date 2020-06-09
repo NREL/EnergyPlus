@@ -121,7 +121,7 @@ namespace SurfaceGeometry {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetupZoneGeometry(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound);
+    void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound);
 
     void AllocateModuleArrays();
 

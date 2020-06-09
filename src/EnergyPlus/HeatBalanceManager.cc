@@ -284,7 +284,7 @@ namespace HeatBalanceManager {
         UniqueConstructNames.clear();
     }
 
-    void ManageHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles)
+    void ManageHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -337,7 +337,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(state); // Obtains heat balance related parameters from input file
-            HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles);
+            HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -358,7 +358,7 @@ namespace HeatBalanceManager {
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance();                                                                // Initialize all heat balance related parameters
+        InitHeatBalance(state.outputFiles);                                                                // Initialize all heat balance related parameters
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -370,13 +370,13 @@ namespace HeatBalanceManager {
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance(state);
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
-        RecKeepHeatBalance(outputFiles);                                             // Do any heat balance related record keeping
+        RecKeepHeatBalance(state.outputFiles);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
         // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
-        ReportHeatBalance(state, outputFiles); // Manage heat balance reporting until the new reporting is in place
+        ReportHeatBalance(state, state.outputFiles); // Manage heat balance reporting until the new reporting is in place
 
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
@@ -395,7 +395,7 @@ namespace HeatBalanceManager {
         }
 
         if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
-            ReportWarmupConvergence(outputFiles);
+            ReportWarmupConvergence(state.outputFiles);
         }
     }
 
@@ -444,14 +444,13 @@ namespace HeatBalanceManager {
 
         // FLOW:
 
-        auto &outputFiles = OutputFiles::getSingleton();
-        GetProjectControlData(outputFiles, ErrorsFound);
+        GetProjectControlData(state.outputFiles, ErrorsFound);
 
-        GetSiteAtmosphereData(outputFiles, ErrorsFound);
+        GetSiteAtmosphereData(state.outputFiles, ErrorsFound);
 
         GetWindowGlassSpectralData(ErrorsFound);
 
-        GetMaterialData(outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(state.outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
@@ -4636,7 +4635,7 @@ namespace HeatBalanceManager {
 
         GetZoneData(ErrorsFound); // Read Zone data from input file
 
-        SetupZoneGeometry(state, OutputFiles::getSingleton(), ErrorsFound);
+        SetupZoneGeometry(state, ErrorsFound);
     }
 
     void GetZoneData(bool &ErrorsFound) // If errors found in input
@@ -5155,7 +5154,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance()
+    void InitHeatBalance(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5206,8 +5205,6 @@ namespace HeatBalanceManager {
         int SurfNum;     // Surface number
         int ZoneNum;
         static bool ChangeSet(true); // Toggle for checking storm windows
-        static ObjexxFCL::gio::Fmt ShdFracFmt1("(' ',I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
-        static ObjexxFCL::gio::Fmt ShdFracFmt2("(f10.8,',')");
 
         // FLOW:
 
@@ -5215,13 +5212,13 @@ namespace HeatBalanceManager {
             AllocateHeatBalArrays(); // Allocate the Module Arrays
             if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
                 DisplayString("Initializing Response Factors");
-                InitConductionTransferFunctions(); // Initialize the response factors
+                InitConductionTransferFunctions(outputFiles); // Initialize the response factors
             }
 
             DisplayString("Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
-            InitWindowOpticalCalculations();
+            InitWindowOpticalCalculations(outputFiles);
             InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations
@@ -5276,7 +5273,7 @@ namespace HeatBalanceManager {
         }
 
         if (BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
-            OpenShadingFile();
+            OpenShadingFile(outputFiles);
         }
 
         if (BeginDayFlag) {
@@ -5300,26 +5297,17 @@ namespace HeatBalanceManager {
         if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
+                    static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                         if (TS == NumOfTimeStepInHour) {
-                            ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour << 0;
+                            print(outputFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
                         } else {
-                            ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt1, flags)
-                                << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * TS;
+                            print(outputFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / NumOfTimeStepInHour) * TS);
                         }
-                    }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt2, flags) << SunlitFrac(TS, iHour, SurfNum);
+                        static constexpr auto ShdFracFmt2("{:10.8F},");
+                        print(outputFiles.shade, ShdFracFmt2, SunlitFrac(TS, iHour, SurfNum));
                     }
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("YES");
-                        ObjexxFCL::gio::write(OutputFileShadingFrac, "()", flags);
-                    }
+                    print(outputFiles.shade, "\n");
                 }
             }
         }
@@ -5936,35 +5924,16 @@ namespace HeatBalanceManager {
         using DataGlobals::KindOfSim;
         using DataGlobals::ksHVACSizeDesignDay;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  LOGICAL, SAVE :: PrintEnvrnStamp=.FALSE.
-        // FLOW:
-
-        // Time step level reporting:
-
         ReportScheduleValues();
 
         if (!WarmupFlag && DoOutputReporting) {
             CalcMoreNodeInfo();
-            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
-            UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills();
         } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
             if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
@@ -6002,13 +5971,13 @@ namespace HeatBalanceManager {
                 }
             }
             CalcMoreNodeInfo();
-            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
-            UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
@@ -6022,7 +5991,7 @@ namespace HeatBalanceManager {
 
     //        End of Reporting subroutines for the HB Module
 
-    void OpenShadingFile()
+    void OpenShadingFile(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6038,38 +6007,14 @@ namespace HeatBalanceManager {
         using DataSurfaces::Surface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int write_stat;
         int SurfNum;
-        static ObjexxFCL::gio::Fmt ShdFracFmtName("(A, A)");
 
-        OutputFileShadingFrac = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileShadingFrac, DataStringGlobals::outputExtShdFracFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write).");
-        }
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(OutputFileShadingFrac, fmtA, flags) << "Surface Name,";
-        }
+        outputFiles.shade.ensure_open("OpenOutputFiles");
+        print(outputFiles.shade, "Surface Name,");
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmtName, flags) << Surface(SurfNum).Name << ",";
-            }
+            print(outputFiles.shade, "{},", Surface(SurfNum).Name);
         }
-        {
-            IOFlags flags;
-            flags.ADVANCE("YES");
-            ObjexxFCL::gio::write(OutputFileShadingFrac, "()", flags);
-        }
+        print(outputFiles.shade, "()\n");
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input
     {
@@ -6327,7 +6272,7 @@ namespace HeatBalanceManager {
         // ErrorsFound = .FALSE.
         EOFonFile = false;
 
-        CheckForActualFileName(DesiredFileName, exists, TempFullFileName);
+        CheckForActualFileName(OutputFiles::getSingleton(), DesiredFileName, exists, TempFullFileName);
         // INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
         if (!exists) {
             ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Could not locate Window5 Data File, expecting it as file name=" +

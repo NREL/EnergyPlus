@@ -461,7 +461,7 @@ namespace MixedAir {
 
     void GetOutsideAirSysInputs(EnergyPlusData &state);
 
-    void GetOAControllerInputs(EnergyPlusData &state, OutputFiles &outputFiles);
+    void GetOAControllerInputs(EnergyPlusData &state);
 
     void AllocateOAControllers();
 

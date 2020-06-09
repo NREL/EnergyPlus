@@ -203,7 +203,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
 
-    HeatBalanceManager::ManageHeatBalance(state, outputFiles());
+    HeatBalanceManager::ManageHeatBalance(state);
 
     // This test will emulate NFRC 100 U-factor test
     int winNum;
@@ -433,9 +433,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
@@ -591,8 +591,6 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     DataIPShortCuts::lAlphaFieldBlanks = true;
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Building,",
         "    Small Office with AirflowNetwork model,  !- Name",
@@ -2452,10 +2450,10 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.outputFiles);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(outputFiles(), FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
@@ -2464,7 +2462,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     HeatBalanceManager::GetWindowGlassSpectralData(FoundError);
     EXPECT_FALSE(FoundError);
-    HeatBalanceManager::GetMaterialData(outputFiles(), FoundError);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -2476,7 +2474,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(outputFiles(), FoundError);
+    SurfaceGeometry::GetGeometryParameters(state.outputFiles, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(4);
@@ -2497,10 +2495,10 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(outputFiles(), FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
-    WindowManager::InitGlassOpticalCalculations();
+    WindowManager::InitGlassOpticalCalculations(state.outputFiles);
 
     int NumAngles = 10; // Number of incident angles
     Real64 sum;
@@ -2652,14 +2650,14 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
                           "  autocalculate;           !- Volume {m3}"});
 
     ASSERT_TRUE(process_idf(idf_objects));
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);
     DataHeatBalance::ZoneIntGain.allocate(1);
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.outputFiles, ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
@@ -2801,7 +2799,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 {
 
    std::string const idf_objects =
-        delimited_string({ 
+        delimited_string({
    "WindowMaterial:ComplexShade,",
     "Shade_14_Layer,          !- Name",
     "VenetianHorizontal,      !- Layer Type",
@@ -2823,8 +2821,8 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     "0.0000;                  !- Slat Curve {m}" });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    bool errors_found = false; 
-    HeatBalanceManager::GetMaterialData(outputFiles(), errors_found);
+    bool errors_found = false;
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errors_found);
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(DataHeatBalance::ComplexShade(1).Name, "SHADE_14_LAYER");
     EXPECT_EQ(DataHeatBalance::ComplexShade(1).LayerType, 1);

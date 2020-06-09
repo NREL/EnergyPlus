@@ -45,7 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/OutputFiles.hh>
 
 #include "DataStringGlobals.hh"
@@ -53,39 +52,21 @@
 
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
-#include <fmt/ostream.h>
+#include <stdexcept>
 
 namespace EnergyPlus {
 
-OutputFile &OutputFile::ensure_open()
+OutputFile &OutputFile::ensure_open(const std::string &caller)
 {
     if (!good()) {
         open();
     }
     if (!good()) {
-        ShowFatalError("OpenOutputFiles: Could not open file " + fileName + " for output (write).");
+        ShowFatalError(fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
     }
     return *this;
 }
 
-std::ostream &open_out_stream(int const fileID, const std::string &fileName)
-{
-    IOFlags flags;
-    flags.ACTION("write");
-    flags.STATUS("UNKNOWN");
-    flags.POSITION("APPEND");
-    ObjexxFCL::gio::open(fileID, fileName, flags);
-    return *ObjexxFCL::gio::out_stream(fileID);
-}
-
-std::ostream &get_out_stream(int const FileID, const std::string &fileName)
-{
-    if (!ObjexxFCL::gio::out_stream(FileID)) {
-        return open_out_stream(FileID, fileName);
-    } else {
-        return *ObjexxFCL::gio::out_stream(FileID);
-    }
-}
 
 bool OutputFile::good() const
 {
@@ -138,6 +119,7 @@ void OutputFile::open()
     os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc));
 }
 
+
 std::vector<std::string> OutputFile::getLines()
 {
     if (os) {
@@ -160,34 +142,24 @@ std::vector<std::string> OutputFile::getLines()
     return std::vector<std::string>();
 }
 
-OutputFiles::GIOOutputFile::GIOOutputFile(int const FileID, std::string FileName)
-    : fileID{FileID}, fileName{std::move(FileName)}, os{get_out_stream(FileID, FileName)}
-{
-}
-
-void OutputFiles::GIOOutputFile::close()
-{
-    ObjexxFCL::gio::close(fileID);
-}
-
-void OutputFiles::GIOOutputFile::open_at_end()
-{
-    os = open_out_stream(fileID, fileName);
-}
-
-OutputFiles OutputFiles::makeOutputFiles()
-{
-    return OutputFiles();
-}
-
-OutputFiles::OutputFiles()
-{
-}
-
 OutputFiles &OutputFiles::getSingleton()
 {
-    static OutputFiles ofs{makeOutputFiles()};
-    return ofs;
+    assert(getSingletonInternal() != nullptr);
+
+    if (getSingletonInternal() == nullptr) {
+        throw std::runtime_error("Invalid impossible state of no outputfiles!?!?!");
+    }
+    return *getSingletonInternal();
+}
+
+void OutputFiles::setSingleton(OutputFiles *newSingleton) noexcept
+{
+    getSingletonInternal() = newSingleton;
+}
+
+OutputFiles *&OutputFiles::getSingletonInternal() {
+    static OutputFiles *singleton{nullptr};
+    return singleton;
 }
 
 using arg_formatter = fmt::arg_formatter<fmt::buffer_range<char>>;
@@ -277,10 +249,57 @@ public:
                 }
             };
 
-            // matches Fortran's 'G' format
-            if (specs()->type == 'N') {
+            // matches Fortran's 'E' format
+            if (specs()->type == 'Z') {
+                // The Fortran 'G' format insists on a leading 0, even though
+                // that actually means losing data
+                specs()->type = 'E';
 
-                if (should_be_fixed_output(value) && fixed_will_fit(value, specs()->width - 5)) {
+                // 0 pad the end
+                specs()->alt = true;
+
+                if (specs()->precision > 0) {
+                    // reduce the precision to get rounding behavior
+                    --specs()->precision;
+                }
+
+                // multiply by 10 to get the exponent we want
+                auto str = write_to_string(value * 10, *specs());
+
+                // we need "space" to insert our leading 0
+                if (str.front() != ' ') {
+                    str.insert(str.begin(), ' ');
+                }
+
+                auto begin = std::find(std::begin(str), std::end(str), '.');
+                // ' -1.2345E15'
+                //     ^
+                std::swap(*begin, *std::prev(begin));
+                // ' -.12345E15'
+                //     ^
+                std::advance(begin, -2);
+                // ' -.12345E15'
+                //   ^
+                if (*begin != ' ') {
+                    // found a sign
+                    std::swap(*begin, *std::prev(begin));
+                    // '- .12345E15'
+                    //   ^
+                }
+                // '-0.12345E15'
+                //   ^
+                *begin = '0';
+                return write_string(str);
+            } else if (specs()->type == 'S') {
+                // matches Fortran's 'G', but stripped of whitespace
+                specs()->type = 'N';
+                return write_string(stripped(write_to_string(value, *specs())));
+            } else if (specs()->type == 'N') {
+                // matches Fortran's 'G' format
+
+                if (specs()->width == 0 && specs()->precision == -1) {
+                    return write_string(format("{:20N}", value));
+                } else if (should_be_fixed_output(value) && fixed_will_fit(value, specs()->width - 5)) {
                     specs()->type = 'F';
 
                     // account for alignment with E formatted
@@ -289,8 +308,11 @@ public:
                         --specs()->precision;
                     } else if (value < 1.0 && value > -1.0) {
                         // No adjustment necessary
+                    } else if (specs()->precision == -1) {
+                        const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(value)));
+                        specs()->precision = specs()->width - (order_of_magnitude + 2);
                     } else {
-                        const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
+                        const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(value)));
                         specs()->precision -= (order_of_magnitude + 1);
                     }
 
@@ -313,26 +335,8 @@ public:
                 } else {
                     // The Fortran 'G' format insists on a leading 0, even though
                     // that actually means losing data
-                    specs()->type = 'E';
-
-                    // 0 pad the end
-                    specs()->alt = true;
-
-                    // reduce the precision to get rounding behavior
-                    --specs()->precision;
-
-                    // multiply by 10 to get the exponent we want
-                    auto str = write_to_string(value * 10, *specs());
-
-                    // swap around the first few characters and add in the leading
-                    // 0 that we need to get the same formatting behavior on the rounded
-                    // value that was acquired from the reduction in precision
-                    auto begin = std::next(std::begin(str), specs()->width - (specs()->precision + 8));
-                    std::swap(*begin, *std::next(begin));
-                    std::advance(begin, 1);
-                    std::swap(*std::next(begin), *std::next(begin, 2));
-                    *begin = '0';
-                    return write_string(str);
+                    specs()->type = 'Z';
+                    return (*this)(value);
                 }
             } else if (specs()->type == 'R') { // matches RoundSigDigits() behavior
                 // push the value up a tad to get the same rounding behavior as Objexx
@@ -403,7 +407,7 @@ void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args
         // Pass custom argument formatter as a template arg to vformat_to.
         fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
     } catch (const fmt::format_error &) {
-        throw fmt::format_error(fmt::format("Error with format, '{}', passed {} args", format_str, count));
+        ShowWarningError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
     }
     os.write(buffer.data(), buffer.size());
 }
@@ -415,7 +419,7 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
         // Pass custom argument formatter as a template arg to vformat_to.
         fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
     } catch (const fmt::format_error &) {
-        throw fmt::format_error(fmt::format("Error with format, '{}', passed {} args", format_str, count));
+        ShowWarningError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
     }
     return fmt::to_string(buffer);
 }

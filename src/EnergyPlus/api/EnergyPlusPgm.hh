@@ -56,17 +56,17 @@
 
 // Functions
 
-void CreateCurrentDateTimeString(std::string &CurrentDateTimeString);
+std::string CreateCurrentDateTimeString();
 
-int initializeEnergyPlus(EnergyPlusData &state, std::string const & filepath);
+int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath);
 
-int wrapUpEnergyPlus(EnergyPlusData &state);
+int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state);
 
-void ENERGYPLUSLIB_API EnergyPlusPgm(EnergyPlusData &state, std::string const &filepath = std::string());
+int ENERGYPLUSLIB_API EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());
 
-int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlusData &state, std::string const & filepath = std::string());
+int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath = std::string());
 
-int runEnergyPlusAsLibrary(EnergyPlusData &state, int argc, const char *argv[]);
+int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const char *argv[]);
 
 void ENERGYPLUSLIB_API StoreProgressCallback(void (*f)(int const));
 

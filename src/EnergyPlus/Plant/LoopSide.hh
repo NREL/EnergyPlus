@@ -51,13 +51,15 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/Branch.hh>
 #include <EnergyPlus/Plant/ConnectedLoopData.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/LoopSidePumpInformation.hh>
 #include <EnergyPlus/Plant/MixerData.hh>
 #include <EnergyPlus/Plant/PlantConvergencePoint.hh>
 #include <EnergyPlus/Plant/SplitterData.hh>
 
 namespace EnergyPlus {
+
+    struct EnergyPlusData;
+
 namespace DataPlant {
 
     struct HalfLoopData

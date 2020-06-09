@@ -472,7 +472,7 @@ namespace HVACVariableRefrigerantFlow {
                               Real64 Q_coil,     // absolute value of OU coil heat release or heat extract [W]
                               Real64 T_coil_in,  // Temperature of air at OU coil inlet [C]
                               Real64 W_coil_in   // Humidity ratio of air at OU coil inlet [kg/kg]
-        );
+        ) const;
 
         Real64 VRFOU_Cap(int OperationMode, // Flag for hex operation
                          Real64 TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
@@ -489,7 +489,7 @@ namespace HVACVariableRefrigerantFlow {
                           Real64 T_coil_in,      // Temperature of air at OU coil inlet [C]
                           Real64 W_coil_in,      // Humidity ratio of air at OU coil inlet [kg/kg]
                           Real64 OutdoorPressure // Outdoor air pressure [Pa]
-        );
+        ) const;
 
         Real64 VRFOU_CapModFactor(Real64 h_comp_in_real, // Enthalpy of refrigerant at the compressor inlet at real conditions [kJ/kg]
                                   Real64 h_evap_in_real, // Enthalpy of refrigerant at the evaporator inlet at real conditions [kJ/kg]
@@ -593,7 +593,7 @@ namespace HVACVariableRefrigerantFlow {
                              Real64 &Pipe_Q,              // unit part load ratio
                              Real64 &Pipe_DeltP,          // ratio of compressor ON airflow to AVERAGE airflow over timestep
                              Real64 &Pipe_h_comp_out      // Piping Loss Algorithm Parameter: Enthalpy before piping loss (compressor outlet) [kJ/kg]
-        );
+        ) const;
     };
 
     struct TerminalUnitListData
@@ -896,7 +896,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void SetCompFlowRate(int VRFTUNum, int VRFCond, Optional_bool_const UseCurrentMode = _);
 
-    void SizeVRF(EnergyPlusData &state, OutputFiles &outputFiles, int const VRFTUNum);
+    void SizeVRF(EnergyPlusData &state, int const VRFTUNum);
 
     void SimVRF(EnergyPlusData &state, int VRFTUNum,
                 bool FirstHVACIteration,

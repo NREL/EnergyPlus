@@ -33,6 +33,7 @@ endif()
 
 set(SKIP_BUILD_RPATH true)
 add_executable( ParametricPreprocessor ${SRC} )
+set_target_properties(ParametricPreprocessor PROPERTIES FOLDER Auxiliary)
 
 set_target_properties(ParametricPreprocessor PROPERTIES
   COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}"

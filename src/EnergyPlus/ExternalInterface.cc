@@ -61,9 +61,9 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -1118,7 +1118,7 @@ namespace ExternalInterface {
                                               cNumericFieldNames);
                 // Get the FMU name
                 FMU(Loop).Name = cAlphaArgs(1);
-                CheckForActualFileName(cAlphaArgs(1), fileExist, tempFullFileName);
+                CheckForActualFileName(OutputFiles::getSingleton(), cAlphaArgs(1), fileExist, tempFullFileName);
                 if (fileExist) {
                     pos = index(FMU(Loop).Name, pathChar, true); // look backwards
                     if (pos != std::string::npos) {
@@ -2277,13 +2277,10 @@ namespace ExternalInterface {
 
         Array1D<Real64> dblValWri(nDblMax);
         Array1D<Real64> dblValRea(nDblMax);
-        std::string retValCha;
         bool continueSimulation; // Flag, true if simulation should continue
         static bool firstCall(true);
         static bool showContinuationWithoutUpdate(true);
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_1000("(I2)");
 
         if (firstCall) {
             DisplayString("ExternalInterface starts first data exchange.");
@@ -2337,11 +2334,9 @@ namespace ExternalInterface {
             if (haveExternalInterfaceBCVTB || (haveExternalInterfaceFMUExport && (flaRea == 0))) {
                 if (retVal != 0) {
                     continueSimulation = false;
-                    ObjexxFCL::gio::write(retValCha, Format_1000) << retVal;
-                    ShowSevereError("ExternalInterface: Socket communication received error value \"" + retValCha +
-                                    "\" at time = " + TrimSigDigits(preSimTim / 3600, 2) + " hours.");
-                    ObjexxFCL::gio::write(retValCha, Format_1000) << flaRea;
-                    ShowContinueError("ExternalInterface: Flag from server \"" + retValCha + "\".");
+                    ShowSevereError(format("ExternalInterface: Socket communication received error value \"{:2}\" at time = {:.2T} hours.", retVal,
+                                    preSimTim / 3600));
+                    ShowContinueError(format("ExternalInterface: Flag from server \"{:2}\".", flaRea));
                     ErrorsFound = true;
                     StopExternalInterfaceIfError();
                 }
@@ -2352,9 +2347,8 @@ namespace ExternalInterface {
                 // No more values will be received in future steps
                 // Added a check since the FMUExport  is terminated with the flaRea set to 1.
                 noMoreValues = true;
-                ObjexxFCL::gio::write(retValCha, Format_1000) << flaRea;
                 if (haveExternalInterfaceBCVTB) {
-                    ShowSevereError("ExternalInterface: Received end of simulation flag at time = " + TrimSigDigits(preSimTim / 3600, 2) + " hours.");
+                    ShowSevereError(format("ExternalInterface: Received end of simulation flag at time = {:.2T} hours.", preSimTim / 3600));
                     StopExternalInterfaceIfError();
                 }
             }

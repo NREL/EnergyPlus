@@ -256,7 +256,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetWaterCoilInput();
@@ -494,7 +494,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetWaterCoilInput();
@@ -731,7 +731,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetWaterCoilInput();
@@ -968,7 +968,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetWaterCoilInput();
@@ -1165,7 +1165,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     }
     GetZoneData(ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
@@ -1379,7 +1379,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetWaterCoilInput();
@@ -1421,7 +1421,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     EXPECT_EQ(WaterCoil(1).DesWaterHeatingCoilRate, 0.0);                    // model output not yet set
 
     // sizing will be called and skipped with Init setting DesWaterHeatingCoilRate based on above inputs
-    InitWaterCoil(state, outputFiles(), 1, false);
+    InitWaterCoil(state, 1, false);
     EXPECT_NEAR(WaterCoil(1).DesWaterHeatingCoilRate, 7390.73, 0.01);
     // not set in Init for water heating coils and not used elsewhere other than sizing
     EXPECT_EQ(WaterCoil(1).DesTotWaterCoilLoad, DataSizing::AutoSize);

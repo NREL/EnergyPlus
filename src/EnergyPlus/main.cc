@@ -59,8 +59,8 @@ int main(int argc, const char *argv[])
     unsigned int fp_control_state = _controlfp(_EM_INEXACT, _MCW_EM);
 #endif
 
-    EnergyPlusData state;
+    EnergyPlus::EnergyPlusData state;
 
     ProcessArgs(state, argc, argv);
-    EnergyPlusPgm(state);
+    return EnergyPlusPgm(state);
 }

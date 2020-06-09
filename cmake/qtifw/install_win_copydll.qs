@@ -52,11 +52,12 @@ function Component()
           // (=overwrite with no prompt) isn't needed since we tested target
           // didn't exist already
           component.addElevatedOperation("Execute", "cmd", "/C", "copy", sourceFile, targetFile, "/Y");
-          // Register it: Only for "OCX"
-          // If it's a .ocx (case insensitive), we save it to be registered
-          if (systemArray[i].toLowerCase().indexOf(".ocx") !== -1) {
-            dllsToReg.push(targetFile);
-          }
+        }
+        // Register it: Only for "OCX"
+        // On some systems these files may be present but not properly registered, so always register here
+        // If it's a .ocx (case insensitive), we save it to be registered
+        if (systemArray[i].toLowerCase().indexOf(".ocx") !== -1) {
+          dllsToReg.push(targetFile);
         }
       }
 

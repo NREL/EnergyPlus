@@ -191,13 +191,10 @@ namespace RuntimeLanguageProcessor {
                   std::string const &Error // error message to be added to ErlStack
     );
 
-    ErlValueType EvaluateStack(int const StackNum);
+    ErlValueType EvaluateStack(OutputFiles &outputFiles, int const StackNum);
 
-    void WriteTrace(int const StackNum,
-                    int const InstructionNum,
-                    ErlValueType const &ReturnValue,
-                    bool const seriousErrorFound // if true then also call energyplus error severe->fatal with Erl program line info
-    );
+    void
+    WriteTrace(OutputFiles &outputFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
 
     //******************************************************************************************
 
@@ -221,8 +218,6 @@ namespace RuntimeLanguageProcessor {
     void GetRuntimeLanguageUserInput();
 
     void ReportRuntimeLanguage();
-
-    std::string IntegerToString(int const Number);
 
     ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue = _);
 

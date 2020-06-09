@@ -54,9 +54,9 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 void cClearAllStates() {
-    EnergyPlusData state;   //THIS IS TEMPORARY
+    EnergyPlus::EnergyPlusData state;   //THIS IS TEMPORARY
     EnergyPlus::clearThisState(state);
-    EnergyPlus::clearAllStates();
+    EnergyPlus::clearAllStates(state.outputFiles);
 }
 
 int energyplus(int argc, const char *argv[]) {
@@ -69,7 +69,7 @@ int energyplus(int argc, const char *argv[]) {
 //    argv[6] = epcomp->iddPath.c_str();
 //    argv[7] = epcomp->idfInputPath.c_str();
 
-    EnergyPlusData state;
+    EnergyPlus::EnergyPlusData state;
     return runEnergyPlusAsLibrary(state, argc, argv);
 }
 

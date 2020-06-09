@@ -94,14 +94,16 @@ namespace WaterThermalTanks {
     // order of ControlTypeEnum and PriorityEnum must be enforced
     enum ControlTypeEnum
     {
-        Cycle,
+        Cycle = 0,
         Modulate
     };
 
     // order of ControlTypeEnum and PriorityEnum must be enforced
+    // WaterThermalTankData uses the same int ControlType to assign either ControlTypeEnum (WaterHeater:Mixed) or PriorityEnum
+    // (WaterHeater:Stratified), so in order to avoid problems, start the int value here as 2 so they don't risk collapsing.
     enum PriorityEnum
     {
-        MasterSlave, // water heater only, master-slave priority control of heater elements
+        MasterSlave = 2, // water heater only, master-slave priority control of heater elements
         Simultaneous // water heater only, simultaneous control of heater elements
     };
 
@@ -607,6 +609,7 @@ namespace WaterThermalTanks {
         std::string OutletNodeName2;
 
         bool myOneTimeInitFlag;
+        bool scanPlantLoopsFlag;
 
         int callerLoopNum;
 
@@ -643,7 +646,7 @@ namespace WaterThermalTanks {
               OffCycParaEnergyToTank(0.0), OnCycParaFuelEnergy(0.0), OnCycParaEnergyToTank(0.0), NetHeatTransferEnergy(0.0), FirstRecoveryDone(false),
               FirstRecoveryFuel(0.0), HeatPumpNum(0), DesuperheaterNum(0), ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0),
               FluidIndex(0), MyOneTimeFlagWH(true), MyTwoTimeFlagWH(true), MyEnvrnFlag(true), WarmupFlag(false), SetLoopIndexFlag(true),
-              AlreadyReported(false), AlreadyRated(false), MyHPSizeFlag(true), CheckWTTEquipName(true), myOneTimeInitFlag(true), callerLoopNum(0)
+              AlreadyReported(false), AlreadyRated(false), MyHPSizeFlag(true), CheckWTTEquipName(true), myOneTimeInitFlag(true), scanPlantLoopsFlag(true), callerLoopNum(0)
         {
         }
 
@@ -691,7 +694,7 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankMixed(); // Water Heater being simulated
 
-        void CalcStandardRatings(EnergyPlusData &state, OutputFiles &outputFiles);
+        void CalcStandardRatings(EnergyPlusData &state);
 
         void ReportCWTankInits(OutputFiles &outputFiles);
 
@@ -899,7 +902,7 @@ namespace WaterThermalTanks {
 
     bool getWaterTankStratifiedInput();
 
-    bool GetWaterThermalTankInput(EnergyPlusData &state, OutputFiles &outputFiles);
+    bool GetWaterThermalTankInput(EnergyPlusData &state);
 
     void CalcWaterThermalTankZoneGains(EnergyPlusData &state);
 

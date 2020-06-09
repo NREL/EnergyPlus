@@ -52,8 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
@@ -515,7 +513,7 @@ namespace HVACManager {
             UpdateNodeThermalHistory();
 
             if (OutputReportTabular::displayHeatEmissionsSummary) {
-                OutputReportTabular::CalcHeatEmissionReport();
+                OutputReportTabular::CalcHeatEmissionReport(state);
             }
 
             ManageEMS(emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
@@ -534,14 +532,14 @@ namespace HVACManager {
                 }
                 if (DoOutputReporting) {
                     ReportMaxVentilationLoads(state);
-                    UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
+                    UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                     if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                         if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                     }
-                    UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
+                    UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 }
                 if (ZoneSizingCalc) {
-                    UpdateZoneSizing(state.dataGlobals, OutputFiles::getSingleton(), DuringDay);
+                    UpdateZoneSizing(state, DuringDay);
                     UpdateFacilitySizing(state.dataGlobals, DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
@@ -580,7 +578,7 @@ namespace HVACManager {
                     PrintedWarmup = true;
                 }
                 CalcMoreNodeInfo();
-                UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
+                UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                     if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                 }
@@ -617,7 +615,7 @@ namespace HVACManager {
                     }
                     PrintedWarmup = true;
                 }
-                UpdateDataandReport(state.dataGlobals, OutputProcessor::TimeStepType::TimeStepSystem);
+                UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
             }
             ManageEMS(emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan); // EMS calling point
             // UPDATE SYSTEM CLOCKS
@@ -761,7 +759,6 @@ namespace HVACManager {
         /////////////////////////
         static int ErrCount(0); // Number of times that the maximum iterations was exceeded
         static bool MySetPointInit(true);
-        std::string CharErrOut; // a character string equivalent of ErrCount
         static int MaxErrCount(0);
         static std::string ErrEnvironmentName;
         int LoopNum;
@@ -1014,9 +1011,7 @@ namespace HVACManager {
             ++ErrCount;
             if (ErrCount < 15) {
                 ErrEnvironmentName = EnvironmentName;
-                ObjexxFCL::gio::write(CharErrOut, "(I5)") << MaxIter;
-                strip(CharErrOut);
-                ShowWarningError("SimHVAC: Maximum iterations (" + CharErrOut + ") exceeded for all HVAC loops, at " + EnvironmentName + ", " +
+                ShowWarningError("SimHVAC: Maximum iterations (" + fmt::to_string(MaxIter) + ") exceeded for all HVAC loops, at " + EnvironmentName + ", " +
                                  CurMnDy + ' ' + CreateSysTimeIntervalString());
                 if (SimAirLoopsFlag) {
                     ShowContinueError("The solution for one or more of the Air Loop HVAC systems did not appear to converge");

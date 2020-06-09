@@ -200,9 +200,9 @@ namespace WindowManager {
 
     void clear_state();
 
-    void InitWindowOpticalCalculations();
+    void InitWindowOpticalCalculations(OutputFiles &outputFiles);
 
-    void InitGlassOpticalCalculations();
+    void InitGlassOpticalCalculations(OutputFiles &outputFiles);
 
     //*****************************************************************************************
 
@@ -465,7 +465,7 @@ namespace WindowManager {
 
     //*************************************************************************************
 
-    void CalcWindowScreenProperties();
+    void CalcWindowScreenProperties(OutputFiles &outputFiles);
 
     void BlindOpticsDiffuse(int const BlindNum,      // Blind number
                             int const ISolVis,       // 1 = solar and IR calculation; 2 = visible calculation

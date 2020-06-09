@@ -482,9 +482,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());  // read schedules
+    ProcessScheduleInput(state.outputFiles);  // read schedules
 
-    GetZoneAirSetPoints(outputFiles());
+    GetZoneAirSetPoints(state.outputFiles);
 
     DeadBandOrSetback.allocate(NumTempControlledZones);
     CurDeadBandOrSetback.allocate(NumTempControlledZones);
@@ -1107,8 +1107,6 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
-        " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",
         " ",

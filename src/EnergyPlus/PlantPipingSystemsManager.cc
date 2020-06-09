@@ -48,16 +48,13 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
-#include <fstream>
 #include <memory>
 #include <set>
-#include <utility>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/floops.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -71,7 +68,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -160,10 +156,10 @@ namespace EnergyPlus {
             DataGlobals::AnyBasementsInModel = (numBasementsCheck > 0);
         }
 
-        PlantComponent *Circuit::factory(DataGlobal &dataGlobals, int EP_UNUSED(objectType), std::string objectName) {
+        PlantComponent *Circuit::factory(EnergyPlusData &state, int EP_UNUSED(objectType), std::string objectName) {
             // Process the input data for circuits if it hasn't been done already
             if (GetInputFlag) {
-                GetPipingSystemsAndGroundDomainsInput(dataGlobals);
+                GetPipingSystemsAndGroundDomainsInput(state);
                 GetInputFlag = false;
             }
             // Now look for this particular pipe in the list
@@ -196,7 +192,7 @@ namespace EnergyPlus {
             thisDomain.UpdatePipingSystems(this);
         }
 
-        void SimulateGroundDomains(DataGlobal &dataGlobals, OutputFiles &outputFiles, bool initOnly)
+        void SimulateGroundDomains(EnergyPlusData &state, bool initOnly)
         {
 
             // SUBROUTINE INFORMATION:
@@ -210,7 +206,7 @@ namespace EnergyPlus {
 
             // Read input if necessary
             if (GetInputFlag) {
-                GetPipingSystemsAndGroundDomainsInput(dataGlobals);
+                GetPipingSystemsAndGroundDomainsInput(state);
                 GetInputFlag = false;
             }
 
@@ -395,12 +391,12 @@ namespace EnergyPlus {
                 // Write eio header
                 static constexpr auto DomainCellsToEIOHeader(
                     "! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells\n");
-                print(outputFiles.eio, DomainCellsToEIOHeader);
+                print(state.outputFiles.eio, DomainCellsToEIOHeader);
 
                 // Write eio data
                 for (auto &thisDomain : domains) {
                     static constexpr auto DomainCellsToEIO("{},{:5},{:5},{:5}\n");
-                    print(outputFiles.eio,
+                    print(state.outputFiles.eio,
                           DomainCellsToEIO,
                           thisDomain.Name,
                           thisDomain.NumDomainCells,
@@ -411,7 +407,7 @@ namespace EnergyPlus {
             }
         }
 
-        void GetPipingSystemsAndGroundDomainsInput(DataGlobal &dataGlobals) {
+        void GetPipingSystemsAndGroundDomainsInput(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -436,16 +432,16 @@ namespace EnergyPlus {
             int NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
 
             // Read in raw inputs, don't try to interpret dependencies yet
-            ReadGeneralDomainInputs(dataGlobals, 1, NumGeneralizedDomains, ErrorsFound);
+            ReadGeneralDomainInputs(state, 1, NumGeneralizedDomains, ErrorsFound);
             //ReadPipeCircuitInputs(ErrorsFound);
-            ReadHorizontalTrenchInputs(dataGlobals, NumGeneralizedDomains + 1, NumPipeCircuits + 1, ErrorsFound);
+            ReadHorizontalTrenchInputs(state, NumGeneralizedDomains + 1, NumPipeCircuits + 1, ErrorsFound);
 
             // This is heavily dependent on the order of the domains in the main array.
-            ReadZoneCoupledDomainInputs(dataGlobals, NumGeneralizedDomains + NumHorizontalTrenches + 1, NumZoneCoupledDomains,
+            ReadZoneCoupledDomainInputs(state, NumGeneralizedDomains + NumHorizontalTrenches + 1, NumZoneCoupledDomains,
                                         ErrorsFound);
 
             // This is heavily dependent on the order of the domains in the main array.
-            ReadBasementInputs(dataGlobals, NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + 1, NumBasements,
+            ReadBasementInputs(state, NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + 1, NumBasements,
                                ErrorsFound);
 
             // Report errors that are purely input problems
@@ -506,7 +502,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadGeneralDomainInputs(DataGlobal &dataGlobals, int const IndexStart, int const NumGeneralizedDomains, bool &ErrorsFound) {
+        void ReadGeneralDomainInputs(EnergyPlusData &state, int const IndexStart, int const NumGeneralizedDomains, bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -817,12 +813,12 @@ namespace EnergyPlus {
                 }
 
                 // Initialize ground temperature model and get pointer reference
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(dataGlobals, groundTempType, groundTempName);
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, groundTempType, groundTempName);
 
             }
         }
 
-        void ReadZoneCoupledDomainInputs(DataGlobal &dataGlobals, int const StartingDomainNumForZone, int const NumZoneCoupledDomains,
+        void ReadZoneCoupledDomainInputs(EnergyPlusData &state, int const StartingDomainNumForZone, int const NumZoneCoupledDomains,
                                          bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
@@ -1122,7 +1118,7 @@ namespace EnergyPlus {
                         thisDomain.Mesh.Y.RegionMeshCount; // Need to clean this out at some point
 
                 // Farfield model
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(dataGlobals, DataIPShortCuts::cAlphaArgs(2),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(2),
                                                                                 DataIPShortCuts::cAlphaArgs(3));
 
                 // Other parameters
@@ -1137,7 +1133,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadBasementInputs(DataGlobal &dataGlobals, int const StartingDomainNumForBasement, int const NumBasements, bool &ErrorsFound) {
+        void ReadBasementInputs(EnergyPlusData &state, int const StartingDomainNumForBasement, int const NumBasements, bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -1430,7 +1426,7 @@ namespace EnergyPlus {
 
                 // Farfield ground temperature model -- note this will overwrite the DataIPShortCuts variables
                 // so any other processing below this line won't have access to the cAlphaArgs, etc., here
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(dataGlobals, DataIPShortCuts::cAlphaArgs(2),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(2),
                                                                                 DataIPShortCuts::cAlphaArgs(3));
 
                 // Total surface area
@@ -1833,7 +1829,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadHorizontalTrenchInputs(DataGlobal &dataGlobals, int const StartingDomainNumForHorizontal,
+        void ReadHorizontalTrenchInputs(EnergyPlusData &state, int const StartingDomainNumForHorizontal,
                                         int const StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound) {
 
@@ -1895,7 +1891,7 @@ namespace EnergyPlus {
                 //******* We'll first set up the domain ********
                 // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
                 thisDomain.IsActuallyPartOfAHorizontalTrench = true;
-                ObjexxFCL::gio::write(thisDomain.Name, "( 'HorizontalTrenchDomain',I4 )") << HorizontalGHXCtr;
+                thisDomain.Name = format("HorizontalTrenchDomain{:4}", HorizontalGHXCtr);
                 thisDomain.Extents.xMax = (double(NumPipeSegments) + 1.0) * thisInterPipeSpacing;
                 thisDomain.Extents.yMax = 2.0 * thisBurialDepth;
                 thisDomain.Extents.zMax = DataIPShortCuts::rNumericArgs(2);
@@ -1930,7 +1926,7 @@ namespace EnergyPlus {
 
                 // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
                 // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(dataGlobals, DataIPShortCuts::cAlphaArgs(4),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                 DataIPShortCuts::cAlphaArgs(5));
 
                 //******* Then we'll do the segments *******!

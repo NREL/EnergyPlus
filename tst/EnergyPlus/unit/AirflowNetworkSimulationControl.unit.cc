@@ -118,7 +118,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
         "Schedule:Constant,OnSch,,1.0;",
         "Schedule:Constant,FreeRunningSeason,,0.0;",
         "Schedule:Constant,Sempre 21,,21.0;",
@@ -167,7 +166,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(state, outputFiles());
+    GetAirflowNetworkInput(state);
 
     EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
@@ -214,7 +213,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
         "Schedule:Constant,OnSch,,1.0;",
         "Schedule:Constant,FreeRunningSeason,,0.0;",
         "Schedule:Constant,Sempre 21,,21.0;",
@@ -265,7 +263,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(state, outputFiles());
+    GetAirflowNetworkInput(state);
 
     EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
