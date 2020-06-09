@@ -188,11 +188,11 @@ namespace AirflowNetwork {
     // Object Data
     Array1D<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
-    Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
-    Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
-    Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
-    Array1D<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
-    Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
+    //Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
+    //Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
+    //Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
+    //Array1D<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
+    //Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
     AirflowNetworkSimuProp AirflowNetworkSimu;
     Array1D<AirflowNetworkNodeProp> AirflowNetworkNodeData;
     Array1D<AirflowNetworkCompProp> AirflowNetworkCompData;
@@ -3835,11 +3835,11 @@ namespace AirflowNetwork {
         VAVSystem = false;
         AirflowNetworkNodeSimu.deallocate();
         AirflowNetworkLinkSimu.deallocate();
-        AirflowNetworkExchangeData.deallocate();
-        AirflowNetworkMultiExchangeData.deallocate();
-        AirflowNetworkLinkReport.deallocate();
-        AirflowNetworkNodeReport.deallocate();
-        AirflowNetworkLinkReport1.deallocate();
+        //AirflowNetworkExchangeData.deallocate();
+        //AirflowNetworkMultiExchangeData.deallocate();
+        //AirflowNetworkLinkReport.deallocate();
+        //AirflowNetworkNodeReport.deallocate();
+        //AirflowNetworkLinkReport1.deallocate();
         AirflowNetworkSimu = AirflowNetworkSimuProp();
         AirflowNetworkNodeData.deallocate();
         AirflowNetworkCompData.deallocate();

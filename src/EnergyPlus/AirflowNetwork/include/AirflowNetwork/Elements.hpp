@@ -1595,13 +1595,9 @@ namespace AirflowNetwork {
     // Object Data
     extern Array1D<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     extern Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
-    extern Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
-    extern Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
-    extern Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
-    extern Array1D<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
-    extern Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
-    extern AirflowNetworkSimuProp
-        AirflowNetworkSimu; // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
+ 
+    extern AirflowNetworkSimuProp AirflowNetworkSimu;
+    // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
                             // field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration |
                             // Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit |
                             // Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along
@@ -1617,7 +1613,6 @@ namespace AirflowNetwork {
     extern Array1D<DetailedOpening> MultizoneCompDetOpeningData;
     extern Array1D<SimpleOpening> MultizoneCompSimpleOpeningData;
     extern Array1D<HorizontalOpening> MultizoneCompHorOpeningData;
-    // extern Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
     extern Array1D<SurfaceCrack> MultizoneSurfaceCrackData;
     extern Array1D<EffectiveLeakageArea> MultizoneSurfaceELAData;
     extern Array1D<MultizoneExternalNodeProp> MultizoneExternalNodeData;

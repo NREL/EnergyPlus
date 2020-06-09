@@ -60,6 +60,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "AirflowNetwork/Solver.hpp"
+#include "AirflowNetwork/Elements.hpp"
 
 namespace EnergyPlus {
 
@@ -99,14 +100,7 @@ namespace AirflowNetworkBalanceManager {
         }
     };
 
-    // Object Data
-    extern Array1D<AirflowNetworkReportVars> AirflowNetworkZnRpt;
-
-    extern AirflowNetwork::Solver solver;
-
     // Functions
-
-    void clear_state();
 
     void ManageAirflowNetworkBalance(EnergyPlusData &state,
                                      Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
@@ -115,8 +109,6 @@ namespace AirflowNetworkBalanceManager {
     );
 
     void GetAirflowNetworkInput(EnergyPlusData &state);
-
-    void InitAirflowNetwork();
 
     void AllocateAndInitData();
 
@@ -228,6 +220,8 @@ namespace AirflowNetworkBalanceManager {
 
     struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
 
+        void initialize();
+
         Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;
         int AirflowNetworkNumOfExtSurfaces;
@@ -283,6 +277,15 @@ namespace AirflowNetworkBalanceManager {
         Array1D<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
         std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
+        AirflowNetwork::Solver solver;
+
+        // Output and reporting
+        Array1D<AirflowNetwork::AirflowNetworkExchangeProp> exchangeData;
+        Array1D<AirflowNetwork::AirflowNetworkExchangeProp> multiExchangeData;
+        Array1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport;
+        Array1D<AirflowNetwork::AirflowNetworkNodeReportData> nodeReport;
+        Array1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport1;
+
         void clear_state() override {
             OccupantVentilationControl.deallocate();
             SplitterNodeNumbers.deallocate();
@@ -335,7 +338,14 @@ namespace AirflowNetworkBalanceManager {
             LoopOnOffFanRunTimeFraction.deallocate();
             LoopOnOffFlag.deallocate();
             UniqueAirflowNetworkSurfaceName.clear();
-            AirflowNetworkBalanceManager::solver.clear();
+
+            exchangeData.deallocate();
+            multiExchangeData.deallocate();
+            linkReport.deallocate();
+            nodeReport.deallocate();
+            linkReport1.deallocate();
+
+            solver.clear();
         }
     };
 

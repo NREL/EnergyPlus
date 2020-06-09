@@ -2326,14 +2326,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     // Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off
     AirflowNetwork::AirflowNetworkFanActivated = false;
 
-    AirflowNetwork::AirflowNetworkExchangeData.allocate(NumOfZones);
+    dataAirflowNetworkBalanceManager.exchangeData.allocate(NumOfZones);
 
     UpdateAirflowNetwork();
 
     EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkNodeSimu(10).PZ, 0.0001);
     EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkNodeSimu(20).PZ, 0.0001);
-    EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkLinkReport(20).FLOW, 0.0001);
-    EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkLinkReport(50).FLOW, 0.0001);
+    EXPECT_NEAR(0.0, dataAirflowNetworkBalanceManager.linkReport(20).FLOW, 0.0001);
+    EXPECT_NEAR(0.0, dataAirflowNetworkBalanceManager.linkReport(50).FLOW, 0.0001);
 
     // Start a test for #6005
     AirflowNetwork::ANZT = 26.0;
@@ -4436,7 +4436,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
 
     // Read AirflowNetwork inputs
     GetAirflowNetworkInput(state);
-    InitAirflowNetwork();
+    dataAirflowNetworkBalanceManager.initialize();
 
     // Check inputs
     EXPECT_EQ(AirflowNetwork::AirflowNetworkLinkageViewFactorData(1).LinkageName, "ZONESUPPLYLINK1");
@@ -8914,7 +8914,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
         "   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
-    InitAirflowNetwork();
+    dataAirflowNetworkBalanceManager.initialize();
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -13456,7 +13456,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(state);
     dataAirflowNetworkBalanceManager.AirflowNetworkGetInputFlag = false;
-    AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
+    dataAirflowNetworkBalanceManager.exchangeData.allocate(1);
     ManageAirflowNetworkBalance(state, First, iter, resimu);
     EXPECT_FALSE(resimu);
 }
