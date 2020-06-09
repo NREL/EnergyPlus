@@ -44,10 +44,6 @@ if( EXISTS ${XELATEX} )
 
   set_target_properties(docs PROPERTIES FOLDER Documentation)
 
-  if (DOCS_TESTING)
-    enable_testing()
-  endif()
-
   include(cmake/doc-targets.cmake)
 
   # add each of the documents, they have their own CMakeLists.txt files
