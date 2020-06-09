@@ -2877,6 +2877,10 @@ namespace ScheduleManager {
             thisHour -= 24;
             thisDayOfWeek = DataEnvironment::DayOfWeekTomorrow;
             thisHolidayIndex = DataEnvironment::HolidayIndexTomorrow;
+        } else if (thisHour < 1) {
+            // For some reason, SolarShading::SkyDifSolarShading calls SkyDifSolarShading::SHADOW(0,0), so with hour = 0... which will make this
+            // routine crash since TSValue is 1-indexed...
+            thisHour = 24;
         }
 
         int WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(thisDayOfYear);
