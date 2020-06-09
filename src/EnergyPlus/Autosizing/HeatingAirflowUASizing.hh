@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef HeatingAirflowUASizing_hh_INCLUDED
+#define HeatingAirflowUASizing_hh_INCLUDED
+
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <ObjexxFCL/Array1D.hh>
@@ -54,8 +57,9 @@ namespace EnergyPlus {
     struct HeatingAirflowUASizer : BaseSizer {
 
         HeatingAirflowUASizer() {
-            this->sizingType = EnergyPlus:: AutoSizingType::HeatingAirflowUASizing;
+            this->sizingType = AutoSizingType::HeatingAirflowUASizing;
         }
+        ~HeatingAirflowUASizer() {};
 
         void initializeWithinEP(EnergyPlusData &state, std::string const &_compName, std::string const &_compType, bool printWarningFlag) override;
 
@@ -73,3 +77,5 @@ namespace EnergyPlus {
     };
 
 } // namespace EnergyPlus
+
+#endif

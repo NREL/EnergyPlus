@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef HeatingWaterDesAirInletTempSizing_hh_INCLUDED
+#define HeatingAirflowUASizing_hh_INCLUDED
+
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <ObjexxFCL/Array1D.hh>
@@ -57,8 +60,9 @@ namespace EnergyPlus {
         Real64 dataFlowUsedForSizing = 0.0;
 
         HeatingWaterDesAirInletTempSizer() {
-            this->sizingType = EnergyPlus::AutoSizingType::HeatingWaterDesAirInletTempSizing;
+            this->sizingType = AutoSizingType::HeatingWaterDesAirInletTempSizing;
         }
+        ~HeatingWaterDesAirInletTempSizer() {};
 
         void initializeWithinEP(EnergyPlusData &state, std::string const &_compName, std::string const &_compType, bool printWarningFlag) override;
 
@@ -76,3 +80,5 @@ namespace EnergyPlus {
     };
 
 } // namespace EnergyPlus
+
+#endif

@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef Base_hh_INCLUDED
+#define Base_hh_INCLUDED
+
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -65,6 +68,7 @@ namespace EnergyPlus {
     };
 
     struct BaseSizer {
+
         AutoSizingType sizingType = AutoSizingType::Unknown;
         std::string sizingString = "";
         Real64 originalValue = 0.0;
@@ -129,3 +133,5 @@ namespace EnergyPlus {
     };
 
 } // namespace EnergyPlus
+
+#endif

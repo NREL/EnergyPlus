@@ -2627,10 +2627,10 @@ namespace WaterCoils {
                     WaterCoil(CoilNum).InletAirMassFlowRate = DataAirFlowUsedForSizing * StdRhoAir; // this is stiil volume flow!
                 } else {
                     TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-                    EnergyPlus::HeatingWaterDesAirInletTempSizer sizer;
+                    HeatingWaterDesAirInletTempSizer sizer;
                     sizer.initializeWithinEP(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), WaterCoil(CoilNum).Name, false);
-                    EnergyPlus::AutoSizingResultType result = sizer.size(state, TempSize);
-                    if (result == EnergyPlus::AutoSizingResultType::NoError) {
+                    AutoSizingResultType result = sizer.size(state, TempSize);
+                    if (result == AutoSizingResultType::NoError) {
                         WaterCoil(CoilNum).InletAirTemp = sizer.autoSizedValue;
                         coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, WaterCoil(CoilNum).InletAirTemp, CurSysNum, CurZoneEqNum);
                     } else {
@@ -2645,10 +2645,10 @@ namespace WaterCoils {
                     WaterCoil(CoilNum).InletAirHumRat = TempSize;
 
                     TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
-                    EnergyPlus::HeatingAirflowUASizer sizer2;
+                    HeatingAirflowUASizer sizer2;
                     sizer2.initializeWithinEP(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), WaterCoil(CoilNum).Name, false);
                     result = sizer2.size(state, TempSize);
-                    if (result == EnergyPlus::AutoSizingResultType::NoError) {
+                    if (result == AutoSizingResultType::NoError) {
                         WaterCoil(CoilNum).DesAirMassFlowRate = sizer2.autoSizedValue; // coil report
                         WaterCoil(CoilNum).InletAirMassFlowRate = sizer2.autoSizedValue;
                     } else {
