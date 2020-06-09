@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -55,6 +56,45 @@
 #include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
+
+    bool oneTimeBaseSizerFlag = true;
+
+    void BaseSizer::clear_state() {
+        oneTimeBaseSizerFlag = true;
+    }
+
+    void BaseSizer::initializeWithinEP(EnergyPlusData &state, const std::string &_compType, const std::string &_compName, bool _printWarningFlag) {
+        this->printWarningFlag = _printWarningFlag;
+        this->compType = _compType;
+        this->compName = _compName;
+        this->sysSizingRunDone = DataSizing::SysSizingRunDone;
+        this->zoneSizingRunDone = DataSizing::ZoneSizingRunDone;
+        this->curSysNum = DataSizing::CurSysNum;
+        this->curOASysNum = DataSizing::CurOASysNum;
+        this->curZoneEqNum = DataSizing::CurZoneEqNum;
+        this->curDuctType = DataSizing::CurDuctType;
+        this->numPrimaryAirSys = DataHVACGlobals::NumPrimaryAirSys;
+        this->numSysSizInput = DataSizing::NumSysSizInput;
+        this->doSystemSizing = DataGlobals::DoSystemSizing;
+        this->numZoneSizingInput = DataSizing::NumZoneSizingInput;
+        this->doZoneSizing = DataGlobals::DoZoneSizing;
+        this->curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
+        this->termUnitSingDuct = DataSizing::TermUnitSingDuct;
+        this->termUnitPIU = DataSizing::TermUnitPIU;
+        this->termUnitIU = DataSizing::TermUnitIU;
+        this->zoneEqFanCoil = DataSizing::ZoneEqFanCoil;
+        this->otherEqType = !(this->termUnitSingDuct || this->termUnitPIU || this->termUnitIU || this->zoneEqFanCoil);
+        this->zoneSizingInput = DataSizing::ZoneSizingInput;
+        this->unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
+        this->oaSysEqSizing = DataSizing::OASysEqSizing;
+        this->outsideAirSys = DataAirLoop::OutsideAirSys;
+        this->termUnitSizing = DataSizing::TermUnitSizing;
+        this->finalZoneSizing = DataSizing::FinalZoneSizing;
+        this->zoneEqSizing = DataSizing::ZoneEqSizing;
+        this->sysSizingInputData = DataSizing::SysSizInput;
+        this->finalSysSizing = DataSizing::FinalSysSizing;
+        this->airloopDOAS = AirLoopHVACDOAS::airloopDOAS;
+    }
 
     void BaseSizer::preSize(EnergyPlusData &EP_UNUSED(state), Real64 const _originalValue) {
         if (this->sizingType == AutoSizingType::Unknown) {
@@ -84,7 +124,6 @@ namespace EnergyPlus {
         }
 
         if (this->curZoneEqNum > 0) {
-
             if (this->zoneEqSizing.allocated()) {
                 this->sizingDesValueFromParent = this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent;
             }
@@ -96,7 +135,6 @@ namespace EnergyPlus {
                     }
                 }
             }
-
             hardSizeNoDesignRun = false;
         }
 
@@ -141,20 +179,16 @@ namespace EnergyPlus {
                                       Optional_string_const UsrDesc,
                                       Optional<Real64 const> UsrValue) {
 
-        static bool MyOneTimeFlag(true);
-
-        // Formats
+        static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
         static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
 
         // to do, make this a parameter. Unfortunately this function is used in MANY
         // places so it involves touching most of E+
         auto &outputFiles = EnergyPlus::OutputFiles::getSingleton();
-        if (MyOneTimeFlag) {
-            static constexpr auto Format_990(
-                    "! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
+        if (oneTimeBaseSizerFlag) {
             if (ReportSizingManager::MyOneTimeFlag) print(outputFiles.eio, Format_990);
             ReportSizingManager::MyOneTimeFlag = false;
-            MyOneTimeFlag = false;
+            oneTimeBaseSizerFlag = false;
         }
 
         print(outputFiles.eio, Format_991, CompType, CompName, VarDesc, VarValue);

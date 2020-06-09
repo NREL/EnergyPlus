@@ -64,17 +64,7 @@ namespace EnergyPlus {
         }
         ~HeatingWaterDesAirInletTempSizer() = default;
 
-        void initializeWithinEP(EnergyPlusData &state, std::string const &_compName, std::string const &_compType, bool printWarningFlag) override;
-
-        void initializeForAPI(EnergyPlusData &state,
-                              Array1D<EnergyPlus::DataSizing::TermUnitSizingData> &termUnitSizing,
-                              Array1D<EnergyPlus::DataSizing::ZoneSizingData> &finalZoneSizing,
-                              Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> &zoneEqSizing,
-                              Array1D<EnergyPlus::DataSizing::SystemSizingInputData> &_sysSizingInputData,
-                              Array1D<EnergyPlus::DataSizing::SystemSizingData> &finalSysSizing,
-                              Array1D<DataAirLoop::OutsideAirSysProps> &outsideAirSys,
-                              Array1D<DataSizing::ZoneEqSizingData> &oaSysEqSizing,
-                              std::vector<AirLoopHVACDOAS::AirLoopDOAS> &airloopDOAS);
+        void initializeWithinEP(EnergyPlusData &state, std::string const &_compType, std::string const &_compName, bool printWarningFlag) override;
 
         AutoSizingResultType size(EnergyPlusData &state, Real64 originalValue) override;
     };

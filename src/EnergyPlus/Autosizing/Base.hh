@@ -116,7 +116,7 @@ namespace EnergyPlus {
         Array1D<EnergyPlus::DataSizing::SystemSizingData> finalSysSizing;
         std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
 
-        virtual void initializeWithinEP(EnergyPlusData &state, std::string const &_compName, std::string const &_compType, bool printWarningFlag) = 0;
+        virtual void initializeWithinEP(EnergyPlusData &state, std::string const &_compType, std::string const &_compName, bool _printWarningFlag);
 
         void preSize(EnergyPlusData &state, Real64 originalValue);
 
@@ -130,7 +130,11 @@ namespace EnergyPlus {
                                Optional<Real64 const> UsrValue = _);
 
         void selectSizerOutput();
+
+        static void clear_state();
     };
+
+    extern bool oneTimeBaseSizerFlag;
 
 } // namespace EnergyPlus
 

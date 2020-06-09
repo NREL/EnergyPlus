@@ -48,7 +48,6 @@
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletTempSizing.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/TypeDefs.h>
@@ -57,72 +56,20 @@
 
 namespace EnergyPlus {
 
-void HeatingWaterDesAirInletTempSizer::initializeForAPI(EnergyPlusData &EP_UNUSED(state),
-                                                        Array1D<EnergyPlus::DataSizing::TermUnitSizingData> &_termUnitSizing,
-                                                        Array1D<EnergyPlus::DataSizing::ZoneSizingData> &_finalZoneSizing,
-                                                        Array1D<EnergyPlus::DataSizing::ZoneEqSizingData> &_zoneEqSizing,
-                                                        Array1D<EnergyPlus::DataSizing::SystemSizingInputData> &_sysSizingInputData,
-                                                        Array1D<EnergyPlus::DataSizing::SystemSizingData> &_finalSysSizing,
-                                                        Array1D<DataAirLoop::OutsideAirSysProps> &_outsideAirSys,
-                                                        Array1D<DataSizing::ZoneEqSizingData> &_oaSysEqSizing,
-                                                        std::vector<AirLoopHVACDOAS::AirLoopDOAS> &_airloopDOAS)
-{
-    this->termUnitSizing = _termUnitSizing;
-    this->finalZoneSizing = _finalZoneSizing;
-    this->zoneEqSizing = _zoneEqSizing;
-    this->sysSizingInputData = _sysSizingInputData;
-    this->finalSysSizing = _finalSysSizing;
-    this->outsideAirSys = _outsideAirSys;
-    this->oaSysEqSizing = _oaSysEqSizing;
-    this->airloopDOAS = _airloopDOAS;
-}
-
-void HeatingWaterDesAirInletTempSizer::initializeWithinEP(EnergyPlusData &EP_UNUSED(state),
+void HeatingWaterDesAirInletTempSizer::initializeWithinEP(EnergyPlusData &state,
                                                           std::string const &_compType,
                                                           std::string const &_compName,
                                                           bool const printWarningFlag)
 {
-    this->sizingString = "Rated Inlet Air Temperature"; // TODO: Is this fixed for each sizer?
-    this->printWarningFlag = printWarningFlag;
-    this->compType = _compType;
-    this->compName = _compName;
-    this->sysSizingRunDone = DataSizing::SysSizingRunDone;
-    this->zoneSizingRunDone = DataSizing::ZoneSizingRunDone;
-    this->curSysNum = DataSizing::CurSysNum;
-    this->curOASysNum = DataSizing::CurOASysNum;
-    this->curZoneEqNum = DataSizing::CurZoneEqNum;
-    this->curDuctType = DataSizing::CurDuctType;
-    this->numPrimaryAirSys = DataHVACGlobals::NumPrimaryAirSys;
-    this->numSysSizInput = DataSizing::NumSysSizInput;
-    this->doSystemSizing = DataGlobals::DoSystemSizing;
-    this->numZoneSizingInput = DataSizing::NumZoneSizingInput;
-    this->doZoneSizing = DataGlobals::DoZoneSizing;
-    this->curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
-    this->termUnitSingDuct = DataSizing::TermUnitSingDuct;
-    this->termUnitPIU = DataSizing::TermUnitPIU;
-    this->termUnitIU = DataSizing::TermUnitIU;
-    this->zoneEqFanCoil = DataSizing::ZoneEqFanCoil;
-    this->otherEqType = !(this->termUnitSingDuct || this->termUnitPIU || this->termUnitIU || this->zoneEqFanCoil);
-    this->zoneSizingInput = DataSizing::ZoneSizingInput;
-    this->unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
-    this->oaSysEqSizing = DataSizing::OASysEqSizing;
-    this->outsideAirSys = DataAirLoop::OutsideAirSys;
-    this->termUnitSizing = DataSizing::TermUnitSizing;
-    this->finalZoneSizing = DataSizing::FinalZoneSizing;
-    this->zoneEqSizing = DataSizing::ZoneEqSizing;
-    this->sysSizingInputData = DataSizing::SysSizInput;
-    this->finalSysSizing = DataSizing::FinalSysSizing;
-    this->airloopDOAS = AirLoopHVACDOAS::airloopDOAS;
-
+    BaseSizer::initializeWithinEP(state, _compType, _compName, printWarningFlag);
+    this->sizingString = "Rated Inlet Air Temperature";
     this->termUnitFinalZoneSizing = DataSizing::TermUnitFinalZoneSizing;
     this->totalSystemAirVolumeFlowRate = DataSizing::DataFlowUsedForSizing;
 }
 
 EnergyPlus::AutoSizingResultType HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue)
 {
-    EnergyPlus::AutoSizingResultType errorsFound = EnergyPlus::AutoSizingResultType::NoError;
     this->preSize(state, _originalValue);
-
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             if (this->printWarningFlag && this->originalValue > 0.0) {
@@ -189,7 +136,7 @@ EnergyPlus::AutoSizingResultType HeatingWaterDesAirInletTempSizer::size(EnergyPl
         }
     }
     if (this->wasAutoSized || this->curOASysNum > 0) this->selectSizerOutput();
-    return errorsFound;
+    return EnergyPlus::AutoSizingResultType::NoError;;
 }
 
 } // namespace EnergyPlus
