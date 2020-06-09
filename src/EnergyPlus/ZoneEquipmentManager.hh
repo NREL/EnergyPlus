@@ -110,13 +110,13 @@ namespace ZoneEquipmentManager {
 
     void InitZoneEquipment(bool const FirstHVACIteration); // unused 1208
 
-    void SizeZoneEquipment();
+    void SizeZoneEquipment(OutputFiles &outputFiles);
 
     void SetUpZoneSizingArrays(OutputFiles &outputFiles);
 
     void RezeroZoneSizingArrays();
 
-    void UpdateZoneSizing(DataGlobal const &dataGlobals, OutputFiles &outputFiles, int const CallIndicator);
+    void UpdateZoneSizing(EnergyPlusData &state, int const CallIndicator);
 
     void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool &SimAir);
 
