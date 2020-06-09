@@ -337,6 +337,7 @@ if( BUILD_PACKAGE )
 endif()
 
 if (BUILD_DOCS)
+  set(DOCS_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
   add_subdirectory(doc)
 endif()
 
