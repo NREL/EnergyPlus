@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -115,6 +116,18 @@ namespace BaseboardElectric {
     void SimElectricConvective(BaseboardElectricData &baseboard, int BaseboardNum, Real64 LoadMet);
 
 } // namespace BaseboardElectric
+
+    struct BaseboardElectricData : BaseGlobalStruct {
+        int NumBaseboards = 0;
+        Array1D<BaseboardElectric::BaseboardParams> Baseboard;
+        Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
+        void clear_state() override
+        {
+            NumBaseboards = 0;
+            Baseboard.deallocate();
+            BaseboardNumericFields.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

@@ -51,6 +51,7 @@ add_executable( Basement ${SRC} )
 set_target_properties(Basement PROPERTIES
   COMPILE_FLAGS "-O1 -ffree-line-length-200 ${SHARED_FLAGS}"
 )
+set_target_properties(Basement PROPERTIES FOLDER Auxiliary)
 
 install( TARGETS Basement DESTINATION PreProcess/GrndTempCalc )
 if(NOT ${STATIC_EXE})
