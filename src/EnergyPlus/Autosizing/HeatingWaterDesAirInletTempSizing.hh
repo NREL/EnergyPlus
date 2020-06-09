@@ -56,8 +56,8 @@ namespace EnergyPlus {
 
     struct HeatingWaterDesAirInletTempSizer: BaseSizer {
 
-        Array1D<DataSizing::ZoneSizingData>termUnitFinalZoneSizing;
-        Real64 dataFlowUsedForSizing = 0.0;
+        Array1D<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
+        Real64 totalSystemAirVolumeFlowRate = 0.0;
 
         HeatingWaterDesAirInletTempSizer() {
             this->sizingType = AutoSizingType::HeatingWaterDesAirInletTempSizing;
