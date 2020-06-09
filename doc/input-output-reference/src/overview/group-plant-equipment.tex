@@ -4047,6 +4047,8 @@ Outputs available from the boiler:
   HVAC,Sum,Boiler Ancillary Electric Energy {[}J{]}
 \item
   HVAC,Average,Boiler Part Load Ratio
+\item
+  HVAC,Average,Boiler Efficiency
 \end{itemize}
 
 ~ One of the following blocks will be applicable based on fuel type:
@@ -4158,6 +4160,10 @@ These outputs are the hot water inlet and outlet temperatures and flow rate for 
 \paragraph{Boiler Part Load Ratio {[]}}\label{boiler-part-load-ratio}
 
 This output is the operating part-load ratio of the boiler. The part-load ratio is calculated as the boiler load divided by the boiler nominal capacity. The part-load ratio is limited by the minimum and maximum part-load ratio inputs specified by the user.
+
+\paragraph{Boiler Efficiency {[]}}\label{boiler-efficiency}
+
+\emph{Note that this variable is reported as zero when the boiler is not operating. When reported for frequencies longer than ``detailed'' (such as timestep, hourly, daily, monthly or environment), this output will only be meaningful when the boiler is operating for the entire reporting period. To determine an efficiency for a longer time period, compute the efficiency based on boiler heating rate divided by boiler gas rate over the desired period.}
 
 \paragraph{Boiler \textless{}Fuel Type\textgreater{} Rate {[}W{]}}\label{boiler-fuel-type-rate-w}
 
