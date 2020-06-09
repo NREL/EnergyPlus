@@ -630,11 +630,9 @@ namespace BoilerSteam {
                 auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
                 if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
                     BoilerDeltaTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
-                } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                } else { // DataPlant::DualSetPointDeadBand
                     BoilerDeltaTemp =
                         DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
-                } else {
-                    assert(false);
                 }
             }
             this->BoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
