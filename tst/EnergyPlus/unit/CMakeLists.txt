@@ -22,6 +22,7 @@ set( test_src
   BoilerSteam.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
+  CTElectricGenerator.unit.cc
   ChilledCeilingPanelSimple.unit.cc
   ChillerAbsorption.unit.cc
   ChillerConstantCOP.unit.cc
@@ -68,6 +69,7 @@ set( test_src
   FanCoilUnits.unit.cc
   Fans.unit.cc
   FaultsManager.unit.cc
+  FileSystem.unit.cc
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   FluidProperties.unit.cc
@@ -102,6 +104,7 @@ set( test_src
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
   HybridModel.unit.cc
+  ICEngineElectricGenerator.unit.cc
   IceThermalStorage.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
@@ -111,6 +114,7 @@ set( test_src
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   MicroCHPElectricGenerator.unit.cc
+  MicroturbineElectricGenerator.unit.cc
   MoistureBalanceEMPD.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
@@ -174,6 +178,7 @@ set( test_src
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
   SZVAVModel.unit.cc
+  ThermalChimney.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
@@ -187,6 +192,7 @@ set( test_src
   Vector.unit.cc
   VentilatedSlab.unit.cc
   WaterCoils.unit.cc
+  WaterManager.unit.cc
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc

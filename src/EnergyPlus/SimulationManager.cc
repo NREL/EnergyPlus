@@ -205,7 +205,7 @@ namespace SimulationManager {
         PreP_Fatal = false;
     }
 
-    void ManageSimulation(EnergyPlusData &state, OutputFiles &outputFiles)
+    void ManageSimulation(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -305,6 +305,7 @@ namespace SimulationManager {
         bool AnyUnderwaterBoundaries = false;
         int EnvCount;
 
+<<<<<<< HEAD
         outputFiles.outputControl.getInput();
         if (DataGlobals::runReadVars) {
             outputFiles.outputControl.csv = true;
@@ -312,6 +313,12 @@ namespace SimulationManager {
         ResultsFramework::resultsFramework->setupOutputOptions();
 
         outputFiles.debug.ensure_open("OpenOutputFiles", outputFiles.outputControl.dbg);
+=======
+        // Windows: ensure that EnergyPlusAPI.dll's notion of the "static singleton OutputFiles" matches
+        // the exe's notion.
+        // TODO: Remove this after we have eliminated all remaining calls to OutputFiles::getSingleton
+        OutputFiles::setSingleton(&state.outputFiles);
+>>>>>>> origin/develop
 
         // CreateSQLiteDatabase();
         sqlite = EnergyPlus::CreateSQLiteDatabase();
@@ -336,8 +343,8 @@ namespace SimulationManager {
             (inputProcessor->getNumObjectsFound("RunPeriod") > 0 || inputProcessor->getNumObjectsFound("RunPeriod:CustomRange") > 0 || FullAnnualRun);
         AskForConnectionsReport = false; // set to false until sizing is finished
 
-        OpenOutputFiles();
-        GetProjectData(outputFiles);
+        OpenOutputFiles(state.outputFiles);
+        GetProjectData(state.outputFiles);
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
         SetPredefinedTables();
@@ -346,7 +353,7 @@ namespace SimulationManager {
         SetupTimePointers("Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
         SetupTimePointers("HVAC", TimeStepSys);
 
-        CheckIfAnyEMS();
+        CheckIfAnyEMS(state.outputFiles);
         CheckIfAnyPlant();
         CheckIfAnySlabs();
         CheckIfAnyBasements(state);
@@ -372,7 +379,7 @@ namespace SimulationManager {
         }
 
         DoingSizing = true;
-        ManageSizing(state, OutputFiles::getSingleton());
+        ManageSizing(state);
 
         BeginFullSimFlag = true;
         SimsDone = false;
@@ -401,7 +408,7 @@ namespace SimulationManager {
         KickOffSimulation = true;
 
         ResetEnvironmentCounter();
-        SetupSimulation(state, outputFiles, ErrorsFound);
+        SetupSimulation(state, ErrorsFound);
 
         CheckAndReadFaults(state);
 
@@ -417,23 +424,23 @@ namespace SimulationManager {
         if (DoOutputReporting) {
             DisplayString("Reporting Surfaces");
 
-            ReportSurfaces(outputFiles);
+            ReportSurfaces(state.outputFiles);
 
-            SetupNodeVarsForReporting(outputFiles);
+            SetupNodeVarsForReporting(state.outputFiles);
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
             SystemReports::AllocateAndSetUpVentReports();
             if (EnergyPlus::PluginManagement::pluginManager) {
                 EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
             }
-            UpdateMeterReporting(outputFiles);
+            UpdateMeterReporting(state.outputFiles);
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
             InitDemandManagers(state);
-            TestBranchIntegrity(outputFiles, ErrFound);
+            TestBranchIntegrity(state.outputFiles, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(state, outputFiles, ErrFound);
+            TestAirPathIntegrity(state, state.outputFiles, ErrFound);
             if (ErrFound) TerminalError = true;
             CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;
@@ -445,9 +452,9 @@ namespace SimulationManager {
             if (ErrFound) TerminalError = true;
 
             if (DoDesDaySim || DoWeathSim) {
-                ReportLoopConnections(outputFiles);
-                ReportAirLoopConnections(outputFiles);
-                ReportNodeConnections(outputFiles);
+                ReportLoopConnections(state.outputFiles);
+                ReportAirLoopConnections(state.outputFiles);
+                ReportNodeConnections(state.outputFiles);
                 // Debug reports
                 //      CALL ReportCompSetMeterVariables
                 //      CALL ReportParentChildren
@@ -479,7 +486,7 @@ namespace SimulationManager {
 
         // if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
         if (DoHVACSizingSimulation) {
-            ManageHVACSizingSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
+            ManageHVACSizingSimulation(state, ErrorsFound);
         }
 
         ShowMessage("Beginning Simulation");
@@ -492,7 +499,7 @@ namespace SimulationManager {
 
         while (Available) {
 
-            GetNextEnvironment(state.dataGlobals, outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -570,7 +577,7 @@ namespace SimulationManager {
                         DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
                     }
                     static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
-                    print(outputFiles.eio, Format_700, NumOfWarmupDays);
+                    print(state.outputFiles.eio, Format_700, NumOfWarmupDays);
                     ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
                     if (KindOfSim == ksRunPeriodWeather) {
@@ -593,7 +600,7 @@ namespace SimulationManager {
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(state.dataGlobals, OutputFiles::getSingleton(), false);
+                            SimulateGroundDomains(state, false);
                         }
 
                         if (AnyUnderwaterBoundaries) {
@@ -629,7 +636,7 @@ namespace SimulationManager {
 
                         ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-                        ManageHeatBalance(state, outputFiles);
+                        ManageHeatBalance(state);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
                             AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
@@ -686,7 +693,7 @@ namespace SimulationManager {
 
         OpenOutputTabularFile();
 
-        WriteTabularReports(state, outputFiles); //     Create the tabular reports at completion of each
+        WriteTabularReports(state); //     Create the tabular reports at completion of each
 
         WriteTabularTariffReports();
 
@@ -699,7 +706,7 @@ namespace SimulationManager {
 #ifdef EP_Detailed_Timings
         epStopTime("Closeout Reporting=");
 #endif
-        CloseOutputFiles(outputFiles);
+        CloseOutputFiles(state.outputFiles);
 
         // sqlite->createZoneExtendedOutput();
         CreateSQLiteZoneExtendedOutput();
@@ -1749,7 +1756,7 @@ namespace SimulationManager {
         }
     }
 
-    void OpenOutputFiles()
+    void OpenOutputFiles(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1786,6 +1793,7 @@ namespace SimulationManager {
 
         // FLOW:
         StdOutputRecordCount = 0;
+<<<<<<< HEAD
         OutputFiles::getSingleton().eso.ensure_open("OpenOutputFiles", OutputFiles::getSingleton().outputControl.eso);
         print(OutputFiles::getSingleton().eso, "Program Version,{}\n", VerString);
 
@@ -1800,6 +1808,22 @@ namespace SimulationManager {
         // Open the Branch-Node Details Output File
         OutputFiles::getSingleton().bnd.ensure_open("OpenOutputFiles", OutputFiles::getSingleton().outputControl.bnd);
         print(OutputFiles::getSingleton().bnd, "Program Version,{}\n", VerString);
+=======
+        outputFiles.eso.ensure_open("OpenOutputFiles");
+        print(outputFiles.eso, "Program Version,{}\n", VerString);
+
+        // Open the Initialization Output File
+        outputFiles.eio.ensure_open("OpenOutputFiles");
+        print(outputFiles.eio, "Program Version,{}\n", VerString);
+
+        // Open the Meters Output File
+        outputFiles.mtr.ensure_open("OpenOutputFiles");
+        print(outputFiles.mtr, "Program Version,{}\n", VerString);
+
+        // Open the Branch-Node Details Output File
+        outputFiles.bnd.ensure_open("OpenOutputFiles");
+        print(outputFiles.bnd, "Program Version,{}\n", VerString);
+>>>>>>> origin/develop
     }
 
     void CloseOutputFiles(OutputFiles &outputFiles)
@@ -1871,7 +1895,11 @@ namespace SimulationManager {
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
 
+<<<<<<< HEAD
         OutputFiles::getSingleton().audit.ensure_open("CloseOutputFiles", OutputFiles::getSingleton().outputControl.audit);
+=======
+        outputFiles.audit.ensure_open("CloseOutputFiles");
+>>>>>>> origin/develop
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
         print(outputFiles.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
@@ -2015,13 +2043,10 @@ namespace SimulationManager {
         }
 
         // Close the External Shading Output File
-
-        if (OutputFileShadingFrac > 0) {
-            ObjexxFCL::gio::close(OutputFileShadingFrac);
-        }
+        outputFiles.shade.close();
     }
 
-    void SetupSimulation(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2061,7 +2086,7 @@ namespace SimulationManager {
 
         while (Available) { // do for each environment
 
-            GetNextEnvironment(state.dataGlobals, outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -2091,7 +2116,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-            ManageHeatBalance(state, outputFiles);
+            ManageHeatBalance(state);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -2106,7 +2131,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-            ManageHeatBalance(state, outputFiles);
+            ManageHeatBalance(state);
 
             //         do an end of day, end of environment time step
 
@@ -2119,12 +2144,12 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-            ManageHeatBalance(state, outputFiles);
+            ManageHeatBalance(state);
 
         } // ... End environment loop.
 
         if (AnySlabsInModel || AnyBasementsInModel) {
-            SimulateGroundDomains(state.dataGlobals, outputFiles, true);
+            SimulateGroundDomains(state, true);
         }
 
         if (!ErrorsFound) SimCostEstimate(state); // basically will get and check input

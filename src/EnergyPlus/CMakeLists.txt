@@ -83,8 +83,7 @@ SET( SRC
   DXCoils.hh
   DXFEarClipping.cc
   DXFEarClipping.hh
-  Data/BaseboardData.hh
-  Data/BaseData.hh
+        Data/BaseData.hh
   Data/EnergyPlusData.hh
   DataAirLoop.cc
   DataAirLoop.hh

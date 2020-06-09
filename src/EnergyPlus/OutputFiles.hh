@@ -48,8 +48,11 @@
 #ifndef OutputFiles_hh_INCLUDED
 #define OutputFiles_hh_INCLUDED
 
+<<<<<<< HEAD
 #include "DataGlobals.hh"
 #include "nlohmann/json.hpp"
+=======
+>>>>>>> origin/develop
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -100,20 +103,6 @@ public:
         }
     };
 
-    class GIOOutputFile
-    {
-    public:
-        void close();
-        void open_at_end();
-
-    private:
-        explicit GIOOutputFile(int const FileID, std::string FileName);
-        int fileID;
-        std::string fileName;
-        std::reference_wrapper<std::ostream> os;
-        template <typename... Args> friend void print(OutputFiles::GIOOutputFile &of, fmt::string_view format_str, const Args &... args);
-        friend class OutputFiles;
-    };
 
 ////  Remove once all gio are converted to OutputFiles
 ////  Use following example at each calling location
@@ -175,6 +164,12 @@ public:
     std::string outputSszTabFileName{"eplusssz.tab"};
     std::string outputSszTxtFileName{"eplusssz.txt"};
 
+    OutputFile map{""};
+    std::string outputMapCsvFileName{"eplusmap.csv"};
+    std::string outputMapTabFileName{"eplusmap.tab"};
+    std::string outputMapTxtFileName{"eplusmap.txt"};
+
+
     OutputFile mtr{"eplusout.mtr"};
     OutputFile bnd{"eplusout.bnd"};
     OutputFile rdd{"eplusout.rdd"};
@@ -192,11 +187,19 @@ public:
     OutputFileName sci{"eplusout.sci"};
     OutputFileName wrl{"eplusout.wrl"};
 
-    static OutputFiles makeOutputFiles();
+    OutputFileName delightIn{"eplusout.delightin"};
+
+    OutputFile mtd{"eplusout.mtd"};
+    OutputFile edd{"eplusout.edd"};
+    OutputFile shade{"eplusshading.csv"};
+
+    OutputFileName screenCsv{"eplusscreen.csv"};
+
     static OutputFiles &getSingleton();
+    static void setSingleton(OutputFiles *newSingleton) noexcept;
 
 private:
-    OutputFiles();
+    static OutputFiles *&getSingletonInternal();
 };
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);
@@ -226,11 +229,6 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
 template <typename... Args> void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
 {
     EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
-}
-
-template <typename... Args> void print(OutputFiles::GIOOutputFile &outputFile, fmt::string_view format_str, const Args &... args)
-{
-    EnergyPlus::vprint(outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
 template <typename... Args> void print(OutputFile &outputFile, fmt::string_view format_str, const Args &... args)

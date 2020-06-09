@@ -219,9 +219,9 @@
 #include <unistd.h>
 #endif
 
-void EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath)
+int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath)
 {
-    std::exit(RunEnergyPlus(state, filepath));
+    return RunEnergyPlus(state, filepath);
 }
 
 int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath) {
@@ -298,7 +298,7 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
         EnergyPlus::inputProcessor->processInput();
         if (DataGlobals::outputEpJSONConversionOnly) {
             DisplayString("Converted input file format. Exiting.");
-            return EndEnergyPlus();
+            return EndEnergyPlus(state.outputFiles);
         }
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);
@@ -383,11 +383,18 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         ScheduleManager::ReportOrphanSchedules();
 
         if (DataGlobals::runReadVars) {
+<<<<<<< HEAD
             OutputFiles::getSingleton().outputControl.csv = true;
 //            int status = CommandLineInterface::runReadVarsESO();
 //            if (status) {
 //                return status;
 //            }
+=======
+            int status = CommandLineInterface::runReadVarsESO(state.outputFiles);
+            if (status) {
+                return status;
+            }
+>>>>>>> origin/develop
         }
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);
@@ -396,7 +403,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         return AbortEnergyPlus(state);
     }
 
-    return EndEnergyPlus();
+    return EndEnergyPlus(state.outputFiles);
 }
 
 int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath)
@@ -420,7 +427,7 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepat
     int status = initializeEnergyPlus(state, filepath);
     if (status) return status;
     try {
-        EnergyPlus::SimulationManager::ManageSimulation(state,EnergyPlus::OutputFiles::getSingleton());
+        EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
@@ -458,7 +465,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     int status = initializeAsLibrary(state);
     if (status) return status;
     try {
-        EnergyPlus::SimulationManager::ManageSimulation(state, EnergyPlus::OutputFiles::getSingleton());
+        EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {

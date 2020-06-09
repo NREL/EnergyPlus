@@ -318,23 +318,14 @@ namespace MicroturbineElectricGenerator {
                 }
             }
 
-            // Fuel Type case statement
-            {
-                auto const SELECT_CASE_var(AlphArray(5));
-                if (is_blank(SELECT_CASE_var)) { // If blank, then the default is Natural Gas
-                    MTGenerator(GeneratorNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "NATURALGAS") {
-                    MTGenerator(GeneratorNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    MTGenerator(GeneratorNum).FuelType = "Propane";
-
-                } else {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
-                    ErrorsFound = true;
-                }
+            // Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(AlphArray(5), MTGenerator(GeneratorNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
+                ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             MTGenerator(GeneratorNum).FuelHigherHeatingValue = NumArray(8);

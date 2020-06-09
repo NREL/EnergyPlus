@@ -200,7 +200,8 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(std::string const &originalInputFileName, // name as input for object
+    void CheckForActualFileName(OutputFiles &outputFiles,
+                                std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &CheckedFileName              // Blank if not found.
     )
@@ -244,8 +245,6 @@ namespace DataSystemVariables {
         static bool firstTime(true);
         std::string InputFileName; // save for changing out path characters
         std::string::size_type pos;
-
-        OutputFiles &outputFiles = OutputFiles::getSingleton();
 
         if (firstTime) {
             outputFiles.audit.ensure_open("CheckForActualFileName", outputFiles.outputControl.audit);

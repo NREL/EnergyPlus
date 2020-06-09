@@ -538,7 +538,7 @@ namespace ScheduleManager {
             inputProcessor->getObjectItem(
                 CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
             std::string ShadingSunlitFracFileName = Alphas(1);
-            CheckForActualFileName(ShadingSunlitFracFileName, FileExists, TempFullFileName);
+            CheckForActualFileName(outputFiles, ShadingSunlitFracFileName, FileExists, TempFullFileName);
             if (!FileExists) {
                 ShowSevereError(RoutineName + ":\"" + ShadingSunlitFracFileName +
                                 "\" not found when External Shading Calculation Method = ImportedShading.");
@@ -1766,7 +1766,7 @@ namespace ScheduleManager {
             //      ENDDO
             //    ENDIF
 
-            CheckForActualFileName(Alphas(3), FileExists, TempFullFileName);
+            CheckForActualFileName(outputFiles, Alphas(3), FileExists, TempFullFileName);
 
             //    INQUIRE(file=Alphas(3),EXIST=FileExists)
             // Setup file reading parameters
