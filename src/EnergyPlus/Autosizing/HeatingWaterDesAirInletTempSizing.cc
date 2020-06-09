@@ -82,7 +82,7 @@ void HeatingWaterDesAirInletTempSizer::initializeWithinEP(EnergyPlusData &EP_UNU
                                                           std::string const &_compName,
                                                           bool const printWarningFlag)
 {
-    this->sizingString = "Heating Coil Airflow For UA"; // TODO: Is this fixed for each sizer?
+    this->sizingString = "Rated Inlet Air Temperature"; // TODO: Is this fixed for each sizer?
     this->printWarningFlag = printWarningFlag;
     this->compType = _compType;
     this->compName = _compName;
