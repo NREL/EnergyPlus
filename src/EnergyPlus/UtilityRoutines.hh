@@ -57,20 +57,20 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include <functional>
 
 namespace EnergyPlus {
 class OutputFile;
 
+int AbortEnergyPlus(EnergyPlusData &state);
 
-int AbortEnergyPlus();
-
-void CloseMiscOpenFiles();
+void CloseMiscOpenFiles(OutputFiles &outputFiles);
 
 void CloseOutOpenFiles();
 
-int EndEnergyPlus();
+int EndEnergyPlus(OutputFiles &outputFiles);
 
 int GetNewUnitNumber();
 
@@ -555,10 +555,6 @@ namespace UtilityRoutines {
 
     bool IsNameEmpty(std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound);
 
-    std::string IPTrimSigDigits(int const IntegerValue);
-
-
-
     // Two structs for case insensitive containers.
     // Eg: for unordered_map, we need to have a case insenstive hasher and a case insensitive comparator
     // (The default allocator for unordered_map is fine)
@@ -576,6 +572,12 @@ namespace UtilityRoutines {
     void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
 
     inline bool exists(const std::string& filename);
+
+    bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound);
+
+    bool ValidateFuelTypeWithFuelTypeNum(std::string const &FuelTypeInput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
+
+    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput, std::string &FuelTypeOutput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
 
 } // namespace UtilityRoutines
 

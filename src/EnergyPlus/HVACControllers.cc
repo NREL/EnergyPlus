@@ -68,6 +68,7 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -261,9 +262,6 @@ namespace HVACControllers {
     } // namespace
 
     static ObjexxFCL::gio::Fmt fmtLD("*");
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
-    static ObjexxFCL::gio::Fmt fmtAA("(A,A)");
-    static ObjexxFCL::gio::Fmt fmtAAA("(A,A,A)");
     static ObjexxFCL::gio::Fmt fmtAAAA("(A,A,A,A)");
 
     // MODULE SUBROUTINES:
@@ -286,7 +284,7 @@ namespace HVACControllers {
         CheckEquipName.deallocate();
     }
 
-    void ManageControllers(std::string const &ControllerName,
+    void ManageControllers(EnergyPlusData &state, std::string const &ControllerName,
                            int &ControllerIndex,
                            bool const FirstHVACIteration,
                            int const AirLoopNum,
@@ -335,7 +333,7 @@ namespace HVACControllers {
 
         // Obtains and Allocates Controller related parameters from input file
         if (GetControllerInputFlag) { // First time subroutine has been entered
-            GetControllerInput();
+            GetControllerInput(state);
             GetControllerInputFlag = false;
         }
 
@@ -401,7 +399,7 @@ namespace HVACControllers {
         if (ControllerProps(ControlNum).InitFirstPass) {
             // Coil must first be sized to:
             // Initialize ControllerProps(ControlNum)%MinActuated and ControllerProps(ControlNum)%MaxActuated
-            InitController(ControlNum, IsConvergedFlag);
+            InitController(state, ControlNum, IsConvergedFlag);
             ControllerProps(ControlNum).InitFirstPass = false;
         }
 
@@ -434,7 +432,7 @@ namespace HVACControllers {
 
             } else if (SELECT_CASE_var == iControllerOpIterate) {
                 // With the correct ControlNum Initialize all Controller related parameters
-                InitController(ControlNum, IsConvergedFlag);
+                InitController(state, ControlNum, IsConvergedFlag);
 
                 // No initialization needed: should have been done before
                 // Simulate the correct Controller with the current ControlNum
@@ -456,7 +454,7 @@ namespace HVACControllers {
 
             } else if (SELECT_CASE_var == iControllerOpEnd) {
                 // With the correct ControlNum Initialize all Controller related parameters
-                InitController(ControlNum, IsConvergedFlag);
+                InitController(state, ControlNum, IsConvergedFlag);
 
                 // No initialization needed: should have been done before
                 // Check convergence for the correct Controller with the current ControlNum
@@ -488,7 +486,7 @@ namespace HVACControllers {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetControllerInput()
+    void GetControllerInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -689,7 +687,7 @@ namespace HVACControllers {
                 ControllerProps(Num).MaxVolFlowActuated = NumArray(2);
                 ControllerProps(Num).MinVolFlowActuated = NumArray(3);
 
-                if (!CheckForControllerWaterCoil(CurrentModuleObject, AlphArray(1))) {
+                if (!CheckForControllerWaterCoil(state, CurrentModuleObject, AlphArray(1))) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\" not found on any AirLoopHVAC:ControllerList.");
                     ErrorsFound = true;
                 }
@@ -697,9 +695,9 @@ namespace HVACControllers {
                 if (ControllerProps(Num).SensedNode > 0) {
 
                     if (ControllerProps(Num).ControlVar == iHumidityRatio || ControllerProps(Num).ControlVar == iTemperatureAndHumidityRatio) {
-                        ResetHumidityRatioCtrlVarType(ControllerProps(Num).SensedNode);
+                        ResetHumidityRatioCtrlVarType(state, ControllerProps(Num).SensedNode);
                     }
-                    CheckForSensorAndSetPointNode(ControllerProps(Num).SensedNode, ControllerProps(Num).ControlVar, NodeNotFound);
+                    CheckForSensorAndSetPointNode(state, ControllerProps(Num).SensedNode, ControllerProps(Num).ControlVar, NodeNotFound);
 
                     if (NodeNotFound) {
                         // the sensor node is not on the water coil air outlet node
@@ -714,7 +712,7 @@ namespace HVACControllers {
                             if (SELECT_CASE_var == iTemperature) {
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iTemperatureSetPoint, EMSSetPointErrorFlag);
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
                                         ShowContinueError(" ..Temperature setpoint not found on coil air outlet node.");
                                         ShowContinueError(
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -724,7 +722,7 @@ namespace HVACControllers {
                             } else if (SELECT_CASE_var == iHumidityRatio) {
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
                                         ShowContinueError(" ..Humidity ratio setpoint not found on coil air outlet node.");
                                         ShowContinueError(
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -734,7 +732,7 @@ namespace HVACControllers {
                             } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) {
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iTemperatureSetPoint, EMSSetPointErrorFlag);
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
                                         ShowContinueError(" ..Temperature setpoint not found on coil air outlet node.");
                                         ShowContinueError(
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -744,7 +742,7 @@ namespace HVACControllers {
                                 EMSSetPointErrorFlag = false;
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
                                         ShowContinueError(" ..Humidity ratio setpoint not found on coil air outlet node.");
                                         ShowContinueError(
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -920,7 +918,7 @@ namespace HVACControllers {
         RootFinders(ControlNum).UpperPoint.DefinedFlag = false;
     }
 
-    void InitController(int const ControlNum, bool &IsConvergedFlag)
+    void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConvergedFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1020,7 +1018,7 @@ namespace HVACControllers {
                             }
                         }
                     } else if (SELECT_CASE_var == iHumidityRatio) { // 'HumidityRatio'
-                        ControllerProps(ControllerIndex).HumRatCntrlType = GetHumidityRatioVariableType(SensedNode);
+                        ControllerProps(ControllerIndex).HumRatCntrlType = GetHumidityRatioVariableType(state, SensedNode);
                         if ((ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType_HumRat &&
                              Node(SensedNode).HumRatSetPoint == SensedNodeFlagValue) ||
                             (ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType_MaxHumRat &&
@@ -2506,10 +2504,6 @@ namespace HVACControllers {
         // DERIVED TYPE DEFINITIONS
         // na
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int FileUnit;
-        int AirLoopNum;
-
         // FLOW
 
         // Detect if statistics have been generated or not for this run
@@ -2517,35 +2511,16 @@ namespace HVACControllers {
             return;
         }
 
-        std::string StatisticsFileName = "statistics.HVACControllers.csv";
+        OutputFiles::OutputFileName StatisticsFileName{"statistics.HVACControllers.csv"};
+        auto statisticsFile = StatisticsFileName.open("DumpAirLoopStatistics");
 
-        FileUnit = GetNewUnitNumber();
-
-        if (FileUnit <= 0) {
-            ShowWarningError("DumpAirLoopStatistics: Invalid unit for air loop statistics file=\"" + StatisticsFileName + "\"");
-            return;
+        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+            WriteAirLoopStatistics(statisticsFile, PrimaryAirSystem(AirLoopNum), AirLoopStats(AirLoopNum));
         }
 
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(FileUnit, StatisticsFileName, flags);
-            if (flags.err()) goto Label100;
-        }
-
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            WriteAirLoopStatistics(FileUnit, PrimaryAirSystem(AirLoopNum), AirLoopStats(AirLoopNum));
-        }
-
-        ObjexxFCL::gio::close(FileUnit);
-
-        return;
-
-    Label100:;
-        ShowFatalError("DumpAirLoopStatistics: Failed to open statistics file \"" + StatisticsFileName + "\" for output (write).");
     }
 
-    void WriteAirLoopStatistics(int const FileUnit, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats)
+    void WriteAirLoopStatistics(OutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2592,11 +2567,11 @@ namespace HVACControllers {
 
         // FLOW
 
-        ObjexxFCL::gio::write(FileUnit, fmtAA) << ThisPrimaryAirSystem.Name << ',';
+        print(statisticsFile, "{},\n", ThisPrimaryAirSystem.Name);
 
         // Number of calls to SimAirLoop() has been invoked over the course of the simulation
         // to simulate the specified air loop
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumCalls" << ',' << TrimSigDigits(ThisAirLoopStats.NumCalls);
+        print(statisticsFile, "NumCalls,{}\n", ThisAirLoopStats.NumCalls);
 
         // Warm restart success ratio
         NumWarmRestarts = ThisAirLoopStats.NumSuccessfulWarmRestarts + ThisAirLoopStats.NumFailedWarmRestarts;
@@ -2606,22 +2581,22 @@ namespace HVACControllers {
             WarmRestartSuccessRatio = double(ThisAirLoopStats.NumSuccessfulWarmRestarts) / double(NumWarmRestarts);
         }
 
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumWarmRestarts" << ',' << TrimSigDigits(NumWarmRestarts);
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumSuccessfulWarmRestarts" << ',' << TrimSigDigits(ThisAirLoopStats.NumSuccessfulWarmRestarts);
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumFailedWarmRestarts" << ',' << TrimSigDigits(ThisAirLoopStats.NumFailedWarmRestarts);
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "WarmRestartSuccessRatio" << ',' << TrimSigDigits(WarmRestartSuccessRatio, 10);
+        print(statisticsFile, "NumWarmRestarts,{}\n", NumWarmRestarts);
+        print(statisticsFile, "NumSuccessfulWarmRestarts,{}\n", ThisAirLoopStats.NumSuccessfulWarmRestarts);
+        print(statisticsFile, "NumFailedWarmRestarts,{}\n", ThisAirLoopStats.NumFailedWarmRestarts);
+        print(statisticsFile, "WarmRestartSuccessRatio,{:.10T}\n", WarmRestartSuccessRatio);
 
         // Total number of times SimAirLoopComponents() has been invoked over the course of the simulation
         // to simulate the specified air loop
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "TotSimAirLoopComponents" << ',' << TrimSigDigits(ThisAirLoopStats.TotSimAirLoopComponents);
+        print(statisticsFile, "TotSimAirLoopComponents,{}\n", ThisAirLoopStats.TotSimAirLoopComponents);
         // Maximum number of times SimAirLoopComponents() has been invoked over the course of the simulation
         // to simulate the specified air loop
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "MaxSimAirLoopComponents" << ',' << TrimSigDigits(ThisAirLoopStats.MaxSimAirLoopComponents);
+        print(statisticsFile, "MaxSimAirLoopComponents,{}\n", ThisAirLoopStats.MaxSimAirLoopComponents);
 
         // Aggregated number of iterations needed by all controllers to simulate the specified air loop
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "TotIterations" << ',' << TrimSigDigits(ThisAirLoopStats.TotIterations);
+        print(statisticsFile, "TotIterations,{}\n", ThisAirLoopStats.TotIterations);
         // Maximum number of iterations needed by controllers to simulate the specified air loop
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "MaxIterations" << ',' << TrimSigDigits(ThisAirLoopStats.MaxIterations);
+        print(statisticsFile, "MaxIterations,{}\n", ThisAirLoopStats.MaxIterations);
 
         // Average number of iterations needed by controllers to simulate the specified air loop
         if (ThisAirLoopStats.NumCalls == 0) {
@@ -2630,12 +2605,12 @@ namespace HVACControllers {
             AvgIterations = double(ThisAirLoopStats.TotIterations) / double(ThisAirLoopStats.NumCalls);
         }
 
-        ObjexxFCL::gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
+        print(statisticsFile, "AvgIterations,{:.10T}\n", AvgIterations);
 
         // Dump statistics for each controller on this air loop
         for (AirLoopControlNum = 1; AirLoopControlNum <= ThisPrimaryAirSystem.NumControllers; ++AirLoopControlNum) {
 
-            ObjexxFCL::gio::write(FileUnit, fmtAA) << ThisPrimaryAirSystem.ControllerName(AirLoopControlNum) << ',';
+            print(statisticsFile, "{},\n", ThisPrimaryAirSystem.ControllerName(AirLoopControlNum));
 
             // Aggregate iteration trackers across all operating modes
             NumCalls = 0;
@@ -2651,11 +2626,11 @@ namespace HVACControllers {
             }
 
             // Number of times this controller was simulated (should match air loop num calls)
-            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "NumCalls" << ',' << TrimSigDigits(NumCalls);
+            print(statisticsFile, "NumCalls,{}\n", NumCalls);
             // Aggregated number of iterations needed by this controller
-            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "TotIterations" << ',' << TrimSigDigits(TotIterations);
+            print(statisticsFile, "TotIterations,{}\n", TotIterations);
             // Aggregated number of iterations needed by this controller
-            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "MaxIterations" << ',' << TrimSigDigits(MaxIterations);
+            print(statisticsFile, "MaxIterations,{}\n", MaxIterations);
 
             // Average number of iterations needed by controllers to simulate the specified air loop
             if (NumCalls == 0) {
@@ -2663,23 +2638,20 @@ namespace HVACControllers {
             } else {
                 AvgIterations = double(TotIterations) / double(NumCalls);
             }
-            ObjexxFCL::gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
+            print(statisticsFile, "AvgIterations,{:.10T}\n", AvgIterations);
 
             // Dump iteration trackers for each operating mode
             for (iModeNum = iFirstMode; iModeNum <= iLastMode; ++iModeNum) {
 
-                ObjexxFCL::gio::write(FileUnit, fmtAA) << ControllerModeTypes(iModeNum) << ',';
+                print(statisticsFile, "{},\n", ControllerModeTypes(iModeNum));
 
                 // Number of times this controller operated in this mode
-                ObjexxFCL::gio::write(FileUnit, fmtAAA)
-                    << "NumCalls" << ',' << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum));
+                print(statisticsFile, "NumCalls,{}\n", ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum));
 
                 // Aggregated number of iterations needed by this controller
-                ObjexxFCL::gio::write(FileUnit, fmtAAA)
-                    << "TotIterations" << ',' << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).TotIterations(iModeNum));
+                print(statisticsFile, "TotIterations,{}\n", ThisAirLoopStats.ControllerStats(AirLoopControlNum).TotIterations(iModeNum));
                 // Aggregated number of iterations needed by this controller
-                ObjexxFCL::gio::write(FileUnit, fmtAAA)
-                    << "MaxIterations" << ',' << TrimSigDigits(ThisAirLoopStats.ControllerStats(AirLoopControlNum).MaxIterations(iModeNum));
+                print(statisticsFile, "MaxIterations,{}\n", ThisAirLoopStats.ControllerStats(AirLoopControlNum).MaxIterations(iModeNum));
 
                 // Average number of iterations needed by controllers to simulate the specified air loop
                 if (ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum) == 0) {
@@ -2688,7 +2660,7 @@ namespace HVACControllers {
                     AvgIterations = double(ThisAirLoopStats.ControllerStats(AirLoopControlNum).TotIterations(iModeNum)) /
                                     double(ThisAirLoopStats.ControllerStats(AirLoopControlNum).NumCalls(iModeNum));
                 }
-                ObjexxFCL::gio::write(FileUnit, fmtAAA) << "AvgIterations" << ',' << TrimSigDigits(AvgIterations, 10);
+                print(statisticsFile, "AvgIterations,{:.10T}\n", AvgIterations);
             }
         }
     }
@@ -3481,7 +3453,7 @@ namespace HVACControllers {
         }
     }
 
-    void CheckCoilWaterInletNode(int const WaterInletNodeNum, // input actuator node number
+    void CheckCoilWaterInletNode(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
                                  bool &NodeNotFound           // true if matching actuator node not found
     )
     {
@@ -3520,7 +3492,7 @@ namespace HVACControllers {
         int ControlNum;
 
         if (GetControllerInputFlag) {
-            GetControllerInput();
+            GetControllerInput(state);
             GetControllerInputFlag = false;
         }
 
@@ -3532,7 +3504,7 @@ namespace HVACControllers {
         }
     }
 
-    void GetControllerNameAndIndex(int const WaterInletNodeNum, // input actuator node number
+    void GetControllerNameAndIndex(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
                                    std::string &ControllerName, // controller name used by water coil
                                    int &ControllerIndex,        // controller index used by water coil
                                    bool &ErrorsFound            // true if matching actuator node not found
@@ -3551,7 +3523,7 @@ namespace HVACControllers {
         int ControlNum;
 
         if (GetControllerInputFlag) {
-            GetControllerInput();
+            GetControllerInput(state);
             GetControllerInputFlag = false;
         }
 
@@ -3570,7 +3542,7 @@ namespace HVACControllers {
         }
     }
 
-    void GetControllerActuatorNodeNum(std::string const &ControllerName, // name of coil controller
+    void GetControllerActuatorNodeNum(EnergyPlusData &state, std::string const &ControllerName, // name of coil controller
                                       int &WaterInletNodeNum,            // input actuator node number
                                       bool &NodeNotFound                 // true if matching actuator node not found
     )
@@ -3589,7 +3561,7 @@ namespace HVACControllers {
         int ControlNum;
 
         if (GetControllerInputFlag) {
-            GetControllerInput();
+            GetControllerInput(state);
             GetControllerInputFlag = false;
         }
 
@@ -3601,7 +3573,7 @@ namespace HVACControllers {
         }
     }
 
-    int GetControllerIndex(std::string const &ControllerName // name of coil controller
+    int GetControllerIndex(EnergyPlusData &state, std::string const &ControllerName // name of coil controller
     )
     {
 
@@ -3612,7 +3584,7 @@ namespace HVACControllers {
         // This subroutine finds the controllers actuator node number
 
         if (GetControllerInputFlag) {
-            GetControllerInput();
+            GetControllerInput(state);
             GetControllerInputFlag = false;
         }
 

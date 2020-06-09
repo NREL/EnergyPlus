@@ -93,6 +93,7 @@
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -210,7 +211,7 @@ namespace HeatBalanceSurfaceManager {
         calcHeatBalanceInsideSurfFirstTime = true;
     }
 
-    void ManageSurfaceHeatBalance()
+    void ManageSurfaceHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -234,7 +235,7 @@ namespace HeatBalanceSurfaceManager {
         int ConstrNum;
 
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Initializing Surfaces");
-        InitSurfaceHeatBalance(); // Initialize all heat balance related parameters
+        InitSurfaceHeatBalance(state); // Initialize all heat balance related parameters
 
         // Solve the zone heat balance 'Detailed' solution
         // Call the outside and inside surface heat balances
@@ -246,7 +247,7 @@ namespace HeatBalanceSurfaceManager {
         // The air heat balance must be called before the temperature history
         // updates because there may be a radiant system in the building
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Air Heat Balance");
-        ManageAirHeatBalance();
+        ManageAirHeatBalance(state);
 
         // IF NECESSARY, do one final "average" heat balance pass.  This is only
         // necessary if a radiant system is present and it was actually on for
@@ -279,7 +280,7 @@ namespace HeatBalanceSurfaceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSurfaceHeatBalance()
+    void InitSurfaceHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -413,7 +414,7 @@ namespace HeatBalanceSurfaceManager {
                     Surface(SurfNum).WindDir = Node(Surface(SurfNum).LinkedOutAirNode).OutAirWindDir;
                 }
 
-                if (Surface(SurfNum).HasSurroundingSurfProperties) {
+                if (InitSurfaceHeatBalancefirstTime && Surface(SurfNum).HasSurroundingSurfProperties) {
                     SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
                     SrdSurfsViewFactor = 0;
                     if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0) {
@@ -509,7 +510,7 @@ namespace HeatBalanceSurfaceManager {
         // Calculate factors that are used to determine how much long-wave radiation from internal
         // gains is absorbed by interior surfaces
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Absorption Factors");
-        if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange(OutputFiles::getSingleton());
+        if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange(state.outputFiles);
         ComputeIntThermalAbsorpFactors();
 
         // Calculate factors for diffuse solar absorbed by room surfaces and interior shades
@@ -719,18 +720,18 @@ namespace HeatBalanceSurfaceManager {
                         DayltgInterReflIllFrIntWins(NZ);
                         DayltgGlareWithIntWins(ZoneDaylight(NZ).GlareIndexAtRefPt, NZ);
                     }
-                    DayltgElecLightingControl(NZ);
+                    DayltgElecLightingControl(state.outputFiles, NZ);
                 }
             }
         } else if (mapResultsToReport && TimeStep == NumOfTimeStepInHour) {
             for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-                ReportIllumMap(MapNum);
+                ReportIllumMap(state.outputFiles, MapNum);
             }
             mapResultsToReport = false;
         }
 
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Internal Heat Gains");
-        ManageInternalHeatGains(false);
+        ManageInternalHeatGains(state, false);
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Solar Distribution");
         InitIntSolarDistribution();
 
@@ -4001,7 +4002,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         RecDifShortFromZ = false;
-        FractDifShortZtoZ = 0.0;
+        FractDifShortZtoZ.to_identity();
         D.to_identity();
 
         //      IF (.not. ANY(Zone%HasInterZoneWindow)) RETURN  ! this caused massive diffs
@@ -6608,7 +6609,8 @@ namespace HeatBalanceSurfaceManager {
                         OutputReportTabular::loadConvectedWithPulse(CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
                     } else {
                         OutputReportTabular::loadConvectedNormal(CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
-                        OutputReportTabular::netSurfRadSeq(CurOverallSimDay, TimeStepInDay, surfNum) = QdotRadNetSurfInRep(surfNum);
+                        OutputReportTabular::netSurfRadSeq(CurOverallSimDay, TimeStepInDay, surfNum) =
+                            NetLWRadToSurf(surfNum) * Surface(surfNum).Area;
                     }
                 }
             }

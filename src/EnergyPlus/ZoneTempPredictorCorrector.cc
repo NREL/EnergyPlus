@@ -75,6 +75,7 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -340,7 +341,7 @@ namespace ZoneTempPredictorCorrector {
         NumOnOffCtrZone = 0;
     }
 
-    void ManageZoneAirUpdates(int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+    void ManageZoneAirUpdates(EnergyPlusData &state, int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
                               Real64 &ZoneTempChange, // Temp change in zone air btw previous and current timestep
                               bool const ShortenTimeStepSys,
                               bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
@@ -366,7 +367,7 @@ namespace ZoneTempPredictorCorrector {
         // unused1208  INTEGER :: zoneloop
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints(OutputFiles::getSingleton());
+            GetZoneAirSetPoints(state.outputFiles);
             GetZoneAirStatsInputFlag = false;
         }
 
@@ -379,10 +380,10 @@ namespace ZoneTempPredictorCorrector {
                 CalcZoneAirTempSetPoints();
 
             } else if (SELECT_CASE_var == iPredictStep) {
-                PredictSystemLoads(ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                PredictSystemLoads(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iCorrectStep) {
-                CorrectZoneAirTemp(ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                CorrectZoneAirTemp(state, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iRevertZoneTimestepHistories) {
                 RevertZoneTimestepHistories();
@@ -3319,7 +3320,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void PredictSystemLoads(bool const ShortenTimeStepSys,
+    void PredictSystemLoads(EnergyPlusData &state, bool const ShortenTimeStepSys,
                             bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     )
@@ -3792,7 +3793,7 @@ namespace ZoneTempPredictorCorrector {
                 // RoomAirflowNetworkModel - make dynamic term independent of TimeStepSys
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).IsUsed) {
                     RoomAirNode = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
-                    LoadPredictionRoomAirModelAirflowNetwork(ZoneNum, RoomAirNode);
+                    LoadPredictionRoomAirModelAirflowNetwork(state, ZoneNum, RoomAirNode);
                     TempDepCoef = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHA +
                                   RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumLinkMCp;
                     TempIndCoef = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntSensibleGain +
@@ -4864,7 +4865,7 @@ namespace ZoneTempPredictorCorrector {
         TotalDehumidLoad *= ZoneMultFac;
     }
 
-    void CorrectZoneAirTemp(Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
+    void CorrectZoneAirTemp(EnergyPlusData &state, Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
                             bool const ShortenTimeStepSys,
                             bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
@@ -5086,7 +5087,7 @@ namespace ZoneTempPredictorCorrector {
 
             AirCap = AIRRAT(ZoneNum);
 
-            ManageAirModel(ZoneNum);
+            ManageAirModel(state, ZoneNum);
 
             // Calculate the various heat balance sums
             CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);

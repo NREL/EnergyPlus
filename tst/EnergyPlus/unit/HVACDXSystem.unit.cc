@@ -51,6 +51,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -400,9 +401,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);
 
-    HVACDXSystem::GetDXCoolingSystemInput();
+    HVACDXSystem::GetDXCoolingSystemInput(state);
     EXPECT_EQ(HVACDXSystem::DXCoolingSystem(1).Name, "DX COOLING COIL SYSTEM");
     EXPECT_FALSE(HVACDXSystem::DXCoolingSystem(1).ISHundredPercentDOASDXCoil);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).Name, "VS DX COOLING COIL");
@@ -516,7 +517,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     OutputReportPredefined::SetPredefinedTables();
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     int DXSystemNum = 1;
@@ -525,7 +526,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     int InletNode = 1;
     int ControlNode = 2; // same as outlet node number
 
-    HVACDXSystem::GetDXCoolingSystemInput();
+    HVACDXSystem::GetDXCoolingSystemInput(state);
     EXPECT_EQ(HVACDXSystem::DXCoolingSystem(DXSystemNum).Name, "DX COOLING COIL SYSTEM");
     EXPECT_FALSE(HVACDXSystem::DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(DXSystemNum).Name, "VS DX COOLING COIL");
@@ -550,7 +551,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     DataLoopNode::Node(ControlNode).HumRatMax = RHControlHumRat;
 
     // test sensible control
-    HVACDXSystem::ControlDXSystem(DXSystemNum, FirstHVACIteration, HXUnitOn);
+    HVACDXSystem::ControlDXSystem(state, DXSystemNum, FirstHVACIteration, HXUnitOn);
     // system meets temperature set point
     EXPECT_NEAR(HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp, DataLoopNode::Node(ControlNode).Temp, 0.00001);
     // system was not told to meet humidity ratio set point (since DesiredOutletHumRat = 1.0)
@@ -560,7 +561,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
 
     // test latent control
     HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = RHControlHumRat;
-    HVACDXSystem::ControlDXSystem(DXSystemNum, FirstHVACIteration, HXUnitOn);
+    HVACDXSystem::ControlDXSystem(state, DXSystemNum, FirstHVACIteration, HXUnitOn);
 
     // system over cools past temperature set point
     EXPECT_GT(HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp, DataLoopNode::Node(ControlNode).Temp);

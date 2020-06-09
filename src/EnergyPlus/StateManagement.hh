@@ -46,7 +46,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-    void clearAllStates();
+    void clearThisState(EnergyPlusData &state);
+    void clearAllStates(OutputFiles &outputFiles);
 }

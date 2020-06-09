@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -349,14 +350,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());  // read schedules
+    ProcessScheduleInput(state.outputFiles);  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
-    GetPTUnit();
+    GetPTUnit(state);
 
     ASSERT_EQ(1, NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", SysATMixer(1).Name);              // single duct air terminal mixer name
@@ -597,16 +598,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
-    GetPTUnit();
+    GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of PTAC
@@ -685,7 +686,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     // set secondary air mass flow rate to zero
     Node(SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // simulate PTAC zoneHVAC equipment
-    SimPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     // apply mass conservation to determine secondary air mass flow rate
     SecondaryAirMassFlowRate = Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
     // check the terminal air mixer secondary air mass flow rate
@@ -928,16 +929,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
-    GetPTUnit();
+    GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
     // get input test for terminal air single duct mixer on supply side of PTAC
@@ -1016,7 +1017,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     // set secondary air mass flow rate to zero
     Node(SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // simulate PTAC zoneHVAC equipment
-    SimPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     // apply mass conservation to determine secondary mass flow rate
     SecondaryAirMassFlowRate = Node(SysATMixer(1).SecInNode).MassFlowRate;
     // check the terminal air mixer secondary air mass flow rate
@@ -1342,16 +1343,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
-    GetPTUnit();
+    GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of PTHP
@@ -1430,7 +1431,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     // set secondary air mass flow rate to zero
     Node(SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // simulate PTHP zoneHVAC equipment
-    SimPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     // apply mass conservation to determine secondary air mass flow rate
     SecondaryAirMassFlowRate = Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
     // check the terminal air mixer secondary air mass flow rate
@@ -1755,16 +1756,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
-    GetPTUnit();
+    GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
     // get input test for terminal air single duct mixer on supply side of PTHP
@@ -1843,7 +1844,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     // set secondary air mass flow rate to zero
     Node(SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // simulate PTHP zoneHVAC equipment
-    SimPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     // apply mass conservation to determine secondary mass flow rate
     SecondaryAirMassFlowRate = Node(SysATMixer(1).SecInNode).MassFlowRate;
     // check the terminal air mixer secondary air mass flow rate
@@ -2427,17 +2428,17 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
 
-    GetVRFInput();
+    GetVRFInput(state);
     GetVRFInputFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of VRF terminal unit
@@ -2524,7 +2525,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     // set secondary air mass flow rate to zero
     Node(SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // Simulate zoneHVAC equipment (VRF terminal unit)
-    SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq);
+    SimVRF(state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq);
     // check the terminal air mixer secondary air mass flow rate
     ASSERT_EQ(SecondaryAirMassFlowRate, Node(SysATMixer(1).SecInNode).MassFlowRate);
     // check the terminal air mixer outlet flow rate must be equal to VRFTU mass flow rate
@@ -3106,17 +3107,17 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
 
-    GetVRFInput();
+    GetVRFInput(state);
     GetVRFInputFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of VRF terminal unit
@@ -3200,7 +3201,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     // set secondary air mass flow rate to zero
     Node(SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // simulate zoneHVAC equipment (VRF terminal unit)
-    SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq);
+    SimVRF(state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq);
 
     // check the terminal air mixer secondary air mass flow rate
     ASSERT_EQ(SecondaryAirMassFlowRate, Node(SysATMixer(1).SecInNode).MassFlowRate);
@@ -4856,17 +4857,17 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
 
-    GetVRFInput();
+    GetVRFInput(state);
     GetVRFInputFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of VRF terminal unit
@@ -4952,7 +4953,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     // set secondary air mass flow rate to zero
     Node(SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // Simulate zoneHVAC equipment (VRF terminal unit)
-    SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq);
+    SimVRF(state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq);
 
     // check the terminal air mixer secondary air mass flow rate, requires updating the secondary flow
     SecondaryAirMassFlowRate = Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate - PrimaryAirMassFlowRate;
@@ -6610,17 +6611,17 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
 
-    GetVRFInput();
+    GetVRFInput(state);
     GetVRFInputFlag = false;
 
     // get input test for terminal air single duct mixer on supply side of VRF terminal unit
@@ -6704,7 +6705,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     // set secondary air mass flow rate to zero
     Node(SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // Simulate zoneHVAC equipment (VRF terminal unit)
-    SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq);
+    SimVRF(state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq);
 
     // check the terminal air mixer secondary air mass flow rate, requires updating the secondary flow
     SecondaryAirMassFlowRate = Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate;
@@ -6857,16 +6858,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
-    GetUnitVentilatorInput();
+    GetUnitVentilatorInput(state);
     GetUnitVentilatorInputFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of PTHP
@@ -6943,7 +6944,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     // set secondary air mass flow rate to zero
     Node(SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // simulate Unit Ventilator zoneHVAC equipment
-    SimUnitVentilator(UnitVent(UnitVentNum).Name, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided, UnitVentNum);
+    SimUnitVentilator(state, UnitVent(UnitVentNum).Name, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided, UnitVentNum);
     // apply mass conservation to determine secondary air mass flow rate
     SecondaryAirMassFlowRate = Node(UnitVent(UnitVentNum).AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
     // check the air mixer secondary air mass flow rate
@@ -7094,16 +7095,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
-    GetUnitVentilatorInput();
+    GetUnitVentilatorInput(state);
     GetUnitVentilatorInputFlag = false;
 
     // get input test for terminal air single duct mixer on supply side of PTHP
@@ -7180,7 +7181,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     // set secondary air mass flow rate to zero
     Node(SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // simulate Unit Ventilator ZoneHVAC equipment
-    SimUnitVentilator(UnitVent(UnitVentNum).Name, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided, UnitVentNum);
+    SimUnitVentilator(state, UnitVent(UnitVentNum).Name, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided, UnitVentNum);
     // apply mass conservation to determine secondary mass flow rate
     SecondaryAirMassFlowRate = Node(SysATMixer(1).SecInNode).MassFlowRate;
     // check the terminal air mixer secondary air mass flow rate
@@ -7342,8 +7343,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
 
     SizingManager::GetOARequirements();
     SizingManager::GetZoneSizingInput();
-    GetZoneEquipmentData1();
-    ZoneEquipmentManager::SetUpZoneSizingArrays(outputFiles());
+    GetZoneEquipmentData1(state);
+    ZoneEquipmentManager::SetUpZoneSizingArrays(state.outputFiles);
     GetZoneAirLoopEquipment();
     GetATMixers();
 
@@ -7534,16 +7535,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
-    ProcessScheduleInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
-    GetFanCoilUnits();
+    GetFanCoilUnits(state);
 
     auto &thisFanCoil(FanCoil(1));
     auto &thisATMixer(SysATMixer(1));
@@ -7626,8 +7627,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     BeginEnvrnFlag = true;
     DataGlobals::DoingSizing = true;
-    LocalTurnFansOff = false;
-    LocalTurnFansOn = true;
+    state.fans.LocalTurnFansOff = false;
+    state.fans.LocalTurnFansOn = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     DataGlobals::HourOfDay = 1;
@@ -7708,9 +7709,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     QUnitOut = 0.0;
     QLatOut = 0.0;
 
-    InitFanCoilUnits(FanCoilNum, ZoneNum, ZoneNum);
+    InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
     EXPECT_EQ(Node(thisFanCoil.AirInNode).MassFlowRateMinAvail, 0.0); // check init value
-    Sim4PipeFanCoil(FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     SecondaryAirMassFlowRate = Node(thisFanCoil.AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
     // check results in heating mode operation
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -7751,9 +7752,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     QZnReq = zoneSysEnergyDemand.RemainingOutputRequired;
     QUnitOut = 0.0;
     QLatOut = 0.0;
-    InitFanCoilUnits(FanCoilNum, ZoneNum, ZoneNum);
+    InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
     EXPECT_EQ(Node(thisFanCoil.AirInNode).MassFlowRateMinAvail, 0.0); // check init value
-    Sim4PipeFanCoil(FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     SecondaryAirMassFlowRate = Node(thisFanCoil.AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
     // check results in cooling mode operation
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);

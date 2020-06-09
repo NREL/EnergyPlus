@@ -21,6 +21,11 @@ include(cmake/Version.cmake)
 
 set( OPENGL_REQUIRED ON CACHE BOOL "Require OpenGL in order to build" )
 if(OPENGL_REQUIRED)
+  # On Linux specifically, OpenGL is complaining about being able to find OpenGL using both the
+  # exported module target or the library variables.  If it has to choose, and doesn't have a user-preference,
+  # a warning is shown on every configure step.  This next line just sets the preference so the warning won't show up.
+  # See this for more info: https://cmake.org/cmake/help/v3.10/module/FindOpenGL.html#linux-specific
+  set(OpenGL_GL_PREFERENCE GLVND)
   find_package(OpenGL)
   if(NOT OPENGL_FOUND)
     set(CMAKE_VERSION_BUILD "${CMAKE_VERSION_BUILD} (No OpenGL)" CACHE STRING "Build number" FORCE) # git sha
@@ -33,7 +38,51 @@ endif()
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
-option( BUILD_DOCS "Build LaTeX-pdf documentation" OFF )
+
+#######################################################################
+
+# TODO: remove at next release
+# Temporary workaround to default the correct DOCUMENTATION_BUILD value if BUILD_DOCS existed in the cache or is passed via the command line
+# This warning will be triggered only once if it's from the Cache since I'm unsetting it
+# (such as when using the GUI or running `cmake .` instead of passing all command line arguments)
+if(DEFINED BUILD_DOCS)
+  if (NOT DEFINED DOCUMENTATION_BUILD)
+    if(BUILD_DOCS)
+      message(AUTHOR_WARNING "BUILD_DOCS (=ON) was deprecated in favor of the 'DOCUMENTATION_BUILD' choice, which was defaulted to 'BuildWithAll'")
+      set(DOCUMENTATION_BUILD "BuildWithAll" CACHE STRING "Build LaTeX-pdf documentation")
+    else()
+      message(AUTHOR_WARNING "BUILD_DOCS (=OFF) was deprecated in favor of the 'DOCUMENTATION_BUILD' choice, which was defaulted to 'DoNotBuild")
+    endif()
+  else()
+    message(AUTHOR_WARNING "DOCUMENTATION_BUILD is already defined and has value '${DOCUMENTATION_BUILD}', ignoring BUILD_DOCS")
+  endif()
+  unset(BUILD_DOCS CACHE)
+endif()
+# END TODO
+
+set(DocumentationBuildValues "DoNotBuild;BuildWithAll;BuildOnlyWithPackage" CACHE INTERNAL
+  "List of possible values for the LaTeX-pdf documentation")
+set(DOCUMENTATION_BUILD "DoNotBuild" CACHE STRING "Build LaTeX-pdf documentation")
+set_property(CACHE DOCUMENTATION_BUILD PROPERTY STRINGS ${DocumentationBuildValues})
+
+if(NOT DOCUMENTATION_BUILD IN_LIST DocumentationBuildValues)
+  message(FATAL_ERROR "DOCUMENTATION_BUILD must be one of ${DocumentationBuildValues}")
+endif()
+
+# Local only variables for ease of use in if blocks
+set(BUILD_DOCS OFF)
+set(BUILD_DOCS_ONLY_WITH_PACKAGE OFF)
+
+if(DOCUMENTATION_BUILD STREQUAL "BuildWithAll")
+  set(BUILD_DOCS ON)
+  set(BUILD_DOCS_ONLY_WITH_PACKAGE OFF)
+elseif(DOCUMENTATION_BUILD STREQUAL "BuildOnlyWithPackage")
+  set(BUILD_DOCS ON)
+  set(BUILD_DOCS_ONLY_WITH_PACKAGE ON)
+endif()
+#######################################################################
+
+option( LINK_WITH_PYTHON "Link with Python Library for Python Plugin Builds" OFF )
 
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
@@ -285,3 +334,17 @@ mark_as_advanced(FMT_INSTALL)
 mark_as_advanced(FMT_PEDANTIC)
 mark_as_advanced(FMT_TEST)
 mark_as_advanced(FMT_WERROR)
+mark_as_advanced(GLFW_BUILD_DOCS)
+mark_as_advanced(GLFW_BUILD_EXAMPLES)
+mark_as_advanced(GLFW_BUILD_TESTS)
+mark_as_advanced(GLFW_INSTALL)
+mark_as_advanced(GLFW_USE_OSMESA)
+mark_as_advanced(GLFW_USE_WAYLAND)
+mark_as_advanced(GLFW_VULKAN_STATIC)
+mark_as_advanced(BUILD_PENUMBRA_TESTING)
+mark_as_advanced(PENUMBRA_COVERAGE)
+mark_as_advanced(PENUMBRA_STATIC_LIB)
+mark_as_advanced(BUILD_GMOCK)
+mark_as_advanced(BUILD_GTEST)
+mark_as_advanced(gmock_build_tests)
+mark_as_advanced(BUILD_WCE_TESTING)

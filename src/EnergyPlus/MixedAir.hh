@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -303,12 +304,12 @@ namespace MixedAir {
         {
         }
 
-        void CalcOAController(int const AirLoopNum, bool const FirstHVACIteration);
+        void CalcOAController(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration);
 
-        void CalcOAEconomizer(
+        void CalcOAEconomizer(EnergyPlusData &state, 
             int const AirLoopNum, Real64 const OutAirMinFrac, Real64 &OASignal, bool &HighHumidityOperationFlag, bool const FirstHVACIteration);
 
-        void SizeOAController();
+        void SizeOAController(EnergyPlusData &state);
 
         void UpdateOAController();
 
@@ -432,13 +433,13 @@ namespace MixedAir {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ManageOutsideAirSystem(std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum);
+    void ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum);
 
-    void SimOutsideAirSys(int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
-    void SimOASysComponents(int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
-    void SimOAComponent(std::string const &CompType, // the component type
+    void SimOAComponent(EnergyPlusData &state, std::string const &CompType, // the component type
                         std::string const &CompName, // the component Name
                         int const CompTypeNum,       // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
@@ -453,20 +454,20 @@ namespace MixedAir {
 
     void SimOAMixer(std::string const &CompName, bool const FirstHVACIteration, int &CompIndex);
 
-    void SimOAController(std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum);
+    void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum);
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetOutsideAirSysInputs();
+    void GetOutsideAirSysInputs(EnergyPlusData &state);
 
-    void GetOAControllerInputs(OutputFiles &outputFiles);
+    void GetOAControllerInputs(EnergyPlusData &state);
 
     void AllocateOAControllers();
 
     void GetOAMixerInputs();
 
-    void ProcessOAControllerInputs(std::string const &CurrentModuleObject,
+    void ProcessOAControllerInputs(EnergyPlusData &state, std::string const &CurrentModuleObject,
                                    int const OutAirNum,
                                    Array1D_string const &AlphArray,
                                    int &NumAlphas,
@@ -485,9 +486,9 @@ namespace MixedAir {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitOutsideAirSys(int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void InitOutsideAirSys(EnergyPlusData &EP_UNUSED(state), int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
-    void InitOAController(int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void InitOAMixer(int const OAMixerNum, bool const FirstHVACIteration);
 
@@ -525,7 +526,7 @@ namespace MixedAir {
                                        Array1D<Real64> const &Par // par(1) = mixed node number
     );
 
-    Real64 MultiCompControlTempResidual(Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+    Real64 MultiCompControlTempResidual(EnergyPlusData &state, Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
                                         Array1D<Real64> const &Par // par(1) = mixed node number
     );
 
@@ -539,17 +540,17 @@ namespace MixedAir {
 
     int GetOAMixerReliefNodeNumber(int const OAMixerNum); // Which Mixer
 
-    int GetOASysControllerListIndex(int const OASysNumber); // OA Sys Number
+    int GetOASysControllerListIndex(EnergyPlusData &state, int const OASysNumber); // OA Sys Number
 
-    int GetOASysNumSimpControllers(int const OASysNumber); // OA Sys Number
+    int GetOASysNumSimpControllers(EnergyPlusData &state, int const OASysNumber); // OA Sys Number
 
-    int GetOASysNumHeatingCoils(int const OASysNumber); // OA Sys Number
+    int GetOASysNumHeatingCoils(EnergyPlusData &state, int const OASysNumber); // OA Sys Number
 
-    int GetOASysNumHXs(int const OASysNumber); // OA Sys Number
+    int GetOASysNumHXs(EnergyPlusData &state, int const OASysNumber); // OA Sys Number
 
-    int GetOASysNumCoolingCoils(int const OASysNumber); // OA Sys Number
+    int GetOASysNumCoolingCoils(EnergyPlusData &state, int const OASysNumber); // OA Sys Number
 
-    int GetOASystemNumber(std::string const &OASysName); // OA Sys Name
+    int GetOASystemNumber(EnergyPlusData &state, std::string const &OASysName); // OA Sys Name
 
     int FindOAMixerMatchForOASystem(int const OASysNumber); // Which OA System
 
@@ -561,27 +562,27 @@ namespace MixedAir {
 
     int GetOAMixerMixedNodeNumber(int const OAMixerNumber); // Which Mixer
 
-    bool CheckForControllerWaterCoil(std::string const &ControllerType, // should be passed in as UPPERCASE
+    bool CheckForControllerWaterCoil(EnergyPlusData &state, std::string const &ControllerType, // should be passed in as UPPERCASE
                                      std::string const &ControllerName  // should be passed in as UPPERCASE
     );
 
-    void CheckControllerLists(bool &ErrFound);
+    void CheckControllerLists(EnergyPlusData &state, bool &ErrFound);
 
     void CheckOAControllerName(std::string &OAControllerName, std::string const &ObjectType, std::string const &FieldName, bool &ErrorsFound);
 
-    int GetNumOASystems();
+    int GetNumOASystems(EnergyPlusData &state);
 
-    int GetOACompListNumber(int const OASysNum); // OA Sys Number
+    int GetOACompListNumber(EnergyPlusData &state, int const OASysNum); // OA Sys Number
 
-    std::string GetOACompName(int const OASysNum, // OA Sys Number
+    std::string GetOACompName(EnergyPlusData &state, int const OASysNum, // OA Sys Number
                               int const InListNum // In-list Number
     );
 
-    std::string GetOACompType(int const OASysNum, // OA Sys Number
+    std::string GetOACompType(EnergyPlusData &state, int const OASysNum, // OA Sys Number
                               int const InListNum // In-list Number
     );
 
-    int GetOACompTypeNum(int const OASysNum, // OA Sys Number
+    int GetOACompTypeNum(EnergyPlusData &state, int const OASysNum, // OA Sys Number
                          int const InListNum // In-list Number
     );
 

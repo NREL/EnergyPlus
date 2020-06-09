@@ -59,6 +59,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -82,7 +83,7 @@ namespace CommandLineInterface {
     using namespace SolarShading;
     using namespace ez;
 
-    int ProcessArgs(int argc, const char *argv[])
+    int ProcessArgs(EnergyPlusData &state, int argc, const char *argv[])
     {
         typedef std::string::size_type size_type;
 
@@ -199,7 +200,7 @@ namespace CommandLineInterface {
 
         DDOnlySimulation = opt.isSet("-D");
 
-        AnnualSimulation = opt.isSet("-a");
+        state.dataGlobals.AnnualSimulation = opt.isSet("-a");
 
         outputEpJSONConversion = opt.isSet("-c");
 
@@ -384,13 +385,13 @@ namespace CommandLineInterface {
         }
 
         // EnergyPlus files
-        OutputFiles::getSingleton().audit.fileName = outputFilePrefix + normalSuffix + ".audit";
-        outputBndFileName = outputFilePrefix + normalSuffix + ".bnd";
-        outputDxfFileName = outputFilePrefix + normalSuffix + ".dxf";
-        OutputFiles::getSingleton().eio.fileName = outputFilePrefix + normalSuffix + ".eio";
+        state.outputFiles.audit.fileName = outputFilePrefix + normalSuffix + ".audit";
+        state.outputFiles.bnd.fileName = outputFilePrefix + normalSuffix + ".bnd";
+        state.outputFiles.dxf.fileName = outputFilePrefix + normalSuffix + ".dxf";
+        state.outputFiles.eio.fileName = outputFilePrefix + normalSuffix + ".eio";
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
-        OutputFiles::getSingleton().eso.fileName = outputFilePrefix + normalSuffix + ".eso";
+        state.outputFiles.eso.fileName = outputFilePrefix + normalSuffix + ".eso";
 
         outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
         outputTSZoneJsonFileName = outputFilePrefix + normalSuffix + "_detailed_zone.json";
@@ -420,44 +421,44 @@ namespace CommandLineInterface {
         outputHRMsgPackFileName = outputFilePrefix + normalSuffix + "_hourly.msgpack";
         outputSMMsgPackFileName = outputFilePrefix + normalSuffix + "_runperiod.msgpack";
 
-        outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
+        state.outputFiles.mtd.fileName = outputFilePrefix + normalSuffix + ".mtd";
         outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
-        OutputFiles::getSingleton().mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
+        state.outputFiles.mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
         outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
-        outputDfsFileName = outputFilePrefix + normalSuffix + ".dfs";
+        state.outputFiles.dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
         outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
-        outputEddFileName = outputFilePrefix + normalSuffix + ".edd";
+        state.outputFiles.edd.fileName = outputFilePrefix + normalSuffix + ".edd";
         outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
-        outputSlnFileName = outputFilePrefix + normalSuffix + ".sln";
-        outputSciFileName = outputFilePrefix + normalSuffix + ".sci";
-        outputWrlFileName = outputFilePrefix + normalSuffix + ".wrl";
+        state.outputFiles.sln.fileName = outputFilePrefix + normalSuffix + ".sln";
+        state.outputFiles.sci.fileName = outputFilePrefix + normalSuffix + ".sci";
+        state.outputFiles.wrl.fileName = outputFilePrefix + normalSuffix + ".wrl";
         outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
-        outputDbgFileName = outputFilePrefix + normalSuffix + ".dbg";
+        state.outputFiles.debug.fileName = outputFilePrefix + normalSuffix + ".dbg";
         outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
         outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
         outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
         outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
         outputTblTxtFileName = outputFilePrefix + tableSuffix + ".txt";
         outputTblXmlFileName = outputFilePrefix + tableSuffix + ".xml";
-        outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
-        outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
-        outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
-        OutputFiles::getSingleton().outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
-        OutputFiles::getSingleton().outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
-        OutputFiles::getSingleton().outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
-        OutputFiles::getSingleton().outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
-        OutputFiles::getSingleton().outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
-        OutputFiles::getSingleton().outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
+        state.outputFiles.outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
+        state.outputFiles.outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
+        state.outputFiles.outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
+        state.outputFiles.outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
+        state.outputFiles.outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
+        state.outputFiles.outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
+        state.outputFiles.outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
+        state.outputFiles.outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
+        state.outputFiles.outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
         outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
-        outputExtShdFracFileName = outputFilePrefix + shdSuffix + ".csv";
+        state.outputFiles.shade.fileName = outputFilePrefix + shdSuffix + ".csv";
         if (suffixType == "L" || suffixType == "l") {
             outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
         } else {
             outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
         }
-        outputScreenCsvFileName = outputFilePrefix + screenSuffix + ".csv";
-        outputDelightInFileName = "eplusout.delightin";
+        state.outputFiles.screenCsv.fileName = outputFilePrefix + screenSuffix + ".csv";
+        state.outputFiles.delightIn.fileName = "eplusout.delightin";
         outputDelightOutFileName = "eplusout.delightout";
         outputDelightEldmpFileName = "eplusout.delighteldmp";
         outputDelightDfdmpFileName = "eplusout.delightdfdmp";
@@ -511,26 +512,19 @@ namespace CommandLineInterface {
         }
 
         // Error for cases where both design-day and annual simulation switches are set
-        if (DDOnlySimulation && AnnualSimulation) {
+        if (DDOnlySimulation && state.dataGlobals.AnnualSimulation) {
             DisplayString("ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
             DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
         }
 
         // Read path from INI file if it exists
-        bool EPlusINI;
         int LFN; // Unit Number for reads
         std::string::size_type TempIndx;
         int iostatus;
-        bool FileExists;
 
         // Check for IDD and IDF files
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(EnergyPlusIniFileName, flags);
-            EPlusINI = flags.exists();
-        }
-        if (EPlusINI) {
+        if (fileExists(EnergyPlusIniFileName)) {
             LFN = GetNewUnitNumber();
             {
                 IOFlags flags;
@@ -563,53 +557,28 @@ namespace CommandLineInterface {
         }
 
         // Check if specified files exist
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(inputFileName, flags);
-            FileExists = flags.exists();
-        }
-        if (!FileExists) {
+        if (!fileExists(inputFileName)) {
             DisplayString("ERROR: Could not find input data file: " + getAbsolutePath(inputFileName) + ".");
             DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
         }
 
         if (opt.isSet("-w") && !DDOnlySimulation) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(inputWeatherFileName, flags);
-                FileExists = flags.exists();
-            }
-            if (!FileExists) {
+            if (!fileExists(inputWeatherFileName)) {
                 DisplayString("ERROR: Could not find weather file: " + getAbsolutePath(inputWeatherFileName) + ".");
                 DisplayString(errorFollowUp);
                 exit(EXIT_FAILURE);
             }
         }
 
-        OutputFileDebug = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(OutputFileDebug, outputDbgFileName, flags);
-            iostatus = flags.ios();
-        }
-        if (iostatus != 0) {
-            DisplayString("ERROR: Could not open output debug file: " + outputDbgFileName + ".");
-            exit(EXIT_FAILURE);
-        }
+        state.outputFiles.debug.ensure_open("OpenOutputFiles");
 
         // TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 
         // Preprocessors (These will likely move to a new file)
         if (runEPMacro) {
             std::string epMacroPath = exeDirectory + "EPMacro" + exeExtension;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(epMacroPath, flags);
-                FileExists = flags.exists();
-            }
-            if (!FileExists) {
+            if (!fileExists(epMacroPath)) {
                 DisplayString("ERROR: Could not find EPMacro executable: " + getAbsolutePath(epMacroPath) + ".");
                 exit(EXIT_FAILURE);
             }
@@ -627,12 +596,7 @@ namespace CommandLineInterface {
 
         if (runExpandObjects) {
             std::string expandObjectsPath = exeDirectory + "ExpandObjects" + exeExtension;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(expandObjectsPath, flags);
-                FileExists = flags.exists();
-            }
-            if (!FileExists) {
+            if (!fileExists(expandObjectsPath)) {
                 DisplayString("ERROR: Could not find ExpandObjects executable: " + getAbsolutePath(expandObjectsPath) + ".");
                 exit(EXIT_FAILURE);
             }
@@ -640,12 +604,7 @@ namespace CommandLineInterface {
             bool inputFileNamedIn = (getAbsolutePath(inputFileName) == getAbsolutePath("in.idf"));
 
             // check if IDD actually exists since ExpandObjects still requires it
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(inputIddFileName, flags);
-                FileExists = flags.exists();
-            }
-            if (!FileExists) {
+            if (!fileExists(inputIddFileName)) {
                 DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + ".");
                 DisplayString(errorFollowUp);
                 exit(EXIT_FAILURE);
@@ -659,12 +618,7 @@ namespace CommandLineInterface {
             if (!inputFileNamedIn) removeFile("in.idf");
             if (!iddFileNamedEnergy) removeFile("Energy+.idd");
             moveFile("expandedidf.err", outputExperrFileName);
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire("expanded.idf", flags);
-                FileExists = flags.exists();
-            }
-            if (FileExists) {
+            if (fileExists("expanded.idf")) {
                 moveFile("expanded.idf", outputExpidfFileName);
                 inputFileName = outputExpidfFileName;
             }
@@ -829,22 +783,13 @@ namespace CommandLineInterface {
         }
     }
 
-    int runReadVarsESO() {
+    int runReadVarsESO(OutputFiles &outputFiles)
+    {
         std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
-        bool FileExists;
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(readVarsPath, flags);
-            FileExists = flags.exists();
-        }
-        if (!FileExists) {
+
+        if (!fileExists(readVarsPath)) {
             readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(readVarsPath, flags);
-                FileExists = flags.exists();
-            }
-            if (!FileExists) {
+            if (!fileExists(readVarsPath)) {
                 DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + ".");
                 return EXIT_FAILURE;
             }
@@ -853,53 +798,26 @@ namespace CommandLineInterface {
         std::string const RVIfile = inputDirPathName + inputFileNameOnly + ".rvi";
         std::string const MVIfile = inputDirPathName + inputFileNameOnly + ".mvi";
 
-        int fileUnitNumber;
-        int iostatus;
-        bool rviFileExists;
-        bool mviFileExists;
-
-        ObjexxFCL::gio::Fmt readvarsFmt("(A)");
-
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(RVIfile, flags);
-            rviFileExists = flags.exists();
-        }
+        const auto rviFileExists = fileExists(RVIfile);
         if (!rviFileExists) {
-            fileUnitNumber = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("write");
-                ObjexxFCL::gio::open(fileUnitNumber, RVIfile, flags);
-                iostatus = flags.ios();
-            }
-            if (iostatus != 0) {
+            std::ofstream ofs{RVIfile};
+            if (!ofs.good()) {
                 ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
+            } else {
+                ofs << outputFiles.eso.fileName << '\n';
+                ofs << outputCsvFileName << '\n';
             }
-            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << OutputFiles::getSingleton().eso.fileName;
-            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputCsvFileName;
-            ObjexxFCL::gio::close(fileUnitNumber);
         }
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(MVIfile, flags);
-            mviFileExists = flags.exists();
-        }
+        const auto mviFileExists = fileExists(MVIfile);
         if (!mviFileExists) {
-            fileUnitNumber = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("write");
-                ObjexxFCL::gio::open(fileUnitNumber, MVIfile, flags);
-                iostatus = flags.ios();
+            std::ofstream ofs{MVIfile};
+            if (!ofs.good()) {
+                ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
+            } else {
+                ofs << outputFiles.mtr.fileName << '\n';
+                ofs << outputMtrCsvFileName << '\n';
             }
-            if (iostatus != 0) {
-                ShowFatalError("EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write).");
-            }
-            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << OutputFiles::getSingleton().mtr.fileName;
-            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrCsvFileName;
-            ObjexxFCL::gio::close(fileUnitNumber);
         }
 
         // We quote the paths in case we have spaces

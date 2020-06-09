@@ -65,7 +65,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,6;
 
@@ -6100,7 +6100,31 @@
     PythonPluginCustomSchedule,  !- Python Module Name
     CoolingSetPoint;         !- Plugin Class Name
 
+  PythonPlugin:Instance,
+    Average Building Temperature,  !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginCustomSchedule,  !- Python Module Name
+    AverageZoneTemps;         !- Plugin Class Name
+
+  PythonPlugin:Variables,
+    MyGlobals,
+    AverageBuildingTemp;
+
+  PythonPlugin:OutputVariable,
+    Averaged Building Temperature,  !- Name
+    AverageBuildingTemp,     !- PythonPlugin:Variable Name
+    Averaged,                !- Type of Data in Variable
+    ZoneTimestep,            !- Update Frequency
+    C;                       !- Units
+
+  Output:Variable,
+    Averaged Building Temperature,
+    PythonPlugin:OutputVariable,
+    Timestep;
+
   Output:Variable,HTGSETP_SCH,Schedule Value,timestep;
 
   Output:Variable,CLGSETP_SCH,Schedule Value,timestep;
+
+
 

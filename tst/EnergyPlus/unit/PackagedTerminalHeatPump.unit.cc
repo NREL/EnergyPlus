@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -446,8 +447,8 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     bool ErrorsFound(false);
     GetZoneData(ErrorsFound);
-    GetZoneEquipmentData();
-    GetPTUnit();
+    GetZoneEquipmentData(state);
+    GetPTUnit(state);
 
     TotNumLoops = 2;
     PlantLoop.allocate(TotNumLoops);
@@ -489,10 +490,11 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 12.0;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.05;
     DataEnvironment::OutBaroPress = 101325;
+    DataEnvironment::StdRhoAir = 1.0;
     OutputReportPredefined::SetPredefinedTables();
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod.allocate(16);
-    SizePTUnit(1);
+    SizePTUnit(state, 1);
 
     // This VS coil is rather quirky. It sizes the capacity based on zone sizing air flow rate.
     // Then uses that capacity to back calculate the air flow needed to keep the reference air flow per capacity ratio constant.
@@ -518,6 +520,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).Name, "LOBBY_ZN_1_FLR_2 WSHP HEATING MODE");
 
     // expect coil air flow to equal PTUnit heating air flow
+    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).RatedAirVolFlowRate, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).RatedAirVolFlowRate, PTUnit(1).MaxHeatAirVolFlow);
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).MSRatedAirVolFlowRate(9), PTUnit(1).MaxHeatAirVolFlow);
 
@@ -529,7 +532,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     // this same ratio should also equal the internal flow per capacity variable used to back calculate operating air flow rate
     EXPECT_EQ(sizingAirflowCapacityRatio, VariableSpeedCoils::VarSpeedCoil(2).MSRatedAirVolFlowPerRatedTotCap(9));
 
-    SizeFan(1);
+    SizeFan(state, 1);
     // the fan vol flow rate should equal the max of cooling and heating coil flow rates
     Real64 maxCoilAirFlow = max(VariableSpeedCoils::VarSpeedCoil( 1 ).RatedAirVolFlowRate, VariableSpeedCoils::VarSpeedCoil( 2 ).RatedAirVolFlowRate);
     EXPECT_EQ(Fan(1).MaxAirFlowRate, maxCoilAirFlow);
@@ -541,7 +544,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     // Also set BeginEnvrnFlag so code is tested for coil initialization and does not crash
     DataGlobals::BeginEnvrnFlag = true;
-    InitPTUnit(1, DataSizing::CurZoneEqNum, true, OnOffAirFlowRatio, ZoneLoad);
+    InitPTUnit(state, 1, DataSizing::CurZoneEqNum, true, OnOffAirFlowRatio, ZoneLoad);
 
     // check that an intermediate speed has the correct flow ratio
     Real64 refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference cooling data and full flow rate at speed 9
@@ -582,8 +585,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
-
         "Schedule:Compact,",
         "    FanAvailSched,           !- Name",
         "    Fraction,                !- Schedule Type Limits Name",
@@ -794,16 +795,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
-    GetPTUnit();
+    GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
     //// get input test for terminal air single duct mixer on inlet side of PTAC
@@ -898,11 +899,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     // initialized to false
     ASSERT_FALSE(PackagedTerminalHeatPump::HeatingLoad);
     // Init PTAC zoneHVAC equipment
-    InitPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    InitPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     // init sets heating mode to true due to cold ventilation air
     ASSERT_TRUE(PackagedTerminalHeatPump::HeatingLoad);
     // simulate PTAC zoneHVAC equipment
-    SimPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     // no zone heating load
     ASSERT_DOUBLE_EQ(QZnReq, 0.0);
     // no net heating delivered to the zone
@@ -1146,16 +1147,16 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(outputFiles()); // read schedules
+    ProcessScheduleInput(state.outputFiles); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
-    GetPTUnit();
+    GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
     BeginEnvrnFlag = true;
@@ -1245,13 +1246,13 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     // initialized to false
     ASSERT_FALSE(PackagedTerminalHeatPump::HeatingLoad);
     // Init PTAC zoneHVAC equipment
-    InitPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    InitPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     BeginEnvrnFlag = false;
-    InitPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    InitPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     // init sets heating mode to true due to cold ventilation air
     ASSERT_TRUE(PackagedTerminalHeatPump::HeatingLoad);
     // simulate PTAC zoneHVAC equipment
-    SimPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     // no zone heating load
     ASSERT_DOUBLE_EQ(QZnReq, 0.0);
     // no net heating delivered to the zone
@@ -1269,20 +1270,20 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     // loads below the bounday load should operate at the minimum air flow rate
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0; // set heating load to non-zero value below lower boundary load
     QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
-    SimPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_NEAR(Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate, PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp);
 
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0; // set heating load to just below lower boundary load
     QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
-    SimPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_NEAR(Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate, PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp);
 
     // loads above the lower bounday load should operate above the minimum air flow rate
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2010.0; // set heating load to just above lower boundary load
     QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
-    SimPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_NEAR(PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp, 0.1);
     ASSERT_GT(Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate, PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow);
 
@@ -1290,7 +1291,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     // system should operate below the maximum air flow rate at loads less than 2995.2 W
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2990.0; // set heating load to just below upper boundary load
     QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
-    SimPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_NEAR(PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp, 0.1);
     ASSERT_GT(Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate, PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow);
     ASSERT_LT(Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate, PTUnit(PTUnitNum).MaxHeatAirMassFlow);
@@ -1300,7 +1301,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     // outlet air temperture is allowed to be above the design maximum supply air temperature in heating mode
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 3000.0; // set heating load to just above upper boundary load
     QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
-    SimPTUnit(PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_GT(HeatingCoils::HeatingCoil(1).OutletAirTemp, PTUnit(PTUnitNum).DesignMaxOutletTemp);
     ASSERT_NEAR(Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate, PTUnit(PTUnitNum).MaxHeatAirMassFlow, 0.0001);
 }

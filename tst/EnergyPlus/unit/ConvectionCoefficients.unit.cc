@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -434,11 +435,11 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(outputFiles(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(outputFiles(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -448,14 +449,14 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(outputFiles(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -902,7 +903,6 @@ TEST_F(ConvectionCoefficientsFixture, TestWindward)
 
 TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 {
-
     std::string const idf_objects = this->getIDFString();
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -910,11 +910,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -924,14 +924,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -967,11 +967,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -981,14 +981,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1024,11 +1024,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1038,14 +1038,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1081,11 +1081,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1095,14 +1095,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1138,11 +1138,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1152,14 +1152,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1195,11 +1195,11 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     DataEnvironment::OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1209,14 +1209,14 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput();
+    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1240,4 +1240,140 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     height = 0.0;
     convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
+}
+
+
+TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpleIntConvCoeff)
+{
+    // Unit test for the function CalcASHRAESimpleIntConvCoeff, used to determine the Convection Coefficient
+    // for the Ashrae Simple algorithm setting
+
+    Real64 Tsurf;
+    Real64 Tamb;
+    Real64 CosTilt;
+    Real64 ConvectionCoefficient;
+    Real64 ExpectedCoefficient;
+
+    // Scenario: Vertical Surface
+    // Hcov expected = 3.076
+    // Delta_T is not relevant for this calculation
+
+    Tsurf = 30.0;
+    Tamb = 20.0;
+    CosTilt = 0.0; // cos(90 degrees)
+    ExpectedCoefficient = 3.076;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: Vertical Surface, CosTilt not exactly zero
+    // Hcov expected = 3.076
+
+    Tsurf = 19.0;
+    Tamb = 20.0;
+    CosTilt = 0.0001; // cos(90 degrees)
+    ExpectedCoefficient = 3.076;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: Vertical Surface, Zero Delta T
+    // Hcov expected = 3.076
+
+    Tsurf = 23.0;
+    Tamb = 23.0;
+    CosTilt = 0; // cos(90 degrees)
+    ExpectedCoefficient = 3.076;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    // Scenario: Horizontal Surface with reduced convection
+    // Hcov expected = 0.948
+    // A negative Delta_T is required for reduced convection
+
+    Tsurf = 30.0;
+    Tamb = 20.0;
+    CosTilt = 0.9239; // cos(22.5 degrees)
+    ExpectedCoefficient = 0.948;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+
+    //Scenario: Horizontal surface with enhanced convection:
+    // Hcov expected = 4.040
+    // A positive Delta_T is required for enhanced convection
+
+    Tsurf = 20.0;
+    Tamb = 30.0;
+    CosTilt = 0.9239; // cos(22.5 degrees)
+    ExpectedCoefficient = 4.040;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: horizontal surface, enhanced convection
+    // 180 degree surface, negative Delta_T
+    // Hcov expected = 4.040
+
+    Tsurf = 30.0;
+    Tamb = 20.0;
+    CosTilt = -1; // cos(180 degrees)
+    ExpectedCoefficient = 4.040;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: horizontal surface, reduced convection
+    // 180 degree surface, positive Delta_T
+    // Hcov expected = 0.948
+
+    Tsurf = 20.0;
+    Tamb = 30.0;
+    CosTilt = -1; // cos(180 degrees)
+    ExpectedCoefficient = 0.948;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: tilted surface with reduced convection
+    // Hcov expected = 2.281
+    // A negative Delta_T is required for reduced convection
+
+    Tsurf = 30.0;
+    Tamb = 20.0;
+    CosTilt = 0.707; // cos(45 degrees)
+    ExpectedCoefficient = 2.281;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
+    //Scenario: tilted surface with enhanced convection
+    // Hcov expected = 3.870
+
+    Tsurf = 20.0;
+    Tamb = 30.0;
+    CosTilt = 0.707; // cos(45 degrees)
+    ExpectedCoefficient = 3.870;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+}
+
+TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependence)
+{
+    Real64 ConvectionCoefficient;
+    Real64 ExpectedCoefficient = 3.076;
+
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).CosTilt = 0;
+
+    DataHeatBalance::HConvIn.allocate(1);
+
+    CalcASHRAESimpleIntConvCoeff(1, 20.0, 30.0);
+
+    ConvectionCoefficient = DataHeatBalance::HConvIn(1);
+
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 }

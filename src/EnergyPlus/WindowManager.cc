@@ -55,7 +55,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -421,7 +420,7 @@ namespace WindowManager {
         CWindowConstructionsSimplified::clearState();
     }
 
-    void InitWindowOpticalCalculations()
+    void InitWindowOpticalCalculations(OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -440,13 +439,13 @@ namespace WindowManager {
         // check and read custom solar and/or visible spectrum data if any
         CheckAndReadCustomSprectrumData();
         if (inExtWindowModel->isExternalLibraryModel()) {
-            InitWCE_SimplifiedOpticalData();
+            InitWCE_SimplifiedOpticalData(outputFiles);
         } else {
-            InitGlassOpticalCalculations();
+            InitGlassOpticalCalculations(outputFiles);
         }
     }
 
-    void InitGlassOpticalCalculations()
+    void InitGlassOpticalCalculations(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -647,7 +646,7 @@ namespace WindowManager {
         if (TotBlinds > 0) CalcWindowBlindProperties();
 
         // Initialize SurfaceScreen structure
-        if (NumSurfaceScreens > 0) CalcWindowScreenProperties();
+        if (NumSurfaceScreens > 0) CalcWindowScreenProperties(outputFiles);
 
         // Get glazing system optical properties of constructions with glass or glass plus
         //   shade, screen or blind
@@ -1826,7 +1825,7 @@ namespace WindowManager {
             }
         } // End of surface loop
 
-        ReportGlass(OutputFiles::getSingleton());
+        ReportGlass(outputFiles);
     }
 
     //*****************************************************************************************
@@ -2944,6 +2943,7 @@ namespace WindowManager {
                 if (AnyLocalEnvironmentsInModel) {
                     if (Surface(SurfNum).HasSurroundingSurfProperties) {
                         SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+
                         if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                             surface.ViewFactorSkyIR = SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                         }
@@ -2954,7 +2954,7 @@ namespace WindowManager {
                             SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs =
                                 GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
-                            OutSrdIR += sigma * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
+                            OutSrdIR += sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
                         }
                     }
                 }
@@ -7613,7 +7613,6 @@ namespace WindowManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const Roughness(6, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
         static Array1D_string const GasTypeName({0, 4}, {"Custom", "Air", "Argon", "Krypton", "Xenon"});
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -8273,7 +8272,7 @@ namespace WindowManager {
 
     //*************************************************************************************
 
-    void CalcWindowScreenProperties()
+    void CalcWindowScreenProperties(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8298,7 +8297,6 @@ namespace WindowManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const M(18);
         int const N(18);
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -8318,7 +8316,6 @@ namespace WindowManager {
         Real64 SumReflectVis;  // Integration variable for visible reflectance
         Real64 SumArea;        // Integration variable for area of quarter hemisphere
         int ShadingType;       // Type of shading device
-        int ScreenTransUnitNo; // Unit number of screen transmittance data file
         bool FoundMaterial;    // Flag to avoid printing screen transmittance data multiple times when Material:WindowScreen
         // is used on multiple surfaces
         bool PrintTransMap; // Flag used to print transmittance map
@@ -8449,14 +8446,10 @@ namespace WindowManager {
         // Write transmittance versus direct normal angle to csv file
 
         if (PrintTransMap) {
-            ScreenTransUnitNo = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("write");
-                flags.STATUS("unknown");
-                ObjexxFCL::gio::open(ScreenTransUnitNo, DataStringGlobals::outputScreenCsvFileName, flags);
-                if (flags.err()) goto Label99999;
-            }
+            // Fortran version did not have error handling in case of file open failure. This one does.
+            // Which is correct?
+            auto screenCsvFile = outputFiles.screenCsv.open("CalcWindowScreenComponents");
+
             //  WRITE(ScreenTransUnitNo,*)' '
             for (ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum) {
                 MatNum = SurfaceScreens(ScreenNum).MaterialNumber;
@@ -8486,81 +8479,43 @@ namespace WindowManager {
                         }
                     }
 
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA)
-                        << "MATERIAL:WINDOWSCREEN:" + Material(SurfaceScreens(ScreenNum).MaterialNumber).Name;
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA)
-                        << "Tabular data for beam solar transmittance at varying \"relative\" azimuth (row) and "
-                           "altitude (column) angles (deg) [relative to surface normal].";
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << ",90";
-                    }
+                    print(screenCsvFile, "MATERIAL:WINDOWSCREEN:{}\n", Material(SurfaceScreens(ScreenNum).MaterialNumber).Name);
+                    print(screenCsvFile, "Tabular data for beam solar transmittance at varying \"relative\" azimuth (row) and "
+                           "altitude (column) angles (deg) [relative to surface normal].\n");
+                    print(screenCsvFile, ",90");
                     for (i = 90 / Material(MatNum).ScreenMapResolution; i >= 2; --i) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags)
-                                << "," + RoundSigDigits(((i - 1) * Material(MatNum).ScreenMapResolution));
-                        }
+                        print(screenCsvFile, ",{}", (i - 1) * Material(MatNum).ScreenMapResolution);
                     }
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << ",0";
+                    print(screenCsvFile, ",0\n");
 
                     for (j = 1; j <= 90 / Material(MatNum).ScreenMapResolution + 1; ++j) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << RoundSigDigits(((j - 1) * Material(MatNum).ScreenMapResolution));
-                        }
+                        print(screenCsvFile, "{}",  (j - 1) * Material(MatNum).ScreenMapResolution);
                         for (i = 90 / Material(MatNum).ScreenMapResolution + 1; i >= 2; --i) {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << "," + RoundSigDigits(ScreenTrans(ScreenNum).Trans(i, j), 6);
-                            }
+                            print(screenCsvFile, ",{:.6R}", ScreenTrans(ScreenNum).Trans(i, j));
                         }
-                        ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "," + RoundSigDigits(ScreenTrans(ScreenNum).Trans(i, j), 6);
+                        print(screenCsvFile, ",{:.6R}\n", ScreenTrans(ScreenNum).Trans(i, j));
                     }
-                    ObjexxFCL::gio::write(ScreenTransUnitNo);
-                    ObjexxFCL::gio::write(ScreenTransUnitNo);
+                    print(screenCsvFile, "\n\n");
 
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA)
-                        << "MATERIAL:WINDOWSCREEN:" + Material(SurfaceScreens(ScreenNum).MaterialNumber).Name;
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA)
-                        << "Tabular data for scattered solar transmittance at varying \"relative\" azimuth (row) and "
-                           "altitude (column) angles (deg) [relative to surface normal].";
+                    print(screenCsvFile, "MATERIAL:WINDOWSCREEN:{}\n", Material(SurfaceScreens(ScreenNum).MaterialNumber).Name);
+                    print(screenCsvFile, "Tabular data for scattered solar transmittance at varying \"relative\" azimuth (row) and "
+                           "altitude (column) angles (deg) [relative to surface normal].\n");
+
                     for (i = 1; i <= 90 / Material(MatNum).ScreenMapResolution; ++i) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags)
-                                << "," + RoundSigDigits(((i - 1) * Material(MatNum).ScreenMapResolution));
-                        }
+                        print(screenCsvFile, ",{}", (i - 1) * Material(MatNum).ScreenMapResolution);
                     }
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "," + RoundSigDigits(((i - 1) * Material(MatNum).ScreenMapResolution));
+                    print(screenCsvFile, ",{}\n", (i - 1) * Material(MatNum).ScreenMapResolution);
 
                     for (j = 1; j <= 90 / Material(MatNum).ScreenMapResolution + 1; ++j) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << RoundSigDigits(((j - 1) * Material(MatNum).ScreenMapResolution));
-                        }
+                        print(screenCsvFile, "{}", (j - 1) * Material(MatNum).ScreenMapResolution);
                         for (i = 1; i <= 90 / Material(MatNum).ScreenMapResolution; ++i) {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << "," + RoundSigDigits(ScreenTrans(ScreenNum).Scatt(i, j), 6);
-                            }
+                            print(screenCsvFile, ",{:.6R}", ScreenTrans(ScreenNum).Scatt(i, j));
                         }
-                        ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA)
-                            << "," + RoundSigDigits(ScreenTrans(ScreenNum).Scatt(90 / Material(MatNum).ScreenMapResolution + 1, j), 6);
+                        print(screenCsvFile, ",{:.6R}\n", ScreenTrans(ScreenNum).Scatt(i, j));
                     }
-                    ObjexxFCL::gio::write(ScreenTransUnitNo);
-                    ObjexxFCL::gio::write(ScreenTransUnitNo);
+                    print(screenCsvFile, "\n\n");
                 }
             }
-        Label99999:;
-            ObjexxFCL::gio::close(ScreenTransUnitNo);
         }
         ScreenTrans.deallocate();
     }

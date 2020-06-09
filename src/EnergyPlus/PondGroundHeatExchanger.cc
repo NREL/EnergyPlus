@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -75,6 +76,8 @@
 namespace EnergyPlus {
 
 namespace PondGroundHeatExchanger {
+
+    std::ofstream file("pond.csv", std::ofstream::out);
 
     // Module containing the routines dealing with pond ground heat exchangers
 
@@ -114,18 +117,14 @@ namespace PondGroundHeatExchanger {
     //   With Closed-Loop Ground-Source Heat Pump Systems.
     //   ASHRAE Transactions.  106(2):107-121.
 
-    static std::string const BlankString;
-    static std::string const fluidNameWater("WATER");
-    Real64 const SmallNum(1.0e-30);         // Very small number to avoid div0 errors
-    Real64 const StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
+    Real64 constexpr StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
+    auto constexpr fluidNameWater("WATER");
 
     int NumOfPondGHEs(0); // Number of pond ground heat exchangers
-
     bool GetInputFlag(true);
-
     Array1D<PondGroundHeatExchangerData> PondGHE;
 
-    void PondGroundHeatExchangerData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PondGroundHeatExchangerData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                                bool const FirstHVACIteration,
                                                Real64 &EP_UNUSED(CurLoad),
                                                bool const EP_UNUSED(RunFlag))
@@ -133,7 +132,6 @@ namespace PondGroundHeatExchanger {
         this->InitPondGroundHeatExchanger(FirstHVACIteration);
         this->CalcPondGroundHeatExchanger();
         this->UpdatePondGroundHeatExchanger();
-        this->ReportPondGroundHeatExchanger();
     }
 
     PlantComponent *PondGroundHeatExchangerData::factory(std::string const &objectName)
@@ -388,9 +386,9 @@ namespace PondGroundHeatExchanger {
         // repeated warm up days tend to drive the initial pond temperature toward the drybulb temperature
         // For each environment start the pond midway between drybulb and ground temp.
 
-        if (setupOutputVarsFlag) {
+        if (this->setupOutputVarsFlag) {
             this->setupOutputVars();
-            setupOutputVarsFlag = false;
+            this->setupOutputVarsFlag = false;
         }
 
         if (this->OneTimeFlag || DataGlobals::WarmupFlag) {
@@ -442,16 +440,16 @@ namespace PondGroundHeatExchanger {
             this->MyFlag = false;
         }
 
-        // check if we are in very first call for this zone time step
-        if (DataGlobals::BeginTimeStepFlag && FirstHVACIteration &&
-            DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 1) { // DSU
+        if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && this->firstTimeThrough) {
             // update past temperature
             this->PastBulkTemperature = this->BulkTemperature;
+            this->firstTimeThrough = false;
+        } else if (!FirstHVACIteration){
+            this->firstTimeThrough = true;
         }
 
         this->InletTemp = DataLoopNode::Node(InletNodeNum).Temp;
-        OutletTemp = DataLoopNode::Node(OutletNodeNum).Temp;
-        PondTemp = this->BulkTemperature;
+        this->PondTemp = this->BulkTemperature;
 
         // Hypothetical design flow rate
         Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(
@@ -502,7 +500,7 @@ namespace PondGroundHeatExchanger {
         Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater,
                                                                      max(this->PondTemp, DataPrecisionGlobals::constant_zero),
                                                                      this->WaterIndex,
-                                                                     RoutineName); // DSU bug fix here, was using working fluid index
+                                                                     RoutineName);
 
         Real64 Flux = this->CalcTotalFLux(this->PondTemp);
         Real64 PondTempStar =
@@ -524,7 +522,6 @@ namespace PondGroundHeatExchanger {
     Real64 PondGroundHeatExchangerData::CalcTotalFLux(Real64 const PondBulkTemp // pond temp for this flux calculation
     )
     {
-
         //       AUTHOR         Simon Rees
         //       DATE WRITTEN   August 2002
         //       MODIFIED       na
@@ -605,10 +602,9 @@ namespace PondGroundHeatExchanger {
         // heat transfer with fluid - heat exchanger analogy.
 
         // convective flux
-        Real64 Qfluid = this->MassFlowRate * SpecHeat * this->CalcEffectiveness(this->InletTemp, PondBulkTemp, this->MassFlowRate) *
+        Real64 effectiveness = this->CalcEffectiveness(this->InletTemp, PondBulkTemp, this->MassFlowRate);
+        Real64 Qfluid = this->MassFlowRate * SpecHeat * effectiveness *
                         (this->InletTemp - PondBulkTemp);
-
-        this->HeatTransferRate = Qfluid;
 
         // evaporation flux
         // get air properties
@@ -626,7 +622,7 @@ namespace PondGroundHeatExchanger {
         Real64 Perimeter = 4.0 * std::sqrt(this->Area); // pond perimeter -- square assumption
 
         // ground heat transfer coefficient
-        Real64 UvalueGround = 0.999 * (GrndConductivity / this->Depth) + 1.37 * (GrndConductivity * Perimeter / this->Area);
+        Real64 UvalueGround = 0.999 * (this->GrndConductivity / this->Depth) + 1.37 * (this->GrndConductivity * Perimeter / this->Area);
 
         // ground heat transfer flux
         Real64 FluxGround = UvalueGround * (PondBulkTemp - DataEnvironment::GroundTemp_Deep);
@@ -636,7 +632,7 @@ namespace PondGroundHeatExchanger {
         return CalcTotalFLux;
     }
 
-    Real64 PondGroundHeatExchangerData::CalcSolarFlux()
+    Real64 PondGroundHeatExchangerData::CalcSolarFlux() const
     {
 
         // FUNCTION INFORMATION:
@@ -748,7 +744,7 @@ namespace PondGroundHeatExchanger {
             DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobals::Pi * Viscosity * TubeInDiameter * NumCircuits);
+        Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobals::Pi * Viscosity * this->TubeInDiameter * this->NumCircuits);
 
         Real64 PrantlNum = Viscosity * SpecificHeat / Conductivity;
 
@@ -762,7 +758,7 @@ namespace PondGroundHeatExchanger {
         }
 
         // inside convection resistance, from Nu
-        Real64 ConvCoefIn = Conductivity * NusseltNum / TubeInDiameter;
+        Real64 ConvCoefIn = Conductivity * NusseltNum / this->TubeInDiameter;
 
         // now find properties of pond water - always assume pond fluid is water
         Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
@@ -775,7 +771,7 @@ namespace PondGroundHeatExchanger {
         // The following code includes some slight modifications from Simon's original code.
         // It guarantees that the delta T is 10C and also avoids the problems associated with
         // water hitting a maximum density at around 4C. (RKS)
-        Real64 ExpansionCoef = -(FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) + 5.0, WaterIndex, CalledFrom) -
+        Real64 ExpansionCoef = -(FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) + 5.0, this->WaterIndex, CalledFrom) -
                                  FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) - 5.0, this->WaterIndex, CalledFrom)) /
                                (10.0 * WaterDensity);
 
@@ -789,13 +785,13 @@ namespace PondGroundHeatExchanger {
         NusseltNum = pow_2(0.6 + (0.387 * std::pow(RayleighNum, 1.0 / 6.0) / (std::pow(1.0 + 0.559 / std::pow(PrantlNum, 9.0 / 16.0), 8.0 / 27.0))));
 
         // outside convection resistance, from Nu
-        Real64 ConvCoefOut = WaterConductivity * NusseltNum / TubeOutDiameter;
+        Real64 ConvCoefOut = WaterConductivity * NusseltNum / this->TubeOutDiameter;
 
         // conduction resistance of pipe
-        Real64 PipeResistance = TubeInDiameter / TubeConductivity * std::log(TubeOutDiameter / TubeInDiameter);
+        Real64 PipeResistance = this->TubeInDiameter / this->TubeConductivity * std::log(this->TubeOutDiameter / this->TubeInDiameter);
 
         // total pipe thermal resistance - conduction and convection
-        Real64 TotalResistance = PipeResistance + 1.0 / ConvCoefIn + TubeInDiameter / (TubeOutDiameter * ConvCoefOut);
+        Real64 TotalResistance = PipeResistance + 1.0 / ConvCoefIn + this->TubeInDiameter / (this->TubeOutDiameter * ConvCoefOut);
 
         // Calculate the NTU parameter
         // NTU = UA/[(Mdot*Cp)min] = A/[Rtot*(Mdot*Cp)min]
@@ -807,7 +803,7 @@ namespace PondGroundHeatExchanger {
         if (massFlowRate == 0.0) {
             CalcEffectiveness = 1.0;
         } else {
-            NTU = DataGlobals::Pi * TubeInDiameter * this->CircuitLength * NumCircuits / (TotalResistance * massFlowRate * SpecificHeat);
+            NTU = DataGlobals::Pi * TubeInDiameter * this->CircuitLength * this->NumCircuits / (TotalResistance * massFlowRate * SpecificHeat);
             // Calculate effectiveness - formula for static fluid
             CalcEffectiveness = (1.0 - std::exp(-NTU));
         }
@@ -855,43 +851,31 @@ namespace PondGroundHeatExchanger {
 
         // Calculate the water side outlet conditions and set the
         // appropriate conditions on the correct HVAC node.
-        Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->LoopNum).FluidName, this->InletTemp, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
-        // check for flow
+        Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                                this->InletTemp,
+                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
         PlantUtilities::SafeCopyPlantNode(InletNodeNum, OutletNodeNum);
 
+        // update outlet temp
         if ((CpFluid > 0.0) && (this->MassFlowRate > 0.0)) {
-
-            DataLoopNode::Node(OutletNodeNum).Temp = this->InletTemp - this->HeatTransferRate / (this->MassFlowRate * CpFluid);
-            DataLoopNode::Node(OutletNodeNum).Enthalpy = DataLoopNode::Node(OutletNodeNum).Temp * CpFluid;
+            this->OutletTemp = this->InletTemp - this->HeatTransferRate / (this->MassFlowRate * CpFluid);
+        } else {
+            this->OutletTemp = this->InletTemp;
         }
 
-        // keep track of the bulk temperature
-        this->BulkTemperature = PondTemp;
-    }
+        // update node
+        DataLoopNode::Node(this->OutletNodeNum).Temp = this->OutletTemp;
+        DataLoopNode::Node(this->OutletNodeNum).MassFlowRate = this->MassFlowRate;
 
-    //==============================================================================
-
-    void PondGroundHeatExchangerData::ReportPondGroundHeatExchanger() // Index for the pond under consideration
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Simon Rees
-        //       DATE WRITTEN   August 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine simply produces output for Pond ground heat exchangers
-
-        // update flows and temps from node data
-        this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
-        this->OutletTemp = DataLoopNode::Node(this->OutletNodeNum).Temp;
-        this->MassFlowRate = DataLoopNode::Node(this->InletNodeNum).MassFlowRate;
-
-        // update other variables from module variables
+        // update heat transfer rate
+        // compute pond heat transfer
+        Real64 effectiveness = this->CalcEffectiveness(this->InletTemp, this->PondTemp, this->MassFlowRate);
+        this->HeatTransferRate = this->MassFlowRate * CpFluid * effectiveness * (this->InletTemp - this->PondTemp);
         this->Energy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+
+        // keep track of the bulk temperature
+        this->BulkTemperature = this->PondTemp;
     }
 
 } // namespace PondGroundHeatExchanger

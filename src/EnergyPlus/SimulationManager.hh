@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -75,7 +76,7 @@ namespace SimulationManager {
     // Functions
     void clear_state();
 
-    void ManageSimulation(OutputFiles &outputFiles);
+    void ManageSimulation(EnergyPlusData &state);
 
     void GetProjectData(OutputFiles &outputFiles);
 
@@ -89,21 +90,21 @@ namespace SimulationManager {
 
     void OpenStreamFile(const std::string &fileName, int &unitNumber, std::ostream *&out_stream);
 
-    void OpenOutputFiles();
+    void OpenOutputFiles(OutputFiles &outputFiles);
 
     void OpenOutputJsonFiles();
 
     void CloseOutputFiles(OutputFiles &outputFiles);
 
-    void SetupSimulation(OutputFiles &outputFiles, bool &ErrorsFound);
+    void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
     void ReportNodeConnections(OutputFiles &outputFiles);
 
     void ReportLoopConnections(OutputFiles &outputFiles);
 
-    void ReportParentChildren();
+    void ReportParentChildren(OutputFiles &outputFiles);
 
-    void ReportCompSetMeterVariables();
+    void ReportCompSetMeterVariables(OutputFiles &outputFiles);
 
     void PostIPProcessing();
 
@@ -114,7 +115,7 @@ namespace SimulationManager {
 
 // EXTERNAL SUBROUTINES:
 
-void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use simulation
+void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                 bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                 bool &ResimHVAC // Flag to resimulate the HVAC simulation
 );

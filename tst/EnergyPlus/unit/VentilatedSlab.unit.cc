@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -2295,10 +2296,10 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());  // read schedule data
+    ProcessScheduleInput(state.outputFiles);  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -2306,7 +2307,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetMaterialData(outputFiles(), ErrorsFound); // read construction material data
+    GetMaterialData(state.outputFiles, ErrorsFound); // read construction material data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -2314,19 +2315,19 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SetupZoneGeometry(outputFiles(), ErrorsFound); // read zone geometry data
+    SetupZoneGeometry(state, ErrorsFound); // read zone geometry data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
     GetSurfaceListsInputs(); // read surface data
     EXPECT_FALSE(ErrorsFound);
 
-    GetVentilatedSlabInput(); // read ventilated slab data
+    GetVentilatedSlabInput(state); // read ventilated slab data
     EXPECT_EQ(2, NumOfVentSlabs);
     EXPECT_EQ("ZONE1VENTSLAB", VentSlab(1).Name);
     EXPECT_EQ("ZONE4VENTSLAB", VentSlab(2).Name);
 
-    InitVentilatedSlab(Item, VentSlabZoneNum, FirstHVACIteration);
+    InitVentilatedSlab(state, Item, VentSlabZoneNum, FirstHVACIteration);
     EXPECT_EQ(324.38499999999999, VentSlab(1).TotalSurfaceArea);
     EXPECT_EQ(139.21499999999997, VentSlab(2).TotalSurfaceArea);
 }

@@ -59,6 +59,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct ChillerGasAbsorptionData;
+
 namespace ChillerGasAbsorption {
 
     struct GasAbsorberSpecs : PlantComponent
@@ -200,15 +204,15 @@ namespace ChillerGasAbsorption {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(ChillerGasAbsorptionData &chillers, std::string const &objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
@@ -231,12 +235,7 @@ namespace ChillerGasAbsorption {
         );
     };
 
-    // Object Data
-    extern Array1D<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
-
-    void GetGasAbsorberInput();
-
-    void clear_state();
+    void GetGasAbsorberInput(ChillerGasAbsorptionData &chillers);
 
 } // namespace ChillerGasAbsorption
 

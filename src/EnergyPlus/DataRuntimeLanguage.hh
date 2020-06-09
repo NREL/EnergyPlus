@@ -106,7 +106,7 @@ namespace DataRuntimeLanguage {
     extern int const OperatorGreaterThan;    // >
     extern int const OperatorRaiseToPower;   // ^
     extern int const OperatorLogicalAND;     // &&
-    extern int const OperatiorLogicalOR;     // ||
+    extern int const OperatorLogicalOR;     // ||
     // note there is an important check "> 15" to distinguish operators from functions
     //  so becareful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
 
@@ -221,7 +221,6 @@ namespace DataRuntimeLanguage {
 
     //######################################################################################################################################
 
-    extern int OutputEMSFileUnitNum;         // file lun handle for open EMS output file
     extern bool OutputEDDFile;               // set to true if user requests EDD output file be written
     extern bool OutputFullEMSTrace;          // how much to write out to trace, if true do verbose for each line
     extern bool OutputEMSErrors;             // how much to write out to trace, if true include Erl error messages
