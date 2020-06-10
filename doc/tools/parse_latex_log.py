@@ -11,8 +11,7 @@ import sys
 
 DEBUG = False
 VERBOSE = False
-EXIT_CODE_ISSUES_FOUND = 2
-EXIT_CODE_ERROR = 1
+EXIT_CODE_ISSUES_FOUND = 0 # set up to not return a non-zero exit code
 EXIT_CODE_GOOD = 0
 
 
@@ -67,7 +66,6 @@ def parse_current_tex_file(line, root_dir):
         try:
             return os.path.relpath(pp_file, start=pp_dir)
         except Exception:
-            print("Exception...")
             # not a file under root_dir -- ignore
             return None
     return None
@@ -147,7 +145,7 @@ def find_locations(root_dir, target, target_ext='.tex', verbose=False):
                 import traceback
                 print("issue encountered in finding locations: {}".format(e))
                 traceback.print_tb(sys.last_traceback)
-                sys.exit(EXIT_CODE_ERROR)
+                sys.exit(EXIT_CODE_ISSUES_FOUND)
     return locations
 
 
@@ -362,7 +360,7 @@ class LogParser:
                                 self._current_issue))
                     self._previous_line = line
         except Exception:
-            return sys.exit(EXIT_CODE_ERROR)
+            sys.exit(EXIT_CODE_ISSUES_FOUND)
         return self._issues
 
 
@@ -426,7 +424,7 @@ def find_issues(log_path, json_error_path, src_dir):
         import traceback
         print("issue encountered in parsing log: {}".format(e))
         traceback.print_tb(sys.last_traceback)
-        sys.exit(EXIT_CODE_ERROR)
+        sys.exit(EXIT_CODE_ISSUES_FOUND)
     num_issues = len(errs['issues'])
     if (num_issues > 0):
         if VERBOSE:
@@ -541,7 +539,7 @@ if __name__ == "__main__":
         print("NOTE: no error file is written if no significant " +
               "errors/warnings found")
         print("To run tests, call `python {} test'".format(sys.argv[0]))
-        sys.exit(EXIT_CODE_ERROR)
+        sys.exit(EXIT_CODE_ISSUES_FOUND)
     log_path = sys.argv[1]
     src_dir = sys.argv[2]
     json_err = sys.argv[3]
