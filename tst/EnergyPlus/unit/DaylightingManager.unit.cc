@@ -2305,3 +2305,357 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_TRUE(compare_dfs_stream(dfsoutput, true));
 }
 
+TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
+{
+    std::string const idf_objects = delimited_string({
+        "  Zone,                                                                                                           ",
+        "    East Zone,               !- Name                                                                              ",
+        "    0.0000000E+00,           !- Direction of Relative North {deg}                                                 ",
+        "    0.0000000E+00,           !- X Origin {m}                                                                      ",
+        "    0.0000000E+00,           !- Y Origin {m}                                                                      ",
+        "    0.0000000E+00,           !- Z Origin {m}                                                                      ",
+        "    1,                       !- Type                                                                              ",
+        "    1,                       !- Multiplier                                                                        ",
+        "    autocalculate,           !- Ceiling Height {m}                                                                ",
+        "    autocalculate;           !- Volume {m3}                                                                       ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Wall001,           !- Name                                                                              ",
+        "    Wall,                    !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    SunExposed,              !- Sun Exposure                                                                      ",
+        "    WindExposed,             !- Wind Exposure                                                                     ",
+        "    0.5000000,               !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    0.0000000E+00,0.0000000E+00,3.048000,  !- X,Y,Z ==> Vertex 1 {m}                                              ",
+        "    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}                                         ",
+        "    6.096000,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}                                              ",
+        "    6.096000,0.0000000E+00,3.048000;  !- X,Y,Z ==> Vertex 4 {m}                                                   ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Wall002,           !- Name                                                                              ",
+        "    Wall,                    !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    SunExposed,              !- Sun Exposure                                                                      ",
+        "    WindExposed,             !- Wind Exposure                                                                     ",
+        "    0.5000000,               !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    0.0000000E+00,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}                                                   ",
+        "    0.0000000E+00,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}                                              ",
+        "    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}                                         ",
+        "    0.0000000E+00,0.0000000E+00,3.048000;  !- X,Y,Z ==> Vertex 4 {m}                                              ",
+        "                                                                                                                  ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Wall003,           !- Name                                                                              ",
+        "    Wall,                    !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    SunExposed,              !- Sun Exposure                                                                      ",
+        "    WindExposed,             !- Wind Exposure                                                                     ",
+        "    0.5000000,               !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}                                                        ",
+        "    6.096000,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}                                                   ",
+        "    0.0000000E+00,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}                                              ",
+        "    0.0000000E+00,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}                                                   ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Wall004,           !- Name                                                                              ",
+        "    Wall,                    !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    SunExposed,              !- Sun Exposure                                                                      ",
+        "    WindExposed,             !- Wind Exposure                                                                     ",
+        "    0.5000000,               !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    6.096000,0.0000000E+00,3.048000,  !- X,Y,Z ==> Vertex 1 {m}                                                   ",
+        "    6.096000,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}                                              ",
+        "    6.096000,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}                                                   ",
+        "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}                                                        ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Flr001,            !- Name                                                                              ",
+        "    Floor,                   !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    NoSun,                   !- Sun Exposure                                                                      ",
+        "    NoWind,                  !- Wind Exposure                                                                     ",
+        "    1.000000,                !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}                                         ",
+        "    0.0000000E+00,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}                                              ",
+        "    6.096000,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}                                                   ",
+        "    6.096000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}                                              ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Roof001,           !- Name                                                                              ",
+        "    Roof,                    !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    SunExposed,              !- Sun Exposure                                                                      ",
+        "    WindExposed,             !- Wind Exposure                                                                     ",
+        "    0.0000000E+00,           !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    0.0000000E+00,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}                                                   ",
+        "    0.0000000E+00,0.0000000E+00,3.048000,  !- X,Y,Z ==> Vertex 2 {m}                                              ",
+        "    6.096000,0.0000000E+00,3.048000,  !- X,Y,Z ==> Vertex 3 {m}                                                   ",
+        "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}                                                        ",
+        "                                                                                                                  ",
+        "  DaylightingDevice:Tubular,                                                                                      ",
+        "    Pipe1,                   !- Name                                                                              ",
+        "    Dome1,                   !- Dome Name                                                                         ",
+        "    Diffuser1,               !- Diffuser Name                                                                     ",
+        "    TDD Pipe,                !- Construction Name                                                                 ",
+        "    0.3556,                  !- Diameter {m}                                                                      ",
+        "    1.4,                     !- Total Length {m}                                                                  ",
+        "    0.28,                    !- Effective Thermal Resistance {m2-K/W}                                             ",
+        "    East Zone,               !- Transition Zone 1 Name                                                            ",
+        "    1.1;                     !- Transition Zone 1 Length {m}                                                      ",
+        "                                                                                                                  ",
+        "  FenestrationSurface:Detailed,                                                                                   ",
+        "    Dome1,                   !- Name                                                                              ",
+        "    TubularDaylightDome,     !- Surface Type                                                                      ",
+        "    TDD Dome,                !- Construction Name                                                                 ",
+        "    East Zone,               !- Building Surface Name                                                             ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    0.0,                     !- View Factor to Ground                                                             ",
+        "    ,                        !- Frame and Divider Name                                                            ",
+        "    1.0,                     !- Multiplier                                                                        ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    2.3425,3.209,3.64,  !- X,Y,Z ==> Vertex 1 {m}                                                                 ",
+        "    2.3425,2.906,3.58,  !- X,Y,Z ==> Vertex 2 {m}                                                                 ",
+        "    2.6575,2.906,3.58,  !- X,Y,Z ==> Vertex 3 {m}                                                                 ",
+        "    2.6575,3.209,3.64;  !- X,Y,Z ==> Vertex 4 {m}                                                                 ",
+        "                                                                                                                  ",
+        "  FenestrationSurface:Detailed,                                                                                   ",
+        "    Diffuser1,               !- Name                                                                              ",
+        "    TubularDaylightDiffuser, !- Surface Type                                                                      ",
+        "    TDD Diffuser,            !- Construction Name                                                                 ",
+        "    Zn001:Roof001,           !- Building Surface Name                                                             ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    0.0,                     !- View Factor to Ground                                                             ",
+        "    ,                        !- Frame and Divider Name                                                            ",
+        "    1.0,                     !- Multiplier                                                                        ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    2.3425,3.1575,2.5,  !- X,Y,Z ==> Vertex 1 {m}                                                                 ",
+        "    2.3425,2.8425,2.5,  !- X,Y,Z ==> Vertex 2 {m}                                                                 ",
+        "    2.6575,2.8425,2.5,  !- X,Y,Z ==> Vertex 3 {m}                                                                 ",
+        "    2.6575,3.1575,2.5;  !- X,Y,Z ==> Vertex 4 {m}                                                                 ",
+        "                                                                                                                  ",
+        "  FenestrationSurface:Detailed,                                                                                   ",
+        "    Zn001:Wall001:Win001,    !- Name                                                                              ",
+        "    Window,                  !- Surface Type                                                                      ",
+        "    WIN-CON-SINGLEPANE,      !- Construction Name                                                                 ",
+        "    Zn001:Wall001,           !- Building Surface Name                                                             ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    0.5000000,               !- View Factor to Ground                                                             ",
+        "    ,                        !- Frame and Divider Name                                                            ",
+        "    1.0,                     !- Multiplier                                                                        ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    0.548000,0.0000000E+00,2.5000,  !- X,Y,Z ==> Vertex 1 {m}                                                     ",
+        "    0.548000,0.0000000E+00,0.5000,  !- X,Y,Z ==> Vertex 2 {m}                                                     ",
+        "    5.548000,0.0000000E+00,0.5000,  !- X,Y,Z ==> Vertex 3 {m}                                                     ",
+        "    5.548000,0.0000000E+00,2.5000;  !- X,Y,Z ==> Vertex 4 {m}                                                     ",
+        "                                                                                                                  ",
+        "  Construction,                                                                                                   ",
+        "    WALL80,               !- Name                                                                                 ",
+        "    C4 - 4 IN COMMON BRICK;  !- Layer 1                                                                           ",
+        "                                                                                                                  ",
+        "  Material,                                                                                                       ",
+        "    C4 - 4 IN COMMON BRICK,  !- Name                                                                              ",
+        "    Rough,                   !- Roughness                                                                         ",
+        "    0.1014984,               !- Thickness {m}                                                                     ",
+        "    0.7264224,               !- Conductivity {W/m-K}                                                              ",
+        "    1922.216,                !- Density {kg/m3}                                                                   ",
+        "    836.8000,                !- Specific Heat {J/kg-K}                                                            ",
+        "    0.9000000,               !- Thermal Absorptance                                                               ",
+        "    0.7600000,               !- Solar Absorptance                                                                 ",
+        "    0.7600000;               !- Visible Absorptance                                                               ",
+        "                                                                                                                  ",
+        "  Construction,                                                                                                   ",
+        "    TDD Pipe,                !- Name                                                                              ",
+        "    Very High Reflectivity Surface;  !- Outside Layer                                                             ",
+        "                                                                                                                  ",
+        "  Construction,                                                                                                   ",
+        "    TDD Dome,                !- Name                                                                              ",
+        "    Clear Acrylic Plastic;   !- Outside Layer                                                                     ",
+        "                                                                                                                  ",
+        "  Construction,                                                                                                   ",
+        "    TDD Diffuser,            !- Name                                                                              ",
+        "    Diffusing Acrylic Plastic;  !- Outside Layer                                                                  ",
+        "                                                                                                                  ",
+        "  WindowMaterial:Glazing,                                                                                         ",
+        "    Clear Acrylic Plastic,   !- Name                                                                              ",
+        "    SpectralAverage,         !- Optical Data Type                                                                 ",
+        "    ,                        !- Window Glass Spectral Data Set Name                                               ",
+        "    0.003,                   !- Thickness {m}                                                                     ",
+        "    0.92,                    !- Solar Transmittance at Normal Incidence                                           ",
+        "    0.05,                    !- Front Side Solar Reflectance at Normal Incidence                                  ",
+        "    0.05,                    !- Back Side Solar Reflectance at Normal Incidence                                   ",
+        "    0.92,                    !- Visible Transmittance at Normal Incidence                                         ",
+        "    0.05,                    !- Front Side Visible Reflectance at Normal Incidence                                ",
+        "    0.05,                    !- Back Side Visible Reflectance at Normal Incidence                                 ",
+        "    0.00,                    !- Infrared Transmittance at Normal Incidence                                        ",
+        "    0.90,                    !- Front Side Infrared Hemispherical Emissivity                                      ",
+        "    0.90,                    !- Back Side Infrared Hemispherical Emissivity                                       ",
+        "    0.90;                    !- Conductivity {W/m-K}                                                              ",
+        "                                                                                                                  ",
+        "  WindowMaterial:Glazing,                                                                                         ",
+        "    Diffusing Acrylic Plastic,  !- Name                                                                           ",
+        "    SpectralAverage,         !- Optical Data Type                                                                 ",
+        "    ,                        !- Window Glass Spectral Data Set Name                                               ",
+        "    0.0022,                  !- Thickness {m}                                                                     ",
+        "    0.90,                    !- Solar Transmittance at Normal Incidence                                           ",
+        "    0.08,                    !- Front Side Solar Reflectance at Normal Incidence                                  ",
+        "    0.08,                    !- Back Side Solar Reflectance at Normal Incidence                                   ",
+        "    0.90,                    !- Visible Transmittance at Normal Incidence                                         ",
+        "    0.08,                    !- Front Side Visible Reflectance at Normal Incidence                                ",
+        "    0.08,                    !- Back Side Visible Reflectance at Normal Incidence                                 ",
+        "    0.00,                    !- Infrared Transmittance at Normal Incidence                                        ",
+        "    0.90,                    !- Front Side Infrared Hemispherical Emissivity                                      ",
+        "    0.90,                    !- Back Side Infrared Hemispherical Emissivity                                       ",
+        "    0.90;                    !- Conductivity {W/m-K}                                                              ",
+        "                                                                                                                  ",
+        "  Material,                                                                                                       ",
+        "    Very High Reflectivity Surface,  !- Name                                                                      ",
+        "    Smooth,                  !- Roughness                                                                         ",
+        "    0.0005,                  !- Thickness {m}                                                                     ",
+        "    237,                     !- Conductivity {W/m-K}                                                              ",
+        "    2702,                    !- Density {kg/m3}                                                                   ",
+        "    903,                     !- Specific Heat {J/kg-K}                                                            ",
+        "    0.90,                    !- Thermal Absorptance                                                               ",
+        "    0.05,                    !- Solar Absorptance                                                                 ",
+        "    0.05;                    !- Visible Absorptance                                                               ",
+        "                                                                                                                  ",
+        "  Construction,                                                                                                   ",
+        "    WIN-CON-SINGLEPANE,      !- Name                                                                              ",
+        "    SINGLEPANE;              !- Outside Layer                                                                     ",
+        "                                                                                                                  ",
+        "  WindowMaterial:Glazing,                                                                                         ",
+        "    SINGLEPANE,              !- Name                                                                              ",
+        "    SpectralAverage,         !- Optical Data Type                                                                 ",
+        "    ,                        !- Window Glass Spectral Data Set Name                                               ",
+        "    0.003,                   !- Thickness {m}                                                                     ",
+        "    0.90,                    !- Solar Transmittance at Normal Incidence                                           ",
+        "    0.031,                   !- Front Side Solar Reflectance at Normal Incidence                                  ",
+        "    0.031,                   !- Back Side Solar Reflectance at Normal Incidence                                   ",
+        "    0.90,                    !- Visible Transmittance at Normal Incidence                                         ",
+        "    0.05,                    !- Front Side Visible Reflectance at Normal Incidence                                ",
+        "    0.05,                    !- Back Side Visible Reflectance at Normal Incidence                                 ",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence                                        ",
+        "    0.84,                    !- Front Side Infrared Hemispherical Emissivity                                      ",
+        "    0.84,                    !- Back Side Infrared Hemispherical Emissivity                                       ",
+        "    0.9;                     !- Conductivity {W/m-K}                                                              ",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    DataGlobals::NumOfTimeStepInHour = 1;
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ScheduleInputProcessed = true;
+    DataGlobals::TimeStep = 1;
+    DataGlobals::HourOfDay = 10;
+    DataGlobals::PreviousHour = 10;
+    DataEnvironment::Month = 1;
+    DataEnvironment::DayOfMonth = 21;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+
+    bool foundErrors = false;
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, foundErrors); // read project control data
+    EXPECT_FALSE(foundErrors);                              // expect no errors
+
+    HeatBalanceManager::GetMaterialData(state.outputFiles, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                        // expect no errors
+
+    HeatBalanceManager::GetConstructData(foundErrors); // read construction data
+    compare_err_stream("");
+    EXPECT_FALSE(foundErrors); // expect no errors
+
+    HeatBalanceManager::GetZoneData(foundErrors); // read zone data
+    EXPECT_FALSE(foundErrors);                    // expect no errors
+
+    SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
+    EXPECT_FALSE(foundErrors);                       // expect no errors
+    HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
+
+    int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone);
+    InternalHeatGains::GetInternalHeatGainsInput(state);
+    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
+    DaylightingManager::GetInputDayliteRefPt(foundErrors);
+    DaylightingManager::GetDaylightingParametersInput(state.outputFiles);
+    DaylightingManager::GILSK = 100.0;
+    DataGlobals::WeightNow = 1.0;
+    DataEnvironment::HISUNF = 100.0;
+    DataEnvironment::HISKF = 100.0;
+    DataEnvironment::SkyClearness = 6.0;
+
+    // Set all daylighting factors to zero
+    ZoneDaylight(ZoneNum).DaylIllFacSky = 0.0;
+    ZoneDaylight(ZoneNum).DaylIllFacSun = 0.0;
+    ZoneDaylight(ZoneNum).DaylIllFacSunDisk = 0.0;
+    ZoneDaylight(ZoneNum).DaylBackFacSky = 0.0;
+    ZoneDaylight(ZoneNum).DaylBackFacSun = 0.0;
+    ZoneDaylight(ZoneNum).DaylBackFacSunDisk = 0.0;
+    ZoneDaylight(ZoneNum).DaylSourceFacSky = 0.0;
+    ZoneDaylight(ZoneNum).DaylSourceFacSun = 0.0;
+    ZoneDaylight(ZoneNum).DaylSourceFacSunDisk = 0.0;
+    DaylightingManager::DayltgInteriorIllum(ZoneNum);
+    EXPECT_NEAR(DaylightingManager::DaylIllum(1), 0.0, 0.001);
+
+    int ISky = 1;
+    int DayltgExtWin = 1;
+    int Shaded = 2;
+    int Unshaded = 1;
+    int IWin = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", DataSurfaces::Surface);
+    EXPECT_GT(IWin, 0);
+
+    // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
+    // Set shaded surface illuminance factor to 0.5 for RefPt1, 0.05 for RefPt2
+    int RefPt = 1;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
+    RefPt = 2;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
+
+    // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
+    SurfaceWindow(IWin).WindowModelType = Window5DetailedModel;
+    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::NoShade;
+    DaylightingManager::DayltgInteriorIllum(ZoneNum);
+    EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
+    EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
+
+    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::ExtBlindOn;
+    DaylightingManager::DayltgInteriorIllum(ZoneNum);
+    EXPECT_NEAR(DaylightingManager::DaylIllum(1), 50.0, 0.001);
+    EXPECT_NEAR(DaylightingManager::DaylIllum(2), 5.0, 0.001);
+
+    // BSDF model - expect 100 for unshaded and 100 for shaded (10 for RefPt2
+    // BSDF does shading differently, it's integrated in the base state
+    SurfaceWindow(IWin).WindowModelType = WindowBSDFModel;
+    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::NoShade;
+    DaylightingManager::DayltgInteriorIllum(ZoneNum);
+    EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
+    EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
+
+    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::ExtBlindOn;
+    DaylightingManager::DayltgInteriorIllum(ZoneNum);
+    EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
+    EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
+}
