@@ -64,6 +64,8 @@ namespace EnergyPlus {
 // define this variable to get new code, commenting should yield original
 #define SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
 
+AirflowNetwork::Solver solver;
+
 namespace AirflowNetwork {
 
     // MODULE INFORMATION:
@@ -102,7 +104,7 @@ namespace AirflowNetwork {
     using DataGlobals::rTinyValue;
     using DataSurfaces::Surface;
 
-    std::vector<AirProperties> properties;
+    //std::vector<AirProperties> properties;
 
     // Data
     int NetworkNumOfLinks(0);
@@ -113,38 +115,38 @@ namespace AirflowNetwork {
     static std::string const BlankString;
 
     // Common block AFEDAT
-    Array1D<Real64> AFECTL;
-    Array1D<Real64> AFLOW2;
-    Array1D<Real64> AFLOW;
-    Array1D<Real64> PS;
-    Array1D<Real64> PW;
+    //Array1D<Real64> AFECTL;
+    //Array1D<Real64> AFLOW2;
+    //Array1D<Real64> AFLOW;
+    //Array1D<Real64> PS;
+    //Array1D<Real64> PW;
 
     // Common block CONTRL
-    Real64 PB(0.0);
-    int LIST(0);
+    //Real64 PB(0.0);
+    //int LIST(0);
 
     // Common block ZONL
     // Array1D<Real64> RHOZ;
     // Array1D<Real64> SQRTDZ;
     // Array1D<Real64> VISCZ;
-    Array1D<Real64> SUMAF;
+    //Array1D<Real64> SUMAF;
     // Array1D<Real64> TZ; // Temperature [C]
     // Array1D<Real64> WZ; // Humidity ratio [kg/kg]
-    Array1D<Real64> PZ; // Pressure [Pa]
+    //Array1D<Real64> PZ; // Pressure [Pa]
 
     // Other array variables
-    Array1D_int ID;
-    Array1D_int IK;
-    Array1D<Real64> AD;
-    Array1D<Real64> AU;
+    //Array1D_int ID;
+    //Array1D_int IK;
+    //Array1D<Real64> AD;
+    //Array1D<Real64> AU;
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-    Array1D_int newIK;     // noel
-    Array1D<Real64> newAU; // noel
+    //Array1D_int newIK;     // noel
+    //Array1D<Real64> newAU; // noel
 #endif
 
     // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-    Array1D<Real64> SUMF;
+    //Array1D<Real64> SUMF;
     int Unit21(0);
 
     // Large opening variables
@@ -155,7 +157,7 @@ namespace AirflowNetwork {
 
     // Functions
 
-    void AllocateAirflowNetworkData()
+    void Solver::allocate()
     {
 
         // SUBROUTINE INFORMATION:
@@ -317,7 +319,7 @@ namespace AirflowNetwork {
         }
         */
 
-        SETSKY();
+        solver.setsky();
 
         // SETSKY figures out the IK stuff -- which is why E+ doesn't allocate AU until here
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
@@ -335,7 +337,7 @@ namespace AirflowNetwork {
         AU.allocate(IK(NetworkNumOfNodes + 1));
     }
 
-    void InitAirflowNetworkData()
+    void Solver::initialize()
     {
 
         // SUBROUTINE INFORMATION:
@@ -391,7 +393,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void SETSKY()
+    void Solver::setsky()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
@@ -461,7 +463,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void AIRMOV()
+    void Solver::airmov()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
@@ -549,7 +551,7 @@ namespace AirflowNetwork {
 
         // Calculate pressure field in a large opening
         PStack();
-        SOLVZP(IK, AD, AU, ITER);
+        solver.solvzp(IK, AD, AU, ITER);
 
         // Report element flows and zone pressures.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
@@ -615,7 +617,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void SOLVZP(Array1D_int &IK,     // pointer to the top of column/row "K"
+    void Solver::solvzp(Array1D_int &IK,     // pointer to the top of column/row "K"
                 Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
                 Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
                 int &ITER           // number of iterations
@@ -707,7 +709,7 @@ namespace AirflowNetwork {
             // Initialize node/zone pressure values by assuming only linear relationship between
             // airflows and pressure drops.
             LFLAG = true;
-            FILJAC(NNZE, LFLAG);
+            solver.filjac(NNZE, LFLAG);
             for (n = 1; n <= NetworkNumOfNodes; ++n) {
                 if (AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = SUMF(n);
             }
@@ -734,7 +736,7 @@ namespace AirflowNetwork {
             ++ITER;
             if (LIST >= 2) ObjexxFCL::gio::write(Unit21, fmtLD) << "Begin iteration " << ITER;
             // Set up the Jacobian matrix.
-            FILJAC(NNZE, LFLAG);
+            solver.filjac(NNZE, LFLAG);
             // Data dump.
             if (LIST >= 3) {
                 DUMPVR("SUMF:", SUMF, NetworkNumOfNodes, Unit21);
@@ -822,8 +824,8 @@ namespace AirflowNetwork {
         }
     }
 
-    void FILJAC(int const NNZE,  // number of nonzero entries in the "AU" array.
-                bool const LFLAG // if = 1, use laminar relationship (initialization).
+    void Solver::filjac(int const NNZE,  // number of nonzero entries in the "AU" array.
+                        bool const LFLAG // if = 1, use laminar relationship (initialization).
     )
     {
 
@@ -1042,7 +1044,7 @@ namespace AirflowNetwork {
 #endif
     }
 
-
+    /*
     int AFEFAN(int const JA,               // Component number
                bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
@@ -1400,6 +1402,8 @@ namespace AirflowNetwork {
         return 1;
     }
 
+    */
+
     int GenericCrack(Real64 &coef,               // Flow coefficient
                      Real64 const expn,          // Flow exponent
                      bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
@@ -1511,7 +1515,7 @@ namespace AirflowNetwork {
                 }
             }
             // Select laminar or turbulent flow.
-            if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << " generic crack: " << PDROP << FL << FT;
+            //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << " generic crack: " << PDROP << FL << FT;
             if (std::abs(FL) <= std::abs(FT)) {
                 F[0] = FL;
                 DF[0] = CDM;
@@ -2964,13 +2968,13 @@ namespace AirflowNetwork {
                 ActLOwnh = 0.0;
             }
 
-            TempL1 = properties[From].temperature;
-            Xhl1 = properties[From].humidityRatio;
-            TzFrom = properties[From].temperature;
-            XhzFrom = properties[From].humidityRatio;
-            RhoL1 = properties[From].density;
+            TempL1 = solver.properties[From].temperature;
+            Xhl1 = solver.properties[From].humidityRatio;
+            TzFrom = solver.properties[From].temperature;
+            XhzFrom = solver.properties[From].humidityRatio;
+            RhoL1 = solver.properties[From].density;
             if (ll == 0 || ll == 3) {
-                PzFrom = PZ(From);
+                PzFrom = solver.PZ(From);
             } else {
                 PzFrom = 0.0;
                 From = 0;
@@ -2984,14 +2988,14 @@ namespace AirflowNetwork {
                 Fromz = From;
             }
 
-            TempL2 = properties[To].temperature;
-            Xhl2 = properties[To].humidityRatio;
-            TzTo = properties[To].temperature;
-            XhzTo = properties[To].humidityRatio;
-            RhoL2 = properties[To].density;
+            TempL2 = solver.properties[To].temperature;
+            Xhl2 = solver.properties[To].humidityRatio;
+            TzTo = solver.properties[To].temperature;
+            XhzTo = solver.properties[To].humidityRatio;
+            RhoL2 = solver.properties[To].density;
 
             if (ll < 3) {
-                PzTo = PZ(To);
+                PzTo = solver.PZ(To);
             } else {
                 PzTo = 0.0;
                 To = 0;

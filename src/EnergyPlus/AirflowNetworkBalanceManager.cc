@@ -463,7 +463,7 @@ namespace AirflowNetworkBalanceManager {
                 MultizoneSurfaceCrackData(i).StandardW = refW;
 
                 // This is the first element that is being added to the lookup table, so no check of naming overlaps
-                dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &MultizoneSurfaceCrackData(i); // Yet another workaround
+                solver.elements[thisObjectName] = &MultizoneSurfaceCrackData(i); // Yet another workaround
 
                 ++i;
             }
@@ -548,8 +548,8 @@ namespace AirflowNetworkBalanceManager {
                 MultizoneCompExhaustFanData(i).StandardW = refW;
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(thisObjectName) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &MultizoneCompExhaustFanData(i); // Yet another workaround
+                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+                    solver.elements[thisObjectName] = &MultizoneCompExhaustFanData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -618,8 +618,8 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompOutdoorAirData(i).StandardW = refW;
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(thisObjectName) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &DisSysCompOutdoorAirData(i); // Yet another workaround
+                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+                    solver.elements[thisObjectName] = &DisSysCompOutdoorAirData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -686,8 +686,8 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompReliefAirData(i).StandardW = refW;
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(thisObjectName) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &DisSysCompReliefAirData(i); // Yet another workaround
+                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+                    solver.elements[thisObjectName] = &DisSysCompReliefAirData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -959,8 +959,8 @@ namespace AirflowNetworkBalanceManager {
                 }
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(thisObjectName) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &MultizoneCompDetOpeningData(i); // Yet another workaround
+                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+                    solver.elements[thisObjectName] = &MultizoneCompDetOpeningData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -999,8 +999,8 @@ namespace AirflowNetworkBalanceManager {
                 MultizoneCompSimpleOpeningData(i).DischCoeff = dischargeCoeff; // Discharge coefficient at full opening
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(thisObjectName) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &MultizoneCompSimpleOpeningData(i); // Yet another workaround
+                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+                    solver.elements[thisObjectName] = &MultizoneCompSimpleOpeningData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1042,8 +1042,8 @@ namespace AirflowNetworkBalanceManager {
                 MultizoneCompHorOpeningData(i).DischCoeff = dischargeCoeff; // Discharge coefficient at full opening
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(thisObjectName) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &MultizoneCompHorOpeningData(i); // Yet another workaround
+                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+                    solver.elements[thisObjectName] = &MultizoneCompHorOpeningData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1090,8 +1090,8 @@ namespace AirflowNetworkBalanceManager {
                 MultizoneSurfaceELAData(i).TestDisCoef = 0.0;     // Testing Discharge coefficient
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(thisObjectName) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &MultizoneSurfaceELAData(i); // Yet another workaround
+                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+                    solver.elements[thisObjectName] = &MultizoneSurfaceELAData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1126,8 +1126,8 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompLeakData(i).FlowExpo = expnt;      // Air Mass Flow exponent
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(thisObjectName) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &DisSysCompLeakData(i); // Yet another workaround
+                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+                    solver.elements[thisObjectName] = &DisSysCompLeakData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1166,8 +1166,8 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompELRData(i).FlowExpo = expnt;               // Air Mass Flow exponent
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(thisObjectName) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &DisSysCompELRData(i); // Yet another workaround
+                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+                    solver.elements[thisObjectName] = &DisSysCompELRData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1240,8 +1240,8 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompDuctData(i).g = DisSysCompDuctData(i).A1;                                    // 1/sqrt(Darcy friction factor)
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(thisObjectName) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &DisSysCompDuctData(i); // Yet another workaround
+                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+                    solver.elements[thisObjectName] = &DisSysCompDuctData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1364,8 +1364,8 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompCVFData(i).OutletNode = outletNode;
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(fan_name) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[fan_name] = &DisSysCompCVFData(i); // Yet another workaround
+                if (solver.elements.find(fan_name) == solver.elements.end()) {
+                    solver.elements[fan_name] = &DisSysCompCVFData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + fan_name);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1400,8 +1400,8 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompCoilData(i).hydraulicDiameter = D;                            // Air path hydraulic diameter
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(DisSysCompCoilData(i).name) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[DisSysCompCoilData(i).name] = &DisSysCompCoilData(i); // Yet another workaround
+                if (solver.elements.find(DisSysCompCoilData(i).name) == solver.elements.end()) {
+                    solver.elements[DisSysCompCoilData(i).name] = &DisSysCompCoilData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + DisSysCompCoilData(i).name);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1437,8 +1437,8 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompHXData(i).CoilParentExists = HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent(state, hx_type, hx_name);
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(DisSysCompHXData(i).name) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[DisSysCompHXData(i).name] = &DisSysCompHXData(i); // Yet another workaround
+                if (solver.elements.find(DisSysCompHXData(i).name) == solver.elements.end()) {
+                    solver.elements[DisSysCompHXData(i).name] = &DisSysCompHXData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + DisSysCompHXData(i).name);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1472,8 +1472,8 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompTermUnitData(i).hydraulicDiameter = D;                          // Air path hydraulic diameter
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(DisSysCompTermUnitData(i).name) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[DisSysCompTermUnitData(i).name] = &DisSysCompTermUnitData(i); // Yet another workaround
+                if (solver.elements.find(DisSysCompTermUnitData(i).name) == solver.elements.end()) {
+                    solver.elements[DisSysCompTermUnitData(i).name] = &DisSysCompTermUnitData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + DisSysCompTermUnitData(i).name);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -1504,8 +1504,8 @@ namespace AirflowNetworkBalanceManager {
                 DisSysCompCPDData(i).DP = dp;               // Pressure difference across the component
 
                 // Add the element to the lookup table, check for name overlaps
-                if (dataAirflowNetworkBalanceManager.solver.elements.find(thisObjectName) == dataAirflowNetworkBalanceManager.solver.elements.end()) {
-                    dataAirflowNetworkBalanceManager.solver.elements[thisObjectName] = &DisSysCompCPDData(i); // Yet another workaround
+                if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+                    solver.elements[thisObjectName] = &DisSysCompCPDData(i); // Yet another workaround
                 } else {
                     ShowSevereError(RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
                     // ShowContinueError("A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
@@ -2846,8 +2846,8 @@ namespace AirflowNetworkBalanceManager {
             if (MultizoneSurfaceData(i).SurfNum == 0) continue;
             bool has_DOP_or_SOP{false};
             // This is terrible, should not do it this way
-            auto afe = dataAirflowNetworkBalanceManager.solver.elements.find(MultizoneSurfaceData(i).OpeningName);
-            if (afe != dataAirflowNetworkBalanceManager.solver.elements.end()) {
+            auto afe = solver.elements.find(MultizoneSurfaceData(i).OpeningName);
+            if (afe != solver.elements.end()) {
                 auto type = afe->second->type();
                 has_DOP_or_SOP = (type == ComponentType::DOP) || (type == ComponentType::SOP);
             }
@@ -2985,7 +2985,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Calculate CP values
         if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
-            CalcWindPressureCoeffs();
+            dataAirflowNetworkBalanceManager.calculateWindPressureCoeffs();
             // Ensure automatic generation is OK
             n = 0;
             for (j = 1; j <= 5; ++j) {
@@ -3698,8 +3698,8 @@ namespace AirflowNetworkBalanceManager {
                 if (PressureControllerData(i).ControlTypeSet == PressureCtrlExhaust) {
                     // This is not great
                     bool is_EXF{false};
-                    auto afe = dataAirflowNetworkBalanceManager.solver.elements.find(Alphas(4));
-                    if (afe != dataAirflowNetworkBalanceManager.solver.elements.end()) {
+                    auto afe = solver.elements.find(Alphas(4));
+                    if (afe != solver.elements.end()) {
                         is_EXF = afe->second->type() == ComponentType::EXF;
                     }
                     if (!is_EXF) {
@@ -3711,8 +3711,8 @@ namespace AirflowNetworkBalanceManager {
                 if (PressureControllerData(i).ControlTypeSet == PressureCtrlRelief) {
                     // This is not great
                     bool is_REL{false};
-                    auto afe = dataAirflowNetworkBalanceManager.solver.elements.find(Alphas(4));
-                    if (afe != dataAirflowNetworkBalanceManager.solver.elements.end()) {
+                    auto afe = solver.elements.find(Alphas(4));
+                    if (afe != solver.elements.end()) {
                         is_REL = afe->second->type() == ComponentType::REL;
                     }
                     if (!is_REL) {
@@ -3870,7 +3870,7 @@ namespace AirflowNetworkBalanceManager {
 
         for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfDetOpenings; ++i) { // Detailed opening component
             AirflowNetworkCompData(i).Name = MultizoneCompDetOpeningData(i).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_DOP;
             AirflowNetworkCompData(i).TypeNum = i;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -3883,7 +3883,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSimOpenings + j; ++i) { // Simple opening component
             n = i - j;
             AirflowNetworkCompData(i).Name = MultizoneCompSimpleOpeningData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_SOP;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -3896,7 +3896,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurCracks + j; ++i) { // Surface crack component
             n = i - j;
             AirflowNetworkCompData(i).Name = MultizoneSurfaceCrackData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_SCR;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -3909,7 +3909,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurELA + j; ++i) { // Surface crack component
             n = i - j;
             AirflowNetworkCompData(i).Name = MultizoneSurfaceELAData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_SEL;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -3922,7 +3922,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= AirflowNetworkNumOfExhFan + j; ++i) { // Zone exhaust fan component
             n = i - j;
             AirflowNetworkCompData(i).Name = MultizoneCompExhaustFanData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_EXF;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -3935,7 +3935,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfHorOpenings + j; ++i) { // Distribution system crack component
             n = i - j;
             AirflowNetworkCompData(i).Name = MultizoneCompHorOpeningData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_HOP;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -3948,7 +3948,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfLeaks + j; ++i) { // Distribution system crack component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompLeakData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_PLR;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -3961,7 +3961,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfELRs + j; ++i) { // Distribution system effective leakage ratio component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompELRData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_ELR;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -3974,7 +3974,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfDucts + j; ++i) { // Distribution system effective leakage ratio component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompDuctData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_DWC;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -3987,7 +3987,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfDampers + j; ++i) { // Distribution system effective leakage ratio component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompDamperData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_DMP;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -4000,7 +4000,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs + j; ++i) { // Distribution system constant volume fan component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompCVFData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_CVF;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -4014,7 +4014,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfDetFans + j; ++i) { // Distribution system fan component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompDetFanData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_FAN;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -4028,7 +4028,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCPDs + j; ++i) { // Distribution system constant pressure drop component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompCPDData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_CPD;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -4041,7 +4041,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCoils + j; ++i) { // Distribution system coil component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompCoilData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_COI;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -4055,7 +4055,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfTermUnits + j; ++i) { // Terminal unit component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompTermUnitData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_TMU;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -4069,7 +4069,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfHXs + j; ++i) { // Distribution system heat exchanger component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompHXData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_HEX;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -4083,7 +4083,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.NumOfOAFans + j; ++i) { // OA fan component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompOutdoorAirData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_OAF;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -4096,7 +4096,7 @@ namespace AirflowNetworkBalanceManager {
         for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.NumOfReliefFans + j; ++i) { // OA fan component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompReliefAirData(n).name;
-            dataAirflowNetworkBalanceManager.solver.compnum[AirflowNetworkCompData(i).Name] = i;
+            solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_REL;
             AirflowNetworkCompData(i).TypeNum = n;
             AirflowNetworkCompData(i).EPlusName = "";
@@ -4141,14 +4141,14 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
             // Find component number
-            auto afe = dataAirflowNetworkBalanceManager.solver.elements.find(AirflowNetworkLinkageData(count).CompName);
-            if (afe != dataAirflowNetworkBalanceManager.solver.elements.end()) {
+            auto afe = solver.elements.find(AirflowNetworkLinkageData(count).CompName);
+            if (afe != solver.elements.end()) {
                 // found = false;
                 // for (i = 1; i <= AirflowNetworkNumOfComps; ++i) {
                 AirflowNetworkLinkageData(count).element = afe->second;
                 // Get CompTypeNum here, this is a hack to hold us over until the introspection is dealt with
-                auto compnum_iter = dataAirflowNetworkBalanceManager.solver.compnum.find(AirflowNetworkLinkageData(count).CompName);
-                assert(compnum_iter != dataAirflowNetworkBalanceManager.solver.compnum.end());
+                auto compnum_iter = solver.compnum.find(AirflowNetworkLinkageData(count).CompName);
+                assert(compnum_iter != solver.compnum.end());
                 int compnum = compnum_iter->second;
                 AirflowNetworkLinkageData(count).CompNum = compnum;
 
@@ -4269,12 +4269,12 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkLinkageData(count).NodeHeights[0] = IntraZoneLinkageData(count - AirflowNetworkNumOfSurfaces).NodeHeights[0];
             AirflowNetworkLinkageData(count).NodeHeights[1] = IntraZoneLinkageData(count - AirflowNetworkNumOfSurfaces).NodeHeights[1];
             // Find component number
-            auto afe = dataAirflowNetworkBalanceManager.solver.elements.find(AirflowNetworkLinkageData(count).CompName);
-            if (afe != dataAirflowNetworkBalanceManager.solver.elements.end()) {
+            auto afe = solver.elements.find(AirflowNetworkLinkageData(count).CompName);
+            if (afe != solver.elements.end()) {
                 AirflowNetworkLinkageData(count).element = afe->second;
                 // Get CompTypeNum here, this is a hack to hold us over until the introspection is dealt with
-                auto compnum_iter = dataAirflowNetworkBalanceManager.solver.compnum.find(AirflowNetworkLinkageData(count).CompName);
-                assert(compnum_iter != dataAirflowNetworkBalanceManager.solver.compnum.end());
+                auto compnum_iter = solver.compnum.find(AirflowNetworkLinkageData(count).CompName);
+                assert(compnum_iter != solver.compnum.end());
                 int compnum = compnum_iter->second;
                 AirflowNetworkLinkageData(count).CompNum = compnum;
                 if (AirflowNetworkLinkageData(count).element->type() != ComponentType::SCR &&
@@ -4388,13 +4388,13 @@ namespace AirflowNetworkBalanceManager {
                     ErrorsFound = true;
                 }
                 // Find component number
-                auto afe = dataAirflowNetworkBalanceManager.solver.elements.find(AirflowNetworkLinkageData(count).CompName);
-                if (afe != dataAirflowNetworkBalanceManager.solver.elements.end()) {
+                auto afe = solver.elements.find(AirflowNetworkLinkageData(count).CompName);
+                if (afe != solver.elements.end()) {
                     AirflowNetworkLinkageData(count).element = afe->second;
 
                     // Get CompTypeNum here, this is a hack to hold us over until the introspection is dealt with
-                    auto compnum_iter = dataAirflowNetworkBalanceManager.solver.compnum.find(AirflowNetworkLinkageData(count).CompName);
-                    assert(compnum_iter != dataAirflowNetworkBalanceManager.solver.compnum.end());
+                    auto compnum_iter = solver.compnum.find(AirflowNetworkLinkageData(count).CompName);
+                    assert(compnum_iter != solver.compnum.end());
                     int compnum = compnum_iter->second;
                     AirflowNetworkLinkageData(count).CompNum = compnum;
                 } else {
@@ -5032,7 +5032,7 @@ namespace AirflowNetworkBalanceManager {
         if (Contaminant.CO2Simulation) ANCO.allocate(NumOfZones);           // Local zone CO2 for rollback use
         if (Contaminant.GenericContamSimulation) ANGC.allocate(NumOfZones); // Local zone generic contaminant for rollback use
 
-        AllocateAirflowNetworkData();
+        solver.allocate();
 
         bool OnOffFanFlag = false;
         for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
@@ -5807,10 +5807,10 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        InitAirflowNetworkData();
+        solver.initialize();
 
         if (!(PressureSetFlag > 0 && AirflowNetworkFanActivated)) {
-            AIRMOV();
+            solver.airmov();
         } else if (PressureSetFlag == PressureCtrlExhaust) {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinExhaustMassFlowrate = 2.0 * VerySmallMassFlow;
@@ -5819,7 +5819,7 @@ namespace AirflowNetworkBalanceManager {
                 MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             ExhaustFanMassFlowRate = MinExhaustMassFlowrate;
-            AIRMOV();
+            solver.airmov();
             ZonePressure1 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
             if (ZonePressure1 <= PressureSet) {
                 // The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
@@ -5841,7 +5841,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             } else {
                 ExhaustFanMassFlowRate = MaxExhaustMassFlowrate;
-                AIRMOV();
+                solver.airmov();
                 ZonePressure2 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
@@ -5896,8 +5896,8 @@ namespace AirflowNetworkBalanceManager {
                 MaxReliefMassFlowrate = MaxReliefMassFlowrate / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             ReliefMassFlowRate = MinReliefMassFlowrate;
-            InitAirflowNetworkData();
-            AIRMOV();
+            solver.initialize();
+            solver.airmov();
             ZonePressure1 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
 
             if (ZonePressure1 <= PressureSet) {
@@ -5920,8 +5920,8 @@ namespace AirflowNetworkBalanceManager {
                 }
             } else {
                 ReliefMassFlowRate = MaxReliefMassFlowrate;
-                InitAirflowNetworkData();
-                AIRMOV();
+                solver.initialize();
+                solver.airmov();
                 ZonePressure2 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
@@ -6003,8 +6003,8 @@ namespace AirflowNetworkBalanceManager {
             ReliefMassFlowRate = ControllerMassFlowRate;
         }
 
-        InitAirflowNetworkData();
-        AIRMOV();
+        solver.initialize();
+        solver.airmov();
 
         ZonePressure = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
 
@@ -6043,7 +6043,9 @@ namespace AirflowNetworkBalanceManager {
         return CurveNum;
     }
 
-    void CalcWindPressureCoeffs()
+}
+
+    void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs()
     {
 
         // SUBROUTINE INFORMATION:
@@ -6120,32 +6122,32 @@ namespace AirflowNetworkBalanceManager {
 
         // Facade azimuth angle
         for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
-            dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum) = AirflowNetworkSimu.Azimuth + (FacadeNum - 1) * 90.0;
-            if (dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum) >= 360.0) {
-                dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum) -= 360.0;
+            FacadeAng(FacadeNum) = AirflowNetworkBalanceManager::AirflowNetworkSimu.Azimuth + (FacadeNum - 1) * 90.0;
+            if (FacadeAng(FacadeNum) >= 360.0) {
+                FacadeAng(FacadeNum) -= 360.0;
             }
         }
 
-        dataAirflowNetworkBalanceManager.FacadeAng(5) = AirflowNetworkSimu.Azimuth + 90.0;
+        FacadeAng(5) = AirflowNetworkBalanceManager::AirflowNetworkSimu.Azimuth + 90.0;
 
         // Create AirflowNetwork external node objects -- one for each of the external surfaces
 
-        MultizoneExternalNodeData.allocate(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces);
-        dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode = dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces;
-        dataAirflowNetworkBalanceManager.NumOfExtNodes = dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces;
-        for (ExtNum = 1; ExtNum <= dataAirflowNetworkBalanceManager.NumOfExtNodes; ++ExtNum) {
-            MultizoneExternalNodeData(ExtNum).ExtNum = AirflowNetworkNumOfZones + ExtNum;
-            MultizoneExternalNodeData(ExtNum).Name = format("ExtNode{:4}", ExtNum);
+        AirflowNetworkBalanceManager::MultizoneExternalNodeData.allocate(AirflowNetworkNumOfExtSurfaces);
+        AirflowNetworkNumOfExtNode = AirflowNetworkNumOfExtSurfaces;
+        NumOfExtNodes = AirflowNetworkNumOfExtSurfaces;
+        for (ExtNum = 1; ExtNum <= NumOfExtNodes; ++ExtNum) {
+            AirflowNetworkBalanceManager::MultizoneExternalNodeData(ExtNum).ExtNum = AirflowNetworkBalanceManager::AirflowNetworkNumOfZones + ExtNum;
+            AirflowNetworkBalanceManager::MultizoneExternalNodeData(ExtNum).Name = format("ExtNode{:4}", ExtNum);
         }
 
         // Associate each external node with SurfaceData
 
         ExtNum = 0;
-        for (SurfDatNum = 1; SurfDatNum <= AirflowNetworkNumOfSurfaces; ++SurfDatNum) {
-            if (SurfDatNum > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone) {
+        for (SurfDatNum = 1; SurfDatNum <= AirflowNetworkBalanceManager::AirflowNetworkNumOfSurfaces; ++SurfDatNum) {
+            if (SurfDatNum > AirflowNetworkBalanceManager::AirflowNetworkNumOfSurfaces - AirflowNetworkBalanceManager::NumOfLinksIntraZone) {
                 continue;
             }
-            SurfNum = MultizoneSurfaceData(SurfDatNum).SurfNum;
+            SurfNum = AirflowNetworkBalanceManager::MultizoneSurfaceData(SurfDatNum).SurfNum;
             if (SurfNum == 0) {
                 continue; // Error caught earlier
             }
@@ -6155,12 +6157,12 @@ namespace AirflowNetworkBalanceManager {
                 if (Surface(SurfNum).Tilt >= 45.0) { // "Vertical" surface
                     SurfAng = Surface(SurfNum).Azimuth;
                     FacadeNumThisSurf = 1;
-                    AngDiffMin = std::abs(SurfAng - dataAirflowNetworkBalanceManager.FacadeAng(1));
+                    AngDiffMin = std::abs(SurfAng - FacadeAng(1));
                     if (AngDiffMin > 359.0) {
                         AngDiffMin = std::abs(AngDiffMin - 360.0);
                     }
                     for (FacadeNum = 2; FacadeNum <= 4; ++FacadeNum) {
-                        AngDiff = std::abs(SurfAng - dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum));
+                        AngDiff = std::abs(SurfAng - FacadeAng(FacadeNum));
                         if (AngDiff > 359.0) {
                             AngDiff = std::abs(AngDiff - 360.0);
                         }
@@ -6169,19 +6171,19 @@ namespace AirflowNetworkBalanceManager {
                             FacadeNumThisSurf = FacadeNum;
                         }
                     }
-                    MultizoneExternalNodeData(ExtNum).facadeNum = FacadeNumThisSurf;
+                    AirflowNetworkBalanceManager::MultizoneExternalNodeData(ExtNum).facadeNum = FacadeNumThisSurf;
                 } else { // "Roof" surface
-                    MultizoneExternalNodeData(ExtNum).facadeNum = 5;
+                    AirflowNetworkBalanceManager::MultizoneExternalNodeData(ExtNum).facadeNum = 5;
                 }
-                MultizoneSurfaceData(SurfDatNum).NodeNums[1] = MultizoneExternalNodeData(ExtNum).ExtNum;
-                MultizoneSurfaceData(SurfDatNum).ExternalNodeName = MultizoneExternalNodeData(ExtNum).Name;
+                AirflowNetworkBalanceManager::MultizoneSurfaceData(SurfDatNum).NodeNums[1] = AirflowNetworkBalanceManager::MultizoneExternalNodeData(ExtNum).ExtNum;
+                AirflowNetworkBalanceManager::MultizoneSurfaceData(SurfDatNum).ExternalNodeName = AirflowNetworkBalanceManager::MultizoneExternalNodeData(ExtNum).Name;
             }
         }
 
         // Check if using the advanced single sided model
-        for (AFNZnNum = 1; AFNZnNum <= AirflowNetworkNumOfZones; ++AFNZnNum) {
-            if (MultizoneZoneData(AFNZnNum).SingleSidedCpType == "ADVANCED") {
-                ++dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSingleSideZones;
+        for (AFNZnNum = 1; AFNZnNum <= AirflowNetworkBalanceManager::AirflowNetworkNumOfZones; ++AFNZnNum) {
+            if (AirflowNetworkBalanceManager::MultizoneZoneData(AFNZnNum).SingleSidedCpType == "ADVANCED") {
+                ++AirflowNetworkNumOfSingleSideZones;
             }
         }
 
@@ -6191,33 +6193,33 @@ namespace AirflowNetworkBalanceManager {
 
         auto dirs30GridIndex = CurveManager::btwxtManager.addGrid("30 Degree Increments", Btwxt::GriddedData(dirs30Axes));
 
-        if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSingleSideZones == 0) { // do the standard surface average coefficient calculation
+        if (AirflowNetworkNumOfSingleSideZones == 0) { // do the standard surface average coefficient calculation
             // Create the array of wind directions
 
             // Create a curve for each facade
             for (FacadeNum = 1; FacadeNum <= 5; ++FacadeNum) {
                 if (FacadeNum == 1 || FacadeNum == 3 || FacadeNum == 5) {
-                    SideRatio = AirflowNetworkSimu.AspectRatio;
+                    SideRatio = AirflowNetworkBalanceManager::AirflowNetworkSimu.AspectRatio;
                 } else { // FacadeNum = 2 or 4
-                    SideRatio = 1.0 / AirflowNetworkSimu.AspectRatio;
+                    SideRatio = 1.0 / AirflowNetworkBalanceManager::AirflowNetworkSimu.AspectRatio;
                 }
-                if (UtilityRoutines::SameString(AirflowNetworkSimu.BldgType, "HighRise") && FacadeNum != 5) {
+                if (UtilityRoutines::SameString(AirflowNetworkBalanceManager::AirflowNetworkSimu.BldgType, "HighRise") && FacadeNum != 5) {
                     SideRatio = 1.0 / SideRatio;
                 }
                 SideRatioFac = std::log(SideRatio);
                 std::vector<Real64> vals(13);
                 for (int windDirNum = 1; windDirNum <= 12; ++windDirNum) {
                     Real64 WindAng = (windDirNum - 1) * 30.0;
-                    dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum));
-                    if (dataAirflowNetworkBalanceManager.IncAng > 180.0) dataAirflowNetworkBalanceManager.IncAng = 360.0 - dataAirflowNetworkBalanceManager.IncAng;
-                    IAng = int(dataAirflowNetworkBalanceManager.IncAng / 30.0) + 1;
-                    DelAng = mod(dataAirflowNetworkBalanceManager.IncAng, 30.0);
+                    IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                    if (IncAng > 180.0) IncAng = 360.0 - IncAng;
+                    IAng = int(IncAng / 30.0) + 1;
+                    DelAng = mod(IncAng, 30.0);
                     WtAng = 1.0 - DelAng / 30.0;
 
                     // Wind-pressure coefficients for vertical facades, low-rise building
 
-                    if (UtilityRoutines::SameString(AirflowNetworkSimu.BldgType, "LowRise") && FacadeNum <= 4) {
-                        IncRad = dataAirflowNetworkBalanceManager.IncAng * DegToRadians;
+                    if (UtilityRoutines::SameString(AirflowNetworkBalanceManager::AirflowNetworkSimu.BldgType, "LowRise") && FacadeNum <= 4) {
+                        IncRad = IncAng * AirflowNetworkBalanceManager::DegToRadians;
                         Real64 const cos_IncRad_over_2(std::cos(IncRad / 2.0));
                         vals[windDirNum - 1] = 0.6 * std::log(1.248 - 0.703 * std::sin(IncRad / 2.0) - 1.175 * pow_2(std::sin(IncRad)) +
                                                               0.131 * pow_3(std::sin(2.0 * IncRad * SideRatioFac)) + 0.769 * cos_IncRad_over_2 +
@@ -6226,7 +6228,7 @@ namespace AirflowNetworkBalanceManager {
 
                     // Wind-pressure coefficients for vertical facades, high-rise building
 
-                    else if (UtilityRoutines::SameString(AirflowNetworkSimu.BldgType, "HighRise") && FacadeNum <= 4) {
+                    else if (UtilityRoutines::SameString(AirflowNetworkBalanceManager::AirflowNetworkSimu.BldgType, "HighRise") && FacadeNum <= 4) {
                         SR = min(max(SideRatio, 0.25), 4.0);
                         if (SR >= 0.25 && SR < 1.0) {
                             ISR = 1;
@@ -6242,8 +6244,8 @@ namespace AirflowNetworkBalanceManager {
 
                     // Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
 
-                    else if ((UtilityRoutines::SameString(AirflowNetworkSimu.BldgType, "HighRise") ||
-                              UtilityRoutines::SameString(AirflowNetworkSimu.BldgType, "LowRise")) &&
+                    else if ((UtilityRoutines::SameString(AirflowNetworkBalanceManager::AirflowNetworkSimu.BldgType, "HighRise") ||
+                              UtilityRoutines::SameString(AirflowNetworkBalanceManager::AirflowNetworkSimu.BldgType, "LowRise")) &&
                              FacadeNum == 5) {
                         SR = min(max(SideRatio, 0.25), 1.0);
                         if (SR >= 0.25 && SR < 0.5) {
@@ -6261,7 +6263,7 @@ namespace AirflowNetworkBalanceManager {
                 } // End of wind direction loop
                 // Add new table
                 vals[12] = vals[0]; // Enforce periodicity
-                curveIndex[FacadeNum - 1] = makeTable("!WPCTABLE" + std::to_string(FacadeNum), dirs30GridIndex, vals);
+                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!WPCTABLE" + std::to_string(FacadeNum), dirs30GridIndex, vals);
             } // End of facade number loop
 
         } else { //-calculate the advanced single sided wind pressure coefficients
@@ -6279,23 +6281,23 @@ namespace AirflowNetworkBalanceManager {
             valsByFacade[FacadeNum] = std::vector<Real64>(12);
             for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
                 if (FacadeNum == 1 || FacadeNum == 3) {
-                    SideRatio = AirflowNetworkSimu.AspectRatio;
+                    SideRatio = AirflowNetworkBalanceManager::AirflowNetworkSimu.AspectRatio;
                 } else { // FacadeNum = 2 or 4
-                    SideRatio = 1.0 / AirflowNetworkSimu.AspectRatio;
+                    SideRatio = 1.0 / AirflowNetworkBalanceManager::AirflowNetworkSimu.AspectRatio;
                 }
-                if (UtilityRoutines::SameString(AirflowNetworkSimu.BldgType, "HighRise") && FacadeNum != 5) {
+                if (UtilityRoutines::SameString(AirflowNetworkBalanceManager::AirflowNetworkSimu.BldgType, "HighRise") && FacadeNum != 5) {
                     SideRatio = 1.0 / SideRatio;
                 }
                 SideRatioFac = std::log(SideRatio);
                 for (int windDirNum = 1; windDirNum <= 36; ++windDirNum) {
                     Real64 WindAng = (windDirNum - 1) * 10.0;
-                    dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum));
-                    if (dataAirflowNetworkBalanceManager.IncAng > 180.0) dataAirflowNetworkBalanceManager.IncAng = 360.0 - dataAirflowNetworkBalanceManager.IncAng;
-                    IAng = int(dataAirflowNetworkBalanceManager.IncAng / 10.0) + 1;
-                    DelAng = mod(dataAirflowNetworkBalanceManager.IncAng, 10.0);
+                    IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                    if (IncAng > 180.0) IncAng = 360.0 - IncAng;
+                    IAng = int(IncAng / 10.0) + 1;
+                    DelAng = mod(IncAng, 10.0);
                     WtAng = 1.0 - DelAng / 10.0;
                     // Wind-pressure coefficients for vertical facades, low-rise building
-                    IncRad = dataAirflowNetworkBalanceManager.IncAng * DegToRadians;
+                    IncRad = IncAng * AirflowNetworkBalanceManager::DegToRadians;
                     valsByFacade[FacadeNum - 1][windDirNum - 1] =
                         0.6 * std::log(1.248 - 0.703 * std::sin(IncRad / 2.0) - 1.175 * pow_2(std::sin(IncRad)) +
                                        0.131 * pow_3(std::sin(2.0 * IncRad * SideRatioFac)) + 0.769 * std::cos(IncRad / 2.0) +
@@ -6314,17 +6316,17 @@ namespace AirflowNetworkBalanceManager {
             }
             for (int windDirNum = 1; windDirNum <= 12; ++windDirNum) {
                 Real64 WindAng = (windDirNum - 1) * 30.0;
-                dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - dataAirflowNetworkBalanceManager.FacadeAng(FacadeNum));
-                if (dataAirflowNetworkBalanceManager.IncAng > 180.0) dataAirflowNetworkBalanceManager.IncAng = 360.0 - dataAirflowNetworkBalanceManager.IncAng;
-                IAng = int(dataAirflowNetworkBalanceManager.IncAng / 30.0) + 1;
-                DelAng = mod(dataAirflowNetworkBalanceManager.IncAng, 30.0);
+                IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                if (IncAng > 180.0) IncAng = 360.0 - IncAng;
+                IAng = int(IncAng / 30.0) + 1;
+                DelAng = mod(IncAng, 30.0);
                 WtAng = 1.0 - DelAng / 30.0;
                 // Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
                 valsByFacade[FacadeNum - 1][windDirNum - 1] =
                     WtSR * (WtAng * CPHighRiseRoof(ISR, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR, IAng + 1)) +
                     (1.0 - WtSR) * (WtAng * CPHighRiseRoof(ISR + 1, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR + 1, IAng + 1));
             }
-            CalcSingleSidedCps(valsByFacade); // run the advanced single sided subroutine if at least one zone calls for it
+            AirflowNetworkBalanceManager::CalcSingleSidedCps(valsByFacade); // run the advanced single sided subroutine if at least one zone calls for it
             // Resize the curve index array
             curveIndex.resize(valsByFacade.size());
             // Create the curves
@@ -6339,21 +6341,23 @@ namespace AirflowNetworkBalanceManager {
 
             for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
                 valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity
-                curveIndex[FacadeNum - 1] = makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs10GridIndex, valsByFacade[FacadeNum - 1]);
+                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs10GridIndex, valsByFacade[FacadeNum - 1]);
             }
             FacadeNum = 5;
             valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity
-            curveIndex[FacadeNum - 1] = makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs30GridIndex, valsByFacade[FacadeNum - 1]);
+            curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs30GridIndex, valsByFacade[FacadeNum - 1]);
             for (unsigned facadeNum = 6; facadeNum <= valsByFacade.size(); ++facadeNum) {
                 valsByFacade[facadeNum - 1].push_back(valsByFacade[facadeNum - 1][0]); // Enforce periodicity
-                curveIndex[facadeNum - 1] = makeTable("!SSWPCTABLE" + std::to_string(facadeNum), dirs10GridIndex, valsByFacade[facadeNum - 1]);
+                curveIndex[facadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!SSWPCTABLE" + std::to_string(facadeNum), dirs10GridIndex, valsByFacade[facadeNum - 1]);
             }
         }
         // Connect the external nodes to the new curves
-        for (ExtNum = 1; ExtNum <= dataAirflowNetworkBalanceManager.NumOfExtNodes; ++ExtNum) {
-            MultizoneExternalNodeData(ExtNum).curve = curveIndex[MultizoneExternalNodeData(ExtNum).facadeNum - 1];
+        for (ExtNum = 1; ExtNum <= NumOfExtNodes; ++ExtNum) {
+            AirflowNetworkBalanceManager::MultizoneExternalNodeData(ExtNum).curve = curveIndex[AirflowNetworkBalanceManager::MultizoneExternalNodeData(ExtNum).facadeNum - 1];
         }
     }
+
+namespace AirflowNetworkBalanceManager {
 
     Real64 CalcWindPressure(int const curve,           // Curve index, change this to pointer after curve refactor
                             bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
@@ -10418,8 +10422,8 @@ namespace AirflowNetworkBalanceManager {
                             Surface(MultizoneSurfaceData(SrfNum).SurfNum).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName);
                         if (MZDZoneNum == AFNZnNum) {
                             // This is terrible, should not do it this way
-                            auto afe = dataAirflowNetworkBalanceManager.solver.elements.find(MultizoneSurfaceData(SrfNum).OpeningName);
-                            if (afe != dataAirflowNetworkBalanceManager.solver.elements.end()) {
+                            auto afe = solver.elements.find(MultizoneSurfaceData(SrfNum).OpeningName);
+                            if (afe != solver.elements.end()) {
                                 auto type = afe->second->type();
                                 if (type == ComponentType::DOP) {
                                     ++AFNNumOfExtOpenings;
@@ -10480,8 +10484,8 @@ namespace AirflowNetworkBalanceManager {
             if (MultizoneZoneData(MZDZoneNum).SingleSidedCpType == "ADVANCED") {
                 if (Surface(MultizoneSurfaceData(SrfNum).SurfNum).ExtBoundCond == ExternalEnvironment) { // check if outdoor boundary condition
                     // This is terrible, should not do it this way
-                    auto afe = dataAirflowNetworkBalanceManager.solver.elements.find(MultizoneSurfaceData(SrfNum).OpeningName);
-                    if (afe != dataAirflowNetworkBalanceManager.solver.elements.end()) {
+                    auto afe = solver.elements.find(MultizoneSurfaceData(SrfNum).OpeningName);
+                    if (afe != solver.elements.end()) {
                         auto type = afe->second->type();
                         if (type == ComponentType::DOP) {
                             ++AFNNumOfExtOpenings;

@@ -1090,20 +1090,20 @@ namespace AirflowNetwork {
         // FLOW:
         int NumCur = n;
 
-        if (AFECTL(i) <= 0.0) {
+        if (solver.AFECTL(i) <= 0.0) {
             // Speed = 0; treat fan as resistance.
             return GenericCrack(FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
         }
         // Pressure rise at reference fan speed.
-        if (AFECTL(i) >= TranRat) {
-            PRISE = -PDROP * (RhoAir / propN.density) / pow_2(AFECTL(i));
+        if (solver.AFECTL(i) >= TranRat) {
+            PRISE = -PDROP * (RhoAir / propN.density) / pow_2(solver.AFECTL(i));
         } else {
-            PRISE = -PDROP * (RhoAir / propN.density) / (TranRat * AFECTL(i));
+            PRISE = -PDROP * (RhoAir / propN.density) / (TranRat * solver.AFECTL(i));
         }
         // if (LIST >= 4) gio::write(Unit21, Format_901) << " fan:" << i << PDROP << PRISE << AFECTL(i) << DisSysCompDetFanData(CompNum).TranRat;
         if (LFLAG) {
             // Initialization by linear approximation.
-            F[0] = -Qfree * AFECTL(i) * (1.0 - PRISE / Pshut);
+            F[0] = -Qfree * solver.AFECTL(i) * (1.0 - PRISE / Pshut);
             DPDF = -Pshut / Qfree;
             // if (LIST >= 4)
             //    gio::write(Unit21, Format_901) << " fni:" << JA << DisSysCompDetFanData(CompNum).Qfree << DisSysCompDetFanData(CompNum).Pshut;
@@ -1158,10 +1158,10 @@ namespace AirflowNetwork {
             DPDF = Coeff(k + 2) + CX * (2.0 * Coeff(k + 3) + CX * 3.0 * Coeff(k + 4));
         }
         // Convert to flow at given speed.
-        F[0] *= (propN.density / RhoAir) * AFECTL(i);
+        F[0] *= (propN.density / RhoAir) * solver.AFECTL(i);
         // Set derivative w/r pressure drop (-).
-        if (AFECTL(i) >= TranRat) {
-            DF[0] = -AFECTL(i) / DPDF;
+        if (solver.AFECTL(i) >= TranRat) {
+            DF[0] = -solver.AFECTL(i) / DPDF;
         } else {
             DF[0] = -1.0 / DPDF;
         }
@@ -1334,7 +1334,7 @@ namespace AirflowNetwork {
 
         // FLOW:
 
-        C = AFECTL(i);
+        C = solver.AFECTL(i);
         if (C < FlowMin) C = FlowMin;
         if (C > FlowMax) C = FlowMax;
         C = A0 + C * (A1 + C * (A2 + C * A3));
@@ -2242,11 +2242,11 @@ namespace AirflowNetwork {
         } else {
             for (k = 1; k <= NetworkNumOfLinks; ++k) {
                 if (AirflowNetworkLinkageData(k).NodeNums[1] == n) {
-                    F[0] = AFLOW(k);
+                    F[0] = solver.AFLOW(k);
                     break;
                 }
             }
-            PZ(m) = PZ(n) - DP;
+            solver.PZ(m) = solver.PZ(n) - DP;
             Co = F[0] / DP;
             DF[0] = 10.e10;
         }

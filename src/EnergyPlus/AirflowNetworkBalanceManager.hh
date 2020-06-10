@@ -114,8 +114,6 @@ namespace AirflowNetworkBalanceManager {
 
     void CalcAirflowNetworkAirBalance();
 
-    void CalcWindPressureCoeffs();
-
     Real64 CalcDuctInsideConvResist(Real64 Tair, // Average air temperature
                                     Real64 mdot, // Mass flow rate
                                     Real64 Dh,   // Hydraulic diameter
@@ -221,6 +219,7 @@ namespace AirflowNetworkBalanceManager {
     struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
 
         void initialize();
+        void calculateWindPressureCoeffs();
 
         Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;
@@ -277,7 +276,7 @@ namespace AirflowNetworkBalanceManager {
         Array1D<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
         std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
-        AirflowNetwork::Solver solver;
+        //AirflowNetwork::Solver solver;
 
         // Output and reporting
         Array1D<AirflowNetwork::AirflowNetworkExchangeProp> exchangeData;
