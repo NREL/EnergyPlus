@@ -304,7 +304,7 @@ namespace WaterCoils {
         }
 
         // With the correct CoilNum Initialize
-        InitWaterCoil(state, OutputFiles::getSingleton(), CoilNum, FirstHVACIteration); // Initialize all WaterCoil related parameters
+        InitWaterCoil(state, CoilNum, FirstHVACIteration); // Initialize all WaterCoil related parameters
 
         if (present(FanOpMode)) {
             OpMode = FanOpMode;
@@ -962,11 +962,7 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(EnergyPlusData &state,
-                       OutputFiles &outputFiles,
-                       int const CoilNum,
-                       bool const FirstHVACIteration // unused1208
-    )
+    void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1692,9 +1688,7 @@ namespace WaterCoils {
                     auto const SELECT_CASE_var(WaterCoil(CoilNum).WaterCoilType_Num);
                     if (SELECT_CASE_var == WaterCoil_SimpleHeating) {
                         if (RptCoilHeaderFlag(1)) {
-                            print(outputFiles.eio,
-                                  "{}",
-                                  "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}\n");
+                            print(state.outputFiles.eio, "{}", "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}\n");
                             RptCoilHeaderFlag(1) = false;
                         }
                         PreDefTableEntry(pdchHeatCoilType, WaterCoil(CoilNum).Name, "Coil:Heating:Water");
@@ -1704,7 +1698,7 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstHeatCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        print(outputFiles.eio,
+                        print(state.outputFiles.eio,
                               "{},{},{:.2R}\n",
                               "Water Heating Coil Capacity Information,Coil:Heating:Water",
                               WaterCoil(CoilNum).Name,
@@ -1722,7 +1716,7 @@ namespace WaterCoils {
                                                                                    WaterCoil(CoilNum).WaterLoopNum); // coil report
                     } else if (SELECT_CASE_var == WaterCoil_DetFlatFinCooling) {
                         if (RptCoilHeaderFlag(2)) {
-                            print(outputFiles.eio,
+                            print(state.outputFiles.eio,
                                   "{}\n",
                                   "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
                                   "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
@@ -1741,7 +1735,7 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        print(outputFiles.eio,
+                        print(state.outputFiles.eio,
                               "{},{},{:.2R},{:.2R},{:.2R},{:.2R}\n",
                               "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry",
                               WaterCoil(CoilNum).Name,
@@ -1762,7 +1756,7 @@ namespace WaterCoils {
                                                                             WaterCoil(CoilNum).WaterLoopNum); // Coil Report
                     } else if (SELECT_CASE_var == WaterCoil_Cooling) {
                         if (RptCoilHeaderFlag(2)) {
-                            print(outputFiles.eio,
+                            print(state.outputFiles.eio,
                                   "{}\n",
                                   "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
                                   "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
@@ -1783,7 +1777,7 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        print(outputFiles.eio,
+                        print(state.outputFiles.eio,
                               "{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n",
                               "Water Cooling Coil Capacity Information,Coil:Cooling:Water",
                               WaterCoil(CoilNum).Name,
