@@ -11,7 +11,7 @@ import sys
 
 DEBUG = False
 VERBOSE = False
-EXIT_CODE_ISSUES_FOUND = 0 # set up to not return a non-zero exit code
+EXIT_CODE_ISSUES_FOUND = 0  # set up to not return a non-zero exit code
 EXIT_CODE_GOOD = 0
 
 
@@ -393,7 +393,9 @@ def update_paths_to_be_from_repo_root(issues, repo_root_to_src):
             for location in update['locations']:
                 loc = copy.deepcopy(location)
                 if 'file' in location:
-                    loc['file'] = os.path.join(repo_root_to_src, location['file'])
+                    loc['file'] = os.path.join(
+                            repo_root_to_src,
+                            location['file'])
                 new_locs.append(loc)
             update['locations'] = new_locs
         updated.append(update)
@@ -415,7 +417,8 @@ def find_issues(log_path, json_error_path, src_dir):
     """
     try:
         errs = parse_log(log_path, src_dir)
-        repo_root = os.path.abspath(os.path.join(os.path.dirname(log_path), '..', '..'))
+        repo_root = os.path.abspath(
+                os.path.join(os.path.dirname(log_path), '..', '..'))
         repo_root_to_src = os.path.relpath(src_dir, start=repo_root)
         errs['issues'] = update_paths_to_be_from_repo_root(
                 errs['issues'],
