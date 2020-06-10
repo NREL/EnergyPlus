@@ -445,13 +445,13 @@ namespace AirflowNetwork {
                               ) = 0;
 
         // Make this abstract once all the classes implement it
-        virtual int calculate(const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                              const Real64 multiplier,    // Element multiplier
-                              const Real64 control,       // Element control signal
-                              const AirProperties &propN, // Node 1 properties
-                              const AirProperties &propM, // Node 2 properties
-                              std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                              std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+        virtual int calculate(const Real64 EP_UNUSED(PDROP),         // Total pressure drop across a component (P1 - P2) [Pa]
+                              const Real64 EP_UNUSED(multiplier),    // Element multiplier
+                              const Real64 EP_UNUSED(control),       // Element control signal
+                              const AirProperties &EP_UNUSED(propN), // Node 1 properties
+                              const AirProperties &EP_UNUSED(propM), // Node 2 properties
+                              std::array<Real64, 2> &EP_UNUSED(F),   // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &EP_UNUSED(DF)   // Partial derivative:  DF/DP
                               )
         {
             return 1;

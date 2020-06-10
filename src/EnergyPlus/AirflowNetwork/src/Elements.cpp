@@ -2616,7 +2616,6 @@ namespace AirflowNetwork {
         Real64 const C(0.868589);
         Real64 const EPS(0.001);
         Real64 const Rough(0.0001);
-        Real64 const InitLamCoef(128.0);
         Real64 const LamDynCoef(64.0);
         Real64 const LamFriCoef(0.0001);
         Real64 const TurDynCoef(0.0001);
@@ -3083,7 +3082,6 @@ namespace AirflowNetwork {
         Real64 const C(0.868589);
         Real64 const EPS(0.001);
         Real64 const Rough(0.0001);
-        Real64 const InitLamCoef(128.0);
         Real64 const LamDynCoef(64.0);
         Real64 const LamFriCoef(0.0001);
         Real64 const TurDynCoef(0.0001);
