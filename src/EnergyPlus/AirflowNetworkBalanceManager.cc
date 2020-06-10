@@ -8105,10 +8105,7 @@ namespace AirflowNetworkBalanceManager {
                 ZonePreDefRep(i).AFNInfilVolMin = StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
             }
             if (ZonePreDefRep(i).isOccupied) {
-                ZonePreDefRep(i).AFNInfilVolTotal += StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
-                if (dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilVolume < ZonePreDefRep(i).AFNInfilVolMin) {
-                    ZonePreDefRep(i).AFNInfilVolMin = StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
-                }
+                ZonePreDefRep(i).AFNInfilVolTotalOcc += StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
             }
 
             Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(OutHumRat, Zone(i).OutDryBulbTemp);
