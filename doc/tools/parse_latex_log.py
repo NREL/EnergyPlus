@@ -488,42 +488,6 @@ def run_tests():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        # shim for testing
-        doc_tags = [
-                'acknowledgments',
-                'auxiliary-programs',
-                'ems-application-guide',
-                'engineering-reference',
-                'essentials',
-                'external-interfaces-application-guide',
-                'getting-started',
-                'input-output-reference',
-                'interface-developer',
-                'module-developer',
-                'output-details-and-examples',
-                'plant-application-guide',
-                'tips-and-tricks-using-energyplus',
-                'using-energyplus-for-compliance',
-                ]
-        current_dir = os.path.abspath('.')
-        for tag in doc_tags:
-            log_path = os.path.abspath(
-                    os.path.join(current_dir, '..', tag, tag + '.log'))
-            assert os.path.exists(log_path)
-            json_err = '{}-err.json'.format(tag)
-            src_dir = os.path.abspath(
-                    os.path.join(current_dir, '..', tag))
-            print("="*60)
-            print("Processing {}...".format(tag))
-            if os.path.exists(json_err):
-                os.remove(json_err)
-            find_issues(
-                    log_path=str(log_path),
-                    json_error_path=json_err,
-                    src_dir=str(src_dir))
-        print("Done!")
-        sys.exit(EXIT_CODE_GOOD)
     if len(sys.argv) == 2 and (sys.argv[1] == 'test'):
         print("TESTING:")
         run_tests()
