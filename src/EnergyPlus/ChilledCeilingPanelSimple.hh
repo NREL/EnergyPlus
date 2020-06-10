@@ -75,17 +75,12 @@ namespace CoolingPanelSimple {
         ZoneConvectiveLoad  // Controls system using zone convective remaining load
     };
 
-//    // Condensation control types:
-//    extern int const CondCtrlNone;      // Condensation control--none, so system never shuts down
-//    extern int const CondCtrlSimpleOff; // Condensation control--simple off, system shuts off when condensation predicted
-//    extern int const CondCtrlVariedOff; // Condensation control--variable off, system modulates to keep running if possible
-//
-//    // Condensation control types:
-//    enum class CondCtrl {
-//        NONE,               // Condensation control--none, so system never shuts down
-//        SIMPLEOFF,          // Condensation control--simple off, system shuts off when condensation predicted
-//        VARIEDOFF           // Condensation control--variable off, system modulates to keep running if possible
-//    };
+    // Condensation control types:
+    enum class CondCtrl {
+        NONE,               // Condensation control--none, so system never shuts down
+        SIMPLEOFF,          // Condensation control--simple off, system shuts off when condensation predicted
+        VARIEDOFF           // Condensation control--variable off, system modulates to keep running if possible
+    };
 
     struct CoolingPanelParams
     {
@@ -105,7 +100,7 @@ namespace CoolingPanelSimple {
         Control ControlType;
         std::string ColdSetptSched;
         int ColdSetptSchedPtr;
-        int CondCtrlType;
+        CondCtrl CondCtrlType;
         Real64 CondDewPtDeltaT;
         int CondErrIndex;
         Real64 ColdThrottlRange;
@@ -148,7 +143,7 @@ namespace CoolingPanelSimple {
         // Default Constructor
         CoolingPanelParams()
             : EquipType(0), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0), TotSurfToDistrib(0), ControlCompTypeNum(0),
-              CompErrIndex(0), ControlType(Control::Unassigned), ColdSetptSchedPtr(0), CondCtrlType(0), CondDewPtDeltaT(0.0), CondErrIndex(0),
+              CompErrIndex(0), ControlType(Control::Unassigned), ColdSetptSchedPtr(0), CondCtrlType(CondCtrl::NONE), CondDewPtDeltaT(0.0), CondErrIndex(0),
               ColdThrottlRange(0.0), RatedWaterTemp(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0), UA(0.0), Offset(0.0), WaterMassFlowRate(0.0),
               WaterMassFlowRateMax(0.0), RatedWaterFlowRate(0.0), WaterVolFlowRateMax(0.0), WaterInletTempStd(0.0), WaterInletTemp(0.0),
               WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0), WaterOutletEnthalpy(0.0), RatedZoneAirTemp(0.0),

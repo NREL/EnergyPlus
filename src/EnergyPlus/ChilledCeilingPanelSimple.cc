@@ -110,11 +110,6 @@ namespace CoolingPanelSimple {
     // MODULE PARAMETER DEFINITIONS
     std::string const cCMO_CoolingPanel_Simple("ZoneHVAC:CoolingPanel:RadiantConvective:Water");
 
-    // Condensation control types:
-    int const CondCtrlNone(0);      // Condensation control--none, so system never shuts down
-    int const CondCtrlSimpleOff(1); // Condensation control--simple off, system shuts off when condensation predicted
-    int const CondCtrlVariedOff(2); // Condensation control--variable off, system modulates to keep running if possible
-
     // MODULE VARIABLE DECLARATIONS:
     int NumCoolingPanels(0);
     Array1D<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
@@ -526,13 +521,13 @@ namespace CoolingPanelSimple {
             }
 
             if (UtilityRoutines::SameString(cAlphaArgs(8), Off)) {
-                ThisCP.CondCtrlType = CondCtrlNone;
+                ThisCP.CondCtrlType = CondCtrl::NONE;
             } else if (UtilityRoutines::SameString(cAlphaArgs(8), SimpleOff)) {
-                ThisCP.CondCtrlType = CondCtrlSimpleOff;
+                ThisCP.CondCtrlType = CondCtrl::SIMPLEOFF;
             } else if (UtilityRoutines::SameString(cAlphaArgs(8), VariableOff)) {
-                ThisCP.CondCtrlType = CondCtrlVariedOff;
+                ThisCP.CondCtrlType = CondCtrl::VARIEDOFF;
             } else {
-                ThisCP.CondCtrlType = CondCtrlSimpleOff;
+                ThisCP.CondCtrlType = CondCtrl::SIMPLEOFF;
             }
 
             ThisCP.CondDewPtDeltaT = rNumericArgs(9);
@@ -1313,9 +1308,9 @@ namespace CoolingPanelSimple {
 
             // Condensation is possible so invoke the three possible ways of handling this based on the user's choice...
 
-            if (this->CondCtrlType == CondCtrlNone) {
+            if (this->CondCtrlType == CondCtrl::NONE) {
                 // Condensation control is "off" which means don't do anything, simply let it run and ignore condensation
-            } else if (this->CondCtrlType == CondCtrlSimpleOff) {
+            } else if (this->CondCtrlType == CondCtrl::SIMPLEOFF) {
                 // For "simple off", simply turn the simple cooling panel off to avoid condensation
                 waterMassFlowRate = 0.0;
                 CoolingPanelOn = false;
@@ -1340,7 +1335,7 @@ namespace CoolingPanelSimple {
                                                    "C");
                 }
 
-            } else if (this->CondCtrlType == CondCtrlVariedOff) {
+            } else if (this->CondCtrlType == CondCtrl::VARIEDOFF) {
                 // Varied off is the most complex because it tries to run by reducing the inlet temperature
                 // As a result of this, there is some bypass/recirculation that has to take place.
                 // We might not have enough flow rate to meet whatever load we have, but at least
