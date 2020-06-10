@@ -120,5 +120,5 @@ inline const Double& HemiSphiral::operator [] (int ii) const
 
 Double	arcdist(BGL::vector3 dir1, BGL::vector3 dir2);
 
-vector<Double>	interpwgts(BGL::vector3 dirext, vector<struct nearestdata>& nd);
+vector<Double>	interpwgts(vector<struct nearestdata>& nd);
 //vector<Double>	interpwgts(BGL::vector3);

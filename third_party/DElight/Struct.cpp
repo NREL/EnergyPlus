@@ -76,7 +76,7 @@ namespace BGL = BldgGeomLib;
 /* Initializes data structure elements. */
 /****************************** subroutine struct_init *****************************/
 int struct_init(
-	char type[],	/* string identifier of structure to be initialized */
+	const char *type,	/* string identifier of structure to be initialized */
 	void *sptr)		/* generic pointer to structure to be initialized */
 {
 	int		ii, jj, kk, ll;

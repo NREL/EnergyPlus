@@ -209,8 +209,8 @@ Double	btdfHS::qinterp(BGL::vector3 indir, BGL::vector3 outdir)
 //	cout << "input angles\n";
 //	vector<int>		nnin = HSin.nearestc(2.0*HSin.DA,indir);
 	vector<struct nearestdata> nd;
-	int	nnsize = HSin.nearestc(2.0*HSin.DA,indir, nd);
-	vector<Double>	inwgt = interpwgts(indir,nd);
+	HSin.nearestc(2.0*HSin.DA,indir, nd);
+	vector<Double>	inwgt = interpwgts(nd);
 	//	final interpolation
 	Double	interpVal = 0;
 	for (int ii=0; ii<(int)inwgt.size(); ii++) {
@@ -254,13 +254,7 @@ ofstream& btdfHS::save(ofstream& outfile)
 
 //	btdfTrgz
 btdfTrgz::btdfTrgz()
-: Isym(0), btdf()
-{
-	DataIndx = vector<int>(Trgz0.NTrgz(),-1);
-}
-
-btdfTrgz::btdfTrgz(int inM, int outN)
-: Isym(0), btdf(Trgz0.NTrgz(),outN)
+: btdf(), Isym(0)
 {
 	DataIndx = vector<int>(Trgz0.NTrgz(),-1);
 }
@@ -289,8 +283,8 @@ Double	btdfTrgz::qinterp(BGL::vector3 indir, BGL::vector3 outdir)
 //	vector<int>		nnin = HSin.nearestc(2.0*HSin.DA,indir);
 	vector<struct nearestdata> nd;
 	Double	DA = sqrt(2*PI/size());
-	int	nnsize = Trgz0.nearestc(2.0*DA,indir, nd);
-	vector<Double>	inwgt = ::interpwgts(indir,nd);
+	Trgz0.nearestc(2.0*DA,indir, nd);
+	vector<Double>	inwgt = ::interpwgts(nd);
 	//	final interpolation
 	Double	interpVal = 0;
 	for (int ii=0; ii<(int)inwgt.size(); ii++) {

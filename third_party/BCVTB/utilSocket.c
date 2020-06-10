@@ -317,7 +317,6 @@ int disassembleHeaderBuffer(const char* buffer,
   int retVal;    // return value
   //////////////////////////////////////////////////////
   // Get first few integers to set up dictionaray
-  int i;
   // set number of received values to zero to ensure that
   // if retVal != 0, we have the values initialized
   *nDbl = 0;
@@ -897,7 +896,7 @@ int readfromsocket(const int *sockfd, int *flaRea,
 		   double *curSimTim,
 		   double dblValRea[], int intValRea[], int booValRea[])
 {
-  int retVal, i;
+  int retVal;
   char *inpBuf;
   /////////////////////////////////////////////////////
   // make sure that the socketFD is valid
@@ -976,6 +975,7 @@ int readfromsocket(const int *sockfd, int *flaRea,
 ///\return The exit value of the \c read command.
 int readbufferfromsocket(const int *sockfd,
 			 char *buffer, int *bufLen){
+  (void)bufLen;
   int retVal;
   int reachedEnd = 0;
   // The number 8192 needs to be the same as in Server.java

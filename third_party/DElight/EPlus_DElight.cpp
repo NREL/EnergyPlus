@@ -103,7 +103,6 @@ DllExport int	DElightDaylightFactors4EPlus(
 {
 	FILE *infile;						/* input file pointer */
 	FILE *outfile;						/* output file pointer */
-	int err;	// error return value from fopen_s
 	SUN_DATA sun_data;	/* sun data structure */
 
     // Init return value  
@@ -124,7 +123,7 @@ DllExport int	DElightDaylightFactors4EPlus(
 	char cInputLine[MAX_CHAR_LINE+1];	/* Input line */
 	fgets(cInputLine, MAX_CHAR_LINE, infile);
 	char cInputVersion[MAX_CHAR_UNAME+1];
-	sscanf(cInputLine,"%*s %s\n",cInputVersion,_countof(cInputVersion));
+	sscanf(cInputLine,"%*s %s\n",cInputVersion); //,_countof(cInputVersion));
 
 	// If the input version is EPlus then use LoadDataFromEPlus()
 	if (strcmp(cInputVersion,"EPlus") == 0)
@@ -158,7 +157,7 @@ DllExport int	DElightDaylightFactors4EPlus(
 	/* Calculate geometrical values required for DF calcs. */
 	if (iSurfNodes > MAX_SURF_NODES) iSurfNodes = MAX_SURF_NODES;
 	if (iWndoNodes > MAX_WNDO_NODES) iWndoNodes = MAX_WNDO_NODES;
-	if (CalcGeomFromEPlus(bldg_ptr,iSurfNodes,iWndoNodes,pofdmpfile) < 0) {
+	if (CalcGeomFromEPlus(bldg_ptr) < 0) {
 		*pofdmpfile << "ERROR: DElight Bad return from CalcGeomFromEPlus()\n";
 		return(-4);
 	}
@@ -255,13 +254,13 @@ DllExport int DElightElecLtgCtrl4EPlus(
 	// Calc interpolation indexes and ratios
 	int iphs, iths;				/* sun position alt and azm interpolation indexes */
 	double phratio, thratio;	/* sun position alt and azm interpolation displacement ratios */
-	if (CalcInterpolationVars(bldg_ptr, dSOLCOS, dMinAlt, dMaxAlt, dAltInc, dMinAzm, dMaxAzm, dAzmInc, &iphs, &iths, &phratio, &thratio, pofdmpfile) < 0) {
+	if (CalcInterpolationVars(bldg_ptr, dSOLCOS, dMinAlt, dMaxAlt, dAltInc, dMinAzm, dMaxAzm, dAzmInc, &iphs, &iths, &phratio, &thratio) < 0) {
 		*pofdmpfile << "ERROR: DElight Bad return from CalcInterpolationVars()\n";
 		return(-5);
 	}
 
 	// Calc interior daylight illuminance at each refpt
-	if (CalcZoneInteriorIllum(zone_ptr, dHISKF, dHISUNF, dCloudFraction, iphs, iths, phratio, thratio, pofdmpfile) < 0) {
+	if (CalcZoneInteriorIllum(zone_ptr, dHISKF, dHISUNF, dCloudFraction, iphs, iths, phratio, thratio) < 0) {
 		*pofdmpfile << "ERROR: DElight Bad return from CalcZoneInteriorIllum()\n";
 		return(-6);
 	}

@@ -1085,7 +1085,7 @@ int	CalcDFs(
 /* Modified from earlier version of wndo_element_contrib() */
 /*   Key modifications are: */
 /*       - remove glare related calculations */
-/*       - replace references to ray[2] (i.e., cos(angle of incidence) for horiz surf) by cosSurfIncidence
+/*       - replace references to ray[2] (i.e., cos(angle of incidence) for horiz surf) by cosSurfIncidence */
 /*   8/2000 modifications: */
 /*       - separate reference point illuminance calc from surface node luminance calculation */
 /************************************************************************************************/
@@ -1313,7 +1313,7 @@ int	wndo_element_refpt_illum_contrib(
 /* Modified from earlier version of wndo_element_contrib() */
 /*   Key modifications are: */
 /*       - remove glare related calculations */
-/*       - replace references to ray[2] (i.e., cos(angle of incidence) for horiz surf) by cosSurfIncidence
+/*       - replace references to ray[2] (i.e., cos(angle of incidence) for horiz surf) by cosSurfIncidence */
 /*   8/2000 modifications: */
 /*       - include visible reflectance of node surface in node luminance calculation */
 /*************************************************************************************************/

@@ -74,7 +74,7 @@ struct btdfHS : public btdf
 	int		size() {return HSoutList.size();}
 	int		iiFindDataIndx(int iiTrgz) {return iiTrgz;}
 	BGL::vector3	inDir(int ii);
-	Double	inDirOmega(int ii) {return HSin.omega;}
+	Double	inDirOmega(int ii) {(void)ii; return HSin.omega;}
 	int		isym() {return 0;}
 	int		iisym(int ii) {return ii;}
 	int		iidata(int ii) {return ii;}
@@ -123,7 +123,6 @@ struct btdfTrgz : public btdf
 	Tregenza	Trgz0;
 
 	btdfTrgz();
-	btdfTrgz(int, int);
 
     HemiSphiral&        operator [] (int ii);
 

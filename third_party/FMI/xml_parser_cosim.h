@@ -144,7 +144,7 @@ double getDouble (void* element, Att a, ValueStatus* vs);
 int getInt (void* element, Att a, ValueStatus* vs);
 unsigned int getUInt (void* element, Att a, ValueStatus* vs);
 char getBoolean (void* element, Att a, ValueStatus* vs);
-Enu getEnumValue (void* element, Att a, ValueStatus* vs);
+int getEnumValue (void* element, Att a, ValueStatus* vs);
 void freeElement (void* element);
 
 // Convenience methods for AST access. To be used afer successful validation only.

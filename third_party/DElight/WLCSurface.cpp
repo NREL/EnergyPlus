@@ -51,19 +51,19 @@ WLCSurface::~WLCSurface()
 { }
 
 WLCSurface::WLCSurface(string Name, BGL::point3 Origin, Double Sazm, Double Stilt, Double Szeta, vector<BGL::point2> p2List, Double maxNodeArea)
-: surf3(Name, Origin, Sazm, Stilt, Szeta, p2List), mesh(vert2,maxNodeArea), vis_refl(1.)
+: surf3(Name, Origin, Sazm, Stilt, Szeta, p2List), vis_refl(1.), mesh(vert2,maxNodeArea)
 { }
 
 WLCSurface::WLCSurface(string Name, BGL::point3 Origin, Double Sazm, Double Stilt, Double Szeta, vector<BGL::point2> p2List, Double maxNodeArea, Double visrefl)
-: surf3(Name, Origin, Sazm, Stilt, Szeta, p2List), mesh(vert2,maxNodeArea), vis_refl(visrefl)
+: surf3(Name, Origin, Sazm, Stilt, Szeta, p2List), vis_refl(visrefl), mesh(vert2,maxNodeArea)
 { }
 
 WLCSurface::WLCSurface(string Name, BGL::point3 Origin, Double Sazm, Double Stilt, Double Szeta, Double width, Double height, Double maxNodeArea)
-: surf3(Name, Origin, Sazm, Stilt, Szeta, width, height), mesh(vert2,maxNodeArea), vis_refl(1.)
+: surf3(Name, Origin, Sazm, Stilt, Szeta, width, height), vis_refl(1.), mesh(vert2,maxNodeArea)
 { }
 
 WLCSurface::WLCSurface(string Name, BGL::point3 Origin, Double Sazm, Double Stilt, Double Szeta, Double width, Double height, Double maxNodeArea, Double visrefl)
-: surf3(Name, Origin, Sazm, Stilt, Szeta, width, height), mesh(vert2,maxNodeArea), vis_refl(visrefl)
+: surf3(Name, Origin, Sazm, Stilt, Szeta, width, height), vis_refl(visrefl), mesh(vert2,maxNodeArea)
 { }
 
 WLCSurface::WLCSurface(string Name, vector<BGL::point3> p3List, Double maxNodeArea)

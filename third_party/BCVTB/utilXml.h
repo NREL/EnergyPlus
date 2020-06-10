@@ -156,7 +156,7 @@ int *   inputVarsType;  ///< the integer array to store the types of each input 
 char ** inputKeys;      ///< the string array to store the types of input variable types
 int     numInputKeys;   ///< the number of input variable types
 int     source;         ///< flag for function /c getepvariables 0=EnergyPlus, 1=Ptolemy
-int const * strLen;     ///< the length of string parsed to this function
+size_t const * strLen;     ///< the length of string parsed to this function
 
 
 ////////////////////////////////////////////////////////////////
@@ -196,7 +196,7 @@ getepvariables(
  char *	const myInputVars, 
  int *	const myNumInputVars,
  int *	const myInputVarsType,
- int const *	const myStrLen
+ size_t const *	const myStrLen
 );
 
 ////////////////////////////////////////////////////////////////
@@ -227,7 +227,7 @@ getepvariablesFMU(
  char *	const myInputVars, 
  int *	const myNumInputVars,
  int *	const myInputVarsType,
- int const *	const myStrLen
+ size_t const *	const myStrLen
 );
 
 ////////////////////////////////////////////////////////////////
@@ -267,7 +267,7 @@ getxmlvalues(
  char const * const exp, 
  char * const myVals, 
  size_t * const myNumVals,
- int const myStrLen
+ size_t const myStrLen
 );
 
 ////////////////////////////////////////////////////////////////
@@ -324,7 +324,7 @@ getxmlvaluesf(
  char const * const atrName,
  size_t * const nVal,
  char * str,
- int * const strLen
+ size_t * const strLen
 );
 
 ////////////////////////////////////////////////////////////////

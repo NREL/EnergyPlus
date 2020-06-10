@@ -566,7 +566,7 @@ Double	HemiSphiral::interp(BGL::vector3 dirext)
 	int	nnsize = nearestc(2.0*DA,dirext, nd);
 	if (nnsize == 0) return 0;
 
-	vector<Double> weights = ::interpwgts(dirext,nd);
+	vector<Double> weights = ::interpwgts(nd);
 
 	Double interpval = 0;
 	for (int ii=0; ii<(int)weights.size(); ii++) {
@@ -577,7 +577,7 @@ Double	HemiSphiral::interp(BGL::vector3 dirext)
 }
 
 //vector<Double>	HemiSphiral::interpwgts(BGL::vector3 dirext, vector<struct nearestdata>& nd)
-vector<Double>	interpwgts(BGL::vector3 dirext, vector<struct nearestdata>& nd)
+vector<Double>	interpwgts(vector<struct nearestdata>& nd)
 {
 	//	avoids singularity if dirext == dir(ii)
 	Double epsilon = MAXPointTol;	//	tunable parameter
@@ -604,17 +604,17 @@ vector<Double>	interpwgts(BGL::vector3 dirext, vector<struct nearestdata>& nd)
 	for (ii=0; ii<size; ii++) {
 		weights[ii] = adistinverse[ii] / sum;
 	}
-	
+
 	return weights;
 }
 
 vector<Double>	HemiSphiral::interpwgts(BGL::vector3 dirext)
 {
 	vector<struct nearestdata> nd;
-	int	nnsize = nearestc(1.5*DA,dirext, nd);
+	nearestc(1.5*DA,dirext, nd);
 
-//	return interpwgts(dirext,nearestc(1.5*DA,dirext));	
-	return ::interpwgts(dirext,nd);	
+//	return interpwgts(dirext,nearestc(1.5*DA,dirext));
+	return ::interpwgts(nd);
 }
 
 Double		HemiSphiral::TotIllum()

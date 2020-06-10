@@ -41,6 +41,6 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 
 int struct_init(
-	char type[],	/* string identifier of structure to be initialized */
+	const char* type,	/* string identifier of structure to be initialized */
 	void *sptr);	/* generic pointer to structure to be initialized */
 

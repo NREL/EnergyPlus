@@ -92,7 +92,6 @@ void	SURF::WLCSURFInit(string Name, Double maxNodeArea)
 	BGL::vector3	v3;
 	//	LOOP over nWNDOs
 	for (ii=0; ii<nwndos; ii++) {
-        int iNVerts = wndo[ii]->nvert();
 		p2List.resize(wndo[ii]->nvert());
 		for (jj=0; jj<wndo[ii]->nvert(); jj++) {
 			v3 = wndo[ii]->vert3D(jj) - vert3D(0);
@@ -102,7 +101,6 @@ void	SURF::WLCSURFInit(string Name, Double maxNodeArea)
 	}
 	//	LOOP over nCFSsurfs
 	for (ii=0; ii<ncfs; ii++) {
-        int iNVerts = cfs[ii]->nvert();
 		p2List.resize(cfs[ii]->nvert());
 		for (jj=0; jj<cfs[ii]->nvert(); jj++) {
 			v3 = cfs[ii]->vert3D(jj) - vert3D(0);

@@ -52,8 +52,7 @@ int CalcInterpolationVars(
 	int *iphs_ptr,		/* sun position altitude interpolation index */
 	int *iths_ptr,		/* sun position azimuth interpolation index */
 	double *phratio_ptr,	/* sun position altitude interpolation displacement ratio */
-	double *thratio_ptr,	/* sun position azimuth interpolation displacement ratio */
-	ofstream* pofdmpfile);	/* ptr to LBLDLL error dump file */
+	double *thratio_ptr);	/* sun position azimuth interpolation displacement ratio */
 
 int	CalcZoneInteriorIllum(
 	ZONE *zone_ptr,			/* bldg->zone data structure pointer */
@@ -63,5 +62,4 @@ int	CalcZoneInteriorIllum(
 	int iphs,		/* sun altitude interpolation lower bound index */
 	int iths,		/* sun azimuth interpolation lower bound index */
 	double phratio,	/* sun altitude interpolation displacement ratio */
-	double thratio,	/* sun azimuth interpolation displacement ratio */
-	ofstream* pofdmpfile);	/* ptr to dump file */
+	double thratio);	/* sun azimuth interpolation displacement ratio */

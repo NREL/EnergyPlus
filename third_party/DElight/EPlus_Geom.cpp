@@ -83,10 +83,7 @@ namespace BGL = BldgGeomLib;
 /* Building geometry input is assumed to already be in World Coordinate System. */
 /****************************** subroutine CalcGeomFromEPlus *****************************/
 int CalcGeomFromEPlus(
-	BLDG *bldg_ptr,			/* bldg structure pointer */
-	int num_nodes,			/* total number of nodes on surface */
-	int num_wnodes,			/* total number of nodes on window */
-	ofstream* pofdmpfile)	/* ptr to LBLDLL error dump file */
+	BLDG *bldg_ptr)			/* bldg structure pointer */
 {
 	int iz, is, ivert, icoord, iw;
 
@@ -110,7 +107,7 @@ int CalcGeomFromEPlus(
 				} // window vertex loop
 
 				// Calc window height and width needed for nodal and radiosity calcs
-				CalcWindowGeomFromVertices(bldg_ptr, iz, is, iw, pofdmpfile);
+				CalcWindowGeomFromVertices(bldg_ptr, iz, is, iw);
 
 				// Mesh this window
                 // Meshing now done in WLCSURFInit - RJH 2/25/04
@@ -130,7 +127,7 @@ int CalcGeomFromEPlus(
 			} // surface vertex loop
 
 			// Calc additional surface geometry needed for nodal and radiosity calcs
-			CalcSurfaceGeomFromVertices(bldg_ptr, iz, is, pofdmpfile);
+			CalcSurfaceGeomFromVertices(bldg_ptr, iz, is);
 
 			// Mesh this surface
             // Meshing now done in WLCSURFInit - RJH 2/25/04
@@ -150,8 +147,7 @@ int CalcGeomFromEPlus(
 int CalcSurfaceGeomFromVertices(
 	BLDG *bldg_ptr,			/* bldg structure pointer */
 	int iz,					/* index of current zone */
-	int is,					/* index of current surface */
-	ofstream* pofdmpfile)	/* ptr to LBLDLL error dump file */
+	int is)					/* index of current surface */
 {
 
 	// Calc surface width and height,
@@ -230,8 +226,7 @@ int CalcWindowGeomFromVertices(
 	BLDG *bldg_ptr,			/* bldg structure pointer */
 	int iz,					/* index of current zone */
 	int is,					/* index of current surface */
-	int iw,					/* index of current window */
-	ofstream* pofdmpfile)	/* ptr to LBLDLL error dump file */
+	int iw)					/* index of current window */
 {
 
 	// Calc window width and height,

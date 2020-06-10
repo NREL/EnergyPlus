@@ -170,8 +170,8 @@ int read_wx_tmy2_hr(
     int wind_dir;
     int wind_speed;
     int visibility;
-    int ceiling_ht;
-    
+    long ceiling_ht;
+
     // present weather condition
     int observed;
     int thunder;

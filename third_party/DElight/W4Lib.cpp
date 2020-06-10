@@ -161,7 +161,6 @@ int ProcessW4GlassType(
 {
 	char cInputLine[MAX_CHAR_LINE+1];	// Input line
 	char *token;						/* Input token pointer */
-	char *next_token;					/* Next token pointer for strtok_s call */
 	int iW4ID;							// Window ID holder
 	int iEntryFound = 0;				// matching ID found flag
 	int iInLine;						// index

@@ -87,7 +87,6 @@ int LoadDataFromEPlus(
 {
 	char cInputLine[MAX_CHAR_LINE+1];	/* Input line */
 	char *token;						/* Input token pointer */
-	char *next_token;					/* Next token pointer for strtok_s call */
 	int icoord, im, iz, ils, is, iw, ish, irp, ihr;/* indexes */
 	int izshade_x, izshade_y;/* indexes */
 
@@ -96,7 +95,7 @@ int LoadDataFromEPlus(
 
 	/* Read site data */
 	fgets(cInputLine, MAX_CHAR_LINE, infile);
-	sscanf(cInputLine,"%*s %s\n",bldg_ptr->name,_countof(bldg_ptr->name));
+	sscanf(cInputLine,"%*s %s\n",bldg_ptr->name); //,_countof(bldg_ptr->name));
 	fgets(cInputLine, MAX_CHAR_LINE, infile);
 	sscanf(cInputLine,"%*s %lf\n",&bldg_ptr->lat);
 	fgets(cInputLine, MAX_CHAR_LINE, infile);
@@ -148,7 +147,7 @@ int LoadDataFromEPlus(
 		fgets(cInputLine, MAX_CHAR_LINE, infile);
 
 		fgets(cInputLine, MAX_CHAR_LINE, infile);
-		sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->name,_countof(bldg_ptr->zone[iz]->name));
+		sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->name); //,_countof(bldg_ptr->zone[iz]->name));
 		/* zone origin in bldg system coordinates */
 		fgets(cInputLine, MAX_CHAR_LINE, infile);
 		/* tokenize the line label */
@@ -205,7 +204,7 @@ int LoadDataFromEPlus(
 			fgets(cInputLine, MAX_CHAR_LINE, infile);
 
 			fgets(cInputLine, MAX_CHAR_LINE, infile);
-			sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->ltsch[ils]->name,_countof(bldg_ptr->zone[iz]->ltsch[ils]->name));
+			sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->ltsch[ils]->name); //,_countof(bldg_ptr->zone[iz]->ltsch[ils]->name));
 			fgets(cInputLine, MAX_CHAR_LINE, infile);
 			sscanf(cInputLine,"%*s %d\n",&bldg_ptr->zone[iz]->ltsch[ils]->mon_begin);
 			fgets(cInputLine, MAX_CHAR_LINE, infile);
@@ -252,7 +251,7 @@ int LoadDataFromEPlus(
 			fgets(cInputLine, MAX_CHAR_LINE, infile);
 
 			fgets(cInputLine, MAX_CHAR_LINE, infile);
-			sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->surf[is]->name,_countof(bldg_ptr->zone[iz]->surf[is]->name));
+			sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->surf[is]->name); //,_countof(bldg_ptr->zone[iz]->surf[is]->name));
 
 			fgets(cInputLine, MAX_CHAR_LINE, infile);
 			sscanf(cInputLine,"%*s %lf\n",&bldg_ptr->zone[iz]->surf[is]->azm_bs);
@@ -328,14 +327,14 @@ int LoadDataFromEPlus(
 				fgets(cInputLine, MAX_CHAR_LINE, infile);
 
 				fgets(cInputLine, MAX_CHAR_LINE, infile);
-				sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->surf[is]->wndo[iw]->name,_countof(bldg_ptr->zone[iz]->surf[is]->wndo[iw]->name));
+				sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->surf[is]->wndo[iw]->name); //,_countof(bldg_ptr->zone[iz]->surf[is]->wndo[iw]->name));
 				fgets(cInputLine, MAX_CHAR_LINE, infile);
-				sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->surf[is]->wndo[iw]->glass_type,_countof(bldg_ptr->zone[iz]->surf[is]->wndo[iw]->glass_type));
+				sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->surf[is]->wndo[iw]->glass_type); //,_countof(bldg_ptr->zone[iz]->surf[is]->wndo[iw]->glass_type));
 				fgets(cInputLine, MAX_CHAR_LINE, infile);
 				sscanf(cInputLine,"%*s %d\n",&bldg_ptr->zone[iz]->surf[is]->wndo[iw]->shade_flag);
 				if (bldg_ptr->zone[iz]->surf[is]->wndo[iw]->shade_flag != 0) {
 					fgets(cInputLine, MAX_CHAR_LINE, infile);
-					sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->surf[is]->wndo[iw]->shade_type,_countof(bldg_ptr->zone[iz]->surf[is]->wndo[iw]->shade_type));
+					sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->surf[is]->wndo[iw]->shade_type); //,_countof(bldg_ptr->zone[iz]->surf[is]->wndo[iw]->shade_type));
 				}
 				/* window overhang/fin zone shade depth (ft) */
 				fgets(cInputLine, MAX_CHAR_LINE, infile);
@@ -408,20 +407,20 @@ int LoadDataFromEPlus(
 				/* Read and store CFS name line */
 				char charCFSname[MAX_CHAR_UNAME+1];
 				fgets(cInputLine, MAX_CHAR_LINE, infile);
-				sscanf(cInputLine,"%*s %s\n",charCFSname,_countof(charCFSname));
+				sscanf(cInputLine,"%*s %s\n",charCFSname); //,_countof(charCFSname));
 
 				// CFS System Parameters
 				string strCFSParameters;
 				char charCFSParameters[MAX_CHAR_UNAME+1];
 				fgets(cInputLine, MAX_CHAR_LINE, infile);
-				sscanf(cInputLine,"%*s %s\n",charCFSParameters,_countof(charCFSParameters));
+				sscanf(cInputLine,"%*s %s\n",charCFSParameters); //,_countof(charCFSParameters));
 				strCFSParameters = charCFSParameters;
 
 				// CFS Rotation
 				double dCFSrotation;
 				fgets(cInputLine, MAX_CHAR_LINE, infile);
 				sscanf(cInputLine,"%*s %lf\n",&dCFSrotation);
-				
+
 				/* CFS Vertices in World Coordinate System coordinates */
 				// Read number of vertices
 				fgets(cInputLine, MAX_CHAR_LINE, infile);
@@ -529,7 +528,7 @@ int LoadDataFromEPlus(
 			fgets(cInputLine, MAX_CHAR_LINE, infile);
 
 			fgets(cInputLine, MAX_CHAR_LINE, infile);
-			sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->ref_pt[irp]->name,_countof(bldg_ptr->zone[iz]->ref_pt[irp]->name));
+			sscanf(cInputLine,"%*s %s\n",bldg_ptr->zone[iz]->ref_pt[irp]->name); //,_countof(bldg_ptr->zone[iz]->ref_pt[irp]->name));
 			/* reference point in world system coordinates */
 			fgets(cInputLine, MAX_CHAR_LINE, infile);
 			/* tokenize the line label */
@@ -584,7 +583,7 @@ int LoadDataFromEPlus(
 		fgets(cInputLine, MAX_CHAR_LINE, infile);
 
 		fgets(cInputLine, MAX_CHAR_LINE, infile);
-		sscanf(cInputLine,"%*s %s\n",bldg_ptr->bshade[ish]->name,_countof(bldg_ptr->bshade[ish]->name));
+		sscanf(cInputLine,"%*s %s\n",bldg_ptr->bshade[ish]->name); //,_countof(bldg_ptr->bshade[ish]->name));
 		/* bldg shade origin in bldg system coordinates */
 		fgets(cInputLine, MAX_CHAR_LINE, infile);
 		/* tokenize the line label */
@@ -648,7 +647,7 @@ int LoadLibDataFromEPlus(
 		fgets(cInputLine, MAX_CHAR_LINE, infile);
 
 		fgets(cInputLine, MAX_CHAR_LINE, infile);
-		sscanf(cInputLine,"%*s %s\n",lib_ptr->glass[ig]->name,_countof(lib_ptr->glass[ig]->name));
+		sscanf(cInputLine,"%*s %s\n",lib_ptr->glass[ig]->name); //,_countof(lib_ptr->glass[ig]->name));
 		fgets(cInputLine, MAX_CHAR_LINE, infile);
 		sscanf(cInputLine,"%*s %lf\n",&lib_ptr->glass[ig]->EPlusDiffuse_Trans);
 		fgets(cInputLine, MAX_CHAR_LINE, infile);
@@ -677,12 +676,10 @@ int LoadLibDataFromEPlus(
 /****************************** subroutine LoadDFs *****************************/
 int LoadDFs(
 	BLDG *bldg_ptr,		/* building structure pointer */
-	FILE *infile,		/* pointer to building data file */
-	ofstream* pofdmpfile)	/* ptr to dump file */
+	FILE *infile)		/* pointer to building data file */
 {
 	char cInputLine[MAX_CHAR_LINE+1];	/* Input line */
 	char *token;						/* Input token pointer */
-	char *next_token;					/* Next token pointer for strtok_s call */
 
 	/* Read and discard the first two lines */
 	fgets(cInputLine, MAX_CHAR_LINE, infile);

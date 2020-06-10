@@ -120,7 +120,6 @@ DllExport int	DElight2(
 	FILE *infile;						/* input file pointer */
 	FILE *outfile;						/* output file pointer */
 	FILE *W4libfile;					/* Window 4 library file pointer */
-	int err;						// error return value from fopen_s
 	ofstream ofdmpfile("DElight2.DMP");	/* LBLDLL debug dump file */
 	BLDG bldg;							/* bldg data structure */
 	LIB lib;							/* library data structure */
@@ -184,7 +183,7 @@ DllExport int	DElight2(
 		/* Calculate geometrical values required for DF calcs. */
 		if (iSurfNodes > MAX_SURF_NODES) iSurfNodes = MAX_SURF_NODES;
 		if (iWndoNodes > MAX_WNDO_NODES) iWndoNodes = MAX_WNDO_NODES;
-		if (CalcGeomFromEPlus(&bldg,iSurfNodes,iWndoNodes,&ofdmpfile) < 0) {
+		if (CalcGeomFromEPlus(&bldg) < 0) {
 			ofdmpfile << "ERROR: DElight Bad return from CalcGeomFromEPlus()\n";
 			/* Close dump file. */
 			ofdmpfile.close();
@@ -316,7 +315,7 @@ DllExport int	DElight2(
 	/* Check for no run period specified => do not perform hourly calcs. */
 	if ((iStrtMonth != 0) && (iStrtDay != 0) && (iEndMonth != 0) && (iEndDay != 0)) {
 		/* Calculate hourly illuminances, glare index and fractional electric light reductions due to daylight. */
-        int iDillumReturnVal = dillum(dCloudFraction,&bldg,&lib,&sun_data,&run_data,wx_flag,wxfile,&ofdmpfile);
+        int iDillumReturnVal = dillum(dCloudFraction,&bldg,&sun_data,&run_data,wx_flag,wxfile,&ofdmpfile);
 		if (iDillumReturnVal < 0) {
             // If Errors have been detected then return now, else ignore Warnings until return from DElight
 	        if (iDillumReturnVal != -10) {

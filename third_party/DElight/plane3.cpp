@@ -91,17 +91,17 @@ RHCoordSys3 plane3::internalCS()
 	return ics;	
 }
 
-const Double	plane3::phi() const
+Double	plane3::phi() const
 {
 	return (ics.RotAngles())[0];
 }
 
-const Double	plane3::theta() const
+Double	plane3::theta() const
 {
 	return (ics.RotAngles())[1];
 }
 
-const Double	plane3::zeta() const
+Double	plane3::zeta() const
 {
 	return (ics.RotAngles())[2];
 }
@@ -135,7 +135,7 @@ surf3::surf3()
 {}
 
 surf3::surf3(const string n, const vector<point3>& vp3)
-: name(n), plane3(vp3[0],RHCoordSys3(NewellVector(vp3),vp3[0],vp3[1])), iHits(0)
+: plane3(vp3[0],RHCoordSys3(NewellVector(vp3),vp3[0],vp3[1])), name(n), iHits(0)
 {
 	vector<point2>	vpoly2(vp3.size());	//	OK!!!
 
@@ -149,15 +149,15 @@ surf3::surf3(const string n, const vector<point3>& vp3)
 
 
 surf3::surf3(const string n, const point3& p0, const RHCoordSys3& cs, const vector<point2>& vp2) :
-	name(n), plane3(p0,cs), vert2(vp2), iHits(0)
+	plane3(p0,cs), name(n), vert2(vp2), iHits(0)
 { }
 
 surf3::surf3(const string n, const point3& p0, Double Azimuth, Double Tilt, Double AxialRot, const vector<point2>& vp2) :
-	name(n), plane3(p0,RHCoordSys3(Azimuth,Tilt,AxialRot)), vert2(vp2), iHits(0)
+	plane3(p0,RHCoordSys3(Azimuth,Tilt,AxialRot)), name(n), vert2(vp2), iHits(0)
 { }
 
 surf3::surf3(const string n, const point3& p0, Double Azimuth, Double Tilt, Double AxialRot, Double wd, Double ht) :
-	name(n), plane3(p0,RHCoordSys3(Azimuth,Tilt,AxialRot)), iHits(0)
+	plane3(p0,RHCoordSys3(Azimuth,Tilt,AxialRot)), name(n), iHits(0)
 {
 	vector<point2> vp2;
 	vp2.push_back(point2(0,0));

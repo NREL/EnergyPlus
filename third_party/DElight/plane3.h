@@ -50,9 +50,9 @@ public:
 	vector3	normVec() const;	//	ics zAxis
 	vector3	icsAxis(int ii) const;
 	RHCoordSys3 internalCS();
-	const Double	phi() const;
-	const Double	theta() const;
-	const Double	zeta() const;
+	Double	phi() const;
+	Double	theta() const;
+	Double	zeta() const;
 
 	// Other Methods
 	Double	DistTo(const point3& pExt) const;

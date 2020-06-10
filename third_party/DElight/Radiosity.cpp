@@ -153,7 +153,7 @@ int slite_interreflect(
 					frac = lib_ptr->glass[igt]->inside_refl / PI;
 					/* call window interreflection routine to loop through other surfaces */
 					/* in this zone and interreflect between this window */
-					wndo_interreflect(bldg_ptr,sun_ptr,iz,is,iw,frac,pofdmpfile);
+					wndo_interreflect(bldg_ptr,sun_ptr,iz,is,iw,frac);
 				}
 				/* now, for this surface itself - */
 				/* if surface inside reflectance is small, its contribution */
@@ -162,15 +162,15 @@ int slite_interreflect(
 				frac = bldg_ptr->zone[iz]->surf[is]->vis_refl / PI;
 				/* call surface interreflection routine to loop through other surfaces */
 				/* in this zone and interreflect to current surface */
-				surf_interreflect(bldg_ptr,sun_ptr,iz,is,frac,pofdmpfile);
+				surf_interreflect(bldg_ptr,sun_ptr,iz,is,frac);
 			}
 		}
 		/* calculate totl illumination for ref_pts due to initial direct and interreflected daylight */
         int iRefptIllumRetVal;
-		if ((iRefptIllumRetVal = refpt_total_illum(bldg_ptr,sun_ptr,iz,pofdmpfile)) < 0) {
+		if ((iRefptIllumRetVal = refpt_total_illum(bldg_ptr,sun_ptr,iz)) < 0) {
             // If errors were detected then return now, else register warnings and continue processing
             if (iRefptIllumRetVal != -10) {
-				*pofdmpfile << "ERROR: DElight Bad return from refpt_total_illum()\n"; 
+				*pofdmpfile << "ERROR: DElight Bad return from refpt_total_illum()\n";
 				return(-1);
             }
             else {
@@ -197,8 +197,7 @@ int surf_interreflect(
 	SUN_DATA *sun_ptr,	/* pointer to sun data structure */
 	int iz,				/* current zone index */
 	int isurf,			/* current surface index */
-	double frac,		/* surface reflectance divided by PI */
-	ofstream* pofdmpfile)	/* ptr to LBLDLL error dump file */
+	double frac)		/* surface reflectance divided by PI */
 {
 	int inode;					/* current surface node loop index */
 	int icoord;					/* node coordinate loop index */
@@ -309,8 +308,7 @@ int wndo_interreflect(
 	int iz,				/* current zone index */
 	int is,				/* current surface index */
 	int iw,				/* current window index */
-	double frac,		/* surface reflectance divided by PI */
-	ofstream* pofdmpfile)	/* ptr to LBLDLL error dump file */
+	double frac)		/* surface reflectance divided by PI */
 {
 	int inode;					/* current window node loop index */
 	int icoord;					/* node coordinate loop index */
@@ -414,8 +412,7 @@ int wndo_interreflect(
 int refpt_total_illum(
 	BLDG *bldg_ptr,		/* pointer to bldg structure */
 	SUN_DATA *sun_ptr,	/* pointer to sun data structure */
-	int iz,				/* current zone index */
-	ofstream* pofdmpfile)	/* ptr to LBLDLL error dump file */
+	int iz)				/* current zone index */
 {
 	double refpt_dircos[NDC];	/* ref_pt direction cosine values (slite) */
 	int irp;			/* current reference point index */

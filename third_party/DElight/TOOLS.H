@@ -45,9 +45,9 @@ double POLYF(
 
 int lib_index(
 	LIB *lib_ptr,						/* pointer to library */
-	char component[MAX_CHAR_UNAME+1],	/* library component category */
+	const char component[MAX_CHAR_UNAME+1],	/* library component category */
 	char uname[MAX_CHAR_UNAME+1]);
-	
+
 int free_bldg(
 	BLDG *bldg_ptr);	/* pointer to building data */
 

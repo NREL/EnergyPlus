@@ -56,6 +56,10 @@ if(MSVC)
     add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
 endif()
 
+IF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"  ) # g++/Clang
+    ADD_COMPILE_OPTIONS(-Wno-unused-parameter -Wno-implicit-function-declaration -Wno-shift-negative-value)
+ENDIF()
+
 #if(NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
 #    # If we're doing an out of source build and the user has a zconf.h
 #    # in their source tree...

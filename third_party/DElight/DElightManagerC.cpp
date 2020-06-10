@@ -438,6 +438,7 @@ extern "C" DllExport void delightfreememory()
 /****************************** subroutine delightoutputgenerator *****************************/
 extern "C" DllExport void delightoutputgenerator(int iOutputFlag)
 {
+    (void)iOutputFlag;
     // Call DElight Output Generation routine.
     // NOT YET IMPLEMENTED
 

@@ -95,7 +95,6 @@ namespace BGL = BldgGeomLib;
 int	dillum(
 	double cloud_fraction,	/* fraction of sky covered by clouds (0.0=clear 1.0=overcast) */
 	BLDG *bldg_ptr,			/* building data structure pointer */
-	LIB *lib_ptr,			/* library data structure pointer */
 	SUN_DATA *sun_ptr,		/* pointer to sun data structure */
 	RUN_DATA *run_ptr,		/* pointer to runtime data structure */
 	int wx_flag,			/* weather availability flag */
@@ -330,7 +329,7 @@ int	dillum(
 				for (izone=0; izone<bldg_ptr->nzones; izone++) {
 					/* Find daylight illuminance level */
 					/* at each ref pt in current zone. */
-					dintil(bldg_ptr->zone[izone],lib_ptr,imon,ihr,hisunf,chiskf,ohiskf,iphs,iths,phratio,thratio,pofdmpfile);
+					dintil(bldg_ptr->zone[izone],imon,ihr,hisunf,chiskf,ohiskf,iphs,iths,phratio,thratio);
 
 					/* Calculate lighting power reduction factor due to daylighting. */
 					/* 	PRF = 1.0 => full power required */
@@ -565,7 +564,6 @@ int	dplumef(
 
 	// Atmospheric moisture (cm).
 	double wch = exp(0.0389 * (sun2_ptr->dewpt - 32.0) - 0.075);
-	double atm_moi = wch / 2.54;
 
 	// Sky diffuse luminous efficacy (lumens/watt).
 	if (del <= 0.0) *pdiflw_ptr = 0.0;
@@ -614,7 +612,7 @@ int init_avail(
 /* from a weather file. */
 /* Otherwise, illuminances are taken from davail(). */
 /* 12/17/98 mods to incorporate Perez model for determining luminous efficacies */
-/* when hourly solar data (irradiances) and dewpoint temp are available.
+/* when hourly solar data (irradiances) and dewpoint temp are available. */
 // Previous method is retained for use when no wx data is available.
 /****************************************************************************/
 /* C Language Implementation of DOE2 Daylighting Algorithms */
@@ -629,9 +627,9 @@ int	dextil(
 	double chilsu,	/* current hour clear sky horiz illum sun component from davail() */
 	double chilsk,	/* current hour clear sky horiz illum sky component from davail() */
 	double ohilsk,	/* current hour overcast sky horiz illum sky component from davail() */
-	double cdirlw,	/* CIE luminous efficacy for direct solar radiation from clear sky */
-	double cdiflw,	/* CIE luminous efficacy for diffuse radiation from clear sky */
-	double odiflw,	/* CIE luminous efficacy for diffuse radiation from overcast sky */
+	//double cdirlw,	/* CIE luminous efficacy for direct solar radiation from clear sky */
+	//double cdiflw,	/* CIE luminous efficacy for diffuse radiation from clear sky */
+	//double odiflw,	/* CIE luminous efficacy for diffuse radiation from overcast sky */
 	double phsun,		/* sun altitude (radians) */
 	double solic[MONTHS],/* extraterrestrial illum for first day of each month */
 	int imon,			/* current month */
@@ -711,7 +709,6 @@ int	dextil(
 /******************************** subroutine dintil *******************************/
 int	dintil(
 	ZONE *zone_ptr,	/* bldg->zone data structure pointer */
-	LIB *lib_ptr,	/* library data structure pointer */
 	int imon,		/* current month */
 	int ihr,		/* current hour */
 	double hisunf,	/* current hour clear sky horiz illum sun component */
@@ -720,8 +717,7 @@ int	dintil(
 	int iphs,		/* sun altitude interpolation lower bound index */
 	int iths,		/* sun azimuth interpolation lower bound index */
 	double phratio,	/* sun altitude interpolation displacement ratio */
-	double thratio,	/* sun azimuth interpolation displacement ratio */
-	ofstream* pofdmpfile)	/* ptr to dump file */
+	double thratio)	/* sun azimuth interpolation displacement ratio */
 {
 	int irp;				/* ref pt loop index */
 	int ip_lo, ip_hi;		/* sun altitude low and high interpolation indexes */

@@ -126,7 +126,7 @@ int geometrans(
 
 				/* radiosity modification */
 				/* calculate window nodal area and coordinates in bldg coord sys */
-				wndo_nodal_calcs(bldg_ptr,num_wnodes,iz,is,iw, pofdmpfile);
+				wndo_nodal_calcs(bldg_ptr,num_wnodes,iz,is,iw);
 
                 /* Create zone shades for shaded windows. */
 				for (lzs=0; lzs<NZSHADES; lzs++) {
@@ -189,11 +189,11 @@ int geometrans(
 			/* calculate surface direction cosine values (slite) in bldg coord sys */
 //			dircos_calc(bldg_ptr,iz,is, pofdmpfile);
 			// RJH 10-16-03 Replace with new version that uses DOE2 WCS, but Superlite conventions
-			dircos_calc_new(bldg_ptr,iz,is, pofdmpfile);
+			dircos_calc_new(bldg_ptr,iz,is);
 
 			/* radiosity modification */
 			/* calculate nodal area and coordinates in bldg coord sys */
-			nodal_calcs(bldg_ptr,num_nodes,iz,is, pofdmpfile);
+			nodal_calcs(bldg_ptr,num_nodes,iz,is);
 
 			/* radiosity modification */
 			/* Calc outward (DOE2) and inward (Slite) unit vector surface normals in DOE2 BCS */
@@ -496,9 +496,9 @@ int apol(
 /* This (vectc) is the vector normal for surfaces for which vecta and vectb */
 /* have been calculated from DOE2 BCS surface vertices 0, 1 (origin), and 2. */
 /* If vecta is from vertex 1 to 2 (along width edge), and vectb is from 1 to 0 (along height edge), */
-/*		then vectc is DOE2 outward normal.
+/*		then vectc is DOE2 outward normal. */
 /* If vecta is from vertex 1 to 0, and vectb is from 1 to 2, */
-/*		then vectc is Superlite inward normal.
+/*		then vectc is Superlite inward normal. */
 /* If vecta and vectb are unit vectors, then (vectc) is a unit vector normal. */
 /****************************************************************************/
 /* C Language Implementation of DOE2 Daylighting Algorithms */

@@ -272,6 +272,7 @@ HemiSphiral GenLuminanceMap(LumParam lp)
 
 Double	ConstLum(LumParam lp, BGL::vector3 Direction)
 {
+        (void)Direction;
 	//	factor 1/2 is 2PI/4PI:
 	//	source BFlux0 per nit area is scattered into 2PI hemisphere
 	//	LumMap assumes 4PI tot solid angle
@@ -279,7 +280,7 @@ Double	ConstLum(LumParam lp, BGL::vector3 Direction)
 	return lp.BFlux0;
 }
 
-Double	CosThetaLum(LumParam lp, BGL::vector3 Direction)
+Double	CosThetaLum(LumParam lp)
 {
 	return lp.BFlux0;
 }
@@ -659,14 +660,13 @@ HemiSphiral	SkyBTDFIntegration(HemiSphiral& sky0, btdf* pbtdf0, BGL::RHCoordSys3
 	HemiSphiral lm((int)pbtdf0->HSoutList[0].size());
 	Tregenza	Trgz0;
 	//	integrate over btdf "natural" incident directions
-	//	sky interpolation needed - even if Nsky = Mbtdf because of possible arbitrary relative orientations 
+	//	sky interpolation needed - even if Nsky = Mbtdf because of possible arbitrary relative orientations
 	int	ii, jj;
 	Double	skyLum, skyLumTot = 0;
-	Double	skyTotIllum = sky0.TotIllum();
 	BGL::vector3	dir, dirsky;
 	for (ii=0; ii<pbtdf0->size(); ii++) {	//	incident dir loop
-		dir = pbtdf0->inDir(ii);	//	"natural" ii'th btdf incident direction in btdf outside LCS coords 
-		if (dir[2] < 0) break;	//	only integrate over top half of btdf incident Sphiral 
+		dir = pbtdf0->inDir(ii);	//	"natural" ii'th btdf incident direction in btdf outside LCS coords
+		if (dir[2] < 0) break;	//	only integrate over top half of btdf incident Sphiral
 		dirsky = BGL::dirLCStoWCS(dir, ics.RotateY());	//	converted to WCS dir for pointing at sky
 		skyLum = sky0.interp(dirsky)*pbtdf0->inDirOmega(ii)*dir[2];
 		for (jj=0; jj<pbtdf0->HSoutList[0].size(); jj++) {	//	out Dir loop
@@ -1060,8 +1060,6 @@ HemiSphiral	RADdata::convertToHS() {
 	double			qdataMax = 0, qdataMin = 0, qdataSum = 0;
 	vector<double>	inwgt;
 	vector<int>		indxCount(Nsize,0);
-	int				indxCountMax=0, indxCountMin=0;
-	int				indxCountMaxIndx=0, indxCountMinIndx=0;
 	vector<int>		indxCountDist(100,0);
 	int				zCount=0;
 	double			phiRAD, thetaRAD, qdata;
@@ -1250,15 +1248,13 @@ HemiSphiral	IESNAdata::convertToHS() {
 	double			qdataMax = 0, qdataMin = 0, qdataSum = 0;
 	vector<double>	inwgt;
 	vector<int>		indxCount(Nsize,0);
-	int				indxCountMax=0, indxCountMin=0;
-	int				indxCountMaxIndx=0, indxCountMinIndx=0;
 	vector<int>		indxCountDist(100,0);
 	int				zCount=0;
 	double			qdata;
 //	double			phiRAD, thetaRAD;
 //	double			phiSPH, thetaSPH;
-	double			deltathetaRAD = theta[theta.size()-1]/(nTheta - 1.);
-	double			deltaphiRAD = phi[phi.size()-1]/(nPhi - 1.);
+//	double			deltathetaRAD = theta[theta.size()-1]/(nTheta - 1.);
+//	double			deltaphiRAD = phi[phi.size()-1]/(nPhi - 1.);
 //	cout << "deltathetaRAD: " << deltathetaRAD << "; deltaphiRAD: " << deltaphiRAD << "\n";
 	BGL::vector3	dir;
 	int				iread = 0;
