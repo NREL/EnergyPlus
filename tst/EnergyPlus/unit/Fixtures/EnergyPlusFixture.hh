@@ -211,6 +211,13 @@ protected:
     // Will return true if string matches the stream and false if it does not
     bool compare_delightin_stream(std::string const &expected_string, bool reset_stream = true);
 
+    // Compare an expected string against the DFS stream. The default is to reset the DFS stream after every call.
+    // It is easier to test successive functions if the DFS stream is 'empty' before the next call.
+    // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
+    // if it makes sense for the unit test to continue after returning from function.
+    // Will return true if string matches the stream and false if it does not
+    bool compare_dfs_stream(std::string const &expected_string, bool reset_stream = true);
+
     // Check if ESO stream has any output. Useful to make sure there are or are not outputs to ESO.
     bool has_json_output(bool reset_stream = true);
 
@@ -234,6 +241,9 @@ protected:
 
     // Check if delightin stream has any output. Useful to make sure there are or are not outputs to delightin.
     bool has_delightin_output(bool reset_stream = true);
+
+    // Check if DFS stream has any output. Useful to make sure there are or are not outputs to DFS.
+    bool has_dfs_output(bool reset_stream = true);
 
     // This function processes an idf snippet and defaults to using the idd cache for the fixture.
     // The cache should be used for nearly all calls to this function.
