@@ -56,12 +56,6 @@ if(MSVC)
     add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
 endif()
 
-IF( MSVC )
-  ADD_DEFINITIONS( "/w" )
-ELSE()
-  ADD_DEFINITIONS( "-w" )
-ENDIF()
-
 #if(NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
 #    # If we're doing an out of source build and the user has a zconf.h
 #    # in their source tree...

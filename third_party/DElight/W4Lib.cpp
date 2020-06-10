@@ -227,7 +227,7 @@ int ProcessW4GlassType(
 				fgets(cInputLine, MAX_CHAR_LINE, W4libfile);
 
 			// Scan the thirty-fourth line to get the inside hemispherical visible reflectance.
-			sscanf(cInputLine,"%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %d\n",&lib_ptr->glass[lib_ptr->nglass]->inside_refl);
+			sscanf(cInputLine,"%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %d\n",(int*)&lib_ptr->glass[lib_ptr->nglass]->inside_refl);
 
 			// Increment LIB GLASS entry counter
 			(lib_ptr->nglass)++;

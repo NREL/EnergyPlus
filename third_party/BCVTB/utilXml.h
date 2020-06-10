@@ -140,7 +140,7 @@ Stack2 expStk; ///< Variables for getxmlvalue function
 
 char * att; ///< Local global variable for function \c getxmlvalue
 char * vals;  ///< Local global variable for function \c getxmlvalue
-int * numVals; ///< Local global variable for function \c getxmlvalue
+size_t * numVals; ///< Local global variable for function \c getxmlvalue
 int PARSEVALUE; ///< flag for parsing xml values 1 if parse, 0 if not parse
 int ERROR_STATUS; ///< flag for xml element handler error status settings
 
@@ -266,7 +266,7 @@ getxmlvalues(
  char const * const fileName, 
  char const * const exp, 
  char * const myVals, 
- int * const myNumVals,
+ size_t * const myNumVals,
  int const myStrLen
 );
 
@@ -285,7 +285,7 @@ getxmlvalues(
 ///\param fileName the name of the xml file
 ///\param exp the xPath expression
 ////////////////////////////////////////////////////////////////
-int
+size_t
 getnumberofxmlvalues(
  char const * const fileName,
  char const * const exp
@@ -322,7 +322,7 @@ getxmlvaluesf(
  char const * const fileName,
  char const * const exp,
  char const * const atrName,
- int * const nVal,
+ size_t * const nVal,
  char * str,
  int * const strLen
 );
@@ -353,7 +353,7 @@ getxmlvalue(
  char const * const fileName,
  char const * const exp,
  char * const str,
- int * const nVals,
+ size_t * const nVals,
  int const strLen
 );
 

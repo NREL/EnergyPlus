@@ -613,7 +613,7 @@ getxmlvalues(
  char const * const fileName,
  char const * const exp,
  char * const myVals,
- int * const myNumVals,
+ size_t * const myNumVals,
  int const myStrLen
 )
 {
@@ -752,13 +752,14 @@ getxmlvalues(
 ///\param fileName the name of the xml file
 ///\param exp the xPath expression
 ////////////////////////////////////////////////////////////////
-int
+size_t
 getnumberofxmlvalues(
  char const * const fileName,
  char const * const exp
 )
 {
-  int n, ret;
+  size_t n;
+  int ret;
   char * str;
   int strLen = 0;
   n=0;
@@ -807,7 +808,7 @@ getxmlvaluesf(
  char const * const fileName,
  char const * const exp,
  char const * const atrName,
- int * const nVal,
+ size_t * const nVal,
  char * str,
  int * const strLen
 )
@@ -864,7 +865,7 @@ getxmlvalue(
  char const * const fileName,
  char const * const exp,
  char * const str,
- int * const nVals,
+ size_t * const nVals,
  int const strLen
 )
 {
@@ -889,7 +890,7 @@ getxmlvalue(
                     "       while expecting one value. \n"
                     "       number of xml values parsed is: %d\n"
                     "       xPath: '%s'\n",
-                    *nVals, exp);
+                    (int)*nVals, exp);
     return -1;
   }
   return 0;

@@ -46,11 +46,10 @@
 #define BIN_WIN "\\binaries\\winxx\\"
 #define BIN_WIN32 "\\binaries\\win32\\"
 #define BIN_WIN64 "\\binaries\\win64\\"
-#if defined(_WIN32)
-#define OperSys 1
-#endif
 #if defined(_WIN64)
 #define OperSys 2
+#elif defined(_WIN32)
+#define OperSys 1
 #endif
 #elif __linux__
 #include <sys/types.h>
@@ -346,9 +345,9 @@ static ScalarVariable* getSV(FMU* fmu, char type, fmiValueReference vr) {
 ///\param fmu FMU The FMU instance
 ///////////////////////////////////////////////////////////////////////////////
 static void replaceRefsInMessage(const char* msg, char* buffer, int nBuffer, FMU* fmu){
-	int i=0; // position in msg
-	int k=0; // position in buffer
-	int n;
+	size_t i=0; // position in msg
+	size_t k=0; // position in buffer
+	size_t n;
 	char c = msg[i];
 	while (c!='\0' && k < nBuffer) {
 		if (c!='#') {
@@ -385,7 +384,7 @@ static void replaceRefsInMessage(const char* msg, char* buffer, int nBuffer, FMU
 				}
 				else {
 					// could not parse the number
-					printf("illegal value reference at position %d in '%s'\n", i+2, msg);
+					printf("illegal value reference at position %d in '%s'\n", (int)i+2, msg);
 					buffer[k++]='#';
 					break;
 				}
@@ -906,8 +905,8 @@ fmiInteger addLibPathCurrentWorkingFolder(
 		_c->index = *index;
 
 #ifdef _MSC_VER
-		len_LibPath = strlen(trimfmuWorkingFolder) + strlen(BIN_WIN) + strlen (fmuInstances[_c->index]->modelID)
-			+ strlen (LIB_EXT);
+		len_LibPath = (fmiInteger)(strlen(trimfmuWorkingFolder) + strlen(BIN_WIN) + strlen (fmuInstances[_c->index]->modelID)
+			+ strlen (LIB_EXT));
 		librPath_w32 = (char*)calloc(sizeof(char), len_LibPath + 1);
 
 		// write the path to the binaries for Windows 32 bit

@@ -197,8 +197,8 @@ int read_wx_tmy2_hr(
     
     // Dummy variables to hold the uncertainty flag for each data item.
     // We don't used this information either.
-    char ughr, udnr, udhr, ughi, udni, udhi, uzi, utsc, uosc, udbt, udpt, urh, uap;
-    char uws, uwd, uvis, uch, upre, uaod, usd, udss;
+    int ughr, udnr, udhr, ughi, udni, udhi, uzi, utsc, uosc, udbt, udpt, urh, uap;
+    int uws, uwd, uvis, uch, upre, uaod, usd, udss;
 
     // Variables to hold the year, month, day, hour for each data item.
     int yr;		// not used

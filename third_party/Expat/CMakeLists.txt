@@ -18,10 +18,8 @@ if(MSVC)
   set(epexpat_SRCS ${epexpat_SRCS} lib/libexpat.def)
 endif(MSVC)
 
-IF( MSVC )
-  ADD_DEFINITIONS( "/w" )
-ELSE()
-  ADD_DEFINITIONS( "-w -fPIC" )
+IF (UNIX)
+  ADD_DEFINITIONS("-fPIC")
 ENDIF()
 
 add_library(epexpat STATIC ${epexpat_SRCS})
