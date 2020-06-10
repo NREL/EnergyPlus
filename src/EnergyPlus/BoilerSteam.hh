@@ -52,16 +52,18 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
-namespace BoilerSteam {
+// Forward declarations
+struct EnergyPlusData;
+struct BoilerSteamData;
 
-    extern int NumBoilers; // Number of boilers
+namespace BoilerSteam {
 
     struct BoilerSpecs : PlantComponent
     {
@@ -141,21 +143,28 @@ namespace BoilerSteam {
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void getSizingFactor(Real64 &SizFac) override;
+        void getSizingFactor(Real64 &sizFac) override;
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(BoilerSteamData &boilers, std::string const &objectName);
     };
 
-    // Object Data
-    extern Array1D<BoilerSpecs> Boiler; // dimension to number of machines
-
-    void clear_state();
-
-    void GetBoilerInput();
+    void GetBoilerInput(BoilerSteamData &boilers);
 
 } // namespace BoilerSteam
+
+    struct BoilerSteamData : BaseGlobalStruct {
+        int numBoilers = 0;
+        bool getSteamBoilerInput = true;
+        Array1D<BoilerSteam::BoilerSpecs> Boiler;
+        void clear_state() override
+        {
+            numBoilers = 0;
+            getSteamBoilerInput = true;
+            Boiler.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

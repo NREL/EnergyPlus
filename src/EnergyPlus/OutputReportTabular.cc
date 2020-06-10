@@ -718,7 +718,7 @@ namespace OutputReportTabular {
         OutputReportTabular::ResetTabularReports();
     }
 
-    void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
+    void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -762,7 +762,7 @@ namespace OutputReportTabular {
             OutputReportTabularAnnual::GetInputTabularAnnual();
             OutputReportTabularAnnual::checkAggregationOrderForAnnual();
             GetInputTabularTimeBins();
-            GetInputTabularStyle(OutputFiles::getSingleton());
+            GetInputTabularStyle(state.outputFiles);
             GetInputOutputTableSummaryReports();
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly();
@@ -787,7 +787,7 @@ namespace OutputReportTabular {
                 GatherSourceEnergyEndUseResultsForTimestep(t_timeStepType);
                 GatherPeakDemandForTimestep(t_timeStepType);
                 GatherHeatGainReport(t_timeStepType);
-                GatherHeatEmissionReport(t_timeStepType);
+                GatherHeatEmissionReport(state, t_timeStepType);
             }
         }
     }
@@ -4080,6 +4080,7 @@ namespace OutputReportTabular {
         static int curFirstColumn(0);
 
         if (!DoWeathSim) return;
+        assert(DataGlobals::TimeStepZoneSec > 0.0);
 
         // create temporary arrays to speed processing of these arrays
         if (GatherMonthlyResultsForTimestepRunOnce) {
@@ -4715,6 +4716,7 @@ namespace OutputReportTabular {
         int curMeterNumber;
         int minuteCalculated;
         int timestepTimeStamp;
+        assert(DataGlobals::TimeStepZoneSec > 0.0);
 
         if ((displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
@@ -4778,7 +4780,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType)
+    void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Gathers the data each zone timestep for the heat gain report.
@@ -4806,7 +4808,7 @@ namespace OutputReportTabular {
             return;
         }
 
-        CalcHeatEmissionReport();
+        CalcHeatEmissionReport(state);
         BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * convertJtoGJ;
         BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * convertJtoGJ;
         BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
@@ -4817,7 +4819,7 @@ namespace OutputReportTabular {
     }
 
 
-    void CalcHeatEmissionReport()
+    void CalcHeatEmissionReport(EnergyPlusData &state)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Gathers the data each zone timestep for the heat gain report.
@@ -4825,12 +4827,6 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using Boilers::Boiler;
-        using Boilers::NumBoilers;
-        using ChillerElectricEIR::ElectricEIRChiller;
-        using ChillerElectricEIR::NumElectricEIRChillers;
-        using ChillerReformulatedEIR::ElecReformEIRChiller;
-        using ChillerReformulatedEIR::NumElecReformEIRChillers;
         using CondenserLoopTowers::NumSimpleTowers;
         using CondenserLoopTowers::towers;
         using DataEnvironment::WeatherFileLocationTitle;
@@ -4861,14 +4857,6 @@ namespace OutputReportTabular {
         using MixedAir::OAController;
         using PackagedThermalStorageCoil::NumTESCoils;
         using PackagedThermalStorageCoil::TESCoil;
-        using PlantChillers::ConstCOPChiller;
-        using PlantChillers::ElectricChiller;
-        using PlantChillers::EngineDrivenChiller;
-        using PlantChillers::GTChiller;
-        using PlantChillers::NumConstCOPChillers;
-        using PlantChillers::NumElectricChillers;
-        using PlantChillers::NumEngineDrivenChillers;
-        using PlantChillers::NumGTChillers;
         using RefrigeratedCase::Condenser;
         using RefrigeratedCase::RefrigRack;
         using VariableSpeedCoils::NumVarSpeedCoils;
@@ -4907,40 +4895,40 @@ namespace OutputReportTabular {
         }
 
         // Air- and Evap-cooled chiller
-        for (iChiller = 1; iChiller <= NumElectricChillers; ++iChiller) {
-            if (ElectricChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
+        for (iChiller = 1; iChiller <= state.dataPlantChillers.NumElectricChillers; ++iChiller) {
+            if (state.dataPlantChillers.ElectricChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataPlantChillers.ElectricChiller(iChiller).CondenserEnergy;
             }
         }
-        for (iChiller = 1; iChiller <= NumEngineDrivenChillers; ++iChiller) {
-            if (EngineDrivenChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += EngineDrivenChiller(iChiller).CondenserEnergy;
+        for (iChiller = 1; iChiller <= state.dataPlantChillers.NumEngineDrivenChillers; ++iChiller) {
+            if (state.dataPlantChillers.EngineDrivenChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataPlantChillers.EngineDrivenChiller(iChiller).CondenserEnergy;
             }
         }
-        for (iChiller = 1; iChiller <= NumGTChillers; ++iChiller) {
-            if (GTChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += GTChiller(iChiller).CondenserEnergy;
+        for (iChiller = 1; iChiller <= state.dataPlantChillers.NumGTChillers; ++iChiller) {
+            if (state.dataPlantChillers.GTChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataPlantChillers.GTChiller(iChiller).CondenserEnergy;
             }
         }
-        for (iChiller = 1; iChiller <= NumConstCOPChillers; ++iChiller) {
-            if (ConstCOPChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ConstCOPChiller(iChiller).CondenserEnergy;
+        for (iChiller = 1; iChiller <= state.dataPlantChillers.NumConstCOPChillers; ++iChiller) {
+            if (state.dataPlantChillers.ConstCOPChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataPlantChillers.ConstCOPChiller(iChiller).CondenserEnergy;
             }
         }
-        for (iChiller = 1; iChiller <= NumElectricEIRChillers; ++iChiller) {
-            if (ElectricEIRChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
+        for (iChiller = 1; iChiller <= state.dataChillerElectricEIR.NumElectricEIRChillers; ++iChiller) {
+            if (state.dataChillerElectricEIR.ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataChillerElectricEIR.ElectricEIRChiller(iChiller).CondEnergy;
             }
         }
-        for (iChiller = 1; iChiller <= NumElecReformEIRChillers; ++iChiller) {
-            if (ElecReformEIRChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
+        for (iChiller = 1; iChiller <= state.dataChillerReformulatedEIR.NumElecReformEIRChillers; ++iChiller) {
+            if (state.dataChillerReformulatedEIR.ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+                SysTotalHVACRejectHeatLoss += state.dataChillerReformulatedEIR.ElecReformEIRChiller(iChiller).CondEnergy;
             }
         }
 
         // Water / steam boiler
-        for (iBoiler = 1; iBoiler <= NumBoilers; ++iBoiler) {
-            SysTotalHVACRejectHeatLoss += Boiler(iBoiler).FuelConsumed + Boiler(iBoiler).ParasiticElecConsumption - Boiler(iBoiler).BoilerEnergy;
+        for (iBoiler = 1; iBoiler <= state.dataBoilers.numBoilers; ++iBoiler) {
+            SysTotalHVACRejectHeatLoss += state.dataBoilers.Boiler(iBoiler).FuelConsumed + state.dataBoilers.Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers.Boiler(iBoiler).BoilerEnergy;
         }
 
         // DX Coils air to air
@@ -5669,7 +5657,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports(EnergyPlusData &state, OutputFiles &outputFiles)
+    void WriteTabularReports(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -5690,14 +5678,14 @@ namespace OutputReportTabular {
             // call each type of report in turn
             WriteBEPSTable();
             WriteTableOfContents();
-            WriteVeriSumTable(outputFiles);
+            WriteVeriSumTable(state.outputFiles);
             WriteDemandEndUseSummary();
             WriteSourceEnergyEndUseSummary();
             WriteComponentSizing();
             WriteSurfaceShadowing();
             WriteCompCostTable();
             WriteAdaptiveComfortTable();
-            WriteEioTables(OutputFiles::getSingleton());
+            WriteEioTables(state.outputFiles);
             WriteLoadComponentSummaryTables();
             WriteHeatEmissionTable();
 
@@ -5712,23 +5700,23 @@ namespace OutputReportTabular {
         }
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
-        outputFiles.audit.ensure_open();
-        print(outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
-        print(outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
-        print(outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
-        print(outputFiles.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
-        print(outputFiles.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
-        print(outputFiles.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
-        print(outputFiles.audit, variable_fmt, "sizeReportName", sizeReportName);
-        print(outputFiles.audit, variable_fmt, "numReportName", numReportName);
-        print(outputFiles.audit, variable_fmt, "sizeSubTable", sizeSubTable);
-        print(outputFiles.audit, variable_fmt, "numSubTable", numSubTable);
-        print(outputFiles.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
-        print(outputFiles.audit, variable_fmt, "numColumnTag", numColumnTag);
-        print(outputFiles.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
-        print(outputFiles.audit, variable_fmt, "numTableEntry", numTableEntry);
-        print(outputFiles.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
-        print(outputFiles.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
+        state.outputFiles.audit.ensure_open("WriteTabularReports");
+        print(state.outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
+        print(state.outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
+        print(state.outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
+        print(state.outputFiles.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
+        print(state.outputFiles.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
+        print(state.outputFiles.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
+        print(state.outputFiles.audit, variable_fmt, "sizeReportName", sizeReportName);
+        print(state.outputFiles.audit, variable_fmt, "numReportName", numReportName);
+        print(state.outputFiles.audit, variable_fmt, "sizeSubTable", sizeSubTable);
+        print(state.outputFiles.audit, variable_fmt, "numSubTable", numSubTable);
+        print(state.outputFiles.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
+        print(state.outputFiles.audit, variable_fmt, "numColumnTag", numColumnTag);
+        print(state.outputFiles.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
+        print(state.outputFiles.audit, variable_fmt, "numTableEntry", numTableEntry);
+        print(state.outputFiles.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
+        print(state.outputFiles.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
     }
 
     void parseStatLine(const std::string &lineIn,
@@ -8646,7 +8634,7 @@ namespace OutputReportTabular {
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
 
                 Array1D_string rowHeadTemp(rowHead);
-                // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+                // Before outputing to SQL, we forward fill the End use column (rowHead)
                 // for better sql queries
                 FillRowHead(rowHeadTemp);
 

@@ -34,7 +34,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 19
 
-  Version,9.3;
+  Version,9.4;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -7708,116 +7708,30 @@
     Boiler:HotWater,         !- Equipment 1 Object Type
     HeatSys1 Boiler;         !- Equipment 1 Name
 
-!  EnergyManagementSystem:ProgramCallingManager,
-!    Heating_dispatch,        !- Name
-!    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-!    Heating_dispatch_Values; !- Program Name 1
-
   PythonPlugin:Instance,
     Heating_dispatch,                  !- Name
     Yes,                                    !- Run During Warmup Days
     PythonPluginPlantOperation_largeOff,    !- Python Module Name
-    Heating_dispatch_Values;           !- Plugin Class Name
-
-!  EnergyManagementSystem:Program,
-!    Heating_dispatch_Values, !- Name
-!    IF HeatSys1_LoopDmnd > 0.0,  !- Program Line 1
-!    SET Boiler_Disptch = HeatSys1_LoopDmnd,  !- Program Line 2
-!    ELSE,                    !- <none>
-!    SET Boiler_Disptch = 0.0,!- <none>
-!    ENDIF;                   !- <none>
-
-!  EnergyManagementSystem:InternalVariable,
-!    HeatSys1_LoopDmnd,       !- Name
-!    HeatSys1 Operation Scheme,  !- Internal Data Index Key Name
-!    Supply Side Current Demand Rate;  !- Internal Data Type
-
-!  EnergyManagementSystem:Actuator,
-!    Boiler_Disptch,          !- Name
-!    HeatSys1 Operation Scheme:HeatSys1 Boiler,  !- Actuated Component Unique Name
-!    Plant Equipment Operation,  !- Actuated Component Type
-!    Distributed Load Rate;   !- Actuated Component Control Type
+    HeatingDispatchValues;           !- Plugin Class Name
 
   PlantEquipmentOperation:UserDefined,
     CoolSys1 Operation Scheme,  !- Name
     Cooling_dispatch,        !- Main Model Program Calling Manager Name
-    Init_Chiller_Capacity,   !- Initialization Program Calling Manager Name
+    ,   !- Initialization Program Calling Manager Name
     Chiller:Electric:ReformulatedEIR,  !- Equipment 1 Object Type
     CoolSys1 Chiller 1,      !- Equipment 1 Name
     Chiller:Electric:ReformulatedEIR,  !- Equipment 2 Object Type
     CoolSys1 Chiller 2;      !- Equipment 2 Name
 
- ! EnergyManagementSystem:ProgramCallingManager,
- !   Init_Chiller_Capacity,         !- Name
- !   UserDefinedComponentModel,     !- EnergyPlus Model Calling Point
- !   Init_Chiller_Capacity_Values;  !- Program Name 1
-
-  PythonPlugin:Instance,
-    Init_Chiller_Capacity,                              !- Name
-    Yes,                                                !- Run During Warmup Days
-    PythonPluginPlantOperation_largeOff,                !- Python Module Name
-    Init_Chiller_Capacity_and_Cooling_dispatch_Values;  !- Plugin Class Name
-
   PythonPlugin:Variables,
     PythonGlobalVars,           !- Name
     totChilCap;     !- Variable Name 1
-
-!  EnergyManagementSystem:Program,
-!    Init_Chiller_Capacity_Values,  !- Name
-!    Set totChilCap = Chil1_Cap + Chil2_Cap;  !- Program Line 1
-
-!  EnergyManagementSystem:GlobalVariable,
-!    totChilCap;              !- Erl Variable 1 Name
-
-!  EnergyManagementSystem:ProgramCallingManager,
-!    Cooling_dispatch,        !- Name
-!    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-!    Cooling_dispatch_Values; !- Program Name 1
 
   PythonPlugin:Instance,
     Cooling_dispatch,                                   !- Name
     Yes,                                                !- Run During Warmup Days
     PythonPluginPlantOperation_largeOff,                !- Python Module Name
-    Init_Chiller_Capacity_and_Cooling_dispatch_Values;  !- Plugin Class Name
-
-!  EnergyManagementSystem:Program,
-!    Cooling_dispatch_Values, !- Name
-!    IF CoolSys1_LoopDmnd < 0.0,  !- Program Line 1
-!    Set UniformPLR  = CoolSys1_LoopDmnd / totChilCap,  !- Program Line 2
-!    Set UniformPLR  =  @min UniformPLR 1.0,  !- <none>
-!    SET Chil1_Disptch = UniformPLR*Chil1_Cap,  !- <none>
-!    SET Chil2_Disptch = UniformPLR*Chil2_Cap,  !- <none>
-!    ELSE,                    !- <none>
-!    SET Chil1_Disptch = 0.0, !- <none>
-!    SET Chil2_Disptch = 0.0, !- <none>
-!    ENDIF;                   !- <none>
-
-!  EnergyManagementSystem:InternalVariable,
-!    CoolSys1_LoopDmnd,       !- Name
-!    CoolSys1 Operation Scheme,  !- Internal Data Index Key Name
-!    Supply Side Current Demand Rate;  !- Internal Data Type
-
-!  EnergyManagementSystem:InternalVariable,
-!    Chil1_Cap,               !- Name
-!    CoolSys1 Chiller 1,      !- Internal Data Index Key Name
-!    Chiller Nominal Capacity;!- Internal Data Type
-
-!  EnergyManagementSystem:InternalVariable,
-!    Chil2_Cap,               !- Name
-!    CoolSys1 Chiller 2,      !- Internal Data Index Key Name
-!    Chiller Nominal Capacity;!- Internal Data Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chil1_Disptch,           !- Name
-!    CoolSys1 Operation Scheme:CoolSys1 Chiller 1,  !- Actuated Component Unique Name
-!    Plant Equipment Operation,  !- Actuated Component Type
-!    Distributed Load Rate;   !- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chil2_Disptch,           !- Name
-!    CoolSys1 Operation Scheme:CoolSys1 Chiller 2,  !- Actuated Component Unique Name
-!    Plant Equipment Operation,  !- Actuated Component Type
-!    Distributed Load Rate;   !- Actuated Component Control Type
+    InitChillerCapacityAndCoolingDispatchValues;  !- Plugin Class Name
 
   PlantEquipmentOperation:UserDefined,
     TowerWaterSys Operation Scheme,  !- Name
@@ -7826,37 +7740,11 @@
     CoolingTower:SingleSpeed,!- Equipment 1 Object Type
     TowerWaterSys CoolTower; !- Equipment 1 Name
 
-!  EnergyManagementSystem:ProgramCallingManager,
-!    Tower_dispatch,             !- Name
-!    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-!    Tower_dispatch_Values;      !- Program Name 1
-
   PythonPlugin:Instance,
     Tower_dispatch,             !- Name
     Yes,                                    !- Run During Warmup Days
     PythonPluginPlantOperation_largeOff,    !- Python Module Name
-    Tower_dispatch_Values;                  !- Plugin Class Name
-
-!  EnergyManagementSystem:Program,
-!    Tower_dispatch_Values,   !- Name
-!    IF TowerWaterSys_LoopDmnd < 0.0,  !- Program Line 1
-!    SET Tower_Disptch = TowerWaterSys_LoopDmnd,  !- Program Line 2
-!    ELSE,                    !- <none>
-!    SET Tower_Disptch = 0.0, !- <none>
-!    ENDIF;                   !- <none>
-
-!  EnergyManagementSystem:InternalVariable,
-!    TowerWaterSys_LoopDmnd,  !- Name
-!    TowerWaterSys Operation Scheme,  !- Internal Data Index Key Name
-!    Supply Side Current Demand Rate;  !- Internal Data Type
-
-!  EnergyManagementSystem:Actuator,
-!    Tower_Disptch,           !- Name
-!    TowerWaterSys Operation Scheme:TowerWaterSys CoolTower,  !- Actuated Component Unique Name
-!    Plant Equipment Operation,  !- Actuated Component Type
-!    Distributed Load Rate;   !- Actuated Component Control Type
-
-! ***LOOPS***
+    TowerDispatchValues;                  !- Plugin Class Name
 
   PlantLoop,
     CoolSys1,                !- Name

@@ -201,10 +201,7 @@ namespace DataGlobals {
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
     int OutputFilePerfLog(0);                        // Unit number for performance log outputs
-    int OutputFileShadingFrac(0);                    // Unit number for shading output
     int StdMeterRecordCount(0);                      // Count of Meter output records
-    int OutputDElightIn(0);                          // Unit number for the DElight In file
-    std::ostream *delightin_stream(nullptr);         // Internal stream used for DElight In file
     bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
     bool SysSizingCalc(false);                       // TRUE if system sizing calculation
     bool DoZoneSizing(false);                        // User input in SimulationControl object
@@ -265,7 +262,7 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state()
+    void clear_state(OutputFiles &outputFiles)
     {
         runReadVars = false;
         DDOnlySimulation = false;
@@ -298,15 +295,15 @@ namespace DataGlobals {
         TimeStep = 0;
         TimeStepZone = 0.0;
         WarmupFlag = false;
-        OutputFiles::getSingleton().eso.close();
+        outputFiles.eso.close();
         OutputStandardError = 0;
         StdOutputRecordCount = 0;
-        OutputFiles::getSingleton().debug.close();
-        OutputFiles::getSingleton().zsz.close();
-        OutputFiles::getSingleton().ssz.close();
-        OutputFiles::getSingleton().mtr.close();
+        outputFiles.debug.close();
+        outputFiles.zsz.close();
+        outputFiles.ssz.close();
+        outputFiles.mtr.close();
         OutputFilePerfLog = 0;
-        OutputFileShadingFrac = 0;
+        outputFiles.shade.close();
         StdMeterRecordCount = 0;
         ZoneSizingCalc = false;
         SysSizingCalc = false;
@@ -360,9 +357,8 @@ namespace DataGlobals {
         progressCallback = nullptr;
         messageCallback = nullptr;
         errorCallback = nullptr;
-        OutputFiles::getSingleton().mtr.close();
+        outputFiles.mtr.close();
         err_stream = nullptr;
-        delightin_stream = nullptr;
         eplusRunningViaAPI = false;
     }
 

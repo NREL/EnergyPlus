@@ -48,113 +48,86 @@
 #ifndef EnergyPlusData_hh_INCLUDED
 #define EnergyPlusData_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_map>
+#include <string>
+
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+
+#include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerExhaustAbsorption.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/Pipes.hh>
+#include <EnergyPlus/PlantChillers.hh>
 #include <unordered_map>
 #include <string>
 
 namespace EnergyPlus {
 
-    struct BaseGlobalStruct {
-        virtual void clear_state() = 0;
-    };
-
-//struct OutputReportTabular : BaseGlobalStruct
-//{
-//    //int MaxHeaderLength;
-//
-//    void clear_state() override {
-//    }
-//};
-
-    struct DataGlobal : BaseGlobalStruct {
-        // Data
-        bool AnnualSimulation = false;
-
-        // MODULE VARIABLE DECLARATIONS:
-        std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
-
-        // MODULE PARAMETER DEFINITIONS
-        static constexpr int EndZoneSizingCalc = 4;
-
-        void clear_state() override {
-            AnnualSimulation = false;
-            DayOfSimChr = "0";
-        }
-    };
-
-    struct ExteriorEnergyUseData : BaseGlobalStruct {
-
-        int NumExteriorLights = 0; // Number of Exterior Light Inputs
-        int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
-        Array1D<ExteriorEnergyUse::ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
-        Array1D<ExteriorEnergyUse::ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
-        std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
-        bool GetExteriorEnergyInputFlag = true; // First time, input is "gotten"
-        ExteriorEnergyUseData() : NumExteriorLights(0), NumExteriorEqs(0), GetExteriorEnergyInputFlag(true) {}
-
-        void clear_state() {
-            NumExteriorLights = 0;
-            NumExteriorEqs = 0;
-            ExteriorLights.deallocate();
-            ExteriorEquipment.deallocate();
-            UniqueExteriorEquipNames.clear();
-            GetExteriorEnergyInputFlag = true;
-        }
-    };
-
-    struct FansData : BaseGlobalStruct {
-        // constants
-        static constexpr int ExhaustFanCoupledToAvailManagers = 150;
-        static constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
-
-        // members
-        int NumFans;
-        int NumNightVentPerf;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
-        bool GetFanInputFlag;      // Flag set to make sure you get input once
-        bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-        bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
-
-        FansData() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false),
-                     LocalTurnFansOff(false) {}
-
-        void clear_state() override {
-            NumFans = 0;
-            NumNightVentPerf = 0;
-            GetFanInputFlag = true;
-            LocalTurnFansOn = false;
-            LocalTurnFansOff = false;
-        }
-    };
-
-    struct PipesData : BaseGlobalStruct {
-        int NumLocalPipes;
-        bool GetPipeInputFlag;
-
-        PipesData() : NumLocalPipes(0), GetPipeInputFlag(true) {}
-
-        void clear_state() override {
-            NumLocalPipes = 0;
-            GetPipeInputFlag = true;
-        }
-    };
-
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
+        BaseboardRadiatorData dataBaseboardRadiator;
+        BaseboardElectricData dataBaseboardElectric;
+        BoilersData dataBoilers;
+        BoilerSteamData dataSteamBoilers;
+        ChillerAbsorberData dataChillerAbsorbers;
+        ChillerElectricEIRData dataChillerElectricEIR;
+        ChillerExhaustAbsorptionData dataChillerExhaustAbsorption;
+        ChillerIndirectAbsoprtionData dataChillerIndirectAbsorption;
+        ChillerGasAbsorptionData dataChillerGasAbsorption;
+        ChillerReformulatedEIRData dataChillerReformulatedEIR;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
         PipesData pipes;
+
+        PlantChillersData dataPlantChillers;
         //OutputReportTabular outputReportTabular;
+
+        // todo: move this from a reference to an object value
+        // after we have eliminated all calls to getSingleton
+        // after we've plumbed enough of the functions to allow
+        OutputFiles outputFiles;
+
+        EnergyPlusData() {
+            OutputFiles::setSingleton(&outputFiles);
+        }
+
+        // Cannot safely copy or delete this until we eradicate all remaining
+        // calls to OutputFiles::getSingleton and OutputFiles::setSingleton
+        EnergyPlusData(const EnergyPlusData &) = delete;
+        EnergyPlusData(EnergyPlusData &&) = delete;
 
         // all clear states
         void clear_state() override {
+            dataBaseboardElectric.clear_state();
+            dataBaseboardRadiator.clear_state();
+            dataBoilers.clear_state();
+            dataSteamBoilers.clear_state();
+            dataChillerAbsorbers.clear_state();
+            dataChillerElectricEIR.clear_state();
+            dataChillerExhaustAbsorption.clear_state();
+            dataChillerGasAbsorption.clear_state();
+            dataChillerIndirectAbsorption.clear_state();
+            dataChillerReformulatedEIR.clear_state();
             dataGlobals.clear_state();
             exteriorEnergyUse.clear_state();
             fans.clear_state();
             //outputReportTabular.clear_state();
             pipes.clear_state();
+            dataPlantChillers.clear_state();
         };
     };
 

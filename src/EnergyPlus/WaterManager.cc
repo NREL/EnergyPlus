@@ -1000,7 +1000,11 @@ namespace WaterManager {
 
         if (RainFall.ModeID == RainSchedDesign) {
             schedRate = GetCurrentScheduleValue(RainFall.RainSchedID); // m/hr
-            ScaleFactor = RainFall.DesignAnnualRain / RainFall.NomAnnualRain;
+            if (RainFall.NomAnnualRain > 0.0){
+                ScaleFactor = RainFall.DesignAnnualRain / RainFall.NomAnnualRain;
+            } else {
+                ScaleFactor = 0.0;
+            }
             RainFall.CurrentRate = schedRate * ScaleFactor / SecInHour; // convert to m/s
             RainFall.CurrentAmount = RainFall.CurrentRate * (TimeStepSys * SecInHour);
         }

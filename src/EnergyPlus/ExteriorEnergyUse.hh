@@ -48,10 +48,13 @@
 #ifndef ExteriorEnergyUse_hh_INCLUDED
 #define ExteriorEnergyUse_hh_INCLUDED
 
+#include <unordered_map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -127,11 +130,11 @@ namespace ExteriorEnergyUse {
         }
     };
 
-    void ManageExteriorEnergyUse(EnergyPlus::ExteriorEnergyUseData &exteriorEnergyUse);
+    void ManageExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
 
-    void GetExteriorEnergyUseInput(EnergyPlus::ExteriorEnergyUseData &exteriorEnergyUse);
+    void GetExteriorEnergyUseInput(ExteriorEnergyUseData &exteriorEnergyUse);
 
-    void ValidateFuelType(EnergyPlus::ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber,                    // Fuel Type to be set in structure.
+    void ValidateFuelType(ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber,                    // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,       // Fuel Type String
                           std::string &FuelTypeString,            // Standardized Fuel Type String (for variable naming)
                           std::string const &CurrentModuleObject, // object being parsed
@@ -139,9 +142,28 @@ namespace ExteriorEnergyUse {
                           std::string const &CurrentName          // current object name being parsed
     );
 
-    void ReportExteriorEnergyUse(EnergyPlus::ExteriorEnergyUseData &exteriorEnergyUse);
+    void ReportExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
 
 } // namespace ExteriorEnergyUse
+
+    struct ExteriorEnergyUseData : BaseGlobalStruct {
+
+        int NumExteriorLights = 0; // Number of Exterior Light Inputs
+        int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+        Array1D<ExteriorEnergyUse::ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
+        Array1D<ExteriorEnergyUse::ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
+        std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
+        bool GetExteriorEnergyInputFlag = true; // First time, input is "gotten"
+        ExteriorEnergyUseData() : NumExteriorLights(0), NumExteriorEqs(0), GetExteriorEnergyInputFlag(true) {}
+        void clear_state() override {
+            NumExteriorLights = 0;
+            NumExteriorEqs = 0;
+            ExteriorLights.deallocate();
+            ExteriorEquipment.deallocate();
+            UniqueExteriorEquipNames.clear();
+            GetExteriorEnergyInputFlag = true;
+        }
+    };
 
 } // namespace EnergyPlus
 

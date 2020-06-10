@@ -940,8 +940,6 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_SupplyAirTempLessThanZoneTStatTest
     // GitHub issue 7039
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.3;",
-
         "  Timestep,1;",
 
         "  Building,",
@@ -1417,7 +1415,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_SupplyAirTempLessThanZoneTStatTest
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(state);
 
     int CtrlZoneNum(1);
     // design peak load conditons and design supply air temperature

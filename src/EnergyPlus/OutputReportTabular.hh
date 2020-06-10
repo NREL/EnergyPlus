@@ -697,7 +697,7 @@ namespace OutputReportTabular {
     // Functions
     void clear_state();
 
-    void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     //======================================================================================================================
     //======================================================================================================================
@@ -771,9 +771,9 @@ namespace OutputReportTabular {
 
     void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType);
+    void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType);
 
-    void CalcHeatEmissionReport();
+    void CalcHeatEmissionReport(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -783,7 +783,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports(EnergyPlus::EnergyPlusData &state, OutputFiles &outputFiles);
+    void WriteTabularReports(EnergyPlusData &state);
 
     void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 

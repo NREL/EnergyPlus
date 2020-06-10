@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -108,7 +109,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-
+    DataEnvironment::StdRhoAir = 1.0;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).ZoneName = "Zone 1";
     ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -209,10 +210,11 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    DataEnvironment::StdRhoAir = 1.0;
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(outputFiles());  // read schedules
+    ProcessScheduleInput(state.outputFiles);  // read schedules
 
     GetFanInput(state.fans);
 

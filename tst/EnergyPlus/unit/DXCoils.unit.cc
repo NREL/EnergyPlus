@@ -1078,7 +1078,7 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     GetCurveInput();
     GetDXCoils();
 
@@ -1318,9 +1318,9 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     // Case 1 test
     GetDXCoils();
 
-    EXPECT_EQ(FuelTypeElectricity, DXCoil(1).FuelType);
+    EXPECT_EQ(FuelTypeElectricity, DXCoil(1).FuelType); // it also covers a test for fuel type input
     EXPECT_EQ(0, DXCoil(1).MSWasteHeat(2));
-
+    
     // Test calculations of the waste heat function #5162
 
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs
@@ -1460,7 +1460,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     GetCurveInput();
     GetDXCoils();
     SetPredefinedTables();
@@ -1790,7 +1790,7 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     GetCurveInput();
     GetDXCoils();
 
@@ -1857,7 +1857,7 @@ TEST_F(EnergyPlusFixture, CurveOutputLimitWarning)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     GetCurveInput();
     GetDXCoils();
 
@@ -1874,8 +1874,6 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
     // tests minimum limits of Minimum Outdoor Drybulb Temperature for Compressor Operation
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",
@@ -1964,7 +1962,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     GetDXCoils();
 
     ASSERT_EQ("HEATING COIL SINGLESPEED", DXCoil(1).Name); // Heating Coil Single Speed
@@ -1977,8 +1975,6 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
     // tests minimum limits of Minimum Outdoor Drybulb Temperature for Compressor Operation #6507
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",
@@ -2075,7 +2071,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(outputFiles());
+    ProcessScheduleInput(state.outputFiles);
     GetDXCoils();
 
     ASSERT_EQ("MAIN COOLING COIL 1", DXCoil(1).Name); // Cooling Coil Two Speed
@@ -2088,8 +2084,6 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({
-
-        "Version,9.3;",
 
         "Schedule:Compact,",
         "  FanAvailSched,           !- Name",
@@ -2198,7 +2192,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);
     DXCoils::GetDXCoils();
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 
@@ -2320,8 +2314,6 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 
     std::string const idf_objects = delimited_string({
 
-        "Version, 9.2;",
-
         "Schedule:Compact,",
         "  FanAndCoilAvailSched, !- Name",
         "  Fraction,             !- Schedule Type Limits Name",
@@ -2420,7 +2412,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(outputFiles());
+    ScheduleManager::ProcessScheduleInput(state.outputFiles);
     DXCoils::GetDXCoils();
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 
@@ -3561,7 +3553,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     // Design Capacity at speed 2 and speed 1
     EXPECT_NEAR(31888.0, DXCoil(1).MSRatedTotCap(2), 0.01);
     EXPECT_NEAR(15944.0, DXCoil(1).MSRatedTotCap(1), 0.01);
-    
+
     // check multi-speed DX heating coil
     EXPECT_EQ("ASHP HTG COIL", DXCoil(2).Name);
     EXPECT_EQ("Coil:Heating:DX:MultiSpeed", DXCoil(2).DXCoilType);

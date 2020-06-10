@@ -127,7 +127,8 @@ namespace OutputReportPredefined {
 
     extern int pdchDXCoolCoilNetCapSI; // Standard Rated (Net) Cooling Capacity [W]
     extern int pdchDXCoolCoilCOP;      // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
-    extern int pdchDXCoolCoilSEERIP;   // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
+    extern int pdchDXCoolCoilSEERUserIP;   // SEER value in IP unit at AHRI std. 210/240 conditionsand and user PLF curve [Btu/W-hr]
+    extern int pdchDXCoolCoilSEERStandardIP;   // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
     extern int pdchDXCoolCoilEERIP;    // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
     extern int pdchDXCoolCoilIEERIP;   // IEER value in IP unit at AHRI std. 340/360 conditions
 
