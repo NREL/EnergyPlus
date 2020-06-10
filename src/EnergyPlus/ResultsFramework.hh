@@ -345,7 +345,7 @@ namespace ResultsFramework {
 
         virtual ~ResultsFramework() = default;
 
-        void setupOutputOptions();
+        void setupOutputOptions(OutputFiles & outputFiles);
 
         bool timeSeriesEnabled() const;
 

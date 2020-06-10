@@ -757,12 +757,12 @@ namespace OutputReportTabular {
         }
 
         if (UpdateTabularReportsGetInput) {
-            GetInputTabularMonthly();
+            GetInputTabularMonthly(state.outputFiles);
             OutputReportTabularAnnual::GetInputTabularAnnual();
             OutputReportTabularAnnual::checkAggregationOrderForAnnual();
-            GetInputTabularTimeBins();
+            GetInputTabularTimeBins(state.outputFiles);
             GetInputTabularStyle(state.outputFiles);
-            GetInputOutputTableSummaryReports();
+            GetInputOutputTableSummaryReports(state.outputFiles);
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly();
             if (isInvalidAggregationOrder()) {
@@ -799,7 +799,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputTabularMonthly()
+    void GetInputTabularMonthly(OutputFiles & outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -850,6 +850,11 @@ namespace OutputReportTabular {
         Array1D<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
+
+        if (!outputFiles.outputControl.tabular) {
+            WriteTabularFiles = false;
+            return;
+        }
 
         MonthlyInputCount = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (MonthlyInputCount > 0) {
@@ -1516,7 +1521,7 @@ namespace OutputReportTabular {
         return foundError;
     }
 
-    void GetInputTabularTimeBins()
+    void GetInputTabularTimeBins(OutputFiles & outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1568,6 +1573,11 @@ namespace OutputReportTabular {
 
         Array1D_string objNames;
         Array1D_int objVarIDs;
+
+        if (!outputFiles.outputControl.tabular) {
+            WriteTabularFiles = false;
+            return;
+        }
 
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
@@ -1918,7 +1928,7 @@ namespace OutputReportTabular {
         return unitsStyleReturn;
     }
 
-    void GetInputOutputTableSummaryReports()
+    void GetInputOutputTableSummaryReports(OutputFiles & outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1977,6 +1987,11 @@ namespace OutputReportTabular {
         int jReport;
         bool nameFound;
         bool ErrorsFound;
+
+        if (!outputFiles.outputControl.tabular) {
+            WriteTabularFiles = false;
+            return;
+        }
 
         ErrorsFound = false;
         NumTabularPredefined = inputProcessor->getNumObjectsFound(CurrentModuleObject);

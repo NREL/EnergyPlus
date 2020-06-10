@@ -314,12 +314,12 @@ namespace SimulationManager {
         if (DataGlobals::runReadVars) {
             state.outputFiles.outputControl.csv = true;
         }
-        ResultsFramework::resultsFramework->setupOutputOptions();
+        ResultsFramework::resultsFramework->setupOutputOptions(state.outputFiles);
 
         state.outputFiles.debug.ensure_open("OpenOutputFiles", state.outputFiles.outputControl.dbg);
 
         // CreateSQLiteDatabase();
-        sqlite = EnergyPlus::CreateSQLiteDatabase();
+        sqlite = EnergyPlus::CreateSQLiteDatabase(state.outputFiles);
 
         if (sqlite) {
             sqlite->sqliteBegin();
@@ -683,7 +683,7 @@ namespace SimulationManager {
 #endif
         SimCostEstimate(state);
 
-        ComputeTariff(); //     Compute the utility bills
+        ComputeTariff(state.outputFiles); //     Compute the utility bills
 
         EMSManager::checkForUnusedActuatorsAtEnd();
 

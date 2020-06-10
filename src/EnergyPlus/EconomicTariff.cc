@@ -2866,7 +2866,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ComputeTariff()
+    void ComputeTariff(OutputFiles & outputFiles)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
@@ -2897,6 +2897,11 @@ namespace EconomicTariff {
         Real64 hugeValue;
         Real64 annualAggregate;
         int annualCnt;
+
+        if (!outputFiles.outputControl.tabular) {
+            WriteTabularFiles = false;
+            return;
+        }
 
         hugeValue = HUGE_(Real64());
         //  Clear the isEvaluated flags for all economics variables.

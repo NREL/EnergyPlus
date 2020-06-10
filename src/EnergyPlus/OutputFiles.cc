@@ -52,6 +52,7 @@
 #include "InputProcessing/InputProcessor.hh"
 #include "InputProcessing/EmbeddedEpJSONSchema.hh"
 
+#include "nlohmann/json.hpp"
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
 #include <stdexcept>
@@ -157,7 +158,7 @@ void OutputFiles::OutputControl::getInput()
     auto const instances = inputProcessor->epJSON.find("Output:Control");
     if (instances != inputProcessor->epJSON.end()) {
 
-        auto find_input = [](json const & fields, std::string const & field_name) -> std::string {
+        auto find_input = [](nlohmann::json const & fields, std::string const & field_name) -> std::string {
             std::string input;
             auto found = fields.find(field_name);
             if (found != fields.end()) {
@@ -266,6 +267,15 @@ void OutputFiles::OutputControl::getInput()
             }
             { // "output_extshd"
                 extshd = boolean_choice(find_input(fields, "output_extshd"));
+            }
+            { // "json"
+                json = boolean_choice(find_input(fields, "json"));
+            }
+            { // "tabular"
+                tabular = boolean_choice(find_input(fields, "tabular"));
+            }
+            { // "sqlite"
+                sqlite = boolean_choice(find_input(fields, "sqlite"));
             }
         }
     }

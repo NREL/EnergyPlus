@@ -48,7 +48,6 @@
 #ifndef OutputFiles_hh_INCLUDED
 #define OutputFiles_hh_INCLUDED
 
-#include "nlohmann/json.hpp"
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -108,7 +107,6 @@ public:
 
     struct OutputControl
     {
-        using json = nlohmann::json;
         OutputControl() = default;
 
         void getInput();
@@ -141,6 +139,9 @@ public:
         bool screen = true;
         bool tarcog = true;
         bool extshd = true;
+        bool json = true;
+        bool tabular = true;
+        bool sqlite = true;
     };
 
     OutputControl outputControl;

@@ -707,7 +707,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputTabularMonthly();
+    void GetInputTabularMonthly(OutputFiles & outputFiles);
 
     int AddMonthlyReport(std::string const &inReportName, int const inNumDigitsShown);
 
@@ -717,7 +717,7 @@ namespace OutputReportTabular {
 
     bool isInvalidAggregationOrder();
 
-    void GetInputTabularTimeBins();
+    void GetInputTabularTimeBins(OutputFiles & outputFiles);
 
     bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName);
 
@@ -725,7 +725,7 @@ namespace OutputReportTabular {
 
     int SetUnitsStyleFromString(std::string const &unitStringIn);
 
-    void GetInputOutputTableSummaryReports();
+    void GetInputOutputTableSummaryReports(OutputFiles & outputFiles);
 
     bool isCompLoadRepReq();
 

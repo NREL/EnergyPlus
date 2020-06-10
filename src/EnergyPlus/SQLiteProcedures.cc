@@ -83,8 +83,11 @@ const int SQLite::UnitsId = 6;
 
 std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase()
+std::unique_ptr<SQLite> CreateSQLiteDatabase(OutputFiles & outputFiles)
 {
+    if (!outputFiles.outputControl.sqlite) {
+        return nullptr;
+    }
     try {
         int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound("Output:SQLite");
         bool writeOutputToSQLite = false;

@@ -903,12 +903,15 @@ namespace ResultsFramework {
         outputFile.close();
     }
 
-    void ResultsFramework::setupOutputOptions()
+    void ResultsFramework::setupOutputOptions(OutputFiles & outputFiles)
     {
-        auto & outputFiles = OutputFiles::getSingleton();
         if (outputFiles.outputControl.csv) {
             tsEnabled = true;
             tsAndTabularEnabled = true;
+        }
+
+        if (!outputFiles.outputControl.json) {
+            return;
         }
 
         int numberOfOutputSchemaObjects = inputProcessor->getNumObjectsFound("Output:JSON");
