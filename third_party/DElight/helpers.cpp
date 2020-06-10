@@ -34,7 +34,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <strstream>
+#include <sstream>
 #include <string>
 #include <cstring>
 #include <vector>
@@ -714,7 +714,7 @@ double POLYF_WLC(
 	else
 	  transmittance = dCosI*(EPCoef[0]+dCosI*(EPCoef[1]+dCosI*(EPCoef[2]+dCosI*(EPCoef[3]+dCosI*(EPCoef[4]+dCosI*EPCoef[5])))));
 
-	  return(transmittance);
+	return(transmittance);
 }
 
 //HemiSphiral	GenWindowMap(int Nsize, LumParam& lp, HemiSphiral& sky0, BGL::RHCoordSys3 ics)
@@ -992,7 +992,7 @@ FILE_FLG::FILE_FLG(string sfpflg)
 int	RADdata::load(string filename)
 //	NOTE:  This only works for ndim==2!
 {
-	ostrstream osstream;
+	std::ostringstream osstream;
 
 	//	open a file for reading ...
 	ifstream	infile(filename.c_str());	//	XXXX NOTE:  This crashes if filename = "" !
@@ -1138,7 +1138,7 @@ HemiSphiral	RADdata::convertToHS() {
 
 int	IESNAdata::load(string filename)
 {
-	ostrstream osstream;
+	std::ostringstream osstream;
 
 	//	open a file for reading ...
 	ifstream	infile(filename.c_str());	//	XXXX NOTE:  This crashes if filename = "" !

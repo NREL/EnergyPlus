@@ -28,7 +28,7 @@
 // =================================================================================
 
 #include <iostream>
-#include <strstream>
+#include <sstream>
 #include <iomanip>
 #include <string>
 #include <vector>
@@ -287,7 +287,7 @@ istream &operator >> (istream &s, plane3 &plane)
     point3	origin;
 	vector3	normdir;
     Char	c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 
 	// Expected format: [Point3 Vec3] = [[1 2 3] [4 5 6]]
 
@@ -348,7 +348,7 @@ istream	&operator >> (istream &s, surf3 &surf)
 	string	name;
 	point3	p3;
     vector<point3>	VertexList;	//
-	ostrstream osstream;
+	std::ostringstream osstream;
 
 	// Expected format: name [Point3 Point3 ... for N verts] = name [[1 2 3] [4 5 6] .. [P Q R]]
 

@@ -23,6 +23,10 @@
 #include "string.h"
 #include "util.h"
 
+#ifndef _MSC_VER
+#include <libgen.h>
+#endif
+
 #define XML_FILE  "modelDescription.xml"
 
 FMU fmu;        // FMU to parse

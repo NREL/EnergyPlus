@@ -97,7 +97,7 @@ double POLYF(
 	else
 	  transmittance = dCosI*(EPCoef[0]+dCosI*(EPCoef[1]+dCosI*(EPCoef[2]+dCosI*(EPCoef[3]+dCosI*(EPCoef[4]+dCosI*EPCoef[5])))));
 
-	  return(transmittance);
+	return(transmittance);
 }
 
 /****************************** subroutine lib_index *****************************/

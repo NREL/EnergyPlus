@@ -33,7 +33,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <strstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <algorithm> // for min/max
@@ -745,12 +745,12 @@ ifstream&	HemiSphiral::load(ifstream& infile)
 {
     HemiSphiral    result;
     Char    c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 
 	// Expected format: {double0 double1 ... doubleN}
 
-    while (infile >> c && isspace(c));
-	if (infile.eof()) return(infile);
+    while (infile >> c && isspace(c)) {;} // skip through spaces
+    if (infile.eof()) return(infile);
 	if (infile.fail()) {
 		osstream << "HemiSphiral:ReadError1: unrecoverable failbit\n";
 	    writewndo(osstream.str(),"e");

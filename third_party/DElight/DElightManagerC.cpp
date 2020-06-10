@@ -88,7 +88,7 @@ int iErrorOccurred = 0; // Error/Warning occurred flag
 /******************************** subroutine writewndo *******************************/
 /* Error/Warning handling routine for WLC code modules. */
 /******************************** subroutine writewndo *******************************/
-void writewndo(const char* instring, string sfpflg)
+void writewndo(const std::string instring, string sfpflg)
 {
 	// Check for open Error message dump file.
 	if(!ofdmpfile)

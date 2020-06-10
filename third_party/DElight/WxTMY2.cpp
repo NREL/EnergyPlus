@@ -123,8 +123,9 @@ int	read_wx_tmy2_hdr(
 
     // Longitude
     bldg_ptr->lon = (double)long_deg + ((double)long_min / 60.0f);
-    if (strcmp(lon,"E") == 0)
-        bldg_ptr->lon = -(bldg_ptr->lon);
+    if (strcmp(lon,"E") == 0) {
+      bldg_ptr->lon = -(bldg_ptr->lon);
+    }
 
 	// Altitude
 	bldg_ptr->alt = (double)elevation / 0.3048;
