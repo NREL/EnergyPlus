@@ -174,14 +174,6 @@ namespace CoolingPanelSimple {
         ~CoolingPanelSysNumericFieldData() = default;
     };
 
-    // Object Data
-    extern Array1D<CoolingPanelParams> CoolingPanel;
-    extern Array1D<CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
-
-    // Functions
-
-    void clear_state();
-
     void SimCoolingPanel(EnergyPlusData &state, std::string const &EquipName,
                          int ActualZoneNum,
                          int ControlledZoneNum,
@@ -207,9 +199,42 @@ namespace CoolingPanelSimple {
 
 struct ChilledCeilingPanelSimpleData : BaseGlobalStruct {
 
+    bool GetInputFlag = true;
+    bool MyOneTimeFlag = true;
+    int NumCoolingPanels = 0;
+    Array1D<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
+    Array1D<Real64> CoolingPanelSrcAvg;   // Need to keep the last value in case we are still iterating
+    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+
+    // Record keeping variables used to calculate CoolingPanelSrcAvg locally
+    Array1D<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
+    Array1D_bool CheckEquipName;
+    Array1D_bool SetLoopIndexFlag; // get loop number flag
+
+    // Autosizing variables
+    Array1D_bool MySizeFlagCoolPanel;
+
+    Array1D<CoolingPanelSimple::CoolingPanelParams> CoolingPanel;
+    Array1D<CoolingPanelSimple::CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
+
     void clear_state() override
     {
-
+        GetInputFlag = true;
+        MyOneTimeFlag = true;
+        NumCoolingPanels = 0;
+        CoolingPanelSource.deallocate();
+        CoolingPanelSrcAvg.deallocate();
+        ZeroSourceSumHATsurf.deallocate();
+        LastCoolingPanelSrc.deallocate();
+        LastSysTimeElapsed.deallocate();
+        LastTimeStepSys.deallocate();
+        CheckEquipName.deallocate();
+        SetLoopIndexFlag.deallocate();
+        MySizeFlagCoolPanel.deallocate();
+        CoolingPanel.deallocate();
+        CoolingPanelSysNumericFields.deallocate();
     }
 };
 

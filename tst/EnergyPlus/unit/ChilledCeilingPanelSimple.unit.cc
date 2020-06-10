@@ -54,11 +54,8 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 
 using namespace EnergyPlus::CoolingPanelSimple;
 
@@ -75,7 +72,7 @@ TEST_F(EnergyPlusFixture, SetCoolingPanelControlTemp)
     CoolingPanelNum = 1;
     ZoneNum = 1;
 
-    CoolingPanelSimple::CoolingPanel.allocate(1);
+    dataChilledCeilingPanelSimple.CoolingPanel.allocate(1);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::MAT(1) = 22.0;
     DataHeatBalance::MRT.allocate(1);
@@ -84,24 +81,24 @@ TEST_F(EnergyPlusFixture, SetCoolingPanelControlTemp)
     DataHeatBalance::Zone(1).OutDryBulbTemp = 10.0;
     DataHeatBalance::Zone(1).OutWetBulbTemp = 5.0;
 
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MAT;
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MAT;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 22.0);
 
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MRT;
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MRT;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 20.0);
 
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::Operative;
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::Operative;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 21.0);
 
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::ODB;
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::ODB;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 10.0);
 
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::OWB;
-    CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::OWB;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 5.0);
 }
 
@@ -114,49 +111,49 @@ TEST_F(EnergyPlusFixture, SizeCoolingPanelUA)
     CoolingPanelNum = 1;
     SizeCoolingPanelUASuccess = true;
 
-    CoolingPanelSimple::CoolingPanel.allocate(CoolingPanelNum);
+    dataChilledCeilingPanelSimple.CoolingPanel.allocate(CoolingPanelNum);
 
     // Valid input combination
-    CoolingPanel(CoolingPanelNum).RatedWaterFlowRate = 1.0;
-    CoolingPanel(CoolingPanelNum).ScaledCoolingCapacity = 4000.0;
-    CoolingPanel(CoolingPanelNum).RatedWaterTemp = 20.0;
-    CoolingPanel(CoolingPanelNum).RatedZoneAirTemp = 21.0;
-    SizeCoolingPanelUASuccess = CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SizeCoolingPanelUA();
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedWaterFlowRate = 1.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ScaledCoolingCapacity = 4000.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedWaterTemp = 20.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedZoneAirTemp = 21.0;
+    SizeCoolingPanelUASuccess = dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).SizeCoolingPanelUA();
     EXPECT_EQ(SizeCoolingPanelUASuccess, true);
-    EXPECT_NEAR(CoolingPanel(CoolingPanelNum).UA, 14569.0, 1.0);
+    EXPECT_NEAR(dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).UA, 14569.0, 1.0);
 
     // Capacity slightly high case--code fixes this and moves on
-    CoolingPanel(CoolingPanelNum).RatedWaterFlowRate = 1.0;
-    CoolingPanel(CoolingPanelNum).ScaledCoolingCapacity = 4200.0;
-    CoolingPanel(CoolingPanelNum).RatedWaterTemp = 20.0;
-    CoolingPanel(CoolingPanelNum).RatedZoneAirTemp = 21.0;
-    SizeCoolingPanelUASuccess = CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SizeCoolingPanelUA();
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedWaterFlowRate = 1.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ScaledCoolingCapacity = 4200.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedWaterTemp = 20.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedZoneAirTemp = 21.0;
+    SizeCoolingPanelUASuccess = dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).SizeCoolingPanelUA();
     EXPECT_EQ(SizeCoolingPanelUASuccess, true);
-    EXPECT_NEAR(CoolingPanel(CoolingPanelNum).UA, 37947.0, 1.0);
+    EXPECT_NEAR(dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).UA, 37947.0, 1.0);
 
     // Temperatures too close--code fixes this and moves on
-    CoolingPanel(CoolingPanelNum).RatedWaterFlowRate = 1.0;
-    CoolingPanel(CoolingPanelNum).ScaledCoolingCapacity = 2000.0;
-    CoolingPanel(CoolingPanelNum).RatedWaterTemp = 20.0;
-    CoolingPanel(CoolingPanelNum).RatedZoneAirTemp = 20.4;
-    SizeCoolingPanelUASuccess = CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SizeCoolingPanelUA();
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedWaterFlowRate = 1.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ScaledCoolingCapacity = 2000.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedWaterTemp = 20.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedZoneAirTemp = 20.4;
+    SizeCoolingPanelUASuccess = dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).SizeCoolingPanelUA();
     EXPECT_EQ(SizeCoolingPanelUASuccess, true);
-    EXPECT_NEAR(CoolingPanel(CoolingPanelNum).UA, 14569.0, 1.0);
+    EXPECT_NEAR(dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).UA, 14569.0, 1.0);
 
     // Capacity too high case
-    CoolingPanel(CoolingPanelNum).RatedWaterFlowRate = 1.0;
-    CoolingPanel(CoolingPanelNum).ScaledCoolingCapacity = 5000.0;
-    CoolingPanel(CoolingPanelNum).RatedWaterTemp = 20.0;
-    CoolingPanel(CoolingPanelNum).RatedZoneAirTemp = 21.0;
-    SizeCoolingPanelUASuccess = CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SizeCoolingPanelUA();
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedWaterFlowRate = 1.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ScaledCoolingCapacity = 5000.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedWaterTemp = 20.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedZoneAirTemp = 21.0;
+    SizeCoolingPanelUASuccess = dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).SizeCoolingPanelUA();
     EXPECT_EQ(SizeCoolingPanelUASuccess, false);
 
     // Water temperature higher than zone temperature (not cooling) case
-    CoolingPanel(CoolingPanelNum).RatedWaterFlowRate = 1.0;
-    CoolingPanel(CoolingPanelNum).ScaledCoolingCapacity = 4000.0;
-    CoolingPanel(CoolingPanelNum).RatedWaterTemp = 21.0;
-    CoolingPanel(CoolingPanelNum).RatedZoneAirTemp = 20.0;
-    SizeCoolingPanelUASuccess = CoolingPanelSimple::CoolingPanel(CoolingPanelNum).SizeCoolingPanelUA();
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedWaterFlowRate = 1.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ScaledCoolingCapacity = 4000.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedWaterTemp = 21.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RatedZoneAirTemp = 20.0;
+    SizeCoolingPanelUASuccess = dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).SizeCoolingPanelUA();
     EXPECT_EQ(SizeCoolingPanelUASuccess, false);
 }
 
@@ -166,18 +163,18 @@ TEST_F(EnergyPlusFixture, ReportCoolingPanel)
 
     CoolingPanelNum = 1;
 
-    CoolingPanelSimple::CoolingPanel.allocate(CoolingPanelNum);
+    dataChilledCeilingPanelSimple.CoolingPanel.allocate(CoolingPanelNum);
 
     // Test the new output for running the values through the Report subroutine
-    CoolingPanel(CoolingPanelNum).TotPower = -10.0;
-    CoolingPanel(CoolingPanelNum).Power = -9.0;
-    CoolingPanel(CoolingPanelNum).ConvPower = -4.0;
-    CoolingPanel(CoolingPanelNum).RadPower = -5.0;
-    CoolingPanel(CoolingPanelNum).ReportCoolingPanel();
-    EXPECT_NEAR(CoolingPanel(CoolingPanelNum).TotPower, 10.0, 1.0);
-    EXPECT_NEAR(CoolingPanel(CoolingPanelNum).Power, 9.0, 1.0);
-    EXPECT_NEAR(CoolingPanel(CoolingPanelNum).ConvPower, 4.0, 1.0);
-    EXPECT_NEAR(CoolingPanel(CoolingPanelNum).RadPower, 5.0, 1.0);
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).TotPower = -10.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).Power = -9.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ConvPower = -4.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RadPower = -5.0;
+    dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ReportCoolingPanel();
+    EXPECT_NEAR(dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).TotPower, 10.0, 1.0);
+    EXPECT_NEAR(dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).Power, 9.0, 1.0);
+    EXPECT_NEAR(dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).ConvPower, 4.0, 1.0);
+    EXPECT_NEAR(dataChilledCeilingPanelSimple.CoolingPanel(CoolingPanelNum).RadPower, 5.0, 1.0);
 }
 
 } // namespace EnergyPlus
