@@ -414,7 +414,12 @@ def find_issues(log_path, json_error_path, src_dir):
       with a summary of issues. Also writes issues to stdout
     - will ONLY write the json error file if an issue is found
     - returns True if issues found, else false
+    - if json_error_path exists when this script is run, the file is deleted
+      (since the presense of the file indicates that issues are found, we don't
+      want the file to persist between calls)
     """
+    if os.path.exists(json_error_path):
+        os.remove(json_error_path)
     try:
         errs = parse_log(log_path, src_dir)
         repo_root = os.path.abspath(
