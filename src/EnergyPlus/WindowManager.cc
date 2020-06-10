@@ -55,7 +55,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -74,6 +73,11 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -81,9 +85,9 @@
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <EnergyPlus/WindowManagerExteriorOptical.hh>
 #include <EnergyPlus/WindowManagerExteriorThermal.hh>
-#include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <EnergyPlus/WindowModel.hh>
 
 namespace EnergyPlus {
@@ -416,7 +420,7 @@ namespace WindowManager {
         CWindowConstructionsSimplified::clearState();
     }
 
-    void InitWindowOpticalCalculations()
+    void InitWindowOpticalCalculations(OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -435,13 +439,13 @@ namespace WindowManager {
         // check and read custom solar and/or visible spectrum data if any
         CheckAndReadCustomSprectrumData();
         if (inExtWindowModel->isExternalLibraryModel()) {
-            InitWCE_SimplifiedOpticalData();
+            InitWCE_SimplifiedOpticalData(outputFiles);
         } else {
-            InitGlassOpticalCalculations();
+            InitGlassOpticalCalculations(outputFiles);
         }
     }
 
-    void InitGlassOpticalCalculations()
+    void InitGlassOpticalCalculations(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -642,7 +646,7 @@ namespace WindowManager {
         if (TotBlinds > 0) CalcWindowBlindProperties();
 
         // Initialize SurfaceScreen structure
-        if (NumSurfaceScreens > 0) CalcWindowScreenProperties();
+        if (NumSurfaceScreens > 0) CalcWindowScreenProperties(outputFiles);
 
         // Get glazing system optical properties of constructions with glass or glass plus
         //   shade, screen or blind
@@ -886,9 +890,9 @@ namespace WindowManager {
                         for (ILam = 1; ILam <= (int)wle.size(); ++ILam) {
                             auto lam = wle(ILam);
                             wlt(IGlass, ILam) = lam;
-                            t(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngTransDataPtr,0.0,lam);
-                            rff(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngFRefleDataPtr,0.0,lam);
-                            rbb(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngBRefleDataPtr,0.0,lam);
+                            t(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngTransDataPtr, 0.0, lam);
+                            rff(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngFRefleDataPtr, 0.0, lam);
+                            rbb(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngBRefleDataPtr, 0.0, lam);
                         }
                         SolarSprectrumAverage(t, tmpTrans);
                         SolarSprectrumAverage(rff, tmpReflectSolBeamFront);
@@ -1821,7 +1825,7 @@ namespace WindowManager {
             }
         } // End of surface loop
 
-        ReportGlass();
+        ReportGlass(outputFiles);
     }
 
     //*****************************************************************************************
@@ -1882,6 +1886,7 @@ namespace WindowManager {
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             if (Construct(ConstrNum).FromWindow5DataFile) continue;
             if (Construct(ConstrNum).WindowTypeBSDF) continue;
+            if (Construct(ConstrNum).TypeIsAirBoundaryInteriorWindow) continue;
             Construct(ConstrNum).TransDiff = 0.0;
             Construct(ConstrNum).TransDiffVis = 0.0;
             Construct(ConstrNum).AbsDiffBackShade = 0.0;
@@ -2461,7 +2466,7 @@ namespace WindowManager {
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSlatAng; // Function for slat angle interpolation
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         // unused0909  USE DataEnvironment, ONLY: CurMnDyHr
         using ScheduleManager::GetCurrentScheduleValue;
@@ -2680,7 +2685,7 @@ namespace WindowManager {
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                         NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                     }
@@ -2902,7 +2907,7 @@ namespace WindowManager {
                         for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                             NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                             MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                            CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNumAdj), NodeTemp);
+                            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNumAdj));
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         }
@@ -2938,6 +2943,7 @@ namespace WindowManager {
                 if (AnyLocalEnvironmentsInModel) {
                     if (Surface(SurfNum).HasSurroundingSurfProperties) {
                         SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+
                         if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                             surface.ViewFactorSkyIR = SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                         }
@@ -2948,7 +2954,7 @@ namespace WindowManager {
                             SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs =
                                 GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
-                            OutSrdIR += sigma * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
+                            OutSrdIR += sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
                         }
                     }
                 }
@@ -3067,7 +3073,11 @@ namespace WindowManager {
         QdotConvOutRepPerArea(SurfNum) = -hcout * (Tsout - tout);
         QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
 
-        QRadLWOutSrdSurfs(SurfNum) = 0;
+        Real64 const Tsout_4(pow_4(Tsout)); // Tuned To reduce pow calls and redundancies
+        Real64 const Tout_4(pow_4(tout));
+        Real64 const emiss_sigma_product(SurfOutsideEmiss * sigma);
+        Real64 rad_out_lw_srd_per_area = 0;
+
         if (AnyLocalEnvironmentsInModel) {
             if (Surface(SurfNum).HasSurroundingSurfProperties) {
                 SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
@@ -3075,20 +3085,25 @@ namespace WindowManager {
                     SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                     SrdSurfTempAbs =
                         GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
-                    QRadLWOutSrdSurfs(SurfNum) += SurfOutsideEmiss * sigma * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(Tsout));
+                    rad_out_lw_srd_per_area += - emiss_sigma_product * SrdSurfViewFac * (Tsout_4 - pow_4(SrdSurfTempAbs));
                 }
             }
         }
 
-        Real64 const Tsout_4(pow_4(Tsout)); // Tuned To reduce pow calls and redundancies
-        Real64 const rad_out_per_area(
-            -SurfOutsideEmiss * sigma *
-            ((((1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR + surface.ViewFactorGroundIR) * (Tsout_4 - pow_4(tout))) +
-             (AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(SkyTempKelvin))) + QRadLWOutSrdSurfs(SurfNum)));
+        Real64 const rad_out_air_per_area = - emiss_sigma_product * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * (Tsout_4 - Tout_4);
+        Real64 const rad_out_ground_per_area = - emiss_sigma_product * surface.ViewFactorGroundIR * (Tsout_4 - Tout_4);
+        Real64 const rad_out_sky_per_area = - emiss_sigma_product * AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(SkyTempKelvin));
+        Real64 const rad_out_per_area = rad_out_air_per_area + rad_out_sky_per_area + rad_out_ground_per_area + rad_out_lw_srd_per_area;
+
+        QRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
         QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area;
         QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
-
         QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
+
+        // Radiation emission to air rate
+        DataHeatBalSurface::QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
+        DataHeatBalSurface::QHeatEmiReport(SurfNum) = surface.Area * hcout * (Tsout - tout) + DataHeatBalSurface::QAirExtReport(SurfNum);;
+
     }
 
     //****************************************************************************
@@ -3273,7 +3288,7 @@ namespace WindowManager {
         using General::InterpSw;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyTdbFnHW;
@@ -3935,8 +3950,8 @@ namespace WindowManager {
                         InletAirHumRat = OutHumRat;
                     }
                     ZoneTemp = MAT(ZoneNum); // this should be Tin (account for different reference temps)
-                    CpAirOutlet = PsyCpAirFnWTdb(InletAirHumRat, TAirflowGapOutletC);
-                    CpAirZone = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZoneTemp);
+                    CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
+                    CpAirZone = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
                     if (SurfaceWindow(SurfNum).AirflowDestination == AirFlowWindow_Destination_IndoorAir) {
                         SurfaceWindow(SurfNum).ConvHeatGainToZoneAir = ConvHeatGainToZoneAir;
@@ -4695,7 +4710,7 @@ namespace WindowManager {
 
     void LUdecomposition(Array2<Real64> &ajac, // As input: matrix to be decomposed;
                          int const n,          // Dimension of matrix
-                         Array1_int &indx,     // Vector of row permutations
+                         Array1D_int &indx,    // Vector of row permutations
                          Real64 &d             // +1 if even number of row interchange is even, -1
     )
     {
@@ -4798,8 +4813,8 @@ namespace WindowManager {
 
     void LUsolution(Array2<Real64> const &a, // Matrix and vector in a.x = b;
                     int const n,             // Dimension of a and b
-                    Array1_int const &indx,  // Vector of row permutations
-                    Array1<Real64> &b        // Matrix and vector in a.x = b;
+                    Array1D_int const &indx, // Vector of row permutations
+                    Array1D<Real64> &b       // Matrix and vector in a.x = b;
     )
     {
 
@@ -7560,7 +7575,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass()
+    void ReportGlass(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7598,7 +7613,6 @@ namespace WindowManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const Roughness(6, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
         static Array1D_string const GasTypeName({0, 4}, {"Custom", "Air", "Argon", "Krypton", "Xenon"});
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -7641,21 +7655,6 @@ namespace WindowManager {
         std::string SlateOrientation;
         std::string GapVentType;
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_700("(' WindowConstruction',8(',',A))");
-        static ObjexxFCL::gio::Fmt Format_702("(' WindowMaterial:Gas',3(',',A))");
-        static ObjexxFCL::gio::Fmt Format_703("(' WindowMaterial:Shade,',7(',',A))");
-        static ObjexxFCL::gio::Fmt Format_704("(' WindowMaterial:Blind',8(',',A))");
-        static ObjexxFCL::gio::Fmt Format_706("(' WindowMaterial:Screen',11(',',A))");
-        static ObjexxFCL::gio::Fmt Format_707("(' WindowMaterial:Glazing',16(',',A))");
-        static ObjexxFCL::gio::Fmt Format_708("(' WindowMaterial:Glazing:EquivalentLayer',17(',',A))");
-        static ObjexxFCL::gio::Fmt Format_709("(' WindowMaterial:Shade:EquivalentLayer',10(',',A))");
-        static ObjexxFCL::gio::Fmt Format_710("(' WindowMaterial:Drape:EquivalentLayer',11(',',A))");
-        static ObjexxFCL::gio::Fmt Format_711("(' WindowMaterial:Screen:EquivalentLayer',11(',',A))");
-        static ObjexxFCL::gio::Fmt Format_712("(' WindowMaterial:Blind:EquivalentLayer',16(',',A))");
-        static ObjexxFCL::gio::Fmt Format_713("(' WindowMaterial:Gap:EquivalentLayer',4(',',A))");
-        static ObjexxFCL::gio::Fmt Format_799("(' Construction:WindowEquivalentLayer',6(',',A))");
-        static ObjexxFCL::gio::Fmt Format_800("(' WindowConstruction:Complex',5(',',A))");
 
         ScanForReports("Constructions", DoReport, "Constructions");
 
@@ -7684,74 +7683,73 @@ namespace WindowManager {
         if (DoReport && (HasWindows || HasComplexWindows || HasEQLWindows)) {
             //                                      Write Descriptions
 
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},SHGC,Solar "
-                                                 "Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence";
+            print(outputFiles.eio, "{}\n", "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},SHGC,Solar "
+                                                 "Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
             if ((TotSimpleWindow > 0) || (W5GlsMat > 0) || (W5GlsMatAlt > 0))
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowMaterial:Glazing>, Material Name, Optical Data Type, Spectral Data Set Name, "
+                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Glazing>, Material Name, Optical Data Type, Spectral Data Set Name, "
                                                      "Thickness {m}, Solar Transmittance,Front Solar Reflectance, Back Solar Reflectance, Visible "
                                                      "Transmittance, Front Visible Reflectance,Back Visible Reflectance,Infrared Transmittance, "
                                                      "Front Thermal Emissivity, Back Thermal Emissivity,Conductivity {W/m-K},Dirt Factor,Solar "
-                                                     "Diffusing";
+                                                     "Diffusing");
             if ((W5GasMat > 0) || (W5GasMatMixture > 0))
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowMaterial:Gas>,Material Name,GasType,Thickness {m}";
+                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Gas>,Material Name,GasType,Thickness {m}");
             if (TotShades > 0)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowMaterial:Shade>,Material Name,Thickness {m},Conductivity {W/m-K},Thermal "
-                                                     "Absorptance,Transmittance,Visible Transmittance,Shade Reflectance";
+                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Shade>,Material Name,Thickness {m},Conductivity {W/m-K},Thermal "
+                                                     "Absorptance,Transmittance,Visible Transmittance,Shade Reflectance");
             if (TotScreens > 0)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowMaterial:Screen>,Material Name,Thickness {m},Conductivity {W/m-K},Thermal "
+                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Screen>,Material Name,Thickness {m},Conductivity {W/m-K},Thermal "
                                                      "Absorptance,Transmittance,Reflectance,Visible Reflectance,Diffuse Reflectance,Diffuse Visible "
-                                                     "Reflectance,Screen Material Diameter To Spacing Ratio,Screen To GlassDistance {m}";
+                                                     "Reflectance,Screen Material Diameter To Spacing Ratio,Screen To GlassDistance {m}");
             if (TotBlinds > 0)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowMaterial:Blind>,Material Name,Slat Width {m},Slat Separation {m},Slat Thickness "
+                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Blind>,Material Name,Slat Width {m},Slat Separation {m},Slat Thickness "
                                                      "{m},Slat Angle {deg},Slat Beam Solar Transmittance,Slat Beam Solar Front Reflectance,Blind To "
-                                                     "Glass Distance {m}";
+                                                     "Glass Distance {m}");
 
             if (HasComplexWindows)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowConstruction:Complex>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC";
+                print(outputFiles.eio, "{}\n", "! <WindowConstruction:Complex>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC");
 
             if (HasEQLWindows)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Construction:WindowEquivalentLayer>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC, "
-                                                     "Solar Transmittance at Normal Incidence";
+                print(outputFiles.eio, "{}\n", "! <Construction:WindowEquivalentLayer>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC, "
+                                                     "Solar Transmittance at Normal Incidence");
             if (W5GlsMatEQL > 0)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowMaterial:Glazing:EquivalentLayer>, Material Name, Optical Data Type, Spectral Data "
+                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Glazing:EquivalentLayer>, Material Name, Optical Data Type, Spectral Data "
                                                      "Set Name, Front Side Beam-Beam Solar Transmittance, Back Side Beam-Beam Solar Transmittance, "
                                                      "Front Side Beam-Beam Solar Reflectance, Back Side Beam-Beam Solar Reflectance, Front Side "
                                                      "Beam-Diffuse Solar Transmittance, Back Side Beam-Diffuse Solar Transmittance, , Front Side "
                                                      "Beam-Diffuse Solar Reflectance, Back Side Beam-Diffuse Solar Reflectance, Diffuse-Diffuse "
                                                      "Solar Transmittance, Front Side Diffuse-Diffuse Solar Reflectance, Back Side Diffuse-Diffuse "
                                                      "Solar Reflectance, Infrared Transmittance, Front Side Infrared Emissivity, Back Side Infrared "
-                                                     "Emissivity";
+                                                     "Emissivity");
             if (TotShadesEQL > 0)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowMaterial:Shade:EquivalentLayer>, Material Name, Front Side Beam-Beam Solar "
+                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Shade:EquivalentLayer>, Material Name, Front Side Beam-Beam Solar "
                                                      "Transmittance, Back Side Beam-Beam Solar Transmittance, Front Side Beam-Diffuse Solar "
                                                      "Transmittance, Back Side Beam-Diffuse Solar Transmittance, , Front Side Beam-Diffuse Solar "
                                                      "Reflectance, Back Side Beam-Diffuse Solar Reflectance, Infrared Transmittance, Front Side "
-                                                     "Infrared Emissivity, Back Side Infrared Emissivity";
+                                                     "Infrared Emissivity, Back Side Infrared Emissivity");
 
             if (TotDrapesEQL > 0)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowMaterial:Drape:EquivalentLayer>, Material Name, Front Side Beam-Beam Solar "
+                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Drape:EquivalentLayer>, Material Name, Front Side Beam-Beam Solar "
                                                      "Transmittance, Back Side Beam-Beam Solar Transmittance, Front Side Beam-Diffuse Solar "
                                                      "Transmittance, Back Side Beam-Diffuse Solar Transmittance, , Front Side Beam-Diffuse Solar "
                                                      "Reflectance, Back Side Beam-Diffuse Solar Reflectance, Infrared Transmittance, Front Side "
                                                      "Infrared Emissivity, Back Side Infrared Emissivity, Width of Pleated Fabric, Length of Pleated "
-                                                     "Fabric";
+                                                     "Fabric");
 
             if (TotBlindsEQL > 0)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowMaterial:Blind:EquivalentLayer>, Material Name, Slat Orientation, Slat Width, Slat "
+                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Blind:EquivalentLayer>, Material Name, Slat Orientation, Slat Width, Slat "
                                                      "Separation, Slat Crown, Slat Angle, Front Side Slate Beam-Diffuse Solar Transmittance, Back "
                                                      "Side Slate Beam-Diffuse Solar Transmittance, Front Side Slate Beam-Diffuse Solar Reflectance, "
                                                      "Back Side Slate Beam-Diffuse Solar Reflectance, Slat Diffuse-Diffuse Solar Transmittance, "
                                                      "Front Side Slat Diffuse-Diffuse Solar Reflectance, Back Side Slat Diffuse-Diffuse Solar "
                                                      "Reflectance, Infrared Transmittance, Front Side Infrared Emissivity, Back Side Infrared "
-                                                     "Emissivity, Slat Angle Control";
+                                                     "Emissivity, Slat Angle Control");
             if (TotScreensEQL > 0)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <WindowMaterial:Screen:EquivalentLayer>, Material Name, Screen Beam-Beam Solar "
+                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Screen:EquivalentLayer>, Material Name, Screen Beam-Beam Solar "
                                                      "Transmittance, Screen Beam-Diffuse Solar Transmittance, Screen Beam-Diffuse Solar Reflectance, "
                                                      "Screen Infrared Transmittance, Screen Infrared Emissivity, Screen Wire Spacing, Screen Wire "
-                                                     "Diameter";
+                                                     "Diameter");
             if (W5GapMatEQL > 0)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                    << "! <WindowMaterial:Gap:EquivalentLayer>, Material Name, GasType, Gap Thickness {m}, Gap Vent Type";
+                print(outputFiles.eio, "{}\n", "! <WindowMaterial:Gap:EquivalentLayer>, Material Name, GasType, Gap Thickness {m}, Gap Vent Type");
 
             for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
 
@@ -7761,9 +7759,14 @@ namespace WindowManager {
                     CalcComplexWindowThermal(0, i, TempVar, TempVar, TempVar, TempVar, winterCondition);
                     CalcComplexWindowThermal(0, i, TempVar, TempVar, TempVar, TempVar, summerCondition);
 
-                    ObjexxFCL::gio::write(OutputFileInits, Format_800)
-                        << Construct(ThisNum).Name << RoundSigDigits(ThisNum) << RoundSigDigits(Construct(ThisNum).TotSolidLayers)
-                        << RoundSigDigits(NominalU(ThisNum), 3) << RoundSigDigits(Construct(ThisNum).SummerSHGC, 3);
+                    static constexpr auto Format_800(" WindowConstruction:Complex,{},{},{},{:.3R},{:.3R}\n");
+                    print(outputFiles.eio,
+                          Format_800,
+                          Construct(ThisNum).Name,
+                          ThisNum,
+                          Construct(ThisNum).TotSolidLayers,
+                          NominalU(ThisNum),
+                          Construct(ThisNum).SummerSHGC);
 
                 } else if (Construct(ThisNum).TypeIsWindow) {
                     // Calculate for ASHRAE winter and summer conditions:
@@ -7778,10 +7781,15 @@ namespace WindowManager {
                         // Construct(ThisNum)%SummerSHGC = SHGCSummer
                         Construct(ThisNum).VisTransNorm = 0.0; // TODO list
 
-                        ObjexxFCL::gio::write(OutputFileInits, Format_799)
-                            << Construct(ThisNum).Name << RoundSigDigits(ThisNum) << RoundSigDigits(Construct(ThisNum).TotSolidLayers)
-                            << RoundSigDigits(NominalU(ThisNum), 3) << RoundSigDigits(Construct(ThisNum).SummerSHGC, 3)
-                            << RoundSigDigits(Construct(ThisNum).SolTransNorm, 3);
+                        static constexpr auto Format_799(" Construction:WindowEquivalentLayer,{},{},{},{:.3R},{:.3R},{:.3R}\n");
+                        print(outputFiles.eio,
+                              Format_799,
+                              Construct(ThisNum).Name,
+                              ThisNum,
+                              Construct(ThisNum).TotSolidLayers,
+                              NominalU(ThisNum),
+                              Construct(ThisNum).SummerSHGC,
+                              Construct(ThisNum).SolTransNorm);
 
                     } else {
 
@@ -7811,10 +7819,17 @@ namespace WindowManager {
                         Construct(ThisNum).SummerSHGC = SHGCSummer;
                         Construct(ThisNum).VisTransNorm = TransVisNorm;
 
-                        ObjexxFCL::gio::write(OutputFileInits, Format_700)
-                            << Construct(ThisNum).Name << RoundSigDigits(ThisNum) << RoundSigDigits(Construct(ThisNum).TotLayers)
-                            << Roughness(Construct(ThisNum).OutsideRoughness) << RoundSigDigits(NominalConductanceWinter, 3)
-                            << RoundSigDigits(SHGCSummer, 3) << RoundSigDigits(TransSolNorm, 3) << RoundSigDigits(TransVisNorm, 3);
+                        static constexpr auto Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                        print(outputFiles.eio,
+                              Format_700,
+                              Construct(ThisNum).Name,
+                              ThisNum,
+                              Construct(ThisNum).TotLayers,
+                              Roughness(Construct(ThisNum).OutsideRoughness),
+                              NominalConductanceWinter,
+                              SHGCSummer,
+                              TransSolNorm,
+                              TransVisNorm);
                     }
                     //    Write(OutputFileConstrainParams, 705)  TRIM(Construct(ThisNum)%Name), SHGCSummer ,TransVisNorm
 
@@ -7823,38 +7838,57 @@ namespace WindowManager {
                         {
                             auto const SELECT_CASE_var(Material(Layer).Group);
                             if (SELECT_CASE_var == WindowGas) {
-                                ObjexxFCL::gio::write(OutputFileInits, Format_702) << Material(Layer).Name << GasTypeName(Material(Layer).GasType(1))
-                                                                        << RoundSigDigits(Material(Layer).Thickness, 3);
+                                static constexpr auto Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
+                                print(outputFiles.eio,
+                                      Format_702,
+                                      Material(Layer).Name,
+                                      GasTypeName(Material(Layer).GasType(1)),
+                                      Material(Layer).Thickness);
 
                                 //! fw CASE(WindowGasMixture)
 
                             } else if (SELECT_CASE_var == Shade) {
-                                ObjexxFCL::gio::write(OutputFileInits, Format_703)
-                                    << Material(Layer).Name << RoundSigDigits(Material(Layer).Thickness, 3)
-                                    << RoundSigDigits(Material(Layer).Conductivity, 3) << RoundSigDigits(Material(Layer).AbsorpThermal, 3)
-                                    << RoundSigDigits(Material(Layer).Trans, 3) << RoundSigDigits(Material(Layer).TransVis, 3)
-                                    << RoundSigDigits(Material(Layer).ReflectShade, 3);
+                                static constexpr auto Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                                print(outputFiles.eio,
+                                      Format_703,
+                                      Material(Layer).Name,
+                                      Material(Layer).Thickness,
+                                      Material(Layer).Conductivity,
+                                      Material(Layer).AbsorpThermal,
+                                      Material(Layer).Trans,
+                                      Material(Layer).TransVis,
+                                      Material(Layer).ReflectShade);
 
                             } else if (SELECT_CASE_var == WindowBlind) {
                                 BlNum = Material(Layer).BlindDataPtr;
-                                ObjexxFCL::gio::write(OutputFileInits, Format_704)
-                                    << Material(Layer).Name << RoundSigDigits(Blind(BlNum).SlatWidth, 4)
-                                    << RoundSigDigits(Blind(BlNum).SlatSeparation, 4) << RoundSigDigits(Blind(BlNum).SlatThickness, 4)
-                                    << RoundSigDigits(Blind(BlNum).SlatAngle, 3) << RoundSigDigits(Blind(BlNum).SlatTransSolBeamDiff, 3)
-                                    << RoundSigDigits(Blind(BlNum).SlatFrontReflSolBeamDiff, 3) << RoundSigDigits(Blind(BlNum).BlindToGlassDist, 3);
+                                static constexpr auto Format_704(" WindowMaterial:Blind,{},{:.4R},{:.4R},{:.4R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                                print(outputFiles.eio,
+                                      Format_704,
+                                      Material(Layer).Name,
+                                      Blind(BlNum).SlatWidth,
+                                      Blind(BlNum).SlatSeparation,
+                                      Blind(BlNum).SlatThickness,
+                                      Blind(BlNum).SlatAngle,
+                                      Blind(BlNum).SlatTransSolBeamDiff,
+                                      Blind(BlNum).SlatFrontReflSolBeamDiff,
+                                      Blind(BlNum).BlindToGlassDist);
                             } else if (SELECT_CASE_var == Screen) {
-                                if (Material(Layer).ScreenDataPtr > 0)
-                                    ObjexxFCL::gio::write(OutputFileInits, Format_706)
-                                        << Material(Layer).Name << RoundSigDigits(Material(Layer).Thickness, 5)
-                                        << RoundSigDigits(Material(Layer).Conductivity, 3) << RoundSigDigits(Material(Layer).AbsorpThermal, 3)
-                                        << RoundSigDigits(SurfaceScreens(Material(Layer).ScreenDataPtr).BmBmTrans, 3)
-                                        << RoundSigDigits(SurfaceScreens(Material(Layer).ScreenDataPtr).ReflectSolBeamFront, 3)
-                                        << RoundSigDigits(SurfaceScreens(Material(Layer).ScreenDataPtr).ReflectVisBeamFront, 3)
-                                        << RoundSigDigits(SurfaceScreens(Material(Layer).ScreenDataPtr).DifReflect, 3)
-                                        << RoundSigDigits(SurfaceScreens(Material(Layer).ScreenDataPtr).DifReflectVis, 3)
-                                        << RoundSigDigits(SurfaceScreens(Material(Layer).ScreenDataPtr).ScreenDiameterToSpacingRatio, 3)
-                                        << RoundSigDigits(Material(Layer).WinShadeToGlassDist, 3);
-
+                                if (Material(Layer).ScreenDataPtr > 0) {
+                                    static constexpr auto Format_706(" WindowMaterial:Screen,{},{:.5R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                                    print(outputFiles.eio,
+                                          Format_706,
+                                          Material(Layer).Name,
+                                          Material(Layer).Thickness,
+                                          Material(Layer).Conductivity,
+                                          Material(Layer).AbsorpThermal,
+                                          SurfaceScreens(Material(Layer).ScreenDataPtr).BmBmTrans,
+                                          SurfaceScreens(Material(Layer).ScreenDataPtr).ReflectSolBeamFront,
+                                          SurfaceScreens(Material(Layer).ScreenDataPtr).ReflectVisBeamFront,
+                                          SurfaceScreens(Material(Layer).ScreenDataPtr).DifReflect,
+                                          SurfaceScreens(Material(Layer).ScreenDataPtr).DifReflectVis,
+                                          SurfaceScreens(Material(Layer).ScreenDataPtr).ScreenDiameterToSpacingRatio,
+                                          Material(Layer).WinShadeToGlassDist);
+                                }
                             } else if ((SELECT_CASE_var == WindowGlass) || (SELECT_CASE_var == WindowSimpleGlazing)) {
                                 SolarDiffusing = "No";
                                 if (Material(Layer).SolarDiffusing) SolarDiffusing = "Yes";
@@ -7870,68 +7904,124 @@ namespace WindowManager {
                                                        PerfCurve(Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
                                                        PerfCurve(Material(Layer).GlassSpecAngBRefleDataPtr).Name;
                                 }
-                                ObjexxFCL::gio::write(OutputFileInits, Format_707)
-                                    << Material(Layer).Name << OpticalDataType << SpectralDataName << RoundSigDigits(Material(Layer).Thickness, 5)
-                                    << RoundSigDigits(Material(Layer).Trans, 5) << RoundSigDigits(Material(Layer).ReflectSolBeamFront, 5)
-                                    << RoundSigDigits(Material(Layer).ReflectSolBeamBack, 5) << RoundSigDigits(Material(Layer).TransVis, 5)
-                                    << RoundSigDigits(Material(Layer).ReflectVisBeamFront, 5) << RoundSigDigits(Material(Layer).ReflectVisBeamBack, 5)
-                                    << RoundSigDigits(Material(Layer).TransThermal, 5) << RoundSigDigits(Material(Layer).AbsorpThermalFront, 5)
-                                    << RoundSigDigits(Material(Layer).AbsorpThermalBack, 5) << RoundSigDigits(Material(Layer).Conductivity, 5)
-                                    << RoundSigDigits(Material(Layer).GlassTransDirtFactor, 5) << SolarDiffusing;
+                                static constexpr auto Format_707(" WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
+                                                                 ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");
+                                print(outputFiles.eio,
+                                      Format_707,
+                                      Material(Layer).Name,
+                                      OpticalDataType,
+                                      SpectralDataName,
+                                      Material(Layer).Thickness,
+                                      Material(Layer).Trans,
+                                      Material(Layer).ReflectSolBeamFront,
+                                      Material(Layer).ReflectSolBeamBack,
+                                      Material(Layer).TransVis,
+                                      Material(Layer).ReflectVisBeamFront,
+                                      Material(Layer).ReflectVisBeamBack,
+                                      Material(Layer).TransThermal,
+                                      Material(Layer).AbsorpThermalFront,
+                                      Material(Layer).AbsorpThermalBack,
+                                      Material(Layer).Conductivity,
+                                      Material(Layer).GlassTransDirtFactor,
+                                      SolarDiffusing);
 
                             } else if (SELECT_CASE_var == GlassEquivalentLayer) {
                                 OpticalDataType = "SpectralAverage";
                                 SpectralDataName = "";
-                                ObjexxFCL::gio::write(OutputFileInits, Format_708)
-                                    << Material(Layer).Name << OpticalDataType << SpectralDataName
-                                    << RoundSigDigits(Material(Layer).TausFrontBeamBeam, 5) << RoundSigDigits(Material(Layer).TausBackBeamBeam, 5)
-                                    << RoundSigDigits(Material(Layer).ReflFrontBeamBeam, 5) << RoundSigDigits(Material(Layer).ReflBackBeamBeam, 5)
-                                    << RoundSigDigits(Material(Layer).TausFrontBeamDiff, 5) << RoundSigDigits(Material(Layer).TausBackBeamDiff, 5)
-                                    << RoundSigDigits(Material(Layer).ReflFrontBeamDiff, 5) << RoundSigDigits(Material(Layer).ReflBackBeamDiff, 5)
-                                    << RoundSigDigits(Material(Layer).TausDiffDiff, 5) << RoundSigDigits(Material(Layer).ReflFrontDiffDiff, 5)
-                                    << RoundSigDigits(Material(Layer).ReflBackDiffDiff, 5) << RoundSigDigits(Material(Layer).TausThermal, 5)
-                                    << RoundSigDigits(Material(Layer).EmissThermalFront, 5) << RoundSigDigits(Material(Layer).EmissThermalBack, 5);
+                                static constexpr auto Format_708(" WindowMaterial:Glazing:EquivalentLayer,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}"
+                                                                 ",{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}\n");
+                                print(outputFiles.eio,
+                                      Format_708,
+                                      Material(Layer).Name,
+                                      OpticalDataType,
+                                      SpectralDataName,
+                                      Material(Layer).TausFrontBeamBeam,
+                                      Material(Layer).TausBackBeamBeam,
+                                      Material(Layer).ReflFrontBeamBeam,
+                                      Material(Layer).ReflBackBeamBeam,
+                                      Material(Layer).TausFrontBeamDiff,
+                                      Material(Layer).TausBackBeamDiff,
+                                      Material(Layer).ReflFrontBeamDiff,
+                                      Material(Layer).ReflBackBeamDiff,
+                                      Material(Layer).TausDiffDiff,
+                                      Material(Layer).ReflFrontDiffDiff,
+                                      Material(Layer).ReflBackDiffDiff,
+                                      Material(Layer).TausThermal,
+                                      Material(Layer).EmissThermalFront,
+                                      Material(Layer).EmissThermalBack);
 
                             } else if (SELECT_CASE_var == ShadeEquivalentLayer) {
-                                ObjexxFCL::gio::write(OutputFileInits, Format_709)
-                                    << Material(Layer).Name << RoundSigDigits(Material(Layer).TausFrontBeamBeam, 4)
-                                    << RoundSigDigits(Material(Layer).TausBackBeamBeam, 4) << RoundSigDigits(Material(Layer).TausFrontBeamDiff, 4)
-                                    << RoundSigDigits(Material(Layer).TausBackBeamDiff, 4) << RoundSigDigits(Material(Layer).ReflFrontBeamDiff, 4)
-                                    << RoundSigDigits(Material(Layer).ReflBackBeamDiff, 4) << RoundSigDigits(Material(Layer).TausThermal, 4)
-                                    << RoundSigDigits(Material(Layer).EmissThermalFront, 4) << RoundSigDigits(Material(Layer).EmissThermalBack, 4);
+                                static constexpr auto Format_709(" WindowMaterial:Shade:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}\n");
+                                print(outputFiles.eio,
+                                      Format_709,
+                                      Material(Layer).Name,
+                                      Material(Layer).TausFrontBeamBeam,
+                                      Material(Layer).TausBackBeamBeam,
+                                      Material(Layer).TausFrontBeamDiff,
+                                      Material(Layer).TausBackBeamDiff,
+                                      Material(Layer).ReflFrontBeamDiff,
+                                      Material(Layer).ReflBackBeamDiff,
+                                      Material(Layer).TausThermal,
+                                      Material(Layer).EmissThermalFront,
+                                      Material(Layer).EmissThermalBack);
 
                             } else if (SELECT_CASE_var == DrapeEquivalentLayer) {
-                                ObjexxFCL::gio::write(OutputFileInits, Format_710)
-                                    << Material(Layer).Name << RoundSigDigits(Material(Layer).TausFrontBeamBeam, 4)
-                                    << RoundSigDigits(Material(Layer).TausFrontBeamDiff, 4) << RoundSigDigits(Material(Layer).TausBackBeamDiff, 4)
-                                    << RoundSigDigits(Material(Layer).ReflFrontBeamDiff, 4) << RoundSigDigits(Material(Layer).ReflBackBeamDiff, 4)
-                                    << RoundSigDigits(Material(Layer).TausThermal, 4) << RoundSigDigits(Material(Layer).EmissThermalFront, 4)
-                                    << RoundSigDigits(Material(Layer).EmissThermalBack, 4) << RoundSigDigits(Material(Layer).PleatedDrapeWidth, 5)
-                                    << RoundSigDigits(Material(Layer).PleatedDrapeLength, 5);
+                                static constexpr auto Format_710(" WindowMaterial:Drape:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.5R},{:.5R}\n");
+                                print(outputFiles.eio,
+                                      Format_710,
+                                      Material(Layer).Name,
+                                      Material(Layer).TausFrontBeamBeam,
+                                      Material(Layer).TausFrontBeamDiff,
+                                      Material(Layer).TausBackBeamDiff,
+                                      Material(Layer).ReflFrontBeamDiff,
+                                      Material(Layer).ReflBackBeamDiff,
+                                      Material(Layer).TausThermal,
+                                      Material(Layer).EmissThermalFront,
+                                      Material(Layer).EmissThermalBack,
+                                      Material(Layer).PleatedDrapeWidth,
+                                      Material(Layer).PleatedDrapeLength);
 
                             } else if (SELECT_CASE_var == ScreenEquivalentLayer) {
-                                ObjexxFCL::gio::write(OutputFileInits, Format_711)
-                                    << Material(Layer).Name << RoundSigDigits(Material(Layer).TausFrontBeamBeam, 4)
-                                    << RoundSigDigits(Material(Layer).TausFrontBeamDiff, 4) << RoundSigDigits(Material(Layer).TausBackBeamDiff, 4)
-                                    << RoundSigDigits(Material(Layer).ReflFrontBeamDiff, 4) << RoundSigDigits(Material(Layer).ReflBackBeamDiff, 4)
-                                    << RoundSigDigits(Material(Layer).TausThermal, 4) << RoundSigDigits(Material(Layer).EmissThermalFront, 4)
-                                    << RoundSigDigits(Material(Layer).EmissThermalBack, 4) << RoundSigDigits(Material(Layer).ScreenWireSpacing, 5)
-                                    << RoundSigDigits(Material(Layer).ScreenWireDiameter, 5);
+                                static constexpr auto Format_711(" WindowMaterial:Screen:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.5R},{:.5R}\n");
+                                print(outputFiles.eio,
+                                      Format_711,
+                                      Material(Layer).Name,
+                                      Material(Layer).TausFrontBeamBeam,
+                                      Material(Layer).TausFrontBeamDiff,
+                                      Material(Layer).TausBackBeamDiff,
+                                      Material(Layer).ReflFrontBeamDiff,
+                                      Material(Layer).ReflBackBeamDiff,
+                                      Material(Layer).TausThermal,
+                                      Material(Layer).EmissThermalFront,
+                                      Material(Layer).EmissThermalBack,
+                                      Material(Layer).ScreenWireSpacing,
+                                      Material(Layer).ScreenWireDiameter);
 
                             } else if (SELECT_CASE_var == BlindEquivalentLayer) {
                                 SlateOrientation = "Horizontal";
                                 if (Material(Layer).SlatOrientation == Vertical) {
                                     SlateOrientation = "Vertical";
                                 }
-                                ObjexxFCL::gio::write(OutputFileInits, Format_712)
-                                    << Material(Layer).Name << SlateOrientation << RoundSigDigits(Material(Layer).SlatWidth, 5)
-                                    << RoundSigDigits(Material(Layer).SlatSeparation, 5) << RoundSigDigits(Material(Layer).SlatCrown, 5)
-                                    << RoundSigDigits(Material(Layer).SlatAngle, 5) << RoundSigDigits(Material(Layer).TausFrontBeamDiff, 5)
-                                    << RoundSigDigits(Material(Layer).TausBackBeamDiff, 5) << RoundSigDigits(Material(Layer).ReflFrontBeamDiff, 5)
-                                    << RoundSigDigits(Material(Layer).ReflBackBeamDiff, 5) << RoundSigDigits(Material(Layer).TausDiffDiff, 5)
-                                    << RoundSigDigits(Material(Layer).ReflFrontDiffDiff, 5) << RoundSigDigits(Material(Layer).ReflBackDiffDiff, 5)
-                                    << RoundSigDigits(Material(Layer).TausThermal, 5) << RoundSigDigits(Material(Layer).EmissThermalFront, 5)
-                                    << RoundSigDigits(Material(Layer).EmissThermalBack, 5);
+                                // Formats
+                                static constexpr auto Format_712(" WindowMaterial:Blind:EquivalentLayer,{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}");
+                                print(outputFiles.eio,
+                                      Format_712,
+                                      Material(Layer).Name,
+                                      SlateOrientation,
+                                      Material(Layer).SlatWidth,
+                                      Material(Layer).SlatSeparation,
+                                      Material(Layer).SlatCrown,
+                                      Material(Layer).SlatAngle,
+                                      Material(Layer).TausFrontBeamDiff,
+                                      Material(Layer).TausBackBeamDiff,
+                                      Material(Layer).ReflFrontBeamDiff,
+                                      Material(Layer).ReflBackBeamDiff,
+                                      Material(Layer).TausDiffDiff,
+                                      Material(Layer).ReflFrontDiffDiff,
+                                      Material(Layer).ReflBackDiffDiff,
+                                      Material(Layer).TausThermal,
+                                      Material(Layer).EmissThermalFront,
+                                      Material(Layer).EmissThermalBack);
 
                             } else if (SELECT_CASE_var == GapEquivalentLayer) {
                                 GapVentType = "Sealed";
@@ -7940,8 +8030,13 @@ namespace WindowManager {
                                 } else if (Material(Layer).GapVentType == 3) {
                                     GapVentType = "VentedOutdoor";
                                 }
-                                ObjexxFCL::gio::write(OutputFileInits, Format_713) << Material(Layer).Name << GasTypeName(Material(Layer).GasType(1))
-                                                                        << RoundSigDigits(Material(Layer).Thickness, 3) << GapVentType;
+                                static constexpr auto Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
+                                print(outputFiles.eio,
+                                      Format_713,
+                                      Material(Layer).Name,
+                                      GasTypeName(Material(Layer).GasType(1)),
+                                      Material(Layer).Thickness,
+                                      GapVentType);
                             }
                         }
                     }
@@ -8177,7 +8272,7 @@ namespace WindowManager {
 
     //*************************************************************************************
 
-    void CalcWindowScreenProperties()
+    void CalcWindowScreenProperties(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8202,7 +8297,6 @@ namespace WindowManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const M(18);
         int const N(18);
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -8222,7 +8316,6 @@ namespace WindowManager {
         Real64 SumReflectVis;  // Integration variable for visible reflectance
         Real64 SumArea;        // Integration variable for area of quarter hemisphere
         int ShadingType;       // Type of shading device
-        int ScreenTransUnitNo; // Unit number of screen transmittance data file
         bool FoundMaterial;    // Flag to avoid printing screen transmittance data multiple times when Material:WindowScreen
         // is used on multiple surfaces
         bool PrintTransMap; // Flag used to print transmittance map
@@ -8353,14 +8446,10 @@ namespace WindowManager {
         // Write transmittance versus direct normal angle to csv file
 
         if (PrintTransMap) {
-            ScreenTransUnitNo = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("write");
-                flags.STATUS("unknown");
-                ObjexxFCL::gio::open(ScreenTransUnitNo, DataStringGlobals::outputScreenCsvFileName, flags);
-                if (flags.err()) goto Label99999;
-            }
+            // Fortran version did not have error handling in case of file open failure. This one does.
+            // Which is correct?
+            auto screenCsvFile = outputFiles.screenCsv.open("CalcWindowScreenComponents");
+
             //  WRITE(ScreenTransUnitNo,*)' '
             for (ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum) {
                 MatNum = SurfaceScreens(ScreenNum).MaterialNumber;
@@ -8390,75 +8479,43 @@ namespace WindowManager {
                         }
                     }
 
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "MATERIAL:WINDOWSCREEN:" + Material(SurfaceScreens(ScreenNum).MaterialNumber).Name;
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "Tabular data for beam solar transmittance at varying \"relative\" azimuth (row) and "
-                                                           "altitude (column) angles (deg) [relative to surface normal].";
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << ",90";
-                    }
+                    print(screenCsvFile, "MATERIAL:WINDOWSCREEN:{}\n", Material(SurfaceScreens(ScreenNum).MaterialNumber).Name);
+                    print(screenCsvFile, "Tabular data for beam solar transmittance at varying \"relative\" azimuth (row) and "
+                           "altitude (column) angles (deg) [relative to surface normal].\n");
+                    print(screenCsvFile, ",90");
                     for (i = 90 / Material(MatNum).ScreenMapResolution; i >= 2; --i) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << "," + RoundSigDigits(((i - 1) * Material(MatNum).ScreenMapResolution));
-                        }
+                        print(screenCsvFile, ",{}", (i - 1) * Material(MatNum).ScreenMapResolution);
                     }
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << ",0";
+                    print(screenCsvFile, ",0\n");
 
                     for (j = 1; j <= 90 / Material(MatNum).ScreenMapResolution + 1; ++j) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << RoundSigDigits(((j - 1) * Material(MatNum).ScreenMapResolution));
-                        }
+                        print(screenCsvFile, "{}",  (j - 1) * Material(MatNum).ScreenMapResolution);
                         for (i = 90 / Material(MatNum).ScreenMapResolution + 1; i >= 2; --i) {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << "," + RoundSigDigits(ScreenTrans(ScreenNum).Trans(i, j), 6);
-                            }
+                            print(screenCsvFile, ",{:.6R}", ScreenTrans(ScreenNum).Trans(i, j));
                         }
-                        ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "," + RoundSigDigits(ScreenTrans(ScreenNum).Trans(i, j), 6);
+                        print(screenCsvFile, ",{:.6R}\n", ScreenTrans(ScreenNum).Trans(i, j));
                     }
-                    ObjexxFCL::gio::write(ScreenTransUnitNo);
-                    ObjexxFCL::gio::write(ScreenTransUnitNo);
+                    print(screenCsvFile, "\n\n");
 
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "MATERIAL:WINDOWSCREEN:" + Material(SurfaceScreens(ScreenNum).MaterialNumber).Name;
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "Tabular data for scattered solar transmittance at varying \"relative\" azimuth (row) and "
-                                                           "altitude (column) angles (deg) [relative to surface normal].";
+                    print(screenCsvFile, "MATERIAL:WINDOWSCREEN:{}\n", Material(SurfaceScreens(ScreenNum).MaterialNumber).Name);
+                    print(screenCsvFile, "Tabular data for scattered solar transmittance at varying \"relative\" azimuth (row) and "
+                           "altitude (column) angles (deg) [relative to surface normal].\n");
+
                     for (i = 1; i <= 90 / Material(MatNum).ScreenMapResolution; ++i) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << "," + RoundSigDigits(((i - 1) * Material(MatNum).ScreenMapResolution));
-                        }
+                        print(screenCsvFile, ",{}", (i - 1) * Material(MatNum).ScreenMapResolution);
                     }
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "," + RoundSigDigits(((i - 1) * Material(MatNum).ScreenMapResolution));
+                    print(screenCsvFile, ",{}\n", (i - 1) * Material(MatNum).ScreenMapResolution);
 
                     for (j = 1; j <= 90 / Material(MatNum).ScreenMapResolution + 1; ++j) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << RoundSigDigits(((j - 1) * Material(MatNum).ScreenMapResolution));
-                        }
+                        print(screenCsvFile, "{}", (j - 1) * Material(MatNum).ScreenMapResolution);
                         for (i = 1; i <= 90 / Material(MatNum).ScreenMapResolution; ++i) {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << "," + RoundSigDigits(ScreenTrans(ScreenNum).Scatt(i, j), 6);
-                            }
+                            print(screenCsvFile, ",{:.6R}", ScreenTrans(ScreenNum).Scatt(i, j));
                         }
-                        ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA)
-                            << "," + RoundSigDigits(ScreenTrans(ScreenNum).Scatt(90 / Material(MatNum).ScreenMapResolution + 1, j), 6);
+                        print(screenCsvFile, ",{:.6R}\n", ScreenTrans(ScreenNum).Scatt(i, j));
                     }
-                    ObjexxFCL::gio::write(ScreenTransUnitNo);
-                    ObjexxFCL::gio::write(ScreenTransUnitNo);
+                    print(screenCsvFile, "\n\n");
                 }
             }
-        Label99999:;
-            ObjexxFCL::gio::close(ScreenTransUnitNo);
         }
         ScreenTrans.deallocate();
     }

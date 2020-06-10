@@ -48,13 +48,11 @@
 #ifndef DaylightingDevices_hh_INCLUDED
 #define DaylightingDevices_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace DaylightingDevices {
 
@@ -70,7 +68,7 @@ namespace DaylightingDevices {
 
     // Functions
 
-    void InitDaylightingDevices();
+    void InitDaylightingDevices(OutputFiles &outputFiles);
 
     void GetTDDInput();
 
@@ -94,8 +92,8 @@ namespace DaylightingDevices {
                     int const RadiationType // Radiation type flag
     );
 
-    Real64 InterpolatePipeTransBeam(Real64 const COSI,              // Cosine of the incident angle
-                                    Array1A<Real64> const transBeam // Table of beam transmittance vs. cosine angle
+    Real64 InterpolatePipeTransBeam(Real64 const COSI,               // Cosine of the incident angle
+                                    const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     );
 
     int FindTDDPipe(int const WinNum);

@@ -48,9 +48,6 @@
 #ifndef TARCOGDeflection_hh_INCLUDED
 #define TARCOGDeflection_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -67,14 +64,14 @@ namespace TARCOGDeflection {
                          Real64 const Pa,
                          Real64 const Pini,
                          Real64 const Tini,
-                         Array1A<Real64> const PaneThickness,
-                         Array1A<Real64> const NonDeflectedGapWidth,
-                         Array1A<Real64> DeflectedGapWidthMax,
-                         Array1A<Real64> DeflectedGapWidthMean,
-                         Array1A<Real64> const PanelTemps,
-                         Array1A<Real64> const YoungsMod,
-                         Array1A<Real64> const PoissonsRat,
-                         Array1A<Real64> LayerDeflection,
+                         const Array1D<Real64> &PaneThickness,
+                         const Array1D<Real64> &NonDeflectedGapWidth,
+                         Array1D<Real64> &DeflectedGapWidthMax,
+                         Array1D<Real64> &DeflectedGapWidthMean,
+                         const Array1D<Real64> &PanelTemps,
+                         const Array1D<Real64> &YoungsMod,
+                         const Array1D<Real64> &PoissonsRat,
+                         Array1D<Real64> &LayerDeflection,
                          int &nperr,
                          std::string &ErrorMessage);
 
@@ -84,23 +81,23 @@ namespace TARCOGDeflection {
                                 Real64 const Pa,
                                 Real64 const Pini,
                                 Real64 const Tini,
-                                Array1A<Real64> const NonDeflectedGapWidth,
-                                Array1A<Real64> DeflectedGapWidthMax,
-                                Array1A<Real64> DeflectedGapWidthMean,
-                                Array1A<Real64> const PanelTemps,
-                                Array1A<Real64> DCoeff,
-                                Array1A<Real64> LayerDeflection,
+                                const Array1D<Real64> &NonDeflectedGapWidth,
+                                Array1D<Real64> &DeflectedGapWidthMax,
+                                Array1D<Real64> &DeflectedGapWidthMean,
+                                const Array1D<Real64> &PanelTemps,
+                                Array1D<Real64> &DCoeff,
+                                Array1D<Real64> &LayerDeflection,
                                 int &nperr,
                                 std::string &ErrorMessage);
 
     void DeflectionWidths(int const nlayer,
                           Real64 const W,
                           Real64 const H,
-                          Array1A<Real64> DCoeff,
-                          Array1A<Real64> const NonDeflectedGapWidth,
-                          Array1A<Real64> const DeflectedGapWidthMax,
-                          Array1A<Real64> DeflectedGapWidthMean,
-                          Array1A<Real64> LayerDeflection);
+                          Array1D<Real64> &DCoeff,
+                          const Array1D<Real64> &NonDeflectedGapWidth,
+                          const Array1D<Real64> &DeflectedGapWidthMax,
+                          Array1D<Real64> &DeflectedGapWidthMean,
+                          Array1D<Real64> &LayerDeflection);
 
 } // namespace TARCOGDeflection
 

@@ -51,13 +51,12 @@
 #include <gtest/gtest.h>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-//#include <OutputReportData.hh>
-//#include <UtilityRoutines.hh>
-//#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
@@ -123,10 +122,10 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors(false);
-    HeatBalanceManager::GetProjectControlData(foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(state.outputFiles, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state.outputFiles, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(foundErrors); // read construction data
@@ -144,11 +143,11 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.outputFiles, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     // reset eio stream
-    compare_eio_stream("", true);
+    has_eio_output(true);
 
     DetailsForSurfaces(10); // 10 = Details Only, Surface details report
     std::string const eiooutput = delimited_string(
@@ -168,7 +167,7 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
          "Zone Surfaces,SPACE1,1",
          "HeatTransfer Surface,FRONT-1,Wall,,CTF - "
          "ConductionTransferFunction,INT-WALL-1,2.811,1.978,,73.20,73.20,73.20,180.00,90.00,30.50,2.40,0.00,ExternalEnvironment,DOE-2,ASHRAETARP,"
-         "SunExposed,WindExposed,0.50,0.50,0.50,0.50,4"});
+         "SunExposed,WindExposed,0.50,0.50,0.50,0.50,4"}, "\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }

@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -135,7 +136,7 @@ namespace SystemReports {
     extern Array1D<Real64> SysHCCompHTNG;
     extern Array1D<Real64> SysHCCompGas;
     extern Array1D<Real64> SysHCCompSteam;
-    extern Array1D<Real64> SysDomesticH20;
+    extern Array1D<Real64> SysDomesticH2O;
 
     extern Array1D<Real64> ZoneOAMassFlow;       // zone mech vent mass flow rate {kg/s}
     extern Array1D<Real64> ZoneOAMass;           // zone mech vent total mass for time {kg}
@@ -223,9 +224,9 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports();
+    void InitEnergyReports(OutputFiles &outputFiles);
 
-    void FindFirstLastPtr(int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
+    void FindFirstLastPtr(OutputFiles &outputFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
     void UpdateZoneCompPtrArray(int &Idx,
                                 int const ListNum,
@@ -303,7 +304,7 @@ namespace SystemReports {
                              Real64 const CompLoad,
                              Real64 const CompEnergy);
 
-    void ReportMaxVentilationLoads();
+    void ReportMaxVentilationLoads(EnergyPlusData &state);
 
     void MatchPlantSys(int const AirLoopNum, // counter for zone air distribution inlets
                        int const BranchNum   // counter for zone air distribution inlets
@@ -318,7 +319,7 @@ namespace SystemReports {
                              int &MatchComp               // Component number of the match
     );
 
-    void ReportAirLoopConnections();
+    void ReportAirLoopConnections(OutputFiles &outputFiles);
 
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************

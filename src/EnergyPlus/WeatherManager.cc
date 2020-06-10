@@ -75,6 +75,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -163,10 +164,14 @@ namespace WeatherManager {
     int const DDDBRangeType_Difference(2); // Design Day DryBulb Range Type = Difference Schedule
     int const DDDBRangeType_Profile(3);    // Design Day DryBulb Range Type = Temperature Profile
 
+    int const WP_ClarkAllenModel(0);     // Use Clark & Allen model for sky emissivity calculation
     int const WP_ScheduleValue(1);  // User entered Schedule value for Weather Property
     int const WP_DryBulbDelta(2);   // User entered DryBulb difference Schedule value for Weather Property
     int const WP_DewPointDelta(3);  // User entered Dewpoint difference Schedule value for Weather Property
-    int const WP_SkyTAlgorithmA(4); // place holder
+    int const WP_BruntModel(4);          // Use Brunt model for sky emissivity calculation
+    int const WP_IdsoModel(5);           // Use Isdo model for sky emissivity calculation
+    int const WP_BerdahlMartinModel(6);  // Use Martin & Berdahl model for sky emissivity calculation
+    int const WP_SkyTAlgorithmA(7);      // place holder
 
     int const GregorianToJulian(1); // JGDate argument for Gregorian to Julian Date conversion
     int const JulianToGregorian(2); // JGDate argument for Julian to Gregorian Date conversion
@@ -374,9 +379,6 @@ namespace WeatherManager {
     std::shared_ptr<BaseGroundTempsModel> siteBuildingSurfaceGroundTempsPtr;
     std::shared_ptr<BaseGroundTempsModel> siteFCFactorMethodGroundTempsPtr;
     std::shared_ptr<BaseGroundTempsModel> siteDeepGroundTempsPtr;
-
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
-    static ObjexxFCL::gio::Fmt fmtAN("(A,$)");
 
     std::vector<UnderwaterBoundary> underwaterBoundaries;
     AnnualMonthlyDryBulbWeatherData OADryBulbAverage; // processes outside air drybulb temperature
@@ -605,7 +607,7 @@ namespace WeatherManager {
 
         SetCurrentWeather();
 
-        ReportWeatherAndTimeInformation(PrintEnvrnStamp);
+        ReportWeatherAndTimeInformation(OutputFiles::getSingleton(), PrintEnvrnStamp);
     }
 
     void ResetEnvironmentCounter()
@@ -724,7 +726,7 @@ namespace WeatherManager {
         int NumAlpha = 0, NumNumber = 0, IOStat = 0;
         DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
         if (inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject) == 0) return;
-        inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                       1,
                                       DataIPShortCuts::cAlphaArgs,
                                       NumAlpha,
@@ -785,9 +787,7 @@ namespace WeatherManager {
         }
     }
 
-    void GetNextEnvironment(bool &Available,  // true if there is another environment, false if the end
-                            bool &ErrorsFound // will be set to true if severe errors are found in inputs
-    )
+    bool GetNextEnvironment(EnergyPlusData &state, bool &Available, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -811,19 +811,11 @@ namespace WeatherManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetNextEnvironment: ");
-        static ObjexxFCL::gio::Fmt EnvironFormat(
-            "('! <Environment>,Environment Name,Environment Type, Start Date, End Date,',    ' Start DayOfWeek, Duration "
-            "{#days}, Source:Start DayOfWeek, ',        ' Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule, "
-            "',    ' Use Rain Values, Use Snow Values',/,                                 '! <Environment:Special Days>, "
-            "Special Day Name, Special Day Type, Source, ',  'Start Date, Duration {#days}',/,                             "
-            "         '! <Environment:Daylight Saving>, Daylight Saving Indicator, Source,',           ' Start Date, End "
-            "Date',/,                                           '! <Environment:WarmupDays>, NumberofWarmupDays')");
-        static ObjexxFCL::gio::Fmt EnvNameFormat("('Environment',12(',',A))");
-        static ObjexxFCL::gio::Fmt EnvDSTNFormat("('Environment:Daylight Saving,No,',A)");
-        static ObjexxFCL::gio::Fmt EnvDSTYFormat("('Environment:Daylight Saving,Yes',3(',',A))");
-        static ObjexxFCL::gio::Fmt EnvSpDyFormat("('Environment:Special Days',4(',',A),',',I3)");
-        static ObjexxFCL::gio::Fmt DateFormat("(I2.2,'/',I2.2)");
-        static ObjexxFCL::gio::Fmt DateFormatwithYear("(I2.2,'/',I2.2,'/',I4.4)");
+        static constexpr auto EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{},{}\n");
+        static constexpr auto EnvDSTNFormat("Environment:Daylight Saving,No,{}\n");
+        static constexpr auto EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
+        static constexpr auto DateFormat("{:02}/{:02}");
+        static constexpr auto DateFormatWithYear("{:02}/{:02}/{:04}");
         static Array1D_string const SpecialDayNames(5, {"Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"});
         static Array1D_string const ValidDayNames(12,
                                                   {"Sunday",
@@ -838,7 +830,14 @@ namespace WeatherManager {
                                                    "WinterDesignDay",
                                                    "CustomDay1",
                                                    "CustomDay2"});
-
+        static Array1D_string const SkyTempModelNames(7,
+                                                      {"Clark and Allen",
+                                                       "Schedule Value",
+                                                       "DryBulb Difference Schedule Value",
+                                                       "Dewpoint Difference Schedule Value",
+                                                       "Brunt",
+                                                       "Idso",
+                                                       "Berdahl and Martin"});
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //////////// hoisted into namespace changed to GetBranchInputOneTimeFlag////////////
         //	static bool GetInputFlag( true ); // Set to true before execution starts changed to GetEnvironmentInputOneTimeFlag
@@ -850,6 +849,7 @@ namespace WeatherManager {
         std::string EnDate;
         std::string string;
         std::string cTotalEnvDays;
+        std::string skyTempModel;
         int DSTActStMon;
         int DSTActStDay;
         int DSTActEnMon;
@@ -875,7 +875,7 @@ namespace WeatherManager {
 
             PrintEndDataDictionary = true;
 
-            ReportOutputFileHeaders(); // Write the output file header information
+            ReportOutputFileHeaders(state.outputFiles); // Write the output file header information
 
             // Setup Output Variables, CurrentModuleObject='All Simulations'
 
@@ -947,7 +947,7 @@ namespace WeatherManager {
             rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW(StdPressureSeaLevel, constant_twenty, constant_zero);
             OpenWeatherFile(ErrorsFound); // moved here because of possibility of special days on EPW file
             CloseWeatherFile();
-            ReadUserWeatherInput();
+            ReadUserWeatherInput(state);
             AllocateWeatherData();
             if (NumIntervalsPerHour != 1) {
                 if (NumIntervalsPerHour != NumOfTimeStepInHour) {
@@ -959,7 +959,7 @@ namespace WeatherManager {
             GetBranchInputOneTimeFlag = false;
             Envrn = 0;
             if (NumOfEnvrn > 0) {
-                ResolveLocationInformation(ErrorsFound); // Obtain weather related info from input file
+                ResolveLocationInformation(state.outputFiles, ErrorsFound); // Obtain weather related info from input file
                 CheckLocationValidity();
                 if ((Environment(NumOfEnvrn).KindOfEnvrn != ksDesignDay) && (Environment(NumOfEnvrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
                     CheckWeatherFileValidity();
@@ -1032,7 +1032,7 @@ namespace WeatherManager {
                 }
             }
             if (Envrn > TotDesDays && WeatherFileExists) {
-                OpenEPlusWeatherFile(ErrorsFound, false);
+                OpenEPlusWeatherFile(state.outputFiles, ErrorsFound, false);
             }
             Available = true;
             if ((KindOfSim == ksRunPeriodWeather) && (!WeatherFileExists && DoWeathSim)) {
@@ -1056,7 +1056,13 @@ namespace WeatherManager {
                 RunPeriodStartDayOfWeek = 0;
                 if ((DoDesDaySim && (KindOfSim != ksRunPeriodWeather)) || ((KindOfSim == ksRunPeriodWeather) && DoWeathSim)) {
                     if (PrntEnvHeaders && DoWeatherInitReporting) {
-                        ObjexxFCL::gio::write(OutputFileInits, EnvironFormat);
+                        static constexpr auto EnvironFormat(
+                            "! <Environment>,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {#days}, "
+                            "Source:Start DayOfWeek,  Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule,  Use Rain Values, Use Snow "
+                            "Values, Sky Temperature Model\n! <Environment:Special Days>, Special Day Name, Special Day Type, Source, Start Date, Duration {#days}\n! "
+                            "<Environment:Daylight Saving>, Daylight Saving Indicator, Source, Start Date, End Date\n! <Environment:WarmupDays>, "
+                            "NumberofWarmupDays");
+                        print(state.outputFiles.eio, "{}\n", EnvironFormat);
                         PrntEnvHeaders = false;
                     }
 
@@ -1137,20 +1143,18 @@ namespace WeatherManager {
 
                             if (!OkRun) {
                                 if (!Environment(Envrn).ActualWeather) {
-                                    ObjexxFCL::gio::write(StDate, DateFormat) << Environment(Envrn).StartMonth << Environment(Envrn).StartDay;
-                                    ObjexxFCL::gio::write(EnDate, DateFormat) << Environment(Envrn).EndMonth << Environment(Envrn).EndDay;
+                                    StDate = format(DateFormat, Environment(Envrn).StartMonth, Environment(Envrn).StartDay);
+                                    EnDate = format(DateFormat, Environment(Envrn).EndMonth, Environment(Envrn).EndDay);
                                     ShowSevereError(RoutineName + "Runperiod [mm/dd] (Start=" + StDate + ",End=" + EnDate +
                                                     ") requested not within Data Period(s) from Weather File");
                                 } else {
-                                    ObjexxFCL::gio::write(StDate, DateFormatwithYear)
-                                        << Environment(Envrn).StartMonth << Environment(Envrn).StartDay << Environment(Envrn).StartYear;
-                                    ObjexxFCL::gio::write(EnDate, DateFormatwithYear)
-                                        << Environment(Envrn).EndMonth << Environment(Envrn).EndDay << Environment(Envrn).EndYear;
+                                    StDate = format(DateFormatWithYear, Environment(Envrn).StartMonth, Environment(Envrn).StartDay, Environment(Envrn).StartYear);
+                                    EnDate = format(DateFormatWithYear, Environment(Envrn).EndMonth, Environment(Envrn).EndDay, Environment(Envrn).EndYear);
                                     ShowSevereError(RoutineName + "Runperiod [mm/dd/yyyy] (Start=" + StDate + ",End=" + EnDate +
                                                     ") requested not within Data Period(s) from Weather File");
                                 }
-                                ObjexxFCL::gio::write(StDate, DateFormat) << DataPeriods(1).StMon << DataPeriods(1).StDay;
-                                ObjexxFCL::gio::write(EnDate, DateFormat) << DataPeriods(1).EnMon << DataPeriods(1).EnDay;
+                                StDate = format(DateFormat, DataPeriods(1).StMon, DataPeriods(1).StDay);
+                                EnDate = format(DateFormat, DataPeriods(1).EnMon, DataPeriods(1).EnDay);
                                 if (DataPeriods(1).StYear > 0) {
                                     string = RoundSigDigits(DataPeriods(1).StYear);
                                     StDate += "/" + string;
@@ -1177,8 +1181,8 @@ namespace WeatherManager {
                             }
 
                             // Following builds Environment start/end for ASHRAE 55 warnings
-                            ObjexxFCL::gio::write(StDate, DateFormat) << Environment(Envrn).StartMonth << Environment(Envrn).StartDay;
-                            ObjexxFCL::gio::write(EnDate, DateFormat) << Environment(Envrn).EndMonth << Environment(Envrn).EndDay;
+                            StDate = format(DateFormat, Environment(Envrn).StartMonth, Environment(Envrn).StartDay);
+                            EnDate = format(DateFormat, Environment(Envrn).EndMonth, Environment(Envrn).EndDay);
                             if (Environment(Envrn).KindOfEnvrn == ksRunPeriodWeather) {
                                 StDate += "/" + RoundSigDigits(Environment(Envrn).StartYear);
                                 EnDate += "/" + RoundSigDigits(Environment(Envrn).EndYear);
@@ -1220,10 +1224,23 @@ namespace WeatherManager {
                                     AlpUseSnow = "No";
                                 }
                                 cTotalEnvDays = RoundSigDigits(Environment(Envrn).TotalDays);
+                                skyTempModel = SkyTempModelNames(Environment(Envrn).SkyTempModel + 1);
 
-                                ObjexxFCL::gio::write(OutputFileInits, EnvNameFormat)
-                                    << Environment(Envrn).Title << kindOfRunPeriod << StDate << EnDate << ValidDayNames(TWeekDay) << cTotalEnvDays
-                                    << "Use RunPeriod Specified Day" << AlpUseDST << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow;
+                                print(state.outputFiles.eio,
+                                      EnvNameFormat,
+                                      Environment(Envrn).Title,
+                                      kindOfRunPeriod,
+                                      StDate,
+                                      EnDate,
+                                      ValidDayNames(TWeekDay),
+                                      cTotalEnvDays,
+                                      "Use RunPeriod Specified Day",
+                                      AlpUseDST,
+                                      AlpUseSpec,
+                                      ApWkRule,
+                                      AlpUseRain,
+                                      AlpUseSnow,
+                                      skyTempModel);
                             }
 
                             if (!DoingSizing && !KickOffSimulation) {
@@ -1326,58 +1343,79 @@ namespace WeatherManager {
                                     Source = "InputFile";
                                 }
                                 if (DaylightSavingIsActive && DoWeatherInitReporting) {
-                                    ObjexxFCL::gio::write(StDate, DateFormat) << DSTActStMon << DSTActStDay;
-                                    ObjexxFCL::gio::write(EnDate, DateFormat) << DSTActEnMon << DSTActEnDay;
-                                    ObjexxFCL::gio::write(OutputFileInits, EnvDSTYFormat) << Source << StDate << EnDate;
+                                    StDate = format(DateFormat, DSTActStMon, DSTActStDay);
+                                    EnDate = format(DateFormat, DSTActEnMon, DSTActEnDay);
+                                    print(state.outputFiles.eio, EnvDSTYFormat, Source, StDate, EnDate);
                                 } else if (DoOutputReporting) {
-                                    ObjexxFCL::gio::write(OutputFileInits, EnvDSTNFormat) << Source;
+                                    print(state.outputFiles.eio, EnvDSTNFormat, Source);
                                 }
                                 for (Loop = 1; Loop <= NumSpecialDays; ++Loop) {
+                                    static constexpr auto EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}");
                                     if (SpecialDays(Loop).WthrFile && UseSpecialDays && DoWeatherInitReporting) {
-                                        ObjexxFCL::gio::write(StDate, DateFormat) << SpecialDays(Loop).ActStMon << SpecialDays(Loop).ActStDay;
-                                        ObjexxFCL::gio::write(OutputFileInits, EnvSpDyFormat)
-                                            << SpecialDays(Loop).Name << SpecialDayNames(SpecialDays(Loop).DayType) << "WeatherFile" << StDate
-                                            << SpecialDays(Loop).Duration;
+                                        StDate = format(DateFormat, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay);
+                                        print(state.outputFiles.eio,
+                                              EnvSpDyFormat,
+                                              SpecialDays(Loop).Name,
+                                              SpecialDayNames(SpecialDays(Loop).DayType),
+                                              "WeatherFile",
+                                              StDate,
+                                              SpecialDays(Loop).Duration);
                                     }
                                     if (!SpecialDays(Loop).WthrFile && DoWeatherInitReporting) {
-                                        ObjexxFCL::gio::write(StDate, DateFormat) << SpecialDays(Loop).ActStMon << SpecialDays(Loop).ActStDay;
-                                        ObjexxFCL::gio::write(OutputFileInits, EnvSpDyFormat)
-                                            << SpecialDays(Loop).Name << SpecialDayNames(SpecialDays(Loop).DayType) << "InputFile" << StDate
-                                            << SpecialDays(Loop).Duration;
+                                        StDate = format(DateFormat, SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay);
+                                        print(state.outputFiles.eio,
+                                              EnvSpDyFormat,
+                                              SpecialDays(Loop).Name,
+                                              SpecialDayNames(SpecialDays(Loop).DayType),
+                                              "InputFile",
+                                              StDate,
+                                              SpecialDays(Loop).Duration);
                                     }
                                 }
                             }
 
                         } else if (SELECT_CASE_var == ksDesignDay || SELECT_CASE_var == ksHVACSizeDesignDay) { // Design Day
                             RunPeriodEnvironment = false;
-                            ObjexxFCL::gio::write(StDate, DateFormat)
-                                << DesDayInput(Environment(Envrn).DesignDayNum).Month << DesDayInput(Environment(Envrn).DesignDayNum).DayOfMonth;
+                            StDate = format(DateFormat, DesDayInput(Environment(Envrn).DesignDayNum).Month, DesDayInput(Environment(Envrn).DesignDayNum).DayOfMonth);
                             EnDate = StDate;
                             if (DesDayInput(Environment(Envrn).DesignDayNum).DayType <= 7 && DoWeatherInitReporting) {
-                                ObjexxFCL::gio::write(OutputFileInits, EnvNameFormat)
-                                    << Environment(Envrn).Title << "SizingPeriod:DesignDay" << StDate << EnDate
-                                    << DaysOfWeek(DesDayInput(Environment(Envrn).DesignDayNum).DayType) << "1"
-                                    << "N/A"
-                                    << "N/A"
-                                    << "N/A"
-                                    << "N/A"
-                                    << "N/A"
-                                    << "N/A";
+
+                                print(state.outputFiles.eio,
+                                      EnvNameFormat,
+                                      Environment(Envrn).Title,
+                                      "SizingPeriod:DesignDay",
+                                      StDate,
+                                      EnDate,
+                                      DaysOfWeek(DesDayInput(Environment(Envrn).DesignDayNum).DayType),
+                                      "1",
+                                      "N/A",
+                                      "N/A",
+                                      "N/A",
+                                      "N/A",
+                                      "N/A",
+                                      "N/A",
+                                      SkyTempModelNames(Environment(Envrn).SkyTempModel + 1));
                             } else if (DoWeatherInitReporting) {
-                                ObjexxFCL::gio::write(OutputFileInits, EnvNameFormat)
-                                    << Environment(Envrn).Title << "SizingPeriod:DesignDay" << StDate << EnDate
-                                    << SpecialDayNames(DesDayInput(Environment(Envrn).DesignDayNum).DayType - 7) << "1"
-                                    << "N/A"
-                                    << "N/A"
-                                    << "N/A"
-                                    << "N/A"
-                                    << "N/A"
-                                    << "N/A";
+                                print(state.outputFiles.eio,
+                                      EnvNameFormat,
+                                      Environment(Envrn).Title,
+                                      "SizingPeriod:DesignDay",
+                                      StDate,
+                                      EnDate,
+                                      SpecialDayNames(DesDayInput(Environment(Envrn).DesignDayNum).DayType - 7),
+                                      "1",
+                                      "N/A",
+                                      "N/A",
+                                      "N/A",
+                                      "N/A",
+                                      "N/A",
+                                      "N/A",
+                                      SkyTempModelNames(Environment(Envrn).SkyTempModel + 1));
                             }
                             if (DesDayInput(Environment(Envrn).DesignDayNum).DSTIndicator == 0 && DoWeatherInitReporting) {
-                                ObjexxFCL::gio::write(OutputFileInits, EnvDSTNFormat) << "SizingPeriod:DesignDay";
+                                print(state.outputFiles.eio, EnvDSTNFormat, "SizingPeriod:DesignDay");
                             } else if (DoWeatherInitReporting) {
-                                ObjexxFCL::gio::write(OutputFileInits, EnvDSTYFormat) << "SizingPeriod:DesignDay" << StDate << EnDate;
+                                print(state.outputFiles.eio, EnvDSTYFormat, "SizingPeriod:DesignDay", StDate, EnDate);
                             }
                         }
                     }
@@ -1391,6 +1429,7 @@ namespace WeatherManager {
         } else if (ErrorsFound) {
             Available = false;
         }
+        return Available && !ErrorsFound;
     }
 
     void AddDesignSetToEnvironmentStruct(int const HVACSizingIterCount)
@@ -1424,7 +1463,7 @@ namespace WeatherManager {
         } // for each loop over Environment data strucure
     }
 
-    void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, Array1A_int WeekDays)
+    void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, Array1D_int &WeekDays)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1447,7 +1486,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        WeekDays.dim(12);
+        EP_SIZE_CHECK(WeekDays, 12);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1541,7 +1580,7 @@ namespace WeatherManager {
         }
     }
 
-    void ResetWeekDaysByMonth(Array1A_int WeekDays,
+    void ResetWeekDaysByMonth(Array1D_int &WeekDays,
                               int const LeapYearAdd,
                               int const StartMonth,
                               int const StartMonthDay,
@@ -1571,7 +1610,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        WeekDays.dim(12);
+        EP_SIZE_CHECK(WeekDays, 12);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1786,8 +1825,8 @@ namespace WeatherManager {
         }
     }
 
-    void SetDSTDateRanges(Array1S_int MonWeekDay, // Weekday of each day 1 of month
-                          Array1S_int DSTIndex,   // DST Index for each julian day (1:366)
+    void SetDSTDateRanges(Array1D_int &MonWeekDay, // Weekday of each day 1 of month
+                          Array1D_int &DSTIndex,   // DST Index for each julian day (1:366)
                           Optional_int DSTActStMon,
                           Optional_int DSTActStDay,
                           Optional_int DSTActEnMon,
@@ -1915,7 +1954,7 @@ namespace WeatherManager {
         }
     }
 
-    void SetSpecialDayDates(Array1S_int MonWeekDay) // Weekday of each day 1 of month
+    void SetSpecialDayDates(Array1D_int &MonWeekDay) // Weekday of each day 1 of month
     {
 
         // SUBROUTINE INFORMATION:
@@ -2088,7 +2127,7 @@ namespace WeatherManager {
             // Call and setup the Design Day environment
             if (Environment(Envrn).KindOfEnvrn != ksRunPeriodWeather) {
                 if (Environment(Envrn).DesignDayNum > 0) {
-                    SetUpDesignDay(Environment(Envrn).DesignDayNum);
+                    SetUpDesignDay(OutputFiles::getSingleton(), Environment(Envrn).DesignDayNum);
                     EnvironmentName = Environment(Envrn).Title;
                 }
             }
@@ -2573,7 +2612,7 @@ namespace WeatherManager {
                 SPSiteBeamSolarScheduleValue(envrnDayNum) = DDBeamSolarValues(TimeStep, HourOfDay, envrnDayNum);
                 SPSiteDiffuseSolarScheduleValue(envrnDayNum) = DDDiffuseSolarValues(TimeStep, HourOfDay, envrnDayNum);
             }
-            if (Environment(Envrn).WP_Type1 != 0) {
+            if (Environment(Envrn).SkyTempModel <= 3 || Environment(Envrn).SkyTempModel >= 1) {
                 SPSiteSkyTemperatureScheduleValue(envrnDayNum) = DDSkyTempScheduleValues(TimeStep, HourOfDay, envrnDayNum);
             }
         } else if (TotDesDays > 0) {
@@ -2690,10 +2729,11 @@ namespace WeatherManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        ReadEPlusWeatherForDay(DayToRead, Environ, BackSpaceAfterRead);
+        ReadEPlusWeatherForDay(OutputFiles::getSingleton(), DayToRead, Environ, BackSpaceAfterRead);
     }
 
-    void ReadEPlusWeatherForDay(int const DayToRead,          // =1 when starting out, otherwise signifies next day
+    void ReadEPlusWeatherForDay(OutputFiles &outputFiles,
+                                int const DayToRead,          // =1 when starting out, otherwise signifies next day
                                 int const Environ,            // Environment being simulated
                                 bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
     )
@@ -2713,6 +2753,7 @@ namespace WeatherManager {
         using ScheduleManager::GetScheduleValuesForDay;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
         static ObjexxFCL::gio::Fmt fmtLD("*");
         static ObjexxFCL::gio::Fmt YMDHFmt("(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)");
         static ObjexxFCL::gio::Fmt YMDHFmt1("(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)");
@@ -2774,11 +2815,8 @@ namespace WeatherManager {
         bool ErrorsFound;
         static Real64 CurTime;
         Real64 HourRep;
-        int OSky;
-        Real64 TDewK;
         Real64 ESky;
         bool ErrorFound;
-        std::string ErrOut;
         static bool LastHourSet; // for Interpolation
         int NxtHour;
         Real64 WtNow;
@@ -2950,11 +2988,9 @@ namespace WeatherManager {
                 if (ReadStatus != 0) {
                     BadRecord = RoundSigDigits(WYear) + '/' + RoundSigDigits(WMonth) + '/' + RoundSigDigits(WDay) + ' ' + RoundSigDigits(WHour) +
                                 ':' + RoundSigDigits(WMinute);
-                    ObjexxFCL::gio::write(ErrOut, fmtLD) << ReadStatus;
-                    strip(ErrOut);
                     ShowFatalError("Error occurred on EPW while searching for first day, stopped at " + BadRecord +
                                        " IO Error=" + RoundSigDigits(ReadStatus),
-                                   OutputFileStandard);
+                                   OptionalOutputFileRef{outputFiles.eso});
                 }
                 if (CurDayOfWeek <= 7) {
                     CurDayOfWeek = mod(CurDayOfWeek, 7) + 1;
@@ -3072,7 +3108,7 @@ namespace WeatherManager {
                                         RoundSigDigits(WHour) + ':' + RoundSigDigits(WMinute);
                             ShowFatalError("Error occurred on EPW while searching for first day, stopped at " + BadRecord +
                                                " IO Error=" + RoundSigDigits(ReadStatus),
-                                           OutputFileStandard);
+                                           OptionalOutputFileRef{outputFiles.eso});
                         }
                     }
                     for (Item = 1; Item <= 23 * NumIntervalsPerHour; ++Item) {
@@ -3087,7 +3123,7 @@ namespace WeatherManager {
                                         RoundSigDigits(WHour) + ':' + RoundSigDigits(WMinute);
                             ShowFatalError("Error occurred on EPW while searching for first day, stopped at " + BadRecord +
                                                " IO Error=" + RoundSigDigits(ReadStatus),
-                                           OutputFileStandard);
+                                           OptionalOutputFileRef{outputFiles.eso});
                         }
                     }
                 }
@@ -3246,14 +3282,14 @@ namespace WeatherManager {
                         } else {
                             BadRecord = RoundSigDigits(WYear) + '/' + RoundSigDigits(WMonth) + '/' + RoundSigDigits(WDay) + BlankString +
                                         RoundSigDigits(WHour) + ':' + RoundSigDigits(WMinute);
-                            ShowFatalError("Unexpected error condition in middle of reading EPW file, stopped at " + BadRecord, OutputFileStandard);
+                            ShowFatalError("Unexpected error condition in middle of reading EPW file, stopped at " + BadRecord, OptionalOutputFileRef{outputFiles.eso});
                         }
                     }
 
                     if (Hour != WHour) {
                         BadRecord = RoundSigDigits(WYear) + '/' + RoundSigDigits(WMonth) + '/' + RoundSigDigits(WDay) + BlankString +
                                     RoundSigDigits(WHour) + ':' + RoundSigDigits(WMinute);
-                        ShowFatalError("Unexpected error condition in middle of reading EPW file, " + BadRecord, OutputFileStandard);
+                        ShowFatalError("Unexpected error condition in middle of reading EPW file, " + BadRecord, OptionalOutputFileRef{outputFiles.eso});
                     }
 
                     //         Set possible missing values
@@ -3456,17 +3492,21 @@ namespace WeatherManager {
                     TomorrowWindSpeed(CurTimeStep, Hour) = WindSpeed;
                     TomorrowWindDir(CurTimeStep, Hour) = WindDir;
                     TomorrowLiquidPrecip(CurTimeStep, Hour) = LiquidPrecip;
-                    TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
 
-                    if (Environment(Envrn).WP_Type1 == 0) {
+                    ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
+                    if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
+                        TomorrowHorizIRSky(CurTimeStep, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
+                    } else {
+                        TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
+                    }
+
+                    if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
                         // Calculate sky temperature, use IRHoriz if not missing
-                        if (IRHoriz >= 9999.0) {
-                            // Missing, use sky cover
-                            OSky = OpaqueSkyCover;
-                            TDewK = min(DryBulb, DewPoint) + TKelvin;
-                            ESky = (0.787 + 0.764 * std::log(TDewK / TKelvin)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
+                        if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
+                            // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
                             SkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
-                        } else { // Valid IR from Sky
+                        } else {
+                            // Valid IR from weather files
                             SkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
                         }
                     } else {
@@ -3619,7 +3659,7 @@ namespace WeatherManager {
                     TomorrowWindSpeed(TS, Hour) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed(Hour) * WtNow;
                     TomorrowWindDir(TS, Hour) = interpolateWindDirection(LastHrWindDir, Wthr.WindDir(Hour), WtNow);
                     TomorrowHorizIRSky(TS, Hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow;
-                    if (Environment(Environ).WP_Type1 == 0) {
+                    if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
                         TomorrowSkyTemp(TS, Hour) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp(Hour) * WtNow;
                     }
                     TomorrowDifSolarRad(TS, Hour) =
@@ -3704,6 +3744,34 @@ namespace WeatherManager {
         return (fmod(interpAng, 360.)); // fmod is float modulus function
     }
 
+    Real64 CalcSkyEmissivity(int ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum){
+        // Calculate Sky Emissivity
+        // References:
+        // M. Li, Y. Jiang and C. F. M. Coimbra,
+        // "On the determination of atmospheric longwave irradiance under all-sky conditions,"
+        // Solar Energy 144, 2017, pp. 40–48,
+        // G. Clark and C. Allen, "The Estimation of Atmospheric Radiation for Clear and
+        // Cloudy Skies," Proc. 2nd National Passive Solar Conference (AS/ISES), 1978, pp. 675-678.
+
+        Real64 ESky;
+
+        if (ESkyCalcType == WP_BruntModel) {
+            double const PartialPress = RelHum * PsyPsatFnTemp(DryBulb) * 0.01;
+            ESky = 0.618 + 0.056 * pow(PartialPress, 0.5);
+        } else if (ESkyCalcType == WP_IdsoModel) {
+            double const PartialPress = RelHum * PsyPsatFnTemp(DryBulb) * 0.01;
+            ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + TKelvin));
+        } else if (ESkyCalcType == WP_BerdahlMartinModel) {
+            double const TDewC = min(DryBulb, DewPoint);
+            ESky = 0.758 + 0.521 * (TDewC / 100) + 0.625 * pow_2(TDewC / 100);
+        } else {
+            ESky = 0.787 + 0.764 * std::log((min(DryBulb, DewPoint) + TKelvin) / TKelvin);
+        }
+        ESky = ESky * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
+        return ESky;
+    }
+
+
     void SetDayOfWeekInitialValues(int const EnvironDayOfWeek, // Starting Day of Week for the (Weather) RunPeriod (User Input)
                                    int &CurDayOfWeek,          // Current Day of Week
                                    bool &UseDayOfWeek          // hmmm does not appear to be used anywhere.
@@ -3785,7 +3853,7 @@ namespace WeatherManager {
                                   Real64 &RField19,      // Visibility
                                   Real64 &RField20,      // CeilHeight
                                   int &WObs,             // PresWeathObs
-                                  Array1A_int WCodesArr, // PresWeathConds
+                                  Array1D_int &WCodesArr, // PresWeathConds
                                   Real64 &RField22,      // PrecipWater
                                   Real64 &RField23,      // AerosolOptDepth
                                   Real64 &RField24,      // SnowDepth
@@ -3823,7 +3891,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        WCodesArr.dim(9);
+        EP_SIZE_CHECK(WCodesArr, 9);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4083,15 +4151,13 @@ namespace WeatherManager {
         ShowFatalError("Error in Reading Weather Data");
 
     Label901:;
-        ObjexxFCL::gio::write(DateError, "(I4,'/',I2,'/',I2,' Hour#=',I2,' Min#=',I2)") << WYear << WMonth << WDay << WHour << WMinute;
-        ShowSevereError("Invalid Weather Line at date=" + DateError);
+        ShowSevereError(format("Invalid Weather Line at date={:4}/{:2}/{:2} Hour#={:2} Min#={:2}", WYear, WMonth, WDay, WHour, WMinute));
         ShowContinueError("Full Data Line=" + SaveLine);
         ShowContinueError("Remainder of line=" + Line);
         ShowFatalError("Error in Reading Weather Data");
 
     Label902:;
-        ObjexxFCL::gio::write(DateError, "(I4,'/',I2,'/',I2,' Hour#=',I2,' Min#=',I2)") << WYear << WMonth << WDay << WHour << WMinute;
-        ShowSevereError("Invalid Weather Line (no commas) at date=" + DateError);
+        ShowSevereError(format("Invalid Weather Line (no commas) at date={:4}/{:2}/{:2} Hour#={:2} Min#={:2}", WYear, WMonth, WDay, WHour, WMinute));
         ShowContinueError("Full Data Line=" + SaveLine);
         ShowContinueError("Remainder of line=" + Line);
         ShowFatalError("Error in Reading Weather Data");
@@ -4104,7 +4170,7 @@ namespace WeatherManager {
         //		ShowFatalError( "Error in Reading Weather Data" );
     }
 
-    void SetUpDesignDay(int const EnvrnNum) // Environment number passed into the routine
+    void SetUpDesignDay(OutputFiles &outputFiles, int const EnvrnNum) // Environment number passed into the routine
     {
 
         // SUBROUTINE INFORMATION:
@@ -4131,18 +4197,11 @@ namespace WeatherManager {
         using ScheduleManager::GetSingleDayScheduleValues;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const GlobalSolarConstant(1367.0);
-        Real64 const ZHGlobalSolarConstant(1355.0);
-        static ObjexxFCL::gio::Fmt EnvDDHdFormat(
-            "('! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, ',   'Temp Range {dC}, Temp Range Ind Type, ',   "
-            "'Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, ',   'Wind Direction {deg CW from N}, ',    'Wind "
-            "Speed {m/s}, Clearness, Rain, Snow')");
-        static ObjexxFCL::gio::Fmt EnvDDayFormat("('Environment:Design Day Data,')");
-        static ObjexxFCL::gio::Fmt DDayMiscHdFormat(
-            "('! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,',   'ASHRAE B Coeff,ASHRAE C Coeff,Solar "
-            "Constant-Annual Variation,',   'Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model')");
-        static ObjexxFCL::gio::Fmt DDayMiscFormat("('Environment:Design Day Misc,',I3,',')");
-        static ObjexxFCL::gio::Fmt MnDyFmt("(I2.2,'/',I2.2)");
+        constexpr Real64 GlobalSolarConstant(1367.0);
+        constexpr Real64 ZHGlobalSolarConstant(1355.0);
+
+
+
         Real64 const ZhangHuangModCoeff_C0(0.5598);   // 37.6865d0
         Real64 const ZhangHuangModCoeff_C1(0.4982);   // 13.9263d0
         Real64 const ZhangHuangModCoeff_C2(-0.6762);  // -20.2354d0
@@ -4171,7 +4230,6 @@ namespace WeatherManager {
         int CurrentYear;
         int OSky;             // Opaque Sky Cover (tenths)
         Real64 HumidityRatio; // Humidity Ratio -- when constant for day
-        Real64 TDewK;         // Dewpoint in Kelvin
         Real64 ESky;          // Emissivitity of Sky
         Real64 CosZenith;     // Cosine of Zenith Angle of Sun
         Real64 TotHoriz;      // Total Radiation on Horizontal Surface
@@ -4231,7 +4289,8 @@ namespace WeatherManager {
         DesignDay(EnvrnNum).Month = DesDayInput(EnvrnNum).Month;
         DesignDay(EnvrnNum).DayOfMonth = DesDayInput(EnvrnNum).DayOfMonth;
         DesignDay(EnvrnNum).DayOfYear = General::OrdinalDay(DesignDay(EnvrnNum).Month, DesignDay(EnvrnNum).DayOfMonth, 0);
-        ObjexxFCL::gio::write(CurMnDy, MnDyFmt) << DesDayInput(EnvrnNum).Month << DesDayInput(EnvrnNum).DayOfMonth;
+        static constexpr auto MnDyFmt("{:02}/{:02}");
+        CurMnDy = format(MnDyFmt, DesDayInput(EnvrnNum).Month, DesDayInput(EnvrnNum).DayOfMonth);
         // EnvironmentName = DesDayInput( EnvrnNum ).Title;
         RunPeriodEnvironment = false;
         // Following builds Environment start/end for ASHRAE 55 warnings
@@ -4277,8 +4336,15 @@ namespace WeatherManager {
                                   DesignDay(EnvrnNum).CosSolarDeclinAngle);
 
         if (PrintDDHeader && DoWeatherInitReporting) {
-            ObjexxFCL::gio::write(OutputFileInits, EnvDDHdFormat);
-            ObjexxFCL::gio::write(OutputFileInits, DDayMiscHdFormat);
+            static constexpr auto EnvDDHdFormat(
+                "! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, "
+                "Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, Wind Direction {deg CW from N}, Wind "
+                "Speed {m/s}, Clearness, Rain, Snow");
+            print(outputFiles.eio, "{}\n", EnvDDHdFormat);
+            static constexpr auto DDayMiscHdFormat(
+                "! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar "
+                "Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model");
+            print(outputFiles.eio, "{}\n", DDayMiscHdFormat);
             PrintDDHeader = false;
         }
         if (DoWeatherInitReporting) {
@@ -4292,23 +4358,10 @@ namespace WeatherManager {
             } else {
                 AlpUseSnow = "No";
             }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, EnvDDayFormat, flags);
-            }
-            StringOut = RoundSigDigits(DesDayInput(EnvrnNum).MaxDryBulb, 2);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(DesDayInput(EnvrnNum).DailyDBRange, 2);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
+            print(outputFiles.eio, "Environment:Design Day Data,");
+            print(outputFiles.eio, "{:.2R},", DesDayInput(EnvrnNum).MaxDryBulb);
+            print(outputFiles.eio, "{:.2R},", DesDayInput(EnvrnNum).DailyDBRange);
+
             StringOut = ",";
             if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Default) {
                 StringOut = "DefaultMultipliers,";
@@ -4319,11 +4372,8 @@ namespace WeatherManager {
             } else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Difference) {
                 StringOut = "DifferenceSchedule,";
             }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut;
-            }
+            print(outputFiles.eio, "{}", StringOut);
+
 
             // Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units
             if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WetBulb) {
@@ -4343,79 +4393,23 @@ namespace WeatherManager {
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfMul) {
                 StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
             }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut;
-            }
+            print(outputFiles.eio, "{}", StringOut);
+            print(outputFiles.eio, "{:.0R},", DesDayInput(EnvrnNum).PressBarom);
+            print(outputFiles.eio, "{:.0R},", DesDayInput(EnvrnNum).WindDir);
+            print(outputFiles.eio, "{:.1R},", DesDayInput(EnvrnNum).WindSpeed);
+            print(outputFiles.eio, "{:.2R},", DesDayInput(EnvrnNum).SkyClear);
 
-            StringOut = RoundSigDigits(DesDayInput(EnvrnNum).PressBarom, 0);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(DesDayInput(EnvrnNum).WindDir, 0);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(DesDayInput(EnvrnNum).WindSpeed, 1);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(DesDayInput(EnvrnNum).SkyClear, 2);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << AlpUseRain + ',' + AlpUseSnow;
+            print(outputFiles.eio, "{},{}\n", AlpUseRain, AlpUseSnow);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, DDayMiscFormat, flags) << DesignDay(EnvrnNum).DayOfYear;
-            }
-            StringOut = RoundSigDigits(A, 1);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(B, 4);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(C, 4);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(AVSC, 1);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(DesignDay(EnvrnNum).EquationOfTime * 60.0, 2);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(std::asin(DesignDay(EnvrnNum).SinSolarDeclinAngle) / DegToRadians, 1);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
+            static constexpr auto DDayMiscFormat("Environment:Design Day Misc,{:3},");
+            print(outputFiles.eio, DDayMiscFormat, DesignDay(EnvrnNum).DayOfYear);
+            print(outputFiles.eio, "{:.1R},", A);
+            print(outputFiles.eio, "{:.4R},", B);
+            print(outputFiles.eio, "{:.4R},", C);
+            print(outputFiles.eio, "{:.1R},", AVSC);
+            print(outputFiles.eio, "{:.2R},", DesignDay(EnvrnNum).EquationOfTime * 60.0);
+            print(outputFiles.eio, "{:.1R},", std::asin(DesignDay(EnvrnNum).SinSolarDeclinAngle) / DegToRadians);
+
             if (DesDayInput(EnvrnNum).SolarModel == ASHRAE_ClearSky) {
                 StringOut = "ASHRAEClearSky";
             } else if (DesDayInput(EnvrnNum).SolarModel == Zhang_Huang) {
@@ -4429,7 +4423,7 @@ namespace WeatherManager {
             } else {
                 StringOut = "unknown";
             }
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+            print(outputFiles.eio, "{}\n", StringOut);
         }
 
         // Must set up weather values for Design Day.  User can specify the "humidity indicator" as
@@ -4550,6 +4544,8 @@ namespace WeatherManager {
                 } else {
                     HumidityRatio = PsyWFnTdbRhPb(
                         TomorrowOutDryBulbTemp(TS, Hour), DDHumIndModifier(TS, Hour, EnvrnNum) / 100.0, DesDayInput(EnvrnNum).PressBarom);
+                    TomorrowOutRelHum(TS, Hour) =
+                            PsyRhFnTdbWPb(TomorrowOutDryBulbTemp(TS, Hour), HumidityRatio, DesDayInput(EnvrnNum).PressBarom, WeatherManager) * 100.0;
                     // TomorrowOutRelHum values set earlier
                     TomorrowOutDewPointTemp(TS, Hour) = PsyTdpFnWPb(HumidityRatio, DesDayInput(EnvrnNum).PressBarom);
                 }
@@ -4578,17 +4574,15 @@ namespace WeatherManager {
                 // G. Clark and C. Allen, "The Estimation of Atmospheric Radiation for Clear and
                 // Cloudy Skies," Proc. 2nd National Passive Solar Conference (AS/ISES), 1978, pp. 675-678.
 
-                if (Environment(EnvrnNum).WP_Type1 == 0) {
-                    TDewK = min(TomorrowOutDryBulbTemp(TS, Hour), TomorrowOutDewPointTemp(TS, Hour)) + TKelvin;
-                    ESky = (0.787 + 0.764 * std::log((TDewK) / TKelvin)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
-                    TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(TomorrowOutDryBulbTemp(TS, Hour) + TKelvin);
-                    TomorrowSkyTemp(TS, Hour) = (TomorrowOutDryBulbTemp(TS, Hour) + TKelvin) * root_4(ESky) - TKelvin;
-                } else {
-                    TDewK = min(TomorrowOutDryBulbTemp(TS, Hour), TomorrowOutDewPointTemp(TS, Hour)) + TKelvin;
-                    ESky = (0.787 + 0.764 * std::log((TDewK) / TKelvin)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
-                    TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(TomorrowOutDryBulbTemp(TS, Hour) + TKelvin);
-                }
+                double DryBulb = TomorrowOutDryBulbTemp(TS, Hour);
+                double RelHum = TomorrowOutRelHum(TS, Hour) * 0.01;
+                ESky = CalcSkyEmissivity(Environment(EnvrnNum).SkyTempModel, OSky, DryBulb, TomorrowOutDewPointTemp(TS, Hour), RelHum);
+                TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
 
+                if (Environment(EnvrnNum).SkyTempModel > 3 || Environment(EnvrnNum).SkyTempModel == 0) {
+                    // Design day not scheduled
+                    TomorrowSkyTemp(TS, Hour) = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
+                }
                 // Generate solar values for timestep
                 //    working results = BeamRad and DiffRad
                 //    stored to program globals at end of loop
@@ -5106,7 +5100,7 @@ namespace WeatherManager {
                                       Real64 const EqOfTime,     // Equation of Time
                                       Real64 const SinSolDeclin, // Sine of Solar Declination
                                       Real64 const CosSolDeclin, // Cosine of Solar Declination
-                                      Array1A<Real64> SUNCOS)
+                                      Array1D<Real64> &SUNCOS)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5129,7 +5123,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        SUNCOS.dim(3);
+        EP_SIZE_CHECK(SUNCOS, 3);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5165,7 +5159,7 @@ namespace WeatherManager {
         }
     }
 
-    void DetermineSunUpDown(Array1A<Real64> SunDirectionCosines)
+    void DetermineSunUpDown(Array1D<Real64> &SunDirectionCosines)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5188,7 +5182,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        SunDirectionCosines.dim(3);
+        EP_SIZE_CHECK(SunDirectionCosines, 3);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5298,11 +5292,12 @@ namespace WeatherManager {
         }
 
         if (WeatherFileExists) {
-            OpenEPlusWeatherFile(ErrorsFound, true);
+            OpenEPlusWeatherFile(OutputFiles::getSingleton(), ErrorsFound, true);
         }
     }
 
-    void OpenEPlusWeatherFile(bool &ErrorsFound,       // Will be set to true if errors found
+    void OpenEPlusWeatherFile(OutputFiles &outputFiles,
+                              bool &ErrorsFound,       // Will be set to true if errors found
                               bool const ProcessHeader // Set to true when headers should be processed (rather than just read)
     )
     {
@@ -5319,6 +5314,8 @@ namespace WeatherManager {
 
         // METHODOLOGY EMPLOYED:
         // List directed reads, as possible.
+
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const Header(8,
@@ -5388,17 +5385,17 @@ namespace WeatherManager {
         return;
 
     Label9997:;
-        ShowSevereError("OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.", OutputFileStandard);
+        ShowSevereError("OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.", OptionalOutputFileRef(outputFiles.eso));
         ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
         ShowFatalError("Program terminates due to previous condition.");
 
     Label9998:;
         ShowFatalError("OpenWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" +
                            Header(HdLine),
-                       OutputFileStandard);
+                       OptionalOutputFileRef(outputFiles.eso));
 
     Label9999:;
-        ShowFatalError("OpenWeatherFile: Could not OPEN EPW Weather File", OutputFileStandard);
+        ShowFatalError("OpenWeatherFile: Could not OPEN EPW Weather File", OptionalOutputFileRef(outputFiles.eso));
     }
 
     void CloseWeatherFile()
@@ -5450,7 +5447,7 @@ namespace WeatherManager {
         if (EPWOpen) ObjexxFCL::gio::close(unitnumber);
     }
 
-    void ResolveLocationInformation(bool &ErrorsFound) // Set to true if no location evident
+    void ResolveLocationInformation(OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if no location evident
     {
 
         // SUBROUTINE INFORMATION:
@@ -5478,10 +5475,6 @@ namespace WeatherManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt LocHdFormat(
-            "('! <Site:Location>, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg}, ',   ' Time Zone Number "
-            "{GMT+/-}, Elevation {m}, ',   ' Standard Pressure at Elevation {Pa}, Standard RhoAir at Elevation')");
-        static ObjexxFCL::gio::Fmt LocFormat("('Site:Location',7(',',A))");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -5527,10 +5520,12 @@ namespace WeatherManager {
             StdBaroPress = StdPressureSeaLevel * std::pow(1.0 - 2.25577e-05 * Elevation, 5.2559);
             StdRhoAir = PsyRhoAirFnPbTdbW(StdBaroPress, constant_twenty, constant_zero);
             // Write Final Location Information to the initialization output file
-            ObjexxFCL::gio::write(OutputFileInits, LocHdFormat);
-            ObjexxFCL::gio::write(OutputFileInits, LocFormat)
-                << LocationTitle << RoundSigDigits(Latitude, 2) << RoundSigDigits(Longitude, 2) << RoundSigDigits(TimeZoneNumber, 2)
-                << RoundSigDigits(Elevation, 2) << RoundSigDigits(StdBaroPress, 0) << RoundSigDigits(StdRhoAir, 4);
+            static constexpr auto LocHdFormat("! <Site:Location>, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg},  Time Zone Number "
+                                              "{GMT+/-}, Elevation {m},  Standard Pressure at Elevation {Pa}, Standard RhoAir at Elevation\n");
+            print(outputFiles.eio, "{}", LocHdFormat);
+
+            static constexpr auto LocFormat("Site:Location,{},{:.2R},{:.2R},{:.2R},{:.2R},{:.0R},{:.4R}\n");
+            print(outputFiles.eio, LocFormat, LocationTitle, Latitude, Longitude, TimeZoneNumber, Elevation, StdBaroPress, StdRhoAir);
         }
     }
 
@@ -5711,7 +5706,7 @@ namespace WeatherManager {
         } // ... end of WeatherFileExists IF-THEN
     }
 
-    void ReportOutputFileHeaders()
+    void ReportOutputFileHeaders(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5766,41 +5761,41 @@ namespace WeatherManager {
         }
         EnvironmentReportChr = std::to_string(EnvironmentReportNbr);
         strip(EnvironmentReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << EnvironmentReportChr + EnvironmentString;
-        ObjexxFCL::gio::write(OutputFileMeters, A) << EnvironmentReportChr + EnvironmentString;
+        print(outputFiles.eso, "{}{}\n", EnvironmentReportChr, EnvironmentString);
+        print(outputFiles.mtr, "{}{}\n", EnvironmentReportChr, EnvironmentString);
 
         AssignReportNumber(OutputProcessor::TimeStepStampReportNbr);
         OutputProcessor::TimeStepStampReportChr = std::to_string(OutputProcessor::TimeStepStampReportNbr);
         strip(OutputProcessor::TimeStepStampReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::TimeStepStampReportChr + TimeStepString;
-        ObjexxFCL::gio::write(OutputFileMeters, A) << OutputProcessor::TimeStepStampReportChr + TimeStepString;
+        print(outputFiles.eso, "{}{}\n", OutputProcessor::TimeStepStampReportChr, TimeStepString);
+        print(outputFiles.mtr, "{}{}\n", OutputProcessor::TimeStepStampReportChr, TimeStepString);
 
         AssignReportNumber(OutputProcessor::DailyStampReportNbr);
         OutputProcessor::DailyStampReportChr = std::to_string(OutputProcessor::DailyStampReportNbr);
         strip(OutputProcessor::DailyStampReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::DailyStampReportChr + DailyString + "Report Variables Requested";
-        ObjexxFCL::gio::write(OutputFileMeters, A) << OutputProcessor::DailyStampReportChr + DailyString + "Meters Requested";
+        print(outputFiles.eso, "{}{}{}\n", OutputProcessor::DailyStampReportChr, DailyString, "Report Variables Requested");
+        print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::DailyStampReportChr, DailyString, "Meters Requested");
 
         AssignReportNumber(OutputProcessor::MonthlyStampReportNbr);
         OutputProcessor::MonthlyStampReportChr = std::to_string(OutputProcessor::MonthlyStampReportNbr);
         strip(OutputProcessor::MonthlyStampReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::MonthlyStampReportChr + MonthlyString + "Report Variables Requested";
-        ObjexxFCL::gio::write(OutputFileMeters, A) << OutputProcessor::MonthlyStampReportChr + MonthlyString + "Meters Requested";
+        print(outputFiles.eso, "{}{}{}\n", OutputProcessor::MonthlyStampReportChr, MonthlyString, "Report Variables Requested");
+        print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::MonthlyStampReportChr, MonthlyString, "Meters Requested");
 
         AssignReportNumber(OutputProcessor::RunPeriodStampReportNbr);
         OutputProcessor::RunPeriodStampReportChr = std::to_string(OutputProcessor::RunPeriodStampReportNbr);
         strip(OutputProcessor::RunPeriodStampReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::RunPeriodStampReportChr + RunPeriodString + "Report Variables Requested";
-        ObjexxFCL::gio::write(OutputFileMeters, A) << OutputProcessor::RunPeriodStampReportChr + RunPeriodString + "Meters Requested";
+        print(outputFiles.eso, "{}{}{}\n", OutputProcessor::RunPeriodStampReportChr, RunPeriodString, "Report Variables Requested");
+        print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::RunPeriodStampReportChr, RunPeriodString, "Meters Requested");
 
         AssignReportNumber(OutputProcessor::YearlyStampReportNbr);
         OutputProcessor::YearlyStampReportChr = std::to_string(OutputProcessor::YearlyStampReportNbr);
         strip(OutputProcessor::YearlyStampReportChr);
-        ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::YearlyStampReportChr + YearlyString + "Report Variables Requested";
-        ObjexxFCL::gio::write(OutputFileMeters, A) << OutputProcessor::YearlyStampReportChr + YearlyString + "Meters Requested";
+        print(outputFiles.eso, "{}{}{}\n", OutputProcessor::YearlyStampReportChr, YearlyString, "Report Variables Requested");
+        print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::YearlyStampReportChr, YearlyString, "Meters Requested");
     }
 
-    void ReportWeatherAndTimeInformation(bool &PrintEnvrnStamp) // Set to true when the environment header should be printed
+    void ReportWeatherAndTimeInformation(OutputFiles &outputFiles, bool &PrintEnvrnStamp) // Set to true when the environment header should be printed
     {
 
         // SUBROUTINE INFORMATION:
@@ -5831,8 +5826,6 @@ namespace WeatherManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
-        static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
         //  CHARACTER(len=*), PARAMETER :: TimeStampFormat = "(i3,',',i4,',',i2,',',i2,',',i2)" ! Format descriptor for the date/time stamp
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -5862,23 +5855,23 @@ namespace WeatherManager {
             if (PrintEnvrnStamp) {
 
                 if (PrintEndDataDictionary && DoOutputReporting) {
-                    ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
-                    ObjexxFCL::gio::write(OutputFileMeters, EndOfHeaderFormat);
+                    static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
+                    print(outputFiles.eso, "{}\n", EndOfHeaderString);
+                    print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
                     std::string const &Title(Environment(Envrn).Title);
-                    ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
-                        << EnvironmentReportChr << Title << Latitude << Longitude << TimeZoneNumber << Elevation;
-                    ObjexxFCL::gio::write(OutputFileMeters, EnvironmentStampFormat)
-                        << EnvironmentReportChr << Title << Latitude << Longitude << TimeZoneNumber << Elevation;
+                    static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+                    print(outputFiles.eso, EnvironmentStampFormatStr, EnvironmentReportChr, Title, Latitude, Longitude, TimeZoneNumber, Elevation);
+                    print(outputFiles.mtr, EnvironmentStampFormatStr, EnvironmentReportChr, Title, Latitude, Longitude, TimeZoneNumber, Elevation);
                     PrintEnvrnStamp = false;
                 }
             }
         } // ... end of .NOT.WarmupFlag IF-THEN block.
     }
 
-    void ReadUserWeatherInput()
+    void ReadUserWeatherInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5972,15 +5965,15 @@ namespace WeatherManager {
 
         GetLocationInfo(ErrorsFound);
 
-        GetGroundTemps(ErrorsFound);
+        GetGroundTemps(state, ErrorsFound);
 
-        GetGroundReflectances(ErrorsFound);
+        GetGroundReflectances(state.outputFiles, ErrorsFound);
 
-        GetSnowGroundRefModifiers(ErrorsFound);
+        GetSnowGroundRefModifiers(state.outputFiles, ErrorsFound);
 
         GetWaterMainsTemperatures(ErrorsFound);
 
-        GetWeatherStation(ErrorsFound);
+        GetWeatherStation(state.outputFiles, ErrorsFound);
 
         SetupEnvironmentTypes();
 
@@ -7129,6 +7122,10 @@ namespace WeatherManager {
                     DesDayInput(EnvrnNum).suppressBegEnvReset = true;
                 }
             }
+            // for PerformancePrecisionTradeoffs
+            if (DataEnvironment::forceBeginEnvResetSuppress) {
+                DesDayInput(EnvrnNum).suppressBegEnvReset = true;
+            }
             //   A7,  \field Rain Indicator
             if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {
                 DesDayInput(EnvrnNum).RainInd = 1;
@@ -7976,6 +7973,18 @@ namespace WeatherManager {
                 WPSkyTemperature(Item).IsSchedule = true;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "Brunt")) {
+                WPSkyTemperature(Item).CalculationType = WP_BruntModel;
+                WPSkyTemperature(Item).IsSchedule = false;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "Idso")) {
+                WPSkyTemperature(Item).CalculationType = WP_IdsoModel;
+                WPSkyTemperature(Item).IsSchedule = false;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "BerdahlMartin")) {
+                WPSkyTemperature(Item).CalculationType = WP_BerdahlMartinModel;
+                WPSkyTemperature(Item).IsSchedule = false;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "ClarkAllen")) {
+                WPSkyTemperature(Item).CalculationType = WP_ClarkAllenModel;
+                WPSkyTemperature(Item).IsSchedule = false;
             } else {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + '.');
                 ShowContinueError("...entered value=\"" + cAlphaArgs(2) +
@@ -7983,62 +7992,82 @@ namespace WeatherManager {
                 ErrorsFound = true;
             }
 
-            WPSkyTemperature(Item).ScheduleName = cAlphaArgs(3);
-            if (Environment(Found).KindOfEnvrn == ksRunPeriodWeather || Environment(Found).KindOfEnvrn == ksRunPeriodDesign) {
+            if (WPSkyTemperature(Item).IsSchedule) {
                 WPSkyTemperature(Item).ScheduleName = cAlphaArgs(3);
-                // See if it's a schedule.
-                Found = GetScheduleIndex(cAlphaArgs(3));
-                if (Found == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + '.');
-                    ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
-                    ShowContinueError("...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or "
-                                      "\"Schedule:Constant\" objects.");
-                    ErrorsFound = true;
-                } else {
-                    WPSkyTemperature(Item).IsSchedule = true;
-                    WPSkyTemperature(Item).SchedulePtr = Found;
-                }
-            } else { // See if it's a valid schedule.
-                Found = GetDayScheduleIndex(cAlphaArgs(3));
-                if (Found == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + '.');
-                    ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
-                    ShowContinueError(
-                        "...Should be a single day schedule (\"Schedule:Day:Hourly\", \"Schedule:Day:Interval\", or \"Schedule:Day:List\" objects.");
-                    ErrorsFound = true;
-                } else {
-                    if (envFound != 0) {
-                        schPtr = FindNumberInList(Found, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs);
-                        if (schPtr == 0) {
-                            ++NumSPSiteScheduleNamePtrs;
-                            SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
-                            SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value",
-                                                unitType,
-                                                SPSiteSkyTemperatureScheduleValue(envFound),
-                                                "Zone",
-                                                "Average",
-                                                cAlphaArgs(3));
-                        } else if (SPSiteScheduleUnits(schPtr) != units) {
-                            ++NumSPSiteScheduleNamePtrs;
-                            SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
-                            SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value",
-                                                unitType,
-                                                SPSiteSkyTemperatureScheduleValue(envFound),
-                                                "Zone",
-                                                "Average",
-                                                cAlphaArgs(3));
-                        }
+                if (Environment(Found).KindOfEnvrn == ksRunPeriodWeather ||
+                    Environment(Found).KindOfEnvrn == ksRunPeriodDesign) {
+                    WPSkyTemperature(Item).ScheduleName = cAlphaArgs(3);
+                    // See if it's a schedule.
+                    Found = GetScheduleIndex(cAlphaArgs(3));
+                    if (Found == 0) {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " +
+                                        cAlphaFieldNames(3) + '.');
+                        ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
+                        ShowContinueError(
+                                "...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or "
+                                "\"Schedule:Constant\" objects.");
+                        ErrorsFound = true;
+                    } else {
                         WPSkyTemperature(Item).IsSchedule = true;
                         WPSkyTemperature(Item).SchedulePtr = Found;
                     }
+                } else { // See if it's a valid schedule.
+                    Found = GetDayScheduleIndex(cAlphaArgs(3));
+                    if (Found == 0) {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " +
+                                        cAlphaFieldNames(3) + '.');
+                        ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
+                        ShowContinueError(
+                                "...Should be a single day schedule (\"Schedule:Day:Hourly\", \"Schedule:Day:Interval\", or \"Schedule:Day:List\" objects.");
+                        ErrorsFound = true;
+                    } else {
+                        if (envFound != 0) {
+                            schPtr = FindNumberInList(Found, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs);
+                            if (schPtr == 0) {
+                                ++NumSPSiteScheduleNamePtrs;
+                                SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
+                                SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
+                                SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value", unitType,
+                                                    SPSiteSkyTemperatureScheduleValue(envFound), "Zone", "Average",
+                                                    cAlphaArgs(3));
+                            } else if (SPSiteScheduleUnits(schPtr) != units) {
+                                ++NumSPSiteScheduleNamePtrs;
+                                SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
+                                SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
+                                SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value", unitType,
+                                                    SPSiteSkyTemperatureScheduleValue(envFound), "Zone", "Average",
+                                                    cAlphaArgs(3));
+                            }
+                            WPSkyTemperature(Item).IsSchedule = true;
+                            WPSkyTemperature(Item).SchedulePtr = Found;
+                        }
+                    }
                 }
+            }
+
+            if (!WPSkyTemperature(Item).IsSchedule && !lAlphaFieldBlanks(4)) {
+                if (UtilityRoutines::SameString(cAlphaArgs(4), "Yes")) {
+                    WPSkyTemperature(Item).UseWeatherFileHorizontalIR = true;
+                } else if (UtilityRoutines::SameString(cAlphaArgs(4), "No")) {
+                    WPSkyTemperature(Item).UseWeatherFileHorizontalIR = false;
+                } else {
+                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(4) + '.');
+                    ShowContinueError("...entered value=\"" + cAlphaArgs(4) + "\", should be Yes or No.");
+                    ErrorsFound = true;
+                }
+            } else {
+                WPSkyTemperature(Item).UseWeatherFileHorizontalIR = true;
+            }
+        }
+        for (int envrn = 1; envrn <= NumOfEnvrn; ++envrn) {
+            if (Environment(envrn).WP_Type1 != 0 && NumWPSkyTemperatures >= Environment(envrn).WP_Type1){
+                Environment(envrn).SkyTempModel = WPSkyTemperature(Environment(envrn).WP_Type1).CalculationType;
+                Environment(envrn).UseWeatherFileHorizontalIR = WPSkyTemperature(Environment(envrn).WP_Type1).UseWeatherFileHorizontalIR;
             }
         }
     }
 
-    void GetGroundTemps(bool &ErrorsFound)
+    void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8060,31 +8089,31 @@ namespace WeatherManager {
 
         // FLOW:
         // Initialize Site:GroundTemperature:BuildingSurface object
-        siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
+        siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
         if (siteBuildingSurfaceGroundTempsPtr) {
             ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:FCFactorMethod object
-        siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
+        siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
         if (siteFCFactorMethodGroundTempsPtr) {
             ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Shallow object
-        siteShallowGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:SHALLOW", "");
+        siteShallowGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:SHALLOW", "");
         if (siteShallowGroundTempsPtr) {
             ErrorsFound = siteShallowGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Deep object
-        siteDeepGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:DEEP", "");
+        siteDeepGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:DEEP", "");
         if (siteDeepGroundTempsPtr) {
             ErrorsFound = siteDeepGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
     }
 
-    void GetGroundReflectances(bool &ErrorsFound)
+    void GetGroundReflectances(OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8139,19 +8168,20 @@ namespace WeatherManager {
         }
 
         // Write Final Ground Reflectance Information to the initialization output file
-        ObjexxFCL::gio::write(OutputFileInits, fmtA)
-            << "! "
+        print(outputFiles.eio, "{}\n",
+               "! "
                "<Site:GroundReflectance>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},"
                "May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{"
-               "dimensionless},Nov{dimensionless},Dec{dimensionless}";
-        ObjexxFCL::gio::write(OutputFileInits, "(' ',A,$)") << "Site:GroundReflectance";
+               "dimensionless},Nov{dimensionless},Dec{dimensionless}");
+
+        print(outputFiles.eio, " Site:GroundReflectance");
         for (I = 1; I <= 12; ++I) {
-            ObjexxFCL::gio::write(OutputFileInits, "(', ',F5.2,$)") << GroundReflectances(I);
+            print(outputFiles.eio, ", {:5.2F}", GroundReflectances(I));
         }
-        ObjexxFCL::gio::write(OutputFileInits);
+        print(outputFiles.eio, "\n");
     }
 
-    void GetSnowGroundRefModifiers(bool &ErrorsFound)
+    void GetSnowGroundRefModifiers(OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8177,8 +8207,7 @@ namespace WeatherManager {
         Array1D<Real64> GndProps; // Temporary array to transfer ground reflectances
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_720("(' Site:GroundReflectance:SnowModifier',2(', ',F7.3))");
-        static ObjexxFCL::gio::Fmt Format_721("(A,12(', ',F5.2))");
+       static ObjexxFCL::gio::Fmt Format_721("(A,12(', ',F5.2))");
 
         // FLOW:
         cCurrentModuleObject = "Site:GroundReflectance:SnowModifier";
@@ -8203,29 +8232,30 @@ namespace WeatherManager {
         }
 
         // Write Final Ground Reflectance Modifier Information to the initialization output file
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Site:GroundReflectance:SnowModifier>, Normal, Daylighting {dimensionless}";
-        ObjexxFCL::gio::write(OutputFileInits, Format_720) << SnowGndRefModifier << SnowGndRefModifierForDayltg;
+        print(outputFiles.eio, "{}\n", "! <Site:GroundReflectance:SnowModifier>, Normal, Daylighting {dimensionless}");
+        static constexpr auto Format_720(" Site:GroundReflectance:SnowModifier, {:7.3F}, {:7.3F}\n");
+        print(outputFiles.eio, Format_720, SnowGndRefModifier, SnowGndRefModifierForDayltg);
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA)
-            << "! "
+        print(outputFiles.eio, "{}\n",
+               "! "
                "<Site:GroundReflectance:Snow>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{"
                "dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{"
-               "dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
-        ObjexxFCL::gio::write(OutputFileInits, fmtAN) << " Site:GroundReflectance:Snow";
+               "dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}");
+        print(outputFiles.eio, "{}"," Site:GroundReflectance:Snow");
         for (I = 1; I <= 12; ++I) {
-            ObjexxFCL::gio::write(OutputFileInits, "(', ',F5.2,$)") << max(min(GroundReflectances(I) * SnowGndRefModifier, 1.0), 0.0);
+            print(outputFiles.eio, ", {:5.2F}", max(min(GroundReflectances(I) * SnowGndRefModifier, 1.0), 0.0));
         }
-        ObjexxFCL::gio::write(OutputFileInits);
-        ObjexxFCL::gio::write(OutputFileInits, fmtA)
-            << "! "
-               "<Site:GroundReflectance:Snow:Daylighting>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{"
+        print(outputFiles.eio, "\n");
+        print(outputFiles.eio, "{}\n",
+              "! "
+              "<Site:GroundReflectance:Snow:Daylighting>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{"
                "dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{"
-               "dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
-        ObjexxFCL::gio::write(OutputFileInits, fmtAN) << " Site:GroundReflectance:Snow:Daylighting";
+               "dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}");
+        print(outputFiles.eio, " Site:GroundReflectance:Snow:Daylighting");
         for (I = 1; I <= 12; ++I) {
-            ObjexxFCL::gio::write(OutputFileInits, "(', ',F5.2,$)") << max(min(GroundReflectances(I) * SnowGndRefModifierForDayltg, 1.0), 0.0);
+            print(outputFiles.eio, ", {:5.2F}", max(min(GroundReflectances(I) * SnowGndRefModifierForDayltg, 1.0), 0.0));
         }
-        ObjexxFCL::gio::write(OutputFileInits);
+        print(outputFiles.eio, "\n");
     }
 
     void GetWaterMainsTemperatures(bool &ErrorsFound)
@@ -8405,7 +8435,7 @@ namespace WeatherManager {
         // Convert F to C
         return (CurrentWaterMainsTemp - 32.0) * (5.0 / 9.0);
     }
-    void GetWeatherStation(bool &ErrorsFound)
+    void GetWeatherStation(OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8433,8 +8463,6 @@ namespace WeatherManager {
         Real64 WeatherFileWindBLHeight;     // Boundary layer height for the wind velocity profile at the weather station (m)
         Real64 WeatherFileTempSensorHeight; // Height of the air temperature sensor at the weather station (m)
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_720("('Environment:Weather Station',6(',',A))");
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // na
@@ -8466,15 +8494,21 @@ namespace WeatherManager {
         WeatherFileTempModCoeff = AtmosphericTempGradient * EarthRadius * WeatherFileTempSensorHeight / (EarthRadius + WeatherFileTempSensorHeight);
 
         // Write to the initialization output file
-        ObjexxFCL::gio::write(OutputFileInits, fmtA)
-            << "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m},Wind Speed Profile Exponent "
+        print(outputFiles.eio, "{}\n",
+               "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m},Wind Speed Profile Exponent "
                "{},Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Sensor Height Above Ground {m},Wind "
-               "Speed Modifier Coefficient-Internal,Temperature Modifier Coefficient-Internal";
+               "Speed Modifier Coefficient-Internal,Temperature Modifier Coefficient-Internal");
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_720)
-            << RoundSigDigits(WeatherFileWindSensorHeight, 3) << RoundSigDigits(WeatherFileWindExp, 3) << RoundSigDigits(WeatherFileWindBLHeight, 3)
-            << RoundSigDigits(WeatherFileTempSensorHeight, 3) << RoundSigDigits(WeatherFileWindModCoeff, 3)
-            << RoundSigDigits(WeatherFileTempModCoeff, 3);
+        // Formats
+        static constexpr auto Format_720("Environment:Weather Station,{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+        print(outputFiles.eio,
+              Format_720,
+              WeatherFileWindSensorHeight,
+              WeatherFileWindExp,
+              WeatherFileWindBLHeight,
+              WeatherFileTempSensorHeight,
+              WeatherFileWindModCoeff,
+              WeatherFileTempModCoeff);
     }
 
     void DayltgCurrentExtHorizIllum()
@@ -8761,6 +8795,7 @@ namespace WeatherManager {
         // Using/Aliasing
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -9470,6 +9505,7 @@ namespace WeatherManager {
         // List directed reads, as possible.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const Header("DATA PERIODS");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -9564,7 +9600,7 @@ namespace WeatherManager {
 
     Label9998:;
         ShowFatalError("Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header,
-                       OutputFileStandard);
+                       OptionalOutputFileRef{OutputFiles::getSingleton().eso});
     }
 
     void ReportMissing_RangeData()
@@ -9595,11 +9631,11 @@ namespace WeatherManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const MissString("Missing Data Found on Weather Data File");
-        static ObjexxFCL::gio::Fmt msFmt("('Missing ',A,', Number of items=',I5)");
+        static constexpr auto msFmt("Missing {}, Number of items={:5}");
         static std::string const InvString("Invalid Data Found on Weather Data File");
-        static ObjexxFCL::gio::Fmt ivFmt("('Invalid ',A,', Number of items=',I5)");
+        static constexpr auto ivFmt("Invalid {}, Number of items={:5}");
         static std::string const RangeString("Out of Range Data Found on Weather Data File");
-        static ObjexxFCL::gio::Fmt rgFmt("('Out of Range ',A,' [',A,',',A,'], Number of items=',I5)");
+        static constexpr auto rgFmt("Out of Range {} [{},{}], Number of items={:5}");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -9610,7 +9646,6 @@ namespace WeatherManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool MissedHeader;
         bool OutOfRangeHeader;
-        std::string ErrString;
 
         if (!DisplayWeatherMissingDataWarnings) return;
 
@@ -9620,64 +9655,56 @@ namespace WeatherManager {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Dry Bulb Temperatures\"" << Missed.DryBulb;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Dry Bulb Temperatures\"", Missed.DryBulb));
         }
         if (Missed.StnPres > 0) {
             if (!MissedHeader) {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Atmospheric Pressure\"" << Missed.StnPres;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Atmospheric Pressure\"", Missed.StnPres));
         }
         if (Missed.RelHumid > 0) {
             if (!MissedHeader) {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Relative Humidity\"" << Missed.RelHumid;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Relative Humidity\"", Missed.RelHumid));
         }
         if (Missed.DewPoint > 0) {
             if (!MissedHeader) {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Dew Point Temperatures\"" << Missed.DewPoint;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Dew Point Temperatures\"", Missed.DewPoint));
         }
         if (Missed.WindSpd > 0) {
             if (!MissedHeader) {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Wind Speed\"" << Missed.WindSpd;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Wind Speed\"", Missed.WindSpd));
         }
         if (Missed.WindDir > 0) {
             if (!MissedHeader) {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Wind Direction\"" << Missed.WindDir;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Wind Direction\"", Missed.WindDir));
         }
         if (Missed.DirectRad > 0) {
             if (!MissedHeader) {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Direct Radiation\"" << Missed.DirectRad;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Direct Radiation\"", Missed.DirectRad));
         }
         if (Missed.DiffuseRad > 0) {
             if (!MissedHeader) {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Diffuse Radiation\"" << Missed.DiffuseRad;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Diffuse Radiation\"", Missed.DiffuseRad));
         }
         //  IF (Missed%Visibility>0) THEN
         //    IF (.not. MissedHeader) THEN
@@ -9700,16 +9727,14 @@ namespace WeatherManager {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Total Sky Cover\"" << Missed.TotSkyCvr;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Total Sky Cover\"", Missed.TotSkyCvr));
         }
         if (Missed.OpaqSkyCvr > 0) {
             if (!MissedHeader) {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Opaque Sky Cover\"" << Missed.OpaqSkyCvr;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Opaque Sky Cover\"", Missed.OpaqSkyCvr));
         }
         //  IF (Missed%Ceiling>0) THEN
         //    IF (.not. MissedHeader) THEN
@@ -9732,13 +9757,11 @@ namespace WeatherManager {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Snow Depth\"" << Missed.SnowDepth;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Snow Depth\"", Missed.SnowDepth));
         }
         if (Missed.WeathCodes > 0) {
             ShowWarningError(InvString);
-            ObjexxFCL::gio::write(ErrString, ivFmt) << "\"Weather Codes\" (not equal 9 digits)" << Missed.WeathCodes;
-            ShowMessage(ErrString);
+            ShowMessage(format(ivFmt, "\"Weather Codes\" (not equal 9 digits)", Missed.WeathCodes));
         }
         //  IF (Missed%Albedo>0) THEN
         //    IF (.not. MissedHeader) THEN
@@ -9753,8 +9776,7 @@ namespace WeatherManager {
                 ShowWarningError(MissString);
                 MissedHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, msFmt) << "\"Liquid Precipitation Depth\"" << Missed.LiquidPrecip;
-            ShowMessage(ErrString);
+            ShowMessage(format(msFmt, "\"Liquid Precipitation Depth\"", Missed.LiquidPrecip));
         }
         //  IF (Missed%DaysLastSnow>0) THEN
         //    IF (.not. MissedHeader) THEN
@@ -9771,20 +9793,14 @@ namespace WeatherManager {
                 ShowWarningError(RangeString);
                 OutOfRangeHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, rgFmt) << "Dry Bulb Temperatures"
-                                                    << ">=-90"
-                                                    << "<=70" << OutOfRange.DryBulb;
-            ShowMessage(ErrString);
+            ShowMessage(format(rgFmt, "Dry Bulb Temperatures", ">=-90", "<=70", OutOfRange.DryBulb));
         }
         if (OutOfRange.StnPres > 0) {
             if (!OutOfRangeHeader) {
                 ShowWarningError(RangeString);
                 OutOfRangeHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, rgFmt) << "Atmospheric Pressure"
-                                                    << ">31000"
-                                                    << "<=120000" << OutOfRange.StnPres;
-            ShowMessage(ErrString);
+            ShowMessage(format(rgFmt, "Atmospheric Pressure", ">31000", "<=120000", OutOfRange.StnPres));
             ShowMessage("Out of Range values set to last good value");
         }
         if (OutOfRange.RelHumid > 0) {
@@ -9792,60 +9808,42 @@ namespace WeatherManager {
                 ShowWarningError(RangeString);
                 OutOfRangeHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, rgFmt) << "Relative Humidity"
-                                                    << ">=0"
-                                                    << "<=110" << OutOfRange.RelHumid;
-            ShowMessage(ErrString);
+            ShowMessage(format(rgFmt, "Relative Humidity", ">=0", "<=110", OutOfRange.RelHumid));
         }
         if (OutOfRange.DewPoint > 0) {
             if (!OutOfRangeHeader) {
                 ShowWarningError(RangeString);
                 OutOfRangeHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, rgFmt) << "Dew Point Temperatures"
-                                                    << ">=-90"
-                                                    << "<=70" << OutOfRange.DewPoint;
-            ShowMessage(ErrString);
+            ShowMessage(format(rgFmt, "Dew Point Temperatures", ">=-90", "<=70", OutOfRange.DewPoint));
         }
         if (OutOfRange.WindSpd > 0) {
             if (!OutOfRangeHeader) {
                 ShowWarningError(RangeString);
                 OutOfRangeHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, rgFmt) << "Wind Speed"
-                                                    << ">=0"
-                                                    << "<=40" << OutOfRange.WindSpd;
-            ShowMessage(ErrString);
+            ShowMessage(format(rgFmt, "Wind Speed", ">=0", "<=40", OutOfRange.WindSpd));
         }
         if (OutOfRange.WindDir > 0) {
             if (!OutOfRangeHeader) {
                 ShowWarningError(RangeString);
                 OutOfRangeHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, rgFmt) << "Wind Direction"
-                                                    << ">=0"
-                                                    << "<=360" << OutOfRange.WindDir;
-            ShowMessage(ErrString);
+            ShowMessage(format(rgFmt, "Wind Direction", ">=0", "<=360", OutOfRange.WindDir));
         }
         if (OutOfRange.DirectRad > 0) {
             if (!OutOfRangeHeader) {
                 ShowWarningError(RangeString);
                 OutOfRangeHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, rgFmt) << "Direct Radiation"
-                                                    << ">=0"
-                                                    << "NoLimit" << OutOfRange.DirectRad;
-            ShowMessage(ErrString);
+            ShowMessage(format(rgFmt, "Direct Radiation", ">=0", "NoLimit", OutOfRange.DirectRad));
         }
         if (OutOfRange.DiffuseRad > 0) {
             if (!OutOfRangeHeader) {
                 ShowWarningError(RangeString);
                 OutOfRangeHeader = true;
             }
-            ObjexxFCL::gio::write(ErrString, rgFmt) << "Diffuse Radiation"
-                                                    << ">=0"
-                                                    << "NoLimit" << OutOfRange.DiffuseRad;
-            ShowMessage(ErrString);
+            ShowMessage(format(rgFmt, "Diffuse Radiation", ">=0", "NoLimit", OutOfRange.DiffuseRad));
         }
     }
 
@@ -10727,8 +10725,12 @@ namespace WeatherManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string const cCalculationMethod({1, 3}, {"Schedule", "Correlation", "CorrelationFromWeatherFile"});
 
-        if (!DataGlobals::eio_stream) return;
-        std::ostream *eiostream = DataGlobals::eio_stream;
+        if (!OutputFiles::getSingleton().eio.good()) {
+            return;
+        }
+
+        std::stringstream ss;
+        auto *eiostream = &ss;
 
         // Write annual average OA temperature and maximum difference in monthly-daily average outdoor air temperature
         *eiostream << "! <Site Water Mains Temperature Information>"
@@ -10736,8 +10738,7 @@ namespace WeatherManager {
                       ",Water Mains Temperature Schedule Name{}"
                       ",Annual Average Outdoor Air Temperature{C}"
                       ",Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC}"
-                      ",Fixed Default Water Mains Temperature{C}" +
-                          DataStringGlobals::NL;
+                      ",Fixed Default Water Mains Temperature{C}\n";
 
         {
             auto const SELECT_CASE_var(WaterMainsTempsMethod);
@@ -10745,14 +10746,14 @@ namespace WeatherManager {
                 *eiostream << "Site Water Mains Temperature Information,";
                 *eiostream << cCalculationMethod(WaterMainsTempsMethod) << "," << WaterMainsTempsScheduleName << ",";
                 *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2) << ",";
-                *eiostream << "NA" << DataStringGlobals::NL;
+                *eiostream << "NA\n";
             } else if (SELECT_CASE_var == CorrelationMethod) {
                 *eiostream << "Site Water Mains Temperature Information,";
                 *eiostream << cCalculationMethod(WaterMainsTempsMethod) << ","
                            << "NA"
                            << ",";
                 *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2) << ",";
-                *eiostream << "NA" << DataStringGlobals::NL;
+                *eiostream << "NA\n";
             } else if (SELECT_CASE_var == CorrelationFromWeatherFileMethod) {
                 if (OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                     *eiostream << "Site Water Mains Temperature Information,";
@@ -10761,7 +10762,7 @@ namespace WeatherManager {
                                << ",";
                     *eiostream << RoundSigDigits(OADryBulbAverage.AnnualAvgOADryBulbTemp, 2) << ","
                                << RoundSigDigits(OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 2) << ","
-                               << "NA" << DataStringGlobals::NL;
+                               << "NA\n";
                 } else {
                     *eiostream << "Site Water Mains Temperature Information,";
                     *eiostream << "FixedDefault"
@@ -10771,7 +10772,7 @@ namespace WeatherManager {
                                << "NA"
                                << ","
                                << "NA"
-                               << "," << RoundSigDigits(10.0, 1) << DataStringGlobals::NL;
+                               << "," << RoundSigDigits(10.0, 1) << '\n';
                 }
             } else {
                 *eiostream << "Site Water Mains Temperature Information,";
@@ -10782,9 +10783,11 @@ namespace WeatherManager {
                            << "NA"
                            << ","
                            << "NA"
-                           << "," << RoundSigDigits(10.0, 1) << DataStringGlobals::NL;
+                           << "," << RoundSigDigits(10.0, 1) << '\n';
             }
         }
+
+        print(OutputFiles::getSingleton().eio, "{}", ss.str());
     }
 } // namespace WeatherManager
 

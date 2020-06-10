@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -366,11 +367,11 @@ namespace RefrigeratedCase {
 
         void ReportRackSystem(int RackNum);
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
     struct RefrigSystemData
@@ -860,11 +861,11 @@ namespace RefrigeratedCase {
 
         void UpdateCondenser();
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
     struct RefrigGasCoolerData
@@ -1456,7 +1457,7 @@ namespace RefrigeratedCase {
         Real64 LatKgPerS_ToZoneRate; // Latent water to zone on sys time step from coils, neg when water removed (kg/s)
         Real64 SenCreditToZoneRate;  // Net sensible credit to zone on sys time step from coil (W)
         Real64 SenCreditToZoneEnergy;
-        Real64 ReportH20RemovedKgPerS_FromZoneRate; // same but positive for reporting purposes (kg/s)
+        Real64 ReportH2ORemovedKgPerS_FromZoneRate; // same but positive for reporting purposes (kg/s)
         Real64 ReportLatCreditToZoneRate;           // Positive for reporting Net latent credit to zone on sys time step from coil (W)
         Real64 ReportLatCreditToZoneEnergy;
         Real64 ReportHeatingToZoneRate; // Positive for reporting Net sensible credit to zone on sys time step from coil (W)
@@ -1469,7 +1470,7 @@ namespace RefrigeratedCase {
         // Default Constructor
         CoilCreditData()
             : LatCreditToZoneRate(0.0), LatCreditToZoneEnergy(0.0), LatKgPerS_ToZoneRate(0.0), SenCreditToZoneRate(0.0), SenCreditToZoneEnergy(0.0),
-              ReportH20RemovedKgPerS_FromZoneRate(0.0), ReportLatCreditToZoneRate(0.0), ReportLatCreditToZoneEnergy(0.0),
+              ReportH2ORemovedKgPerS_FromZoneRate(0.0), ReportLatCreditToZoneRate(0.0), ReportLatCreditToZoneEnergy(0.0),
               ReportHeatingToZoneRate(0.0), ReportHeatingToZoneEnergy(0.0), ReportSenCoolingToZoneRate(0.0), ReportSenCoolingToZoneEnergy(0.0),
               ReportTotCoolingToZoneRate(0.0), ReportTotCoolingToZoneEnergy(0.0)
         {
@@ -1483,7 +1484,7 @@ namespace RefrigeratedCase {
             LatKgPerS_ToZoneRate = 0.0;
             SenCreditToZoneRate = 0.0;
             SenCreditToZoneEnergy = 0.0;
-            ReportH20RemovedKgPerS_FromZoneRate = 0.0;
+            ReportH2ORemovedKgPerS_FromZoneRate = 0.0;
             ReportLatCreditToZoneRate = 0.0;
             ReportLatCreditToZoneEnergy = 0.0;
             ReportHeatingToZoneRate = 0.0;
@@ -1517,9 +1518,9 @@ namespace RefrigeratedCase {
 
     // Functions
 
-    void ManageRefrigeratedCaseRacks();
+    void ManageRefrigeratedCaseRacks(EnergyPlusData &state);
 
-    void GetRefrigerationInput();
+    void GetRefrigerationInput(EnergyPlusData &state);
 
     void SetupReportInput();
 
@@ -1531,20 +1532,20 @@ namespace RefrigeratedCase {
 
     void SimulateDetailedTransRefrigSystems();
 
-    void GetRefrigeratedRackIndex(std::string const &Name,
+    void GetRefrigeratedRackIndex(EnergyPlusData &state, std::string const &Name,
                                   int &IndexPtr,
                                   int SysType,
                                   bool &ErrorsFound,
                                   Optional_string_const ThisObjectType = _,
                                   const Optional_bool_const &SuppressWarning = _);
 
-    void ReportRefrigerationComponents();
+    void ReportRefrigerationComponents(OutputFiles &outputFiles);
 
     void SumZoneImpacts();
 
-    void CheckRefrigerationInput();
+    void CheckRefrigerationInput(EnergyPlusData &state);
 
-    void SimAirChillerSet(std::string const &AirChillerSetName,
+    void SimAirChillerSet(EnergyPlusData &state, std::string const &AirChillerSetName,
                           int ZoneNum,
                           bool FirstHVACIteration,
                           Real64 &SysOutputProvided,
@@ -1559,7 +1560,7 @@ namespace RefrigeratedCase {
                         Real64 AvailableTotalLoad // Load that system or secondary loop is able to serve [W]
     );
 
-    void FigureRefrigerationZoneGains();
+    void FigureRefrigerationZoneGains(EnergyPlusData &state);
 
     void ZeroHVACValues();
 

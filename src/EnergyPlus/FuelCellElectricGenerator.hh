@@ -413,7 +413,7 @@ namespace FuelCellElectricGenerator {
         Real64 HXenergy;           // energy from gas stream to water [J]
         Real64 THXexh;             // temperature of exhaust gases leaving heat exchanger.
         Real64 WaterVaporFractExh; // water vapor fraction in exhaust gas stream
-        // relative to water vapor entering HX  (NdotH20/Ndoaux-mix)
+        // relative to water vapor entering HX  (NdotH2O/Ndoaux-mix)
         Real64 CondensateRate;     // water condensation rate [kmol/s]
         int SeqSubstIterations;    // number of iterations in SOFC loop
         int RegulaFalsiIterations; // number of iterations in Tproduct gas solving
@@ -548,7 +548,7 @@ namespace FuelCellElectricGenerator {
 
         void setupOutputVars();
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void FigureAirHeatCap(Real64 FluidTemp, Real64 &Cp);
 
@@ -573,7 +573,7 @@ namespace FuelCellElectricGenerator {
                                         Real64 &PelDiff    // if constrained then this is the difference, positive
         );
 
-        Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, Array1<Real64> const &Par);
+        Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, Array1D<Real64> const &Par);
 
         static void FigureGaseousWaterEnthalpy(Real64 FluidTemp, Real64 &HGasWater);
 

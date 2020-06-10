@@ -54,9 +54,10 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-
+    class OutputFiles;
 namespace SizingManager {
 
     // Using/Aliasing
@@ -91,9 +92,17 @@ namespace SizingManager {
     // Functions
     void clear_state();
 
-    void ManageSizing();
+    void ManageSizing(EnergyPlusData &state);
 
-    void ManageSystemSizingAdjustments();
+    bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
+                                     bool const WarmupFlag,
+                                     int const HourOfDay,
+                                     int const TimeStep,
+                                     int const KindOfSim,
+                                     int const DayOfSim
+                                     );
+
+    void ManageSystemSizingAdjustments(EnergyPlusData &state);
 
     void ManageSystemVentilationAdjustments();
 
@@ -103,14 +112,14 @@ namespace SizingManager {
 
     void ProcessInputOARequirements(std::string const &cCurrentModuleObject,
                                     int const OAIndex,
-                                    Array1_string const &cAlphaArgs,
+                                    Array1D_string const &cAlphaArgs,
                                     int &NumAlphas,
-                                    Array1<Real64> const &rNumericArgs,
+                                    Array1D<Real64> const &rNumericArgs,
                                     int &NumNumbers,
-                                    Array1_bool const &lNumericFieldBlanks, // Unused
-                                    Array1_bool const &lAlphaFieldBlanks,
-                                    Array1_string const &cAlphaFieldNames,
-                                    Array1_string const &cNumericFieldNames, // Unused
+                                    Array1D_bool const &lNumericFieldBlanks, // Unused
+                                    Array1D_bool const &lAlphaFieldBlanks,
+                                    Array1D_string const &cAlphaFieldNames,
+                                    Array1D_string const &cNumericFieldNames, // Unused
                                     bool &ErrorsFound                        // If errors found in input
     );
 
@@ -120,7 +129,7 @@ namespace SizingManager {
 
     void GetAirTerminalSizing();
 
-    void GetSizingParams();
+    void GetSizingParams(OutputFiles &outputFiles);
 
     void GetZoneSizingInput();
 
@@ -131,9 +140,10 @@ namespace SizingManager {
 
     void GetPlantSizingInput();
 
-    void SetupZoneSizing(bool &ErrorsFound);
+    void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound);
 
-    void ReportZoneSizing(std::string const &ZoneName,   // the name of the zone
+    void ReportZoneSizing(OutputFiles &outputFiles,
+                          std::string const &ZoneName,   // the name of the zone
                           std::string const &LoadType,   // the description of the input variable
                           Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
                           Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
@@ -149,7 +159,8 @@ namespace SizingManager {
                           Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
     );
 
-    void ReportSysSizing(std::string const &SysName,      // the name of the zone
+    void ReportSysSizing(OutputFiles &outputFiles,
+                         std::string const &SysName,      // the name of the zone
                          std::string const &LoadType,     // either "Cooling" or "Heating"
                          std::string const &PeakLoadType, // either "Sensible" or "Total"
                          Real64 const &UserDesCap,        // User  Design Capacity
@@ -162,7 +173,7 @@ namespace SizingManager {
 
     std::string TimeIndexToHrMinString(int timeIndex);
 
-    void UpdateFacilitySizing(int const CallIndicator);
+    void UpdateFacilitySizing(DataGlobal const &dataGlobals, int const CallIndicator);
 
     void UpdateTermUnitFinalZoneSizing();
 

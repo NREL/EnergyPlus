@@ -65,12 +65,12 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
@@ -91,8 +91,6 @@ namespace RuntimeLanguageProcessor {
     // METHODOLOGY EMPLOYED:
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::OutputFileDebug;
     using namespace DataRuntimeLanguage;
 
     // Data
@@ -165,9 +163,6 @@ namespace RuntimeLanguageProcessor {
     int ActualDateAndTimeNum(0);
     int ActualTimeNum(0);
     int WarmUpFlagNum(0);
-
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     // SUBROUTINE SPECIFICATIONS:
 
@@ -442,15 +437,15 @@ namespace RuntimeLanguageProcessor {
             EMSActuatorVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
             ErlVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
             ErlVariable(ErlVariableNum).Value.Type = ValueNull;
-            EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
+            *EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
             {
                 auto const SELECT_CASE_var(EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed);
                 if (SELECT_CASE_var == PntrReal) {
-                    EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = 0.0;
+                    *EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = 0.0;
                 } else if (SELECT_CASE_var == PntrInteger) {
-                    EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = 0;
+                    *EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = 0;
                 } else if (SELECT_CASE_var == PntrLogical) {
-                    EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
+                    *EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
                 }
             }
         }
@@ -467,7 +462,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    void ParseStack(int const StackNum)
+    void ParseStack(OutputFiles &outputFiles, int const StackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -557,16 +552,16 @@ namespace RuntimeLanguageProcessor {
                 auto const SELECT_CASE_var(Keyword);
 
                 if (SELECT_CASE_var == "RETURN") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "RETURN \"" + Line + "\"";
+                    if (DeveloperFlag) print(outputFiles.debug, "RETURN \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn);
                     } else {
-                        ParseExpression(Remainder, StackNum, ExpressionNum, Line);
+                        ParseExpression(outputFiles, Remainder, StackNum, ExpressionNum, Line);
                         InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn, ExpressionNum);
                     }
 
                 } else if (SELECT_CASE_var == "SET") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "SET \"" + Line + "\"";
+                    if (DeveloperFlag) print(outputFiles.debug, "SET \"{}\"\n", Line);
                     Pos = scan(Remainder, '=');
                     if (Pos == std::string::npos) {
                         AddError(StackNum, LineNum, "Equal sign missing for the SET instruction.");
@@ -585,13 +580,13 @@ namespace RuntimeLanguageProcessor {
                         if (Expression.empty()) {
                             AddError(StackNum, LineNum, "Expression missing for the SET instruction.");
                         } else {
-                            ParseExpression(Expression, StackNum, ExpressionNum, Line);
+                            ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
                             InstructionNum = AddInstruction(StackNum, LineNum, KeywordSet, VariableNum, ExpressionNum);
                         }
                     }
 
                 } else if (SELECT_CASE_var == "RUN") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "RUN \"" + Line + "\"";
+                    if (DeveloperFlag) print(outputFiles.debug, "RUN \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction.");
                     } else {
@@ -608,14 +603,16 @@ namespace RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == "IF") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "IF \"" + Line + "\"";
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "NestedIf=" << NestedIfDepth;
+                    if (DeveloperFlag) {
+                        print(outputFiles.debug, "IF \"{}\"\n", Line);
+                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                    }
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Expression missing for the IF instruction.");
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     ++NestedIfDepth;
@@ -630,8 +627,10 @@ namespace RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == "ELSEIF") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ELSEIF \"" + Line + "\"";
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "NestedIf=" << NestedIfDepth;
+                    if (DeveloperFlag) {
+                        print(outputFiles.debug, "ELSEIF \"{}\"\n", Line);
+                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                    }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ELSEIF instruction.");
                         break; // Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
@@ -652,7 +651,7 @@ namespace RuntimeLanguageProcessor {
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     InstructionNum = AddInstruction(StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
@@ -660,8 +659,10 @@ namespace RuntimeLanguageProcessor {
                     SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
                 } else if (SELECT_CASE_var == "ELSE") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ELSE \"" + Line + "\"";
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "NestedIf=" << NestedIfDepth;
+                    if (DeveloperFlag) {
+                        print(outputFiles.debug, "ELSE \"{}\"\n", Line);
+                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                    }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ELSE instruction.");
                         break; // Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
@@ -690,8 +691,10 @@ namespace RuntimeLanguageProcessor {
                     SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
                 } else if (SELECT_CASE_var == "ENDIF") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ENDIF \"" + Line + "\"";
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "NestedIf=" << NestedIfDepth;
+                    if (DeveloperFlag) {
+                        print(outputFiles.debug, "ENDIF \"{}\"\n", Line);
+                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                    }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ENDIF instruction.");
                         break; // PE Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
@@ -722,13 +725,13 @@ namespace RuntimeLanguageProcessor {
                     --NestedIfDepth;
 
                 } else if (SELECT_CASE_var == "WHILE") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "WHILE \"" + Line + "\"";
+                    if (DeveloperFlag) print(outputFiles.debug, "WHILE \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Expression missing for the WHILE instruction.");
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     ++NestedWhileDepth;
@@ -742,7 +745,7 @@ namespace RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == "ENDWHILE") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ENDWHILE \"" + Line + "\"";
+                    if (DeveloperFlag) print(outputFiles.debug, "ENDWHILE \"{}\"\n", Line);
                     if (NestedWhileDepth == 0) {
                         AddError(StackNum, LineNum, "Starting WHILE instruction missing for the ENDWHILE instruction.");
                         break;
@@ -761,7 +764,7 @@ namespace RuntimeLanguageProcessor {
                     SavedWhileExpressionNum = 0;
 
                 } else {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ERROR \"" + Line + "\"";
+                    if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", Line);
                     AddError(StackNum, LineNum, "Unknown keyword [" + Keyword + "].");
                 }
             }
@@ -772,7 +775,7 @@ namespace RuntimeLanguageProcessor {
         if (NestedIfDepth == 1) {
             AddError(StackNum, 0, "Missing an ENDIF instruction needed to terminate an earlier IF instruction.");
         } else if (NestedIfDepth > 1) {
-            AddError(StackNum, 0, "Missing " + IntegerToString(NestedIfDepth) + " ENDIF instructions needed to terminate earlier IF instructions.");
+            AddError(StackNum, 0, "Missing " + fmt::to_string(NestedIfDepth) + " ENDIF instructions needed to terminate earlier IF instructions.");
         }
 
         //  ALLOCATE(DummyError(ErlStack(StackNum)%NumErrors))
@@ -870,13 +873,13 @@ namespace RuntimeLanguageProcessor {
 
         ErrorNum = ErlStack(StackNum).NumErrors;
         if (LineNum > 0) {
-            ErlStack(StackNum).Error(ErrorNum) = "Line " + IntegerToString(LineNum) + ":  " + Error + " \"" + ErlStack(StackNum).Line(LineNum) + "\"";
+            ErlStack(StackNum).Error(ErrorNum) = "Line " + fmt::to_string(LineNum) + ":  " + Error + " \"" + ErlStack(StackNum).Line(LineNum) + "\"";
         } else {
             ErlStack(StackNum).Error(ErrorNum) = Error;
         }
     }
 
-    ErlValueType EvaluateStack(int const StackNum)
+    ErlValueType EvaluateStack(OutputFiles &outputFiles, int const StackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -920,7 +923,7 @@ namespace RuntimeLanguageProcessor {
                     if (ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
                         ReturnValue = EvaluateExpression(ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
 
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     break; // RETURN always terminates an instruction stack
 
                 } else if (SELECT_CASE_var == KeywordSet) {
@@ -934,13 +937,13 @@ namespace RuntimeLanguageProcessor {
                         ErlVariable(VariableNum).Value.Error = ReturnValue.Error;
                     }
 
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordRun) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    ReturnValue = EvaluateStack(ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    ReturnValue = EvaluateStack(outputFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
 
                 } else if ((SELECT_CASE_var == KeywordIf) || (SELECT_CASE_var == KeywordElse)) { // same???
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
@@ -948,7 +951,7 @@ namespace RuntimeLanguageProcessor {
 
                     if (ExpressionNum > 0) { // could be 0 if this was an ELSE
                         ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
-                        WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                             // Eventually should handle strings and arrays too
                             InstructionNum = InstructionNum2;
@@ -958,7 +961,7 @@ namespace RuntimeLanguageProcessor {
                         // KeywordELSE  -- kind of a kludge
                         ReturnValue.Type = ValueNumber;
                         ReturnValue.Number = 1.0;
-                        WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     }
 
                 } else if (SELECT_CASE_var == KeywordGoto) {
@@ -974,14 +977,14 @@ namespace RuntimeLanguageProcessor {
                 } else if (SELECT_CASE_var == KeywordEndIf) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordWhile) {
                     // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
                     ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
-                    WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                         // Eventually should handle strings and arrays too
                         InstructionNum = InstructionNum2;
@@ -995,7 +998,7 @@ namespace RuntimeLanguageProcessor {
                     ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
                     if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
                         // Eventually should handle strings and arrays too
-                        WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
+                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
                         InstructionNum = InstructionNum2;
                         ++WhileLoopExitCounter;
 
@@ -1005,11 +1008,11 @@ namespace RuntimeLanguageProcessor {
                             WhileLoopExitCounter = 0;
                             ReturnValue.Type = ValueError;
                             ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
-                            WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                            WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         } else {
                             ReturnValue.Type = ValueNumber;
                             ReturnValue.Number = 0.0;
-                            WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                            WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                             WhileLoopExitCounter = 0;
                         }
                     }
@@ -1024,7 +1027,8 @@ namespace RuntimeLanguageProcessor {
         return ReturnValue;
     }
 
-    void WriteTrace(int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound)
+    void
+    WriteTrace(OutputFiles &outputFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1042,7 +1046,6 @@ namespace RuntimeLanguageProcessor {
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
         using DataGlobals::DoingSizing;
-        using DataGlobals::OutputFileDebug;
         using DataGlobals::WarmupFlag;
         using General::CreateSysTimeIntervalString;
 
@@ -1068,15 +1071,15 @@ namespace RuntimeLanguageProcessor {
         }
 
         if (!MyOneTimeFlag) {
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "****  Begin EMS Language Processor Error and Trace Output  *** ";
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "<Erl program name, line #, line text, result, occurrence timing information ... >";
+            print(outputFiles.edd, "****  Begin EMS Language Processor Error and Trace Output  *** \n");
+            print(outputFiles.edd, "<Erl program name, line #, line text, result, occurrence timing information ... >\n");
             MyOneTimeFlag = true;
         }
         // if have not return'd yet then write out full trace
 
         NameString = ErlStack(StackNum).Name;
         LineNum = ErlStack(StackNum).Instruction(InstructionNum).LineNum;
-        LineNumString = IntegerToString(LineNum);
+        LineNumString = fmt::to_string(LineNum);
         LineString = ErlStack(StackNum).Line(LineNum);
         cValueString = ValueToString(ReturnValue);
 
@@ -1097,8 +1100,7 @@ namespace RuntimeLanguageProcessor {
         TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
         if (OutputFullEMSTrace || (OutputEMSErrors && (ReturnValue.Type == ValueError))) {
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' +
-                                                          TimeString;
+            print(outputFiles.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
         }
 
         if (seriousErrorFound) { // throw EnergyPlus severe then fatal
@@ -1118,7 +1120,8 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(std::string const &InString, // String of expression text written in the Runtime Language
+    void ParseExpression(OutputFiles &outputFiles,
+                         std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
                          std::string const &Line      // Actual line from string
@@ -1280,9 +1283,9 @@ namespace RuntimeLanguageProcessor {
                 if (!ErrorFlag) {
                     Token(NumTokens).Type = TokenNumber;
                     Token(NumTokens).String = StringToken;
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "Number=\"" + StringToken + "\"";
+                    if (DeveloperFlag) print(outputFiles.debug, "Number=\"{}\"\n", StringToken);
                     Token(NumTokens).Number = UtilityRoutines::ProcessNumber(StringToken, ErrorFlag);
-                    if (DeveloperFlag && ErrorFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "Numeric error flagged";
+                    if (DeveloperFlag && ErrorFlag) print(outputFiles.debug, "{}\n", "Numeric error flagged");
                     if (MinusFound) {
                         Token(NumTokens).Number = -Token(NumTokens).Number;
                         MinusFound = false;
@@ -1321,7 +1324,7 @@ namespace RuntimeLanguageProcessor {
                 // Save the variable token
                 Token(NumTokens).Type = TokenVariable;
                 Token(NumTokens).String = StringToken;
-                if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "Variable=\"" + StringToken + "\"";
+                if (DeveloperFlag) print(outputFiles.debug, "Variable=\"{}\"\n", StringToken);
                 Token(NumTokens).Variable = NewEMSVariable(StringToken, StackNum);
 
             } else if (is_any_of(NextChar, "+-*/^=<>@|&")) {
@@ -1360,314 +1363,65 @@ namespace RuntimeLanguageProcessor {
                     Token(NumTokens).Type = TokenOperator;
                 }
 
-                // First check for two character operators:  == <> <= >=
-                std::string const cc(String.substr(Pos, 2));
-                if (cc == "==") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 2) + "\"";
-                    Token(NumTokens).Operator = OperatorEqual;
-                    Token(NumTokens).String = String.substr(Pos, 2);
-                    OperatorProcessing = true;
-                    ++Pos;
-                } else if (cc == "<>") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 2) + "\"";
-                    Token(NumTokens).Operator = OperatorNotEqual;
-                    Token(NumTokens).String = String.substr(Pos, 2);
-                    OperatorProcessing = true;
-                    ++Pos;
-                } else if (cc == "<=") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 2) + "\"";
-                    Token(NumTokens).Operator = OperatorLessOrEqual;
-                    Token(NumTokens).String = String.substr(Pos, 2);
-                    OperatorProcessing = true;
-                    ++Pos;
-                } else if (cc == ">=") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 2) + "\"";
-                    Token(NumTokens).Operator = OperatorGreaterOrEqual;
-                    Token(NumTokens).String = String.substr(Pos, 2);
-                    OperatorProcessing = true;
-                    ++Pos;
-                } else if (cc == "||") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 2) + "\"";
-                    Token(NumTokens).Operator = OperatiorLogicalOR;
-                    Token(NumTokens).String = String.substr(Pos, 2);
-                    OperatorProcessing = true;
-                    ++Pos;
-                } else if (cc == "&&") {
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 2) + "\"";
-                    Token(NumTokens).Operator = OperatorLogicalAND;
-                    Token(NumTokens).String = String.substr(Pos, 2);
-                    OperatorProcessing = true;
-                    ++Pos;
-                    // next check for builtin functions signaled by "@"
-                } else if (String[Pos] == '@') {
+                // parse an operator if found,
+                // returns true and increments position, other wise returns false and leaves state untouched
+                const auto parse = [&](const char *string, int op, bool case_insensitive) {
+                    const auto len = strlen(string);
+                    const auto potential_match = String.substr(Pos, len);
 
-                    if (UtilityRoutines::SameString(String.substr(Pos, 6), "@Round")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 6) + "\"";
-                        Token(NumTokens).Operator = FuncRound;
-                        Token(NumTokens).String = String.substr(Pos, 6);
-                        Pos += 5;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 4), "@Mod")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 4) + "\"";
-                        Token(NumTokens).Operator = FuncMod;
-                        Token(NumTokens).String = String.substr(Pos, 4);
-                        Pos += 3;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 4), "@Sin")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 4) + "\"";
-                        Token(NumTokens).Operator = FuncSin;
-                        Token(NumTokens).String = String.substr(Pos, 4);
-                        Pos += 3;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 4), "@Cos")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 4) + "\"";
-                        Token(NumTokens).Operator = FuncCos;
-                        Token(NumTokens).String = String.substr(Pos, 4);
-                        Pos += 3;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 7), "@ArcCos")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 7) + "\"";
-                        Token(NumTokens).Operator = FuncArcCos;
-                        Token(NumTokens).String = String.substr(Pos, 7);
-                        Pos += 6;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 7), "@ArcSin")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 7) + "\"";
-                        Token(NumTokens).Operator = FuncArcSin;
-                        Token(NumTokens).String = String.substr(Pos, 7);
-                        Pos += 6;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 9), "@DegToRad")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 9) + "\"";
-                        Token(NumTokens).Operator = FuncDegToRad;
-                        Token(NumTokens).String = String.substr(Pos, 9);
-                        Pos += 8;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 9), "@RadToDeg")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 9) + "\"";
-                        Token(NumTokens).Operator = FuncRadToDeg;
-                        Token(NumTokens).String = String.substr(Pos, 9);
-                        Pos += 8;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 4), "@Exp")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 4) + "\"";
-                        Token(NumTokens).Operator = FuncExp;
-                        Token(NumTokens).String = String.substr(Pos, 4);
-                        Pos += 3;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 3), "@Ln")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 3) + "\"";
-                        Token(NumTokens).Operator = FuncLn;
-                        Token(NumTokens).String = String.substr(Pos, 3);
-                        Pos += 2;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 4), "@Max")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 4) + "\"";
-                        Token(NumTokens).Operator = FuncMax;
-                        Token(NumTokens).String = String.substr(Pos, 4);
-                        Pos += 3;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 4), "@Min")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 4) + "\"";
-                        Token(NumTokens).Operator = FuncMin;
-                        Token(NumTokens).String = String.substr(Pos, 4);
-                        Pos += 3;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 4), "@Abs")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 4) + "\"";
-                        Token(NumTokens).Operator = FuncABS;
-                        Token(NumTokens).String = String.substr(Pos, 4);
-                        Pos += 3;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 14), "@RANDOMUNIFORM")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 14) + "\"";
-                        Token(NumTokens).Operator = FuncRandU;
-                        Token(NumTokens).String = String.substr(Pos, 14);
-                        Pos += 13;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 13), "@RANDOMNORMAL")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 13) + "\"";
-                        Token(NumTokens).Operator = FuncRandG;
-                        Token(NumTokens).String = String.substr(Pos, 13);
-                        Pos += 12;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 11), "@SEEDRANDOM")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + String.substr(Pos, 11) + "\"";
-                        Token(NumTokens).Operator = FuncRandSeed;
-                        Token(NumTokens).String = String.substr(Pos, 11);
-                        Pos += 10;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 15), "@RhoAirFnPbTdbW")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 15) + "\"";
-                        Token(NumTokens).Operator = FuncRhoAirFnPbTdbW;
-                        Token(NumTokens).String = String.substr(Pos, 15);
-                        Pos += 14;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 12), "@CpAirFnWTdb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 12) + "\"";
-                        Token(NumTokens).Operator = FuncCpAirFnWTdb;
-                        Token(NumTokens).String = String.substr(Pos, 12);
-                        Pos += 11;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 13), "@HfgAirFnWTdb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 13) + "\"";
-                        Token(NumTokens).Operator = FuncHfgAirFnWTdb;
-                        Token(NumTokens).String = String.substr(Pos, 13);
-                        Pos += 12;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 12), "@HgAirFnWTdb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 12) + "\"";
-                        Token(NumTokens).Operator = FuncHgAirFnWTdb;
-                        Token(NumTokens).String = String.substr(Pos, 12);
-                        Pos += 11;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 14), "@TdpFnTdbTwbPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 14) + "\"";
-                        Token(NumTokens).Operator = FuncTdpFnTdbTwbPb;
-                        Token(NumTokens).String = String.substr(Pos, 14);
-                        Pos += 13;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 9), "@TdpFnWPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 9) + "\"";
-                        Token(NumTokens).Operator = FuncTdpFnWPb;
-                        Token(NumTokens).String = String.substr(Pos, 9);
-                        Pos += 8;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 8), "@HFnTdbW")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 8) + "\"";
-                        Token(NumTokens).Operator = FuncHFnTdbW;
-                        Token(NumTokens).String = String.substr(Pos, 8);
-                        Pos += 7;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 11), "@HFnTdbRhPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 11) + "\"";
-                        Token(NumTokens).Operator = FuncHFnTdbRhPb;
-                        Token(NumTokens).String = String.substr(Pos, 11);
-                        Pos += 10;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 8), "@TdbFnHW")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 8) + "\"";
-                        Token(NumTokens).Operator = FuncTdbFnHW;
-                        Token(NumTokens).String = String.substr(Pos, 8);
-                        Pos += 7;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 18), "@RhovFnTdbRhLBnd0C")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 18) + "\"";
-                        Token(NumTokens).Operator = FuncRhovFnTdbRhLBnd0C;
-                        Token(NumTokens).String = String.substr(Pos, 18);
-                        Pos += 17;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 12), "@RhovFnTdbRh")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 12) + "\"";
-                        Token(NumTokens).Operator = FuncRhovFnTdbRh;
-                        Token(NumTokens).String = String.substr(Pos, 12);
-                        Pos += 11;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 13), "@RhovFnTdbWPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 13) + "\"";
-                        Token(NumTokens).Operator = FuncRhovFnTdbWPb;
-                        Token(NumTokens).String = String.substr(Pos, 13);
-                        Pos += 12;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 18), "@RhFnTdbRhovLBnd0C")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 18) + "\"";
-                        Token(NumTokens).Operator = FuncRhFnTdbRhovLBnd0C;
-                        Token(NumTokens).String = String.substr(Pos, 18);
-                        Pos += 17;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 12), "@RhFnTdbRhov")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 12) + "\"";
-                        Token(NumTokens).Operator = FuncRhFnTdbRhov;
-                        Token(NumTokens).String = String.substr(Pos, 12);
-                        Pos += 11;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 11), "@RhFnTdbWPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 11) + "\"";
-                        Token(NumTokens).Operator = FuncRhFnTdbWPb;
-                        Token(NumTokens).String = String.substr(Pos, 11);
-                        Pos += 10;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 12), "@TwbFnTdbWPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 12) + "\"";
-                        Token(NumTokens).Operator = FuncTwbFnTdbWPb;
-                        Token(NumTokens).String = String.substr(Pos, 12);
-                        Pos += 11;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 10), "@VFnTdbWPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 10) + "\"";
-                        Token(NumTokens).Operator = FuncVFnTdbWPb;
-                        Token(NumTokens).String = String.substr(Pos, 10);
-                        Pos += 9;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 9), "@WFnTdpPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 9) + "\"";
-                        Token(NumTokens).Operator = FuncWFnTdpPb;
-                        Token(NumTokens).String = String.substr(Pos, 9);
-                        Pos += 8;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 8), "@WFnTdbH")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 8) + "\"";
-                        Token(NumTokens).Operator = FuncWFnTdbH;
-                        Token(NumTokens).String = String.substr(Pos, 8);
-                        Pos += 7;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 12), "@WFnTdbTwbPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 12) + "\"";
-                        Token(NumTokens).Operator = FuncWFnTdbTwbPb;
-                        Token(NumTokens).String = String.substr(Pos, 12);
-                        Pos += 11;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 11), "@WFnTdbRhPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 11) + "\"";
-                        Token(NumTokens).Operator = FuncWFnTdbRhPb;
-                        Token(NumTokens).String = String.substr(Pos, 11);
-                        Pos += 10;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 11), "@PsatFnTemp")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 11) + "\"";
-                        Token(NumTokens).Operator = FuncPsatFnTemp;
-                        Token(NumTokens).String = String.substr(Pos, 11);
-                        Pos += 10;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 10), "@TsatFnHPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 10) + "\"";
-                        Token(NumTokens).Operator = FuncTsatFnHPb;
-                        Token(NumTokens).String = String.substr(Pos, 10);
-                        Pos += 9;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 9), "@TsatFnPb")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 9) + "\"";
-                        Token(NumTokens).Operator = FuncTsatFnPb;
-                        Token(NumTokens).String = String.substr(Pos, 9);
-                        Pos += 8;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 5), "@CpCW")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 5) + "\"";
-                        Token(NumTokens).Operator = FuncCpCW;
-                        Token(NumTokens).String = String.substr(Pos, 5);
-                        Pos += 4;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 5), "@CpHW")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 5) + "\"";
-                        Token(NumTokens).Operator = FuncCpHW;
-                        Token(NumTokens).String = String.substr(Pos, 5);
-                        Pos += 4;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 7), "@RhoH2O")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 7) + "\"";
-                        Token(NumTokens).Operator = FuncRhoH2O;
-                        Token(NumTokens).String = String.substr(Pos, 7);
-                        Pos += 6;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 12), "@FATALHALTEP")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 12) + "\"";
-                        Token(NumTokens).Operator = FuncFatalHaltEp;
-                        Token(NumTokens).String = String.substr(Pos, 12);
-                        Pos += 11;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 13), "@SEVEREWARNEP")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 13) + "\"";
-                        Token(NumTokens).Operator = FuncSevereWarnEp;
-                        Token(NumTokens).String = String.substr(Pos, 13);
-                        Pos += 12;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 7), "@WARNEP")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 7) + "\"";
-                        Token(NumTokens).Operator = FuncWarnEp;
-                        Token(NumTokens).String = String.substr(Pos, 7);
-                        Pos += 6;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 11), "@TRENDVALUE")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 11) + "\"";
-                        Token(NumTokens).Operator = FuncTrendValue;
-                        Token(NumTokens).String = String.substr(Pos, 11);
-                        Pos += 10;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 13), "@TRENDAVERAGE")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 13) + "\"";
-                        Token(NumTokens).Operator = FuncTrendAverage;
-                        Token(NumTokens).String = String.substr(Pos, 13);
-                        Pos += 12;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 9), "@TRENDMAX")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 9) + "\"";
-                        Token(NumTokens).Operator = FuncTrendMax;
-                        Token(NumTokens).String = String.substr(Pos, 9);
-                        Pos += 8;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 9), "@TRENDMIN")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 9) + "\"";
-                        Token(NumTokens).Operator = FuncTrendMin;
-                        Token(NumTokens).String = String.substr(Pos, 9);
-                        Pos += 8;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 15), "@TRENDDIRECTION")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 15) + "\"";
-                        Token(NumTokens).Operator = FuncTrendDirection;
-                        Token(NumTokens).String = String.substr(Pos, 15);
-                        Pos += 14;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 9), "@TRENDSUM")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 9) + "\"";
-                        Token(NumTokens).Operator = FuncTrendSum;
-                        Token(NumTokens).String = String.substr(Pos, 9);
-                        Pos += 8;
-                    } else if (UtilityRoutines::SameString(String.substr(Pos, 11), "@CURVEVALUE")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 11) + "\"";
-                        Token(NumTokens).Operator = FuncCurveValue;
-                        Token(NumTokens).String = String.substr(Pos, 11);
-                        Pos += 10;
+                    if ((case_insensitive && UtilityRoutines::SameString(potential_match, string)) ||
+                        (!case_insensitive && potential_match == string)) {
+                        if (DeveloperFlag) print(outputFiles.debug, "OPERATOR \"{}\"\n", potential_match);
+                        Token(NumTokens).Operator = op;
+                        Token(NumTokens).String = potential_match;
+                        Pos += (len - 1);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                };
+
+                // case insensitive wrapper call to parse
+                const auto i_parse = [&](const char *string, const int op) {
+                    return parse(string, op, true);
+                };
+
+                // First check for two character operators:  == <> <= >= || &&
+                std::string const cc(String.substr(Pos, 2));
+                if (parse("==", OperatorEqual, false) || parse("<>", OperatorNotEqual, false) || parse("<=", OperatorLessOrEqual, false) ||
+                    parse(">=", OperatorGreaterOrEqual, false) || parse("||", OperatorLogicalOR, false) || parse("&&", OperatorLogicalAND, false)) {
+                    // One of the comparision / logical operators
+                    OperatorProcessing = true;
+
+                } else if (String[Pos] == '@') { // next check for builtin functions signaled by "@"
+
+                    if (i_parse("@Round", FuncRound) || i_parse("@Mod", FuncMod) || i_parse("@Sin", FuncSin) ||
+                        i_parse("@Cos", FuncCos) || i_parse("@ArcCos", FuncArcCos) || i_parse("@ArcSin", FuncArcSin) ||
+                        i_parse("@DegToRad", FuncDegToRad) || i_parse("@RadToDeg", FuncRadToDeg) || i_parse("@Exp", FuncExp) ||
+                        i_parse("@Ln", FuncLn) || i_parse("@Max", FuncMax) || i_parse("@Min", FuncMin) || i_parse("@Abs", FuncABS) ||
+                        i_parse("@RANDOMUNIFORM", FuncRandU) || i_parse("@RANDOMNORMAL", FuncRandG) ||
+                        i_parse("@SEEDRANDOM", FuncRandSeed) || i_parse("@RhoAirFnPbTdbW", FuncRhoAirFnPbTdbW) ||
+                        i_parse("@CpAirFnW", FuncCpAirFnW) || i_parse("@HfgAirFnWTdb", FuncHfgAirFnWTdb) ||
+                        i_parse("@HgAirFnWTdb", FuncHgAirFnWTdb) || i_parse("@TdpFnTdbTwbPb", FuncTdpFnTdbTwbPb) ||
+                        i_parse("@TdpFnWPb", FuncTdpFnWPb) || i_parse("@HFnTdbW", FuncHFnTdbW) ||
+                        i_parse("@HFnTdbRhPb", FuncHFnTdbRhPb) || i_parse("@TdbFnHW", FuncTdbFnHW) ||
+                        i_parse("@RhovFnTdbRhLBnd0C", FuncRhovFnTdbRhLBnd0C) || i_parse("@RhovFnTdbRh", FuncRhovFnTdbRh) ||
+                        i_parse("@RhovFnTdbWPb", FuncRhovFnTdbWPb) || i_parse("@RhFnTdbRhovLBnd0C", FuncRhFnTdbRhovLBnd0C) ||
+                        i_parse("@RhFnTdbRhov", FuncRhFnTdbRhov) || i_parse("@RhFnTdbWPb", FuncRhFnTdbWPb) ||
+                        i_parse("@TwbFnTdbWPb", FuncTwbFnTdbWPb) || i_parse("@VFnTdbWPb", FuncVFnTdbWPb) ||
+                        i_parse("@WFnTdpPb", FuncWFnTdpPb) || i_parse("@WFnTdbH", FuncWFnTdbH) ||
+                        i_parse("@WFnTdbTwbPb", FuncWFnTdbTwbPb) || i_parse("@WFnTdbRhPb", FuncWFnTdbRhPb) ||
+                        i_parse("@PsatFnTemp", FuncPsatFnTemp) || i_parse("@TsatFnHPb", FuncTsatFnHPb) ||
+                        i_parse("@TsatFnPb", FuncTsatFnPb) || i_parse("@CpCW", FuncCpCW) || i_parse("@CpHW", FuncCpHW) ||
+                        i_parse("@RhoH2O", FuncRhoH2O) || i_parse("@FATALHALTEP", FuncFatalHaltEp) ||
+                        i_parse("@SEVEREWARNEP", FuncSevereWarnEp) || i_parse("@WARNEP", FuncWarnEp) ||
+                        i_parse("@TRENDVALUE", FuncTrendValue) || i_parse("@TRENDAVERAGE", FuncTrendAverage) ||
+                        i_parse("@TRENDMAX", FuncTrendMax) || i_parse("@TRENDMIN", FuncTrendMin) ||
+                        i_parse("@TRENDDIRECTION", FuncTrendDirection) || i_parse("@TRENDSUM", FuncTrendSum) ||
+                        i_parse("@CURVEVALUE", FuncCurveValue)) {
+                        // was a built in function operator
                     } else { // throw error
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ERROR \"" + String + "\"";
+                        if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", String);
                         ShowFatalError("EMS Runtime Language: did not find valid input for built-in function =" + String);
                     }
                 } else {
@@ -1676,7 +1430,7 @@ namespace RuntimeLanguageProcessor {
                     MultFound = false;
                     DivFound = false;
 
-                    if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "OPERATOR \"" + StringToken + "\"";
+                    if (DeveloperFlag) print(outputFiles.debug, "OPERATOR \"{}\"\n", StringToken);
 
                     if (StringToken == "+") {
                         if (!OperatorProcessing) {
@@ -1717,7 +1471,7 @@ namespace RuntimeLanguageProcessor {
                         Token(NumTokens).String = StringToken;
                     } else {
                         // Uh OH, this should never happen! throw error
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ERROR \"" + StringToken + "\"";
+                        if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", StringToken);
                         ShowFatalError("EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String);
                     }
                 }
@@ -1728,7 +1482,7 @@ namespace RuntimeLanguageProcessor {
                 // Parse a parenthesis token
                 ++Pos;
                 StringToken = NextChar;
-                if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "PAREN \"" + StringToken + "\"";
+                if (DeveloperFlag) print(outputFiles.debug, "PAREN \"{}\"\n", StringToken);
                 Token(NumTokens).Type = TokenParenthesis;
                 Token(NumTokens).String = StringToken;
                 if (NextChar == '(') {
@@ -1739,7 +1493,7 @@ namespace RuntimeLanguageProcessor {
 
             } else if (is_any_of(NextChar, "\"")) {
                 // Parse a string literal token
-                if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "LITERAL STRING";
+                if (DeveloperFlag) print(outputFiles.debug, "{}\n", "LITERAL STRING");
                 ++Pos;
 
             } else {
@@ -1748,14 +1502,14 @@ namespace RuntimeLanguageProcessor {
         }
 
         if (NumErrors > 0) {
-            if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ERROR OUT";
+            if (DeveloperFlag) print(outputFiles.debug, "{}\n", "ERROR OUT");
             ShowFatalError("EMS, previous errors cause termination.");
         }
 
         ExpressionNum = ProcessTokens(Token, NumTokens, StackNum, String);
     }
 
-    int ProcessTokens(Array1S<TokenType> const TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)
+    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1877,7 +1631,7 @@ namespace RuntimeLanguageProcessor {
             while (Pos > 0) {
                 if (Pos == 1) {
                     // if first token is for a built-in function starting with "@" then okay, otherwise the operator needs a LHS
-                    if (Token(TokenNum).Operator > OperatiorLogicalOR) { // we have a function expression to set up
+                    if (Token(TokenNum).Operator > OperatorLogicalOR) { // we have a function expression to set up
                         ExpressionNum = NewExpression();
                         ErlExpression(ExpressionNum).Operator = OperatorNum;
                         NumOperands = PossibleOperators(OperatorNum).NumOperands;
@@ -2247,7 +2001,7 @@ namespace RuntimeLanguageProcessor {
                                 ReturnValue = False;
                             }
                         }
-                    } else if (SELECT_CASE_var == OperatiorLogicalOR) {
+                    } else if (SELECT_CASE_var == OperatorLogicalOR) {
                         if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
                             if ((Operand(1).Number == True.Number) || (Operand(2).Number == True.Number)) {
                                 ReturnValue = True;
@@ -2345,10 +2099,9 @@ namespace RuntimeLanguageProcessor {
                                                                           EMSBuiltInFunction)); // result =>   density of moist air (kg/m3) | pressure
                                                                                                 // (Pa) | drybulb (C) | Humidity ratio (kg water
                                                                                                 // vapor/kg dry air) | called from
-                    } else if (SELECT_CASE_var == FuncCpAirFnWTdb) {
-                        ReturnValue = SetErlValueNumber(PsyCpAirFnWTdb(Operand(1).Number, Operand(2).Number)); // result =>   heat capacity of air
-                                                                                                               // {J/kg-C} | Humidity ratio (kg water
-                                                                                                               // vapor/kg dry air) | drybulb (C)
+                    } else if (SELECT_CASE_var == FuncCpAirFnW) {
+                        ReturnValue = SetErlValueNumber(PsyCpAirFnW(Operand(1).Number)); // result =>   heat capacity of air
+                                                                                         // {J/kg-C} | Humidity ratio (kg water vapor/kg dry air)
                     } else if (SELECT_CASE_var == FuncHfgAirFnWTdb) {
                         // BG comment these two psych funct seems confusing (?) is this the enthalpy of water in the air?
                         ReturnValue = SetErlValueNumber(PsyHfgAirFnWTdb(Operand(1).Number, Operand(2).Number)); // result =>   heat of vaporization
@@ -3222,7 +2975,7 @@ namespace RuntimeLanguageProcessor {
 
             // Parse the runtime language code
             for (StackNum = 1; StackNum <= NumErlStacks; ++StackNum) {
-                ParseStack(StackNum);
+                ParseStack(OutputFiles::getSingleton(), StackNum);
 
                 if (ErlStack(StackNum).NumErrors > 0) {
                     ShowSevereError("Errors found parsing EMS Runtime Language program or subroutine = " + ErlStack(StackNum).Name);
@@ -3302,7 +3055,7 @@ namespace RuntimeLanguageProcessor {
                             }
                         } else if (UnitsB == "" && UnitsA != "") {
                             UnitsB = UnitsA;
-                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " using deprecated units designation.");
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
                             ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                         }
                     }
@@ -3470,7 +3223,7 @@ namespace RuntimeLanguageProcessor {
                             }
                         } else if (UnitsB == "" && UnitsA != "") {
                             UnitsB = UnitsA;
-                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " using deprecated units designation.");
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
                             ShowContinueError("...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                         }
                     }
@@ -3750,49 +3503,6 @@ namespace RuntimeLanguageProcessor {
                 RuntimeReportVar(RuntimeReportVarNum).Value = 0.0;
             }
         }
-    }
-
-    std::string IntegerToString(int const Number)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         P Ellis
-        //       DATE WRITTEN   unknown
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // convert integer number to a string
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        std::string String;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        ObjexxFCL::gio::write(String, fmtLD) << Number; // Could add formatting here
-        strip(String);
-
-        return String;
     }
 
     ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue)
@@ -4129,9 +3839,9 @@ namespace RuntimeLanguageProcessor {
         PossibleOperators(OperatorLogicalAND).NumOperands = 2;
         PossibleOperators(OperatorLogicalAND).Code = OperatorLogicalAND;
 
-        PossibleOperators(OperatiorLogicalOR).Symbol = "||";
-        PossibleOperators(OperatiorLogicalOR).NumOperands = 2;
-        PossibleOperators(OperatiorLogicalOR).Code = OperatiorLogicalOR;
+        PossibleOperators(OperatorLogicalOR).Symbol = "||";
+        PossibleOperators(OperatorLogicalOR).NumOperands = 2;
+        PossibleOperators(OperatorLogicalOR).Code = OperatorLogicalOR;
 
         PossibleOperators(FuncRound).Symbol = "@ROUND";
         PossibleOperators(FuncRound).NumOperands = 1;
@@ -4201,9 +3911,9 @@ namespace RuntimeLanguageProcessor {
         PossibleOperators(FuncRhoAirFnPbTdbW).NumOperands = 3;
         PossibleOperators(FuncRhoAirFnPbTdbW).Code = FuncRhoAirFnPbTdbW;
 
-        PossibleOperators(FuncCpAirFnWTdb).Symbol = "@CPAIRFNWTDB";
-        PossibleOperators(FuncCpAirFnWTdb).NumOperands = 2;
-        PossibleOperators(FuncCpAirFnWTdb).Code = FuncCpAirFnWTdb;
+        PossibleOperators(FuncCpAirFnW).Symbol = "@CPAIRFNW";
+        PossibleOperators(FuncCpAirFnW).NumOperands = 1;
+        PossibleOperators(FuncCpAirFnW).Code = FuncCpAirFnW;
 
         PossibleOperators(FuncHfgAirFnWTdb).Symbol = "@HFGAIRFNWTDB";
         PossibleOperators(FuncHfgAirFnWTdb).NumOperands = 2;

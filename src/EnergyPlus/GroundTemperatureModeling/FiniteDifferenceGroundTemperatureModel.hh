@@ -58,6 +58,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
@@ -84,7 +85,6 @@ public:
 
     // Default constructor
     FiniteDiffGroundTempsModel() : minDailyAirTemp(100.0), maxDailyAirTemp(-100.0), dayOfMinDailyAirTemp(1)
-
     {
     }
 
@@ -128,11 +128,11 @@ public:
 
     Array1D<instanceOfWeatherData> weatherDataArray;
 
-    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(int objectType, std::string objectName);
+    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
-    void getWeatherData();
+    void getWeatherData(EnergyPlusData &state);
 
-    void initAndSim();
+    void initAndSim(EnergyPlusData &state);
 
     void developMesh();
 
@@ -156,11 +156,11 @@ public:
 
     void doStartOfTimeStepInits();
 
-    Real64 getGroundTemp();
+    Real64 getGroundTemp() override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim);
+    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim);
+    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
 
     void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
 
@@ -177,10 +177,6 @@ public:
         surfaceCoverType_longGrass = 3
     };
 
-    // Destructor
-    ~FiniteDiffGroundTempsModel()
-    {
-    }
 };
 
 } // namespace EnergyPlus

@@ -232,6 +232,18 @@ RoomAir:TemperaturePattern:TwoGradient,
   ;                       ! Lower Heat Rate [W]
 \end{lstlisting}
 
+\subsubsection{Outputs}\label{roomairtemperaturepatterntwogradient-outputs}
+
+The user-defined air temperature pattern that interpolates between two gradients produces the following output variable.
+
+\begin{lstlisting}
+HVAC,Average,Room Air Zone Vertical Temperature Gradient [K/m]
+\end{lstlisting}
+
+\paragraph{Room Air Zone Vertical Temperature Gradient {[}K/m{]}}\label{room-air-zone-vertical-temperature-gradient-km}
+
+This output variable is the result of the interpolation performed by the user-defined roomair model using RoomAir:TemperaturePattern:TwoGradient. This is the temperature gradient in the vertical direction. The units are degrees Kelvin per meter.
+
 \subsection{RoomAir:TemperaturePattern:NondimensionalHeight}\label{roomairtemperaturepatternnondimensionalheight}
 
 This object defines a distribution pattern for air temperatures relative to the current mean air temperature as a function of height. The height, referred to as Zeta, is non-dimensional by normalizing with the zone ceiling height. (The actual zone ceiling height can be explicitly entered in the `Zone' object but if not it is calculated by EnergyPlus from the surfaces attached to the zone.) The temperature differences are not non-dimensional and remain in units of degrees Celsius.
@@ -438,12 +450,23 @@ This numeric field indicates what fraction of the infiltration air enters near t
 An IDF example:
 
 \begin{lstlisting}
-
 RoomAirSettings:OneNodeDisplacementVentilation,
       WEST ZONE,  !- Zone Name
       0.1,  !- Fraction of internal loads from the convective Floor Air
       0.1;  !- Fraction of internal loads from the Infiltration Air
 \end{lstlisting}
+
+\subsubsection{Outputs}\label{roomairsettingsonenodedisplacementventilation-outputs}
+
+The following output is available for the Mundt model.
+
+\begin{lstlisting}
+Room Air Node Air Temperature {[}C{]}
+\end{lstlisting}
+
+\paragraph{Room Air Node Air Temperature {[}C{]}}\label{room-air-node-air-temperature-c}
+
+This output variable provides the drybulb air temperature used in, or calculated by, the Mundt model. The selection key is the name of an air node defined in a ROOMAIR Node object.
 
 \subsection{RoomAirSettings:ThreeNodeDisplacementVentilation}\label{roomairsettingsthreenodedisplacementventilation}
 
@@ -539,6 +562,71 @@ RoomAirSettings:ThreeNodeDisplacementVentilation,
       .3;  !- Temp. Difference Threshold for Displacement Ventilation
 \end{lstlisting}
 
+\subsubsection{Outputs}\label{roomairsettingsthreenodedisplacementventilation-outputs}
+
+\begin{itemize}
+\item
+  HVAC,Average,Room Air Zone Mixed Subzone Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Occupied Subzone Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Floor Subzone Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Transition Height {[}m{]}
+\item
+  HVAC,Average,Room Air Zone Recommended Minimum Flow Fraction
+\item
+  HVAC,Average,Room Air Zone Is Mixed Status
+\item
+  HVAC,Average,Room Air Zone Average Temperature Gradient {[}K/m{]}
+\item
+  HVAC,Average,Room Air Zone Maximum Temperature Gradient {[}K/m{]}
+\item
+  HVAC,Average,Room Air Zone Thermal Comfort Effective Air Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Thermostat Temperature {[}C{]}
+\end{itemize}
+
+\paragraph{Room Air Zone Mixed Subzone Temperature {[}C{]}}\label{room-air-zone-mixed-subzone-temperature-c}
+
+The temperature of the upper well-mixed subzone in degrees C.
+
+\paragraph{Room Air Zone Occupied Subzone Temperature {[}C{]}}\label{room-air-zone-occupied-subzone-temperature-c}
+
+The average temperature of the lower, stratified, occupied subzone in degrees C.
+
+\paragraph{Room Air Zone Floor Subzone Temperature {[}C{]}}\label{room-air-zone-floor-subzone-temperature-c}
+
+The temperature of the region near the floor in degrees C.
+
+\paragraph{Room Air Zone Transition Height {[}m{]}}\label{room-air-zone-transition-height-m}
+
+The height above the floor, in meters, of the boundary between the lower occupied subzone and the upper well-mixed subzone.
+
+\paragraph{Room Air Zone Recommended Minimum Flow Fraction {[]}}\label{room-air-zone-recommended-minimum-flow-fraction}
+
+The ratio of the minimum recommended flow rate to the actual flow rate. Here flow rate means the sum of infiltration, ventilation, mixing and system air flow rates. The minimum flow is the flow needed to establish the boundary between the occupied and mixed subzones at 1.5 meters.
+
+\paragraph{Room Air Zone Is Mixed Status {[]}}\label{room-air-zone-is-mixed-status}
+
+An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or stratified (UCSD DV model used). The value 1 means well-mixed; 0 means stratified.
+
+\paragraph{Room Air Zone Average Temperature Gradient {[}K/m{]}}\label{room-air-zone-average-temperature-gradient-km}
+
+The temperature gradient between the middle of the floor region and the middle of the well-mixed upper subzone in degrees Kelvin per meter.
+
+\paragraph{Room Air Zone Maximum Temperature Gradient {[}K/m{]}}\label{room-air-zone-maximum-temperature-gradient-km}
+
+The maximum of the temperature gradient between the middle of the floor region and the middle of the occupied subzone and the temperature gradient between the middle of the occupied subzone and the middle of the well-mixed subzone. The gradient is in degrees Kelvin per meter.
+
+\paragraph{Room Air Zone Thermal Comfort Effective Air Temperature {[}C{]}}\label{room-air-zone-thermal-comfort-effective-air-temperature-c}
+
+The temperature at the user specified comfort height in degrees C.
+
+\paragraph{Room Air Zone Thermostat Temperature {[}C{]}}\label{room-air-zone-thermostat-temperature-c}
+
+The temperature at the height of the thermostat (specified by user input) in degrees C.
+
 \subsection{RoomAirSettings:CrossVentilation}\label{roomairsettingscrossventilation}
 
 The UCSD Cross Ventilation Room Air Model provides a simple model for heat transfer and temperature prediction in cross ventilated rooms. Cross Ventilation (CV) is common in many naturally ventilated buildings, with air flowing through windows, open doorways and large internal apertures across rooms and corridors in the building.
@@ -588,18 +676,28 @@ Possible choices: Jet or Recirculation.
 
 \subsubsection{Outputs}\label{outputs-030}
 
-\begin{lstlisting}
-Zone,Average,Room Air Zone Jet Region Temperature [C]
-Zone,Average,Room Air Zone Recirculation Region Temperature [C]
-Zone,Average,Room Air Zone Jet Region Average Air Velocity [m/s]
-Zone,Average,Room Air Zone Recirculation Region Average Air Velocity [m/s]
-Zone,Average,Room Air Window Jet Region Average Air Velocity [m/s]
-Zone,Average,Room Air Zone Recirculation and Inflow Rate Ratio
-Zone,Average,Room Air Zone Inflow Opening Area [m2]
-Zone,Average,Room Air Zone Room Length [m]
-Zone,Average,Room Air Zone Is Mixing Status
-Zone,Average,Room Air Zone Is Recirculating Status
-\end{lstlisting}
+\begin{itemize}
+\item
+  Zone,Average,Room Air Zone Jet Region Temperature {[}C{]}
+\item
+  Zone,Average,Room Air Zone Recirculation Region Temperature {[}C{]}
+\item
+  Zone,Average,Room Air Zone Jet Region Average Air Velocity {[}m/s{]}
+\item
+  Zone,Average,Room Air Zone Recirculation Region Average Air Velocity {[}m/s{]}
+\item
+  Zone,Average,Room Air Window Jet Region Average Air Velocity {[}m/s{]}
+\item
+  Zone,Average,Room Air Zone Recirculation and Inflow Rate Ratio
+\item
+  Zone,Average,Room Air Zone Inflow Opening Area {[}m2{]}
+\item
+  Zone,Average,Room Air Zone Room Length {[}m{]}
+\item
+  Zone,Average,Room Air Zone Is Mixing Status
+\item
+  Zone,Average,Room Air Zone Is Recirculating Status
+\end{itemize}
 
 \paragraph{Room Air Zone Jet Region Temperature {[}C{]}}\label{room-air-zone-jet-region-temperature-c}
 
@@ -746,6 +844,75 @@ An example input is:
      Autocalculate;           !- Coefficient E
 \end{lstlisting}
 
+\subsubsection{Outputs}\label{roomairsettingsunderfloorairdistributioninterior-outputs}
+
+\begin{itemize}
+\item
+  HVAC,Average,Room Air Zone Mixed Subzone Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Occupied Subzone Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Transition Height {[}m{]}
+\item
+  HVAC,Average,Room Air Zone Is Mixed Status {[]}
+\item
+  HVAC,Average,Room Air Zone Average Temperature Gradient {[}K/m{]}
+\item
+  HVAC,Average,Room Air Zone Effective Comfort Air Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Thermostat Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Transition Height Gamma Value {[]}
+\item
+  HVAC,Average,Room Air Zone Plume Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Room Air Zone Temperature Stratification Fraction {[]}
+\end{itemize}
+
+\paragraph{Room Air Zone Mixed Subzone Temperature {[}C{]}}\label{room-air-zone-mixed-subzone-temperature-c-1}
+
+The temperature of the upper subzone in degrees C.
+
+\paragraph{Room Air Zone Occupied Subzone Temperature {[}C{]}}\label{room-air-zone-occupied-subzone-temperature-c-1}
+
+The temperature of the lower, occupied subzone in degrees C.
+
+\paragraph{Room Air Zone Transition Height {[}m{]}}\label{room-air-zone-transition-height-m-1}
+
+The height above the floor, in meters, of the boundary between the lower occupied subzone and the upper subzone..
+
+\paragraph{Room Air Zone Is Mixed Status {[]}}\label{room-air-zone-is-mixed-status-1}
+
+An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or stratified (UCSD UFI model used). The value 1 means well-mixed; 0 means stratified.
+
+\paragraph{Room Air Zone Average Temperature Gradient {[}K/m{]}}\label{room-air-zone-average-temperature-gradient-km-1}
+
+The temperature gradient between the middle of the occupied subzone and the middle of the upper subzone in degrees Kelvin per meter.
+
+\paragraph{Room Air Zone Effective Comfort Air Temperature {[}C{]}}\label{room-air-zone-effective-comfort-air-temperature-c}
+
+The temperature at the user specified comfort height in degrees C.
+
+\paragraph{Room Air Zone Thermostat Temperature {[}C{]}}\label{room-air-zone-thermostat-temperature-c-1}
+
+The temperature at the height of the thermostat (specified by user input) in degrees C.
+
+\paragraph{Room Air Zone Transition Height Gamma Value {[]}}\label{room-air-zone-transition-height-gamma-value}
+
+Value of gamma -- a dimensionless ``height'' used in calculating the transition height. Lower values of gamma indicate increased stratification, higher values less. Generally the values should be between 2 and 30.
+
+\paragraph{Room Air Zone Plume Heat Transfer Rate {[}W{]}}\label{room-air-zone-plume-heat-transfer-rate-w}
+
+The heat in watts driving the plumes in the occupied subzone.
+
+\paragraph{Room Air Zone Temperature Stratification Fraction {[]}}\label{room-air-zone-temperature-stratification-fraction}
+
+This output, (Phi) is a measure of temperature stratification in the space. It is the difference between the occupied subzone temperature and the supply temperature divided by difference between the return temperature and the supply temperature. Technically it is equal to Kc. As phi approaches 1, the space is fully mixed. As phi approaches 0, the space becomes fully stratified. Expressed as an equation:
+
+\begin{equation}
+  \frac{T_{occ} - T_{sup}}{T_{ret} - T_{sup}}
+\end{equation}
+
 \subsection{RoomAirSettings:UnderFloorAirDistributionExterior}\label{roomairsettingsunderfloorairdistributionexterior}
 
 This model is applicable to exterior spaces that are served by an underfloor air distribution system. The dominant sources of heat gain should be from people, equipment, and other localized sources located in the occupied part of the room, as well as convective gain coming from a warm window. The model predicts two temperatures in the room:
@@ -845,6 +1012,81 @@ RoomAirSettings:UnderFloorAirDistributionExterior,
       Autocalculate,           !- Coefficient D
       Autocalculate;           !- Coefficient E
 \end{lstlisting}
+
+\subsubsection{Outputs}\label{roomairsettingsunderfloorairdistributionexterior-outputs}
+
+\begin{itemize}
+\item
+  HVAC,Average,Room Air Zone Mixed Subzone Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Occupied Subzone Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Transition Height {[}m{]}
+\item
+  HVAC,Average,Room Air Zone Is Mixed Status {[]}
+\item
+  HVAC,Average,Room Air Zone Average Temperature Gradient {[}K/m{]}
+\item
+  HVAC,Average,Room Air Zone Effective Comfort Air Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Thermostat Temperature {[}C{]}
+\item
+  HVAC,Average,Room Air Zone Transition Height Gamma Value {[]}
+\item
+  HVAC,Average,Room Air Zone Plume Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Room Air Zone Window Plume Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Room Air Zone Temperature Stratification Fraction {[]}
+\end{itemize}
+
+\paragraph{Room Air Zone Mixed Subzone Temperature {[}C{]}}\label{room-air-zone-mixed-subzone-temperature-c-1-2}
+
+The temperature of the upper subzone in degrees C.
+
+\paragraph{Room Air Zone Occupied Subzone Temperature {[}C{]}}\label{room-air-zone-occupied-subzone-temperature-c-1-2}
+
+The temperature of the lower, occupied subzone in degrees C.
+
+\paragraph{Room Air Zone Transition Height {[}m{]}}\label{room-air-zone-transition-height-m-1-2}
+
+The height above the floor, in meters, of the boundary between the lower occupied subzone and the upper subzone..
+
+\paragraph{Room Air Zone Is Mixed Status {[]}}\label{room-air-zone-is-mixed-status-1-2}
+
+An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or stratified (UCSD UFE model used). The value 1 means well-mixed; 0 means stratified.
+
+\paragraph{Room Air Zone Average Temperature Gradient {[}K/m{]}}\label{room-air-zone-average-temperature-gradient-km-1-2}
+
+The temperature gradient between the middle of the occupied subzone and the middle of the upper subzone in degrees Kelvin per meter.
+
+\paragraph{Room Air Zone Effective Comfort Air Temperature {[}C{]}}\label{room-air-zone-effective-comfort-air-temperature-c-2}
+
+The temperature at the user specified comfort height in degrees C.
+
+\paragraph{Room Air Zone Thermostat Temperature {[}C{]}}\label{room-air-zone-thermostat-temperature-c-1-2}
+
+The temperature at the height of the thermostat (specified by user input) in degrees C.
+
+\paragraph{Room Air Zone Transition Height Gamma Value {[]}}\label{room-air-zone-transition-height-gamma-value-2}
+
+Value of gamma -- a dimensionless ``height'' used in calculating the transition height. Lower values of gamma indicate increased stratification, higher values less. Generally the values should be between 2 and 30.
+
+\paragraph{Room Air Zone Plume Heat Transfer Rate {[}W{]}}\label{room-air-zone-plume-heat-transfer-rate-w-2}
+
+The heat in watts driving the plumes in the occupied subzone.
+
+\paragraph{Room Air Zone Window Plume Heat Transfer Rate {[}W{]}}\label{room-air-zone-window-plume-heat-transfer-rate-w}
+
+The convective heat gain from windows in an UnderFloorAirDistributionExterior zone.
+
+\paragraph{Room Air Zone Temperature Stratification Fraction {[]}}\label{room-air-zone-temperature-stratification-fraction-2}
+
+This output, (Phi) is a measure of temperature stratification in the space. It is the difference between the occupied subzone temperature and the supply temperature divided by difference between the return temperature and the supply temperature. Technically it is equal to Kc. As phi approaches 1, the space is fully mixed. As phi approaches 0, the space becomes fully stratified. Expressed as an equation:
+
+\begin{equation}
+  \frac{T_{occ} - T_{sup}}{T_{ret} - T_{sup}}
+\end{equation}
 
 \subsection{RoomAirflowNetwork Model}\label{roomairflownetwork-model}
 
@@ -1050,219 +1292,6 @@ Each room air model sets up outputs specific to that model. The effect of room a
 \paragraph{Zone Predicted Sensible Load Room Air Correction Factor}\label{zone-predicted-sensible-load-room-air-correction-factor}
 
 This output variable provides the value of the correction factor applied to the predicted zone loads. Predicted zone load to setpoint is (usually) used to control HVAC air systems and the presence of a room air model has an impact on the loads. The predicted loads are multiplied by the factor in this output variable. The value is always 1.0 when there is no Room Air model. When there is a Room Air model, this output shows how that model is increasing or decreasing overall zone loads experienced by the air system.
-
-\subsubsection{Outputs}\label{outputs-2-019}
-
-The user-defined air temperature pattern that interpolates between two gradients produces the following output variable.
-
-\begin{lstlisting}
-HVAC,Average,Room Air Zone Vertical Temperature Gradient [K/m]
-\end{lstlisting}
-
-\paragraph{Room Air Zone Vertical Temperature Gradient {[}K/m{]}}\label{room-air-zone-vertical-temperature-gradient-km}
-
-This output variable is the result of the interpolation performed by the user-defined roomair model using RoomAir:TemperaturePattern:TwoGradient. This is the temperature gradient in the vertical direction. The units are degrees Kelvin per meter.
-
-\subsubsection{Outputs}\label{outputs-3-017}
-
-The following output is available for the Mundt model.
-
-\begin{lstlisting}
-Room Air Node Air Temperature {[}C{]}
-\end{lstlisting}
-
-\paragraph{Room Air Node Air Temperature {[}C{]}}\label{room-air-node-air-temperature-c}
-
-This output variable provides the drybulb air temperature used in, or calculated by, the Mundt model. The selection key is the name of an air node defined in a ROOMAIR Node object.
-
-\subsubsection{Outputs}\label{outputs-4-014}
-
-\begin{lstlisting}
-HVAC,Average,Room Air Zone Mixed Subzone Temperature [C]
-HVAC,Average,Room Air Zone Occupied Subzone Temperature [C]
-HVAC,Average,Room Air Zone Floor Subzone Temperature [C]
-HVAC,Average,Room Air Zone Transition Height [m]
-HVAC,Average,Room Air Zone Recommended Minimum Flow Fraction
-HVAC,Average,Room Air Zone Is Mixed Status \protect\hyperlinksection-1
-HVAC,Average,Room Air Zone Average Temperature Gradient [K/m]
-HVAC,Average,Room Air Zone Maximum Temperature Gradient [K/m]
-HVAC,Average,Room Air Zone Thermal Comfort Effective Air Temperature [C]
-HVAC,Average,Room Air Zone Thermostat Temperature [C]
-\end{lstlisting}
-
-\paragraph{Room Air Zone Mixed Subzone Temperature {[}C{]}}\label{room-air-zone-mixed-subzone-temperature-c}
-
-The temperature of the upper well-mixed subzone in degrees C.
-
-\paragraph{Room Air Zone Occupied Subzone Temperature {[}C{]}}\label{room-air-zone-occupied-subzone-temperature-c}
-
-The average temperature of the lower, stratified, occupied subzone in degrees C.
-
-\paragraph{Room Air Zone Floor Subzone Temperature {[}C{]}}\label{room-air-zone-floor-subzone-temperature-c}
-
-The temperature of the region near the floor in degrees C.
-
-\paragraph{Room Air Zone Transition Height {[}m{]}}\label{room-air-zone-transition-height-m}
-
-The height above the floor, in meters, of the boundary between the lower occupied subzone and the upper well-mixed subzone.
-
-\paragraph{Room Air Zone Recommended Minimum Flow Fraction {[]}}\label{room-air-zone-recommended-minimum-flow-fraction}
-
-The ratio of the minimum recommended flow rate to the actual flow rate. Here flow rate means the sum of infiltration, ventilation, mixing and system air flow rates. The minimum flow is the flow needed to establish the boundary between the occupied and mixed subzones at 1.5 meters.
-
-\paragraph{Room Air Zone Is Mixed Status {[]}}\label{room-air-zone-is-mixed-status}
-
-An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or stratified (UCSD DV model used). The value 1 means well-mixed; 0 means stratified.
-
-\paragraph{Room Air Zone Average Temperature Gradient {[}K/m{]}}\label{room-air-zone-average-temperature-gradient-km}
-
-The temperature gradient between the middle of the floor region and the middle of the well-mixed upper subzone in degrees Kelvin per meter.
-
-\paragraph{Room Air Zone Maximum Temperature Gradient {[}K/m{]}}\label{room-air-zone-maximum-temperature-gradient-km}
-
-The maximum of the temperature gradient between the middle of the floor region and the middle of the occupied subzone and the temperature gradient between the middle of the occupied subzone and the middle of the well-mixed subzone. The gradient is in degrees Kelvin per meter.
-
-\paragraph{Room Air Zone Thermal Comfort Effective Air Temperature {[}C{]}}\label{room-air-zone-thermal-comfort-effective-air-temperature-c}
-
-The temperature at the user specified comfort height in degrees C.
-
-\paragraph{Room Air Zone Thermostat Temperature {[}C{]}}\label{room-air-zone-thermostat-temperature-c}
-
-The temperature at the height of the thermostat (specified by user input) in degrees C.
-
-\subsubsection{Outputs}\label{outputs-5-009}
-
-\begin{itemize}
-\item
-  Zone,Average,Room Air Zone Jet Region Temperature {[}C{]}
-\item
-  Zone,Average,Room Air Zone Recirculation Region Temperature {[}C{]}
-\item
-  Zone,Average,Room Air Zone Jet Region Average Air Velocity {[}m/s{]}
-\item
-  Zone,Average,Room Air Zone Recirculation Region Average Air Velocity {[}m/s{]}
-\item
-  Zone,Average,Room Air Zone Inflow Opening Area{[}m2{]}
-\item
-  Zone,Average,Room Air Zone Room Length {[}m{]}
-\item
-  Zone,Average,Room Air Zone Recirculation and Inflow Rate Ratio
-\item
-  Zone,Average,Room Air Zone Is Mixing Status
-\item
-  Zone,Average,Room Air Zone Is Recirculating Status
-\end{itemize}
-
-\paragraph{Room Air Zone Jet Region Temperature {[}C{]}}\label{room-air-zone-jet-region-temperature-c-1}
-
-Average air temperature in the jet region of the flow in degrees C.
-
-\paragraph{Room Air Zone Recirculation Region Temperature {[}C{]}}\label{room-air-zone-recirculation-region-temperature-c-1}
-
-Average air temperature in the recirculation region of the flow in degrees C.
-
-\paragraph{Room Air Zone Jet Region Average Air Velocity {[}m/s{]}}\label{room-air-zone-jet-region-average-air-velocity-ms-1}
-
-Average airflow velocity in the jet region of the flow in meters per second.
-
-\paragraph{Room Air Zone Recirculation Region Average Air Velocity {[}m/s{]}}\label{room-air-zone-recirculation-region-average-air-velocity-ms-1}
-
-Average airflow velocity in the recirculation region of the flow in meters per second.
-
-\paragraph{Room Air Zone Inflow Opening Area {[}m2{]}}\label{room-air-zone-inflow-opening-area-m2-1}
-
-Area of the inflow aperture in square meters. This area can change due to variation in wind direction (as inflow aperture changes) or variations in the opening schedule.
-
-\paragraph{Room Air Zone Room Length {[}m{]}}\label{room-air-zone-room-length-m-1}
-
-Length of the room along the cross ventilation direction, in meters.
-
-\paragraph{Room Air Zone Recirculation and Inflow Rate Ratio {[]}}\label{room-air-zone-recirculation-and-inflow-rate-ratio-1}
-
-Ratio between airflow rate in the recirculation region and inflow rate, non-dimensional.
-
-\paragraph{Room Air Zone Is Mixing Status {[]}}\label{room-air-zone-is-mixing-status-1}
-
-An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or significant momentum conservation is occurring (UCSD CV model used). The value 1 means well-mixed; 0 means cross ventilation is present. Transition to mixed flow can occur due to three mechanism: reduction in inflow velocity, reduction in inflow aperture area and dominance of buoyancy effects. A value of 1 is yes, a value of 0 is no.
-
-\paragraph{Room Air Zone Is Recirculating Status {[]}}\label{room-air-zone-is-recirculating-status-1}
-
-An integer flag that indicates whether recirculations are present in the flow. A cross ventilation flow does not have recirculations whenever the inflow area is similar to the room cross section area (such as airflow in a typical corridor). A value of 1 is yes, a value of 0 is no.
-
-\subsubsection{Outputs}\label{outputs-6-009}
-
-\begin{itemize}
-\item
-  HVAC,Average,Room Air Zone Mixed Subzone Temperature {[}C{]}
-\item
-  HVAC,Average,Room Air Zone Occupied Subzone Temperature {[}C{]}
-\item
-  HVAC,Average,Room Air Zone Transition Height {[}m{]}
-\item
-  HVAC,Average,Room Air Zone Is Mixed Status {[]}
-\item
-  HVAC,Average,Room Air Zone Average Temperature Gradient {[}K/m{]}
-\item
-  HVAC,Average,Room Air Zone Effective Comfort Air Temperature {[}C{]}
-\item
-  HVAC,Average,Room Air Zone Thermostat Temperature {[}C{]}
-\item
-  HVAC,Average,Room Air Zone Transition Height Gamma Value {[]}
-\item
-  HVAC,Average,Room Air Zone Plume Heat Transfer Rate {[}W{]}
-\item
-  HVAC,Average,Room Air Zone Temperature Stratification Fraction {[]}
-\item
-  HVAC,Average,Room Air Zone Window Plume Heat Transfer Rate {[}W{]}
-\end{itemize}
-
-\paragraph{Room Air Zone Mixed Subzone Temperature {[}C{]}}\label{room-air-zone-mixed-subzone-temperature-c-1}
-
-The temperature of the upper subzone in degrees C.
-
-\paragraph{Room Air Zone Occupied Subzone Temperature {[}C{]}}\label{room-air-zone-occupied-subzone-temperature-c-1}
-
-The temperature of the lower, occupied subzone in degrees C.
-
-\paragraph{Room Air Zone Transition Height {[}m{]}}\label{room-air-zone-transition-height-m-1}
-
-The height above the floor, in meters, of the boundary between the lower occupied subzone and the upper subzone..
-
-\paragraph{Room Air Zone Is Mixed Status {[]}}\label{room-air-zone-is-mixed-status-1}
-
-An integer flag that indicates whether the zone is mixed (single node well-mixed zone model used) or stratified (UCSD UFI model used). The value 1 means well-mixed; 0 means stratified.
-
-\paragraph{Room Air Zone Average Temperature Gradient {[}K/m{]}}\label{room-air-zone-average-temperature-gradient-km-1}
-
-The temperature gradient between the middle of the occupied subzone and the middle of the upper subzone in degrees Kelvin per meter.
-
-\paragraph{Room Air Zone Effective Comfort Air Temperature {[}C{]}}\label{room-air-zone-effective-comfort-air-temperature-c}
-
-The temperature at the user specified comfort height in degrees C.
-
-\paragraph{Room Air Zone Thermostat Temperature {[}C{]}}\label{room-air-zone-thermostat-temperature-c-1}
-
-The temperature at the height of the thermostat (specified by user input) in degrees C.
-
-\paragraph{Room Air Zone Transition Height Gamma Value {[]}}\label{room-air-zone-transition-height-gamma-value}
-
-Value of gamma -- a dimensionless ``height'' used in calculating the transition height. Lower values of gamma indicate increased stratification, higher values less. Generally the values should be between 2 and 30.
-
-\paragraph{Room Air Zone Plume Heat Transfer Rate {[}W{]}}\label{room-air-zone-plume-heat-transfer-rate-w}
-
-The heat in watts driving the plumes in the occupied subzone.
-
-\paragraph{Room Air Zone Window Plume Heat Transfer Rate {[}W{]}}\label{room-air-zone-window-plume-heat-transfer-rate-w}
-
-The convective heat gain from windows in an UnderFloorAirDistributionExterior zone.
-
-\paragraph{Room Air Zone Temperature Stratification Fraction {[]}}\label{room-air-zone-temperature-stratification-fraction}
-
-This output, (Phi) is a measure of temperature stratification in the space. It is the difference between the occupied subzone temperature and the supply temperature divided by difference between the return temperature and the supply temperature. Technically it is equal to Kc. As phi approaches 1, the space is fully mixed. As phi approaches 0, the space becomes fully stratified. Expressed as an equation:
-
-\begin{equation}
-  \frac{T_{occ} - T_{sup}}{T_{ret} - T_{sup}}
-\end{equation}
 
 \subsubsection{Outputs}\label{outputs-7-009}
 

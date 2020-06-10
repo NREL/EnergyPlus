@@ -45,7 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/public/EnergyPlusPgm.hh>
+#include <EnergyPlus/api/EnergyPlusPgm.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <iostream>
 
 void message_callback_handler(std::string const &message)
@@ -69,7 +70,8 @@ int main(int argc, char *argv[])
         std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
         return EXIT_FAILURE;
     } else {
-        status = RunEnergyPlus(argv[1]);
+        EnergyPlus::EnergyPlusData state;
+        status = RunEnergyPlus(state, argv[1]);
     }
     if (!std::cin.good()) std::cin.clear();
     if (!std::cerr.good()) std::cerr.clear();

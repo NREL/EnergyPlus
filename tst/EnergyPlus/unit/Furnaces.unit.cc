@@ -58,9 +58,11 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/Furnaces.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -143,7 +145,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).SchedPtr = -1; // denotes missing schedule name in Furnace input ( returns 1.0 )
     HeatingLoad = true;
     CoolingLoad = false;
-    SetVSHPAirFlow(FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
 
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
     EXPECT_DOUBLE_EQ(0.5, CompOnMassFlow);
@@ -154,7 +156,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 0;
     HeatingLoad = true;
     CoolingLoad = false;
-    SetVSHPAirFlow(FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(0.25, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(0.25, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -166,7 +168,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 0;
     HeatingLoad = true;
     CoolingLoad = false;
-    SetVSHPAirFlow(FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(0.5, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(0.5, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -178,7 +180,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 0;
     HeatingLoad = true;
     CoolingLoad = false;
-    SetVSHPAirFlow(FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(1.0, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(1.0, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -190,7 +192,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 1;
     HeatingLoad = false;
     CoolingLoad = true;
-    SetVSHPAirFlow(FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(0.3, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(0.3, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -202,7 +204,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 2;
     HeatingLoad = false;
     CoolingLoad = true;
-    SetVSHPAirFlow(FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(0.6, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(0.6, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -214,7 +216,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 3;
     HeatingLoad = false;
     CoolingLoad = true;
-    SetVSHPAirFlow(FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(1.2, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(1.2, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -229,7 +231,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 0;
     HeatingLoad = true;
     CoolingLoad = false;
-    SetVSHPAirFlow(FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(0.0, MSHPMassFlowRateLow);
     EXPECT_EQ(0.0, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.2, CompOffMassFlow);
@@ -254,7 +256,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnaces::HeatingLoad = false;
     Furnaces::CoolingLoad = false;
 
-    CalcNewZoneHeatCoolFlowRates(
+    CalcNewZoneHeatCoolFlowRates(state, 
         FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(Furnace(1).MdotFurnace, 0.5); // CompOnMassFlow rate
     EXPECT_EQ(DataLoopNode::Node(1).MassFlowRate, 0.5); // furnace inlet node mass flow rate
@@ -319,7 +321,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     DataHeatBalance::HeatReclaimSimple_WAHPCoil.allocate(2);
 
     WaterToAirHeatPumpSimple::GetCoilsInputFlag = false; // turn off water source coil GetInput
-    CalcNewZoneHeatCoolFlowRates(
+    CalcNewZoneHeatCoolFlowRates(state, 
         FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(Furnace(1).MdotFurnace, 0.2); // flow rate is at idle speed flow rate
     EXPECT_EQ(DataLoopNode::Node(1).MassFlowRate, 0.2); // furnace inlet node mass flow rate is at idle speed flow rate
@@ -328,7 +330,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 
     Furnace(1).HeatPartLoadRatio = 1.0;
     Furnaces::HeatingLoad = true;
-    CalcNewZoneHeatCoolFlowRates(
+    CalcNewZoneHeatCoolFlowRates(state, 
         FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(Furnace(1).HeatPartLoadRatio, 1.0);
 
@@ -1167,13 +1169,13 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
     bool FirstHVACIteration(false);
 
     // OutputProcessor::TimeValue.allocate(2);
-    ManageSimulation();
+    ManageSimulation(state);
     // check the design max air outlet temperature
     EXPECT_DOUBLE_EQ(45.0, Furnace(1).DesignMaxOutletTemp);
 
     ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = 25000.0;
     ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 25000.0;
-    SimFurnace(Furnace(1).Name, FirstHVACIteration, AirLoopNum, CompIndex);
+    SimFurnace(state, Furnace(1).Name, FirstHVACIteration, AirLoopNum, CompIndex);
     // check the heating mode is On
     EXPECT_TRUE(Furnaces::HeatingLoad);
     // check the cooling mode is Off

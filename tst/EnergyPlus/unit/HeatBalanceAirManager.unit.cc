@@ -54,6 +54,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -87,7 +88,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
 
     bool ErrorsFound(false);
 
-    HeatBalanceAirManager::GetRoomAirModelParameters(ErrorsFound);
+    HeatBalanceAirManager::GetRoomAirModelParameters(state.outputFiles, ErrorsFound);
 
     EXPECT_TRUE(ErrorsFound);
 

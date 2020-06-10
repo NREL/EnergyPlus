@@ -899,7 +899,7 @@ namespace TranspiredCollector {
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
         using General::RoundSigDigits;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataHeatBalance; // , ONLY: QRadSWOutIncident, Construct, Material
@@ -1004,7 +1004,7 @@ namespace TranspiredCollector {
 
         RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, Tamb, OutHumRat);
 
-        CpAir = PsyCpAirFnWTdb(OutHumRat, Tamb);
+        CpAir = PsyCpAirFnW(OutHumRat);
 
         holeArea = UTSC(UTSCNum).ActualArea * UTSC(UTSCNum).Porosity;
 
@@ -1557,9 +1557,7 @@ namespace TranspiredCollector {
         TsColl = UTSC(UTSCNum).Tcoll;
     }
 
-    int GetAirInletNodeNum(std::string const &UTSCName,
-        bool &ErrorsFound
-    )
+    int GetAirInletNodeNum(std::string const &UTSCName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1594,9 +1592,7 @@ namespace TranspiredCollector {
         return NodeNum;
     }
 
-    int GetAirOutletNodeNum(std::string const &UTSCName,
-        bool &ErrorsFound
-    )
+    int GetAirOutletNodeNum(std::string const &UTSCName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1611,7 +1607,7 @@ namespace TranspiredCollector {
         // Return value
         int NodeNum; // node number returned
 
-                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichUTSC;
 
         if (GetInputFlag) {
@@ -1622,8 +1618,7 @@ namespace TranspiredCollector {
         WhichUTSC = UtilityRoutines::FindItemInList(UTSCName, UTSC);
         if (WhichUTSC != 0) {
             NodeNum = UTSC(WhichUTSC).OutletNode(1);
-        }
-        else {
+        } else {
             ShowSevereError("GetAirOutletNodeNum: Could not find TranspiredCollector = \"" + UTSCName + "\"");
             ErrorsFound = true;
             NodeNum = 0;

@@ -66,6 +66,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceHAMTManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -229,7 +230,7 @@ namespace HeatBalanceHAMTManager {
             OneTimeFlag = false;
             DisplayString("Initialising Heat and Moisture Transfer Model");
             GetHeatBalHAMTInput();
-            InitHeatBalHAMT();
+            InitHeatBalHAMT(OutputFiles::getSingleton());
         }
 
         CalcHeatBalHAMT(SurfNum, TempSurfInTmp, TempSurfOutTmp);
@@ -692,7 +693,7 @@ namespace HeatBalanceHAMTManager {
         }
     }
 
-    void InitHeatBalHAMT()
+    void InitHeatBalHAMT(OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph
@@ -750,14 +751,6 @@ namespace HeatBalanceHAMTManager {
         Real64 testlen;
         Real64 waterd; // water density
         bool DoReport;
-
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_1966("('! <HAMT cells>, Surface Name, Construction Name, Cell Numbers')");
-        static ObjexxFCL::gio::Fmt Format_1965("('! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) ')");
-        static ObjexxFCL::gio::Fmt Format_1968("('HAMT cells, ',A,',',A,400(,:,',',i4))");
-        static ObjexxFCL::gio::Fmt Format_1967("('HAMT origins,',A,',',A,400(,:,',',f10.7))");
-        static ObjexxFCL::gio::Fmt Format_108("('! <Material Nominal Resistance>, Material Name,  Nominal R')");
-        static ObjexxFCL::gio::Fmt Format_111("('Material Nominal Resistance's,2(',',A))");
 
         deltat = TimeStepZone * 3600.0;
 
@@ -997,8 +990,10 @@ namespace HeatBalanceHAMTManager {
         }
 
         // Reset surface virtual cell origins and volumes. Initialize report variables.
-        ObjexxFCL::gio::write(OutputFileInits, Format_1966);
-        ObjexxFCL::gio::write(OutputFileInits, Format_1965);
+        static constexpr auto Format_1966("! <HAMT cells>, Surface Name, Construction Name, Cell Numbers\n");
+        print(outputFiles.eio, Format_1966);
+        static constexpr auto Format_1965("! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) \n");
+        print(outputFiles.eio, Format_1965);
         // cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
         for (sid = 1; sid <= TotSurfaces; ++sid) {
             if (!Surface(sid).HeatTransSurf) continue;
@@ -1028,16 +1023,16 @@ namespace HeatBalanceHAMTManager {
 
             // write cell origins to initialization output file
             conid = Surface(sid).Construction;
-            ObjexxFCL::gio::write(OutputFileInits, "('HAMT cells, ',A,',',A,$)") << Surface(sid).Name << Construct(conid).Name;
+            print(outputFiles.eio, "HAMT cells, {},{}", Surface(sid).Name, Construct(conid).Name);
             for (int concell = 1, concell_end = Intcell(sid) - Extcell(sid) + 1; concell <= concell_end; ++concell) {
-                ObjexxFCL::gio::write(OutputFileInits, "(',',i4,$)") << concell;
+                print(outputFiles.eio, ",{:4}", concell);
             }
-            ObjexxFCL::gio::write(OutputFileInits);
-            ObjexxFCL::gio::write(OutputFileInits, "('HAMT origins,',A,',',A,$)") << Surface(sid).Name << Construct(conid).Name;
+            print(outputFiles.eio, "\n");
+            print(outputFiles.eio, "HAMT origins,{},{}", Surface(sid).Name, Construct(conid).Name);
             for (int cellid = Extcell(sid); cellid <= Intcell(sid); ++cellid) {
-                ObjexxFCL::gio::write(OutputFileInits, "(','f10.7,$)") << cells(cellid).origin(1);
+                print(outputFiles.eio, ",{:10.7F}", cells(cellid).origin(1));
             }
-            ObjexxFCL::gio::write(OutputFileInits);
+            print(outputFiles.eio, "\n");
 
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
                 SetupOutputVariable("HAMT Surface Temperature Cell " + TrimSigDigits(concell) + "",
@@ -1068,11 +1063,13 @@ namespace HeatBalanceHAMTManager {
         ScanForReports("Constructions", DoReport, "Constructions");
         if (DoReport) {
 
-            ObjexxFCL::gio::write(OutputFileInits, Format_108);
+            static constexpr auto Format_108("! <Material Nominal Resistance>, Material Name,  Nominal R\n");
+            print(outputFiles.eio, Format_108);
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 
-                ObjexxFCL::gio::write(OutputFileInits, Format_111) << Material(MaterNum).Name << RoundSigDigits(NominalR(MaterNum), 4);
+                static constexpr auto Format_111("Material Nominal Resistance,{},{:.4R}\n");
+                print(outputFiles.eio, Format_111, Material(MaterNum).Name, NominalR(MaterNum));
             }
         }
     }
@@ -1587,7 +1584,7 @@ namespace HeatBalanceHAMTManager {
         surfvp(sid) = RHtoVP(cells(Intcell(sid)).rh, cells(Intcell(sid)).temp);
     }
 
-    void interp(int const ndata, Array1A<Real64> const xx, Array1A<Real64> const yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad)
+    void interp(int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph
@@ -1609,8 +1606,8 @@ namespace HeatBalanceHAMTManager {
         // na
 
         // Argument array dimensioning
-        xx.dim(ndata);
-        yy.dim(ndata);
+        EP_SIZE_CHECK(xx, ndata);
+        EP_SIZE_CHECK(yy, ndata);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

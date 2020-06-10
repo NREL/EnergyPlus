@@ -45,6 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -126,18 +131,82 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
     DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));
     // Open six files to get unit number beyond 6 - these all get closed later by EnergyPlusFixture
-    DataGlobals::OutputFileStandard = FindUnitNumber(DataStringGlobals::outputEsoFileName);
-    DataGlobals::OutputFileInits = FindUnitNumber(DataStringGlobals::outputEioFileName);
-    DataGlobals::OutputFileMeters = FindUnitNumber(DataStringGlobals::outputMtrFileName);
-    DataGlobals::OutputFileBNDetails = FindUnitNumber(DataStringGlobals::outputBndFileName);
-    DataGlobals::OutputFileZoneSizing = FindUnitNumber(DataStringGlobals::outputZszCsvFileName);
-    DataGlobals::OutputFileSysSizing = FindUnitNumber(DataStringGlobals::outputSszCsvFileName);
     DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));
     // repeat this one - before fix, this broke cout_stream
-    int unitNum; // found unit number
-    unitNum = FindUnitNumber(DataStringGlobals::outputSszCsvFileName);
     EXPECT_FALSE(has_cout_output(true));
     DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));
 }
+
+TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
+{
+    DataStringGlobals::outputPerfLogFileName = "eplusout_1_perflog.csv";
+
+    // start with no file 
+    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+
+    // make sure the static variables are cleared
+    UtilityRoutines::appendPerfLog("RESET", "RESET");
+
+    // add headers and values
+    UtilityRoutines::appendPerfLog("header1", "value1-1");
+    UtilityRoutines::appendPerfLog("header2", "value1-2");
+    UtilityRoutines::appendPerfLog("header3", "value1-3", true);
+
+    std::ifstream perfLogFile;
+    std::stringstream perfLogStrSteam;
+
+    perfLogFile.open(DataStringGlobals::outputPerfLogFileName);
+    perfLogStrSteam << perfLogFile.rdbuf();
+    perfLogFile.close();
+    std::string perfLogContents = perfLogStrSteam.str();
+
+    std::string expectedContents = "header1,header2,header3,\n"
+                                   "value1-1,value1-2,value1-3,\n";
+
+    EXPECT_EQ(perfLogContents, expectedContents);
+
+    // clean up the file
+    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+
+}
+
+TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
+{
+    // make sure the static variables are cleared
+    UtilityRoutines::appendPerfLog("RESET", "RESET");
+
+    DataStringGlobals::outputPerfLogFileName = "eplusout_2_perflog.csv";
+
+    //create a file for the equivalent of the previous run
+    std::ofstream initPerfLogFile;
+    initPerfLogFile.open(DataStringGlobals::outputPerfLogFileName);
+    initPerfLogFile << "header1,header2,header3,\n";
+    initPerfLogFile << "value1-1,value1-2,value1-3,\n";
+    initPerfLogFile.close();
+
+    // without deleting file add headers and values again
+    UtilityRoutines::appendPerfLog("ignored1", "value2-1");
+    UtilityRoutines::appendPerfLog("ignored2", "value2-2");
+    UtilityRoutines::appendPerfLog("ignored3", "value2-3", true);
+
+    std::ifstream perfLogFile;
+    std::stringstream perfLogStrSteam;
+
+    perfLogFile.open(DataStringGlobals::outputPerfLogFileName);
+    perfLogStrSteam << perfLogFile.rdbuf();
+    perfLogFile.close();
+    std::string perfLogContents = perfLogStrSteam.str();
+
+    std::string expectedContents = "header1,header2,header3,\n"
+                       "value1-1,value1-2,value1-3,\n"
+                       "value2-1,value2-2,value2-3,\n";
+
+    EXPECT_EQ(perfLogContents, expectedContents);
+
+    // clean up the file
+    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+
+}
+

@@ -2,92 +2,6 @@
 
 The systems described in the Air Distribution Units (ADU's) are shown below. A variety of air terminal units are available for connecting air systems to thermal zones. These single description ADU's contain the reference to the components and the actual controls in one block of input. The idea is that the control volume is drawn tightly around the controls and loosely around the components. This allows complex interactions to take place between all of the components that respond to the Zone Thermostatic Control output. The coils that are referenced in the ADU's are explained fully in the ``Coils'' section of this manual.
 
-\subsection{AirTerminal:SingleDuct:Uncontrolled}\label{airterminalsingleductuncontrolled}
-
-Central system air is usually supplied to a zone through a terminal unit such as a single duct VAV reheat box. Sometimes, however, it is desirable to supply central system air directly to a zone without any zone level control or tempering. An example would be a single zone reheat system.
-
-The control zone receives supply air directly from the central system since the supply air temperature has been adjusted to control the temperature in the control zone. The slave zones then have baseboards or reheat coils to allow some temperature adjustment. The AirTerminal:SingleDuct:Uncontrolled object creates the capability of supplying central system air directly to a zone. Its input consists of the object name, an availability (on/off) schedule, and a node name. This node is both a zone inlet node and an outlet node of the \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter}.
-
-For the objects to work correctly, it is important in any systems including Direct Air objects for the sum of the maximum zone air flow rates to be equal to the maximum central system flow rate. The zone maximum flow rates are specified in the zone terminal unit or direct air inputs. The central air system flow rate is specified in the \hyperref[airloophvac]{AirLoopHVAC} input and also in the air loop branch and central fan inputs.
-
-\subsubsection{Inputs}\label{inputs-001}
-
-\paragraph{Field: Name}\label{field-name-001}
-
-A unique user assigned name for each AirTerminal:SingleDuct:Uncontrolled component. Any other component that needs to use this direct air component will refer to it by this name.
-
-\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name}
-
-The name of the schedule (ref: Schedule) that denotes whether the component can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
-
-\paragraph{Field: Zone Supply Air Node Name}\label{field-zone-supply-air-node-name}
-
-The name of the node to which the component is supplying air. This should be one of the supply air nodes for the zone the component is serving. This node should also be an outlet node of a \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} component.
-
-\paragraph{Field: Maximum Air Flow Rate}\label{field-maximum-air-flow-rate}
-
-The design maximum volume flow rate~ (m\(^{3}\)/sec) specified for the AirTerminal:SingleDuct:Uncontrolled object.~ This field is autosizable.
-
-\paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-DSOA-object-name}
-
-This field allows modifying the behavior of this air terminal so that it is modulated to supply the required outdoor air to the zone.  This field is optional. When the name of an \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object is entered, the model is changed to adjust the flow rate to provide the volume of outdoor air described by that object.  This feature allows modeling demand controlled ventilation on a zone-by-zone basis using the Outdoor Air Flow per Person rate (specified in the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object) and the number of occupants (specified in the \hyperref[people]{People} object schedules).  If the outdoor air fraction of the supply air is 1.0, as for a dedicated outdoor air system, the air flow rate will match the outdoor air requirement.  When the outdoor air fraction is less than 1.0, as for a recirculating air system, the terminal air flow will be modulated upward to account for the increased total air flow needed to provide the required flow rate of outdoor air.   The total air flow rate will not exceed the Maximum Air Flow Rate specified above. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0.
-
-\paragraph{Field: Per Person Ventilation Rate Mode}\label{field-per-person-ventilation-rate-mode}
-
-This field specifies how the outdoor air ventilation rates are calculated when based on a rate per person. It can be either based on the current number of people as affected by time-varying occupancy schedules, or on the constant value for the maximum number of people.~~ Enter the key CurrentOccupancy for the former and DesignOccupancy for the later.
-
-\paragraph{Field: Design Specification Air Terminal Sizing Name}\label{design-specification-air-terminal-sizing-name1}
-
-This optional input field is the name of a \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} object which specifies sizing adjustments to be made for this terminal unit. The terminal unit is initially sized according to the inputs in the corresponding \hyperref[sizingzone]{Sizing:Zone} object. Then the adjustment factors in the \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} object are applied. See \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} for more details. If left blank, then no adjustments are made.
-
-An example input follows.
-
-\begin{lstlisting}
-
-AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,
-      FanAndCoilAvailSched,
-      Zone 1 Inlet Node,
-      0.47;
-  AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,
-      FanAndCoilAvailSched,
-      Zone 2 Inlet Node,
-      0.36;
-  AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,
-      FanAndCoilAvailSched,
-      Zone 3 Inlet Node,
-      0.47,
-      OA Design Rate,
-      CurrentOccupancy;
-\end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-000}
-
-\begin{itemize}
-\item
-  HVAC,Sum,Zone Air Terminal Sensible Heating Energy {[}J{]}
-\item
-  HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
-\item
-  HVAC,Average,Zone Air Terminal Sensible Heating Rate {[}W{]}
-\item
-  HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
-\end{itemize}
-
-\paragraph{Zone Air Terminal Sensible Heating Energy~ {[}J{]}}\label{zone-air-terminal-sensible-heating-energy-j}
-
-\paragraph{Zone Air Terminal Sensible Heating Rate {[}W{]}}\label{zone-air-terminal-sensible-heating-rate-w}
-
-These outputs are the sensible heating power and energy provided to the zone by the uncontrolled air terminal unit.
-
-\paragraph{Zone Air Terminal Sensible Cooling Energy {[}J{]}}\label{zone-air-terminal-sensible-cooling-energy-j}
-
-\paragraph{Zone Air Terminal Sensible Cooling Rate {[}W{]}}\label{zone-air-terminal-sensible-cooling-rate-w}
-
-These outputs are the sensible cooling power and energy provided to the zone by the uncontrolled air terminal unit.
-
 \subsection{AirTerminal:SingleDuct:ConstantVolume:Reheat}\label{airterminalsingleductconstantvolumereheat}
 
 The AirTerminal:SingleDuct:ConstantVolume:Reheat or terminal reheat system is a constant volume reheat system. The systems cooling capabilities are provided by way of cooling coil that supplies cooling to the entire supply air volume. The cooling coil is controlled by a controller setpoint specified for the cooling coil. Zone control is accomplished by heating (reheating) the airflow into each zone as determined by the zone thermostat. Currently the reheat can be supplied by a electric, gas, or hot water coil that tries to meet the zone demand.
@@ -143,11 +57,22 @@ This field is zero for gas and electric coils. Set to the minimum design hot wat
 
 \paragraph{Field: Convergence Tolerance}\label{field-convergence-tolerance}
 
-The coil is controlled by knowing the zone demand determined by the zone thermostat and setting the outlet conditions to meet this demand. For the electric and gas coils, this is set exactly since the coil model solution can be inverted. With the hot water coil that uses an effectiveness-NTU method, the solution cannot be inverted directly. Therefore, to determine the correct mass flow rate for the hot water the solution is solved for by iteration. The iterative solution uses an interval halving routine and needs a termination criteria that is set with the Convergence Tolerance parameter. This control offset is set to a decimal fraction of the zone demand as the criteria, i.e.~0.001. The default for the field is 0.001.
+The coil is controlled by knowing the zone demand determined by the zone thermostat and setting the outlet conditions to meet this demand. For the electric and gas coils, this is set exactly since the coil model solution can be inverted. With the hot water coil that uses an effectiveness-NTU method, the solution cannot be inverted directly. Therefore, to determine the correct mass flow rate for the hot water the solution is solved for by iteration. The iterative solution uses an interval halving routine and needs a termination criterion that is set with the Convergence Tolerance parameter. This control offset is set to a decimal fraction of the zone demand as the criteria, i.e.~0.001. The default for the field is 0.001.
 
 \paragraph{Field: Maximum Reheat Air Temperature}\label{field-maximum-reheat-air-temperature}
 
 This is the upper limit on the temperature in degrees C of the air leaving the terminal unit -- reheat coil (and being delivered to the zone). If the user leaves this field blank, no maximum reheat air temperature is enforced.
+
+\subsubsection{Outputs}
+
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 An IDF example:
 
@@ -165,11 +90,6 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
       0.0,  !- Min Reheat Water Flow {m3/s}
       0.001;  !- Convergence Tolerance
 \end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-1-000}
-
-There are no outputs for the constant volume reheat air terminal.
-
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:NoReheat}\label{airterminalsingleductconstantvolumenoreheat}
 The AirTerminal:SingleDuct:ConstantVolume:NoReheat object creates the capability of supplying central system air directly to a zone without any zone level thermostat control. The supply air temperature is controlled by the central system controller. It is typically used with a unitary system and furnaces which controls the system supply temperature and flow rate with continuous or cycling fan. When used without the Design Specification Outdoor Air Object Name, the terminal unit is passive and accepts any flow rate supplied by the central system, but will never exceed the maximum air flow rate.
@@ -206,6 +126,17 @@ This field is used to modulate the terminal unit flow rate based on the specifie
 
 This field specifies the occupancy level to use when calculating the ventilation rate per person when a Design Specification Outdoor Air Object Name has been specified. \textit{CurrentOccupancy} uses the current number of people in the zone which may vary. \textit{DesignOccupancy} uses the total Number of People specified for the zone which is constant.
 
+\subsubsection{Outputs}
+
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
+
 An IDF example:
 
 \begin{lstlisting}
@@ -220,41 +151,9 @@ AirTerminal:SingleDuct:ConstantVolume:NoReheat,
       ;                               !- Per Person Ventilation Rate Mode
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-000}
-
-\begin{itemize}
-\item
-  HVAC,Sum,Zone Air Terminal Sensible Heating Energy {[}J{]}
-\item
-  HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
-\item
-  HVAC,Average,Zone Air Terminal Sensible Heating Rate {[}W{]}
-\item
-  HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
-\item
-  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
-\end{itemize}
-
-\paragraph{Zone Air Terminal Sensible Heating Rate {[}W{]}}\label{zone-air-terminal-sensible-heating-rate-w}
-
-\paragraph{Zone Air Terminal Sensible Heating Energy~ {[}J{]}}\label{zone-air-terminal-sensible-heating-energy-j}
-
-These outputs are the sensible heating rate and energy provided to the zone by the single duct constant volume no reheat air terminal unit.
-
-\paragraph{Zone Air Terminal Sensible Cooling Rate {[}W{]}}\label{zone-air-terminal-sensible-cooling-rate-w}
-
-\paragraph{Zone Air Terminal Sensible Cooling Energy {[}J{]}}\label{zone-air-terminal-sensible-cooling-energy-j}
-
-These outputs are the sensible cooling rate and energy provided to the zone by the single duct constant volume no reheat air terminal unit.
-
-\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
-
-This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported.~ The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
-
-
 \subsection{AirTerminal:SingleDuct:VAV:Reheat}\label{airterminalsingleductvavreheat}
 
-AirTerminal:SingleDuct:VAV:Reheat - Variable air volume (VAV) systems control the dry-bulb temperature inside a zone by varying the supply air volume instead of the air temperature. At full cooling the VAV damper is fully open supplying the specified maximum air flow rate. As the cooling load decreases, the damper closes until it reaches the minimum stop specified by the zone minimum air flow fraction.
+AirTerminal:SingleDuct:VAV:Reheat - Variable air volume (VAV) systems control the dry-bulb temperature inside a zone by varying the supply air volume instead of the air temperature. At full cooling the VAV damper is fully open supplying the specified maximum air flow rate. As the cooling load decreases, the damper closes until it reaches the minimum stop specified by the zone minimum air flow fraction. The zone minimum supply air flow can be further adjusted using scheduled fraction values specified in the field \textit{Minimum Air Flow Turndown Schedule Name}.
 
 VAV systems can be used for interior or perimeter zones with a common fan system, air temperature control, and reheating devices. The VAV concept may vary according to the VAV box locations, air temperature controls and types of heating elements. Heating can usually be provided by use of reheat coils or thermostatic baseboard.
 
@@ -298,7 +197,7 @@ This field is autosizable and defaulted to autosize. The autosized flow rate is 
 
 \paragraph{Field: Minimum Air Flow Fraction Schedule Name}\label{field-minimum-air-flow-fraction-schedule-name}
 
-The name of a schedule that determines the value of the minimum air flow fraction.~ The schedule should contain fractions from 0.0 to 1.0.~ These values will define the minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate.~ The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).~ This field is used if the previous field is set to Scheduled.~ If the previous field is left blank (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then the air flow rate usedfor sizing normal-action reheat coils is the average of the minimum and maximum values in this schedule.~ The air flow rate used for reheat coil sizing is reported with other component sizing information as ``Reheat Coil Sizing Air Volume Flow Rate.''
+The name of a schedule that determines the value of the minimum air flow fraction.~ The schedule should contain fractions from 0.0 to 1.0.~ These values will define the minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate.~ The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).~ This field is used if the previous field is set to Scheduled.~ If the previous field is left blank (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then the air flow rate used for sizing normal-action reheat coils is the average of the minimum and maximum values in this schedule.~ The air flow rate used for reheat coil sizing is reported with other component sizing information as ``Reheat Coil Sizing Air Volume Flow Rate.''
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-1}
 
@@ -315,19 +214,19 @@ The valid reheat component objects currently available are:
   \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
-If there is no reheat coil,use \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} instead of this object.
+If there is no reheat coil, use \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} instead of this object.
 
 \paragraph{Field: Reheat Coil Name}\label{field-reheat-coil-name-1}
 
-Reheat Coil Object name being simulated with this ADU. Applicable for all coils. If there is no reheat coil,use object \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} instead of this object.
+Reheat Coil Object name being simulated with this ADU. Applicable for all coils. If there is no reheat coil, use object \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} instead of this object.
 
 \paragraph{Field: Maximum Hot Water or Steam Flow Rate}\label{field-maximum-hot-water-or-steam-flow-rate-1}
 
-This field is zero for gas and electric coils. Set to the maximum design hot water or steam volumetric flow rate in m\(^{3}\)/s for the hot water or steam heating coil. The steam volumetric flow rate is calculated at 100C and 101325 Pa. This field is autosizable. If there is no reheat coil,~ this is left blank.
+This field is zero for gas and electric coils. Set to the maximum design hot water or steam volumetric flow rate in m\(^{3}\)/s for the hot water or steam heating coil. The steam volumetric flow rate is calculated at 100C and 101325 Pa. This field is autosizable. If there is no reheat coil, this is left blank.
 
 \paragraph{Field: Minimum Hot Water or Steam Flow Rate}\label{field-minimum-hot-water-or-steam-flow-rate-1}
 
-This field is zero for gas and electric coils. Set to the minimum design hot water or steam volumetric flow rate in m\(^{3}\)/s for the hot water or steam heating coil, normally set to be a shut off valve that is set to zero. The steam volumetric flow rate is calculated at 100C and 101325 Pa. If there is no reheat coil,~ this is left blank.
+This field is zero for gas and electric coils. Set to the minimum design hot water or steam volumetric flow rate in m\(^{3}\)/s for the hot water or steam heating coil, normally set to be a shut off valve that is set to zero. The steam volumetric flow rate is calculated at 100C and 101325 Pa. If there is no reheat coil, this is left blank.
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-1}
 
@@ -375,11 +274,15 @@ This fraction is multiplied by the Maximum Air Flow Rate to determine the maximu
 
 \paragraph{Field: Maximum Reheat Air Temperature}\label{field-maximum-reheat-air-temperature-1}
 
-This field specifies a maximum supply air temperature (Â°C) leaving the reheat coil in a VAV terminal unit during heating operation. If leaving blank, the temperature of the supply air to the space in heating operation may get unrealistic high.
+This field specifies a maximum supply air temperature (°C) leaving the reheat coil in a VAV terminal unit during heating operation. If leaving blank, the temperature of the supply air to the space in heating operation may get unrealistic high.
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-design-specification-outdoor-air-object-name}
 
 This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
+
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+
+This field adjusts the \textit{Constant Minimum Air Flow Fraction}, \textit{Fixed Minimum Air Flow Rate}, or \textit{Minimum Air Flow Fraction Schedule} value by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1.
 
 An IDF example:
 
@@ -405,7 +308,8 @@ An IDF example:
       ,         !- Maximum Flow per Zone Floor Area During Reheat
       ,         !- Maximum Flow Fraction During Reheat
       35.0,     !- Maximum Reheat Air Temperature {C}
-      ;         !- Design Specification Outdoor Air Object Name
+      ,         !- Design Specification Outdoor Air Object Name
+      TurndownMinAirFlowSch;   !- Minimum Air Flow Turndown Schedule Name
 
     DesignSpecification:OutdoorAir,
       ZoneMinOARequirements,    !- Name
@@ -433,6 +337,19 @@ An IDF example:
       autosize,  !- Nominal Capacity of the Coil {W}
       SPACE1-1 Zone Coil Air In Node,  !- Coil_Air_Inlet_Node
       SPACE1-1 In Node;  !- Coil_Air_Outlet_Node
+
+    Schedule:Compact,
+      TurndownMinAirFlowSch,   !- Name
+      Fraction,                !- Schedule Type Limits Name
+      Through: 12/31,          !- Field 1
+      For: Weekdays,           !- Field 2
+      Until: 7:00,0.50,        !- Field 3
+      Until: 17:00,0.75,       !- Field 4
+      Until: 24:00,0.50,       !- Field 5
+      For: SummerDesignDay WinterDesignDay, !- Field 6
+      Until: 24:00,1.0,        !- Field 7
+      For: Weekends Holidays CustomDay1 CustomDay2, !- Field 8
+      Until: 24:00,0.25;       !- Field 9
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-2-000}
@@ -452,17 +369,17 @@ This output is the variable air volume damper position required to meet the zone
 
 \paragraph{Zone Air Terminal Minimum Air Flow Fraction {[]}}\label{zone-air-terminal-minimum-air-flow-fraction}
 
-This output is the value for the minimum air flow fraction setting on a VAV terminal.~~ This is the average value over the frequency being reported.~ The minimum air flow fraction is defined as the lower limit on the terminal unit air mass flow rate divided by the terminal units maximum air mass flow rate.
+This output is the value for the minimum air flow fraction setting on a VAV terminal.~~ This is the average value over the frequency being reported. The minimum air flow fraction is defined as the lower limit on the terminal unit air mass flow rate divided by the terminal units maximum air mass flow rate.
 
 \paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
 
-This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported.~ The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan}\label{airterminalsingleductvavreheatvariablespeedfan}
 
 The VAV terminal unit with variable-speed fan and reheat coil is an air system terminal unit consisting of a variable speed fan in series with a heating coil. These units are usually employed in underfloor air distribution (UFAD) systems where the air is supplied at low static pressure through an underfloor plenum. The fan is used to control the flow of conditioned air that enters the space. When the fan is off the plenum pressure drives the minimum air flow through the terminal unit. At maximum cooling the fan runs at its maximum speed. At full heating the fan runs at its heating maximum -- usually less than the cooling maximum flow rate. Thus this unit has two separate maximum flow rates -- one for heating and one for cooling.
 
-For cooling, control is maintained simply by varying the fan speed. For heating, the unit first tries to meet the heating load by varying the heating coil output while keeping the air flow at minimum (fan off). If this is not adequate the fan turns on and operates in variable flow mode up to the heating maximum flow rate.
+For cooling, control is maintained simply by varying the fan speed. For heating, the unit first tries to meet the heating load by varying the heating coil output while keeping the air flow at minimum (fan off). If this is not adequate the fan turns on and operates in variable flow mode up to the heating maximum flow rate. The zone fan-off minimum supply air flow can be further adjusted using scheduled fraction values specified in the field \textit{Minimum Air Flow Turndown Schedule Name}.
 
 This unit is modeled in EnergyPlus as a compound component -- a variable speed fan and a heating coil in series in the air stream. The unit is blow through -- the fan is upstream of the heating coil.
 
@@ -531,7 +448,9 @@ The maximum hot water or steam volumetric flow rate in m\(^{3}\)/s through the u
 
 The minimum hot water or steam volumetric flow rate in m\(^{3}\)/s through the unit's heating coil. The steam volumetric flow rate is calculated at 100C and 101325 Pa. If the heating coil is not a hot water or steam coil this field should be left blank.
 
-The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. The model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
+\paragraph{Field: Heating Convergence Tolerance}\label{field-heating-convergence-tolerance}
+
+The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. The model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically, this is the fraction:
 
 \begin{equation}
   \frac{\left| Q_{\rm{unit, out}} - Q_{\rm{zone load}} \right|}{Q_{\rm{zone load}}} \le \rm{ConvergenceTolerance}
@@ -542,6 +461,10 @@ The control tolerance for the unit heating output. The unit is controlled by mat
 % \end{equation}
 
 The default is 0.001.
+
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+
+This field adjusts \textit{Zone Minimum Air Flow Fraction} by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and the VAV air terminal uses the fixed fraction specified in in the field \textit{Zone Minimum Air Flow Fraction}.
 
 An IDF example:
 
@@ -560,7 +483,8 @@ AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,
   SPACE2-1 Zone Coil,                   !- Heating coil name
   autosize,                             !- Max hot water flow
   0.0,                                  !- Min hot water flow
-  0.001;                                !- Heating Convergence Tolerance
+  0.001,                                !- Heating Convergence Tolerance
+  TurndownMinAirFlowSch;   !- Minimum Air Flow Turndown Schedule Name
 
 Coil:Heating:Water,
   SPACE2-1 Zone Coil,                   !- Coil Name
@@ -588,6 +512,19 @@ Fan:VariableVolume,
   0.000,                                !- FanCoefficient 5
   SPACE2-1 ATU In Node,                 !- Fan_Inlet_Node
   SPACE2-1 Zone Coil AirIn Node;        !- Fan_Outlet_Node
+
+Schedule:Compact,
+  TurndownMinAirFlowSch,   !- Name
+  Fraction,                !- Schedule Type Limits Name
+  Through: 12/31,          !- Field 1
+  For: Weekdays,           !- Field 2
+  Until: 7:00,0.50,        !- Field 3
+  Until: 17:00,0.75,       !- Field 4
+  Until: 24:00,0.50,       !- Field 5
+  For: SummerDesignDay WinterDesignDay, !- Field 6
+  Until: 24:00,1.0,        !- Field 7
+  For: Weekends Holidays CustomDay1 CustomDay2, !- Field 8
+  Until: 24:00,0.25;       !- Field 9
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3}
@@ -602,7 +539,7 @@ This output is the variable air volume flow fraction required to meet the zone l
 
 Variable air volume (VAV) systems typically control the dry-bulb temperature inside a zone by varying the supply air volume instead of the supply air temperature (ref: \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat}). Reheat coils may be required to avoid overcooling (ref: \hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat}).
 
-This terminal unit is slightly different from the \hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat} terminal unit. Both operate the same in cooling mode: the damper opens as needed to provide additional sensible cooling to the zone. The difference between the two is in heating mode.~ For the Single Duct VAV Reheat terminal unit, the air flow rate is reduced to the minimum value (max air flow rate x zone minimum air flow fraction) when zone heating is required and the reheat coil output is modulated to meet the zone heating load.~ For the AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat terminal unit, the air flow rate in heating mode is increased to meet higher zone heating loads (similar to what is done in cooling mode). If additional heat is required (beyond what the terminal unit can provide with its damper fully open), then the reheat coil is modulated as needed to meet the additional heating load.
+This terminal unit is slightly different from the \hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat} terminal unit. Both operate the same in cooling mode: the damper opens as needed to provide additional sensible cooling to the zone. The difference between the two is in heating mode.~ For the Single Duct VAV Reheat terminal unit, the air flow rate is reduced to the minimum value (max air flow rate x zone minimum air flow fraction) when zone heating is required and the reheat coil output is modulated to meet the zone heating load. The zone minimum supply air flow can be further adjusted using scheduled fraction values specified in the field \textit{Minimum Air Flow Turndown Schedule Name}.~ For the AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat terminal unit, the air flow rate in heating mode is increased to meet higher zone heating loads (similar to what is done in cooling mode). If additional heat is required (beyond what the terminal unit can provide with its damper fully open), then the reheat coil is modulated as needed to meet the additional heating load.
 
 This terminal unit model was originally developed and tested for use with the changeover-bypass VAV unitary system.
 
@@ -673,11 +610,15 @@ This is the air outlet node for the ADU and is then connected to the zone. This 
 
 \paragraph{Field: Convergence Tolerance}\label{field-convergence-tolerance-2}
 
-The coil is controlled by knowing the zone demand determined by the zone thermostat and setting the outlet conditions to meet this demand. For the electric and gas coils, this is set exactly since the coil model solution can be inverted and this field is not used. With the hot water coil that uses an effectiveness-NTU method, the solution cannot be inverted directly. Therefore, to determine the correct mass flow rate for the hot water the solution is solved by iteration. The iterative solution uses an interval-halving routine and needs a termination criteria that is set with this Convergence Tolerance parameter. This control offset is set to a decimal fraction of the zone demand. The default value for this field is 0.001.
+The coil is controlled by knowing the zone demand determined by the zone thermostat and setting the outlet conditions to meet this demand. For the electric and gas coils, this is set exactly since the coil model solution can be inverted and this field is not used. With the hot water coil that uses an effectiveness-NTU method, the solution cannot be inverted directly. Therefore, to determine the correct mass flow rate for the hot water the solution is solved by iteration. The iterative solution uses an interval-halving routine and needs a termination criterion that is set with this Convergence Tolerance parameter. This control offset is set to a decimal fraction of the zone demand. The default value for this field is 0.001.
 
 \paragraph{Field: Maximum Reheat Air Temperature}\label{field-maximum-reheat-air-temperature-2}
 
 This is the upper limit on the temperature in degrees C of the air leaving the terminal unit -- reheat coil (and being delivered to the zone). If the user leaves this field blank, no maximum reheat air temperature is enforced.
+
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+
+This field adjusts the \textit{Zone Minimum Air Flow Fraction} by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and uses the fixed fraction specified in the field \textit{Zone Minimum Air Flow Fraction}.
 
 An IDF example is provided below:
 
@@ -716,7 +657,7 @@ This output is the damper position required to meet the zone load. This is the a
 
 \subsection{AirTerminal:SingleDuct:VAV:NoReheat}\label{airterminalsingleductvavnoreheat}
 
-Variable air volume (VAV) systems control the dry-bulb temperature inside a zone by varying the supply air volume instead of the air temperature. At full cooling the VAV damper is fully open supplying the specified maximum air flow rate. As the cooling load decreases, the damper closes until it reaches the minimum stop specified by the zone minimum air flow fraction.
+Variable air volume (VAV) systems control the dry-bulb temperature inside a zone by varying the supply air volume instead of the air temperature. At full cooling the VAV damper is fully open supplying the specified maximum air flow rate. As the cooling load decreases, the damper closes until it reaches the minimum stop specified by the zone minimum air flow fraction. The zone minimum supply air flow can be adjusted using scheduled fraction values specified in the field \textit{Minimum Air Flow Turndown Schedule Name}.
 
 VAV systems can be used for interior or perimeter zones with a common fan system and air temperature control. The VAV concept may vary according to the VAV box locations and air temperature controls. Heating can be provided if necessary by use of baseboard.
 
@@ -766,6 +707,10 @@ The name of a schedule that determines the value of the minimum air flow fractio
 
 This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
 
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+
+This field adjusts the \textit{Constant Minimum Air Flow Fraction}, \textit{Fixed Minimum Air Flow Rate}, or \textit{Minimum Air Flow Fraction Schedule} value by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1.
+
 An IDF example:
 
 \begin{lstlisting}
@@ -780,7 +725,8 @@ An IDF example:
       0.3,                     !- Constant Minimum Air Flow Fraction
       ,                        !- Fixed Minimum Air Flow Rate
       ,                        !- Minimum Air Flow Fraction Schedule Name
-      ZoneOAData;              !- Design Specification Outdoor Air Object Name
+      ZoneOAData,              !- Design Specification Outdoor Air Object Name
+      TurndownMinAirFlowSch;   !- Minimum Air Flow Turndown Schedule Name
 
     DesignSpecification:OutdoorAir,
       ZoneOAData,            !- Name
@@ -799,6 +745,19 @@ An IDF example:
       Until: 24:00, 1.0,       !- Field 4
       For: AllOtherDays,       !- Field 5
       Until: 24:00, 0.5;       !- Field 7
+
+    Schedule:Compact,
+      TurndownMinAirFlowSch,   !- Name
+      Fraction,                !- Schedule Type Limits Name
+      Through: 12/31,          !- Field 1
+      For: Weekdays,           !- Field 2
+      Until: 7:00,0.50,        !- Field 3
+      Until: 17:00,0.75,       !- Field 4
+      Until: 24:00,0.50,       !- Field 5
+      For: SummerDesignDay WinterDesignDay, !- Field 6
+      Until: 24:00,1.0,        !- Field 7
+      For: Weekends Holidays CustomDay1 CustomDay2, !- Field 8
+      Until: 24:00,0.25;       !- Field 9
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-5}
@@ -816,15 +775,15 @@ This output is the damper position required to meet the zone load. This is the a
 
 \paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s-1}
 
-This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported.~ The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat}\label{airterminalsingleductvavheatandcoolnoreheat}
 
 Variable air volume (VAV) systems typically control the dry-bulb temperature inside a zone by varying the supply air volume instead of the supply air temperature (ref: \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat}). Reheat coils may be required to avoid overcooling (ref: \hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat}).
 
-This terminal unit is slightly different from the \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} terminal unit. Both operate the same in cooling mode: the damper opens as needed to provide additional sensible cooling to the zone. The difference between the two is in heating mode. For the Single Duct VAV NoReheat terminal unit, the air flow rate is reduced to the minimum value (max air flow rate x zone minimum air flow fraction) when zone heating is required. For the AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat terminal unit, the air flow rate in heating mode is increased to meet higher zone heating loads (similar to what is done in cooling mode).
+This terminal unit is slightly different from the \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} terminal unit. Both operate the same in cooling mode: the damper opens as needed to provide additional sensible cooling to the zone. The difference between the two is in heating mode. For the Single Duct VAV NoReheat terminal unit, the air flow rate is reduced to the minimum value (max air flow rate x zone minimum air flow fraction) when zone heating is required. The zone minimum supply air flow can be further adjusted using scheduled fraction values specified in the field \textit{Minimum Air Flow Turndown Schedule Name}. For the AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat terminal unit, the air flow rate in heating mode is increased to meet higher zone heating loads (similar to what is done in cooling mode).
 
-This terminal unit model was originally developed and tested for use with the changeover-bypass VAV unitary system..This object may be used when the central heating coil is sufficient to maintain the heating set point temperature. Additional heating may be provided, if necessary, by use of \hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or ZoneHVAC:Baseboard:* objects.
+This terminal unit model was originally developed and tested for use with the changeover-bypass VAV unitary system. This object may be used when the central heating coil is sufficient to maintain the heating set point temperature. Additional heating may be provided, if necessary, by use of \hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or ZoneHVAC:Baseboard:* objects.
 
 \begin{figure}[hbtp] % fig 105
 \centering
@@ -857,6 +816,10 @@ This numeric field defines the design maximum volume flow rate (m\(^{3}\)/sec) s
 \paragraph{Field: Zone Minimum Air Flow Fraction}\label{field-zone-minimum-air-flow-fraction-2}
 
 This numeric field defines the minimum air volume flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. This value must be between 0 and 1.
+
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+
+This field adjusts the \textit{Zone Minimum Air Flow Fraction} by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and uses the fixed fraction specified in the field \textit{Zone Minimum Air Flow Fraction}.
 
 An IDF example is provided below:
 
@@ -953,7 +916,7 @@ The type of coil in the PIU. The valid choices are:
   \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
-In other words the PIU may have a hot water, gas, electric or steam reheat coil.
+In other words, the PIU may have a hot water, gas, electric or steam reheat coil.
 
 \paragraph{Field: Reheat Coil Name}\label{field-reheat-coil-name-3}
 
@@ -969,7 +932,7 @@ The minimum hot water volumetric flow rate in m\(^{3}\)/sec through the unit's h
 
 \paragraph{Field: Convergence Tolerance}\label{field-convergence-tolerance-3}
 
-The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For units with water coils, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
+The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For units with water coils, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically, this is the fraction:
 
 \begin{equation}
 \frac{{\left| {{Q_{PIU,out}} - {Q_{zone\;load}}} \right|}}{{{Q_{zone\;load}}}} \le ConvergenceTolerance
@@ -1108,7 +1071,7 @@ The type of coil in the PIU. The valid choices are:
   \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
-In other words the PIU may have a hot water, gas, electric or steam reheat coil.
+In other words, the PIU may have a hot water, gas, electric or steam reheat coil.
 
 \paragraph{Field: Reheat Coil Name}\label{field-reheat-coil-name-4}
 
@@ -1124,7 +1087,7 @@ The minimum hot water or steam volumetric flow rate in m\(^{3}\)/s through the u
 
 \paragraph{Field: Convergence Tolerance}\label{field-convergence-tolerance-4}
 
-The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For units with water coils, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
+The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For units with water coils, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically, this is the fraction:
 
 \begin{equation}
 \frac{{\left| {{Q_{PIU,out}} - {Q_{zone\;load}}} \right|}}{{{Q_{zone\;load}}}} \le ConvergenceTolerance
@@ -1187,7 +1150,7 @@ This field reports the dry air sensible heat extraction of the parallel PIU term
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}\label{airterminalsingleductconstantvolumefourpipeinduction}
 
-The four pipe induction terminal unit provides local hot water heating or chilled water cooling of induced zone air which then mixes with centrally conditioned supply air. An air conditioning system consisting of these terminal units is effectively a mixed cental air / local hydronic system. The centrally conditioned air supplied to the induction terminal units is constant volume at quite high pressure. The central air is discharged through a nozzle in the terminal unit, inducing a flow of room air over a hydronic heating/cooling coil. The coil is connected either to a single inlet and outlet pipe (2 pipe unit) or to 2 inlets and 2 outlets (4 pipe unit). The heated or cooled induced air mixes with the centrally conditioned air before being discharged into the zone. The terminal units are usually expected to do only sensible cooling -- any dehumidification is done by the central air conditioning system.
+The four pipe induction terminal unit provides local hot water heating or chilled water cooling of induced zone air which then mixes with centrally conditioned supply air. An air conditioning system consisting of these terminal units is effectively a mixed central air / local hydronic system. The centrally conditioned air supplied to the induction terminal units is constant volume at quite high pressure. The central air is discharged through a nozzle in the terminal unit, inducing a flow of room air over a hydronic heating/cooling coil. The coil is connected either to a single inlet and outlet pipe (2 pipe unit) or to 2 inlets and 2 outlets (4 pipe unit). The heated or cooled induced air mixes with the centrally conditioned air before being discharged into the zone. The terminal units are usually expected to do only sensible cooling -- any dehumidification is done by the central air conditioning system.
 
 The EnergyPlus model of the four pipe induction terminal unit is a compound component consisting of a hot water heating coil, a chilled water cooling coil, and an air mixer. The unit has two inlet air streams: the centrally conditioned supply air and the induced air from the zone. The induced air passes first through the heating coil, then through the cooling coil and finally through the mixer. The central supply air goes directly into the mixer. The water flow through the hot or cold water coil is varied to meet the zone air conditioning requirement. Note that EnergyPlus models the four pipe induction terminal unit as having separate heating and cooling coils whereas real units have only a single coil used for both heating and cooling. Note also that the four pipe induction unit model can be used to model a two pipe unit by simply adjusting the heating and cooling coil schedules so that the heating coil is off when the cooling coil is on and vice versa.
 
@@ -1231,7 +1194,7 @@ The type of heating coil in the terminal unit. The choices are:
   \hyperref[coilheatingwater]{Coil:Heating:Water}
 \end{itemize}
 
-In other words the unit may have a hot water coil only.
+In other words, the unit may have a hot water coil only.
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-1}
 
@@ -1247,7 +1210,7 @@ The minimum hot water volumetric flow rate in m\(^{3}\)/sec through the unit's h
 
 \paragraph{Field: Heating Convergence Tolerance}\label{field-heating-convergence-tolerance}
 
-The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. The model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
+The control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. The model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically, this is the fraction:
 
 \begin{equation}
 \frac{{\left| {{Q_{unit,out}} - {Q_{zone\;load}}} \right|}}{{{Q_{zone\;load}}}} \le ConvergenceTolerance
@@ -1266,7 +1229,7 @@ The type of cooling coil in the terminal unit. The choices are:
   \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry}
 \end{itemize}
 
-In other words the unit must use only the water cooling coils.
+In other words, the unit must use only the water cooling coils.
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name}
 
@@ -1282,7 +1245,7 @@ The minimum cold water volumetric flow rate in m\(^{3}\)/sec through the unit's 
 
 \paragraph{Field: Cooling Convergence Tolerance}\label{field-cooling-convergence-tolerance}
 
-The control tolerance for the unit cooling output. The unit is controlled by matching the unit output to the zone demand. The model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
+The control tolerance for the unit cooling output. The unit is controlled by matching the unit output to the zone demand. The model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically, this is the fraction:
 
 \begin{equation}
 \frac{{\left| {{Q_{unit,out}} - {Q_{zone\;load}}} \right|}}{{{Q_{zone\;load}}}} \le ConvergenceTolerance
@@ -1354,7 +1317,7 @@ There are no specific outputs for the four pipe induction terminal units.
 
 The four-pipe beam air terminal system is a mixed air-hydronic system. A central, single-duct forced-air system that supplies conditioned air to the zones. Chilled water circulates through ceiling-mounted fin-tube convector units to provide sensible cooling. Hot water circulates through the same convectors to provide heating. Water flow rate through the beam unit is varied to meet the zone sensible cooling or heating load. Any dehumidification is done by the central forced-air system. Thermodynamically, the cooled beam system resembles the four-pipe induction unit (\textbf{\hyperref[airterminalsingleductconstantvolumefourpipeinduction]{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}}).
 
-To model a typical four-pipe beam system the user will need to define a conventional central constant volume forced air system in order to deliver primary air to the beam. This central system (usually) provides outside air for ventilation. Primary air is normally delivered at a fixed temperature but could be reset by a schedule or using an outdoor air reset setpoint manager. On the supply side of this air loop there will be the usual central conditioning equipment: outside air mixer, fan, heating and cooling coil. On the zone equipment (demand) side of the loop, the four-pipe beams will be represented as air terminal units. Because the four-pipe beam can provide heating the system can avoid over-cooling zones during times of low load with cool primary air temperatures, similar to the action of a reheat coil in a VAV terminal. Therefore it is not necessary to have additional zone equipment (such as baseboard heaters) to handle heating (or reheating) loads.
+To model a typical four-pipe beam system the user will need to define a conventional central constant volume forced air system in order to deliver primary air to the beam. This central system (usually) provides outside air for ventilation. Primary air is normally delivered at a fixed temperature but could be reset by a schedule or using an outdoor air reset setpoint manager. On the supply side of this air loop there will be the usual central conditioning equipment: outside air mixer, fan, heating and cooling coil. On the zone equipment (demand) side of the loop, the four-pipe beams will be represented as air terminal units. Because the four-pipe beam can provide heating the system can avoid over-cooling zones during times of low load with cool primary air temperatures, similar to the action of a reheat coil in a VAV terminal. Therefore, it is not necessary to have additional zone equipment (such as baseboard heaters) to handle heating (or reheating) loads.
 
 Although the four-pipe beam equipment in a zone is treated by the program as a single terminal unit, the actual installation will often have multiple beam units in each zone. In this model, it is only the total length of all the beams and the total air flow of all the units that are described, not the number of individual beam units.
 
@@ -1434,7 +1397,7 @@ This field is the name of a curve or table object that describes how the beam co
 
 \paragraph{Field: Beam Cooling Capacity Air Flow Modification Factor Curve Name}\label{field-beam-cooling-capacity-air-flow-modification-factor-curve-name}
 
-This field is the name of a curve or table object that describes how the beam convector's cooling capacity varies as a function of the primary air flow rate. The single independent variable is the ratio of the current primary air flow rate and the primary air flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity. The factor is useful to adjust for a range of primary air flow rates that a given product can accommodate. However since this is a constant volume air terminal, the modification does not typically vary during the simulation and the range of independent variable does not need to be all that broad in practice.
+This field is the name of a curve or table object that describes how the beam convector's cooling capacity varies as a function of the primary air flow rate. The single independent variable is the ratio of the current primary air flow rate and the primary air flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the cooling capacity. The factor is useful to adjust for a range of primary air flow rates that a given product can accommodate. However, since this is a constant volume air terminal, the modification does not typically vary during the simulation and the range of independent variable does not need to be all that broad in practice.
 
 \paragraph{Field: Beam Cooling Capacity Chilled Water Flow Modification Factor Curve Name}\label{field-beam-cooling-capacity-chilled-water-flow-modification-factor-curve-name}
 
@@ -1458,7 +1421,7 @@ This field is the name of a curve or table object that describes how the beam co
 
 \paragraph{Field: Beam Heating Capacity Air Flow Modification Factor Curve Name}\label{field-beam-heating-capacity-air-flow-modification-factor-curve-name}
 
-This field is the name of a curve or table object that describes how the beam convectors heating capacity varies as a function of the primary air flow rate. The single independent variable is the ratio of the current primary air flow rate and the primary air flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the heating capacity. The factor is useful to adjust for a range of primary air rates that a given product can accommodate. However since this is a constant volume air terminal, the modification does not typically vary during the simulation and the range of independent variable does not need to be all that broad in practice.
+This field is the name of a curve or table object that describes how the beam convectors heating capacity varies as a function of the primary air flow rate. The single independent variable is the ratio of the current primary air flow rate and the primary air flow rate at the rating point. The result of the curve or table is multiplied by the rated capacity to adjust the heating capacity. The factor is useful to adjust for a range of primary air rates that a given product can accommodate. However, since this is a constant volume air terminal, the modification does not typically vary during the simulation and the range of independent variable does not need to be all that broad in practice.
 
 \paragraph{Field: Beam Heating Capacity Hot Water Flow Modification Factor Curve Name}\label{field-beam-heating-capacity-hot-water-flow-modification-factor-curve-name}
 
@@ -1900,6 +1863,8 @@ This output is the damper position of the hot air stream in a dual duct air term
 
 AirTerminal:DualDuct:VAV (i.e., Dual duct variable air volume (DDVAV)) systems are used to obtain zone temperature control by mixing the cold and warm air in various volume combinations. The fan is sized for the anticipated maximum coincident hot or cold volume, not the sum of the instantaneous peaks. This system has an advantage of a true single path VAV system, except for warm port leakage. When cold air is modulated for control before mixing, it operates similar to the VAV induction when mixing occurs without hot deck reheat. It is similar to a reheat system when mixing occurs while the hot deck is using the reheat coil. It uses more energy than a true VAV system, but less than a constant volume dual duct system.
 
+The zone minimum supply air flow can be further adjusted using scheduled fraction values specified in the field \textit{Minimum Air Flow Turndown Schedule Name}.
+
 \subsubsection{Inputs}\label{inputs-15-000}
 
 \paragraph{Field: Name}\label{field-name-15}
@@ -1934,6 +1899,11 @@ The minimum flow rate to the zone while the system is operating, specified as a 
 
 This alpha field specifies the name of a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object. When this field is used, the terminal unit will increase flow as needed to meet this outdoor air requirement. If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on the current number of occupants in the zone. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. See documentation for the zone HVAC outdoor air object for further information (Ref \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
 
+\paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
+
+This field adjusts \textit{Zone Minimum Air Flow Fraction} by multiplying it using this schedule. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and the VAV air terminal uses the fixed fraction specified in in the field \textit{Zone Minimum Air Flow Fraction}.
+
+
 An IDF example:
 
 \begin{lstlisting}
@@ -1946,7 +1916,8 @@ An IDF example:
       Zone 1 Dual Duct Cold Inlet,  !- Cold Air Inlet Node Name
       autosize,                !- Maximum Air Flow Rate {m3/s}
       0.1,                     !- Zone Minimum Air Flow Fraction
-      ZoneMinOARequirements;   !- Design Specification Outdoor Air Object Name
+      ZoneMinOARequirements,   !- Design Specification Outdoor Air Object Name
+      TurndownMinAirFlowSch;   !- Minimum Air Flow Turndown Schedule Name
 
   ! Outdoor air specification should be consistent with Sizing:Zone object inputs.
     DesignSpecification:OutdoorAir,
@@ -1966,6 +1937,19 @@ An IDF example:
       Until: 24:00,1.0,          !- Field 7
       For: AllOtherDays,         !- Field 9
       Until: 24:00,0.25;         !- Field 10
+
+    Schedule:Compact,
+      TurndownMinAirFlowSch,   !- Name
+      Fraction,                !- Schedule Type Limits Name
+      Through: 12/31,          !- Field 1
+      For: Weekdays,           !- Field 2
+      Until: 7:00,0.50,        !- Field 3
+      Until: 17:00,0.75,       !- Field 4
+      Until: 24:00,0.50,       !- Field 5
+      For: SummerDesignDay WinterDesignDay, !- Field 6
+      Until: 24:00,1.0,        !- Field 7
+      For: Weekends Holidays CustomDay1 CustomDay2, !- Field 8
+      Until: 24:00,0.25;       !- Field 9
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-13}
@@ -1989,7 +1973,7 @@ This output is the damper position of the hot air stream in a dual duct air term
 
 \paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s-2}
 
-This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported.~ The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outdoor air system.
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outdoor air system.
 
 \subsection{AirTerminal:DualDuct:VAV:OutdoorAir}\label{airterminaldualductvavoutdoorair}
 
@@ -2019,7 +2003,7 @@ The inlet node of the Outdoor Air (OA) stream deck of the Dual Duct system.
 
 \paragraph{Field: Recirculated Air Inlet Node Name}\label{field-recirculated-air-inlet-node-name}
 
-The inlet node of the Recirculated Air (RA) stream deck of the Dual Duct system. ~This input is optional.~ If no node name is entered here, then the recirulation duct is disabled and the model functions as a single duct terminal and no second cooling deck is needed.
+The inlet node of the Recirculated Air (RA) stream deck of the Dual Duct system. ~This input is optional. If no node name is entered here, then the recirculation duct is disabled and the model functions as a single duct terminal and no second cooling deck is needed.
 
 \paragraph{Field: Maximum Zone Total Airflow Rate}\label{field-maximum-zone-total-airflow-rate}
 
@@ -2079,4 +2063,4 @@ This output is the damper position of the recirculated cool air stream in a dual
 
 \paragraph{Zone Air Terminal Outdoor Air Fraction {[]}}\label{zone-air-terminal-outdoor-air-fraction}
 
-This output is the current fraction of outdoor air contained in the combined flow of aire entering the zone from the terminal unit. This is the average value over the frequency being reported. The outdoor air fraction is defined as the terminal unit outdoor air mass flow rate divided by the total air mass flow rate.~ This output is dimensionless and ranges from 0.0 to 1.0.
+This output is the current fraction of outdoor air contained in the combined flow of air entering the zone from the terminal unit. This is the average value over the frequency being reported. The outdoor air fraction is defined as the terminal unit outdoor air mass flow rate divided by the total air mass flow rate. This output is dimensionless and ranges from 0.0 to 1.0.

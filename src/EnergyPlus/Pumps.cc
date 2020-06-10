@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -1224,41 +1224,41 @@ namespace Pumps {
                                               "Pump:VariableSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_Pump_VarSpeed,
-                                              PumpEquipReport(PumpNum).ZoneConvGainRate,
-                                              _,
-                                              PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                              &PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                              nullptr,
+                                              &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == Pump_ConSpeed) {
                         SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
                                               "Pump:ConstantSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_Pump_ConSpeed,
-                                              PumpEquipReport(PumpNum).ZoneConvGainRate,
-                                              _,
-                                              PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                              &PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                              nullptr,
+                                              &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == Pump_Cond) {
                         SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
                                               "Pump:VariableSpeed:Condensate",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_Pump_Cond,
-                                              PumpEquipReport(PumpNum).ZoneConvGainRate,
-                                              _,
-                                              PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                              &PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                              nullptr,
+                                              &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == PumpBank_VarSpeed) {
                         SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
                                               "HeaderedPumps:VariableSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_PumpBank_VarSpeed,
-                                              PumpEquipReport(PumpNum).ZoneConvGainRate,
-                                              _,
-                                              PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                              &PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                              nullptr,
+                                              &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == PumpBank_ConSpeed) {
                         SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
                                               "HeaderedPumps:ConstantSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_PumpBank_ConSpeed,
-                                              PumpEquipReport(PumpNum).ZoneConvGainRate,
-                                              _,
-                                              PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                              &PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                              nullptr,
+                                              &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     }
                 }
             }

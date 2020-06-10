@@ -21,7 +21,7 @@ The components
   \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed}
 \end{itemize}
 
-are compound components usually placed in the primary air loop as the sole component. On the zone equipment side they are usually connected to one or more zones through uncontrolled terminal units (i.e., \hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled} objects). The maximum or design air flow rate through the furnace or unitary system should usually be set equal to the sum of the maximum air flow rates through the terminal unit objects. However, the simulation program can usually account for unequal air flows if the user wishes to model this scenario.
+are compound components usually placed in the primary air loop as the sole component. On the zone equipment side they are usually connected to one or more zones through uncontrolled terminal units (i.e., \hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat} objects). The maximum or design air flow rate through the furnace or unitary system should usually be set equal to the sum of the maximum air flow rates through the terminal unit objects. However, the simulation program can usually account for unequal air flows if the user wishes to model this scenario.
 
 The following HVAC equipment types are allowed in the air loop. The component matrix shows which coils and fans are allowed with which equipment models.
 
@@ -271,7 +271,7 @@ This alpha field defines the supply air flow method when neither cooling or heat
 
 \paragraph{Field: No Load Supply Air Flow Rate}\label{field-no-load-supply-air-flow-rate-000}
 
-This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when neither cooling or heating is required (i.e., main cooling/heating coils and supplemental heater are off but the supply air fan operates). This field is only used when the unitary system operating mode is specified as continuous fan operation. Values must be greater than or equal to 0, or this field is autosizable. If the unitary system operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation).
+This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when neither cooling or heating is required (i.e., main cooling/heating coils and supplemental heater are off but the supply air fan operates). This field is only used when the unitary system operating mode is specified as continuous fan operation. Values must be greater than or equal to 0, or this field is autosizable. If this field is autosized, then it is sized to the minimum of the heating and cooling lowest speed supply air flow rate. If the unitary system operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation).
 
 \paragraph{Field: No Load Supply Air Flow Rate Per Floor Area}\label{field-no-load-supply-air-flow-rate-per-floor-area}
 
@@ -387,7 +387,7 @@ As shown in the example below, correct specification of the heat/cool unitary sy
 \item
   Reheat coil
 \item
-  Direct air unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}) for each zone served by the unitary system when used in an air loop
+  Direct air unit (\hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat}) for each zone served by the unitary system when used in an air loop
 \end{enumerate}
 
 \begin{lstlisting}
@@ -566,6 +566,15 @@ Water to air heat pump outputs
   HVAC,Average, Unitary System Water Coil Speed Level {[]}
 \end{itemize}
 
+Subcool reheat coil outputs under Coil:Cooling:DX
+
+\begin{itemize}
+\item
+  HVAC,Average, Unitary System Zone Load Sensible Heat Ratio {[]}
+\item
+  HVAC,Average, Unitary System Cooling Coil Load Sensible Heat Ratio {[]}
+\end{itemize}
+
 \paragraph{Unitary System Fan Part Load Ratio {[]}}\label{unitary-system-fan-part-load-ratio}
 
 This output variable is the ratio of actual air mass flow rate through the unitary system to the unitary system's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the unitary system is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state unitary system heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the unitary system fan may be different from the fan part-load ratio reported here due the part-load performance of the unitary system's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff). When the speed number is greater than 1, the value is 1.0.
@@ -683,6 +692,14 @@ This output variable is the ratio of time in a system timestep that the AHU fan 
 
 This output variable reports the maximum speed needed when the system operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the AHU operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed level is above the minimum (speed = 1), the system operation is determined by the speed ratio. For example, when the speed ratio is 0.4 and the speed lever is 3, then the supply air fan and water coil operate at Speed 3 for 40\% of a system timestep and at Speed 2 for 60\% of a system timestep.
 
+\paragraph{Unitary System Zone Load Sensible Heat Ratio {[]}}\label{unitary-system-zone-load-sensible-heat-ratio}
+
+This output variable reports the load sensible heat ratio, defined as sensible load / (sensible load + latent load) for a subcool reheat coil. The value is used to determine required coil output sensible heat ratio.
+
+\paragraph{Unitary System Cooling Coil Load Sensible Heat Ratio {[]}}\label{unitary-system-cooling-coil-load-sensible-heat-ratio}
+
+This output variable reports the cooling coil load sensible heat ratio, defined as sensible output / (sensible output + latent output) for a subcool reheat coil. The value is used to determine mode ratio between coil normal operation mode and subcool or reheat operation mode.
+
 \subsection{UnitarySystemPerformance:Multispeed}\label{unitarysystemperformancemultispeed}
 
 \subsubsection{Inputs}\label{inputs-1-046}
@@ -709,7 +726,7 @@ The allowed cooling and heating coil types are restricted to the following combi
 
 \paragraph{Field: No Load Supply Air Flow Rate Ratio}\label{field-no-load-supply-air-flow-rate-ratio}
 
-This field defines the no load operating air flow rate when the system fan is specified to operate continuously. The allowed fractions are between 0 and 1 with a default value of 1. The no load air flow rate will be calculated as this fraction multiplied by the minimum of the cooling and heating supply air flow rate. If the cooling or heating coil is not present, this fraction is multiplied by the operating supply air flow rate.
+This field defines the no load operating air flow rate when the system fan is specified to operate continuously. The allowed fractions are between 0 and 1 with a default value of 1. This fraction is usually set to the mimumum of heating and cooling operation lowest speed supply air flow fraction. The no load air flow rate will be calculated as this fraction multiplied by the minimum of the cooling and heating high speed supply air flow rate. If the cooling or heating coil is not present, this fraction is multiplied by the operating supply air flow rate.
 
 \paragraph{Field Group: Heating and Cooling Speeds 1 to 10}\label{field-group-heating-and-cooling-speeds-1-to-10}
 
@@ -877,7 +894,7 @@ As shown in the example below, correct specification of the heat/cool furnace re
 \item
   reheat coil (optional, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric}, or \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater})
 \item
-  terminal unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}) for each zone served by the furnace
+  terminal unit (\hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat}) for each zone served by the furnace
 \end{enumerate}
 
 Note: the furnace's fan, cooling coil, heating coil and optional reheat coil must be connected in the air loop according to the configuration shown above (Figure~\ref{fig:schematic-of-energyplus-heatcool-furnace}) when CoolReheat is selected as the dehujmidificaiton control type. In addition, the volumetric air flow rate specified in the terminal air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the furnace object.
@@ -941,23 +958,26 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
       Air Loop Inlet Node,         !- Fan\_Inlet\_Node
       DX Cooling Coil Air Inlet Node; !- Fan\_Outlet\_Node
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 1 Inlet Node,     !- Zone Supply Air Node Name
-     0.47;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone1DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 1 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 1 Supply Node,          !- Air Outlet Node Name
+      0.47;                        !- Maximum air flow rate {m3/s}
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 2 Inlet Node,     !- Zone Supply Air Node Name
-      0.36;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone2DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 2 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 2 Supply Node,          !- Air Outlet Node Name
+      0.36;                        !- Maximum air flow rate {m3/s}
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 3 Inlet Node,     !- Zone Supply Air Node Name
-     0.47;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone3DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 3 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 3 Supply Node,          !- Air Outlet Node Name
+      0.47;                        !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 ~Example of Heat/Cool Furnace Specification
@@ -1122,7 +1142,7 @@ As shown in the example below, correct specification of the heat/cool unitary sy
 
 4)~~~Reheat coil (optional, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric}, or \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater})
 
-5)~~~Direct air unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}) for each zone served by the unitary system
+5)~~~Direct air unit (\hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat}) for each zone served by the unitary system
 
 Note: the unitary system's fan, cooling coil, heating coil and optional reheat coil must be connected in the air loop according to the configuration shown above (Figure~\ref{fig:schematic-of-blow-through-heatcool-unitary}). In addition, the volumetric air flow rate specified in the direct air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the unitary system object.
 
@@ -1186,23 +1206,26 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
       Air Loop Inlet Node,         !- Fan\_Inlet\_Node
       DX Cooling Coil Air Inlet Node; !- Fan\_Outlet\_Node
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 1 Inlet Node,     !- Zone Supply Air Node Name
-     0.47;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone1DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 1 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 1 Supply Node,          !- Air Outlet Node Name
+      0.47;                        !- Maximum air flow rate {m3/s}
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 2 Inlet Node,     !- Zone Supply Air Node Name
-     0.36;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone2DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 2 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 2 Supply Node,          !- Air Outlet Node Name
+      0.36;                        !- Maximum air flow rate {m3/s}
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,        !- Direct Air Name
-      FanAndCoilAvailSched,  !- Schedule name for on/off schedule
-      Zone 3 Inlet Node,     !- Zone Supply Air Node Name
-     0.47;  !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone3DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 3 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 3 Supply Node,          !- Air Outlet Node Name
+      0.47;                        !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 Example of Heat/Cool Unitary System Specification
@@ -1348,7 +1371,7 @@ As shown in the example below, correct specification of the air-to-air heat pump
 
 4)~~~Supplemental heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel} or \hyperref[coilheatingelectric]{Coil:Heating:Electric})
 
-5)~~~Direct air unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled})for each zone served by the unitary system
+5)~~~Direct air unit (\hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat})for each zone served by the unitary system
 
 \paragraph{Field: Dehumidification Control Type}\label{field-dehumidification-control-type-3-000}
 
@@ -1454,23 +1477,26 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         Mixed Air Node,                  ! fan inlet node
         DX Cooling Coil Air Inlet Node;  ! fan outlet node
 
-     AirTerminal:SingleDuct:Uncontrolled,
-        Zone1DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 1 Inlet Node,               ! zone supply air node name
-       0.612;                           ! maximum air flow rate, m3/s
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone1DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 1 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 1 Supply Node,          !- Air Outlet Node Name
+      0.612;                       !- Maximum air flow rate {m3/s}
 
-     AirTerminal:SingleDuct:Uncontrolled,
-        Zone2DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 2 Inlet Node,               ! zone supply air node name
-       0.476;                           ! maximum air flow rate, m3/s
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone2DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 2 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 2 Supply Node,          !- Air Outlet Node Name
+      0.476;                       !- Maximum air flow rate {m3/s}
 
-     AirTerminal:SingleDuct:Uncontrolled,
-        Zone3DirectAir,                  ! direct air unit name
-       FanAndCoilAvailSched,            ! schedule name for on/off schedule
-        Zone 3 Inlet Node,               ! zone supply air node name
-       0.612;                           ! maximum air flow rate, m3/s
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone3DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 3 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 3 Supply Node,          !- Air Outlet Node Name
+      0.612;                       !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-2-024}
@@ -1878,23 +1904,26 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
       Mixed Air Node,          !- Fan\_Inlet\_Node
       DX Cooling Coil Air Inlet Node;  !- Fan\_Outlet\_Node
 
-  AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,                  ! direct air unit name
-      FanAndCoilAvailSched,            ! schedule name for on/off schedule
-      Zone 1 Inlet Node,               ! zone supply air node name
-      0.612;                           ! maximum air flow rate, m3/s
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone1DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 1 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 1 Supply Node,          !- Air Outlet Node Name
+      0.612;                       !- Maximum air flow rate {m3/s}
 
-  AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,                  ! direct air unit name
-      FanAndCoilAvailSched,            ! schedule name for on/off schedule
-      Zone 2 Inlet Node,               ! zone supply air node name
-      0.476;                           ! maximum air flow rate, m3/s
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone2DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 2 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 2 Supply Node,          !- Air Outlet Node Name
+      0.476;                       !- Maximum air flow rate {m3/s}
 
-  AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,                  ! direct air unit name
-      FanAndCoilAvailSched,            ! schedule name for on/off schedule
-      Zone 3 Inlet Node,               ! zone supply air node name
-      0.612;                           ! maximum air flow rate, m3/s
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone3DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 3 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 3 Supply Node,          !- Air Outlet Node Name
+      0.612;                       !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3-021}
@@ -2116,7 +2145,7 @@ As shown in the example below, correct specification of the furnace requires spe
 
 2)~~~heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel} or \hyperref[coilheatingelectric]{Coil:Heating:Electric})
 
-3)~~~direct air unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}) for each zone served by the furnace
+3)~~~direct air unit (\hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat}) for each zone served by the furnace
 
 Note: the furnace's fan and heating coil must be connected in the air loop according to the configuration shown above (Figure~\ref{fig:schematic-of-blow-through-furnace-model}) when a blow through fan configuration is specified. If a draw through fan is used, the fan is located down stream of the heating coil. In addition, the volumetric air flow rate specified in the direct air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the furnace object.
 
@@ -2174,25 +2203,26 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
       Heating Coil Air Inlet Node;  !- Fan_Outlet_Node
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,       !-Direct Air Name
-      FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 1 Inlet Node,    !- Zone Supply Air Node Name
-      0.47;   !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone1DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 1 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 1 Supply Node,          !- Air Outlet Node Name
+      0.47;                        !- Maximum air flow rate {m3/s}
 
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone2DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 2 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 2 Supply Node,          !- Air Outlet Node Name
+      0.36;                        !- Maximum air flow rate {m3/s}
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,       !- Direct Air Name
-      FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 2 Inlet Node,    !- Zone Supply Air Node Name
-      0.36;   !- Maximum air flow rate {m3/s}
-
-
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,       !- Direct Air Name
-      FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 3 Inlet Node,    !- Zone Supply Air Node Name
-      0.47;   !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone3DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 3 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 3 Supply Node,          !- Air Outlet Node Name
+      0.47;                        !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 Example of Heat-Only Furnace Specification
@@ -2292,7 +2322,7 @@ As shown in the example below, correct specification of the heat-only unitary sy
 
 2)~~~heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel} or \hyperref[coilheatingelectric]{Coil:Heating:Electric})
 
-3)~~~direct air unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}) for each zone served by the furnace
+3)~~~direct air unit (\hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat}) for each zone served by the furnace
 
 Note: the unitary system's fan and heating coil must be connected in the air loop according to the configuration shown above (Figure~\ref{fig:schematic-of-blow-through-heat-only-unitary}) when a blow through fan configuration is specified. If a draw through fan is used, the fan is located down stream of the heating coil. In addition, the volumetric air flow rate specified in the direct air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the unitary system object.
 
@@ -2350,25 +2380,26 @@ AirLoopHVAC:UnitaryHeatOnly,
       Heating Coil Air Inlet Node;  !- Fan_Outlet_Node
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,       !-Direct Air Name
-      FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 1 Inlet Node,    !- Zone Supply Air Node Name
-      0.47;   !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone1DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 1 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 1 Supply Node,          !- Air Outlet Node Name
+      0.47;                        !- Maximum air flow rate {m3/s}
 
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone2DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 2 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 2 Supply Node,          !- Air Outlet Node Name
+      0.36;                        !- Maximum air flow rate {m3/s}
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,       !- Direct Air Name
-      FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 2 Inlet Node,    !- Zone Supply Air Node Name
-      0.36;   !- Maximum air flow rate {m3/s}
-
-
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,       !- Direct Air Name
-      FanAndCoilAvailSched, !- Schedule name for on/off schedule
-      Zone 3 Inlet Node,    !- Zone Supply Air Node Name
-      0.47;   !- Maximum air flow rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone3DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 3 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 3 Supply Node,          !- Air Outlet Node Name
+      0.47;                        !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 Example of Heat-Only Unitary System Specification
@@ -2750,25 +2781,26 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
       Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone1DirectAir,        !- Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
-      Zone 1 Inlet Node,     !- Zone Supply Air Node Name
-      0.7;                   !- Maximum Air Flow Rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone1DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 1 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 1 Supply Node,          !- Air Outlet Node Name
+      0.7;                         !- Maximum air flow rate {m3/s}
 
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone2DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 2 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 2 Supply Node,          !- Air Outlet Node Name
+      0.6;                         !- Maximum air flow rate {m3/s}
 
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone2DirectAir,        !- Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
-      Zone 2 Inlet Node,     !- Zone Supply Air Node Name
-      0.6;                   !- Maximum Air Flow Rate {m3/s}
-
-
-    AirTerminal:SingleDuct:Uncontrolled,
-      Zone3DirectAir,        !- Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
-      Zone 3 Inlet Node,     !- Zone Supply Air Node Name
-      0.7;                   !- Maximum Air Flow Rate {m3/s}
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      Zone3DirectAir,              !- Name
+      ,                            !- Availability Schedule Name
+      Zone 3 Terminal Inlet Node,  !- Air Inlet Node Name
+      Zone 3 Supply Node,          !- Air Outlet Node Name
+      0.7;                         !- Maximum air flow rate {m3/s}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-6-011}

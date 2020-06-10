@@ -145,7 +145,6 @@ namespace AirflowNetwork {
 
     // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
     Array1D<Real64> SUMF;
-    int Unit11(0);
     int Unit21(0);
 
     // Large opening variables
@@ -556,7 +555,7 @@ namespace AirflowNetwork {
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
             SUMAF(n) = 0.0;
         }
-        if (LIST >= 1) ObjexxFCL::gio::write(Unit21, Format_900);
+        //if (LIST >= 1) ObjexxFCL::gio::write(Unit21, Format_900);
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
             n = AirflowNetworkLinkageData(i).NodeNums[0];
             m = AirflowNetworkLinkageData(i).NodeNums[1];
@@ -616,9 +615,9 @@ namespace AirflowNetwork {
         }
     }
 
-    void SOLVZP(Array1A_int IK,     // pointer to the top of column/row "K"
-                Array1A<Real64> AD, // the main diagonal of [A] before and after factoring
-                Array1A<Real64> AU, // the upper triangle of [A] before and after factoring
+    void SOLVZP(Array1D_int &IK,     // pointer to the top of column/row "K"
+                Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
+                Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
                 int &ITER           // number of iterations
     )
     {
@@ -641,9 +640,9 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        IK.dim(NetworkNumOfNodes + 1);
-        AD.dim(NetworkNumOfNodes);
-        AU.dim(IK(NetworkNumOfNodes + 1));
+        EP_SIZE_CHECK(IK, NetworkNumOfNodes + 1);
+        EP_SIZE_CHECK(AD, NetworkNumOfNodes);
+        EP_SIZE_CHECK(AU, IK(NetworkNumOfNodes + 1));
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1700,10 +1699,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    void FACSKY(Array1A<Real64> AU,   // the upper triangle of [A] before and after factoring
-                Array1A<Real64> AD,   // the main diagonal of [A] before and after factoring
-                Array1A<Real64> AL,   // the lower triangle of [A] before and after factoring
-                Array1A_int const IK, // pointer to the top of column/row "K"
+    void FACSKY(Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
+                Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
+                Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
+                const Array1D_int &IK, // pointer to the top of column/row "K"
                 int const NEQ,        // number of equations
                 int const NSYM        // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     )
@@ -1736,10 +1735,10 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        AU.dim(IK(NetworkNumOfNodes + 1));
-        AD.dim(NetworkNumOfNodes);
-        AL.dim(IK(NetworkNumOfNodes + 1) - 1);
-        IK.dim(NetworkNumOfNodes + 1);
+        EP_SIZE_CHECK(IK, NetworkNumOfNodes + 1);
+        EP_SIZE_CHECK(AU, IK(NetworkNumOfNodes + 1));
+        EP_SIZE_CHECK(AD, NetworkNumOfNodes);
+        EP_SIZE_CHECK(AL, IK(NetworkNumOfNodes + 1) - 1);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1849,11 +1848,11 @@ namespace AirflowNetwork {
         }
     }
 
-    void SLVSKY(Array1A<Real64> const AU, // the upper triangle of [A] before and after factoring
-                Array1A<Real64> const AD, // the main diagonal of [A] before and after factoring
-                Array1A<Real64> const AL, // the lower triangle of [A] before and after factoring
-                Array1A<Real64> B,        // "B" vector (input); "X" vector (output).
-                Array1A_int const IK,     // pointer to the top of column/row "K"
+    void SLVSKY(const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
+                const Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
+                const Array1D<Real64> &AL, // the lower triangle of [A] before and after factoring
+                Array1D<Real64> &B,        // "B" vector (input); "X" vector (output).
+                const Array1D_int &IK,     // pointer to the top of column/row "K"
                 int const NEQ,            // number of equations
                 int const NSYM            // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     )
@@ -1881,11 +1880,11 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        AU.dim(IK(NetworkNumOfNodes + 1));
-        AD.dim(NetworkNumOfNodes);
-        AL.dim(IK(NetworkNumOfNodes + 1) - 1);
-        B.dim(NetworkNumOfNodes);
-        IK.dim(NetworkNumOfNodes + 1);
+        EP_SIZE_CHECK(IK, NetworkNumOfNodes + 1);
+        EP_SIZE_CHECK(AU, IK(NetworkNumOfNodes + 1));
+        EP_SIZE_CHECK(AD, NetworkNumOfNodes);
+        EP_SIZE_CHECK(AL, IK(NetworkNumOfNodes + 1) - 1);
+        EP_SIZE_CHECK(B, NetworkNumOfNodes);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1951,12 +1950,12 @@ namespace AirflowNetwork {
         }
     }
 
-    void FILSKY(Array1A<Real64> const X,     // element array (row-wise sequence)
-                std::array<int, 2> const LM, // location matrix
-                Array1A_int const IK,        // pointer to the top of column/row "K"
-                Array1A<Real64> AU,          // the upper triangle of [A] before and after factoring
-                Array1A<Real64> AD,          // the main diagonal of [A] before and after factoring
-                int const FLAG               // mode of operation
+    void FILSKY(const Array1D<Real64> &X,     // element array (row-wise sequence)
+                std::array<int, 2> const LM,  // location matrix
+                const Array1D_int &IK,        // pointer to the top of column/row "K"
+                Array1D<Real64> &AU,          // the upper triangle of [A] before and after factoring
+                Array1D<Real64> &AD,          // the main diagonal of [A] before and after factoring
+                int const FLAG                // mode of operation
     )
     {
 
@@ -1981,10 +1980,10 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        X.dim(4);
-        IK.dim(NetworkNumOfNodes + 1);
-        AU.dim(IK(NetworkNumOfNodes + 1));
-        AD.dim(NetworkNumOfNodes);
+        EP_SIZE_CHECK(X, 4);
+        EP_SIZE_CHECK(IK, NetworkNumOfNodes + 1);
+        EP_SIZE_CHECK(AU, IK(NetworkNumOfNodes + 1));
+        EP_SIZE_CHECK(AD, NetworkNumOfNodes);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2029,7 +2028,7 @@ namespace AirflowNetwork {
     }
 
     void DUMPVD(std::string const &S,    // Description
-                Array1A<Real64> const V, // Output values
+                const Array1D<Real64> &V, // Output values
                 int const n,             // Array size
                 int const UOUT           // Output file unit
     )
@@ -2056,7 +2055,7 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        V.dim(_);
+        //V.dim(_);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2087,7 +2086,7 @@ namespace AirflowNetwork {
     }
 
     void DUMPVR(std::string const &S,    // Description
-                Array1A<Real64> const V, // Output values
+                const Array1D<Real64> &V, // Output values
                 int const n,             // Array size
                 int const UOUT           // Output file unit
     )
@@ -2114,7 +2113,7 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        V.dim(_);
+        //V.dim(_);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2665,19 +2664,19 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    void PresProfile(int const il,                 // Linkage number
-                     int const Pprof,              // Opening number
-                     Real64 const G,               // gravitation field strength [N/kg]
-                     Array1A<Real64> const DpF,    // Stack pressures at start heights of Layers
-                     Array1A<Real64> const DpT,    // Stack pressures at start heights of Layers
-                     Array1A<Real64> const BetaF,  // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
-                     Array1A<Real64> const BetaT,  // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
-                     Array1A<Real64> const RhoStF, // Density at the start heights of Layers in the FROM zone
-                     Array1A<Real64> const RhoStT, // Density at the start heights of Layers in the TO zone
-                     int const From,               // Number of FROM zone
-                     int const To,                 // Number of To zone
-                     Real64 const ActLh,           // Actual height of opening [m]
-                     Real64 const OwnHeightFactor  // Cosine of deviation angle of the opening plane from the vertical direction
+    void PresProfile(int const il,                  // Linkage number
+                     int const Pprof,               // Opening number
+                     Real64 const G,                // gravitation field strength [N/kg]
+                     const Array1D<Real64> &DpF,    // Stack pressures at start heights of Layers
+                     const Array1D<Real64> &DpT,    // Stack pressures at start heights of Layers
+                     const Array1D<Real64> &BetaF,  // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
+                     const Array1D<Real64> &BetaT,  // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
+                     const Array1D<Real64> &RhoStF, // Density at the start heights of Layers in the FROM zone
+                     const Array1D<Real64> &RhoStT, // Density at the start heights of Layers in the TO zone
+                     int const From,                // Number of FROM zone
+                     int const To,                  // Number of To zone
+                     Real64 const ActLh,            // Actual height of opening [m]
+                     Real64 const OwnHeightFactor   // Cosine of deviation angle of the opening plane from the vertical direction
     )
     {
 
@@ -2719,12 +2718,12 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        DpF.dim(2);
-        DpT.dim(2);
-        BetaF.dim(2);
-        BetaT.dim(2);
-        RhoStF.dim(2);
-        RhoStT.dim(2);
+        EP_SIZE_CHECK(DpF, 2);
+        EP_SIZE_CHECK(DpT, 2);
+        EP_SIZE_CHECK(BetaF, 2);
+        EP_SIZE_CHECK(BetaT, 2);
+        EP_SIZE_CHECK(RhoStF, 2);
+        EP_SIZE_CHECK(RhoStT, 2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

@@ -64,11 +64,12 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -168,11 +169,11 @@ namespace PipeHeatTransfer {
 
     // Functions
 
-    PlantComponent *PipeHTData::factory(int objectType, std::string objectName)
+    PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
         if (GetPipeInputFlag) {
-            GetPipesHeatTransfer();
+            GetPipesHeatTransfer(state);
             GetPipeInputFlag = false;
         }
         // Now look for this particular pipe in the list
@@ -192,7 +193,7 @@ namespace PipeHeatTransfer {
         PipeHTUniqueNames.clear();
     }
 
-    void PipeHTData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PipeHTData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                               bool const FirstHVACIteration,
                               Real64 &EP_UNUSED(CurLoad),
                               bool const EP_UNUSED(RunFlag))
@@ -235,7 +236,7 @@ namespace PipeHeatTransfer {
         this->PreviousPipeTemp = this->PipeTemp;
     }
 
-    void GetPipesHeatTransfer()
+    void GetPipesHeatTransfer(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -640,7 +641,7 @@ namespace PipeHeatTransfer {
             }
 
             // Get ground temperature model
-            PipeHT(Item).groundTempModel = GetGroundTempModelAndInit(cAlphaArgs(7), cAlphaArgs(8));
+            PipeHT(Item).groundTempModel = GetGroundTempModelAndInit(state, cAlphaArgs(7), cAlphaArgs(8));
 
             // Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
             NumSections = NumPipeSections;
@@ -708,7 +709,7 @@ namespace PipeHeatTransfer {
                     "Pipe Ambient Heat Transfer Energy", OutputProcessor::Unit::J, PipeHT(Item).EnvHeatLossEnergy, "Plant", "Sum", PipeHT(Item).Name);
 
                 SetupZoneInternalGain(
-                    PipeHT(Item).EnvrZonePtr, "Pipe:Indoor", PipeHT(Item).Name, IntGainTypeOf_PipeIndoor, PipeHT(Item).ZoneHeatGainRate);
+                    PipeHT(Item).EnvrZonePtr, "Pipe:Indoor", PipeHT(Item).Name, IntGainTypeOf_PipeIndoor, &PipeHT(Item).ZoneHeatGainRate);
             }
 
             SetupOutputVariable("Pipe Mass Flow Rate", OutputProcessor::Unit::kg_s, PipeHT(Item).MassFlowRate, "Plant", "Average", PipeHT(Item).Name);

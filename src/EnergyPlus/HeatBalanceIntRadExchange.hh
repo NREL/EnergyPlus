@@ -49,7 +49,6 @@
 #define HeatBalanceIntRadExchange_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Array2S.hh>
@@ -59,6 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 #define EP_HBIRE_SEQ
 
@@ -71,7 +71,9 @@ namespace HeatBalanceIntRadExchange {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int MaxNumOfRadEnclosureSurfs; // Max saved to get large enough space for SendSurfaceTempInKto4thPrecalc
+    extern int MaxNumOfRadEnclosureSurfs; // Max saved to get large enough space for SurfaceTempInKto4th
+
+    extern bool CarrollMethod;  // Use Carroll MRT method
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
 
@@ -80,7 +82,7 @@ namespace HeatBalanceIntRadExchange {
 
     void CalcInteriorRadExchange(Array1S<Real64> const SurfaceTemp,       // Current surface temperatures
                                  int const SurfIterations,                // Number of iterations in calling subroutine
-                                 Array1<Real64> &NetLWRadToSurf,          // Net long wavelength radiant exchange from other surfaces
+                                 Array1D<Real64> &NetLWRadToSurf,          // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
                                  std::string const &CalledFrom = "");
 
@@ -88,9 +90,9 @@ namespace HeatBalanceIntRadExchange {
                                      int const SurfNum              // surface number of surface being investigated
     );
 
-    void InitInteriorRadExchange();
+    void InitInteriorRadExchange(OutputFiles &outputFiles);
 
-    void InitSolarViewFactors();
+    void InitSolarViewFactors(OutputFiles &outputFiles);
 
     void AlignInputViewFactors(std::string const &cCurrentModuleObject, // Object type
                                bool &ErrorsFound                        // True when errors are found
@@ -99,7 +101,7 @@ namespace HeatBalanceIntRadExchange {
     void GetInputViewFactors(std::string const &EnclosureName, // Needed to check for user input view factors.
                              int const N,                      // NUMBER OF SURFACES
                              Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                             Array1A_int const SPtr,           // pointer to actual surface number
+                             const Array1D_int &SPtr,          // pointer to actual surface number
                              bool &NoUserInputF,               // Flag signifying no input F's for this
                              bool &ErrorsFound                 // True when errors are found in number of fields vs max args
     );
@@ -107,21 +109,21 @@ namespace HeatBalanceIntRadExchange {
     void GetInputViewFactorsbyName(std::string const &ZoneName, // Needed to check for user input view factors.
                                    int const N,                 // NUMBER OF SURFACES
                                    Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                                   Array1A_int const SPtr,      // pointer to actual surface number
+                                   const Array1D_int &SPtr,     // pointer to actual surface number
                                    bool &NoUserInputF,          // Flag signifying no input F's for this
                                    bool &ErrorsFound            // True when errors are found in number of fields vs max args
     );
 
-    void CalcApproximateViewFactors(int const N,                   // NUMBER OF SURFACES
-                                    Array1A<Real64> const A,       // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                                    Array1A<Real64> const Azimuth, // Facing angle of the surface (in degrees)
-                                    Array1A<Real64> const Tilt,    // Tilt angle of the surface (in degrees)
-                                    Array2A<Real64> F,             // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-                                    Array1A_int const SPtr         // pointer to REAL(r64) surface number (for error message)
+    void CalcApproximateViewFactors(int const N,                    // NUMBER OF SURFACES
+                                    const Array1D<Real64> &A,       // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                                    const Array1D<Real64> &Azimuth, // Facing angle of the surface (in degrees)
+                                    const Array1D<Real64> &Tilt,    // Tilt angle of the surface (in degrees)
+                                    Array2A<Real64> F,              // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+                                    const Array1D_int &SPtr         // pointer to REAL(r64) surface number (for error message)
     );
 
     void FixViewFactors(int const N,                     // NUMBER OF SURFACES
-                        Array1A<Real64> const A,         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                        const Array1D<Real64> &A,        // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                         Array2A<Real64> F,               // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
                         std::string &enclName,           // Name of Enclosure being fixed
                         std::vector<int> const zoneNums, // Zones which are part of this enclosure
@@ -133,10 +135,21 @@ namespace HeatBalanceIntRadExchange {
     );
 
     void CalcScriptF(int const N,             // Number of surfaces
-                     Array1<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                     Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                      Array2<Real64> const &F, // DIRECT VIEW FACTOR MATRIX (N X N)
-                     Array1<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
+                     Array1D<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
                      Array2<Real64> &ScriptF  // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
+    );
+
+    void CalcFMRT(int const N,             // Number of surfaces
+                  Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                  Array1D<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+    );
+
+    void CalcFp(int const N,             // Number of surfaces
+                Array1D<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
+                Array1D<Real64> &FMRT,    // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+                Array1D<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTNACE VALUES
     );
 
     void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form

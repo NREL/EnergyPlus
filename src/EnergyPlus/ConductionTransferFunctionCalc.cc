@@ -64,6 +64,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 
@@ -153,7 +154,7 @@ namespace ConductionTransferFunctionCalc {
 
     // Functions
 
-    void InitConductionTransferFunctions()
+    void InitConductionTransferFunctions(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1235,7 +1236,7 @@ namespace ConductionTransferFunctionCalc {
 
         } // ... end of construction loop.
 
-        ReportCTFs(DoCTFErrorReport);
+        ReportCTFs(outputFiles, DoCTFErrorReport);
 
         if (ErrorsFound) {
             ShowFatalError("Program terminated for reasons listed (InitConductionTransferFunctions)");
@@ -2114,7 +2115,7 @@ namespace ConductionTransferFunctionCalc {
                 // transfer functions for this construction.
     }
 
-    void ReportCTFs(bool const DoReportBecauseError)
+    void ReportCTFs(OutputFiles &outputFiles, bool const DoReportBecauseError)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2157,79 +2158,107 @@ namespace ConductionTransferFunctionCalc {
         int Layer;
         int I;
 
-        // Formats
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static ObjexxFCL::gio::Fmt Format_700("(' Construction CTF,',A,3(',',I4),',',F8.3,',',G15.4,4(',',F8.3),',',A)");
-        static ObjexxFCL::gio::Fmt Format_701("(' Material CTF Summary,',A,',',F8.4,',',F14.3,',',F11.3,',',F13.3,',',G12.4)");
-        static ObjexxFCL::gio::Fmt Format_702("(' Material:Air,',A,',',G12.4)");
-        static ObjexxFCL::gio::Fmt Format_703("(' CTF,',I4,4(',',G20.8))");
-        static ObjexxFCL::gio::Fmt Format_704("(' CTF,',I4,3(',',G20.8))");
-        static ObjexxFCL::gio::Fmt Format_705("(' QTF,',I4,2(',',G20.8))");
-        static ObjexxFCL::gio::Fmt Format_706("(' Source/Sink Loc Internal Temp QTF,',I4,3(',',G20.8))");
-        static ObjexxFCL::gio::Fmt Format_707("(' User Loc Internal Temp QTF,',I4,3(',',G20.8))");
 
         ScanForReports("Constructions", DoReport, "Constructions");
 
         if (DoReport || DoReportBecauseError) {
             //                                      Write Descriptions
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Construction CTF>,Construction Name,Index,#Layers,#CTFs,Time Step {hours},ThermalConductance "
-                                                 "{w/"
-                                                 "m2-K},OuterThermalAbsorptance,InnerThermalAbsorptance,OuterSolarAbsorptance,InnerSolarAbsorptance,"
-                                                 "Roughness";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Material CTF Summary>,Material Name,Thickness {m},Conductivity {w/m-K},Density {kg/m3},Specific "
-                                                 "Heat {J/kg-K},ThermalResistance {m2-K/w}";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Material:Air>,Material Name,ThermalResistance {m2-K/w}";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)";
+            print(outputFiles.eio,
+                  "! <Construction CTF>,Construction Name,Index,#Layers,#CTFs,Time Step {{hours}},ThermalConductance "
+                  "{{w/m2-K}},OuterThermalAbsorptance,InnerThermalAbsorptance,OuterSolarAbsorptance,InnerSolarAbsorptance,Roughness\n");
+            print(outputFiles.eio,
+                  "! <Material CTF Summary>,Material Name,Thickness {{m}},Conductivity {{w/m-K}},Density {{kg/m3}},Specific Heat "
+                  "{{J/kg-K}},ThermalResistance {{m2-K/w}}\n");
+            print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
+            print(outputFiles.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
 
             for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
 
                 if (!Construct(ThisNum).IsUsedCTF) continue;
 
-                ObjexxFCL::gio::write(OutputFileInits, Format_700)
-                    << Construct(ThisNum).Name << ThisNum << Construct(ThisNum).TotLayers << Construct(ThisNum).NumCTFTerms
-                    << Construct(ThisNum).CTFTimeStep << Construct(ThisNum).UValue << Construct(ThisNum).OutsideAbsorpThermal
-                    << Construct(ThisNum).InsideAbsorpThermal << Construct(ThisNum).OutsideAbsorpSolar << Construct(ThisNum).InsideAbsorpSolar
-                    << DisplayMaterialRoughness(Construct(ThisNum).OutsideRoughness);
+                static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
+                print(outputFiles.eio,
+                      Format_700,
+                      Construct(ThisNum).Name,
+                      ThisNum,
+                      Construct(ThisNum).TotLayers,
+                      Construct(ThisNum).NumCTFTerms,
+                      Construct(ThisNum).CTFTimeStep,
+                      Construct(ThisNum).UValue,
+                      Construct(ThisNum).OutsideAbsorpThermal,
+                      Construct(ThisNum).InsideAbsorpThermal,
+                      Construct(ThisNum).OutsideAbsorpSolar,
+                      Construct(ThisNum).InsideAbsorpSolar,
+                      DisplayMaterialRoughness(Construct(ThisNum).OutsideRoughness));
 
                 for (I = 1; I <= Construct(ThisNum).TotLayers; ++I) {
                     Layer = Construct(ThisNum).LayerPoint(I);
                     {
                         auto const SELECT_CASE_var(Material(Layer).Group);
                         if (SELECT_CASE_var == Air) {
-                            ObjexxFCL::gio::write(OutputFileInits, Format_702) << Material(Layer).Name << Material(Layer).Resistance;
+                            static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
+                            print(outputFiles.eio, Format_702, Material(Layer).Name, Material(Layer).Resistance);
                         } else {
-                            ObjexxFCL::gio::write(OutputFileInits, Format_701)
-                                << Material(Layer).Name << Material(Layer).Thickness << Material(Layer).Conductivity << Material(Layer).Density
-                                << Material(Layer).SpecHeat << Material(Layer).Resistance;
+                            static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
+                            print(outputFiles.eio,
+                                  Format_701,
+                                  Material(Layer).Name,
+                                  Material(Layer).Thickness,
+                                  Material(Layer).Conductivity,
+                                  Material(Layer).Density,
+                                  Material(Layer).SpecHeat,
+                                  Material(Layer).Resistance);
                         }
                     }
                 }
 
                 for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
                     if (I != 0) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_703) << I << Construct(ThisNum).CTFOutside(I) << Construct(ThisNum).CTFCross(I)
-                                                                << Construct(ThisNum).CTFInside(I) << Construct(ThisNum).CTFFlux(I);
+                        static constexpr auto Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
+                        print(outputFiles.eio,
+                              Format_703,
+                              I,
+                              Construct(ThisNum).CTFOutside(I),
+                              Construct(ThisNum).CTFCross(I),
+                              Construct(ThisNum).CTFInside(I),
+                              Construct(ThisNum).CTFFlux(I));
                     } else {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_704)
-                            << I << Construct(ThisNum).CTFOutside(I) << Construct(ThisNum).CTFCross(I) << Construct(ThisNum).CTFInside(I);
+                        static constexpr auto Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+                        print(outputFiles.eio,
+                              Format_704,
+                              I,
+                              Construct(ThisNum).CTFOutside(I),
+                              Construct(ThisNum).CTFCross(I),
+                              Construct(ThisNum).CTFInside(I));
                     }
                 }
 
                 if (Construct(ThisNum).SourceSinkPresent) {
                     // QTFs...
                     for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_705) << I << Construct(ThisNum).CTFSourceOut(I) << Construct(ThisNum).CTFSourceIn(I);
+                        static constexpr auto Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
+                        print(outputFiles.eio, Format_705, I, Construct(ThisNum).CTFSourceOut(I), Construct(ThisNum).CTFSourceIn(I));
                     }
                     // QTFs for source/sink location temperature calculation...
                     for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_706)
-                            << I << Construct(ThisNum).CTFTSourceOut(I) << Construct(ThisNum).CTFTSourceIn(I) << Construct(ThisNum).CTFTSourceQ(I);
+                        static constexpr auto Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+                        print(outputFiles.eio,
+                              Format_706,
+                              I,
+                              Construct(ThisNum).CTFTSourceOut(I),
+                              Construct(ThisNum).CTFTSourceIn(I),
+                              Construct(ThisNum).CTFTSourceQ(I));
                     }
                     if (Construct(ThisNum).TempAfterLayer != 0) {
                         // QTFs for user specified interior temperature calculation...
                         for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
-                            ObjexxFCL::gio::write(OutputFileInits, Format_707)
-                                << I << Construct(ThisNum).CTFTUserOut(I) << Construct(ThisNum).CTFTUserIn(I) << Construct(ThisNum).CTFTUserSource(I);
+                            static constexpr auto Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+                            print(outputFiles.eio,
+                                  Format_707,
+                                  I,
+                                  Construct(ThisNum).CTFTUserOut(I),
+                                  Construct(ThisNum).CTFTUserIn(I),
+                                  Construct(ThisNum).CTFTUserSource(I));
                         }
                     }
                 }

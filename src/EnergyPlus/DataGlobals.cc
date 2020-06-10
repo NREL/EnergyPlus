@@ -53,6 +53,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/OutputFiles.hh>
 
 namespace EnergyPlus {
 
@@ -87,7 +89,6 @@ namespace DataGlobals {
     // Thus, all variables in this module must be PUBLIC.
     bool runReadVars(false);
     bool DDOnlySimulation(false);
-    bool AnnualSimulation(false);
     bool outputEpJSONConversion(false);
     bool outputEpJSONConversionOnly(false);
     bool isEpJSON(false);
@@ -101,7 +102,6 @@ namespace DataGlobals {
     int const BeginDay(1);
     int const DuringDay(2);
     int const EndDay(3);
-    int const EndZoneSizingCalc(4);
     int const EndSysSizingCalc(5);
 
     // Parameters for KindOfSim
@@ -179,7 +179,6 @@ namespace DataGlobals {
     bool BeginFullSimFlag(false);       // True until full simulation has begun, False after first time step
     bool BeginTimeStepFlag(false);      // True at the start of each time step, False after first subtime step of time step
     int DayOfSim(0);                    // Counter for days (during the simulation)
-    std::string DayOfSimChr("0");       // Counter for days (during the simulation) (character -- for reporting)
     int CalendarYear(0);                // Calendar year of the current day of simulation
     std::string CalendarYearChr;        // Calendar year of the current day of simulation (character -- for reporting)
     bool EndEnvrnFlag(false);           // True at the end of each environment (last time step of last hour of last day of environ)
@@ -197,24 +196,12 @@ namespace DataGlobals {
     int TimeStep(0);                   // Counter for time steps (fractional hours)
     Real64 TimeStepZone(0.0);          // Zone time step in fractional hours
     bool WarmupFlag(false);            // True during the warmup portion of a simulation
-    int OutputFileStandard(0);         // Unit number for the standard output file (hourly data only)
-    std::ostream *eso_stream(nullptr); // Internal stream used for eso output (used for performance)
     JsonOutputStreams jsonOutputStreams;
     int OutputStandardError(0);                      // Unit number for the standard error output file
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
-    int OutputFileInits(0);                          // Unit number for the standard Initialization output file
-    std::ostream *eio_stream(nullptr);               // Internal stream used for eio output (used for unit tests)
-    int OutputFileDebug(0);                          // Unit number for debug outputs
-    int OutputFileZoneSizing(0);                     // Unit number of zone sizing calc output file
-    int OutputFileSysSizing(0);                      // Unit number of system sizing calc output file
-    int OutputFileMeters(0);                         // Unit number for meters output
-    std::ostream *mtr_stream(nullptr);               // Internal stream used for mtr output (used for performance)
-    int OutputFileShadingFrac(0);                    // Unit number for shading output
+    int OutputFilePerfLog(0);                        // Unit number for performance log outputs
     int StdMeterRecordCount(0);                      // Count of Meter output records
-    int OutputFileBNDetails(0);                      // Unit number for Branch-Node Details
-    int OutputDElightIn(0);                          // Unit number for the DElight In file
-    std::ostream *delightin_stream(nullptr);         // Internal stream used for DElight In file
     bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
     bool SysSizingCalc(false);                       // TRUE if system sizing calculation
     bool DoZoneSizing(false);                        // User input in SimulationControl object
@@ -262,18 +249,23 @@ namespace DataGlobals {
     bool AnyBasementsInModel(false);     // true if there are any basements in the input file
     // Performance tradeoff globals
     bool DoCoilDirectSolutions(false);       //true if use coil direction solutions
+    bool createPerfLog(false); //true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
 
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
     void (*fMessagePtr)(std::string const &);
+    void (*progressCallback)(int const);
+    void (*messageCallback)(const char * message);
+    void (*errorCallback)(const char * errorMessage);
+
+    bool eplusRunningViaAPI;
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state()
+    void clear_state(OutputFiles &outputFiles)
     {
         runReadVars = false;
         DDOnlySimulation = false;
-        AnnualSimulation = false;
         outputEpJSONConversion = false;
         outputEpJSONConversionOnly = false;
         isEpJSON = false;
@@ -287,7 +279,6 @@ namespace DataGlobals {
         BeginFullSimFlag = false;
         BeginTimeStepFlag = false;
         DayOfSim = 0;
-        DayOfSimChr = "0";
         CalendarYear = 0;
         CalendarYearChr = "0";
         EndEnvrnFlag = false;
@@ -304,17 +295,16 @@ namespace DataGlobals {
         TimeStep = 0;
         TimeStepZone = 0.0;
         WarmupFlag = false;
-        OutputFileStandard = 0;
+        outputFiles.eso.close();
         OutputStandardError = 0;
         StdOutputRecordCount = 0;
-        OutputFileInits = 0;
-        OutputFileDebug = 0;
-        OutputFileZoneSizing = 0;
-        OutputFileSysSizing = 0;
-        OutputFileMeters = 0;
-        OutputFileShadingFrac = 0;
+        outputFiles.debug.close();
+        outputFiles.zsz.close();
+        outputFiles.ssz.close();
+        outputFiles.mtr.close();
+        OutputFilePerfLog = 0;
+        outputFiles.shade.close();
         StdMeterRecordCount = 0;
-        OutputFileBNDetails = 0;
         ZoneSizingCalc = false;
         SysSizingCalc = false;
         DoZoneSizing = false;
@@ -362,11 +352,14 @@ namespace DataGlobals {
         AnyBasementsInModel = false;
         DoCoilDirectSolutions = false;
         Progress = 0;
-        eso_stream = nullptr;
-        mtr_stream = nullptr;
+        fProgressPtr = nullptr;
+        fMessagePtr = nullptr;
+        progressCallback = nullptr;
+        messageCallback = nullptr;
+        errorCallback = nullptr;
+        outputFiles.mtr.close();
         err_stream = nullptr;
-        eio_stream = nullptr;
-        delightin_stream = nullptr;
+        eplusRunningViaAPI = false;
     }
 
 } // namespace DataGlobals

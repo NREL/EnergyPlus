@@ -318,7 +318,6 @@ namespace RoomAirModelUserTempPattern {
         // Using/Aliasing
         using DataSurfaces::ZoneMeanAirTemp;
         using General::FindNumberInList;
-        using OutputReportTabular::IntToStr;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -357,7 +356,7 @@ namespace RoomAirModelUserTempPattern {
 
             if (CurPatrnID == 0) {
                 // throw error here ? way to test schedules before getting to this point?
-                ShowFatalError("User defined room air pattern index not found: " + IntToStr(CurntPatternKey));
+                ShowFatalError("User defined room air pattern index not found: " + std::to_string(CurntPatternKey));
                 return;
             }
 
@@ -997,7 +996,7 @@ namespace RoomAirModelUserTempPattern {
         using DataSurfaces::ZoneMeanAirTemp;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using InternalHeatGains::SumAllReturnAirLatentGains;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyHgAirFnWTdb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1047,7 +1046,7 @@ namespace RoomAirModelUserTempPattern {
             // Add sensible heat gain from refrigerated cases with under case returns
             SumAllReturnAirConvectionGains(ZoneNum, QRetAir, ReturnNode);
 
-            CpAir = PsyCpAirFnWTdb(Node(ZoneNode).HumRat, Node(ZoneNode).Temp);
+            CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
 
             // Need to add the energy to the return air from lights and from airflow windows. Where the heat
             // is added depends on if there is system flow or not.  If there is system flow the heat is added

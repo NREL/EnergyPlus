@@ -79,11 +79,13 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
@@ -91,6 +93,7 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -101,7 +104,9 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -150,7 +155,6 @@ namespace MixedAir {
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DoZoneSizing;
     using DataGlobals::NumOfZones;
-    using DataGlobals::OutputFileInits;
     using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using namespace DataEnvironment;
@@ -206,6 +210,7 @@ namespace MixedAir {
     int const Humidifier(21);
     int const Fan_System_Object(22);
     int const UnitarySystemModel(23);
+    int const VRFTerminalUnit(24); // new Jan 2020
 
     int const ControllerOutsideAir(2);
     int const ControllerStandAloneERV(3);
@@ -383,7 +388,7 @@ namespace MixedAir {
         OAControllerUniqueNames.clear();
     }
 
-    void ManageOutsideAirSystem(std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum)
+    void ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -396,7 +401,7 @@ namespace MixedAir {
         // Manage the outside air system
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -407,12 +412,12 @@ namespace MixedAir {
             }
         }
 
-        InitOutsideAirSys(OASysNum, FirstHVACIteration, AirLoopNum);
+        InitOutsideAirSys(state, OASysNum, FirstHVACIteration, AirLoopNum);
 
-        SimOutsideAirSys(OASysNum, FirstHVACIteration, AirLoopNum);
+        SimOutsideAirSys(state, OASysNum, FirstHVACIteration, AirLoopNum);
     }
 
-    void SimOASysComponents(int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
+    void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
         int CompNum;
         static std::string CompType; // Tuned Made static
@@ -427,7 +432,7 @@ namespace MixedAir {
         for (CompNum = 1; CompNum <= OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
             CompType = OutsideAirSys(OASysNum).ComponentType(CompNum);
             CompName = OutsideAirSys(OASysNum).ComponentName(CompNum);
-            SimOAComponent(CompType,
+            SimOAComponent(state, CompType,
                            CompName,
                            OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
                            FirstHVACIteration,
@@ -447,7 +452,7 @@ namespace MixedAir {
             for (CompNum = OutsideAirSys(OASysNum).NumComponents - 1; CompNum >= 1; --CompNum) {
                 CompType = OutsideAirSys(OASysNum).ComponentType(CompNum);
                 CompName = OutsideAirSys(OASysNum).ComponentName(CompNum);
-                SimOAComponent(CompType,
+                SimOAComponent(state, CompType,
                                CompName,
                                OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
                                FirstHVACIteration,
@@ -463,7 +468,7 @@ namespace MixedAir {
             for (CompNum = 1; CompNum <= OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
                 CompType = OutsideAirSys(OASysNum).ComponentType(CompNum);
                 CompName = OutsideAirSys(OASysNum).ComponentName(CompNum);
-                SimOAComponent(CompType,
+                SimOAComponent(state, CompType,
                                CompName,
                                OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
                                FirstHVACIteration,
@@ -478,7 +483,7 @@ namespace MixedAir {
         }
     }
 
-    void SimOutsideAirSys(int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
+    void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -509,9 +514,9 @@ namespace MixedAir {
         CurOASysNum = OASysNum;
         auto &CurrentOASystem(OutsideAirSys(OASysNum));
         if (OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
-            SimOAController(CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
+            SimOAController(state, CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
         }
-        SimOASysComponents(OASysNum, FirstHVACIteration, AirLoopNum);
+        SimOASysComponents(state, OASysNum, FirstHVACIteration, AirLoopNum);
 
         if (MyOneTimeErrorFlag(OASysNum)) {
             if (CurrentOASystem.NumControllers - CurrentOASystem.NumSimpleControllers > 1) {
@@ -557,7 +562,7 @@ namespace MixedAir {
         }
     }
 
-    void SimOAComponent(std::string const &CompType, // the component type
+    void SimOAComponent(EnergyPlusData &state, std::string const &CompType, // the component type
                         std::string const &CompName, // the component Name
                         int const CompTypeNum,       // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
@@ -589,7 +594,6 @@ namespace MixedAir {
 
         // USE Statements
         // Using/Aliasing
-        using DataAirLoop::AirLoopInputsFilled;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
         using EvaporativeCoolers::SimEvapCooler;
         using HeatingCoils::SimulateHeatingCoilComponents;
@@ -634,11 +638,11 @@ namespace MixedAir {
                 // Fan Types
             } else if (SELECT_CASE_var == Fan_Simple_CV) { // 'Fan:ConstantVolume'
                 if (Sim) {
-                    Fans::SimulateFanComponents(CompName, FirstHVACIteration, CompIndex);
+                    Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
                 }
             } else if (SELECT_CASE_var == Fan_Simple_VAV) { // 'Fan:VariableVolume'
                 if (Sim) {
-                    Fans::SimulateFanComponents(CompName, FirstHVACIteration, CompIndex);
+                    Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
                 }
 
             } else if (SELECT_CASE_var == Fan_System_Object) { // 'Fan:SystemModel'
@@ -646,21 +650,21 @@ namespace MixedAir {
                     CompIndex = HVACFan::getFanObjectVectorIndex(CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
                 }
                 if (Sim) {
-                    HVACFan::fanObjs[CompIndex - 1]->simulate(_, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
+                    HVACFan::fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
                 }
                 // cpw22Aug2010 Add Fan:ComponentModel (new num=18)
             } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
                 if (Sim) {
-                    Fans::SimulateFanComponents(CompName, FirstHVACIteration, CompIndex);
+                    Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
                 }
 
                 // Coil Types
             } else if (SELECT_CASE_var == WaterCoil_Cooling) { // 'Coil:Cooling:Water'
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
-                    SolveWaterCoilController(FirstHVACIteration,
+                    SolveWaterCoilController(state, FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
@@ -674,9 +678,9 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
-                    SolveWaterCoilController(FirstHVACIteration,
+                    SolveWaterCoilController(state, FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
@@ -689,15 +693,15 @@ namespace MixedAir {
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
                 if (Sim) {
-                    SimulateSteamCoilComponents(CompName, FirstHVACIteration, CompIndex, 0.0);
+                    SimulateSteamCoilComponents(state, CompName, FirstHVACIteration, CompIndex, 0.0);
                 }
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == WaterCoil_DetailedCool) { // 'Coil:Cooling:Water:DetailedGeometry'
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
-                    SolveWaterCoilController(FirstHVACIteration,
+                    SolveWaterCoilController(state, FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
@@ -711,21 +715,21 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == Coil_ElectricHeat) { // 'Coil:Heating:Electric'
                 if (Sim) {
                     //     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
-                    SimulateHeatingCoilComponents(CompName, FirstHVACIteration, _, CompIndex);
+                    SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex);
                 }
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == Coil_GasHeat) { // 'Coil:Heating:Fuel'
                 if (Sim) {
                     //     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
-                    SimulateHeatingCoilComponents(CompName, FirstHVACIteration, _, CompIndex);
+                    SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex);
                 }
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == WaterCoil_CoolingHXAsst) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimHXAssistedCoolingCoil(CompName, FirstHVACIteration, On, 0.0, CompIndex, ContFanCycCoil);
+                    if (CompIndex == 0) SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, On, 0.0, CompIndex, ContFanCycCoil);
                     // iterate on OA sys controller and water coil at the same time
-                    SolveWaterCoilController(FirstHVACIteration,
+                    SolveWaterCoilController(state, FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
@@ -738,7 +742,7 @@ namespace MixedAir {
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
                 if (Sim) {
-                    SimDXCoolingSystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
+                    SimDXCoolingSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == UnitarySystemModel) { // AirLoopHVAC:UnitarySystem
@@ -747,19 +751,28 @@ namespace MixedAir {
                     bool CoolingActive = false;
                     Real64 OAUCoilOutTemp = 0.0;
                     bool ZoneEquipFlag = false;
-                    OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(
-                        CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, CompIndex, OAUCoilOutTemp, ZoneEquipFlag);
+                    Real64 sensOut = 0.0;
+                    Real64 latOut = 0.0;
+                    OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(state, CompName,
+                                                                             FirstHVACIteration,
+                                                                             AirLoopNum,
+                                                                             CompIndex,
+                                                                             HeatingActive,
+                                                                             CoolingActive,
+                                                                             CompIndex,
+                                                                             OAUCoilOutTemp,
+                                                                             ZoneEquipFlag,
+                                                                             sensOut,
+                                                                             latOut);
                 }
-                if (AirLoopInputsFilled) UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil, 0);
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
-                    if (AirLoopInputsFilled) {
-                        UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(CompName, 0);
-                        MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
-                    }
+                    UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, OACoolingCoil, OAHeatingCoil, 0);
+                    UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
+                    if (Sim) MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
                 }
             } else if (SELECT_CASE_var == DXHeatPumpSystem) {
                 if (Sim) {
-                    SimDXHeatPumpSystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
+                    SimDXHeatPumpSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
                 }
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == Coil_UserDefined) {
@@ -790,9 +803,9 @@ namespace MixedAir {
                         }
                     }
                     if (OutsideAirSys(OASysNum).AirLoopDOASNum > -1) {
-                        SimHeatRecovery(CompName, FirstHVACIteration, CompIndex, FanOpMode, AirloopPLR, _, _, _, _, _);
+                        SimHeatRecovery(state, CompName, FirstHVACIteration, CompIndex, FanOpMode, AirloopPLR, _, _, _, _, _);
                     } else {
-                        SimHeatRecovery(CompName,
+                        SimHeatRecovery(state, CompName,
                                         FirstHVACIteration,
                                         CompIndex,
                                         FanOpMode,
@@ -810,7 +823,7 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == Desiccant) { // 'Dehumidifier:Desiccant:NoFans'
                 // 'Dehumidifier:Desiccant:System'
                 if (Sim) {
-                    SimDesiccantDehumidifier(CompName, FirstHVACIteration, CompIndex);
+                    SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
                 }
                 OAHX = true;
 
@@ -833,7 +846,7 @@ namespace MixedAir {
                     if (CompIndex == 0) {
                         CompIndex = PhotovoltaicThermalCollectors::getPVTindexFromName(CompName);
                     }
-                    PhotovoltaicThermalCollectors::simPVTfromOASys(CompIndex, FirstHVACIteration);
+                    PhotovoltaicThermalCollectors::simPVTfromOASys(state, CompIndex, FirstHVACIteration);
                 }
 
                 // Evaporative Cooler Types
@@ -841,6 +854,31 @@ namespace MixedAir {
                 // 'EvaporativeCooler:Indirect:WetCoil','EvaporativeCooler:Indirect:ResearchSpecial'
                 if (Sim) {
                     SimEvapCooler(CompName, CompIndex);
+                }
+
+            } else if (SELECT_CASE_var == VRFTerminalUnit) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
+                if (Sim) {
+                    int ControlledZoneNum = 0;
+                    bool HeatingActive = false;
+                    bool CoolingActive = false;
+                    int const OAUnitNum = 0;
+                    Real64 const OAUCoilOutTemp = 0.0;
+                    bool const ZoneEquipment = false;
+                    Real64 sysOut = 0.0;
+                    Real64 latOut = 0.0;
+                    HVACVariableRefrigerantFlow::SimulateVRF(state, CompName,
+                        FirstHVACIteration,
+                        ControlledZoneNum,
+                        CompIndex,
+                        HeatingActive,
+                        CoolingActive,
+                        OAUnitNum,
+                        OAUCoilOutTemp,
+                        ZoneEquipment,
+                        sysOut,
+                        latOut);
+                } else {
+                    HVACVariableRefrigerantFlow::isVRFCoilPresent(state, CompName, OACoolingCoil, OAHeatingCoil);
                 }
 
             } else {
@@ -888,7 +926,7 @@ namespace MixedAir {
         ReportOAMixer(OAMixerNum);
     }
 
-    void SimOAController(std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum)
+    void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -904,7 +942,7 @@ namespace MixedAir {
         int OAControllerNum;
 
         if ((GetOAControllerInputFlag) && (AirLoopNum > 0)) { // Gets input for object  first time Sim routine is called from an airloop
-            GetOAControllerInputs();
+            GetOAControllerInputs(state);
             GetOAControllerInputFlag = false;
         }
 
@@ -922,16 +960,16 @@ namespace MixedAir {
             OAControllerNum = CtrlIndex;
         }
 
-        InitOAController(OAControllerNum, FirstHVACIteration, AirLoopNum);
+        InitOAController(state, OAControllerNum, FirstHVACIteration, AirLoopNum);
 
-        OAController(OAControllerNum).CalcOAController(AirLoopNum, FirstHVACIteration);
+        OAController(OAControllerNum).CalcOAController(state, AirLoopNum, FirstHVACIteration);
         OAController(OAControllerNum).UpdateOAController();
     }
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetOutsideAirSysInputs()
+    void GetOutsideAirSysInputs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1218,7 +1256,7 @@ namespace MixedAir {
                     } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = DXSystem;
                         // set the data for 100% DOAS DX cooling coil
-                        CheckDXCoolingCoilInOASysExists(OutsideAirSys(OASysNum).ComponentName(CompNum));
+                        CheckDXCoolingCoilInOASysExists(state, OutsideAirSys(OASysNum).ComponentName(CompNum));
                     } else if (SELECT_CASE_var == "COILSYSTEM:HEATING:DX") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = DXHeatPumpSystem;
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
@@ -1226,7 +1264,7 @@ namespace MixedAir {
                         OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
                         UnitarySystems::UnitarySys thisSys;
                         OutsideAirSys(OASysNum).compPointer[CompNum] =
-                            thisSys.factory(DataHVACGlobals::UnitarySys_AnyCoilType, OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
+                            thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
                     } else if (SELECT_CASE_var == "COIL:USERDEFINED") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = Coil_UserDefined;
                         // Heat recovery
@@ -1266,6 +1304,8 @@ namespace MixedAir {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = EvapCooler;
                     } else if (SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = EvapCooler;
+                    } else if ( SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW" ) {
+                        OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = VRFTerminalUnit;
                     } else {
                         ShowSevereError(CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid Outside Air Component=\"" +
                                         OutsideAirSys(OASysNum).ComponentType(CompNum) + "\".");
@@ -1297,7 +1337,7 @@ namespace MixedAir {
         GetOASysInputFlag = false;
     }
 
-    void GetOAControllerInputs()
+    void GetOAControllerInputs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1369,15 +1409,12 @@ namespace MixedAir {
         int i;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700(
-            "('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
-            "{Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
-            "Name,DSZAD Name')");
+
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // First, call other get input routines in this module to make sure data is filled during this routine.
         if (GetOASysInputFlag) { // Gets input for object  first time Sim routine is called
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
         if (GetOAMixerInputFlag) { // Gets input for object  first time Sim routine is called
@@ -1385,7 +1422,7 @@ namespace MixedAir {
             GetOAMixerInputFlag = false;
         }
 
-        FaultsManager::CheckAndReadFaults();
+        FaultsManager::CheckAndReadFaults(state);
 
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
         MaxAlphas = NumAlphas;
@@ -1426,7 +1463,7 @@ namespace MixedAir {
                                               cNumericFields);
                 GlobalNames::VerifyUniqueInterObjectName(OAControllerUniqueNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
-                ProcessOAControllerInputs(CurrentModuleObject,
+                ProcessOAControllerInputs(state, CurrentModuleObject,
                                           OutAirNum,
                                           AlphArray,
                                           NumAlphas,
@@ -1894,6 +1931,7 @@ namespace MixedAir {
                                                     if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipName(EquipNum),
                                                                                     AirDistUnit(ADUNum).Name)) {
                                                         if ((AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVReheat) ||
+                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolNoReheat) ||
                                                             (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolReheat) ||
                                                             (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVNoReheat) ||
                                                             (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVReheatVSFan) ||
@@ -1970,109 +2008,59 @@ namespace MixedAir {
             }
 
             // write to .eio file
-            ObjexxFCL::gio::write(OutputFileInits, Format_700);
+            static constexpr auto Format_700(
+                "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
+                "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
+                "Name,DSZAD Name");
+            print(state.outputFiles.eio, "{}\n", Format_700);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << " Controller:MechanicalVentilation," +
-                                                                               VentilationMechanical(VentMechNum).Name + ',' +
-                                                                               VentilationMechanical(VentMechNum).SchName + ',';
-                }
+                print(state.outputFiles.eio,
+                      " Controller:MechanicalVentilation,{},{},",
+                      VentilationMechanical(VentMechNum).Name,
+                      VentilationMechanical(VentMechNum).SchName);
+
                 if (VentilationMechanical(VentMechNum).DCVFlag) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "Yes,";
-                    }
+                    print(state.outputFiles.eio, "Yes,");
                 } else {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "No,";
-                    }
+                    print(state.outputFiles.eio, "No,");
                 }
+
                 if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ZoneSum) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ZoneSum,";
-                    }
+                    print(state.outputFiles.eio, "ZoneSum,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRP) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "VentilationRateProcedure,";
-                    }
+                    print(state.outputFiles.eio, "VentilationRateProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedure,";
-                    }
+                    print(state.outputFiles.eio, "IndoorAirQualityProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedonOccupancySchedule,";
-                    }
+                    print(state.outputFiles.eio, "ProportionalControlBasedonOccupancySchedule,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOcc) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOccupancy,";
-                    }
+                    print(state.outputFiles.eio, "ProportionalControlBasedOnDesignOccupancy,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOARate) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOARate,";
-                    }
+                    print(state.outputFiles.eio, "ProportionalControlBasedOnDesignOARate,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPGC) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityGenericContaminant,";
-                    }
+                    print(state.outputFiles.eio, "IndoorAirQualityGenericContaminant,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPCOM) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedureCombined,";
-                    }
+                    print(state.outputFiles.eio, "IndoorAirQualityProcedureCombined,");
                 } else {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "Invalid/Unknown,";
-                    }
+                    print(state.outputFiles.eio, "Invalid/Unknown,");
                 }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                        << RoundSigDigits(VentilationMechanical(VentMechNum).ZoneMaxOAFraction, 2) + ',';
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                        << RoundSigDigits(VentilationMechanical(VentMechNum).NumofVentMechZones) + ',';
-                }
+
+                print(state.outputFiles.eio, "{:.2R},", VentilationMechanical(VentMechNum).ZoneMaxOAFraction);
+                print(state.outputFiles.eio, "{},", VentilationMechanical(VentMechNum).NumofVentMechZones);
+
                 for (jZone = 1; jZone <= VentilationMechanical(VentMechNum).NumofVentMechZones; ++jZone) {
                     if (jZone < VentilationMechanical(VentMechNum).NumofVentMechZones) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                                << Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name + ',' +
-                                       VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                       VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone) + ',';
-                        }
+                        print(state.outputFiles.eio,
+                              "{},{},{},",
+                              Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     } else {
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << VentilationMechanical(VentMechNum).VentMechZoneName(jZone) + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone);
+                        print(state.outputFiles.eio,
+                              "{},{},{}\n",
+                              Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     }
                 }
             }
@@ -2232,16 +2220,16 @@ namespace MixedAir {
         GetOAMixerInputFlag = false;
     }
 
-    void ProcessOAControllerInputs(std::string const &CurrentModuleObject,
+    void ProcessOAControllerInputs(EnergyPlusData &state, std::string const &CurrentModuleObject,
                                    int const OutAirNum,
-                                   Array1_string const &AlphArray,
+                                   Array1D_string const &AlphArray,
                                    int &NumAlphas,
-                                   Array1<Real64> const &NumArray,
+                                   Array1D<Real64> const &NumArray,
                                    int &NumNums,
-                                   Array1_bool const &lNumericBlanks, // Unused
-                                   Array1_bool const &lAlphaBlanks,
-                                   Array1_string const &cAlphaFields,
-                                   Array1_string const &cNumericFields, // Unused
+                                   Array1D_bool const &lNumericBlanks, // Unused
+                                   Array1D_bool const &lAlphaBlanks,
+                                   Array1D_string const &cAlphaFields,
+                                   Array1D_string const &cNumericFields, // Unused
                                    bool &ErrorsFound                    // If errors found in input
     )
     {
@@ -2597,7 +2585,7 @@ namespace MixedAir {
             ShowContinueError("...The high humidity control option will be disabled and the simulation continues.");
         }
 
-        OAController(OutAirNum).MixedAirSPMNum = GetMixedAirNumWithCoilFreezingCheck(OAController(OutAirNum).MixNode);
+        OAController(OutAirNum).MixedAirSPMNum = GetMixedAirNumWithCoilFreezingCheck(state, OAController(OutAirNum).MixNode);
     }
 
     // End of Get Input subroutines for the Module
@@ -2606,7 +2594,7 @@ namespace MixedAir {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitOutsideAirSys(int const(OASysNum), bool const FirstHVACIteration, int const AirLoopNum)
+    void InitOutsideAirSys(EnergyPlusData &EP_UNUSED(state), int const(OASysNum), bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2658,7 +2646,7 @@ namespace MixedAir {
         // Each iteration
     }
 
-    void InitOAController(int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum)
+    void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2830,7 +2818,7 @@ namespace MixedAir {
         }
 
         if (!SysSizingCalc && OAControllerMySizeFlag(OAControllerNum)) {
-            thisOAController.SizeOAController();
+            thisOAController.SizeOAController(state);
             if (AirLoopNum > 0) {
                 AirLoopControlInfo(AirLoopNum).OACtrlNum = OAControllerNum;
                 AirLoopControlInfo(AirLoopNum).OACtrlName = thisOAController.Name;
@@ -3536,7 +3524,7 @@ namespace MixedAir {
     // Beginning Calculation Section of the Module
     //******************************************************************************
 
-    void OAControllerProps::CalcOAController(int const AirLoopNum, bool const FirstHVACIteration)
+    void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3710,7 +3698,7 @@ namespace MixedAir {
         }
 
         // Economizer
-        this->CalcOAEconomizer(AirLoopNum, OutAirMinFrac, OASignal, HighHumidityOperationFlag, FirstHVACIteration);
+        this->CalcOAEconomizer(state, AirLoopNum, OutAirMinFrac, OASignal, HighHumidityOperationFlag, FirstHVACIteration);
 
         this->OAMassFlow = OASignal * this->MixMassFlow;
 
@@ -3839,7 +3827,7 @@ namespace MixedAir {
         }
         this->RelTemp = this->RetTemp;
         this->RelEnth = this->RetEnth;
-        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnWTdb(OutHumRat, OutDryBulbTemp) * (this->RelTemp - OutDryBulbTemp);
+        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnW(OutHumRat) * (this->RelTemp - OutDryBulbTemp);
         this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - OutEnthalpy);
         this->RelLatentLossRate = this->RelTotalLossRate - this->RelSensiLossRate;
     }
@@ -4426,13 +4414,14 @@ namespace MixedAir {
         }
     }
 
-    void OAControllerProps::CalcOAEconomizer(
+    void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state, 
         int const AirLoopNum, Real64 const OutAirMinFrac, Real64 &OASignal, bool &HighHumidityOperationFlag, bool const FirstHVACIteration)
     {
         using DataAirLoop::OutsideAirSys;
         using DataLoopNode::Node;
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using General::SolveRoot;
+        using TempSolveRoot::SolveRoot;
         using SetPointManager::GetCoilFreezingCheckFlag;
 
         static std::string const RoutineName("CalcOAEconomizer: ");
@@ -4487,7 +4476,7 @@ namespace MixedAir {
 
         // Define an outside air signal
         if (this->MixedAirSPMNum > 0) {
-            this->CoolCoilFreezeCheck = GetCoilFreezingCheckFlag(this->MixedAirSPMNum);
+            this->CoolCoilFreezeCheck = GetCoilFreezingCheckFlag(state, this->MixedAirSPMNum);
         } else {
             this->CoolCoilFreezeCheck = false;
         }
@@ -4656,13 +4645,13 @@ namespace MixedAir {
                         // save actual OA flow frac for use as min value for RegulaFalsi call
                         minOAFrac = max(OutAirMinFrac, Node(this->OANode).MassFlowRate / this->MixMassFlow);
                     }
-                    SimOASysComponents(AirLoopControlInfo(AirLoopNum).OASysNum, FirstHVACIteration, AirLoopNum);
+                    SimOASysComponents(state, AirLoopControlInfo(AirLoopNum).OASysNum, FirstHVACIteration, AirLoopNum);
                     lowFlowResiduum = Node(this->MixNode).TempSetPoint - Node(this->MixNode).Temp;
 
                     // 2 - check max OA flow result
                     Node(this->OANode).MassFlowRate = max(this->ExhMassFlow, Node(this->MixNode).MassFlowRate);
                     Node(this->RelNode).MassFlowRate = max(Node(this->OANode).MassFlowRate - this->ExhMassFlow, 0.0);
-                    SimOASysComponents(AirLoopControlInfo(AirLoopNum).OASysNum, FirstHVACIteration, AirLoopNum);
+                    SimOASysComponents(state, AirLoopControlInfo(AirLoopNum).OASysNum, FirstHVACIteration, AirLoopNum);
                     highFlowResiduum = Node(this->MixNode).TempSetPoint - Node(this->MixNode).Temp;
 
                     // 3 - test to ensure RegulaFalsi can find an answer
@@ -4678,7 +4667,7 @@ namespace MixedAir {
                         if (FirstHVACIteration) Par(5) = 1.0;
                         Par(6) = double(AirLoopNum);
 
-                        SolveRoot((Acc / 10.0), MaxIte, SolFla, OASignal, MultiCompControlTempResidual, minOAFrac, 1.0, Par);
+                        SolveRoot(state, (Acc / 10.0), MaxIte, SolFla, OASignal, MultiCompControlTempResidual, minOAFrac, 1.0, Par);
                         if (SolFla < 0) { // if RegulaFalsi fails to find a solution, returns -1 or -2, set to existing OutAirSignal
                             OASignal = OutAirSignal;
                         }
@@ -4869,7 +4858,7 @@ namespace MixedAir {
     // Beginning Sizing Section of the Module
     //******************************************************************************
 
-    void OAControllerProps::SizeOAController()
+    void OAControllerProps::SizeOAController(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5001,8 +4990,8 @@ namespace MixedAir {
                     UtilityRoutines::SameString(CompType, "COIL:HEATING:WATER") ||
                     UtilityRoutines::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
                     if (UtilityRoutines::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
-                        CoilName = GetHXDXCoilName(CompType, CompName, ErrorsFound);
-                        CoilType = GetHXCoilType(CompType, CompName, ErrorsFound);
+                        CoilName = GetHXDXCoilName(state, CompType, CompName, ErrorsFound);
+                        CoilType = GetHXCoilType(state, CompType, CompName, ErrorsFound);
                     } else {
                         CoilName = CompName;
                         CoilType = CompType;
@@ -5182,8 +5171,8 @@ namespace MixedAir {
     // Beginning Utility Section of the Module
     //******************************************************************************
 
-    Real64 MixedAirControlTempResidual(Real64 const OASignal,    // Relative outside air flow rate (0 to 1)
-                                       Array1<Real64> const &Par // par(1) = mixed node number
+    Real64 MixedAirControlTempResidual(Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+                                       Array1D<Real64> const &Par // par(1) = mixed node number
     )
     {
 
@@ -5256,8 +5245,8 @@ namespace MixedAir {
         return Residuum;
     }
 
-    Real64 MultiCompControlTempResidual(Real64 const OASignal,    // Relative outside air flow rate (0 to 1)
-                                        Array1<Real64> const &Par // par(1) = mixed node number
+    Real64 MultiCompControlTempResidual(EnergyPlusData &state, Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+                                        Array1D<Real64> const &Par // par(1) = mixed node number
     )
     {
 
@@ -5327,7 +5316,7 @@ namespace MixedAir {
         Node(OANode).MassFlowRate = OAMassFlowRate;                          // set OA node mass flow rate
         Node(RelNode).MassFlowRate = max(OAMassFlowRate - ExhMassFlow, 0.0); // set relief node mass flow rate to maintain mixer continuity calcs
 
-        SimOASysComponents(OASysNum, FirstHVACIteration, AirloopNum);
+        SimOASysComponents(state, OASysNum, FirstHVACIteration, AirloopNum);
 
         Residuum = Node(MixNode).TempSetPoint - Node(MixNode).Temp;
 
@@ -5532,7 +5521,7 @@ namespace MixedAir {
         return ReliefNodeNumber;
     }
 
-    int GetOASysControllerListIndex(int const OASysNumber) // OA Sys Number
+    int GetOASysControllerListIndex(EnergyPlusData &state, int const OASysNumber) // OA Sys Number
     {
 
         // FUNCTION INFORMATION:
@@ -5572,7 +5561,7 @@ namespace MixedAir {
         // na
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -5581,7 +5570,7 @@ namespace MixedAir {
         return OASysControllerListNum;
     }
 
-    int GetOASysNumSimpControllers(int const OASysNumber) // OA Sys Number
+    int GetOASysNumSimpControllers(EnergyPlusData &state, int const OASysNumber) // OA Sys Number
     {
 
         // FUNCTION INFORMATION:
@@ -5621,7 +5610,7 @@ namespace MixedAir {
         // na
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -5630,7 +5619,7 @@ namespace MixedAir {
         return OASysNumSimpControllers;
     }
 
-    int GetOASysNumHeatingCoils(int const OASysNumber) // OA Sys Number
+    int GetOASysNumHeatingCoils(EnergyPlusData &state, int const OASysNumber) // OA Sys Number
     {
 
         // FUNCTION INFORMATION:
@@ -5678,7 +5667,7 @@ namespace MixedAir {
         bool OAHX(false);
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -5686,7 +5675,7 @@ namespace MixedAir {
         for (CompNum = 1; CompNum <= OutsideAirSys(OASysNumber).NumComponents; ++CompNum) {
             CompType = OutsideAirSys(OASysNumber).ComponentType(CompNum);
             CompName = OutsideAirSys(OASysNumber).ComponentName(CompNum);
-            SimOAComponent(CompType,
+            SimOAComponent(state, CompType,
                            CompName,
                            OutsideAirSys(OASysNumber).ComponentType_Num(CompNum),
                            FirstHVACIteration,
@@ -5705,7 +5694,7 @@ namespace MixedAir {
         return NumHeatingCoils;
     }
 
-    int GetOASysNumHXs(int const OASysNumber)
+    int GetOASysNumHXs(EnergyPlusData &state, int const OASysNumber)
     {
 
         // FUNCTION INFORMATION:
@@ -5746,7 +5735,7 @@ namespace MixedAir {
         int CompNum_end;
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -5763,7 +5752,7 @@ namespace MixedAir {
         return NumHX;
     }
 
-    int GetOASysNumCoolingCoils(int const OASysNumber) // OA Sys Number
+    int GetOASysNumCoolingCoils(EnergyPlusData &state, int const OASysNumber) // OA Sys Number
     {
 
         // FUNCTION INFORMATION:
@@ -5811,7 +5800,7 @@ namespace MixedAir {
         bool OAHX(false);
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -5819,7 +5808,7 @@ namespace MixedAir {
         for (CompNum = 1; CompNum <= OutsideAirSys(OASysNumber).NumComponents; ++CompNum) {
             CompType = OutsideAirSys(OASysNumber).ComponentType(CompNum);
             CompName = OutsideAirSys(OASysNumber).ComponentName(CompNum);
-            SimOAComponent(CompType,
+            SimOAComponent(state, CompType,
                            CompName,
                            OutsideAirSys(OASysNumber).ComponentType_Num(CompNum),
                            FirstHVACIteration,
@@ -5838,7 +5827,7 @@ namespace MixedAir {
         return NumCoolingCoils;
     }
 
-    int GetOASystemNumber(std::string const &OASysName) // OA Sys Name
+    int GetOASystemNumber(EnergyPlusData &state, std::string const &OASysName) // OA Sys Name
     {
 
         // FUNCTION INFORMATION:
@@ -5855,7 +5844,7 @@ namespace MixedAir {
         int OASysNumber; // OA Sys Number
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -6090,7 +6079,7 @@ namespace MixedAir {
         return OAMixerMixedNodeNumber;
     }
 
-    bool CheckForControllerWaterCoil(std::string const &ControllerType, // should be passed in as UPPERCASE
+    bool CheckForControllerWaterCoil(EnergyPlusData &state, std::string const &ControllerType, // should be passed in as UPPERCASE
                                      std::string const &ControllerName  // should be passed in as UPPERCASE
     )
     {
@@ -6113,7 +6102,7 @@ namespace MixedAir {
         int CompNum;
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -6132,7 +6121,7 @@ namespace MixedAir {
         return OnControllerList;
     }
 
-    void CheckControllerLists(bool &ErrFound)
+    void CheckControllerLists(EnergyPlusData &state, bool &ErrFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6167,7 +6156,7 @@ namespace MixedAir {
         std::string AirLoopName;
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -6302,7 +6291,7 @@ namespace MixedAir {
         }
     }
 
-    int GetNumOASystems()
+    int GetNumOASystems(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -6342,7 +6331,7 @@ namespace MixedAir {
         // na
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -6351,7 +6340,7 @@ namespace MixedAir {
         return NumberOfOASystems;
     }
 
-    int GetOACompListNumber(int const OASysNum) // OA Sys Number
+    int GetOACompListNumber(EnergyPlusData &state, int const OASysNum) // OA Sys Number
     {
 
         // FUNCTION INFORMATION:
@@ -6368,7 +6357,7 @@ namespace MixedAir {
         int NumOACompList; // OA Comp Number
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -6377,7 +6366,7 @@ namespace MixedAir {
         return NumOACompList;
     }
 
-    std::string GetOACompName(int const OASysNum, // OA Sys Number
+    std::string GetOACompName(EnergyPlusData &state, int const OASysNum, // OA Sys Number
                               int const InListNum // In-list Number
     )
     {
@@ -6417,7 +6406,7 @@ namespace MixedAir {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -6426,7 +6415,7 @@ namespace MixedAir {
         return OACompName;
     }
 
-    std::string GetOACompType(int const OASysNum, // OA Sys Number
+    std::string GetOACompType(EnergyPlusData &state, int const OASysNum, // OA Sys Number
                               int const InListNum // In-list Number
     )
     {
@@ -6466,7 +6455,7 @@ namespace MixedAir {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 
@@ -6475,7 +6464,7 @@ namespace MixedAir {
         return OACompType;
     }
 
-    int GetOACompTypeNum(int const OASysNum, // OA Sys Number
+    int GetOACompTypeNum(EnergyPlusData &state, int const OASysNum, // OA Sys Number
                          int const InListNum // In-list Number
     )
     {
@@ -6515,7 +6504,7 @@ namespace MixedAir {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
 

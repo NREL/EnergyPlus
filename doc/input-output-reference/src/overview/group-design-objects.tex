@@ -139,8 +139,6 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat \tabularnewline
  & Maximum Primary Air Flow Rate \tabularnewline
  & Minimum Primary Air Flow Fraction \tabularnewline
  & Maximum Hot Water or Steam Flow Rate \tabularnewline
-AirTerminal:SingleDuct:Uncontrolled \tabularnewline
- & Maximum Air Flow Rate \tabularnewline
 AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat \tabularnewline
  & Maximum Air Flow Rate \tabularnewline
 AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat \tabularnewline
@@ -738,7 +736,7 @@ Mixed user-specified and autosized inputs can be successfully used if the follow
 
 1.~~~~Each component is autosized independently. Thus user input for a flow rate in one component will have no effect on other components' autosized flow rates. For instance, specifying the chilled water loop pump's rated flow rate will have no effect on the autosizing of the chiller's design evaporator flow rate or on the plant loop's autosized maximum loop flow rate.
 
-2.~~~~Within a component it is best to autosize all inputs are enter specified values for all inputs. For example, in a chiller, if only the nominal capaciity is user-specified, the autosized chilled water flow rate may not be consistent with the specified capacity.
+2.~~~~Within a component it is best to autosize all inputs and enter specified values for all inputs. For example, in a chiller, if only the nominal capacity is user-specified, the autosized chilled water flow rate may not be consistent with the specified capacity.
 
 3.~~~~Sizing information flows only from the sizing objects to the components. The sizing calculations have no knowledge of user-specified values in a component. The only exception to this rule is that plant loop sizing will collect all component design water flow rates whether autosized or user-specified.
 
@@ -775,7 +773,7 @@ AirLoopHVAC:UnitarySystem & AirTerminal:DualDuct:ConstantVolume \tabularnewline
 AirTerminal:DualDuct:VAV & AirTerminal:DualDuct:VAV:OutdoorAir \tabularnewline
 AirTerminal:SingleDuct:ConstantVolume:CooledBeam & AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction \tabularnewline
 AirTerminal:SingleDuct:ConstantVolume:Reheat & AirTerminal:SingleDuct:ParallelPIU:Reheat \tabularnewline
-AirTerminal:SingleDuct:SeriesPIU:Reheat & AirTerminal:SingleDuct:Uncontrolled \tabularnewline
+AirTerminal:SingleDuct:SeriesPIU:Reheat & AirTerminal:SingleDuct:ConstantVolume:NoReheat \tabularnewline
 AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat & AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat \tabularnewline
 AirTerminal:SingleDuct:VAV:NoReheat & AirTerminal:SingleDuct:VAV:Reheat \tabularnewline
 AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan & Boiler:HotWater \tabularnewline
@@ -859,7 +857,7 @@ For each system (\hyperref[airloophvac]{AirLoopHVAC}), in the corresponding \hyp
 
 \subsection{DesignSpecification:OutdoorAir}\label{designspecificationoutdoorair}
 
-This object allows for the outdoor air requirements to be defined in a common location for use by other objects. This object may be referenced by name from other objects (e.g., VAV terminal units, \hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}, and \hyperref[airterminalsingleductmixer]{AirTerminal:SingleDuct:Mixer}) as required to identify an outdoor air quantity for use by that object. Note that a zone name Is not included as an input to this zone outdoor air definition and the number of people in a zone, zone floor area, and zone volume can only be determined after this object has been referenced by another. A single zone outdoor air definition may be referenced by multiple objects to specify that the same outdoor air requirements are used by those objects \emph{or} multiple zone outdoor air objects may be defined and referenced by other objects as needed. If multiple zone outdoor air definitions are used, each outdoor air definition must have a unique name.
+This object allows for the outdoor air requirements to be defined in a common location for use by other objects. This object may be referenced by name from other objects (e.g., VAV terminal units, \hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat}, and \hyperref[airterminalsingleductmixer]{AirTerminal:SingleDuct:Mixer}) as required to identify an outdoor air quantity for use by that object. Note that a zone name Is not included as an input to this zone outdoor air definition and the number of people in a zone, zone floor area, and zone volume can only be determined after this object has been referenced by another. A single zone outdoor air definition may be referenced by multiple objects to specify that the same outdoor air requirements are used by those objects \emph{or} multiple zone outdoor air objects may be defined and referenced by other objects as needed. If multiple zone outdoor air definitions are used, each outdoor air definition must have a unique name.
 
 \subsubsection{Inputs}\label{inputs-012}
 
@@ -1012,7 +1010,7 @@ The global cooling sizing ratio applied to all of the zone design cooling loads 
 
 The number of load timesteps in the zone design flow sequence averaging window. The default is 1, in which case the calculated zone design flow rates are averaged over the load timestep.
 
-The zone design air flow rate calculation is performed assuming a potentially infinite supply of heating or cooling air at a fixed temperature. Thus the calculated design air flow rate will always be able to meet any load or change in load no matter how large or abrupt. In reality air flow rates are limited by duct sizes and fan capacities. The idealized zone design flow calculation may result in unrealistically large flow rates, especially if the user is performing the sizing calculations using thermostat schedules with night setup or setback. The calculated zone design flow rates are always averaged over the load timestep. The user may want to perform a broader average to mitigate the effect of thermostat setup and setback and prevent the warm up or cool down flow rates from dominating the design flow rate calculation.. Specifying the width of the averaging window allows the user to do this.
+The zone design air flow rate calculation is performed assuming a potentially infinite supply of heating or cooling air at a fixed temperature. Thus the calculated design air flow rate will always be able to meet any load or change in load no matter how large or abrupt. In reality air flow rates are limited by duct sizes and fan capacities. The idealized zone design flow calculation may result in unrealistically large flow rates, especially if the user is performing the sizing calculations using thermostat schedules with night setup or setback. The calculated zone design flow rates are always averaged over the load timestep. The user may want to perform a broader average to mitigate the effect of thermostat setup and setback and prevent the warm up or cool down flow rates from dominating the design flow rate calculation. Specifying the width of the averaging window allows the user to do this.
 
 For example, if the load calculation timestep is 15 minutes and the user specifies the \emph{Timesteps in Averaging Window} to be 4, the zone design air flows will be averaged over a time period of 1 hour. Specifying 8 would result in averaging over a 2 hour period.
 
@@ -1160,15 +1158,15 @@ The design zone heating air flow rate in cubic meters per second. This input is 
 
 \paragraph{Field: Heating Maximum Air Flow per Zone Floor Area}\label{field-heating-maximum-air-flow-per-zone-floor-area}
 
-The maximum zone heating volumetric flow rate per square meter (units are m\(^{3}\)/s-m\(^{2}\)). This field is used when \emph{Heating Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets an upper bound on the zone design heating air flow rate. For this and the next two input fields, the maximum flow derived from \emph{Heating Maximum Air Flow per Zone Floor Area}, \emph{Heating Maximum Air Flow}, and \emph{Heating Maximum Air Flow Fraction}~ is used to set a maximum heating supply air flow rate for the zone for VAV systems. The default is 0.002032, corresponding to 0.40 cfm/ft\(^{2}\). If the maximum heating design flow rate calculated using these input fields is greater than the design heating flow rate calculated during sizing, these input fields have no impact on sizing. It may be more appropriate to select only one of these three fields to calculate the maximum heating design flow rate (i.e., if one ore more of these three fields is 0, it will not be used in calculating the maximum heating design flow rate).
+The maximum zone heating volumetric flow rate per square meter (units are m\(^{3}\)/s-m\(^{2}\)). This field is used when \emph{Heating Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets an upper bound on the zone design heating air flow rate. For this and the next two input fields, the maximum flow derived from \emph{Heating Maximum Air Flow per Zone Floor Area}, \emph{Heating Maximum Air Flow}, and \emph{Heating Maximum Air Flow Fraction}~ is used to set a maximum heating supply air flow rate for the zone for VAV systems. The default is 0.002032, corresponding to 0.40 cfm/ft\(^{2}\). If the maximum heating design flow rate calculated using these input fields is greater than the design heating flow rate calculated during sizing, these input fields have no impact on sizing. It may be more appropriate to select only one of these three fields to calculate the maximum heating design flow rate (i.e., if one or more of these three fields is 0, it will not be used in calculating the maximum heating design flow rate).
 
 \paragraph{Field: Heating Maximum Air Flow}\label{field-heating-maximum-air-flow}
 
-The maximum zone heating volumetric flow rate in m\(^{3}\)/s. This field is used when \emph{Heating Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets an upper bound on the zone design heating air flow rate. For this field and the two input fields just prior to and after this field,,the maximum flow derived from \emph{Heating Maximum Air Flow per Zone Floor Area}, \emph{Heating Maximum Air Flow}, and \emph{Heating Maximum Air Flow Fraction} is used to set a maximum heating supply air flow rate for the zone for VAV systems. The default is 0.1415762, corresponding to 300 cfm. If the maximum heating design flow rate calculated using these input fields is greater than the design heating flow rate calculated during sizing, these input fields have no impact on sizing. It may be more appropriate to select only one of these three fields to calculate the maximum heating design flow rate (i.e., if one ore more of these three fields is 0, it will not be used in calculating the maximum heating design flow rate).
+The maximum zone heating volumetric flow rate in m\(^{3}\)/s. This field is used when \emph{Heating Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets an upper bound on the zone design heating air flow rate. For this field and the two input fields just prior to and after this field,,the maximum flow derived from \emph{Heating Maximum Air Flow per Zone Floor Area}, \emph{Heating Maximum Air Flow}, and \emph{Heating Maximum Air Flow Fraction} is used to set a maximum heating supply air flow rate for the zone for VAV systems. The default is 0.1415762, corresponding to 300 cfm. If the maximum heating design flow rate calculated using these input fields is greater than the design heating flow rate calculated during sizing, these input fields have no impact on sizing. It may be more appropriate to select only one of these three fields to calculate the maximum heating design flow rate (i.e., if one or more of these three fields is 0, it will not be used in calculating the maximum heating design flow rate).
 
 \paragraph{Field: Heating Maximum Air Flow Fraction}\label{field-heating-maximum-air-flow-fraction}
 
-The maximum zone design heating volumetric flow rate expressed as a fraction of the zone design cooling volumetric flow rate. For this and the previous two input fields, the maximum flow derived from \emph{Heating Maximum Air Flow per Zone Floor Area}, \emph{Heating Maximum Air Flow}, and \emph{Heating Maximum Air Flow Fraction}~ is used to set a maximum heating supply air flow rate for the zone for VAV systems. The default is 0.3. If the maximum heating design flow rate calculated using these input fields is greater than the design heating flow rate calculated during sizing, these input fields have no impact on sizing. It may be more appropriate to select only one of these three fields to calculate the maximum heating design flow rate (i.e., if one ore more of these three fields is 0, it will not be used in calculating the maximum heating design flow rate).
+The maximum zone design heating volumetric flow rate expressed as a fraction of the zone design cooling volumetric flow rate. For this and the previous two input fields, the maximum flow derived from \emph{Heating Maximum Air Flow per Zone Floor Area}, \emph{Heating Maximum Air Flow}, and \emph{Heating Maximum Air Flow Fraction}~ is used to set a maximum heating supply air flow rate for the zone for VAV systems. The default is 0.3. If the maximum heating design flow rate calculated using these input fields is greater than the design heating flow rate calculated during sizing, these input fields have no impact on sizing. It may be more appropriate to select only one of these three fields to calculate the maximum heating design flow rate (i.e., if one or more of these three fields is 0, it will not be used in calculating the maximum heating design flow rate).
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name}\label{field-design-specification-zone-air-distribution-object-name}
 
@@ -1188,7 +1186,7 @@ This is a choice field with a choice of three ideal control strategies for the D
 
 \emph{ColdSupplyAir} means that the ventilation air will be used to supply cooling to the zone. Cold outside air is heated to the upper setpoint; warm outside air is cooled to the lower setpoint. A good choice for the setpoints would be 12.2 and 14.4 degrees C.
 
-\paragraph{Field: Dedicated Outdoor Air Low Temperatue Setpoint for Design}\label{field-dedicated-outdoor-air-low-temperatue-setpoint-for-design}
+\paragraph{Field: Dedicated Outdoor Air Low Temperature Setpoint for Design}\label{field-dedicated-outdoor-air-low-temperatue-setpoint-for-design}
 
 The lower setpoint temperature to be used with the DOAS design control strategy. The units are degrees C. The default is autosized to the values given above for the three design control strategies.
 
@@ -1296,7 +1294,7 @@ The sizing methods input fields available in this objects are for supply air flo
   \textbf{FlowPerHeatingCapacity}: entered when it is intended that the simulation engine determines the supply air flow rates from the user specified \emph{supply air flow per heating capacity value} and \emph{autosized heating design capacity}.
 \end{itemize}
 
-The~ Design Specification ZoneHVAC Sizing object also has input fields for sizing or scalable sizing of cooling and heating capacity. However, most of the parent zone HVAC objects do not have input fields for sizing capacities. So, the capacity scalable sizing fields in the parent objects are used for sizing child components capacity sizings.~ The scalable capacity sizing may be indirectly impacted by the scalable supply air flow rates sizing values. Moreover, the autosized cold water, hot water and steam flow rates in the parent zone HVAC objects (e.g.~FanCoils, UnitHeaters, UnitVentilators, and VentilatedSlabs) and capacity in child components are determined using the scalable sizing methods.~ Sizing methods allowed for cooling and heating capacity include: \emph{CoolingDesignCapacity, HeatingDesignCapacity}, \emph{CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity}, \emph{FractionOfAutosizedHeatingCapacity}.
+The~ Design Specification ZoneHVAC Sizing object also has input fields for sizing or scalable sizing of cooling and heating capacity. However, most of the parent zone HVAC objects do not have input fields for sizing capacities. So, the capacity scalable sizing fields in the parent objects are used for sizing child components capacity sizings.~ The scalable capacity sizing may be indirectly impacted by the scalable supply air flow rates sizing values. Moreover, the autosized cold water, hot water and steam flow rates in the parent zone HVAC objects (e.g. FanCoils, UnitHeaters, UnitVentilators, and VentilatedSlabs) and capacity in child components are determined using the scalable sizing methods. Sizing methods allowed for cooling and heating capacity include: \emph{CoolingDesignCapacity, HeatingDesignCapacity}, \emph{CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity}, \emph{FractionOfAutosizedHeatingCapacity}.
 
 \begin{itemize}
 \item
@@ -1520,13 +1518,13 @@ Enter the heating capacity as a fraction of the autosized heating capacity. This
 
 \subsection{DesignSpecification:AirTerminal:Sizing}\label{designspecificationairterminalsizing}
 
-This object modifies the sizing of an air loop terminal unit. It may be referenced by a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} or \hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled} object. The values specified here are applied to the base sizing results from the corresponding \hyperref[sizingzone]{Sizing:Zone} inputs. Any given DesignSpecification:AirTerminal:Sizing object may be used by multiple terminal units with similar characteristics.
+This object modifies the sizing of an air loop terminal unit. It may be referenced by a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} object. The values specified here are applied to the base sizing results from the corresponding \hyperref[sizingzone]{Sizing:Zone} inputs. Any given DesignSpecification:AirTerminal:Sizing object may be used by multiple terminal units with similar characteristics.
 
 \subsubsection{Inputs}\label{inputs-52-007}
 
 \paragraph{Field: Name}\label{designspecificationairterminalsizing-field-name}
 
-Name of the design specification air terminal sizing object. This name may be referenced by a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} or \hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled} object.
+Name of the design specification air terminal sizing object. This name may be referenced by a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} object.
 
 \paragraph{Field: Fraction of Design Sensible Cooling Load}\label{fraction-of-design-sensible-cooling-load}
 
@@ -1641,7 +1639,7 @@ The input of this field must be the method used to determine the airloop cooling
 
 \paragraph{Field: Cooling Supply Air Flow Rate}\label{field-cooling-supply-air-flow-rate}
 
-The design system cooling air flow rate in cubic meters per second. This input is an alternative to using the program autocalculated value. This input is used if Coolingi Supply Air Flow Rate Method is Flow/System. This value will \emph{not} be multiplied by any sizing factor or by zone multipliers. If using zone multipliers, this value must be large enough to serve the multiplied zones.
+The design system cooling air flow rate in cubic meters per second. This input is an alternative to using the program autocalculated value. This input is used if Cooling Supply Air Flow Rate Method is Flow/System. This value will \emph{not} be multiplied by any sizing factor or by zone multipliers. If using zone multipliers, this value must be large enough to serve the multiplied zones.
 
 \paragraph{Field: Cooling Supply Air Flow Rate Per Floor Area \{m3/s-m2\}}\label{field-cooling-supply-air-flow-rate-per-floor-area-m3s-m2}
 
@@ -1685,7 +1683,7 @@ The method used to calculate the system minimum outdoor air flow. The two choice
 
 \paragraph{Field: Zone Maximum Outdoor Air Fraction}\label{field-zone-maximum-outdoor-air-fraction-000}
 
-This positive numeric input is the zone maximum outdoor air fraction. For an air loop, when a zone requires outdoor air higher than the user specified Zone Maximum Outdoor Air Fraction, the zone supply air flow will be increased to cap the outdoor air fraction at the maximum value. This allows the system level outdoor air flow to be reduced while the total supply air flow increases. Valid values are from 0 to 1.0. Default is 1.0 which indicates zones can have 100\% outdoor air maintaining backward compatibility. This inputs work for constant volume air systems, single and dual duct VAV systems.
+This positive numeric input is the zone maximum outdoor air fraction. For an air loop, when a zone requires outdoor air higher than the user specified Zone Maximum Outdoor Air Fraction, the zone supply air flow will be increased to cap the outdoor air fraction at the maximum value. This allows the system level outdoor air flow to be reduced while the total supply air flow increases. Valid values are from 0 to 1.0. Default is 1.0 which indicates zones can have 100\% outdoor air maintaining backward compatibility. This input work for constant volume air systems, single and dual duct VAV systems.
 
 \paragraph{Field Cooling Design Capacity Method}\label{field-cooling-design-capacity-method-1}
 

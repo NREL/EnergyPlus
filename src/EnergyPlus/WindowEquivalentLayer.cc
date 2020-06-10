@@ -800,9 +800,8 @@ namespace WindowEquivalentLayer {
         using DataHeatBalSurface::HcExtSurf;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
-        using General::InterpSlatAng;
         using General::InterpSw;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace DataHeatBalFanSys;
@@ -903,7 +902,7 @@ namespace WindowEquivalentLayer {
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                         NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                     }
@@ -947,7 +946,7 @@ namespace WindowEquivalentLayer {
                         for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                             NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                             MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                            CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNumAdj), NodeTemp);
+                            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNumAdj));
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         }
@@ -1171,9 +1170,9 @@ namespace WindowEquivalentLayer {
         return P01;
     }
 
-    Real64 HEMINT(std::function<Real64(Real64 const THETA, int const OPT, Array1A<Real64> const)> F, // property integrand function
+    Real64 HEMINT(std::function<Real64(Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function
                   int const F_Opt,                                                                   // options passed to F() (hipRHO, hipTAU)
-                  Array1A<Real64> const F_P                                                          // parameters passed to F()
+                  const Array1D<Real64> &F_P                                                          // parameters passed to F()
     )
     {
         //       AUTHOR         ASHRAE 1311-RP
@@ -1193,7 +1192,7 @@ namespace WindowEquivalentLayer {
         // Return value
 
         // Argument array dimensioning
-        F_P.dim(hipDIM);
+        EP_SIZE_CHECK(F_P, hipDIM);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -1329,7 +1328,7 @@ namespace WindowEquivalentLayer {
 
     Real64 RB_F(Real64 const THETA,       // incidence angle, radians
                 int const EP_UNUSED(OPT), // options (unused)
-                Array1A<Real64> const P   // parameters
+                const Array1D<Real64> &P   // parameters
     )
     {
         //       AUTHOR         ASHRAE 1311-RP
@@ -1349,7 +1348,7 @@ namespace WindowEquivalentLayer {
         // Return value
 
         // Argument array dimensioning
-        P.dim(hipDIM);
+        EP_SIZE_CHECK(P, hipDIM);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -1515,7 +1514,7 @@ namespace WindowEquivalentLayer {
 
     Real64 IS_F(Real64 const THETA,     // incidence angle, radians
                 int const OPT,          // options (1=reflectance, 2=transmittance)
-                Array1A<Real64> const P // parameters
+                const Array1D<Real64> &P // parameters
     )
     {
         //       AUTHOR         ASHRAE 1311-RP
@@ -1536,7 +1535,7 @@ namespace WindowEquivalentLayer {
         Real64 IS_F;
 
         // Argument array dimensioning
-        P.dim(hipDIM);
+        EP_SIZE_CHECK(P, hipDIM);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -1796,7 +1795,7 @@ namespace WindowEquivalentLayer {
 
     Real64 FM_F(Real64 const THETA,     // incidence angle, radians
                 int const Opt,          // options (hipRHO, hipTAU)
-                Array1A<Real64> const P // parameters
+                const Array1D<Real64> &P // parameters
     )
     {
         //       AUTHOR         ASHRAE 1311-RP
@@ -1817,7 +1816,7 @@ namespace WindowEquivalentLayer {
         Real64 FM_F;
 
         // Argument array dimensioning
-        P.dim(hipDIM);
+        EP_SIZE_CHECK(P, hipDIM);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -4889,9 +4888,9 @@ namespace WindowEquivalentLayer {
         } // END OF CHECK FOR CLOSED BLIND
     }
 
-    void SOLMATS(int const N,         // # of active rows in A
-                 Array2S<Real64> A,   // matrix, minimum required dimensions: A( N, N+2)
-                 Array1S<Real64> XSOL // returned: solution vector, min req dimension: XSOL( N)
+    void SOLMATS(int const N,          // # of active rows in A
+                 Array2S<Real64> A,    // matrix, minimum required dimensions: A( N, N+2)
+                 Array1D<Real64> &XSOL // returned: solution vector, min req dimension: XSOL( N)
     )
     {
         // SUBROUTINE INFORMATION:
@@ -5013,13 +5012,13 @@ namespace WindowEquivalentLayer {
                             Real64 const TRMIN,           // indoor / outdoor mean radiant temp, K
                             Array1S<Real64> const SOURCE, // absorbed solar by layer, W/m2
                             Real64 const TOL,             // convergence tolerance, usually
-                            Array1A<Real64> QOCF,         // returned: heat flux to layer i from gaps i-1 and i
+                            Array1D<Real64> &QOCF,        // returned: heat flux to layer i from gaps i-1 and i
                             Real64 &QOCFRoom,             // returned: open channel heat gain to room, W/m2
-                            Array1A<Real64> T,            // returned: layer temperatures, 1=outside-most layer, K
-                            Array1<Real64> &Q,            // returned: heat flux at ith gap (betw layers i and i+1), W/m2
-                            Array1A<Real64> JF,           // returned: front (outside facing) radiosity of surfaces, W/m2
-                            Array1A<Real64> JB,           // returned: back (inside facing) radiosity, W/m2
-                            Array1A<Real64> HC            // returned: gap convective heat transfer coefficient, W/m2K
+                            Array1D<Real64> &T,           // returned: layer temperatures, 1=outside-most layer, K
+                            Array1D<Real64> &Q,           // returned: heat flux at ith gap (betw layers i and i+1), W/m2
+                            Array1D<Real64> &JF,          // returned: front (outside facing) radiosity of surfaces, W/m2
+                            Array1D<Real64> &JB,          // returned: back (inside facing) radiosity, W/m2
+                            Array1D<Real64> &HC           // returned: gap convective heat transfer coefficient, W/m2K
     )
     {
         // SUBROUTINE INFORMATION:
@@ -5054,11 +5053,11 @@ namespace WindowEquivalentLayer {
         // na
 
         // Argument array dimensioning
-        QOCF.dim(FS.NL);
-        T.dim(FS.NL);
-        JF.dim(FS.NL + 1);
-        JB.dim({0, FS.NL});
-        HC.dim({0, FS.NL});
+        EP_SIZE_CHECK(QOCF, FS.NL);
+        EP_SIZE_CHECK(T, FS.NL);
+        EP_SIZE_CHECK(JF, FS.NL + 1);
+        EP_SIZE_CHECK(JB, FS.NL+1);
+        EP_SIZE_CHECK(HC, FS.NL+1);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -5069,7 +5068,7 @@ namespace WindowEquivalentLayer {
         //   due to open channel flow, W/m2
         //   + = heat flow indoor to outdoor
         //   JF( NL+1) = room radiosity
-        //   JB( 0) = outside environment radiosity
+        //   JB[ 0] = outside environment radiosity
         //   0=outside, 1=betw layer 1-2, ..., NL=inside
 
         // FUNCTION PARAMETER DEFINITIONS:
@@ -5244,16 +5243,16 @@ namespace WindowEquivalentLayer {
 
             // start by assuming no open channel flow on indoor side
 
-            HC(NL) = HCIN; //  default - HC(NL) supplied by calling routine
+            HC[NL] = HCIN; //  default - HC[NL] supplied by calling routine
                            //  use this for HBX
                            // or
-                           // trigger calculation of HC(NL) using ASHRAE correlation
-                           //  HC(NL) = HIC_ASHRAE(1.0d0, T(NL), TIN)  ! h - flat plate
+                           // trigger calculation of HC[NL] using ASHRAE correlation
+                           //  HC[NL] = HIC_ASHRAE(1.0d0, T(NL), TIN)  ! h - flat plate
                            // Add by BAN June 2013 for standard ratings U-value and SHGC calc only
                            // if (present(HCInFlag)) {
-                           //     if (HCInFlag) HC(NL) = HCInWindowStandardRatings(Height, T(NL), TIN);
+                           //     if (HCInFlag) HC[NL] = HCInWindowStandardRatings(Height, T(NL), TIN);
                            // }
-            HC(0) = HCOUT; // HC(0) supplied by calling routine as HCOUT
+            HC[0] = HCOUT; // HC[0] supplied by calling routine as HCOUT
 
             // Check for open channels -  only possible with at least two layers
             if (NL >= 2) {
@@ -5285,10 +5284,10 @@ namespace WindowEquivalentLayer {
                         //  1 = Conduction, 2 = slight Ra penalty
                         //  Set negative for default HC_GS=0
                         //  Recommended:  2
-                        HC(NL - 1) = HC_GS;
-                        HC(NL) = HCIN * ConvF;
+                        HC[NL - 1] = HC_GS;
+                        HC[NL] = HCIN * ConvF;
                         QOCF_B(NL - 1) = (TIN - T(NL - 1)) * HC_GA;
-                        QOCF_F(NL) = (TIN - T(NL)) * (HC_SA - HC(NL));
+                        QOCF_F(NL) = (TIN - T(NL)) * (HC_SA - HC[NL]);
                         QOCFRoom = -QOCF_B(NL - 1) - QOCF_F(NL);
                         // end of gap open to indoor side
 
@@ -5296,11 +5295,11 @@ namespace WindowEquivalentLayer {
                         // outdoor open channel
                         QOCF_B(1) = (TOUT - T(1)) * HCOCFout;
                         QOCF_F(2) = (TOUT - T(2)) * HCOCFout;
-                        HC(1) = 0.0;
-                        HC(0) = HCOCFout;
+                        HC[1] = 0.0;
+                        HC[0] = HCOCFout;
                     } else {
                         // normal gap
-                        HC(I) = HConvGap(FS.G(I), T(I), T(I + 1));
+                        HC[I] = HConvGap(FS.G(I), T(I), T(I + 1));
                     }
                 } //  end scan through gaps
 
@@ -5312,16 +5311,16 @@ namespace WindowEquivalentLayer {
             //  CONVERT TEMPERATURE POTENTIAL CONVECTIVE COEFFICIENTS to
             //  BLACK EMISSIVE POWER POTENTIAL CONVECTIVE COEFFICIENTS
 
-            HHAT(0) = HC(0) * (1.0 / StefanBoltzmann) / ((TOUT_2 + pow_2(T(1))) * (TOUT + T(1)));
+            HHAT(0) = HC[0] * (1.0 / StefanBoltzmann) / ((TOUT_2 + pow_2(T(1))) * (TOUT + T(1)));
 
             Real64 T_I_2(pow_2(T(1))), T_IP_2;
             for (I = 1; I <= NL - 1; ++I) { // Scan the cavities
                 T_IP_2 = pow_2(T(I + 1));
-                HHAT(I) = HC(I) * (1.0 / StefanBoltzmann) / ((T_I_2 + T_IP_2) * (T(I) + T(I + 1)));
+                HHAT(I) = HC[I] * (1.0 / StefanBoltzmann) / ((T_I_2 + T_IP_2) * (T(I) + T(I + 1)));
                 T_I_2 = T_IP_2;
             }
 
-            HHAT(NL) = HC(NL) * (1.0 / StefanBoltzmann) / ((pow_2(T(NL)) + TIN_2) * (T(NL) + TIN));
+            HHAT(NL) = HC[NL] * (1.0 / StefanBoltzmann) / ((pow_2(T(NL)) + TIN_2) * (T(NL) + TIN));
 
             //  SET UP MATRIX
             XSOL = 0.0;
@@ -5392,7 +5391,7 @@ namespace WindowEquivalentLayer {
             SOLMATS(ADIM, A, XSOL);
 
             //  UNPACK SOLUTION VECTOR AND RECORD LARGEST TEMPERATURE CHANGE
-            JB(0) = XSOL(1);
+            JB[0] = XSOL(1);
 
             MAXERR = 0.0;
             for (I = 1; I <= NL; ++I) {
@@ -5402,7 +5401,7 @@ namespace WindowEquivalentLayer {
                 EB(I) = max(1.0, XSOL(J)); // prevent impossible temps
                 TNEW(I) = root_4(EB(I) / StefanBoltzmann);
                 ++J;
-                JB(I) = XSOL(J);
+                JB[I] = XSOL(J);
                 MAXERR = max(MAXERR, std::abs(TNEW(I) - T(I)) / TNEW(I));
             }
 
@@ -5410,7 +5409,7 @@ namespace WindowEquivalentLayer {
 
             //  CALCULATE HEAT FLUX AT EACH GAP, Q
             for (I = 0; I <= NL; ++I) { // Loop gaps (including inside and outside
-                Q(I) = JF(I + 1) - JB(I) + HHAT(I) * (EB(I + 1) - EB(I));
+                Q(I) = JF(I + 1) - JB[I] + HHAT(I) * (EB(I + 1) - EB(I));
             }
 
             //  A CHECK - NET HEAT FLUX INTO ANY LAYER, AT STEADY-STATE,
@@ -5450,11 +5449,11 @@ namespace WindowEquivalentLayer {
         //  NOTE:  HC_SA, HC_GA and HC_SG are only available if there is
         //         an open channel on the indoor side and the calculation of
         //         these coefficients was triggered earlier
-        QGAIN = SOURCE(NL + 1) + HC(NL) * (T(NL) - TIN) + JB(NL) - JF(NL + 1);
+        QGAIN = SOURCE(NL + 1) + HC[NL] * (T(NL) - TIN) + JB[NL] - JF(NL + 1);
         // Modified by BAN May 3, 2013 to avoid zero layer index
         if (NL >= 2) {
             if (FS.G(NL - 1).GTYPE == gtyOPENin) {
-                QGAIN = SOURCE(NL + 1) + (HC_SA / 2.0) * (T(NL) - TIN) + JB(NL) - JF(NL + 1);
+                QGAIN = SOURCE(NL + 1) + (HC_SA / 2.0) * (T(NL) - TIN) + JB[NL] - JF(NL + 1);
                 QGAIN += HC_GA * (T(NL - 1) - TIN) + (HC_SA / 2.0) * (T(NL) - TIN);
             }
         }
@@ -5472,13 +5471,13 @@ namespace WindowEquivalentLayer {
                                Real64 const ISOL,            // total incident solar, W/m2 (values used for SOURCE derivation)
                                Array1S<Real64> const SOURCE, // absorbed solar by layer, W/m2
                                Real64 const TOL,             // convergence tolerance, usually
-                               Array1A<Real64> QOCF,         // returned: heat flux to layer i from gaps i-1 and i
+                               Array1D<Real64> &QOCF,        // returned: heat flux to layer i from gaps i-1 and i
                                Real64 &QOCFRoom,             // returned: open channel heat gain to room, W/m2
-                               Array1A<Real64> T,            // returned: layer temperatures, 1=outside-most layer, K
-                               Array1<Real64> &Q,            // returned: heat flux at ith gap (betw layers i and i+1), W/m2
-                               Array1A<Real64> JF,           // returned: front (outside facing) radiosity of surfaces, W/m2
-                               Array1A<Real64> JB,           // returned: back (inside facing) radiosity, W/m2
-                               Array1A<Real64> HC,           // returned: gap convective heat transfer coefficient, W/m2K
+                               Array1D<Real64> &T,           // returned: layer temperatures, 1=outside-most layer, K
+                               Array1D<Real64> &Q,           // returned: heat flux at ith gap (betw layers i and i+1), W/m2
+                               Array1D<Real64> &JF,          // returned: front (outside facing) radiosity of surfaces, W/m2
+                               Array1D<Real64> &JB,          // returned: back (inside facing) radiosity, W/m2
+                               Array1D<Real64> &HC,          // returned: gap convective heat transfer coefficient, W/m2K
                                Real64 &UCG,                  // returned: center-glass U-factor, W/m2-K
                                Real64 &SHGC,                 // returned: center-glass SHGC (Solar Heat Gain Coefficient)
                                bool const HCInFlag           // If true uses ISO Std 150099 routine for HCIn calc
@@ -5519,11 +5518,11 @@ namespace WindowEquivalentLayer {
         bool ASHWAT_ThermalRatings;
 
         // Argument array dimensioning
-        QOCF.dim(FS.NL);
-        T.dim(FS.NL);
-        JF.dim(FS.NL + 1);
-        JB.dim({0, FS.NL});
-        HC.dim({0, FS.NL});
+        EP_SIZE_CHECK(QOCF, FS.NL);
+        EP_SIZE_CHECK(T, FS.NL);
+        EP_SIZE_CHECK(JF, FS.NL + 1);
+        EP_SIZE_CHECK(JB, FS.NL + 1);
+        EP_SIZE_CHECK(HC, FS.NL + 1);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -5534,7 +5533,7 @@ namespace WindowEquivalentLayer {
         //   due to open channel flow, W/m2
         //   + = heat flow indoor to outdoor
         //   JF( NL+1) = room radiosity
-        //   JB( 0) = outside environment radiosity
+        //   JB[ 0] = outside environment radiosity
         //   0=outside, 1=betw layer 1-2, ..., NL=inside
 
         // FUNCTION PARAMETER DEFINITIONS:
@@ -5623,8 +5622,8 @@ namespace WindowEquivalentLayer {
         Real64 TRMOUTdv;
         Array1D<Real64> SOURCEdv(FS.NL + 1); // indices of merit
         Real64 QGAIN;                        // total gain to conditioned space [[W/m2]
-        Real64 SaveHCNLm;                    // place to save HC(NL-1) - two resistance networks differ
-        Real64 SaveHCNL;                     // place to save HC(NL)   - two resistance networks differ
+        Real64 SaveHCNLm;                    // place to save HC[NL-1] - two resistance networks differ
+        Real64 SaveHCNL;                     // place to save HC[NL]   - two resistance networks differ
                                              // in their definitions of these heat transfer coefficients
                                              // Flow
 
@@ -5733,14 +5732,14 @@ namespace WindowEquivalentLayer {
 
             // start by assuming no open channel flow on indoor side
 
-            HC(NL) = HCIN; //  default - HC(NL) supplied by calling routine
+            HC[NL] = HCIN; //  default - HC[NL] supplied by calling routine
                            //  use this for HBX
                            // or
-                           // trigger calculation of HC(NL) using ASHRAE correlation
-                           //  HC(NL) = HIC_ASHRAE(1.0d0, T(NL), TIN)  ! h - flat plate
+                           // trigger calculation of HC[NL] using ASHRAE correlation
+                           //  HC[NL] = HIC_ASHRAE(1.0d0, T(NL), TIN)  ! h - flat plate
                            // Add by BAN June 2013 for standard ratings U-value and SHGC calc only
-            if (HCInFlag) HC(NL) = HCInWindowStandardRatings(Height, T(NL), TIN);
-            HC(0) = HCOUT; // HC(0) supplied by calling routine as HCOUT
+            if (HCInFlag) HC[NL] = HCInWindowStandardRatings(Height, T(NL), TIN);
+            HC[0] = HCOUT; // HC[0] supplied by calling routine as HCOUT
 
             // Check for open channels -  only possible with at least two layers
             if (NL >= 2) {
@@ -5772,10 +5771,10 @@ namespace WindowEquivalentLayer {
                         //  1 = Conduction, 2 = slight Ra penalty
                         //  Set negative for default HC_GS=0
                         //  Recommended:  2
-                        HC(NL - 1) = HC_GS;
-                        HC(NL) = HCIN * ConvF;
+                        HC[NL - 1] = HC_GS;
+                        HC[NL] = HCIN * ConvF;
                         QOCF_B(NL - 1) = (TIN - T(NL - 1)) * HC_GA;
-                        QOCF_F(NL) = (TIN - T(NL)) * (HC_SA - HC(NL));
+                        QOCF_F(NL) = (TIN - T(NL)) * (HC_SA - HC[NL]);
                         QOCFRoom = -QOCF_B(NL - 1) - QOCF_F(NL);
                         // end of gap open to indoor side
 
@@ -5783,11 +5782,11 @@ namespace WindowEquivalentLayer {
                         // outdoor open channel
                         QOCF_B(1) = (TOUT - T(1)) * HCOCFout;
                         QOCF_F(2) = (TOUT - T(2)) * HCOCFout;
-                        HC(1) = 0.0;
-                        HC(0) = HCOCFout;
+                        HC[1] = 0.0;
+                        HC[0] = HCOCFout;
                     } else {
                         // normal gap
-                        HC(I) = HConvGap(FS.G(I), T(I), T(I + 1));
+                        HC[I] = HConvGap(FS.G(I), T(I), T(I + 1));
                     }
                 } //  end scan through gaps
 
@@ -5799,16 +5798,16 @@ namespace WindowEquivalentLayer {
             //  CONVERT TEMPERATURE POTENTIAL CONVECTIVE COEFFICIENTS to
             //  BLACK EMISSIVE POWER POTENTIAL CONVECTIVE COEFFICIENTS
 
-            HHAT(0) = HC(0) * (1.0 / StefanBoltzmann) / ((TOUT_2 + pow_2(T(1))) * (TOUT + T(1)));
+            HHAT(0) = HC[0] * (1.0 / StefanBoltzmann) / ((TOUT_2 + pow_2(T(1))) * (TOUT + T(1)));
 
             Real64 T_I_2(pow_2(T(1))), T_IP_2;
             for (I = 1; I <= NL - 1; ++I) { // Scan the cavities
                 T_IP_2 = pow_2(T(I + 1));
-                HHAT(I) = HC(I) * (1.0 / StefanBoltzmann) / ((T_I_2 + T_IP_2) * (T(I) + T(I + 1)));
+                HHAT(I) = HC[I] * (1.0 / StefanBoltzmann) / ((T_I_2 + T_IP_2) * (T(I) + T(I + 1)));
                 T_I_2 = T_IP_2;
             }
 
-            HHAT(NL) = HC(NL) * (1.0 / StefanBoltzmann) / ((pow_2(T(NL)) + TIN_2) * (T(NL) + TIN));
+            HHAT(NL) = HC[NL] * (1.0 / StefanBoltzmann) / ((pow_2(T(NL)) + TIN_2) * (T(NL) + TIN));
 
             //  SET UP MATRIX
             XSOL = 0.0;
@@ -5879,7 +5878,7 @@ namespace WindowEquivalentLayer {
             SOLMATS(ADIM, A, XSOL);
 
             //  UNPACK SOLUTION VECTOR AND RECORD LARGEST TEMPERATURE CHANGE
-            JB(0) = XSOL(1);
+            JB[0] = XSOL(1);
 
             MAXERR = 0.0;
             for (I = 1; I <= NL; ++I) {
@@ -5889,7 +5888,7 @@ namespace WindowEquivalentLayer {
                 EB(I) = max(1.0, XSOL(J)); // prevent impossible temps
                 TNEW(I) = root_4(EB(I) / StefanBoltzmann);
                 ++J;
-                JB(I) = XSOL(J);
+                JB[I] = XSOL(J);
                 MAXERR = max(MAXERR, std::abs(TNEW(I) - T(I)) / TNEW(I));
             }
 
@@ -5897,7 +5896,7 @@ namespace WindowEquivalentLayer {
 
             //  CALCULATE HEAT FLUX AT EACH GAP, Q
             for (I = 0; I <= NL; ++I) { // Loop gaps (including inside and outside
-                Q(I) = JF(I + 1) - JB(I) + HHAT(I) * (EB(I + 1) - EB(I));
+                Q(I) = JF(I + 1) - JB[I] + HHAT(I) * (EB(I + 1) - EB(I));
             }
 
             //  A CHECK - NET HEAT FLUX INTO ANY LAYER, AT STEADY-STATE,
@@ -5937,11 +5936,11 @@ namespace WindowEquivalentLayer {
         //  NOTE:  HC_SA, HC_GA and HC_SG are only available if there is
         //         an open channel on the indoor side and the calculation of
         //         these coefficients was triggered earlier
-        QGAIN = SOURCE(NL + 1) + HC(NL) * (T(NL) - TIN) + JB(NL) - JF(NL + 1);
+        QGAIN = SOURCE(NL + 1) + HC[NL] * (T(NL) - TIN) + JB[NL] - JF(NL + 1);
         // Modified by BAN May 3, 2013 to avoid zero layer index
         if (NL >= 2) {
             if (FS.G(NL - 1).GTYPE == gtyOPENin) {
-                QGAIN = SOURCE(NL + 1) + (HC_SA / 2.0) * (T(NL) - TIN) + JB(NL) - JF(NL + 1);
+                QGAIN = SOURCE(NL + 1) + (HC_SA / 2.0) * (T(NL) - TIN) + JB[NL] - JF(NL + 1);
                 QGAIN += HC_GA * (T(NL - 1) - TIN) + (HC_SA / 2.0) * (T(NL) - TIN);
             }
         }
@@ -6074,16 +6073,16 @@ namespace WindowEquivalentLayer {
                        //  true for the same gap (i.e., for NL=2)
 
             if (FS.G(NL - 1).GTYPE == gtyOPENin) {
-                SaveHCNLm = HC(NL - 1);
-                SaveHCNL = HC(NL);
-                HC(NL - 1) = HC_GS;
-                HC(NL) = HC_SA;
+                SaveHCNLm = HC[NL - 1];
+                SaveHCNL = HC[NL];
+                HC[NL - 1] = HC_GS;
+                HC[NL] = HC_SA;
                 HJC(NL) = HC_GA;
             }
 
-            HC(0) = HCOUT;
+            HC[0] = HCOUT;
             if (FS.G(1).GTYPE == gtyOPENout) {
-                HC(0) = HCOUT + HCOCFout;
+                HC[0] = HCOUT + HCOCFout;
                 HJC(1) = HCOCFout;
             }
         }
@@ -6094,7 +6093,7 @@ namespace WindowEquivalentLayer {
         IE = NL - 1;
         if (IB <= IE) {
             for (I = IB; I <= IE; ++I) {
-                HC2D(I + 1, I) = HC(I);
+                HC2D(I + 1, I) = HC[I];
                 HC2D(I, I + 1) = HC2D(I + 1, I);
             }
         }
@@ -6120,11 +6119,11 @@ namespace WindowEquivalentLayer {
         }
 
         //  outdoor side
-        HCIout(1) = HC(0);
+        HCIout(1) = HC[0];
         if (NL >= 2) HCIout(2) = HJC(1);
 
         //  indoor side
-        HCIin(NL) = HC(NL);
+        HCIin(NL) = HC[NL];
         if (NL >= 2) HCIin(NL - 1) = HJC(NL);
 
         //  special case - indoor-to-outdoor convection (?)
@@ -6400,8 +6399,8 @@ namespace WindowEquivalentLayer {
         //  receive faulty data
         if (NL >= 2) { // no OCF unless at least two layers exist
             if (FS.G(NL - 1).GTYPE == gtyOPENin) {
-                HC(NL - 1) = SaveHCNLm;
-                HC(NL) = SaveHCNL;
+                HC[NL - 1] = SaveHCNLm;
+                HC[NL] = SaveHCNL;
             }
         }
 
@@ -7473,8 +7472,8 @@ namespace WindowEquivalentLayer {
                 Array1S<CFSSWP> const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
                 Real64 const RHO_room,         // effective solar reflectance of room (at inside)
                 Real64 const ISOL,             // incident flux (W/m2)
-                Array1<Real64> &QPLUS,         // returned: see Edwards paper
-                Array1<Real64> &QMINUS         // returned: see Edwards paper
+                Array1D<Real64> &QPLUS,        // returned: see Edwards paper
+                Array1D<Real64> &QMINUS        // returned: see Edwards paper
     )
     {
         // SUBROUTINE INFORMATION:
@@ -7535,7 +7534,7 @@ namespace WindowEquivalentLayer {
     }
 
     void
-    TDMA_R(Array1S<Real64> X, Array1S<Real64> const AP, Array1S<Real64> const AE, Array1S<Real64> const AW, Array1S<Real64> const BP, int const N)
+    TDMA_R(Array1D<Real64> &X, const Array1D<Real64> &AP, const Array1D<Real64> &AE, const Array1D<Real64> &AW, const Array1D<Real64> &BP, int const N)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT
@@ -7585,7 +7584,7 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void TDMA(Array1S<Real64> X, Array1S<Real64> const AP, Array1S<Real64> const AE, Array1S<Real64> const AW, Array1S<Real64> const BP, int const N)
+    void TDMA(Array1D<Real64> &X, const Array1D<Real64> &AP, const Array1D<Real64> &AE, const Array1D<Real64> &AW, const Array1D<Real64> &BP, int const N)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT
@@ -7642,7 +7641,7 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void AUTOTDMA(Array1S<Real64> X, Array1S<Real64> AP, Array1S<Real64> const AE, Array1S<Real64> const AW, Array1S<Real64> const BP, int &N)
+    void AUTOTDMA(Array1D<Real64> &X, Array1D<Real64> &AP, const Array1D<Real64> &AE, const Array1D<Real64> &AW, const Array1D<Real64> &BP, int &N)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT
@@ -7990,7 +7989,7 @@ namespace WindowEquivalentLayer {
 
     Real64 Specular_F(Real64 const THETA,     // incidence angle, radians
                       int const OPT,          // options (unused)
-                      Array1A<Real64> const P // parameters (none defined)
+                      const Array1D<Real64> &EP_UNUSED(P) // parameters (none defined)
     )
     {
         // FUNCTION INFORMATION:
@@ -8013,7 +8012,7 @@ namespace WindowEquivalentLayer {
         Real64 Specular_F;
 
         // Argument array dimensioning
-        P.dim(hipDIM);
+        //EP_SIZE_CHECK(P, hipDIM);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:

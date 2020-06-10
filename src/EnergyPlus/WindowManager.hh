@@ -58,6 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace WindowManager {
 
@@ -199,9 +200,9 @@ namespace WindowManager {
 
     void clear_state();
 
-    void InitWindowOpticalCalculations();
+    void InitWindowOpticalCalculations(OutputFiles &outputFiles);
 
-    void InitGlassOpticalCalculations();
+    void InitGlassOpticalCalculations(OutputFiles &outputFiles);
 
     //*****************************************************************************************
 
@@ -316,7 +317,7 @@ namespace WindowManager {
 
     void LUdecomposition(Array2<Real64> &ajac, // As input: matrix to be decomposed;
                          int const n,          // Dimension of matrix
-                         Array1_int &indx,     // Vector of row permutations
+                         Array1D_int &indx,    // Vector of row permutations
                          Real64 &d             // +1 if even number of row interchange is even, -1
     );
 
@@ -324,8 +325,8 @@ namespace WindowManager {
 
     void LUsolution(Array2<Real64> const &a, // Matrix and vector in a.x = b;
                     int const n,             // Dimension of a and b
-                    Array1_int const &indx,  // Vector of row permutations
-                    Array1<Real64> &b        // Matrix and vector in a.x = b;
+                    Array1D_int const &indx, // Vector of row permutations
+                    Array1D<Real64> &b       // Matrix and vector in a.x = b;
     );
 
     //******************************************************************************
@@ -456,7 +457,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass();
+    void ReportGlass(OutputFiles &outputFiles);
 
     //*************************************************************************************
 
@@ -464,7 +465,7 @@ namespace WindowManager {
 
     //*************************************************************************************
 
-    void CalcWindowScreenProperties();
+    void CalcWindowScreenProperties(OutputFiles &outputFiles);
 
     void BlindOpticsDiffuse(int const BlindNum,      // Blind number
                             int const ISolVis,       // 1 = solar and IR calculation; 2 = visible calculation

@@ -47,9 +47,9 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 
@@ -136,7 +136,8 @@ namespace OutputReportPredefined {
 
     int pdchDXCoolCoilNetCapSI; // Standard Rated (Net) Cooling Capacity [W]
     int pdchDXCoolCoilCOP;      // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
-    int pdchDXCoolCoilSEERIP;   // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
+    int pdchDXCoolCoilSEERUserIP;   // SEER value in IP unit at AHRI std. 210/240 conditions and user PLF curve [Btu/W-hr]
+    int pdchDXCoolCoilSEERStandardIP;   // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
     int pdchDXCoolCoilEERIP;    // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
     int pdchDXCoolCoilIEERIP;   // IEER value in IP unit at AHRI std. 340/360 conditions
 
@@ -812,8 +813,22 @@ namespace OutputReportPredefined {
     int pdchLeedPerfElDem;
     int pdchLeedPerfGasEneUse;
     int pdchLeedPerfGasDem;
-    int pdchLeedPerfAddFuelEneUse;
-    int pdchLeedPerfAddFuelDem;
+    int pdchLeedPerfGasolineEneUse;
+    int pdchLeedPerfGasolineDem;
+    int pdchLeedPerfDieselEneUse;
+    int pdchLeedPerfDieselDem;
+    int pdchLeedPerfCoalEneUse;
+    int pdchLeedPerfCoalDem;
+    int pdchLeedPerfFuelOil1EneUse;
+    int pdchLeedPerfFuelOil1Dem;
+    int pdchLeedPerfFuelOil2EneUse;
+    int pdchLeedPerfFuelOil2Dem;
+    int pdchLeedPerfPropaneEneUse;
+    int pdchLeedPerfPropaneDem;
+    int pdchLeedPerfOtherFuel1EneUse;
+    int pdchLeedPerfOtherFuel1Dem;
+    int pdchLeedPerfOtherFuel2EneUse;
+    int pdchLeedPerfOtherFuel2Dem;
     int pdchLeedPerfDisClEneUse;
     int pdchLeedPerfDisClDem;
     int pdchLeedPerfDisHtEneUse;
@@ -950,7 +965,8 @@ namespace OutputReportPredefined {
         pdchDXCoolCoilType = 0;     // DX cooling coil type
         pdchDXCoolCoilNetCapSI = 0; // Standard Rated (Net) Cooling Capacity [W]
         pdchDXCoolCoilCOP = 0;      // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
-        pdchDXCoolCoilSEERIP = 0;   // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
+        pdchDXCoolCoilSEERUserIP = 0;   // SEER value in IP unit at AHRI std. 210/240 conditions and user PLF curve [Btu/W-hr]
+        pdchDXCoolCoilSEERStandardIP = 0;   // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
         pdchDXCoolCoilEERIP = 0;    // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
         pdchDXCoolCoilIEERIP = 0;   // IEER value in IP unit at AHRI std. 340/360 conditions
         pdstDXCoolCoil2 = 0;
@@ -1551,8 +1567,22 @@ namespace OutputReportPredefined {
         pdchLeedPerfElDem = 0;
         pdchLeedPerfGasEneUse = 0;
         pdchLeedPerfGasDem = 0;
-        pdchLeedPerfAddFuelEneUse = 0;
-        pdchLeedPerfAddFuelDem = 0;
+        pdchLeedPerfGasolineEneUse = 0;
+        pdchLeedPerfGasolineDem = 0;
+        pdchLeedPerfDieselEneUse = 0;
+        pdchLeedPerfDieselDem = 0;
+        pdchLeedPerfCoalEneUse = 0;
+        pdchLeedPerfCoalDem = 0;
+        pdchLeedPerfFuelOil1EneUse = 0;
+        pdchLeedPerfFuelOil1Dem = 0;
+        pdchLeedPerfFuelOil2EneUse = 0;
+        pdchLeedPerfFuelOil2Dem = 0;
+        pdchLeedPerfPropaneEneUse = 0;
+        pdchLeedPerfPropaneDem = 0;
+        pdchLeedPerfOtherFuel1EneUse = 0;
+        pdchLeedPerfOtherFuel1Dem = 0;
+        pdchLeedPerfOtherFuel2EneUse = 0;
+        pdchLeedPerfOtherFuel2Dem = 0;
         pdchLeedPerfDisClEneUse = 0;
         pdchLeedPerfDisClDem = 0;
         pdchLeedPerfDisHtEneUse = 0;
@@ -1841,7 +1871,8 @@ namespace OutputReportPredefined {
 
         pdchDXCoolCoilCOP = newPreDefColumn(pdstDXCoolCoil, "Standard Rated Net COP [W/W]");
         pdchDXCoolCoilEERIP = newPreDefColumn(pdstDXCoolCoil, "EER [Btu/W-h]");
-        pdchDXCoolCoilSEERIP = newPreDefColumn(pdstDXCoolCoil, "SEER [Btu/W-h]");
+        pdchDXCoolCoilSEERUserIP = newPreDefColumn(pdstDXCoolCoil, "SEER User [Btu/W-h]");
+        pdchDXCoolCoilSEERStandardIP = newPreDefColumn(pdstDXCoolCoil, "SEER Standard [Btu/W-h]");
         pdchDXCoolCoilIEERIP = newPreDefColumn(pdstDXCoolCoil, "IEER [Btu/W-h]");
 
         // for DX Cooling Coil ASHRAE 127-12 Report
@@ -1917,9 +1948,9 @@ namespace OutputReportPredefined {
         pdchZnClPkTime = newPreDefColumn(pdstZoneClSize, "Date/Time Of Peak {TIMESTAMP}");
         pdchZnClPkTstatTemp = newPreDefColumn(pdstZoneClSize, "Thermostat Setpoint Temperature at Peak Load [C]");
         pdchZnClPkIndTemp = newPreDefColumn(pdstZoneClSize, "Indoor Temperature at Peak Load [C]");
-        pdchZnClPkIndHum = newPreDefColumn(pdstZoneClSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]");
+        pdchZnClPkIndHum = newPreDefColumn(pdstZoneClSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
         pdchZnClPkOATemp = newPreDefColumn(pdstZoneClSize, "Outdoor Temperature at Peak Load [C]");
-        pdchZnClPkOAHum = newPreDefColumn(pdstZoneClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]");
+        pdchZnClPkOAHum = newPreDefColumn(pdstZoneClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
         pdchZnClPkOAMinFlow = newPreDefColumn(pdstZoneClSize, "Minimum Outdoor Air Flow Rate [m3/s]");
         pdchZnClPkDOASHeatGain = newPreDefColumn(pdstZoneClSize, "Heat Gain Rate from DOAS [W]");
         addFootNoteSubTable(pdstZoneClSize,
@@ -1935,9 +1966,9 @@ namespace OutputReportPredefined {
         pdchZnHtPkTime = newPreDefColumn(pdstZoneHtSize, "Date/Time Of Peak {TIMESTAMP}");
         pdchZnHtPkTstatTemp = newPreDefColumn(pdstZoneHtSize, "Thermostat Setpoint Temperature at Peak Load [C]");
         pdchZnHtPkIndTemp = newPreDefColumn(pdstZoneHtSize, "Indoor Temperature at Peak Load [C]");
-        pdchZnHtPkIndHum = newPreDefColumn(pdstZoneHtSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgAir]");
+        pdchZnHtPkIndHum = newPreDefColumn(pdstZoneHtSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
         pdchZnHtPkOATemp = newPreDefColumn(pdstZoneHtSize, "Outdoor Temperature at Peak Load [C]");
-        pdchZnHtPkOAHum = newPreDefColumn(pdstZoneHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgAir]");
+        pdchZnHtPkOAHum = newPreDefColumn(pdstZoneHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
         pdchZnHtPkOAMinFlow = newPreDefColumn(pdstZoneHtSize, "Minimum Outdoor Air Flow Rate [m3/s]");
         pdchZnHtPkDOASHeatGain = newPreDefColumn(pdstZoneHtSize, "Heat Gain Rate from DOAS [W]");
         addFootNoteSubTable(pdstZoneHtSize,
@@ -1991,17 +2022,18 @@ namespace OutputReportPredefined {
         pdch2CoilEntDryBulbIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Entering Air Drybulb at Ideal Loads Peak [C]");
         pdch2CoilEntWetBulbIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Ideal Loads Peak [C]");
         pdch2CoilEntHumRatIdealPeak =
-            newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]");
+            newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         pdch2CoilLvgDryBulbIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Ideal Loads Peak [C]");
         pdch2CoilLvgWetBulbIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Ideal Loads Peak [C]");
-        pdch2CoilLvgHumRatIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [C]");
+        pdch2CoilLvgHumRatIdealPeak =
+            newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         pdch2OADryBulbIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Outdoor Air Drybulb at Ideal Loads Peak [C]");
-        pdch2OAHumRatIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]");
+        pdch2OAHumRatIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         pdch2OAWetBulbatIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Outdoor Air Wetbulb at Ideal Loads Peak [C]");
         pdch2OAFlowPrcntIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Outdoor Air Flow Percentage at Ideal Loads Peak [%]");
         pdch2ZoneAirDryBulbIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Zone Air Drybulb at Ideal Loads Peak [C]");
         pdch2ZoneAirHumRatIdealPeak =
-            newPreDefColumn(pdst2CoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]");
+            newPreDefColumn(pdst2CoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         pdch2ZoneAirRelHumIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Zone Air Relative Humidity at Ideal Loads Peak [%]");
         pdch2ZoneSensibleLoadIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Zone Sensible Heat Gain at Ideal Loads Peak [W]");
         pdch2ZoneLatentLoadIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Zone Latent Heat Gain at Ideal Loads Peak [W]");
@@ -2085,11 +2117,12 @@ namespace OutputReportPredefined {
         pdchCoilEntDryBulbIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Entering Air Drybulb at Ideal Loads Peak [C]");
         pdchCoilEntWetBulbIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Ideal Loads Peak [C]");
         pdchCoilEntHumRatIdealPeak =
-            newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]");
+            newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         pdchCoilEntEnthalpyIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Entering Air Enthalpy at Ideal Loads Peak [J/KG-K]");
         pdchCoilLvgDryBulbIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Ideal Loads Peak [C]");
         pdchCoilLvgWetBulbIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Ideal Loads Peak [C]");
-        pdchCoilLvgHumRatIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [C]");
+        pdchCoilLvgHumRatIdealPeak =
+            newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         pdchCoilLvgEnthalpyIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Ideal Loads Peak [J/KG-K]");
         pdchCoilWaterMassFlowIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Plant Fluid Mass Flow Rate at Ideal Loads Peak [kg/s]");
         pdchCoilEntWaterTempIdealPeak =
@@ -2100,15 +2133,15 @@ namespace OutputReportPredefined {
         pdchFanHeatGainIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Supply Fan Air Heat Gain at Ideal Loads Peak [W]");
         pdchCoilNetTotalCapacityIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil and Fan Net Total Capacity at Ideal Loads Peak [W]");
         pdchOADryBulbIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Outdoor Air Drybulb at Ideal Loads Peak [C]");
-        pdchOAHumRatIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]");
+        pdchOAHumRatIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         pdchOAWetBulbatIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Outdoor Air Wetbulb at Ideal Loads Peak [C]");
         pdchOAVolFlowIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Outdoor Air Volume Flow Rate at Ideal Loads Peak [m3/s]");
         pdchOAFlowPrcntIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Outdoor Air Flow Percentage at Ideal Loads Peak [%]");
         pdchAirSysRADryBulbIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "System Return Air Drybulb at Ideal Loads Peak [C]");
         pdchAirSysRAHumRatIdealPeak =
-            newPreDefColumn(pdstCoilSummaryCoilSelection, "System Return Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]");
+            newPreDefColumn(pdstCoilSummaryCoilSelection, "System Return Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         pdchZoneAirDryBulbIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Zone Air Drybulb at Ideal Loads Peak [C]");
-        pdchZoneAirHumRatIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]");
+        pdchZoneAirHumRatIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]");
         pdchZoneAirRelHumIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Zone Air Relative Humidity at Ideal Loads Peak [%]");
         pdchZoneSensibleLoadIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Zone Sensible Heat Gain at Ideal Loads Peak [W]");
         pdchZoneLatentLoadIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Zone Latent Heat Gain at Ideal Loads Peak [W]");
@@ -2120,12 +2153,12 @@ namespace OutputReportPredefined {
         pdchCoilRatedEntDryBulb = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Entering Air Drybulb at Rating Conditions [C]");
         pdchCoilRatedEntWetBulb = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Rating Conditions [C]");
         pdchCoilRatedEntHumRat =
-            newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Rating Conditions [KGWATER/KGDRYAIR]");
+            newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Rating Conditions [kgWater/kgDryAir]");
         pdchCoilRatedEntEnthalpy = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Entering Air Enthalpy at Rating Conditions [J/KG-K]");
         pdchCoilRatedLvgDryBulb = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Rating Conditions [C]");
         pdchCoilRatedLvgWetBulb = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Rating Conditions [C]");
         pdchCoilRatedLvgHumRat =
-            newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Rating Conditions [KGWATER/KGDRYAIR]");
+            newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Rating Conditions [kgWater/kgDryAir]");
         pdchCoilRatedLvgEnthalpy = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Rating Conditions [J/KG-K]");
 
         // System Summary Report
@@ -2525,8 +2558,22 @@ namespace OutputReportPredefined {
         pdchLeedPerfElDem = newPreDefColumn(pdstLeedPerf, "Electric Demand [W]");
         pdchLeedPerfGasEneUse = newPreDefColumn(pdstLeedPerf, "Natural Gas Energy Use [GJ]");
         pdchLeedPerfGasDem = newPreDefColumn(pdstLeedPerf, "Natural Gas Demand [W]");
-        pdchLeedPerfAddFuelEneUse = newPreDefColumn(pdstLeedPerf, "Additional Fuel Use [GJ]");
-        pdchLeedPerfAddFuelDem = newPreDefColumn(pdstLeedPerf, "Additional Fuel Demand [W]");
+        pdchLeedPerfGasolineEneUse = newPreDefColumn(pdstLeedPerf, "Gasoline Use [GJ]");
+        pdchLeedPerfGasolineDem = newPreDefColumn(pdstLeedPerf, "Gasoline Demand [W]");
+        pdchLeedPerfDieselEneUse = newPreDefColumn(pdstLeedPerf, "Diesel Use [GJ]");
+        pdchLeedPerfDieselDem = newPreDefColumn(pdstLeedPerf, "Diesel Demand [W]");
+        pdchLeedPerfCoalEneUse = newPreDefColumn(pdstLeedPerf, "Coal Use [GJ]");
+        pdchLeedPerfCoalDem = newPreDefColumn(pdstLeedPerf, "Coal Demand [W]");
+        pdchLeedPerfFuelOil1EneUse = newPreDefColumn(pdstLeedPerf, "Fuel Oil No 1 Use [GJ]");
+        pdchLeedPerfFuelOil1Dem = newPreDefColumn(pdstLeedPerf, "Fuel Oil No 1 Demand [W]");
+        pdchLeedPerfFuelOil2EneUse = newPreDefColumn(pdstLeedPerf, "Fuel Oil No 2 Use [GJ]");
+        pdchLeedPerfFuelOil2Dem = newPreDefColumn(pdstLeedPerf, "Fuel Oil No 2 Demand [W]");
+        pdchLeedPerfPropaneEneUse = newPreDefColumn(pdstLeedPerf, "Propane Use [GJ]");
+        pdchLeedPerfPropaneDem = newPreDefColumn(pdstLeedPerf, "Propane Demand [W]");
+        pdchLeedPerfOtherFuel1EneUse = newPreDefColumn(pdstLeedPerf, "Other Fuel 1 Use [GJ]");
+        pdchLeedPerfOtherFuel1Dem = newPreDefColumn(pdstLeedPerf, "Other Fuel 1 Demand [W]");
+        pdchLeedPerfOtherFuel2EneUse = newPreDefColumn(pdstLeedPerf, "Other Fuel 2 Use [GJ]");
+        pdchLeedPerfOtherFuel2Dem = newPreDefColumn(pdstLeedPerf, "Other Fuel 2 Demand [W]");
         pdchLeedPerfDisClEneUse = newPreDefColumn(pdstLeedPerf, "District Cooling Use [GJ]");
         pdchLeedPerfDisClDem = newPreDefColumn(pdstLeedPerf, "District Cooling Demand [W]");
         pdchLeedPerfDisHtEneUse = newPreDefColumn(pdstLeedPerf, "District Heating Use [GJ]");
@@ -2629,7 +2676,6 @@ namespace OutputReportPredefined {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtI1("(I1)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2639,10 +2685,7 @@ namespace OutputReportPredefined {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int sigDigitCount;
-        std::string digitString;
-        std::string formatConvert;
         std::string stringEntry;
-        int IOS;
 
         incrementTableEntry();
         // check for number of significant digits
@@ -2655,21 +2698,18 @@ namespace OutputReportPredefined {
         } else {
             sigDigitCount = 2;
         }
-        // convert the integer to a string for the number of digits
-        ObjexxFCL::gio::write(digitString, fmtI1) << sigDigitCount;
-        // build up the format string
+
         if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
-            formatConvert = "(F12." + digitString + ')';
+            tableEntry(numTableEntry).charEntry = format("{:#12.{}F}", tableEntryReal, sigDigitCount);
         } else {
-            formatConvert = "(E12." + digitString + ')';
+            tableEntry(numTableEntry).charEntry = format("{:12.{}Z}", tableEntryReal, sigDigitCount);
         }
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::write(stringEntry, formatConvert, flags) << tableEntryReal;
-            IOS = flags.ios();
+
+
+        if (tableEntry(numTableEntry).charEntry.size() > 12) {
+            tableEntry(numTableEntry).charEntry = "  Too Big";
         }
-        if (IOS != 0) stringEntry = "  Too Big";
-        tableEntry(numTableEntry).charEntry = stringEntry;
+
         tableEntry(numTableEntry).objectName = objName;
         tableEntry(numTableEntry).indexColumn = columnIndex;
         tableEntry(numTableEntry).origRealEntry = tableEntryReal;
@@ -2741,7 +2781,6 @@ namespace OutputReportPredefined {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2750,12 +2789,10 @@ namespace OutputReportPredefined {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string stringEntry;
 
         incrementTableEntry();
         // convert the integer to a string
-        ObjexxFCL::gio::write(stringEntry, fmtLD) << tableEntryInt;
-        tableEntry(numTableEntry).charEntry = stringEntry;
+        tableEntry(numTableEntry).charEntry = format("{:12}", tableEntryInt);
         tableEntry(numTableEntry).objectName = objName;
         tableEntry(numTableEntry).indexColumn = columnIndex;
     }

@@ -54,10 +54,18 @@
 
 // C++ Headers
 #include <cstdint> // C++11
+#include <cassert>
 
-// macro to supress unused parameter
+#include <EnergyPlus/api/TypeDefs.h>
+
+// macro to suppress unused parameter
 // UNUSED( foo );
 #define EP_UNUSED(expr)
+// macro to guarantee array sizing in debug builds
+#define EP_SIZE_CHECK(array, min_size) assert(min_size >= 0);assert(array.size() >= (size_t)min_size)
+
+typedef std::int32_t Int32;
+typedef std::int64_t Int64;
 
 // ObjexxFCL
 #include <ObjexxFCL/Array1.fwd.hh>
@@ -207,11 +215,5 @@ using ObjexxFCL::bit::bit_and;
 using ObjexxFCL::bit::bit_shift;
 using ObjexxFCL::bit::bit_transfer;
 using ObjexxFCL::bit::bit_xor;
-
-// Types
-typedef std::int32_t Int32;
-typedef std::int64_t Int64;
-typedef float Real32;  // Platform-specific: C++ has no defined precision floating point types
-typedef double Real64; // Platform-specific: C++ has no defined precision floating point types
 
 #endif

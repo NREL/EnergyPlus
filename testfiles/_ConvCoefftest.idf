@@ -10,7 +10,7 @@
 ! Modified: Conforms with Beta 4 input
 ! 2 design days to facilitate reverse DD testing.
 
-  Version,9.3;
+  Version,9.4;
 
   Site:Location,
     ATLANTA,                 !- Name
@@ -251,8 +251,9 @@
     ;                        !- Convection Coefficient 2 User Curve Name
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    1;                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    1;                       !- Shading Calculation Update Frequency
 
   Site:GroundReflectance,0,0,0,0,0,0,0,0,0,0,0,0;
 
@@ -260,7 +261,7 @@
     ExtSolRad,               !- Name
     0.0,                     !- North Axis {deg}
     Country,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     4.0000002E-03,           !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     ,                        !- Maximum Number of Warmup Days
@@ -280,7 +281,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   BuildingSurface:Detailed,
     ZONE SURFACE SOUTH,      !- Name

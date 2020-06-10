@@ -48,84 +48,24 @@
 #ifndef AirflowNetworkBalanceManager_hh_INCLUDED
 #define AirflowNetworkBalanceManager_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+    // Forward declarations
+    class OutputFiles;
+    struct EnergyPlusData;
+
 namespace AirflowNetworkBalanceManager {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const VentCtrNum_None;  // Wrong input
-    extern int const VentCtrNum_Temp;  // Temperature venting control
-    extern int const VentCtrNum_Enth;  // Enthalpy venting control
-    extern int const VentCtrNum_Const; // Constant venting control
-    extern int const VentCtrNum_ASH55;
-    extern int const VentCtrNum_CEN15251;
-    extern int const VentCtrNum_Novent;    // No venting
-    extern int const VentCtrNum_ZoneLevel; // ZoneLevel control for a heat transfer subsurface
-    extern int const VentCtrNum_AdjTemp;   // Temperature venting control based on adjacent zone conditions
-    extern int const VentCtrNum_AdjEnth;   // Enthalpy venting control based on adjacent zone conditions
-    extern int const NumOfVentCtrTypes;    // Number of zone level venting control types
-
-    // DERIVED TYPE DEFINITIONS:
-    // Report variables
-
-    // MODULE VARIABLE DECLARATIONS:
-    // Report variables
-    extern Array1D<Real64> PZ;
-    // Inverse matrix
-    extern Array1D<Real64> MA;
-    extern Array1D<Real64> MV;
-    extern Array1D_int IVEC;
-    extern Array1D_int SplitterNodeNumbers;
-
-    extern bool AirflowNetworkGetInputFlag;
-    extern int VentilationCtrl;  // Hybrid ventilation control type
-    extern int NumOfExhaustFans; // Number of exhaust fans
-
-    extern int NumAirflowNetwork;
-    extern int AirflowNetworkNumOfDetOpenings;
-    extern int AirflowNetworkNumOfSimOpenings;
-    extern int AirflowNetworkNumOfHorOpenings;
-    extern int AirflowNetworkNumOfSurCracks;
-    extern int AirflowNetworkNumOfSurELA;
-    extern int AirflowNetworkNumOfExtNode;
-    extern int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
-    extern int DisSysNumOfNodes;
-    extern int DisSysNumOfLeaks;
-    extern int DisSysNumOfELRs;
-    extern int DisSysNumOfDucts;
-    extern int DysSysNumOfDuctViewFactors;
-    extern int DisSysNumOfDampers;
-    extern int DisSysNumOfCVFs;
-    extern int DisSysNumOfDetFans;
-    extern int DisSysNumOfCoils;
-    extern int DisSysNumOfHXs;
-    extern int DisSysNumOfCPDs;
-    extern int DisSysNumOfTermUnits;
-    extern int DisSysNumOfLinks;
-    extern int NumOfExtNodes;
-    extern int AirflowNetworkNumOfExtSurfaces;
-    extern Real64 IncAng;                  // Wind incidence angle relative to facade normal (deg)
-    extern Array1D<Real64> FacadeAng;      // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
-    extern int WindDirNum;                 // Wind direction number
-    extern Real64 WindAng;                 // Wind direction angle (degrees clockwise from North)
-    extern int SupplyFanInletNode;         // Supply air fan inlet node number
-    extern int SupplyFanOutletNode;        // Supply air fan outlet node number
-    extern int SupplyFanType;              // Supply air fan type
-    extern Real64 OnOffFanRunTimeFraction; // Run time fraction for an On/Off fan flow rate
-    extern int AirflowNetworkNumOfOccuVentCtrls;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE AirflowNetworkBalanceManager:
-    // Name Public routines, optionally name Private routines within this module
-
-    // Types
 
     struct AirflowNetworkReportVars
     {
@@ -157,19 +97,13 @@ namespace AirflowNetworkBalanceManager {
         }
     };
 
-    // Object Data
-    extern Array1D<AirflowNetworkReportVars> AirflowNetworkZnRpt;
-
-    // Functions
-
-    void clear_state();
-
-    void ManageAirflowNetworkBalance(Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
+    void ManageAirflowNetworkBalance(EnergyPlusData &state,
+                                     Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
                                      Optional_int_const Iter = _,                // Iteration number
                                      Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
     );
 
-    void GetAirflowNetworkInput();
+    void GetAirflowNetworkInput(EnergyPlusData &state);
 
     void InitAirflowNetwork();
 
@@ -179,29 +113,29 @@ namespace AirflowNetworkBalanceManager {
 
     void CalcWindPressureCoeffs();
 
-    Real64 CalcDuctInsideConvResist(Real64 const Tair, // Average air temperature
-                                    Real64 const mdot, // Mass flow rate
-                                    Real64 const Dh,   // Hydraulic diameter
-                                    Real64 const hIn   // User defined convection coefficient
+    Real64 CalcDuctInsideConvResist(Real64 Tair, // Average air temperature
+                                    Real64 mdot, // Mass flow rate
+                                    Real64 Dh,   // Hydraulic diameter
+                                    Real64 hIn   // User defined convection coefficient
     );
 
-    Real64 CalcDuctOutsideConvResist(Real64 const Ts,      // Surface temperature
-                                     Real64 const Tamb,    // Free air temperature
-                                     Real64 const Wamb,    // Free air humidity ratio
-                                     Real64 const Pamb,    // Free air barometric pressure
-                                     Real64 const Dh,      // Hydraulic diameter
-                                     Real64 const ZoneNum, // Zone number
-                                     Real64 const hOut     // User defined convection coefficient
+    Real64 CalcDuctOutsideConvResist(Real64 Ts,      // Surface temperature
+                                     Real64 Tamb,    // Free air temperature
+                                     Real64 Wamb,    // Free air humidity ratio
+                                     Real64 Pamb,    // Free air barometric pressure
+                                     Real64 Dh,      // Hydraulic diameter
+                                     Real64 ZoneNum, // Zone number
+                                     Real64 hOut     // User defined convection coefficient
     );
 
-    Real64 CalcWindPressure(int const curve,           // Curve index, change this to pointer after curve refactor
-                            bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
-                            bool const relativeAngle,  // True if the Cp curve angle is measured relative to the surface
-                            Real64 const azimuth,      // Azimuthal angle of surface
-                            Real64 const windSpeed,    // Wind velocity
-                            Real64 const windDir,      // Wind direction
-                            Real64 const dryBulbTemp,  // Air node dry bulb temperature
-                            Real64 const humRat        // Air node humidity ratio
+    Real64 CalcWindPressure(int curve,           // Curve index, change this to pointer after curve refactor
+                            bool symmetricCurve, // True if the curve is symmetric (0 to 180)
+                            bool relativeAngle,  // True if the Cp curve angle is measured relative to the surface
+                            Real64 azimuth,      // Azimuthal angle of surface
+                            Real64 windSpeed,    // Wind velocity
+                            Real64 windDir,      // Wind direction
+                            Real64 dryBulbTemp,  // Air node dry bulb temperature
+                            Real64 humRat        // Air node humidity ratio
     );
 
     void CalcAirflowNetworkHeatBalance();
@@ -212,17 +146,17 @@ namespace AirflowNetworkBalanceManager {
 
     void CalcAirflowNetworkGCBalance();
 
-    void MRXINV(int const NORDER);
+    void MRXINV(int NORDER);
 
     void ReportAirflowNetwork();
 
     void UpdateAirflowNetwork(Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
 
-    void AirflowNetworkVentingControl(int const i,       // AirflowNetwork surface number
+    void AirflowNetworkVentingControl(int i,       // AirflowNetwork surface number
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
 
-    void ValidateDistributionSystem();
+    void ValidateDistributionSystem(EnergyPlusData &state);
 
     void ValidateFanFlowRate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
 
@@ -232,12 +166,12 @@ namespace AirflowNetworkBalanceManager {
 
     void CalcSingleSidedCps(std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
 
-    Real64 GetZoneInfilAirChangeRate(int const ZoneNum); // hybrid ventilation system controlled zone number
+    Real64 GetZoneInfilAirChangeRate(int ZoneNum); // hybrid ventilation system controlled zone number
 
-    int GetAirLoopNumber(int const NodeNumber); // Get air loop number for each distribution node and linkage
+    int GetAirLoopNumber(EnergyPlusData &state, int NodeNumber); // Get air loop number for each distribution node and linkage
 
-    Real64 AFNPressureResidual(Real64 const ExFanMassFlowRate,
-                               Array1<Real64> const &Par); // Residual function using Regula Falsi
+    Real64 AFNPressureResidual(Real64 ExFanMassFlowRate,
+                               Array1D<Real64> const &Par); // Residual function using Regula Falsi
 
     // derived class or struct
     struct OccupantVentilationControlProp
@@ -266,24 +200,134 @@ namespace AirflowNetworkBalanceManager {
         {
         }
 
-        void calc(int const ZoneNum,
-                  int const SurfNum,
-                  int const PrevOpeningstatus,
-                  Real64 const TimeOpenDuration,
-                  Real64 const TimeCloseDuration,
+        void calc(int ZoneNum,
+                  Real64 TimeOpenDuration,
+                  Real64 TimeCloseDuration,
                   int &OpeningStatus,
                   int &OpeningProbStatus,
                   int &ClosingProbStatus); // function to perform calculations
 
-        bool openingProbability(int const ZoneNum,
-                                Real64 const TimeCloseDuration); // function to perform calculations of opening probability
+        bool openingProbability(int ZoneNum,
+                                Real64 TimeCloseDuration); // function to perform calculations of opening probability
 
-        bool closingProbability(Real64 const TimeCloseDuration); // function to perform calculations of closing probability
+        bool closingProbability(Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
 
-    extern Array1D<OccupantVentilationControlProp> OccupantVentilationControl;
-
 } // namespace AirflowNetworkBalanceManager
+
+    struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
+
+        Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
+        Array1D_int SplitterNodeNumbers;
+        int AirflowNetworkNumOfExtSurfaces;
+        // Inverse matrix
+        Array1D<Real64> MA;
+        Array1D<Real64> MV;
+        Array1D_int IVEC;
+        int VentilationCtrl = 0;  // Hybrid ventilation control type
+        int NumOfExhaustFans = 0; // Number of exhaust fans
+        int NumAirflowNetwork = 0;
+        int AirflowNetworkNumOfDetOpenings = 0;
+        int AirflowNetworkNumOfSimOpenings = 0;
+        int AirflowNetworkNumOfHorOpenings = 0;
+        int AirflowNetworkNumOfSurCracks = 0;
+        int AirflowNetworkNumOfSurELA = 0;
+        int AirflowNetworkNumOfExtNode = 0;
+        int AirflowNetworkNumOfOutAirNode = 0;
+        int AirflowNetworkNumOfSingleSideZones = 0; // Total number of zones with advanced single sided wind pressure coefficient calculation
+        int DisSysNumOfNodes = 0;
+        int DisSysNumOfLeaks = 0;
+        int DisSysNumOfELRs = 0;
+        int DisSysNumOfDucts = 0;
+        int DisSysNumOfDuctViewFactors = 0;
+        int DisSysNumOfDampers = 0;
+        int DisSysNumOfCVFs = 0;
+        int DisSysNumOfDetFans = 0;
+        int DisSysNumOfCoils = 0;
+        int DisSysNumOfHXs = 0;
+        int DisSysNumOfCPDs = 0;
+        int DisSysNumOfTermUnits = 0;
+        int DisSysNumOfLinks = 0;
+        int NumOfExtNodes = 0;
+        Real64 IncAng = 0.0;                            // Wind incidence angle relative to facade normal (deg)
+        int SupplyFanType = 0;                          // Supply air fan type
+        Real64 MaxOnOffFanRunTimeFraction = 0.0;        // max Run time fraction for an On/Off fan flow rate among airloops
+        Real64 CurrentEndTimeLast = 0.0;                // last end time
+        Real64 TimeStepSysLast = 0.0;                   // last system time step
+        int AirflowNetworkNumOfOccuVentCtrls = 0;
+        int IntraZoneNumOfNodes = 0;
+        int IntraZoneNumOfLinks = 0;
+        int IntraZoneNumOfZones = 0;
+        int NumOfPressureControllers = 0;               // number of pressure controllers
+        int NumOfOAFans = 0;                            // number of OutdoorAir fans
+        int NumOfReliefFans = 0;                        // number of OutdoorAir relief fans
+        bool AirflowNetworkGetInputFlag = true;
+        bool ValidateDistributionSystemFlag = true;
+        Array1D<Real64> FacadeAng = Array1D<Real64>(5);  // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
+        Array1D<Real64> LoopPartLoadRatio;
+        Array1D<Real64> LoopOnOffFanRunTimeFraction;
+        Array1D<bool> LoopOnOffFlag;
+
+        // Object Data
+        Array1D<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
+        std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
+
+        void clear_state() override {
+            OccupantVentilationControl.deallocate();
+            SplitterNodeNumbers.deallocate();
+            AirflowNetworkNumOfExtSurfaces = 0;
+            MA.deallocate();
+            MV.deallocate();
+            IVEC.deallocate();
+            VentilationCtrl = 0;
+            NumOfExhaustFans = 0;
+            NumAirflowNetwork = 0;
+            AirflowNetworkNumOfDetOpenings = 0;
+            AirflowNetworkNumOfSimOpenings = 0;
+            AirflowNetworkNumOfHorOpenings = 0;
+            AirflowNetworkNumOfSurCracks = 0;
+            AirflowNetworkNumOfSurELA = 0;
+            AirflowNetworkNumOfExtNode = 0;
+            AirflowNetworkNumOfOutAirNode = 0;
+            AirflowNetworkNumOfSingleSideZones = 0;
+            DisSysNumOfNodes = 0;
+            DisSysNumOfLeaks = 0;
+            DisSysNumOfELRs = 0;
+            DisSysNumOfDucts = 0;
+            DisSysNumOfDuctViewFactors = 0;
+            DisSysNumOfDampers = 0;
+            DisSysNumOfCVFs = 0;
+            DisSysNumOfDetFans = 0;
+            DisSysNumOfCoils = 0;
+            DisSysNumOfHXs = 0;
+            DisSysNumOfCPDs = 0;
+            DisSysNumOfTermUnits = 0;
+            DisSysNumOfLinks = 0;
+            NumOfExtNodes = 0;
+            IncAng = 0.0;
+            SupplyFanType = 0;
+            MaxOnOffFanRunTimeFraction = 0.0;
+            CurrentEndTimeLast = 0.0;
+            TimeStepSysLast = 0.0;
+            AirflowNetworkNumOfOccuVentCtrls = 0;
+            IntraZoneNumOfNodes = 0;
+            IntraZoneNumOfLinks = 0;
+            IntraZoneNumOfZones = 0;
+            NumOfPressureControllers = 0;
+            NumOfOAFans = 0;
+            NumOfReliefFans = 0;
+            AirflowNetworkGetInputFlag = true;
+            ValidateDistributionSystemFlag = true;
+            FacadeAng = Array1D<Real64>(5);
+            AirflowNetworkZnRpt.deallocate();
+            LoopPartLoadRatio.deallocate();
+            LoopOnOffFanRunTimeFraction.deallocate();
+            LoopOnOffFlag.deallocate();
+            UniqueAirflowNetworkSurfaceName.clear();
+        }
+    };
+
+    extern AirflowNetworkBalanceManagerData dataAirflowNetworkBalanceManager;
 
 } // namespace EnergyPlus
 

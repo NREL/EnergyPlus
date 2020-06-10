@@ -1,6 +1,12 @@
 \section{Group - Zone Equipment}\label{group---zone-equipment}
 
-There are five main zone equipment statements that must be used to describe a block of zone equipment as shown in the below figure ``Zone Equipment Input Syntax Map''.
+There are five main zone equipment statements that must be used to describe a block of zone equipment as shown in Figure \ref{fig:zone-equipment-syntax-map} - ``Zone Equipment Input Syntax Map'' below:
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image261.png}
+\caption{Zone Equipment Input Syntax Map \protect \label{fig:zone-equipment-syntax-map}}
+\end{figure}
 
 Types of Zone equipment are listed below and shown below in figure ``Zone Equipment''.
 
@@ -8,13 +14,13 @@ Types of Zone equipment are listed below and shown below in figure ``Zone Equipm
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
 \caption{Available Zone Equipment Types \label{table:available-zone-equipment-types}} \tabularnewline
 \toprule
-Air Distribution Equipment & AirTerminal:SingleDuct:Uncontrolled    AirTerminal:SingleDuct:ConstantVolume:Reheat    AirTerminal:SingleDuct:VAV:Reheat    AirTerminal:SingleDuct:VAV:NoReheat    AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan    AirTerminal:DualDuct:ConstantVolume    AirTerminal:DualDuct:VAV    Powered Induction Units (Series and Parallel) \tabularnewline
+Air Distribution Equipment & AirTerminal:SingleDuct:ConstantVolume:Reheat     AirTerminal:SingleDuct:ConstantVolume:NoReheat    AirTerminal:SingleDuct:VAV:Reheat    AirTerminal:SingleDuct:VAV:NoReheat    AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan    AirTerminal:DualDuct:ConstantVolume    AirTerminal:DualDuct:VAV    Powered Induction Units (Series and Parallel) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Available Zone Equipment Types} \tabularnewline
 \toprule
-Air Distribution Equipment & AirTerminal:SingleDuct:Uncontrolled    AirTerminal:SingleDuct:ConstantVolume:Reheat    AirTerminal:SingleDuct:VAV:Reheat    AirTerminal:SingleDuct:VAV:NoReheat    AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan    AirTerminal:DualDuct:ConstantVolume    AirTerminal:DualDuct:VAV    Powered Induction Units (Series and Parallel) \tabularnewline
+Air Distribution Equipment & AirTerminal:SingleDuct:ConstantVolume:Reheat    AirTerminal:SingleDuct:ConstantVolume:NoReheat    AirTerminal:SingleDuct:VAV:Reheat    AirTerminal:SingleDuct:VAV:NoReheat    AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan    AirTerminal:DualDuct:ConstantVolume    AirTerminal:DualDuct:VAV    Powered Induction Units (Series and Parallel) \tabularnewline
 \midrule
 \endhead
 
@@ -23,21 +29,17 @@ Radiative/Convective Units & Baseboard Heaters    Low Temp Radiant Systems    Hi
 \bottomrule
 \end{longtable}
 
-!{[}ZoneEquipmentSyntax (media/image261.png)
-
-Figure 99. Zone Equipment Input Syntax Map
-
-\begin{figure}[hbtp] % fig 100
+\begin{figure}[hbtp]
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image262.png}
+\includegraphics[width=0.8\textwidth, keepaspectratio=true]{media/image262.png}
 \caption{Representative Zone Equipment \protect \label{fig:representative-zone-equipment}}
 \end{figure}
 
-The following figure (Air Loop/Zone Equipment Node Diagram) illustrates the connection between the zone equipment and the air loop systems.
+The following Figure \ref{fig:air-loopzone-equipment-node-diagram} ``Air Loop/Zone Equipment Node Diagram'' illustrates the connection between the zone equipment and the air loop systems.
 
-\begin{figure}[hbtp] % fig 101
+\begin{figure}[hbtp]
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image263.png}
+\includegraphics[width=0.4\textwidth, keepaspectratio=true]{media/image263.png}
 \caption{Air Loop/Zone Equipment Node Diagram \protect \label{fig:air-loopzone-equipment-node-diagram}}
 \end{figure}
 
@@ -114,6 +116,37 @@ This is the leakage downstream of the terminal unit as a fraction of the current
 \paragraph{Field: Design Specification Air Terminal Sizing Name}\label{design-specification-air-terminal-sizing-name2}
 
 This optional input field is the name of a \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} object which specifies sizing adjustments to be made for the air terminal unit referenced by this object. The terminal unit is initially sized according to the inputs in the corresponding \hyperref[sizingzone]{Sizing:Zone} object. Then the adjustment factors in the \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} object are applied. See \hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing} for more details. If left blank, then no adjustments are made.
+
+\subsubsection{Outputs}
+
+\begin{itemize}
+    \item
+    HVAC,Sum,Zone Air Terminal Sensible Heating Energy {[}J{]}
+    \item
+    HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
+    \item
+    HVAC,Average,Zone Air Terminal Sensible Heating Rate {[}W{]}
+    \item
+    HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
+    \item
+    HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
+
+\paragraph{Zone Air Terminal Sensible Heating Rate {[}W{]}}\label{zone-air-terminal-sensible-heating-rate-w}
+
+\paragraph{Zone Air Terminal Sensible Heating Energy~ {[}J{]}}\label{zone-air-terminal-sensible-heating-energy-j}
+
+These outputs are the sensible heating rate and energy provided to the zone by the single duct constant volume no reheat air terminal unit.
+
+\paragraph{Zone Air Terminal Sensible Cooling Rate {[}W{]}}\label{zone-air-terminal-sensible-cooling-rate-w}
+
+\paragraph{Zone Air Terminal Sensible Cooling Energy {[}J{]}}\label{zone-air-terminal-sensible-cooling-energy-j}
+
+These outputs are the sensible cooling rate and energy provided to the zone by the single duct constant volume no reheat air terminal unit.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported.~ The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 Two example IDF excerpts (one with duct leakage, one without):
 
@@ -199,7 +232,7 @@ The following HVAC equipment types are allowed as zone equipment. The component 
 
 The first list encountered in the \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} statement is the ZoneHVAC:EquipmentList. This object lists all HVAC equipment serving the zone. Each item in the list has four fields associated with it: Object Type, Name, Cooling Sequence and Heating or No-Load Sequence The Object Type and Name identify the specific equipment object. Cooling Sequence and Heating or No-Load Sequence specify the order of simulation for zones with more than one type of HVAC equipment.
 
-Note that a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} or \hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled} must be listed in this statement if there is a forced air system serving the zone from an air loop.
+Note that a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} must be listed in this statement if there is a forced air system serving the zone from an air loop.
 
 \subsubsection{Inputs}\label{inputs-2-048}
 
@@ -245,7 +278,6 @@ Legal Zone Equipment Types \tabularnewline
 \midrule
 \endhead
 
-AirTerminal:SingleDuct:Uncontrolled \tabularnewline
 Fan:ZoneExhaust \tabularnewline
 WaterHeater:HeatPump:PumpedCondenser \tabularnewline
 WaterHeater:HeatPump:WrappedCondenser \tabularnewline
@@ -311,18 +343,18 @@ Examples of this statement in an IDF are:
 
 
     ZoneHVAC:EquipmentList,
-      Zone1Equipment,                       !- Name
-      SequentialLoad,                       !- Load Distribution Scheme
-      AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-      Zone1DirectAir,                       !- Zone Equipment 1 Name
-      1,                                    !- Zone Equipment 1 Cooling Sequence
-      1,                                    !- Zone Equipment 1 Heating or No-Load Sequence
-      0.5,                                  !- Zone Equipment 1 Sequential Cooling Fraction
-      0.5,                                  !- Zone Equipment 1 Sequential Heating Fraction
-      ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
-      Zone1WTAHP,                           !- Zone Equipment 2 Name
-      2,                                    !- Zone Equipment 2 Cooling Sequence
-      2,                                    !- Zone Equipment 2 Heating or No-Load Sequence
-      0.5,                                  !- Zone Equipment 2 Sequential Cooling Fraction
-      0.5;                                  !- Zone Equipment 2 Sequential Heating Fraction
+      Zone1Equipment,                !- Name
+      SequentialLoad,                !- Load Distribution Scheme
+      ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+      Zone1TermReheat,               !- Zone Equipment 1 Name
+      1,                             !- Zone Equipment 1 Cooling Sequence
+      1,                             !- Zone Equipment 1 Heating or No-Load Sequence
+      0.5,                           !- Zone Equipment 1 Sequential Cooling Fraction
+      0.5,                           !- Zone Equipment 1 Sequential Heating Fraction
+      ZoneHVAC:WaterToAirHeatPump,   !- Zone Equipment 2 Object Type
+      Zone1WTAHP,                    !- Zone Equipment 2 Name
+      2,                             !- Zone Equipment 2 Cooling Sequence
+      2,                             !- Zone Equipment 2 Heating or No-Load Sequence
+      0.5,                           !- Zone Equipment 2 Sequential Cooling Fraction
+      0.5;                           !- Zone Equipment 2 Sequential Heating Fraction
 \end{lstlisting}

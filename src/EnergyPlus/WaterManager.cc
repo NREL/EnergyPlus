@@ -1000,7 +1000,11 @@ namespace WaterManager {
 
         if (RainFall.ModeID == RainSchedDesign) {
             schedRate = GetCurrentScheduleValue(RainFall.RainSchedID); // m/hr
-            ScaleFactor = RainFall.DesignAnnualRain / RainFall.NomAnnualRain;
+            if (RainFall.NomAnnualRain > 0.0){
+                ScaleFactor = RainFall.DesignAnnualRain / RainFall.NomAnnualRain;
+            } else {
+                ScaleFactor = 0.0;
+            }
             RainFall.CurrentRate = schedRate * ScaleFactor / SecInHour; // convert to m/s
             RainFall.CurrentAmount = RainFall.CurrentRate * (TimeStepSys * SecInHour);
         }
@@ -1816,6 +1820,8 @@ namespace WaterManager {
             }
             WaterStorage(TankNum).VdotOverflow = 0.0;
             if (WaterStorage(TankNum).NumWaterSupplies > 0) {
+                // TODO: Figure out what to do with this...the available supply should be updated by the components
+                //       This was an issue because the coil supply was being stomped by this assignment to zero, so no tank action was happening
                 WaterStorage(TankNum).VdotAvailSupply = 0.0;
             }
             if ((WaterStorage(TankNum).ControlSupplyType == WellFloatValve) || (WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup)) {

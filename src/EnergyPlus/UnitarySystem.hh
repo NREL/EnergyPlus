@@ -50,6 +50,8 @@
 
 #include <string>
 #include <vector>
+#include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -100,7 +102,7 @@ namespace UnitarySystems {
         }
 
         std::string name;
-        static DesignSpecMSHP *factory(int object_type_of_num, std::string const objectName);
+        static DesignSpecMSHP *factory(EnergyPlusData &state, int object_type_of_num, std::string const objectName);
         int numOfSpeedHeating;
         int numOfSpeedCooling;
         Real64 noLoadAirFlowRateRatio;
@@ -111,11 +113,11 @@ namespace UnitarySystems {
         int m_DesignSpecMSHPType_Num;
         bool m_SingleModeFlag;
 
-        static void getDesignSpecMSHP();
-        static void getDesignSpecMSHPdata(bool errorsFound);
+        static void getDesignSpecMSHP(EnergyPlusData &state);
+        static void getDesignSpecMSHPdata(EnergyPlusData &EP_UNUSED(state), bool errorsFound);
     };
 
-    struct UnitarySys
+    struct UnitarySys : HVACSystemData
     {
 
         enum class ControlType : int
@@ -193,6 +195,7 @@ namespace UnitarySystems {
         int m_SystemHeatControlNodeNum;
         bool m_CoolCoilExists;
         int m_CoolingCoilType_Num;
+        int m_CoolingCoilSubType_Num;
         int m_NumOfSpeedCooling;
         int m_CoolingCoilAvailSchPtr;
         Real64 m_DesignCoolingCapacity;
@@ -202,8 +205,8 @@ namespace UnitarySystems {
         int m_CoolingCoilIndex;
         bool m_HeatPump;
         int m_ActualDXCoilIndexForHXAssisted;
-        bool m_MultiSpeedCoolingCoil;
-        bool m_VarSpeedCoolingCoil;
+        bool m_DiscreteSpeedCoolingCoil;
+        bool m_ContSpeedCoolingCoil;
         int m_SystemCoolControlNodeNum;
         int m_WaterCyclingMode;
         bool m_ISHundredPercentDOASDXCoil;
@@ -363,6 +366,7 @@ namespace UnitarySystems {
         bool m_HeatCompNotSetYet;
         bool m_SuppCompNotSetYet;
         bool m_OKToPrintSizing;
+        Real64 m_SmallLoadTolerance;
 
     public:
         // SZVAV variables
@@ -408,6 +412,8 @@ namespace UnitarySystems {
         DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;
+        Real64 LoadSHR;                  // Load sensible heat ratio with humidity control
+        Real64 CoilSHR;    // Load sensible heat ratio with humidity control
 
         //    private:
         // private members not initialized in constructor
@@ -429,6 +435,8 @@ namespace UnitarySystems {
         std::vector<Real64> m_HeatingVolFlowRatio;
         std::vector<int> m_IterationMode; // array of operating mode each iteration
         std::vector<Real64> FullOutput;   // Full output for different speed
+        std::vector<Real64> FullLatOutput;   // Full latent output for different speed
+        std::vector<Real64> SpeedSHR; // SHR at different speed
 
         struct WarnMessages
         {
@@ -470,7 +478,7 @@ namespace UnitarySystems {
         };
         WarnMessages warnIndex;
 
-        static void getUnitarySystemInput(std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum);
+        static void getUnitarySystemInput(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
         static Real64 DOE2DXCoilResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                          std::vector<Real64> const &Par // par(1) = DX coil number
@@ -480,83 +488,83 @@ namespace UnitarySystems {
                                                std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 calcUnitarySystemLoadResidual(Real64 const PartLoadRatio,    // DX cooling coil part load ratio
+        static Real64 calcUnitarySystemLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // DX cooling coil part load ratio
                                                     std::vector<Real64> const &Par // Function parameters
         );
 
-        static Real64 HXAssistedCoolCoilTempResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 HXAssistedCoolCoilTempResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                      std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 hotWaterHeatingCoilResidual(Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 hotWaterHeatingCoilResidual(EnergyPlusData &state, Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                   std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 HXAssistedCoolCoilHRResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 HXAssistedCoolCoilHRResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                    std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 DXCoilVarSpeedResidual(Real64 const SpeedRatio,       // compressor speed ratio (1.0 is max, 0.0 is min)
+        static Real64 DXCoilVarSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,       // compressor speed ratio (1.0 is max, 0.0 is min)
                                              std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 heatingCoilVarSpeedResidual(Real64 const SpeedRatio,       // compressor speed ratio (1.0 is max, 0.0 is min)
+        static Real64 heatingCoilVarSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,       // compressor speed ratio (1.0 is max, 0.0 is min)
                                                   std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 DXCoilVarSpeedHumRatResidual(Real64 const SpeedRatio,       // compressor speed ratio (1.0 is max, 0.0 is min)
+        static Real64 DXCoilVarSpeedHumRatResidual(EnergyPlusData &state, Real64 const SpeedRatio,       // compressor speed ratio (1.0 is max, 0.0 is min)
                                                    std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 DXCoilCyclingResidual(Real64 const CycRatio,         // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 DXCoilCyclingResidual(EnergyPlusData &state, Real64 const CycRatio,         // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                             std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 DXCoilCyclingHumRatResidual(Real64 const CycRatio,         // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 DXCoilCyclingHumRatResidual(EnergyPlusData &state, Real64 const CycRatio,         // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                   std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 heatingCoilVarSpeedCycResidual(Real64 const CycRatio,         // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 heatingCoilVarSpeedCycResidual(EnergyPlusData &state, Real64 const CycRatio,         // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                      std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 TESIceStorageCoilOutletResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 TESIceStorageCoilOutletResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                       std::vector<Real64> const &Par // par( 1 ) = double( UnitarySysNum );
         );
 
-        static Real64 multiModeDXCoilResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 multiModeDXCoilResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                               std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 multiModeDXCoilHumRatResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 multiModeDXCoilHumRatResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                     std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 coolWaterHumRatResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 coolWaterHumRatResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                               std::vector<Real64> const &Par // par(1) = CoolWater coil number
         );
 
-        static Real64 coolWaterTempResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 coolWaterTempResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                             std::vector<Real64> const &Par // par(1) = CoolWater coil number
         );
 
-        static Real64 gasElecHeatingCoilResidual(Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 gasElecHeatingCoilResidual(EnergyPlusData &state, Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                  std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 steamHeatingCoilResidual(Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 steamHeatingCoilResidual(EnergyPlusData &state, Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 heatWatertoAirHPTempResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 heatWatertoAirHPTempResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                    std::vector<Real64> const &Par // par(1) = HeatWatertoAirHP coil number
         );
 
-        static Real64 coolWatertoAirHPHumRatResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 coolWatertoAirHPHumRatResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                      std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
         );
 
-        static Real64 coolWatertoAirHPTempResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 coolWatertoAirHPTempResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                    std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
         );
 
@@ -564,7 +572,7 @@ namespace UnitarySystems {
                                             std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        void initUnitarySystems(int const &AirLoopNum, bool const &FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp);
+        void initUnitarySystems(EnergyPlusData &state, int const &AirLoopNum, bool const &FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp);
 
         void checkNodeSetPoint(int const AirLoopNum,       // number of the current air loop being simulated
                                int const ControlNode,      // Node to test for set point
@@ -583,7 +591,7 @@ namespace UnitarySystems {
 
         void unitarySystemHeatRecovery();
 
-        void controlUnitarySystemtoSP(int const AirLoopNum,          // Primary air loop number
+        void controlUnitarySystemtoSP(EnergyPlusData &state, int const AirLoopNum,          // Primary air loop number
                                       bool const FirstHVACIteration, // True when first HVAC iteration
                                       int &CompOn,                   // compressor on/off control
                                       Real64 const OAUCoilOutTemp,   // the coil inlet temperature of OutdoorAirUnit
@@ -592,7 +600,7 @@ namespace UnitarySystems {
                                       Real64 &latOutputProvided      // latent output at supply air node
         );
 
-        void controlUnitarySystemtoLoad(int const AirLoopNum,          // Primary air loop number
+        void controlUnitarySystemtoLoad(EnergyPlusData &state, int const AirLoopNum,          // Primary air loop number
                                         bool const FirstHVACIteration, // True when first HVAC iteration
                                         int &CompOn,                   // Determines if compressor is on or off
                                         Real64 const OAUCoilOutTemp,   // the coil inlet temperature of OutdoorAirUnit
@@ -601,7 +609,7 @@ namespace UnitarySystems {
                                         Real64 &latOutputProvided      // system latent output at supply air node
         );
 
-        void updateUnitarySystemControl(int const AirLoopNum,  // number of the current air loop being simulated
+        void updateUnitarySystemControl(EnergyPlusData &state, int const AirLoopNum,  // number of the current air loop being simulated
                                         int const OutNode,     // coil outlet node number
                                         int const ControlNode, // control node number
                                         Real64 &OnOffAirFlowRatio,
@@ -611,20 +619,18 @@ namespace UnitarySystems {
                                         Real64 const MaxOutletTemp // limits heating coil outlet temp [C]
         );
 
-        void controlUnitarySystemOutput(int const AirLoopNum,          // Index to air loop
+        void controlUnitarySystemOutput(EnergyPlusData &state, int const AirLoopNum,          // Index to air loop
                                         bool const FirstHVACIteration, // True when first HVAC iteration
                                         Real64 &OnOffAirFlowRatio,     // ratio of heating PLR to cooling PLR (is this correct?)
                                         Real64 const ZoneLoad,
                                         Real64 &FullSensibleOutput,
-                                        bool HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
+                                        bool &HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
                                         int CompOn);
 
-        void initLoadBasedControl(int const AirLoopNum, // number of the current air loop being simulated
+        void initLoadBasedControl(EnergyPlusData &state, int const AirLoopNum, // number of the current air loop being simulated
                                   bool const FirstHVACIteration,
                                   Real64 &OnOffAirFlowRatio,
                                   Real64 &ZoneLoad);
-
-        void sizeUnitarySystem(bool const FirstHVACIteration, int const AirLoopNum);
 
         void setOnOffMassFlowRate(Real64 &OnOffAirFlowRatio, // ratio of coil on to coil off air flow rate
                                   Real64 const PartLoadRatio // coil part-load ratio
@@ -638,7 +644,7 @@ namespace UnitarySystems {
                                Real64 &LatOutput   // latent output of AirloopHVAC:UnitarySystem
         );
 
-        void calcUnitaryCoolingSystem(int const AirLoopNum,          // index to air loop
+        void calcUnitaryCoolingSystem(EnergyPlusData &state, int const AirLoopNum,          // index to air loop
                                       bool const FirstHVACIteration, // True when first HVAC iteration
                                       Real64 const PartLoadRatio,    // coil operating part-load ratio
                                       int const CompOn,              // compressor control (0=off, 1=on)
@@ -647,7 +653,7 @@ namespace UnitarySystems {
                                       bool const HXUnitOn           // Flag to control HX for HXAssisted Cooling Coil
         );
 
-        void calcUnitaryHeatingSystem(int const AirLoopNum,           // index to air loop
+        void calcUnitaryHeatingSystem(EnergyPlusData &state, int const AirLoopNum,           // index to air loop
                                       bool const FirstHVACIteration,  // True when first HVAC iteration
                                       Real64 const PartLoadRatio,     // coil operating part-load ratio
                                       int const CompOn,               // comrpressor control (0=off, 1=on)
@@ -655,31 +661,31 @@ namespace UnitarySystems {
                                       Real64 HeatCoilLoad             // adjusted heating coil load if outlet temp exceeds max (W)
         );
 
-        void calcUnitarySuppHeatingSystem(bool const FirstHVACIteration, // True when first HVAC iteration
+        void calcUnitarySuppHeatingSystem(EnergyPlusData &state, bool const FirstHVACIteration, // True when first HVAC iteration
                                           Real64 const PartLoadRatio,    // coil operating part-load ratio
                                           Real64 const SuppCoilLoad      // adjusted supp coil load when outlet temp exceeds max (W)
         );
 
-        void calcUnitarySuppSystemToSP(bool const FirstHVACIteration // True when first HVAC iteration
+        void calcUnitarySuppSystemToSP(EnergyPlusData &state, bool const FirstHVACIteration // True when first HVAC iteration
         );
 
-        void controlCoolingSystemToSP(int const AirLoopNum,          // index to air loop
+        void controlCoolingSystemToSP(EnergyPlusData &state, int const AirLoopNum,          // index to air loop
                                       bool const FirstHVACIteration, // First HVAC iteration flag
                                       bool &HXUnitOn,                // flag to enable heat exchanger heat recovery
                                       int &CompOp                    // compressor on/off control
         );
 
-        void controlHeatingSystemToSP(int const AirLoopNum,          // index to air loop
+        void controlHeatingSystemToSP(EnergyPlusData &state, int const AirLoopNum,          // index to air loop
                                       bool const FirstHVACIteration, // First HVAC iteration flag
                                       int &CompOn,                   // compressor on/off control
                                       Real64 &HeatCoilLoad           // load met by heating coil
         );
 
-        void controlSuppHeatSystemToSP(int const AirLoopNum,         // index to air loop
+        void controlSuppHeatSystemToSP(EnergyPlusData &state, int const AirLoopNum,         // index to air loop
                                        bool const FirstHVACIteration // First HVAC iteration flag
         );
 
-        void simMultiSpeedCoils(int const AirLoopNum,          // Index to air loop
+        void simMultiSpeedCoils(EnergyPlusData &state, int const AirLoopNum,          // Index to air loop
                                 bool const FirstHVACIteration, // True when first HVAC iteration
                                 int &CompOn,                   // compressor on/off control
                                 bool const SensibleLoad,
@@ -688,7 +694,7 @@ namespace UnitarySystems {
                                 int const CoilType,
                                 int const SpeedNumber);
 
-        void calcPassiveSystem(int const AirLoopNum,         // Index to air loop
+        void calcPassiveSystem(EnergyPlusData &state, int const AirLoopNum,         // Index to air loop
                                bool const FirstHVACIteration // True when first HVAC iteration
         );
 
@@ -708,35 +714,11 @@ namespace UnitarySystems {
         {
         }
 
-        static void getUnitarySystemInputData(std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+        static void getUnitarySystemInputData(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
-        static UnitarySys *factory(int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
+        static HVACSystemData *factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
-        void simulate(std::string const &Name,
-                      bool const firstHVACIteration,
-                      int const &AirLoopNum,
-                      int &CompIndex,
-                      bool &HeatActive,
-                      bool &CoolActive,
-                      int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
-                      Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
-                      bool const ZoneEquipment,    // TRUE if called as zone equipment
-                      Real64 &sysOutputProvided,   // sensible output at supply air node
-                      Real64 &latOutputProvided    // latent output at supply air node
-        );
-
-        void simulate(std::string const &Name,
-                      bool const firstHVACIteration,
-                      int const &AirLoopNum,
-                      int &CompIndex,
-                      bool &HeatActive,
-                      bool &CoolActive,
-                      int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
-                      Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
-                      bool const ZoneEquipment     // TRUE if called as zone equipment
-        );
-
-        void simulateSys(std::string const &Name,
+        void simulateSys(EnergyPlusData &state, std::string const &Name,
                          bool const firstHVACIteration,
                          int const &AirLoopNum,
                          int &CompIndex,
@@ -749,7 +731,7 @@ namespace UnitarySystems {
                          Real64 &latOutputProvided    // latent output at supply air node
         );
 
-        void calcUnitarySystemToLoad(int const AirLoopNum,          // index to air loop
+        void calcUnitarySystemToLoad(EnergyPlusData &state, int const AirLoopNum,          // index to air loop
                                      bool const FirstHVACIteration, // True when first HVAC iteration
                                      Real64 const CoolPLR,          // operating cooling part-load ratio []
                                      Real64 const HeatPLR,          // operating cooling part-load ratio []
@@ -762,17 +744,34 @@ namespace UnitarySystems {
                                      int const CompOn               // Determines if compressor is on or off
         );
 
-        static void checkUnitarySysCoilInOASysExists(std::string const &UnitarySysName, int const ZoneOAUnitNum);
+        static void checkUnitarySysCoilInOASysExists(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum);
 
-        static void getUnitarySysHeatCoolCoil(std::string const &UnitarySysName, // Name of Unitary System object
+        static void getUnitarySysHeatCoolCoil(EnergyPlusData &state, std::string const &UnitarySysName, // Name of Unitary System object
                                               bool &CoolingCoil,                 // Cooling coil exists
                                               bool &HeatingCoil,                 // Heating coil exists
                                               int const ZoneOAUnitNum            // index to zone OA unit
         );
 
-        static Real64 calcUnitarySystemWaterFlowResidual(Real64 const PartLoadRatio,    // water mass flow rate [kg/s]
+        static Real64 calcUnitarySystemWaterFlowResidual(EnergyPlusData &state, Real64 const PartLoadRatio,    // water mass flow rate [kg/s]
                                                          std::vector<Real64> const &Par // Function parameters
         );
+
+        void simulate(EnergyPlusData &state, std::string const &Name,
+            bool const firstHVACIteration,
+            int const &AirLoopNum,
+            int &CompIndex,
+            bool &HeatActive,
+            bool &CoolActive,
+            int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
+            Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+            bool const ZoneEquipment,    // TRUE if called as zone equipment
+            Real64 &sysOutputProvided,   // sensible output at supply air node
+            Real64 &latOutputProvided    // latent output at supply air node
+        ) override;
+
+        void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) override;
+        int getAirInNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
+        int getAirOutNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
     };
 
     extern std::vector<UnitarySys> unitarySys;

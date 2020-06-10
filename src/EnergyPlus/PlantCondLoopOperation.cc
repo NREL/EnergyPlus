@@ -55,7 +55,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -64,7 +63,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -77,6 +76,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
@@ -1320,13 +1320,10 @@ namespace PlantCondLoopOperation {
         using SetPointManager::SetUpNewScheduledTESSetPtMgr;
 
         // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        std::string EquipNum;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const Plant(1);     // Used to identify whether the current loop is Plant
         int const Condenser(2); // Used to identify whether the current loop is Condenser
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -1335,7 +1332,6 @@ namespace PlantCondLoopOperation {
         int CompInNode;
         int IOStat;
         Real64 CompFlowRate(0.0);
-        int Num;
         std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
         bool SchemeNameFound;        // Set to FALSE if a match of OpScheme object and OpScheme name is not found
         bool NodeEMSSetPointMissing;
@@ -1358,7 +1354,7 @@ namespace PlantCondLoopOperation {
         }
 
         if (NumSchemes > 0) {
-            for (Num = 1; Num <= NumSchemes; ++Num) {
+            for (int Num = 1; Num <= NumSchemes; ++Num) {
                 inputProcessor->getObjectItem(CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
                 if (UtilityRoutines::SameString(PlantLoop(LoopNum).OpScheme(SchemeNum).Name, cAlphaArgs(1))) break;
                 if (Num == NumSchemes) {
@@ -1428,7 +1424,8 @@ namespace PlantCondLoopOperation {
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate = rNumericArgs(CompNumN);
 
                         if (rNumericArgs(CompNumN) == AutoSize) {
-                            for (Num = 1; Num <= SaveNumPlantComps; ++Num) {
+                            int Num = 1;
+                            for (; Num <= SaveNumPlantComps; ++Num) {
                                 CompInNode = CompDesWaterFlow(Num).SupNode;
                                 CompFlowRate = CompDesWaterFlow(Num).DesVolFlowRate;
                                 if (CompInNode == PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).DemandNodeNum) {
@@ -1437,10 +1434,9 @@ namespace PlantCondLoopOperation {
                                     // call error...Demand node must be component inlet node for autosizing
                                 }
                             }
-                            ObjexxFCL::gio::write(EquipNum, fmtLD) << Num;
                             ReportSizingOutput(CurrentModuleObject,
                                                PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
-                                               "Design Water Flow Rate [m3/s] Equipment # " + stripped(EquipNum),
+                                               "Design Water Flow Rate [m3/s] Equipment # " + std::to_string(Num),
                                                CompFlowRate);
                         }
 
@@ -1757,6 +1753,7 @@ namespace PlantCondLoopOperation {
                                          "[W]",
                                          lDummy,
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).EMSActuatorDispatchedLoadValue);
+                        // TODO: I think this should be a sensor really
                         SetupEMSInternalVariable("Component Remaining Current Demand Rate",
                                                  PlantLoop(LoopNum).OpScheme(SchemeNum).Name + ':' +
                                                      PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name,
@@ -1768,20 +1765,26 @@ namespace PlantCondLoopOperation {
                 if (StackMngrNum > 0) { // found it
                     PlantLoop(LoopNum).OpScheme(SchemeNum).ErlSimProgramMngr = StackMngrNum;
                 } else {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                    ShowContinueError("Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
-                    ShowContinueError("EMS Program Manager Name not found.");
-                    ErrorsFound = true;
+                    PlantLoop(LoopNum).OpScheme(SchemeNum).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
+                    if (PlantLoop(LoopNum).OpScheme(SchemeNum).simPluginLocation == -1) {
+                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                        ShowContinueError("Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowContinueError("Not found as either an EMS Program Manager or a Python Plugin instance.");
+                        ErrorsFound = true;
+                    }
                 }
                 if (!lAlphaFieldBlanks(3)) {
                     StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         PlantLoop(LoopNum).OpScheme(SchemeNum).ErlInitProgramMngr = StackMngrNum;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                        ShowContinueError("Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("EMS Program Manager Name not found.");
-                        ErrorsFound = true;
+                        PlantLoop(LoopNum).OpScheme(SchemeNum).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
+                        if (PlantLoop(LoopNum).OpScheme(SchemeNum).initPluginLocation == -1) {
+                            ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                            ShowContinueError("Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
+                            ShowContinueError("Not found as either an EMS Program Manager or a Python Plugin instance.");
+                            ErrorsFound = true;
+                        }
                     }
                 }
 
@@ -2069,6 +2072,8 @@ namespace PlantCondLoopOperation {
                             if (this_op_scheme.ErlInitProgramMngr > 0) {
                                 bool anyEMSRan;
                                 ManageEMS(emsCallFromUserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr);
+                            } else if (this_op_scheme.initPluginLocation > -1) {
+                                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(this_op_scheme.initPluginLocation);
                             }
                             this_op_scheme.MyEnvrnFlag = false;
                         }
@@ -3075,6 +3080,8 @@ namespace PlantCondLoopOperation {
         if (PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr > 0) {
             bool anyEMSRan;
             ManageEMS(emsCallFromUserDefinedComponentModel, anyEMSRan, PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr);
+        } else if (PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation > -1) {
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation);
         }
 
         // move actuated value to MyLoad
@@ -3236,7 +3243,7 @@ namespace PlantCondLoopOperation {
                 for (MachineOnBranch = 1; MachineOnBranch <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents;
                      ++MachineOnBranch) {
                     // Sankar Non Integrated Economizer
-                    if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).GeneralEquipType != GenEquipTypes_Pump) {
+                    if (!PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).isPump()) {
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).ON = false;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
                     }
@@ -3277,7 +3284,7 @@ namespace PlantCondLoopOperation {
         for (Num = 1; Num <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++Num) {
             for (MachineOnBranch = 1; MachineOnBranch <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents; ++MachineOnBranch) {
                 // Sankar Non Integrated Economizer
-                if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).GeneralEquipType != GenEquipTypes_Pump) {
+                if (!PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).isPump()) {
                     PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).ON = false;
                     PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
                 }
@@ -3374,7 +3381,7 @@ namespace PlantCondLoopOperation {
                         SetupEMSActuator(ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
-                                         "[W]",
+                                         "[fraction]",
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideOn,
                                          PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideValue);
                     }

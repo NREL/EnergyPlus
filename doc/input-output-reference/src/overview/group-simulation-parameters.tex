@@ -122,7 +122,7 @@ The figure below shows how the building north axis can be rotated to correspond 
 
 \begin{figure}[hbtp] % fig 1
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image001.png}
+\includegraphics[width=0.4\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image001.png}
 \caption{Illustration of Building North Axis \protect \label{fig:illustration-of-building-north-axis}}
 \end{figure}
 
@@ -178,11 +178,11 @@ Setting this value determines how EnergyPlus treats beam solar radiation and ref
 
 \textbf{MinimalShadowing}
 
-In this case, there is no exterior shadowing except from window and door reveals. All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the transmitted diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
+In this case, there is no exterior shadowing except from window and door reveals. All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the reflected diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
 
 \textbf{FullExterior, FullExteriorWithReflections}
 
-In this case, shadow patterns on exterior surfaces caused by detached shading, wings, overhangs, and exterior surfaces of all zones are computed. As for MinimalShadowing, shadowing by window and door reveals is also calculated. Beam solar radiation entering the zone is treated as for MinimalShadowing -- All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the transmitted diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
+In this case, shadow patterns on exterior surfaces caused by detached shading, wings, overhangs, and exterior surfaces of all zones are computed. As for MinimalShadowing, shadowing by window and door reveals is also calculated. Beam solar radiation entering the zone is treated as for MinimalShadowing -- All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the reflected diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
 
 \textbf{FullInteriorAndExterior, FullInteriorAndExteriorWithReflections}
 
@@ -194,13 +194,18 @@ If you use \textbf{FullInteriorAndExterior} the program will also calculate how 
 
 \begin{figure}[hbtp] % fig 2
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image002.png}
+\includegraphics[width=0.9\textwidth, height=0.5\textheight, keepaspectratio=true]{media/image002.png}
 \caption{Illustration of Convex and Non-convex Zones \protect \label{fig:illustration-of-convex-and-non-convex-zones}}
 \end{figure}
 
+\textbf{Diffuse Radiation}
+
+Diffuse solar transmitted through exterior and interior windows is distributed according to the approximate view factors between the transmitting window and all other heat transfer surfaces in the zone.
+The portion of this diffuse solar that is reflected by all surfaces in the zone is subsequently redistributed uniformly (based on area and solar absorptance) to all heat transfer surfaces in the zone, along with interior reflected beam solar and shortwave radiation from lights. Refer to the section ``Solar Distribution'' in the Engineering Reference Guide for more information including equations.
+
 \textbf{Reflection calculations}
 
-Note: Using the reflection calculations can be very time-consuming. Even error-prone. As a possible alleviation, you can use the \hyperref[outputdiagnostics]{Output:Diagnostics},DoNotMirrorDetachedShading; in many cases to get past a fatal error.
+Note: Using the reflection calculations can be very time-consuming. Even error-prone. As a possible alleviation, you can use the \hyperref[outputdiagnostics]{Output:Diagnostics} ``DoNotMirrorDetachedShading'' in many cases to get past a fatal error.
 
 If using reflections, the program calculates beam and sky solar radiation that is reflected from exterior surfaces and then strikes the building. These reflecting surfaces fall into three categories:
 
@@ -216,19 +221,19 @@ The building surfaces are assumed to be diffusely reflecting if they are opaque 
 
 \begin{figure}[hbtp] % fig 3
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image003.png}
+\includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image003.png}
 \caption{  Solar reflection from shadowing surfaces. Solid arrows are beam solar radiation; dashed arrows are diffuse solar radiation. (a) Diffuse reflection of beam solar radiation from the top of an overhang. (b) Diffuse reflection of sky solar radiation from the top of an overhang. (c) Beam-to-beam (specular) reflection from the façade of an adjacent highly-glazed building represented by a vertical shadowing surface. \protect \label{fig:solar-reflection-from-shadowing-surfaces.}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 4
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image004.png}
+\includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image004.png}
 \caption{  Solar reflection from building surfaces onto other building surfaces. In this example beam solar reflects from a vertical section of the building onto a roof section. The reflection from the window is specular. The reflection from the wall is diffuse. \protect \label{fig:solar-reflection-from-building-surfaces-onto}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 5
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image005.png}
+\includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image005.png}
 \caption{Shadowing from building affects beam solar reflection from the ground. Beam-to-diffuse reflection from the ground onto the building occurs only for sunlit areas, A and C, not from shaded area, B. \protect \label{fig:shadowing-from-building-affects-beam-solar}}
 \end{figure}
 
@@ -249,7 +254,7 @@ As noted in the message, there will be more information in the .eio file. (Refer
 
 You may be able to increase the Maximum Number of Warmup Days and get convergence, but some anomalous buildings may still not converge. Simulation proceeds for x warmup days until ``convergence'' is reached (see the discussion under the Temperature Convergence Tolerance Value field in this object, just above).
 
-The value in this field is an overall parameter for all types of environments in the simulation.  The maximum nmber of warmup days can also be controlled separately for individual designgdays using the input field Maximum Number Warmup Days in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object. 
+The value in this field is an overall parameter for all types of environments in the simulation.  The maximum nmber of warmup days can also be controlled separately for individual designgdays using the input field Maximum Number Warmup Days in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object.
 
 \paragraph{Field: Minimum Number of Warmup Days}\label{field-minimum-number-of-warmup-days}
 
@@ -505,7 +510,7 @@ ZoneAirContaminantBalance,
 The following output variables are available when Carbon Dioxide Concentration = Yes.
 
 \begin{lstlisting}
-HVAC,Average,Zone Air CO2 Internal Gain Volume Flow Rate
+HVAC,Average,Zone Air CO2 Internal Gain Volume Flow Rate [m3/s]
 HVAC,Average,Zone Air CO2 Concentration [ppm]
 \end{lstlisting}
 
@@ -515,7 +520,7 @@ This output variable represents the carbon dioxide concentration level in parts 
 
 \paragraph{Zone Air CO2 Internal Gain Volume Flow Rate {[}m3/s{]}}\label{zone-air-co2-internal-gain-volume-flow-rate-m3s}
 
-This is the rate of carbon dioxide added to a zone from all types of sources or sinks, in m\(^{3}\)/s.
+This is the total (net) rate of carbon dioxide internal gains/losses for a zone in \si{\volumeFlowRate} from all types of sources or sinks. It includes impacts from three objects: ZoneContaminantSourceAndSink:CarbonDioxide, People, and GasEquipment. Positive values denote carbon dioxide generation (gain or source), while negative values denote carbon dioxide removal (loss or sink).
 
 \subsubsection{Outputs}\label{outputs-1-024}
 
@@ -543,21 +548,61 @@ The object also allows input to disable self-shading effect from exterior surfac
 
 \subsubsection{Inputs}\label{inputs-10-019}
 
-\paragraph{Field: Calculation Method}\label{field-calculation-method-000}
+\paragraph{Field: Shading Calculation Method}
 
-This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword AverageOverDaysInFrequency. A more detailed and slower method can be selected using the keyword TimestepFrequency. The TimestepFrequency method must be used for modeling dynamic fenestration and shading surfaces.
+Select between CPU-based polygon clipping method, the GPU-based pixel counting method, or importing from external shading data.
 
-\paragraph{Field: Calculation Frequency}\label{field-calculation-frequency}
+Choices are:
+\begin{enumerate}
+    \item PolygonClipping
+    \item PixelCounting
+    \item Scheduled
+    \item Imported
+\end{enumerate}
 
-This numeric field will cause the shadowing calculations to be done periodically using the number in the field as the number of days in each period. This field is only used if the default method AverageOverDaysInFrequency is used in the previous field. Using this field will allow you to synchronize the shadowing calculations with changes in shading devices. Using the default of 20 days in each period is the average number of days between significant changes in solar position angles. For these shadowing calculations, an ``average'' (over the time period) of solar angles, position, equation of time are also used.
+Default: PolygonClipping
+
+If \textbf{PixelCounting} is selected and GPU hardware (or GPU emulation) is not available, a warning will be displayed and EnergyPlus will revert to PolygonClipping. Unlike PolygonClipping, PixelCounting has no limitations related to zone concavity when used with any ``FullInterior'' solar distribution options (i.e., it can accommodate both concave and convex zones equally).
+
+Use of the PixelCounting method requires some overhead in passing instructions between the CPU and the GPU. For low numbers of shading surfaces (less than about 200 for most hardware), PolygonClipping requires less runtime than PixelCounting. However, PixelCounting runtime scales significantly better at higher numbers of shading surfaces.
+
+Some computers have multiple GPUs. In this case, the highest performance GPU is not always used by default. You may want to select which GPU is used when running EnergyPlus by setting the graphics performance preferences on your computer.
+
+If \textbf{Scheduled} is chosen, the External Shading Fraction Schedule Name is required in \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}}. If some exterior surfaces do not have their \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} objects, no shading is assigned on those exterior surfaces.
+
+If \textbf{Imported} is chosen, the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object is required to define the external file that stores all shading calculation results. The results are imported altogether by reading the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object during initialization. The file explicitly defines the mappings to the surfaces. If the data for a surface is not listed in the file, no shading is assigned on this surface.
+
+The sunlit fraction to overwrite accounts for the shading of both direct and sky diffuse solar radiation caused by all exterior shadowing surfaces. In this case, shadow patterns on exterior surfaces caused by detached shading, side-fins, overhangs, and exterior surfaces of all zones are overwritten. The interior shading devices, such as window shades and blinds, should be further calculated and applied after the importing.
+
+\paragraph{Field: Shading Calculation Update Frequency Method}\label{field-calculation-method-000}
+
+This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword Periodic. A more detailed and slower method can be selected using the keyword Timestep. The Timestep method must be used for modeling dynamic fenestration and shading surfaces.
+
+\paragraph{Field: Shading Calculation Update Frequency}\label{field-calculation-frequency}
+
+This numeric field will cause the shadowing calculations to be done periodically using the number in the field as the number of days in each period. This field is only used if the default Periodic calculation frequency method is used in the previous field. Using this field will allow you to synchronize the shadowing calculations with changes in shading devices. Using the default of 20 days in each period is the average number of days between significant changes in solar position angles. For these shadowing calculations, an ``average'' (over the time period) of solar angles, position, equation of time are also used.
 
 \paragraph{Field: Maximum Figures in Shadow Overlap Calculations}\label{field-maximum-figures-in-shadow-overlap-calculations}
 
-This numeric field will allow you to increase the number of figures in shadow overlaps. Due to the shadowing algorithm, the number of shadows in a figure may grow quite large even with fairly reasonable looking structures. Of course, the inclusion of more allowed figures will increase calculation time. Likewise, too few figures may not result in as accurate calculations as you desire.
+This numeric field will allow you to increase the number of figures in shadow overlaps in the PolygonClipping method. Due to the shadowing algorithm, the number of shadows in a figure may grow quite large even with fairly reasonable looking structures. Of course, the inclusion of more allowed figures will increase calculation time. Likewise, too few figures may not result in as accurate calculations as you desire.
 
 \paragraph{Field: Polygon Clipping Algorithm}\label{field-polygon-clipping-algorithm}
 
-This is an advanced feature. Prior to V7, the internal polygon clipping method was a special case of the Weiler-Atherton method. Now, two options are available: \textbf{SutherlandHodgman} (default) and \textbf{ConvexWeilerAtherton}. Theoretically, Sutherland-Hodgman is a simpler algorithm but it works well in cases where receiving surfaces (of shadows) are non-convex. The Weiler-Atherton implementation is only accurate where both casting and receiving surfaces are convex. Warnings/severe errors are displayed when necessary. More details on polygon clipping are contained in the Engineering Reference.
+This is an advanced feature. Prior to V7, the internal polygon clipping method was a special case of the Weiler-Atherton method. Now, three options are available:
+
+\begin{description}
+  \item[SutherlandHodgman] A simpler algorithm but it works well in cases where receiving surfaces (of shadows) are non-convex.
+  \item[ConvexWeilerAtherton] Only accurate where both casting and receiving surfaces are convex. Warnings/severe errors are displayed when necessary.
+  \item[SlaterBarskyandSutherlandHodgman] Slater-Barsky only applies to rectangular surfaces. Polygon clipping for rectangular surfaces will be calculated using the Slater-Barsky algorithm, while the rest adopts the default Sutherl-Hodgman algorithm.
+\end{description}
+
+Default is SutherlandHodgman. More details on polygon clipping are contained in the Engineering Reference.
+
+\paragraph{Field: Pixel Counting Resolution}
+
+Number of pixels in both dimensions of the surface rendering. Higher resolution will create more accurate calculations, but can significantly increase computation time.
+
+Default: 512.
 
 \paragraph{Field: Sky Diffuse Modeling Algorithm}\label{field-sky-diffuse-modeling-algorithm}
 
@@ -565,19 +610,7 @@ Two choices are available here: SimpleSkyDiffuseModeling and DetailedSkyDiffuseM
 
 In general (and you should also read the previous field description), if shadowing surfaces are used with the transmittance property, the user should be careful to synchronize this calculation with the scheduled occurrence of the transmittance (if any) (or use 1, which will be the most accurate but will cause more time in the calculations).
 
-This field applies to the method called ``AverageOverDaysInFrequency.'' When the method called ``DetailedTimestepIntegration'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
-
-\paragraph{Field: External Shading Calculation Method}\label{field-external-shading-calculation-method}
-
-The field has three options: \textbf{ScheduledShading}, \textbf{ImportedShading} and \textbf{InternalCalculation}. The field indicates whether the external shading is pre-calculated and imported as schedules, which overwrite the EnergyPlus calculated array of the surface sunlit fraction. If \textbf{ScheduledShading} or \textbf{ImportedShading} is chosen, all external shading calculation would be performed externally (EnergyPlus internal calculations of external shading will be turned off).
-
-If \textbf{ScheduledShading} is chosen, the shading calculation results are imported during the initialization of an EnergyPlus run with the schedule object defined by the \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} object of this surface. If some exterior surfaces do not have their \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} objects, no shading is assigned on those exterior surfaces.
-
-If \textbf{ImportedShading} is chosen, a \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object is required to define the external file that stores all shading calculation results. The results are imported altogether by reading the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object during initialization. The file explicitly defines the mappings to the surfaces. If the data for a surface is not listed in the file, no shading is assigned on this surface.
-
-The default choice is \textbf{InternalCalculation}, indicating EnergyPlus will do the external shading calculations and no external results will be used.
-
-The sunlit fraction to overwrite accounts for the shading of both direct and sky diffuse solar radiation caused by all exterior shadowing surfaces. In this case, shadow patterns on exterior surfaces caused by detached shading, side-fins, overhangs, and exterior surfaces of all zones are overwritten. The interior shading devices, such as window shades and blinds, should be further calculated and applied after the importing.
+This field applies to the shading calculation update frequency method called ``Periodic.'' When the method called ``Timestep'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
 
 \paragraph{Field: Output External Shading Calculation Results}\label{field-output-external-shading-calculation results}
 This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. This file saves external sunlit fractions for all surfaces. If \textbf{Yes} is chosen, hourly shading fraction of all surfaces will be exported as a CSV file, naming as "output file prefix + shading" (the default name is "eplusshading.csv" if no output file prefix is defined). Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. It only writes data for each simulation day that shadows are calculated, e.g. once every 20 days by default. If the results are intended to be reused to be imported  back using \textbf{ImportedShading} in \textbf{Field: External Shading Calculation Method}, the Calculation Frequency should be set as one to write year-round hourly results. Design days are not included. The default choice is \textbf{No}.
@@ -595,16 +628,16 @@ This field is extensible.
 Examples of this object in IDF: (note this object must be unique in an IDF)
 
 \begin{lstlisting}
-ShadowCalculation,AverageOverDaysInFrequency,1;
+ShadowCalculation, PixelCounting, Periodic, 1;
 
-ShadowCalculation, AverageOverDaysInFrequency, 1, , SutherlandHodgman, DetailedSkyDiffuseModeling;
+ShadowCalculation, PolygonClipping, Periodic, 1, , SutherlandHodgman, , DetailedSkyDiffuseModeling;
 
-ShadowCalculation, AverageOverDaysInFrequency, , , , , ScheduledShading, YES;
+ShadowCalculation, Scheduled, Periodic, , , , , Yes;
 
-ShadowCalculation, AverageOverDaysInFrequency, , , , , , , , Yes, No, ShadingZoneGroup;
+ShadowCalculation, PolygonClipping, Periodic, , , , , , , Yes, No, ShadingZoneGroup;
 \end{lstlisting}
 
-Note that the use of ``1'' in the examples is NOT the same as using DetailedTimestepIntegration -- ``1'' causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.
+Note that the use of ``1'' in the examples is NOT the same as using Timestep calculation frequency -- ``1'' causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.
 
 \subsection{Output:Diagnostics}\label{outputdiagnostics}
 
@@ -794,7 +827,132 @@ SimulationControl,
 
 \subsection{PerformancePrecisionTradeoffs}\label{performanceprecisiontradeoffs}
 
-The PerformancePrecisionTradeoffs object can be used to control tradeoffs between performance (speed) and precision for certain EnergyPlus features. This object enables users to choose to use selected options that are intended to shorten the time needed for the computer to run EnergyPlus simulations, but may tend to decrease the accuracy of results compared to methods that require longer computing time. 
+The PerformancePrecisionTradeoffs object can be used to control tradeoffs between performance (speed) and precision for certain EnergyPlus features. This object enables users to choose to use selected options that are intended to shorten the time needed for the computer to run EnergyPlus simulations, but may tend to decrease the accuracy of results compared to methods that require longer computing time. The field by field explanation of the object follows the next section, which describes the procedure by an example of how to use the \_perflog.csv file in conjunction with the options available in the PerformancePrecisionTradeoffs object.
+
+\paragraph{Tuning using the \_perflog.csv file}\label{tuning-using-perlog-csv-file}
+
+Every time a simulation includes the PerformancePrecisionTradeoffs object, a file is generated with the same name as the input but ending with \erflog.csv file (the performance log file). This file can be opened using a spreadsheet program and may be helpful in adjusting the input field values for the PerformancePrecisionTradeoffs object. Unlike most EnergyPlus output files, a new line of results is appended (added to the end of the file) every time the input file is simulated. The \_perflog.csv file contains a log of results from each run and allows the examination of the impacts of the changes to the PerformancePrecisionTradeoffs object and any other simulation inputs. You are encouraged to not make changes to any other portions of your input file other than the PerformancePrecisionTradeoffs object when you are tuning that object. Also, if you are looking at the \_perflog.csv in a spreadsheet program, make sure you close the file before each simulation. A spreadsheet program will often lock a CSV file and prevent it from being modified by another program like EnergyPlus.
+
+To illustrate how to use the PerformancePrecisionTradeoffs object and the \_perflog.csv file together, here is an example using an IDF file with 100 zones, one window per zone, and is served by fan coil units and a central boiler and chiller. Thirteen simulations were made, and the results in the <filename>\_perflog.csv for various options in the PerformancePrecisionTradeoffs object are shown below in the following tables.
+
+
+% table X
+{\scriptsize
+\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.6in}p{0.5in}p{0.5in}p{0.6in}p{0.6in}p{0.65in}}
+% \begin{longtable}[c]{cccccccrr}
+\caption{PerfLog Mode Columns\label{table:perflog_mode_columns}} \tabularnewline
+\toprule
+Run & 
+Direct Coil & 
+Radiant Algorithm & 
+Override Mode & 
+Timesteps& 
+Min Warmup& 
+Suppress Resets & 
+MaxZone TempDiff & 
+Runtime {[}seconds{]} \tabularnewline
+\midrule
+\endfirsthead
+
+1  & FALSE & ScriptF    & NORMAL & 6 & 1 & FALSE & 0.30 & 158.05 \tabularnewline
+2  & FALSE & ScriptF    & MODE01 & 1 & 1 & FALSE & 0.30 & 55.07  \tabularnewline
+3  & FALSE & ScriptF    & MODE02 & 1 & 1 & FALSE & 0.30 & 52.39  \tabularnewline
+4  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 0.30 & 52.42  \tabularnewline
+5  & FALSE & ScriptF    & MODE04 & 1 & 1 & TRUE  & 0.30 & 51.74  \tabularnewline
+6  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 1.00 & 32.74  \tabularnewline
+7  & TRUE  & ScriptF    & NORMAL & 6 & 1 & FALSE & 0.30 & 161.89 \tabularnewline
+8  & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 0.30 & 171.00    \tabularnewline
+9  & FALSE & CarrollMRT & MODE01 & 1 & 1 & FALSE & 0.30 & 54.19  \tabularnewline
+10 & FALSE & CarrollMRT & MODE02 & 1 & 1 & FALSE & 0.30 & 53.85  \tabularnewline
+11 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 0.30 & 51.21  \tabularnewline
+12 & FALSE & CarrollMRT & MODE04 & 1 & 1 & TRUE  & 0.30 & 51.14  \tabularnewline
+13 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 1.00 & 32.76  \tabularnewline
+\bottomrule
+\end{longtable}
+}
+
+This example uses 13 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffsobject, but fewer trials could have been made to reach a similar conclusion. The first run shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 6 are just stepping through the Override Modes. Run 7 employs the Use Coil Direct Solution option, but the time for the simulation went up, so it was not used anymore.  Runs 8 through 13 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. Mode02, Moded03, and Mode04 only save a few seconds compared to Mode01, which takes about one-third of the time of the baseline Run 1 time. Mode05 saves the most time with both ScriptF and CarrollMRT taking about one-fifth of the original time. Mode05 seems like the natural choice, but we need to look at other results in the \_perflog.csv file first before we come to that conclusion.
+
+These example simulations each took three minutes or less to try. If your building takes much longer than a few minutes, you might want to temporarily change your run period to just a  month or even a week to tune the PerformancePrecisionTradeoffs object inputs. If temporarily shortening the run period is necessary, it is best to pick a month or week that has some cooling and some heating. Just remember to set your run period back to a full year before coming to any conclusions about the building or energy efficiency options being considered for the building.
+
+
+% table X
+{\scriptsize
+\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.7in}p{0.65in}}
+\caption{PerfLog Energy Columns\label{table:perflog_mode_columns}} \tabularnewline
+\toprule
+Run & 
+Direct Coil & 
+Radiant Algorithm & 
+Override Mode & 
+  Electricity {[}MJ{]} &
+  Natural Gas {[}MJ{]} &
+  Water {[}m3{]} &
+  Runtime {[}seconds{]} \tabularnewline
+\midrule
+\endfirsthead
+
+1  & False & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 158.05 \tabularnewline
+2  & False & ScriptF  & MODE01 & 3,093,683 & 738,559 & 211,747 & 55.07  \tabularnewline
+3  & False & ScriptF  & MODE02 & 3,097,292 & 746,356 & 212,704 & 52.39  \tabularnewline
+4  & False & ScriptF  & MODE03 & 3,097,292 & 746,356 & 212,704 & 52.42  \tabularnewline
+5  & False & ScriptF  & MODE04 & 3,097,292 & 746,356 & 212,704 & 51.74  \tabularnewline
+6  & False & ScriptF  & MODE05 & 3,098,474 & 743,652 & 213,207 & 32.74  \tabularnewline
+7  & True  & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 161.89 \tabularnewline
+8  & False & CarrollMRT & NORMAL & 3,256,436 & 498,372 & 267,030 & 171.00 \tabularnewline
+9  & False & CarrollMRT & MODE01 & 3,245,912 & 486,067 & 265,166 & 54.19  \tabularnewline
+10 & False & CarrollMRT & MODE02 & 3,243,835 & 492,423 & 265,212 & 53.85  \tabularnewline
+11 & False & CarrollMRT & MODE03 & 3,243,835 & 492,423 & 265,212 & 51.21  \tabularnewline
+12 & False & CarrollMRT & MODE04 & 3,243,835 & 492,423 & 265,212 & 51.14  \tabularnewline
+13 & False & CarrollMRT & MODE05 & 3,244,804 & 490,038 & 265,528 & 32.76  \tabularnewline
+\bottomrule
+\end{longtable}
+}
+
+
+The CarrollMRT options seemed to have a much more significant impact on the natural gas usage, and the total water and the times were similar to the runtimes using ScriptF, so for this example, CarrollMRT doesn’t seem to be a right choice. In this case, times are not very different than the ScriptF instances, but the energy usage is further from the Normal baseline. The electricity usage differences for Runs 2 through 6 are small compared to Run 1, the normal case, and are less than 0.4\% different. Natural gas usage has a more significant impact of 1.3 to 2.4\%, and the water usage changes from 0.1 to 0.8\%. From an energy perspective, these impacts for the ScriptF runs 2 through 6 are probably tolerable. 
+
+
+% table X
+{\scriptsize
+\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.6in}p{0.65in}}
+\caption{PerfLog Oscillation Columns\label{table:perflog_mode_columns}} \tabularnewline
+\toprule
+Run & 
+Direct Coil & 
+Radiant Algorithm & 
+Override Mode & 
+  Oscillating {[}hours{]} &
+  Oscillating Occupancy {[}hours{]} &
+  Oscillating Deadband {[}hours{]} &
+  Warnings &
+  Runtime {[}seconds{]} \tabularnewline
+\midrule
+\endfirsthead
+1  & FALSE & ScriptF    & NORMAL & 3.48  & 3.28  & 0.2   & 44 & 158.05 \tabularnewline
+2  & FALSE & ScriptF    & MODE01 & 8.02  & 2.62  & 6.57  & 45 & 55.07  \tabularnewline
+3  & FALSE & ScriptF    & MODE02 & 9.85  & 4.45  & 8.4   & 46 & 52.39  \tabularnewline
+4  & FALSE & ScriptF    & MODE03 & 9.85  & 4.45  & 8.4   & 47 & 52.42  \tabularnewline
+5  & FALSE & ScriptF    & MODE04 & 9.85  & 4.45  & 8.4   & 48 & 51.74  \tabularnewline
+6  & FALSE & ScriptF    & MODE05 & 86.57 & 59.33 & 71.57 & 50 & 32.74  \tabularnewline
+7  & TRUE  & ScriptF    & NORMAL & 3.48  & 3.28  & 0.2   & 45 & 161.89 \tabularnewline
+8  & FALSE & CarrollMRT & NORMAL & 2.92  & 2.72  & 0.2   & 45 & 171.00    \tabularnewline
+9  & FALSE & CarrollMRT & MODE01 & 7.88  & 0.95  & 6.48  & 46 & 54.19  \tabularnewline
+10 & FALSE & CarrollMRT & MODE02 & 10.47 & 3.53  & 7.73  & 47 & 53.85  \tabularnewline
+11 & FALSE & CarrollMRT & MODE03 & 10.47 & 3.53  & 7.73  & 48 & 51.21  \tabularnewline
+12 & FALSE & CarrollMRT & MODE04 & 10.47 & 3.53  & 7.73  & 49 & 51.14  \tabularnewline
+13 & FALSE & CarrollMRT & MODE05 & 88.15 & 62.33 & 74.9  & 50 & 32.76  \tabularnewline
+\bottomrule
+\end{longtable}
+}
+
+
+The number of hours any zone is oscillating for Run 1 the Normal baseline case using Script F is only 3.48 hours, with almost none of the hours in the dead band and nearly all during occupancy. This changes when considering the other ScriptF cases using Mode01 to Mode05 (Run 2 to Run 5).  For these cases, the oscillating hours increase but are still less than 10 per year, while more than doubling, on an absolute basis, a small change. The change is even more minor when considering the hours with the dead band, which for Run 2 to 6 only increases about an hour. Similar numbers are shown for the CarrollMRT cases for Mode01 to Mode04. The most significant change is Mode05, which for both ScriptF and CarrollMRT raise the oscillating hours to nearly 90. This is a substantial change that does indicate a significant shift in the way the simulation is behaving. It would be easy to eliminate using Mode05 if it wasn’t for the fact that it is also substantially faster than the other modes. No severe errors were reported for any of these simulations, so no column is shown for them, and the column for warnings shows a small increase. After investigating the changes, the change in the count warning messages was not considered important.
+
+The decision on which mode to use is up to the individual modelers, but for these simulations, Run 3 is recommended. Run 3 does not use direct coil solution, uses ScriptF, and Mode02. This simulation saves some time (a few seconds) compared to Mode01 but doesn’t add any additional overrides, which should be avoided if not adding value. Mode03 and Mode04 for this model were just about the same time as Mode02.  Mode05 was avoided because of the substantially larger oscillating hours.
+
+Additional guidance on how to make EnergyPlus faster appears in the "Tips And Tricks for Using EnergyPlus" document that is distributed with EnergyPlus within the section titled "Platforms and Run-Time."
+
 
 \paragraph{Field: Use Coil Direct Solutions}\label{use-coil-direct-solutions}
 
@@ -888,11 +1046,50 @@ CoilSystem:Heating:DX & Coil:Heating:DX:SingleSpeed, Coil:Heating:DX:VariableSpe
 
 Note: The choice of Load in the Control Type of the AirLoopHVAC:UnitarySystem object is required for all coils listed in the above table.
 
+\paragraph{Field: Zone Radiant Exchange Algorithm}\label{zone-radiant-exchange-algorithm}
+
+Allowed choices are: ScriptF (default) and CarrollMRT. ScriptF uses view factors among all surfaces in a zone and calculates radiant heat transfer from each surface in the zone to each other surface in the zone based on their respective temperatures and emissivities. The CarrollMRT algorithm calculates radiant heat transfer between surfaces which exchange heat through a central, mean radiant temperature (MRT) node.
+
+Although, defined view factors cannot be used with CarrollMRT, the algorithm approximates ``view factors'' based on relative areas of the surfaces in a similar way to how EnergyPlus determines its default view factors. One exception is that with CarrollMRT, every surface can ``view'' every other surface in the zone regardless of orientation. For enclosed prism shapes, this approximation is very accurate.
+
+\paragraph{Field: Override Mode}\label{override-mode}
+
+The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the following tables. The Advanced option, allows the remaining fields of the PerformancePrecisionTradeoffs to be used. 
+
+% table 2
+\begin{longtable}[c]{p{1.5in}p{5.0in}}
+\caption{Override Modes\label{table:override_modes}} \tabularnewline
+\toprule
+Mode & Description \tabularnewline
+\midrule
+\endfirsthead
+
+Normal & no overrides\tabularnewline
+Mode01 & Zone Time step (TimeStep object) will be set to one timestep per hour\tabularnewline
+Mode02 & Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler\tabularnewline
+Mode03 & Mode02 plus Minimum Number of Warmup Days will be set to 1\tabularnewline
+Mode04 & Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets\tabularnewline
+Mode05 & Mode04 MaxZoneTempDiff will be set to 1.00\tabularnewline
+Advanced& Allow direct input of convergence field values\tabularnewline
+
+\bottomrule
+\end{longtable}
+
+The increasing mode number roughly corresponds with increased speed. Mode01 to Mode04 are overriding inputs in other parts of the IDF/epJSON file and is equivalent to changing those input directly. Mode05 is changing a convergence parameter previously not available to modified by the user.
+
+\paragraph{Field: MaxZoneTempDiff}\label{max-zone-temp-diff}
+
+This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxZoneTempDiff variable within EnergyPlus. This variable sets the maximum zone temperature change before the HVAC timestep is shortened. Larger values result in fewer iterations. To understand this input completely, please review the use of the MaxZoneTempDiff variable in the ManageHVAC() routine located in the HVACManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.3, which is also the default value. Testing has been done with a value of 1.0, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 1.0 have not been tested.
+
+
 An IDF example:
 
 \begin{lstlisting}
 PerformancePrecisionTradeoffs,
-  Yes;                      !- Use Coil Direct Solutions
+  Yes,                      !- Use Coil Direct Solutions
+  CarrollMRT;               !- Zone Radiant Exchange Algorithm
+  Mode05,                   !- Override Mode
+  0.3;                      !- MaxZoneTempDiff
 \end{lstlisting}
 
 \subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}

@@ -738,6 +738,8 @@ namespace DataSurfaces {
         bool HasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
         int LinkedOutAirNode;              // Index of the an OutdoorAir:Node
 
+        int PenumbraID;    // Surface ID in penumbra
+
         std::string UNomWOFilm; // Nominal U Value without films stored as string
         std::string UNomFilm;   // Nominal U Value with films stored as string
         bool ExtEcoRoof;        // True if the top outside construction material is of type Eco Roof
@@ -768,7 +770,7 @@ namespace DataSurfaces {
         int IntConvWindowLocation;       // relative location of window in zone for interior Hc models
         bool IntConvSurfGetsRadiantHeat;
         bool IntConvSurfHasActiveInIt;
-        bool PartOfVentSlabOrRadiantSurface; // surface cannot be part of both a radiant surface & ventilated slab group
+        bool IsRadSurfOrVentSlabOrPool; // surface cannot be part of both a radiant surface & ventilated slab group
         // LG added 1/6/12
         Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
         // Air boundaries
@@ -801,14 +803,14 @@ namespace DataSurfaces {
               WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0),
 
               SchedExternalShadingFrac(false), ExternalShadingSchInd(0), HasSurroundingSurfProperties(false), SurroundingSurfacesNum(0),
-              HasLinkedOutAirNode(false), LinkedOutAirNode(0),
+              HasLinkedOutAirNode(false), LinkedOutAirNode(0), PenumbraID(-1),
 
               UNomWOFilm("-              "), UNomFilm("-              "), ExtEcoRoof(false), ExtCavityPresent(false), ExtCavNum(0), IsPV(false),
               IsICS(false), IsPool(false), ICSPtr(0), MirroredSurf(false), IntConvClassification(0), IntConvHcModelEq(0), IntConvHcUserCurveIndex(0),
               OutConvClassification(0), OutConvHfModelEq(0), OutConvHfUserCurveIndex(0), OutConvHnModelEq(0), OutConvHnUserCurveIndex(0),
               OutConvFaceArea(0.0), OutConvFacePerimeter(0.0), OutConvFaceHeight(0.0), IntConvZoneWallHeight(0.0), IntConvZonePerimLength(0.0),
               IntConvZoneHorizHydrDiam(0.0), IntConvWindowWallRatio(0.0), IntConvWindowLocation(InConvWinLoc_NotSet),
-              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), PartOfVentSlabOrRadiantSurface(false), GenericContam(0.0), SolarEnclIndex(0), SolarEnclSurfIndex(0)
+              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), IsRadSurfOrVentSlabOrPool(false), GenericContam(0.0), SolarEnclIndex(0), SolarEnclSurfIndex(0)
         {
         }
 

@@ -52,6 +52,7 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
+
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -67,8 +68,10 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -78,7 +81,6 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace DataGlobals;
@@ -290,34 +292,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     Zone(1).IsControlled = true;
     CorrectZoneHumRat(1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
-
-    // Deallocate everything
-    ZoneEquipConfig(1).InletNode.deallocate();
-    ZoneEquipConfig(1).ExhaustNode.deallocate();
-    ZoneEquipConfig.deallocate();
-    Node.deallocate();
-    Zone.deallocate();
-    HybridModelZone.deallocate();
-    ZoneLatentGain.deallocate();
-    ZoneEqSizing.deallocate();
-    SumLatentHTRadSys.deallocate();
-    SumLatentPool.deallocate();
-    ZT.deallocate(); // Zone temperature C
-    ZoneAirHumRat.deallocate();
-    Surface.deallocate();
-    OAMFL.deallocate();
-    VAMFL.deallocate();
-    EAMFL.deallocate();
-    EAMFLxHumRat.deallocate();
-    CTMFL.deallocate();
-    SumHmARaW.deallocate();
-    SumHmARa.deallocate();
-    MixingMassFlowXHumRat.deallocate();
-    MixingMassFlowZone.deallocate();
-    MDotOA.deallocate();
-    ZoneAirHumRatTemp.deallocate();
-    ZoneW1.deallocate();
-    AirModel.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
@@ -508,9 +482,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(state.outputFiles);  // read schedules
 
-    GetZoneAirSetPoints();
+    GetZoneAirSetPoints(state.outputFiles);
 
     DeadBandOrSetback.allocate(NumTempControlledZones);
     CurDeadBandOrSetback.allocate(NumTempControlledZones);
@@ -653,28 +627,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     EXPECT_EQ(25.0, TempZoneThermostatSetPoint(DualZoneNum));
     EXPECT_FALSE(CurDeadBandOrSetback(DualZoneNum));                          // Tstat should show there is load on a dual SP
     EXPECT_EQ(-2500.0, ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired); // should show a cooling load
-
-    NumTempControlledZones = 0;
-    Zone.deallocate();
-    DeadBandOrSetback.deallocate();
-    CurDeadBandOrSetback.deallocate();
-    TempControlType.deallocate();
-    TempControlledZone.deallocate();
-    ZoneSysEnergyDemand.deallocate();
-    TempZoneThermostatSetPoint.deallocate();
-    ZoneSetPointLast.deallocate();
-    Setback.deallocate();
-    AdapComfortCoolingSetPoint.deallocate();
-    ZoneThermostatSetPointLo.deallocate();
-    ZoneThermostatSetPointHi.deallocate();
-    SNLoadPredictedRate.deallocate();
-    LoadCorrectionFactor.deallocate();
-    SNLoadPredictedHSPRate.deallocate();
-    SNLoadPredictedCSPRate.deallocate();
-    TempDepZnLd.deallocate();
-    TempIndZnLd.deallocate();
-    OccRoomTSetPointHeat.deallocate();
-    OccRoomTSetPointCool.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
@@ -970,10 +922,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     ZoneAirSetPoint = 26.0;
     AdjustOperativeSetPointsforAdapComfort(DualZoneNum, ZoneAirSetPoint);
     ASSERT_EQ(26.0, ZoneAirSetPoint); // Tstat should show set point is not overwritten
-
-    Environment.deallocate();
-    DesDayInput.deallocate();
-    TempControlledZone.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectionTest)
@@ -1111,30 +1059,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     EXPECT_EQ(10.0, SumHA);
     EXPECT_EQ(300.0, SumHATsurf);
     EXPECT_EQ(50.0, SumHATref);
-
-    DataHeatBalance::ZoneIntGain.deallocate();
-    DataHeatBalFanSys::SumConvHTRadSys.deallocate();
-    DataHeatBalFanSys::SumConvPool.deallocate();
-    DataHeatBalFanSys::MCPI.deallocate();
-    DataHeatBalFanSys::MCPV.deallocate();
-    DataHeatBalFanSys::MCPM.deallocate();
-    DataHeatBalFanSys::MCPE.deallocate();
-    DataHeatBalFanSys::MCPC.deallocate();
-    DataHeatBalFanSys::MCPTI.deallocate();
-    DataHeatBalFanSys::MCPTV.deallocate();
-    DataHeatBalFanSys::MCPTM.deallocate();
-    DataHeatBalFanSys::MCPTE.deallocate();
-    DataHeatBalFanSys::MCPTC.deallocate();
-    DataHeatBalFanSys::MDotCPOA.deallocate();
-    ZoneEquipConfig.deallocate();
-    Zone.deallocate();
-    Surface.deallocate();
-    MAT.deallocate();
-    ZoneAirHumRat.deallocate();
-    HConvIn.deallocate();
-    TempEffBulkAir.deallocate();
-    Node.deallocate();
-    DataHeatBalSurface::TempSurfInTmp.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)
@@ -1183,8 +1107,6 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
-        " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",
         " ",
@@ -1334,14 +1256,14 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     NumOnOffCtrZone = 1;
 
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
 
     MAT(1) = 23.0;
     ZoneT1(1) = MAT(1);
     TempControlledZone(1).HeatModeLast = true;
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     TempControlledZone(1).HeatModeLast = false;
 
@@ -1357,14 +1279,14 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
 
     TempControlledZone(1).CoolModeLast = true;
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
     TempControlledZone(1).CoolModeLast = false;
 
     MAT(1) = 27.0;
     ZoneT1(1) = MAT(1);
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
 
     // SingleHeatCoolSetPoint
@@ -1378,7 +1300,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     ZoneT1(1) = MAT(1);
 
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
 
@@ -1397,7 +1319,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     TempControlledZone(1).CoolModeLast = true;
     TempControlledZone(1).HeatModeLast = true;
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
     TempControlledZone(1).HeatModeLast = false;
@@ -1406,7 +1328,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     MAT(1) = 21.0;
     ZoneT1(1) = MAT(1);
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
 
@@ -1415,39 +1337,9 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     MAT(1) = 27.0;
     ZoneT1(1) = MAT(1);
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
-
-    TempControlledZone(1).DeltaTCutSet = 0.0;
-    TempControlledZone(1).HeatModeLast = false;
-    TempControlledZone(1).CoolModeLast = false;
-
-    SNLoadPredictedRate.deallocate();
-    SNLoadPredictedHSPRate.deallocate();
-    SNLoadPredictedCSPRate.deallocate();
-    CurDeadBandOrSetback.deallocate();
-    LoadCorrectionFactor.deallocate();
-    DeadBandOrSetback.deallocate();
-    DataZoneEnergyDemands::Setback.deallocate();
-    ZoneSetPointLast.deallocate();
-    DataHeatBalance::Zone.deallocate();
-    DeadBandOrSetback.deallocate();
-    AIRRAT.deallocate();
-    TempDepZnLd.deallocate();
-    TempIndZnLd.deallocate();
-    ZoneT1.deallocate();
-    MAT.deallocate();
-    Schedule.deallocate();
-    TempZoneThermostatSetPoint.deallocate();
-    TempControlledZone.deallocate();
-    TempControlType.deallocate();
-    SetPointSingleHeating.deallocate();
-    ZoneThermostatSetPointLo.deallocate();
-    ZoneThermostatSetPointHi.deallocate();
-    SetPointSingleCooling.deallocate();
-    SetPointSingleHeatCool.deallocate();
-    SetPointDualHeatCool.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
@@ -1499,12 +1391,12 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     NumOnOffCtrZone = 1;
 
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
 
     TempControlledZone(1).HeatModeLastSave = true;
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(true, false, 0.01);
+    PredictSystemLoads(state, true, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
 
     // SingleCoolingSetPoint
@@ -1519,13 +1411,13 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
 
     TempControlledZone(1).CoolModeLast = true;
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
     TempControlledZone(1).CoolModeLast = false;
 
     TempControlledZone(1).CoolModeLastSave = true;
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(true, false, 0.01);
+    PredictSystemLoads(state, true, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
 
     // SingleHeatCoolSetPoint
@@ -1539,7 +1431,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     XMPT(1) = MAT(1);
 
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
 
@@ -1558,7 +1450,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     TempControlledZone(1).CoolModeLast = true;
     TempControlledZone(1).HeatModeLast = true;
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(false, false, 0.01);
+    PredictSystemLoads(state, false, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
     TempControlledZone(1).HeatModeLast = false;
@@ -1566,7 +1458,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     // DualSetPointWithDeadBand : Adjust heating setpoint
     TempControlledZone(1).HeatModeLastSave = true;
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(true, false, 0.01);
+    PredictSystemLoads(state, true, false, 0.01);
     EXPECT_EQ(24.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
 
@@ -1574,39 +1466,233 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     TempControlledZone(1).CoolModeLastSave = true;
     XMPT(1) = 27.0;
     CalcZoneAirTempSetPoints();
-    PredictSystemLoads(true, false, 0.01);
+    PredictSystemLoads(state, true, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
+}
 
-    TempControlledZone(1).DeltaTCutSet = 0.0;
-    TempControlledZone(1).HeatModeLast = false;
-    TempControlledZone(1).CoolModeLast = false;
-    TempControlledZone(1).HeatModeLastSave = false;
-    TempControlledZone(1).CoolModeLastSave = false;
+TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
+{
+    Real64 TotOutReq;
+    Real64 OutReqToHumSP;
+    Real64 OutReqToDehumSP;
+    Real64 SingleZoneTotRate;
+    Real64 SingleZoneHumRate;
+    Real64 SingleZoneDehRate;
+    Real64 ZoneMultiplier;
+    Real64 ZoneMultiplierList;
+    Real64 ExpectedResult;
+    Real64 AcceptableTolerance = 0.00001;
 
-    SNLoadPredictedRate.deallocate();
-    SNLoadPredictedHSPRate.deallocate();
-    SNLoadPredictedCSPRate.deallocate();
-    CurDeadBandOrSetback.deallocate();
-    LoadCorrectionFactor.deallocate();
-    DeadBandOrSetback.deallocate();
-    DataZoneEnergyDemands::Setback.deallocate();
-    ZoneSetPointLast.deallocate();
-    DataHeatBalance::Zone.deallocate();
-    DeadBandOrSetback.deallocate();
-    AIRRAT.deallocate();
-    TempDepZnLd.deallocate();
-    TempIndZnLd.deallocate();
-    XMPT.deallocate();
-    MAT.deallocate();
-    Schedule.deallocate();
-    TempZoneThermostatSetPoint.deallocate();
-    TempControlledZone.deallocate();
-    TempControlType.deallocate();
-    SetPointSingleHeating.deallocate();
-    ZoneThermostatSetPointLo.deallocate();
-    ZoneThermostatSetPointHi.deallocate();
-    SetPointSingleCooling.deallocate();
-    SetPointSingleHeatCool.deallocate();
-    SetPointDualHeatCool.deallocate();
+    // Test 1: Zone Multipliers are all unity (1.0).  So, single zone loads should be the same as total loads
+    TotOutReq = 1000.0;
+    OutReqToHumSP = 2000.0;
+    OutReqToDehumSP = 3000.0;
+    ZoneMultiplier = 1.0;
+    ZoneMultiplierList = 1.0;
+    ReportMoistLoadsZoneMultiplier(TotOutReq,OutReqToHumSP,OutReqToDehumSP,
+                                   SingleZoneTotRate,SingleZoneHumRate,SingleZoneDehRate,
+                                   ZoneMultiplier,ZoneMultiplierList);
+    EXPECT_NEAR(TotOutReq,SingleZoneTotRate,AcceptableTolerance);
+    EXPECT_NEAR(OutReqToHumSP,SingleZoneHumRate,AcceptableTolerance);
+    EXPECT_NEAR(OutReqToDehumSP,SingleZoneDehRate,AcceptableTolerance);
+
+    // Test 2a: Zone Multiplier (non-list) is greater than 1, list Zone Multiplier is still one
+    TotOutReq = 1000.0;
+    OutReqToHumSP = 2000.0;
+    OutReqToDehumSP = 3000.0;
+    ZoneMultiplier = 7.0;
+    ZoneMultiplierList = 1.0;
+    ReportMoistLoadsZoneMultiplier(TotOutReq,OutReqToHumSP,OutReqToDehumSP,
+                                   SingleZoneTotRate,SingleZoneHumRate,SingleZoneDehRate,
+                                   ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHumRate,AcceptableTolerance);
+    ExpectedResult = 3000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneDehRate,AcceptableTolerance);
+    ExpectedResult = 7000.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 14000.0;
+    EXPECT_NEAR(OutReqToHumSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 21000.0;
+    EXPECT_NEAR(OutReqToDehumSP,ExpectedResult,AcceptableTolerance);
+
+    // Test 2b: list Zone Multiplier is greater than 1, non-list Zone Multiplier is one
+    TotOutReq = 1000.0;
+    OutReqToHumSP = 2000.0;
+    OutReqToDehumSP = 3000.0;
+    ZoneMultiplier = 1.0;
+    ZoneMultiplierList = 7.0;
+    ReportMoistLoadsZoneMultiplier(TotOutReq,OutReqToHumSP,OutReqToDehumSP,
+                                   SingleZoneTotRate,SingleZoneHumRate,SingleZoneDehRate,
+                                   ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHumRate,AcceptableTolerance);
+    ExpectedResult = 3000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneDehRate,AcceptableTolerance);
+    ExpectedResult = 7000.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 14000.0;
+    EXPECT_NEAR(OutReqToHumSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 21000.0;
+    EXPECT_NEAR(OutReqToDehumSP,ExpectedResult,AcceptableTolerance);
+
+    // Test 3: both zone multipliers are greater than 1.0
+    TotOutReq = 300.0;
+    OutReqToHumSP = 150.0;
+    OutReqToDehumSP = 100.0;
+    ZoneMultiplier = 2.0;
+    ZoneMultiplierList = 3.0;
+    ReportMoistLoadsZoneMultiplier(TotOutReq,OutReqToHumSP,OutReqToDehumSP,
+                                   SingleZoneTotRate,SingleZoneHumRate,SingleZoneDehRate,
+                                   ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 300.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 150.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHumRate,AcceptableTolerance);
+    ExpectedResult = 100.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneDehRate,AcceptableTolerance);
+    ExpectedResult = 1800.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 900.0;
+    EXPECT_NEAR(OutReqToHumSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 600.0;
+    EXPECT_NEAR(OutReqToDehumSP,ExpectedResult,AcceptableTolerance);
+}
+
+TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
+{
+    Real64 TotOutReq;
+    Real64 OutReqToHeatSP;
+    Real64 OutReqToCoolSP;
+    Real64 SingleZoneTotRate;
+    Real64 SingleZoneHeatRate;
+    Real64 SingleZoneCoolRate;
+    Real64 HeatToSP;
+    Real64 CoolToSP;
+    Real64 CorrectionFactor;
+    Real64 ZoneMultiplier;
+    Real64 ZoneMultiplierList;
+    Real64 ExpectedResult;
+    Real64 AcceptableTolerance = 0.00001;
+
+    // Test 1: Zone Multipliers and Load Correction Factor are all unity (1.0).  So, single zone loads should be the same as total loads
+    TotOutReq = 1000.0;
+    OutReqToHeatSP = 0.0;
+    OutReqToCoolSP = 0.0;
+    HeatToSP = 2000.0;
+    CoolToSP = 3000.0;
+    CorrectionFactor = 1.0;
+    ZoneMultiplier = 1.0;
+    ZoneMultiplierList = 1.0;
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,OutReqToHeatSP,OutReqToCoolSP,
+                                   SingleZoneTotRate,SingleZoneHeatRate,SingleZoneCoolRate,
+                                   HeatToSP,CoolToSP,CorrectionFactor,ZoneMultiplier,ZoneMultiplierList);
+    EXPECT_NEAR(TotOutReq,SingleZoneTotRate,AcceptableTolerance);
+    EXPECT_NEAR(OutReqToHeatSP,SingleZoneHeatRate,AcceptableTolerance);
+    EXPECT_NEAR(OutReqToCoolSP,SingleZoneCoolRate,AcceptableTolerance);
+
+    // Test 2a: Zone Multiplier (non-list) is greater than 1, list Zone Multiplier and Load Correction are still one
+    TotOutReq = 1000.0;
+    OutReqToHeatSP = 0.0;
+    OutReqToCoolSP = 0.0;
+    HeatToSP = 2000.0;
+    CoolToSP = 3000.0;
+    CorrectionFactor = 1.0;
+    ZoneMultiplier = 4.0;
+    ZoneMultiplierList = 1.0;
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,OutReqToHeatSP,OutReqToCoolSP,
+                                   SingleZoneTotRate,SingleZoneHeatRate,SingleZoneCoolRate,
+                                   HeatToSP,CoolToSP,CorrectionFactor,ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHeatRate,AcceptableTolerance);
+    ExpectedResult = 3000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneCoolRate,AcceptableTolerance);
+    ExpectedResult = 4000.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 8000.0;
+    EXPECT_NEAR(OutReqToHeatSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 12000.0;
+    EXPECT_NEAR(OutReqToCoolSP,ExpectedResult,AcceptableTolerance);
+
+    // Test 2b: list Zone Multiplier is greater than 1, non-list Zone Multiplier and Load Correction are still one
+    TotOutReq = 1000.0;
+    OutReqToHeatSP = 0.0;
+    OutReqToCoolSP = 0.0;
+    HeatToSP = 2000.0;
+    CoolToSP = 3000.0;
+    CorrectionFactor = 1.0;
+    ZoneMultiplier = 1.0;
+    ZoneMultiplierList = 5.0;
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,OutReqToHeatSP,OutReqToCoolSP,
+                                   SingleZoneTotRate,SingleZoneHeatRate,SingleZoneCoolRate,
+                                   HeatToSP,CoolToSP,CorrectionFactor,ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHeatRate,AcceptableTolerance);
+    ExpectedResult = 3000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneCoolRate,AcceptableTolerance);
+    ExpectedResult = 5000.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 10000.0;
+    EXPECT_NEAR(OutReqToHeatSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 15000.0;
+    EXPECT_NEAR(OutReqToCoolSP,ExpectedResult,AcceptableTolerance);
+
+    // Test 2c: list Zone Multiplier and Zone Multiplier are unity, Load Correction is not equal to 1.0
+    TotOutReq = 1000.0;
+    OutReqToHeatSP = 0.0;
+    OutReqToCoolSP = 0.0;
+    HeatToSP = 2000.0;
+    CoolToSP = 3000.0;
+    CorrectionFactor = 1.1;
+    ZoneMultiplier = 1.0;
+    ZoneMultiplierList = 1.0;
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,OutReqToHeatSP,OutReqToCoolSP,
+                                   SingleZoneTotRate,SingleZoneHeatRate,SingleZoneCoolRate,
+                                   HeatToSP,CoolToSP,CorrectionFactor,ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1100.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2200.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHeatRate,AcceptableTolerance);
+    ExpectedResult = 3300.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneCoolRate,AcceptableTolerance);
+    ExpectedResult = 1100.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 2200.0;
+    EXPECT_NEAR(OutReqToHeatSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 3300.0;
+    EXPECT_NEAR(OutReqToCoolSP,ExpectedResult,AcceptableTolerance);
+
+    // Test 3: none of the multipliers are unity
+    TotOutReq = 1000.0;
+    OutReqToHeatSP = 0.0;
+    OutReqToCoolSP = 0.0;
+    HeatToSP = 2000.0;
+    CoolToSP = 3000.0;
+    CorrectionFactor = 1.2;
+    ZoneMultiplier = 2.0;
+    ZoneMultiplierList = 1.5;
+    ReportSensibleLoadsZoneMultiplier(TotOutReq,OutReqToHeatSP,OutReqToCoolSP,
+                                   SingleZoneTotRate,SingleZoneHeatRate,SingleZoneCoolRate,
+                                   HeatToSP,CoolToSP,CorrectionFactor,ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1200.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2400.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHeatRate,AcceptableTolerance);
+    ExpectedResult = 3600.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneCoolRate,AcceptableTolerance);
+    ExpectedResult = 3600.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 7200.0;
+    EXPECT_NEAR(OutReqToHeatSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 10800.0;
+    EXPECT_NEAR(OutReqToCoolSP,ExpectedResult,AcceptableTolerance);
 }

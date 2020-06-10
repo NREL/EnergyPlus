@@ -42,7 +42,7 @@ Name of the actuated node that controls the water mass flow rate through the coi
 
 \paragraph{Field: Controller Convergence Tolerance}\label{field-controller-convergence-tolerance}
 
-The coil is controlled by knowing the outlet temperature and/or humidity ratio specified by the setpoint managers, and setting the outlet conditions from the coil to meet these setpoints. The hot and chilled water coils use complex models that cannot be inverted directly. Therefore, to determine the correct mass flow rate for the hot or cold water the models are inverted numerically using an iterative procedure. The iterative solution uses an interval-halving routine and needs a termination criteria that is set with the Controller Convergence Tolerance parameter. The convergence tolerance is the maximum difference between the actual temperature at the setpoint node and the setpoint temperature. This control offset is set to a small temperature difference, such as 0.01 to denote 1/100 degree C. The default is 0.1 degree C.
+The coil is controlled by knowing the outlet temperature and/or humidity ratio specified by the setpoint managers, and setting the outlet conditions from the coil to meet these setpoints. The hot and chilled water coils use complex models that cannot be inverted directly. Therefore, to determine the correct mass flow rate for the hot or cold water the models are inverted numerically using an iterative procedure. The iterative solution uses an interval-halving routine and needs a termination criterion that is set with the Controller Convergence Tolerance parameter. The convergence tolerance is the maximum difference between the actual temperature at the setpoint node and the setpoint temperature. This control offset is set to a small temperature difference, such as 0.01 to denote 1/100 degree C. The default is 0.1 degree C.
 
 \paragraph{Field: Maximum Actuated Flow}\label{field-maximum-actuated-flow}
 
@@ -248,7 +248,7 @@ If this schedule is 1.0 (and there is no Maximum Fraction of Outdoor Air Schedul
 
 \paragraph{Field: Maximum Fraction of Outdoor Air Schedule Name}\label{field-maximum-fraction-of-outdoor-air-schedule-name}
 
-The name of a schedule with decimal values which are limited between 0.0 and 1.0. The current schedule value is multiplied by the current system mixed air flow rate to set the maximum outdoor air flow rate. This schedule is applied after all other limits (except EMS and demand-limiting overrides).  This schedule can override all minimums and economizer opearation.  For example, if this schedule is zero, then the outdoor air flow rate will be zero, regardless of any other settings in Controller:OutdoorAir or \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation}. If this schedule name is blank, then it is not applied.
+The name of a schedule with decimal values which are limited between 0.0 and 1.0. The current schedule value is multiplied by the current system mixed air flow rate to set the maximum outdoor air flow rate. This schedule is applied after all other limits (except EMS and demand-limiting overrides).  This schedule can override all minimums and economizer operations.  For example, if this schedule is zero, then the outdoor air flow rate will be zero, regardless of any other settings in Controller:OutdoorAir or \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation}. If this schedule name is blank, then it is not applied.
 
 \paragraph{Field: Mechanical Ventilation Controller Name}\label{field-mechanical-ventilation-controller-name}
 
@@ -372,7 +372,7 @@ Note that the key value for these outputs is the AirLoopHVAC name, not the name 
 
 \paragraph{Air System Outdoor Air Economizer Status {[]}}\label{air-system-outdoor-air-economizer-status}
 
-Reports the average operating status of an air economizer over the reporting interval. The economizer status is set to 1 when the conditions are favorable for the economizer to operate (i.e., none of the control limits have been exceeded). While conditions may be favorable for economizer operation, it does not guarantee that the air-side economizer has increased outdoor air flow above the minimum level since the actual outdoor air flow rate is also governed by other controls (e.g., mixed air set point tempeature, time of day economizer control, maximum humidity setpoint, etc.). This variable is set to 0 if conditions disable economizer operation or NoEconomizer (Economizer Control Type) is specified.
+Reports the average operating status of an air economizer over the reporting interval. The economizer status is set to 1 when the conditions are favorable for the economizer to operate (i.e., none of the control limits have been exceeded). While conditions may be favorable for economizer operation, it does not guarantee that the air-side economizer has increased outdoor air flow above the minimum level since the actual outdoor air flow rate is also governed by other controls (e.g., mixed air set point temperature, time of day economizer control, maximum humidity setpoint, etc.). This variable is set to 0 if conditions disable economizer operation or NoEconomizer (Economizer Control Type) is specified.
 
 \paragraph{Air System Outdoor Air Heat Recovery Bypass Status {[]}}\label{air-system-outdoor-air-heat-recovery-bypass-status}
 
@@ -384,7 +384,7 @@ Reports the operating status of any heating coil in the air loop. If the heating
 
 \paragraph{Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature {[}C{]}}\label{air-system-outdoor-air-heat-recovery-bypass-minimum-outdoor-air-mixed-air-temperature-c}
 
-Reports the outdoor air mixer's mixed air node temperature at minimum outdoor air flow rate when the heat exchanger is disabled (off). This temperature is calculated as the return air temperature multiplied by the return air mass flow rate plus the mixer's inlet node temperature multipled by the minimum outdoor air flow rate. This quantity is then divided by the mixed air mass flow rate. If this temperature is less than the outdoor air mixer's mixed air node set point temperature, and the Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum, the outdoor air flow rate is set to the minimum. This output variable is only available when using Heat Recvoery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum.
+Reports the outdoor air mixer's mixed air node temperature at minimum outdoor air flow rate when the heat exchanger is disabled (off). This temperature is calculated as the return air temperature multiplied by the return air mass flow rate plus the mixer's inlet node temperature multipled by the minimum outdoor air flow rate. This quantity is then divided by the mixed air mass flow rate. If this temperature is less than the outdoor air mixer's mixed air node set point temperature, and the Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum, the outdoor air flow rate is set to the minimum. This output variable is only available when using Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum.
 
 \paragraph{Air System Outdoor Air High Humidity Control Status {[]}}\label{air-system-outdoor-air-high-humidity-control-status}
 
@@ -452,13 +452,13 @@ Note: When System Outdoor Air Method = IndoorAirQualityProcedure or IndoorAirQua
 
 \paragraph{Field: Zone Maximum Outdoor Air Fraction}\label{field-zone-maximum-outdoor-air-fraction}
 
-This positive numeric input is the zone maximum outdoor air fraction. For VAV systems, when a zone requires outdoor air higher than the user specified Zone Maximum Outdoor Air Fraction, the zone supply air flow will be increased (if damper not fully open yet) to cap the outdoor air fraction at the maximum value. This allows the system level outdoor air flow to be reduced while the total supply air flow increases to meet zone outdoor air requirement. Valid values are from 0 to 1.0. Default is 1.0 which indicates zones can have 100\% outdoor air maintaining backward compatibility. This inputs work for single and dual duct VAV systems.
+This positive numeric input is the zone maximum outdoor air fraction. For VAV systems, when a zone requires outdoor air higher than the user specified Zone Maximum Outdoor Air Fraction, the zone supply air flow will be increased (if damper not fully open yet) to cap the outdoor air fraction at the maximum value. This allows the system level outdoor air flow to be reduced while the total supply air flow increases to meet zone outdoor air requirement. Valid values are from 0 to 1.0. Default is 1.0 which indicates zones can have 100\% outdoor air maintaining backward compatibility. This input work for single and dual duct VAV systems.
 
 \paragraph{Field Set (Zone Name, Design Specification Outdoor Air Object Name, and Design Specification Zone Air Distribution Object Name)}\label{field-set-zone-name-design-specification-outdoor-air-object-name-and-design-specification-zone-air-distribution-object-name}
 
 The following three fields are needed to define the parameters for the ventilation. This object is extensible by duplicating these three fields.
 
-\paragraph{Field:Zone \textless{}x\textgreater{} Name}\label{fieldzone-x-name}
+\paragraph{Field: Zone or ZoneList \textless{}x\textgreater{} Name}\label{fieldzoneorzonelist-x-name}
 
 The zone name or zone list to apply the ventilation rates specified in the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object.
 
@@ -466,7 +466,7 @@ The zone name or zone list to apply the ventilation rates specified in the \hype
 
 The name of the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object, defining the amount of outdoor air, that applies to the zone or zone list. If this field is blank, the corresponding \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object for the zone will come from the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object referenced by the \hyperref[sizingzone]{Sizing:Zone} object for the same zone. If no such zone match is found, default values from the IDD will be used for the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object which is 0.0094 m3/s-person.
 
-If an Outdoor Air Schedule Name is specified in the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object, the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calcaulations.
+If an Outdoor Air Schedule Name is specified in the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object, the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calculations.
 
 \paragraph{Field: Design Specification Zone Air Distribution Object Name \textless{}x\textgreater{}}\label{field-design-specification-zone-air-distribution-object-name-x}
 
@@ -581,7 +581,7 @@ This optional input defines the zone name where the humidistat is located. This 
 
 \paragraph{Field: High Humidity Outdoor Air Flow Ratio}\label{field-high-humidity-outdoor-air-flow-ratio-1}
 
-This optional input is the ratio of the modified supply (outdoor) air flow rate to the supply air flow rate specified in the Energy Recovery Ventilator:Stand Alone ERV object. When the high humidity control algorithm determines that the supply air flow rate will be changed (i.e.~increased or decreased), the operating supply air flow rate is equal to the supply air flow rate specified in the Energy Recovery Ventilator:Stand Alone ERV object multiplied by this ratio. The minimum value for this field is 0. This field is used to modify both the supply and exhasut air flow rates when high humidity control is active. The supply and exhasut air fan volumetric flow rates must be able to account for the increase in air flow when this input is greater than 1. The default value is 1.
+This optional input is the ratio of the modified supply (outdoor) air flow rate to the supply air flow rate specified in the Energy Recovery Ventilator:Stand Alone ERV object. When the high humidity control algorithm determines that the supply air flow rate will be changed (i.e.~increased or decreased), the operating supply air flow rate is equal to the supply air flow rate specified in the Energy Recovery Ventilator:Stand Alone ERV object multiplied by this ratio. The minimum value for this field is 0. This field is used to modify both the supply and exhaust air flow rates when high humidity control is active. The supply and exhaust air fan volumetric flow rates must be able to account for the increase in air flow when this input is greater than 1. The default value is 1.
 
 \paragraph{Field: Control High Indoor Humidity based on Outdoor Humidity Ratio}\label{field-control-high-indoor-humidity-based-on-outdoor-humidity-ratio-1}
 

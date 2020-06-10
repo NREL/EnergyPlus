@@ -1565,9 +1565,9 @@ namespace ThermalComfort {
         }
     }
 
-    void DERIV(int &EP_UNUSED(TempIndiceNum), // Number of temperature indices  unused1208
-               Array1A<Real64> Temp,          // Temperature unused1208
-               Array1A<Real64> TempChange     // Change of temperature
+    void DERIV(int &EP_UNUSED(TempIndiceNum),    // Number of temperature indices  unused1208
+               Array1D<Real64> &EP_UNUSED(Temp), // Temperature unused1208
+               Array1D<Real64> &TempChange       // Change of temperature
     )
     {
 
@@ -1590,8 +1590,8 @@ namespace ThermalComfort {
         // Maloney, Dan, M.S. Thesis, University of Illinois at Urbana-Champaign
 
         // Argument array dimensioning
-        Temp.dim(2);
-        TempChange.dim(2);
+        //EP_SIZE_CHECK(Temp, 2);
+        EP_SIZE_CHECK(TempChange, 2);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ActLevelTot;             // Total activity level
@@ -1761,7 +1761,7 @@ namespace ThermalComfort {
         TempChange(2) = (HeatFlow - EvapHeatLoss - DryHeatLoss) / SkinThermCap;
     }
 
-    void RKG(int &NEQ, Real64 &H, Real64 &X, Array1A<Real64> Y, Array1A<Real64> DY, Array1A<Real64> C)
+    void RKG(int &NEQ, Real64 &H, Real64 &X, Array1D<Real64> &Y, Array1D<Real64> &DY, Array1D<Real64> &C)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1781,9 +1781,9 @@ namespace ThermalComfort {
         // Maloney, Dan, M.S. Thesis, University of Illinois at Urbana-Champaign
 
         // Argument array dimensioning
-        Y.dim(NEQ);
-        DY.dim(NEQ);
-        C.dim(NEQ);
+        EP_SIZE_CHECK(Y, NEQ);
+        EP_SIZE_CHECK(DY, NEQ);
+        EP_SIZE_CHECK(C, NEQ);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int I;

@@ -49,7 +49,6 @@
 #define WindowComplexManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
 
@@ -249,7 +248,7 @@ namespace WindowComplexManager {
     // This function check if gas with molecular weight has already been feed into coefficients and
     // feed arrays
 
-    void CheckGasCoefs(Real64 const currentWeight, int &indexNumber, Array1A<Real64> wght, bool &feedData);
+    void CheckGasCoefs(Real64 const currentWeight, int &indexNumber, Array1D<Real64> &wght, bool &feedData);
 
     int SearchAscTable(Real64 const y,            // Value to be found in the table
                        int const n,               // Number of values in the table
@@ -257,10 +256,6 @@ namespace WindowComplexManager {
     );
 
     //=================================================================================================
-
-    void CrossProduct(Array1A<Real64> A, // Vector components: C = A X B
-                      Array1A<Real64> B,
-                      Array1A<Real64> C);
 
 } // namespace WindowComplexManager
 

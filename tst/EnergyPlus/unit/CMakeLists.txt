@@ -1,4 +1,3 @@
-
 set( test_src
   TestHelpers/IdfParser.cc
   TestHelpers/IdfParser.hh
@@ -22,6 +21,7 @@ set( test_src
   BoilerSteam.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
+  CTElectricGenerator.unit.cc
   ChilledCeilingPanelSimple.unit.cc
   ChillerAbsorption.unit.cc
   ChillerConstantCOP.unit.cc
@@ -30,6 +30,11 @@ set( test_src
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
   ChillerIndirectAbsorption.unit.cc
+  Coils/CoilCoolingDXFixture.hh
+  Coils/CoilCoolingDX.unit.cc
+  Coils/CoilCoolingDXCurveFitPerformance.unit.cc
+  Coils/CoilCoolingDXCurveFitOperatingMode.unit.cc
+  Coils/CoilCoolingDXCurveFitSpeed.unit.cc
   CondenserLoopTowers.unit.cc
   ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
@@ -58,10 +63,12 @@ set( test_src
   ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
+  EvaporativeFluidCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
   FanCoilUnits.unit.cc
   Fans.unit.cc
   FaultsManager.unit.cc
+  FileSystem.unit.cc
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   FluidProperties.unit.cc
@@ -96,6 +103,7 @@ set( test_src
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
   HybridModel.unit.cc
+  ICEngineElectricGenerator.unit.cc
   IceThermalStorage.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
@@ -105,6 +113,8 @@ set( test_src
   JsonOutput.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
+  MicroCHPElectricGenerator.unit.cc
+  MicroturbineElectricGenerator.unit.cc
   MoistureBalanceEMPD.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
@@ -112,6 +122,7 @@ set( test_src
   OASystemHWPreheatCoil.unit.cc
   OutAirNodeManager.unit.cc
   OutdoorAirUnit.unit.cc
+  OutputFiles.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
   OutputReports.unit.cc
@@ -130,6 +141,7 @@ set( test_src
   PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
   PlantCondLoopOperation.unit.cc
+  PlantLoopHeatPumpEIR.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
   Psychrometrics.unit.cc
@@ -165,6 +177,7 @@ set( test_src
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
   SZVAVModel.unit.cc
+  ThermalChimney.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
@@ -178,10 +191,10 @@ set( test_src
   Vector.unit.cc
   VentilatedSlab.unit.cc
   WaterCoils.unit.cc
+  WaterManager.unit.cc
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
-  WaterToWaterHeatPumpEIR.unit.cc
   WeatherManager.unit.cc
   WinCalcEngine.unit.cc
   WindowAC.unit.cc
@@ -191,14 +204,25 @@ set( test_src
   XingGroundTemperatureModel.unit.cc
   ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
-  ZoneHVACEvaporativeCooler.unit
+  ZoneHVACEvaporativeCooler.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
 )
+
 set( test_dependencies
   energyplusapi
- )
+)
+
+if(LINK_WITH_PYTHON)
+  if (CMAKE_HOST_UNIX)
+    find_package(PythonLibs 3 REQUIRED)
+    include_directories(${PYTHON_INCLUDE_DIRS})
+    list(APPEND test_src api/datatransfer.unit.cc)
+    list(APPEND test_src PluginManager.unit.cc)
+    list(APPEND test_dependencies ${PYTHON_LIBRARIES} )
+  endif()
+endif()
 
 if(CMAKE_HOST_UNIX)
   if(NOT APPLE)

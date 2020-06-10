@@ -71,6 +71,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ThermalComfort.hh> // MRT Weighting
@@ -646,13 +647,13 @@ namespace HeatBalanceKivaManager {
         ObjexxFCL::gio::close(kivaWeatherFileUnitNumber);
     }
 
-    bool KivaManager::setupKivaInstances()
+    bool KivaManager::setupKivaInstances(OutputFiles &outputFiles)
     {
         Kiva::setMessageCallback(kivaErrorCallback, nullptr);
         bool ErrorsFound = false;
 
         if (DataZoneControls::GetZoneAirStatsInputFlag) {
-            ZoneTempPredictorCorrector::GetZoneAirSetPoints();
+            ZoneTempPredictorCorrector::GetZoneAirSetPoints(outputFiles);
             DataZoneControls::GetZoneAirStatsInputFlag = false;
         }
 
@@ -1063,10 +1064,10 @@ namespace HeatBalanceKivaManager {
             }
         }
 
-        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, "(A)") << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed "
+        print(outputFiles.eio, "{}", "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed "
                                                            "Perimeter, Perimeter Fraction, Wall Height, Wall Construction, Floor Surface, Wall "
-                                                           "Surface(s)";
-        std::string fmt = "(A,',',I0',',I0',',I0',',A',',A',',A',',A',',A,A)";
+                                                           "Surface(s)\n");
+
         for (auto &kv : kivaInstances) {
             auto grnd = kv.instance.ground.get();
 
@@ -1081,11 +1082,20 @@ namespace HeatBalanceKivaManager {
             for (auto &wl : kv.wallSurfaces) {
                 wallSurfaceString += "," + DataSurfaces::Surface(wl).Name;
             }
-            ObjexxFCL::gio::write(DataGlobals::OutputFileInits, fmt)
-                << foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name << grnd->nX << grnd->nZ << grnd->nX * grnd->nZ
-                << General::RoundSigDigits(grnd->foundation.netPerimeter, 2) << General::RoundSigDigits(kv.floorWeight, 2)
-                << General::RoundSigDigits(grnd->foundation.foundationDepth, 2) << constructionName << DataSurfaces::Surface(kv.floorSurface).Name
-                << wallSurfaceString;
+
+            static constexpr auto fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
+            print(outputFiles.eio,
+                  fmt,
+                  foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name,
+                  grnd->nX,
+                  grnd->nZ,
+                  grnd->nX * grnd->nZ,
+                  grnd->foundation.netPerimeter,
+                  kv.floorWeight,
+                  grnd->foundation.foundationDepth,
+                  constructionName,
+                  DataSurfaces::Surface(kv.floorSurface).Name,
+                  wallSurfaceString);
         }
 
         return ErrorsFound;

@@ -58,11 +58,12 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/Plant/Loop.hh>
 #include <EnergyPlus/Plant/LoopSide.hh>
@@ -125,7 +126,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     EXPECT_EQ("No", c1->coilWaterFlowAutoMsg);
 
     // Exercise report writing with mostly defaults
-    coilSelectionReportObj->finishCoilSummaryReportTable();
+    coilSelectionReportObj->finishCoilSummaryReportTable(state);
 
     // Use the other form for coil 2
     std::string coil2Name("Coil 2");             // user-defined name of the coil
@@ -222,7 +223,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     EXPECT_EQ(200.0, c3->rmLatentAtPeak);
 
     // Exercise report writing again
-    coilSelectionReportObj->finishCoilSummaryReportTable();
+    coilSelectionReportObj->finishCoilSummaryReportTable(state);
 }
 
 TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
@@ -293,7 +294,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
     EXPECT_EQ("Yes", c1b->coilWaterFlowAutoMsg);
 
     // Exercise report writing again
-    coilSelectionReportObj->finishCoilSummaryReportTable();
+    coilSelectionReportObj->finishCoilSummaryReportTable(state);
 }
 
 TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
@@ -450,7 +451,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     EXPECT_EQ(0.0, c1->rmLatentAtPeak);
 
     // Exercise report writing again
-    coilSelectionReportObj->finishCoilSummaryReportTable();
+    coilSelectionReportObj->finishCoilSummaryReportTable(state);
 
     // Test coil reporting
     curZoneEqNum = 1;

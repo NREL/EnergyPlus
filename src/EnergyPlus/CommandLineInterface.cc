@@ -59,6 +59,9 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReports.hh>
@@ -80,7 +83,7 @@ namespace CommandLineInterface {
     using namespace SolarShading;
     using namespace ez;
 
-    int ProcessArgs(int argc, const char *argv[])
+    int ProcessArgs(EnergyPlusData &state, int argc, const char *argv[])
     {
         typedef std::string::size_type size_type;
 
@@ -128,7 +131,7 @@ namespace CommandLineInterface {
         // Define options
         ezOptionParser opt;
 
-        opt.overview = VerString;
+        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage();
 
         opt.syntax = "energyplus [options] [input-file]";
 
@@ -197,7 +200,7 @@ namespace CommandLineInterface {
 
         DDOnlySimulation = opt.isSet("-D");
 
-        AnnualSimulation = opt.isSet("-a");
+        state.dataGlobals.AnnualSimulation = opt.isSet("-a");
 
         outputEpJSONConversion = opt.isSet("-c");
 
@@ -382,13 +385,13 @@ namespace CommandLineInterface {
         }
 
         // EnergyPlus files
-        outputAuditFileName = outputFilePrefix + normalSuffix + ".audit";
-        outputBndFileName = outputFilePrefix + normalSuffix + ".bnd";
-        outputDxfFileName = outputFilePrefix + normalSuffix + ".dxf";
-        outputEioFileName = outputFilePrefix + normalSuffix + ".eio";
+        state.outputFiles.audit.fileName = outputFilePrefix + normalSuffix + ".audit";
+        state.outputFiles.bnd.fileName = outputFilePrefix + normalSuffix + ".bnd";
+        state.outputFiles.dxf.fileName = outputFilePrefix + normalSuffix + ".dxf";
+        state.outputFiles.eio.fileName = outputFilePrefix + normalSuffix + ".eio";
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
-        outputEsoFileName = outputFilePrefix + normalSuffix + ".eso";
+        state.outputFiles.eso.fileName = outputFilePrefix + normalSuffix + ".eso";
 
         outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
         outputTSZoneJsonFileName = outputFilePrefix + normalSuffix + "_detailed_zone.json";
@@ -418,43 +421,44 @@ namespace CommandLineInterface {
         outputHRMsgPackFileName = outputFilePrefix + normalSuffix + "_hourly.msgpack";
         outputSMMsgPackFileName = outputFilePrefix + normalSuffix + "_runperiod.msgpack";
 
-        outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
+        state.outputFiles.mtd.fileName = outputFilePrefix + normalSuffix + ".mtd";
         outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
-        outputMtrFileName = outputFilePrefix + normalSuffix + ".mtr";
+        state.outputFiles.mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
         outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
-        outputDfsFileName = outputFilePrefix + normalSuffix + ".dfs";
+        state.outputFiles.dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
         outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
-        outputEddFileName = outputFilePrefix + normalSuffix + ".edd";
+        state.outputFiles.edd.fileName = outputFilePrefix + normalSuffix + ".edd";
         outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
-        outputSlnFileName = outputFilePrefix + normalSuffix + ".sln";
-        outputSciFileName = outputFilePrefix + normalSuffix + ".sci";
-        outputWrlFileName = outputFilePrefix + normalSuffix + ".wrl";
+        state.outputFiles.sln.fileName = outputFilePrefix + normalSuffix + ".sln";
+        state.outputFiles.sci.fileName = outputFilePrefix + normalSuffix + ".sci";
+        state.outputFiles.wrl.fileName = outputFilePrefix + normalSuffix + ".wrl";
         outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
-        outputDbgFileName = outputFilePrefix + normalSuffix + ".dbg";
+        state.outputFiles.debug.fileName = outputFilePrefix + normalSuffix + ".dbg";
+        outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
         outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
         outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
         outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
         outputTblTxtFileName = outputFilePrefix + tableSuffix + ".txt";
         outputTblXmlFileName = outputFilePrefix + tableSuffix + ".xml";
-        outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
-        outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
-        outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
-        outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
-        outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
-        outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
-        outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
-        outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
-        outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
+        state.outputFiles.outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
+        state.outputFiles.outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
+        state.outputFiles.outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
+        state.outputFiles.outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
+        state.outputFiles.outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
+        state.outputFiles.outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
+        state.outputFiles.outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
+        state.outputFiles.outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
+        state.outputFiles.outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
         outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
-        outputExtShdFracFileName = outputFilePrefix + shdSuffix + ".csv";
+        state.outputFiles.shade.fileName = outputFilePrefix + shdSuffix + ".csv";
         if (suffixType == "L" || suffixType == "l") {
             outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
         } else {
             outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
         }
-        outputScreenCsvFileName = outputFilePrefix + screenSuffix + ".csv";
-        outputDelightInFileName = "eplusout.delightin";
+        state.outputFiles.screenCsv.fileName = outputFilePrefix + screenSuffix + ".csv";
+        state.outputFiles.delightIn.fileName = "eplusout.delightin";
         outputDelightOutFileName = "eplusout.delightout";
         outputDelightEldmpFileName = "eplusout.delighteldmp";
         outputDelightDfdmpFileName = "eplusout.delightdfdmp";
@@ -508,26 +512,19 @@ namespace CommandLineInterface {
         }
 
         // Error for cases where both design-day and annual simulation switches are set
-        if (DDOnlySimulation && AnnualSimulation) {
+        if (DDOnlySimulation && state.dataGlobals.AnnualSimulation) {
             DisplayString("ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
             DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
         }
 
         // Read path from INI file if it exists
-        bool EPlusINI;
         int LFN; // Unit Number for reads
         std::string::size_type TempIndx;
         int iostatus;
-        bool FileExists;
 
         // Check for IDD and IDF files
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(EnergyPlusIniFileName, flags);
-            EPlusINI = flags.exists();
-        }
-        if (EPlusINI) {
+        if (fileExists(EnergyPlusIniFileName)) {
             LFN = GetNewUnitNumber();
             {
                 IOFlags flags;
@@ -560,53 +557,28 @@ namespace CommandLineInterface {
         }
 
         // Check if specified files exist
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(inputFileName, flags);
-            FileExists = flags.exists();
-        }
-        if (!FileExists) {
+        if (!fileExists(inputFileName)) {
             DisplayString("ERROR: Could not find input data file: " + getAbsolutePath(inputFileName) + ".");
             DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
         }
 
         if (opt.isSet("-w") && !DDOnlySimulation) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(inputWeatherFileName, flags);
-                FileExists = flags.exists();
-            }
-            if (!FileExists) {
+            if (!fileExists(inputWeatherFileName)) {
                 DisplayString("ERROR: Could not find weather file: " + getAbsolutePath(inputWeatherFileName) + ".");
                 DisplayString(errorFollowUp);
                 exit(EXIT_FAILURE);
             }
         }
 
-        OutputFileDebug = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            ObjexxFCL::gio::open(OutputFileDebug, outputDbgFileName, flags);
-            iostatus = flags.ios();
-        }
-        if (iostatus != 0) {
-            DisplayString("ERROR: Could not open output debug file: " + outputDbgFileName + ".");
-            exit(EXIT_FAILURE);
-        }
+        state.outputFiles.debug.ensure_open("OpenOutputFiles");
 
         // TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 
         // Preprocessors (These will likely move to a new file)
         if (runEPMacro) {
             std::string epMacroPath = exeDirectory + "EPMacro" + exeExtension;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(epMacroPath, flags);
-                FileExists = flags.exists();
-            }
-            if (!FileExists) {
+            if (!fileExists(epMacroPath)) {
                 DisplayString("ERROR: Could not find EPMacro executable: " + getAbsolutePath(epMacroPath) + ".");
                 exit(EXIT_FAILURE);
             }
@@ -624,12 +596,7 @@ namespace CommandLineInterface {
 
         if (runExpandObjects) {
             std::string expandObjectsPath = exeDirectory + "ExpandObjects" + exeExtension;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(expandObjectsPath, flags);
-                FileExists = flags.exists();
-            }
-            if (!FileExists) {
+            if (!fileExists(expandObjectsPath)) {
                 DisplayString("ERROR: Could not find ExpandObjects executable: " + getAbsolutePath(expandObjectsPath) + ".");
                 exit(EXIT_FAILURE);
             }
@@ -637,12 +604,7 @@ namespace CommandLineInterface {
             bool inputFileNamedIn = (getAbsolutePath(inputFileName) == getAbsolutePath("in.idf"));
 
             // check if IDD actually exists since ExpandObjects still requires it
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(inputIddFileName, flags);
-                FileExists = flags.exists();
-            }
-            if (!FileExists) {
+            if (!fileExists(inputIddFileName)) {
                 DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + ".");
                 DisplayString(errorFollowUp);
                 exit(EXIT_FAILURE);
@@ -656,12 +618,7 @@ namespace CommandLineInterface {
             if (!inputFileNamedIn) removeFile("in.idf");
             if (!iddFileNamedEnergy) removeFile("Energy+.idd");
             moveFile("expandedidf.err", outputExperrFileName);
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire("expanded.idf", flags);
-                FileExists = flags.exists();
-            }
-            if (FileExists) {
+            if (fileExists("expanded.idf")) {
                 moveFile("expanded.idf", outputExpidfFileName);
                 inputFileName = outputExpidfFileName;
             }
@@ -824,6 +781,60 @@ namespace CommandLineInterface {
                 }
             }
         }
+    }
+
+    int runReadVarsESO(OutputFiles &outputFiles)
+    {
+        std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
+
+        if (!fileExists(readVarsPath)) {
+            readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
+            if (!fileExists(readVarsPath)) {
+                DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + ".");
+                return EXIT_FAILURE;
+            }
+        }
+
+        std::string const RVIfile = inputDirPathName + inputFileNameOnly + ".rvi";
+        std::string const MVIfile = inputDirPathName + inputFileNameOnly + ".mvi";
+
+        const auto rviFileExists = fileExists(RVIfile);
+        if (!rviFileExists) {
+            std::ofstream ofs{RVIfile};
+            if (!ofs.good()) {
+                ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
+            } else {
+                ofs << outputFiles.eso.fileName << '\n';
+                ofs << outputCsvFileName << '\n';
+            }
+        }
+
+        const auto mviFileExists = fileExists(MVIfile);
+        if (!mviFileExists) {
+            std::ofstream ofs{MVIfile};
+            if (!ofs.good()) {
+                ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
+            } else {
+                ofs << outputFiles.mtr.fileName << '\n';
+                ofs << outputMtrCsvFileName << '\n';
+            }
+        }
+
+        // We quote the paths in case we have spaces
+        // "/Path/to/ReadVarEso" "/Path/to/folder with spaces/file.rvi" unlimited
+        std::string const readVarsRviCommand = "\"" + readVarsPath + "\" \"" + RVIfile + "\" unlimited";
+        std::string const readVarsMviCommand = "\"" + readVarsPath + "\" \"" + MVIfile + "\" unlimited";
+
+        // systemCall will be responsible to handle to above command on Windows versus Unix
+        systemCall(readVarsRviCommand);
+        systemCall(readVarsMviCommand);
+
+        if (!rviFileExists) removeFile(RVIfile.c_str());
+
+        if (!mviFileExists) removeFile(MVIfile.c_str());
+
+        moveFile("readvars.audit", outputRvauditFileName);
+        return EXIT_SUCCESS;
     }
 
 } // namespace CommandLineInterface

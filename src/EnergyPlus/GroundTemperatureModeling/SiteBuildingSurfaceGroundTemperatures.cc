@@ -48,9 +48,6 @@
 // C++ Headers
 #include <memory>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -58,18 +55,17 @@
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
-static ObjexxFCL::gio::Fmt fmtA("(A)");
-static ObjexxFCL::gio::Fmt fmtAN("(A,$)");
-
 //******************************************************************************
 
 // Site:GroundTemperature:BuildingSurface factory
-std::shared_ptr<SiteBuildingSurfaceGroundTemps> SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(int objectType, std::string objectName)
+std::shared_ptr<SiteBuildingSurfaceGroundTemps>
+SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(OutputFiles &outputFiles, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -82,14 +78,12 @@ std::shared_ptr<SiteBuildingSurfaceGroundTemps> SiteBuildingSurfaceGroundTemps::
 
     // USE STATEMENTS:
     using DataEnvironment::GroundTempObjInput;
-    using DataGlobals::OutputFileInits;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
     using namespace ObjexxFCL::gio;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool found = false;
     bool genErrorMessage = false;
     int NumNums;
     int NumAlphas;
@@ -135,17 +129,9 @@ std::shared_ptr<SiteBuildingSurfaceGroundTemps> SiteBuildingSurfaceGroundTemps::
     }
 
     // Write Final Ground Temp Information to the initialization output file
-    ObjexxFCL::gio::write(OutputFileInits, fmtA)
-        << "! <Site:GroundTemperature:BuildingSurface>,Jan{C},Feb{C},Mar{C},Apr{C},May{C},Jun{C},Jul{C},Aug{C},Sep{C},Oct{C},Nov{C},Dec{C}";
-    ObjexxFCL::gio::write(OutputFileInits, fmtAN) << " Site:GroundTemperature:BuildingSurface";
-    for (int i = 1; i <= 12; ++i) {
-        ObjexxFCL::gio::write(OutputFileInits, "(', ',F6.2,$)") << thisModel->buildingSurfaceGroundTemps(i);
-    }
-    ObjexxFCL::gio::write(OutputFileInits);
+    write_ground_temps(outputFiles.eio, "BuildingSurface", thisModel->buildingSurfaceGroundTemps);
 
-    found = true;
-
-    if (found && !thisModel->errorsFound) {
+    if (!thisModel->errorsFound) {
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {

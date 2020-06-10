@@ -99,6 +99,8 @@ namespace DataPlant {
             }
             return load;
         }
+
+        Real64 DetermineBranchFlowRequest();
     };
 
 } // namespace DataPlant

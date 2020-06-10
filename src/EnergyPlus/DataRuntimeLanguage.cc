@@ -108,7 +108,7 @@ namespace DataRuntimeLanguage {
     int const OperatorGreaterThan(12);    // >
     int const OperatorRaiseToPower(13);   // ^
     int const OperatorLogicalAND(14);     // &&
-    int const OperatiorLogicalOR(15);     // ||
+    int const OperatorLogicalOR(15);     // ||
     // note there is an important check "> 15" to distinguish operators from functions
     //  so becareful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
 
@@ -134,7 +134,7 @@ namespace DataRuntimeLanguage {
 
     // begin psychrometric routines
     int const FuncRhoAirFnPbTdbW(32);    // accessor for E+ psych routine
-    int const FuncCpAirFnWTdb(33);       // accessor for E+ psych routine
+    int const FuncCpAirFnW(33);       // accessor for E+ psych routine
     int const FuncHfgAirFnWTdb(34);      // accessor for E+ psych routine
     int const FuncHgAirFnWTdb(35);       // accessor for E+ psych routine
     int const FuncTdpFnTdbTwbPb(36);     // accessor for E+ psych routine
@@ -223,7 +223,6 @@ namespace DataRuntimeLanguage {
 
     //######################################################################################################################################
 
-    int OutputEMSFileUnitNum(0);             // file lun handle for open EMS output file
     bool OutputEDDFile(false);               // set to true if user requests EDD output file be written
     bool OutputFullEMSTrace(false);          // how much to write out to trace, if true do verbose for each line
     bool OutputEMSErrors(false);             // how much to write out to trace, if true include Erl error messages
@@ -284,7 +283,6 @@ namespace DataRuntimeLanguage {
         NumExternalInterfaceActuatorsUsed = 0;
         NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = 0;
         NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = 0;
-        OutputEMSFileUnitNum = 0;
         OutputEDDFile = false;
         OutputFullEMSTrace = false;
         OutputEMSErrors = false;

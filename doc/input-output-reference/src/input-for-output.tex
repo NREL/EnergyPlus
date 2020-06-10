@@ -246,15 +246,24 @@ Output:Constructions,Materials;
 
 \subsection{Output:DaylightFactors}\label{outputdaylightfactors}
 
+This report content is added to the \textbf{eplusout.dfs} file.
+
 Daylight factors are ratios of interior illuminance at a specific location to exterior horizontal illuminance. In EnergyPlus, they are pre-calculated hourly for every shadow calculation day for every exterior window of a daylight zone. The pre-calculated daylight factors are interpolated between hours and for the actual sky conditions in the time-step calculation of the daylighting performance of daylight zones.
 
-EnergyPlus reports the daylight factors for four sky types (clear, turbid clear, intermediate, and overcast) at noon time (12:00pm) for each exterior windows (base window without shading) in the eio file when the daylight factors are first calculated. This new object can report all hourly pre-calculated daylight factors. Details of the report are shown in the Output Details document.
+EnergyPlus reports the daylight factors for four CIE sky types (clear, turbid clear, intermediate, and overcast) at noon time (12:00pm) for each exterior windows (base window without shading) in the \textbf{eio} file when the daylight factors are first calculated. This new object can report all hourly pre-calculated daylight factors. Details of the report are shown in the Output Details document.
 
 \subsubsection{Inputs}\label{inputs-4-027}
 
 \paragraph{Field: Reporting Days}\label{field-reporting-days}
 
-This field is used to select days to report the daylight factors. Two choices are ``SizingDays'' and ``All\hyperref[shadowcalculation]{ShadowCalculation}Days''. The SizingDays choice will output the daylight factors for only the sizing calculation days, while the All\hyperref[shadowcalculation]{ShadowCalculation}Days choice will output daylight factors for all shadow calculation days.
+This field is used to select days to report the daylight factors. Two choices are ``\textbf{SizingDays}'' and ``\textbf{AllShadowCalculationDays}''. The ``\textbf{SizingDays}'' choice will output the daylight factors for only the sizing calculation days, while the ``\textbf{AllShadowCalculationDays}'' choice will output daylight factors for all shadow calculation days.
+
+An example of this object follows.
+
+\begin{lstlisting}
+Output:DaylightFactors,
+  SizingDays;    !- Reporting Days
+\end{lstlisting}
 
 \subsection{Output:EnergyManagementSystem}\label{outputenergymanagementsystem}
 
@@ -748,9 +757,7 @@ Multiplied by the fuel consumption to compute the source energy contribution for
 
 This field contains the name of a schedule containing values that are multiplied by the fuel consumption to determine the source energy. Specifically, each value in the schedule are multiplied by the Source Energy Factor field value and by the fuel consumption to determine the source energy consumption for the fuel. If the values in the schedule fully represent the source energy conversion factor, the value in the previous field, Source Energy Factor should be set to one.
 
-The use of this field is required for evaluations using source energy factors that change throughout the year such as Time Dependent Valuation (TDV), the method used to show compliance with to California's Title 24 under the ACM (Alternative Compliance Method). Data files containing TDV factors are in the DataSets\textbackslash{}TDV\textbackslash{} directory. An example file for use with TDV file is in the ExampleFiles directory and is named 5zoneTDV.IDF. When using these TDV files with EnergyPlus it is important that a consistent weather file be used. It is also important that the day of the week for January 1 is set to Tuesday since all the TDV and related weather files use 1991 as the year of reference. Also note that the values in the TDV datasets files are in non SI units of measure. The source energy factor field should contain the value of 0.293 for electricity and 0.01 for natural gas to account for the non-standard units used in the files. A summary report that provides a breakdown of the facility energy use in terms of source energy can be obtained by selecting the `\emph{AllSummary}' or `\emph{SourceEnergyEndUseComponentsSummary}' keywords in the `\hyperref[outputtablesummaryreports]{Output:Table:SummaryReports}' reporting object. To learn more about TDV see:
-
-\url{http://www.energy.ca.gov/title24/2005standards/archive/rulemaking/documents/tdv/index.html}
+The use of this field is required for evaluations using source energy factors that change throughout the year such as Time Dependent Valuation (TDV), the method used to show compliance with to California's Title 24 under the ACM (Alternative Compliance Method). Data files containing TDV factors are in the DataSets\textbackslash{}TDV\textbackslash{} directory. An example file for use with TDV file is in the ExampleFiles directory and is named 5zoneTDV.IDF. When using these TDV files with EnergyPlus it is important that a consistent weather file be used. It is also important that the day of the week for January 1 is set to Tuesday since all the TDV and related weather files use 1991 as the year of reference. Also note that the values in the TDV datasets files are in non SI units of measure. The source energy factor field should contain the value of 0.293 for electricity and 0.01 for natural gas to account for the non-standard units used in the files. A summary report that provides a breakdown of the facility energy use in terms of source energy can be obtained by selecting the `\emph{AllSummary}' or `\emph{SourceEnergyEndUseComponentsSummary}' keywords in the `\hyperref[outputtablesummaryreports]{Output:Table:SummaryReports}' reporting object. To learn more about TDV you can see the original methodology used for the 2005 Standards \href{http://h-m-g.com/TDV/}{here} and the 2019 Standards methodology \href{https://www.ethree.com/wp-content/uploads/2017/01/TN212524_20160801T120224_2019_TDV_Methodology_Report_7222016.pdf}{here}.
 
 \textbf{WARNING}
 

@@ -54,14 +54,12 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -80,6 +78,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -93,6 +92,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterUse.hh>
@@ -148,15 +148,6 @@ namespace InternalHeatGains {
 
     static std::string const BlankString;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE InternalHeatGains
-    // PUBLIC  SumInternalConvectionGainsByIndices
-    // PUBLIC SumReturnAirConvectionGainsByIndices
-    // PUBLIC  SumInternalRadiationGainsByIndices
-    // PUBLIC  SumInternalLatentGainsByIndices
-    // PUBLIC
-    // PUBLIC  SumInternalCO2GainsByIndices
-    // PUBLIC  GetInternalGainDeviceIndex
-
     // Functions
     void clear_state()
     {
@@ -164,7 +155,7 @@ namespace InternalHeatGains {
         ErrorsFound = false;
     }
 
-    void ManageInternalHeatGains(Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
+    void ManageInternalHeatGains(EnergyPlusData &state, Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
 
         // SUBROUTINE INFORMATION:
@@ -176,33 +167,9 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // This is the main driver subroutine for the internal heat gains.
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // unused  INTEGER       :: ZoneNum              ! Zone number
-
         // FLOW:
         if (GetInternalHeatGainsInputFlag) {
-            GetInternalHeatGainsInput();
+            GetInternalHeatGainsInput(state);
             GetInternalHeatGainsInputFlag = false;
         }
 
@@ -210,7 +177,7 @@ namespace InternalHeatGains {
             if (InitOnly) return;
         }
 
-        InitInternalHeatGains();
+        InitInternalHeatGains(state);
 
         ReportInternalHeatGains();
 
@@ -220,7 +187,7 @@ namespace InternalHeatGains {
         if (ZoneSizingCalc) GatherComponentLoadsIntGain();
     }
 
-    void GetInternalHeatGainsInput()
+    void GetInternalHeatGainsInput(EnergyPlus::EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -263,7 +230,6 @@ namespace InternalHeatGains {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const RoutineName("GetInternalHeatGains: ");
-        int const noOtherFuelTypeZero = 0;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string AlphaName;
@@ -287,7 +253,6 @@ namespace InternalHeatGains {
         Real64 StmTot;         // Total Steam for calculating Steam per square meter
         std::string BBHeatInd; // Yes if BBHeat in zone, no if not.
         int Loop1;
-        std::string StringOut;
         Real64 SchMin;
         Real64 SchMax;
         static bool UsingThermalComfort(false);
@@ -305,14 +270,19 @@ namespace InternalHeatGains {
         int Item1;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_720("(' Zone Internal Gains Nominal, ',A,',',A,',',A,',')");
-        static ObjexxFCL::gio::Fmt Format_721("('! <Zone Internal Gains Nominal>,Zone Name, Floor Area {m2},# Occupants,','Area per Occupant "
-                                   "{m2/person},Occupant per Area {person/m2},Interior Lighting {W/m2},','Electric Load {W/m2},Gas Load {W/m2},Other "
-                                   "Load {W/m2},Hot Water Eq {W/m2},','Steam Equipment {W/m2},Sum Loads per Area {W/m2},Outdoor Controlled Baseboard "
-                                   "Heat')");
-        static ObjexxFCL::gio::Fmt Format_722("(' ',A,' Internal Gains Nominal, ',A,',',A,',',A,',',A,',',A,',')");
-        static ObjexxFCL::gio::Fmt Format_723("('! <',A,' Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {m2},# Zone Occupants,',A)");
-        static ObjexxFCL::gio::Fmt Format_724("(' ',A,', ',A)");
+        static constexpr auto Format_720(" Zone Internal Gains Nominal, {},{:.2R},{:.1R},");
+
+        static constexpr auto Format_722(" {} Internal Gains Nominal, {},{},{},{:.2R},{:.1R},");
+        static constexpr auto Format_723("! <{} Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {{m2}},# Zone Occupants,{}");
+        static constexpr auto Format_724(" {}, {}\n");
+
+        auto print_and_divide_if_greater_than_zero = [&](const Real64 numerator, const Real64 denominator) {
+            if (denominator > 0.0) {
+                print(state.outputFiles.eio, "{:.3R},", numerator / denominator);
+            } else {
+                print(state.outputFiles.eio, "N/A,");
+            }
+        };
 
         // FLOW:
         ZoneIntGain.allocate(NumOfZones);
@@ -708,7 +678,7 @@ namespace InternalHeatGains {
                         MustInpSch = false;
                         UsingThermalComfort = false;
                         lastOption = NumAlpha;
-                        
+
                         // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
                         // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
                         // which could cause confusion.  The solution is for the user to either remove those schedules or pick a thermal
@@ -716,12 +686,17 @@ namespace InternalHeatGains {
                         int const NumFirstTCModel = 14;
                         if (NumAlpha < NumFirstTCModel) {
                             bool NoTCModelSelectedWithSchedules = false;
-                            NoTCModelSelectedWithSchedules = CheckThermalComfortSchedules(lAlphaFieldBlanks(9),lAlphaFieldBlanks(12),lAlphaFieldBlanks(13));
+                            NoTCModelSelectedWithSchedules =
+                                CheckThermalComfortSchedules(lAlphaFieldBlanks(9), lAlphaFieldBlanks(12), lAlphaFieldBlanks(13));
                             if (NoTCModelSelectedWithSchedules) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\" has comfort related schedules but no thermal comfort model selected.");
-                                ShowContinueError("If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no thermal comfort");
-                                ShowContinueError("thermal comfort model is selected, the schedules will be listed as unused schedules in the .err file.");
-                                ShowContinueError("To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.");
+                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) +
+                                                 "\" has comfort related schedules but no thermal comfort model selected.");
+                                ShowContinueError("If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no "
+                                                  "thermal comfort");
+                                ShowContinueError(
+                                    "thermal comfort model is selected, the schedules will be listed as unused schedules in the .err file.");
+                                ShowContinueError(
+                                    "To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.");
                             }
                         }
 
@@ -1106,12 +1081,12 @@ namespace InternalHeatGains {
                                               "People",
                                               People(Loop).Name,
                                               IntGainTypeOf_People,
-                                              People(Loop).ConGainRate,
-                                              _,
-                                              People(Loop).RadGainRate,
-                                              People(Loop).LatGainRate,
-                                              _,
-                                              People(Loop).CO2GainRate);
+                                              &People(Loop).ConGainRate,
+                                              nullptr,
+                                              &People(Loop).RadGainRate,
+                                              &People(Loop).LatGainRate,
+                                              nullptr,
+                                              &People(Loop).CO2GainRate);
 
                 } // Item1 - number of zones
             }     // Item - number of people statements
@@ -1413,7 +1388,7 @@ namespace InternalHeatGains {
                         }
                     }
                     if (Lights(Loop).ZonePtr > 0) {
-                        Lights(Loop).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(Zone(Lights(Loop).ZonePtr).Name, retNodeName);
+                        Lights(Loop).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(state, Zone(Lights(Loop).ZonePtr).Name, retNodeName);
                     }
 
                     if ((Lights(Loop).ZoneReturnNum == 0) && (Lights(Loop).FractionReturnAir > 0.0) && (!lAlphaFieldBlanks(7))) {
@@ -1572,13 +1547,13 @@ namespace InternalHeatGains {
                                               "Lights",
                                               Lights(Loop).Name,
                                               IntGainTypeOf_Lights,
-                                              Lights(Loop).ConGainRate,
-                                              Lights(Loop).RetAirGainRate,
-                                              Lights(Loop).RadGainRate,
-                                              _,
-                                              _,
-                                              _,
-                                              _,
+                                              &Lights(Loop).ConGainRate,
+                                              &Lights(Loop).RetAirGainRate,
+                                              &Lights(Loop).RadGainRate,
+                                              nullptr,
+                                              nullptr,
+                                              nullptr,
+                                              nullptr,
                                               returnNodeNum);
 
                     if (Lights(Loop).FractionReturnAir > 0) Zone(Lights(Loop).ZonePtr).HasLtsRetAirGain = true;
@@ -1995,10 +1970,10 @@ namespace InternalHeatGains {
                                               "ElectricEquipment",
                                               ZoneElectric(Loop).Name,
                                               IntGainTypeOf_ElectricEquipment,
-                                              ZoneElectric(Loop).ConGainRate,
-                                              _,
-                                              ZoneElectric(Loop).RadGainRate,
-                                              ZoneElectric(Loop).LatGainRate);
+                                              &ZoneElectric(Loop).ConGainRate,
+                                              nullptr,
+                                              &ZoneElectric(Loop).RadGainRate,
+                                              &ZoneElectric(Loop).LatGainRate);
 
                 } // Item1
             }     // Item - Number of ZoneElectric objects
@@ -2390,12 +2365,12 @@ namespace InternalHeatGains {
                                               "GasEquipment",
                                               ZoneGas(Loop).Name,
                                               IntGainTypeOf_GasEquipment,
-                                              ZoneGas(Loop).ConGainRate,
-                                              _,
-                                              ZoneGas(Loop).RadGainRate,
-                                              ZoneGas(Loop).LatGainRate,
-                                              _,
-                                              ZoneGas(Loop).CO2GainRate);
+                                              &ZoneGas(Loop).ConGainRate,
+                                              nullptr,
+                                              &ZoneGas(Loop).RadGainRate,
+                                              &ZoneGas(Loop).LatGainRate,
+                                              nullptr,
+                                              &ZoneGas(Loop).CO2GainRate);
 
                 } // Item1
             }     // Item - number of gas statements
@@ -2784,10 +2759,10 @@ namespace InternalHeatGains {
                                               "HotWaterEquipment",
                                               ZoneHWEq(Loop).Name,
                                               IntGainTypeOf_HotWaterEquipment,
-                                              ZoneHWEq(Loop).ConGainRate,
-                                              _,
-                                              ZoneHWEq(Loop).RadGainRate,
-                                              ZoneHWEq(Loop).LatGainRate);
+                                              &ZoneHWEq(Loop).ConGainRate,
+                                              nullptr,
+                                              &ZoneHWEq(Loop).RadGainRate,
+                                              &ZoneHWEq(Loop).LatGainRate);
 
                 } // Item1
             }     // Item - number of hot water statements
@@ -3177,10 +3152,10 @@ namespace InternalHeatGains {
                                               "SteamEquipment",
                                               ZoneSteamEq(Loop).Name,
                                               IntGainTypeOf_SteamEquipment,
-                                              ZoneSteamEq(Loop).ConGainRate,
-                                              _,
-                                              ZoneSteamEq(Loop).RadGainRate,
-                                              ZoneSteamEq(Loop).LatGainRate);
+                                              &ZoneSteamEq(Loop).ConGainRate,
+                                              nullptr,
+                                              &ZoneSteamEq(Loop).RadGainRate,
+                                              &ZoneSteamEq(Loop).LatGainRate);
 
                 } // Item1
             }     // Item - number of hot water statements
@@ -3280,7 +3255,7 @@ namespace InternalHeatGains {
 
                     std::string FuelTypeString("");
                     if (AlphaName(2) == "NONE") {
-                        ZoneOtherEq(Loop).OtherEquipFuelType = noOtherFuelTypeZero;
+                        ZoneOtherEq(Loop).OtherEquipFuelType = ExteriorEnergyUse::ExteriorFuelUsage::Unknown;
                         FuelTypeString = AlphaName(2);
                     } else {
                         ExteriorEnergyUse::ValidateFuelType(ZoneOtherEq(Loop).OtherEquipFuelType,
@@ -3289,8 +3264,8 @@ namespace InternalHeatGains {
                                                             CurrentModuleObject,
                                                             cAlphaFieldNames(2),
                                                             AlphaName(2));
-                        if (ZoneOtherEq(Loop).OtherEquipFuelType == noOtherFuelTypeZero ||
-                            ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::WaterUse) {
+                        if (ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::Unknown ||
+                            ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::WaterUse) {
                             ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered=" + AlphaName(2) +
                                             " for " + cAlphaFieldNames(1) + '=' + AlphaName(1));
                             ErrorsFound = true;
@@ -3370,7 +3345,7 @@ namespace InternalHeatGains {
                     }
 
                     // Throw an error if the design level is negative and we have a fuel type
-                    if (ZoneOtherEq(Loop).DesignLevel < 0.0 && ZoneOtherEq(Loop).OtherEquipFuelType != noOtherFuelTypeZero) {
+                    if (ZoneOtherEq(Loop).DesignLevel < 0.0 && ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                         cNumericFieldNames(DesignLevelFieldNumber) + " is not allowed to be negative");
                         ShowContinueError("... when a fuel type of " + FuelTypeString + " is specified.");
@@ -3417,7 +3392,7 @@ namespace InternalHeatGains {
                     if (ZoneOtherEq(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    if (ZoneOtherEq(Loop).OtherEquipFuelType > noOtherFuelTypeZero) {
+                    if (ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                         SetupOutputVariable("Other Equipment " + FuelTypeString + " Rate",
                                             OutputProcessor::Unit::W,
                                             ZoneOtherEq(Loop).Power,
@@ -3505,7 +3480,7 @@ namespace InternalHeatGains {
                     if (RepVarSet(ZoneOtherEq(Loop).ZonePtr)) {
                         RepVarSet(ZoneOtherEq(Loop).ZonePtr) = false;
 
-                        if (ZoneOtherEq(Loop).OtherEquipFuelType > noOtherFuelTypeZero) {
+                        if (ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                             SetupOutputVariable("Zone Other Equipment " + FuelTypeString + " Rate",
                                                 OutputProcessor::Unit::W,
                                                 ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherPower,
@@ -3596,10 +3571,10 @@ namespace InternalHeatGains {
                                               "OtherEquipment",
                                               ZoneOtherEq(Loop).Name,
                                               IntGainTypeOf_OtherEquipment,
-                                              ZoneOtherEq(Loop).ConGainRate,
-                                              _,
-                                              ZoneOtherEq(Loop).RadGainRate,
-                                              ZoneOtherEq(Loop).LatGainRate);
+                                              &ZoneOtherEq(Loop).ConGainRate,
+                                              nullptr,
+                                              &ZoneOtherEq(Loop).RadGainRate,
+                                              &ZoneOtherEq(Loop).LatGainRate);
 
                 } // Item1
             }     // Item - number of other equipment statements
@@ -3869,12 +3844,35 @@ namespace InternalHeatGains {
                         ShowContinueError("For " + cAlphaFieldNames(3) + "= FlowControlWithApproachTemperatures, " + cAlphaFieldNames(14) +
                                           " is required, but this field is blank.");
                         ErrorsFound = true;
-                    } else {
-                        ZoneITEq(Loop).SupplyAirNodeNum = 0;
                     }
                 } else {
                     ZoneITEq(Loop).SupplyAirNodeNum = GetOnlySingleNode(
                         AlphaName(14), ErrorsFound, CurrentModuleObject, AlphaName(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                }
+
+                // check supply air node for matches with zone equipment supply air node
+                int zoneEqIndex = DataZoneEquipment::GetControlledZoneIndex(state, Zone(ZoneITEq(Loop).ZonePtr).Name);
+                auto itStart = DataZoneEquipment::ZoneEquipConfig(zoneEqIndex).InletNode.begin();
+                auto itEnd = DataZoneEquipment::ZoneEquipConfig(zoneEqIndex).InletNode.end();
+                auto key = ZoneITEq(Loop).SupplyAirNodeNum;
+                bool supplyNodeFound = false;
+                if (std::find(itStart, itEnd, key) != itEnd) {
+                    supplyNodeFound = true;
+                }
+
+                if (ZoneITEq(Loop).AirConnectionType == ITEInletAdjustedSupply && !supplyNodeFound) {
+                    // supply air node must match zone equipment supply air node for these conditions
+                    ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
+                    ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                    ErrorsFound = true;
+                } else if (ZoneITEq(Loop).FlowControlWithApproachTemps && !supplyNodeFound) {
+                    // supply air node must match zone equipment supply air node for these conditions
+                    ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
+                    ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                    ErrorsFound = true;
+                } else if (ZoneITEq(Loop).SupplyAirNodeNum != 0 && !supplyNodeFound) {
+                    // the given supply air node does not match any zone equipment supply air nodes
+                    ShowWarningError(CurrentModuleObject + "name: '" + AlphaName(1) + ". " + "Supply Air Node Name '" + AlphaName(14) + "' does not match any ZoneHVAC:EquipmentConnections objects.");
                 }
 
                 // End-Use subcategories
@@ -3928,6 +3926,19 @@ namespace InternalHeatGains {
                             ErrorsFound = true;
                         }
                     }
+                }
+
+                if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
+                    Real64 TAirInSizing = 0.0;
+                    // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite object
+                    SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
+                    for (int SetPtMgrNum = 1; SetPtMgrNum <= SetPointManager::NumSZClSetPtMgrs; ++SetPtMgrNum) {
+                        if (SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == Loop) {
+                            TAirInSizing = SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
+                        }
+                    }
+
+                    ZoneITEq(Loop).SizingTAirIn = max(TAirInSizing, ZoneITEq(Loop).DesignTAirIn);
                 }
 
                 // Object report variables
@@ -4318,7 +4329,7 @@ namespace InternalHeatGains {
                                           "ElectricEquipment:ITE:AirCooled",
                                           ZoneITEq(Loop).Name,
                                           IntGainTypeOf_ElectricEquipmentITEAirCooled,
-                                          ZoneITEq(Loop).ConGainRateToZone);
+                                          &ZoneITEq(Loop).ConGainRateToZone);
 
             } // Item - Number of ZoneITEq objects
             for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
@@ -4520,9 +4531,9 @@ namespace InternalHeatGains {
                                   "ZoneBaseboard:OutdoorTemperatureControlled",
                                   ZoneBBHeat(Loop).Name,
                                   IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
-                                  ZoneBBHeat(Loop).ConGainRate,
-                                  _,
-                                  ZoneBBHeat(Loop).RadGainRate);
+                                  &ZoneBBHeat(Loop).ConGainRate,
+                                  nullptr,
+                                  &ZoneBBHeat(Loop).RadGainRate);
         }
 
         RepVarSet = true;
@@ -4613,12 +4624,12 @@ namespace InternalHeatGains {
                                   "ZoneContaminantSourceAndSink:CarbonDioxide",
                                   ZoneCO2Gen(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  ZoneCO2Gen(Loop).CO2GainRate);
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  &ZoneCO2Gen(Loop).CO2GainRate);
         }
 
         RepVarSet.deallocate();
@@ -4629,7 +4640,13 @@ namespace InternalHeatGains {
             ShowFatalError(RoutineName + "Errors found in Getting Internal Gains Input, Program Stopped");
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_721);
+        static constexpr auto Format_721(
+            "! <Zone Internal Gains Nominal>,Zone Name, Floor Area {{m2}},# Occupants,Area per Occupant "
+            "{{m2/person}},Occupant per Area {{person/m2}},Interior Lighting {{W/m2}},Electric Load {{W/m2}},Gas Load {{W/m2}},Other "
+            "Load {{W/m2}},Hot Water Eq {{W/m2}},Steam Equipment {{W/m2}},Sum Loads per Area {{W/m2}},Outdoor Controlled Baseboard "
+            "Heat\n");
+
+        print(state.outputFiles.eio, Format_721);
         for (Loop = 1; Loop <= NumOfZones; ++Loop) {
             LightTot = 0.0;
             ElecTot = 0.0;
@@ -4672,943 +4689,441 @@ namespace InternalHeatGains {
             }
             Zone(Loop).InternalHeatGains = LightTot + ElecTot + GasTot + OthTot + HWETot + StmTot;
             if (Zone(Loop).FloorArea > 0.0) {
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
-                        << Zone(Loop).Name << RoundSigDigits(Zone(Loop).FloorArea, 2) << RoundSigDigits(Zone(Loop).TotOccupants, 1);
-                }
-                if (Zone(Loop).TotOccupants > 0.0) {
-                    StringOut = RoundSigDigits(Zone(Loop).FloorArea / Zone(Loop).TotOccupants, 3);
-                } else {
-                    StringOut = "N/A";
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                }
-                StringOut = RoundSigDigits(Zone(Loop).TotOccupants / Zone(Loop).FloorArea, 3);
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                }
-                StringOut = RoundSigDigits(LightTot / Zone(Loop).FloorArea, 3);
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                }
-                StringOut = RoundSigDigits(ElecTot / Zone(Loop).FloorArea, 3);
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                }
-                StringOut = RoundSigDigits(GasTot / Zone(Loop).FloorArea, 3);
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                }
-                StringOut = RoundSigDigits(OthTot / Zone(Loop).FloorArea, 3);
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                }
-                StringOut = RoundSigDigits(HWETot / Zone(Loop).FloorArea, 3);
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                }
-                StringOut = RoundSigDigits(StmTot / Zone(Loop).FloorArea, 3);
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                }
-                StringOut = RoundSigDigits(Zone(Loop).InternalHeatGains / Zone(Loop).FloorArea, 3);
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut + ',' + BBHeatInd;
+                print(state.outputFiles.eio, Format_720, Zone(Loop).Name, Zone(Loop).FloorArea, Zone(Loop).TotOccupants);
+                print_and_divide_if_greater_than_zero(Zone(Loop).FloorArea, Zone(Loop).TotOccupants);
+                print(state.outputFiles.eio, "{:.3R},", Zone(Loop).TotOccupants / Zone(Loop).FloorArea);
+                print(state.outputFiles.eio, "{:.3R},", LightTot / Zone(Loop).FloorArea);
+                print(state.outputFiles.eio, "{:.3R},", ElecTot / Zone(Loop).FloorArea);
+                print(state.outputFiles.eio, "{:.3R},", GasTot / Zone(Loop).FloorArea);
+                print(state.outputFiles.eio, "{:.3R},", OthTot / Zone(Loop).FloorArea);
+                print(state.outputFiles.eio, "{:.3R},", HWETot / Zone(Loop).FloorArea);
+                print(state.outputFiles.eio, "{:.3R},", StmTot / Zone(Loop).FloorArea);
+                print(state.outputFiles.eio, "{:.3R},{}\n", Zone(Loop).InternalHeatGains / Zone(Loop).FloorArea, BBHeatInd);
             } else {
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
-                        << Zone(Loop).Name << RoundSigDigits(Zone(Loop).FloorArea, 2) << RoundSigDigits(Zone(Loop).TotOccupants, 1);
-                }
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "0.0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A" + BBHeatInd;
+                print(state.outputFiles.eio, Format_720, Zone(Loop).Name, Zone(Loop).FloorArea, Zone(Loop).TotOccupants);
+                print(state.outputFiles.eio, "0.0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,{}\n", BBHeatInd);
             }
         }
         for (Loop = 1; Loop <= TotPeople; ++Loop) {
             if (Loop == 1) {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, Format_723, flags)
-                    << "People"
-                    << "Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction "
-                       "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum "
-                       "Number of People,Nominal Maximum Number of People";
-            };
-            if (Loop == 1) {
+                print(state.outputFiles.eio,
+                      Format_723,
+                      "People",
+                      "Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction "
+                      "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum "
+                      "Number of People,Nominal Maximum Number of People");
                 if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
-                                                         "Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce "
-                                                         "Calculation,KSU Calculation";
+                    print(state.outputFiles.eio,
+                          ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
+                          "Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce "
+                          "Calculation,KSU Calculation\n");
                 } else {
-                    ObjexxFCL::gio::write(OutputFileInits);
+                    print(state.outputFiles.eio, "\n");
                 }
             }
 
             ZoneNum = People(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "People-Illegal Zone specified" << People(Loop).Name;
+                print(state.outputFiles.eio, Format_724, "People-Illegal Zone specified", People(Loop).Name);
                 continue;
             }
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
-                    << "People" << People(Loop).Name << GetScheduleName(People(Loop).NumberOfPeoplePtr) << Zone(ZoneNum).Name
-                    << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(People(Loop).NumberOfPeople, 1) + ',';
-            }
-            if (Zone(ZoneNum).FloorArea > 0.0) {
-                StringOut = RoundSigDigits(People(Loop).NumberOfPeople / Zone(ZoneNum).FloorArea, 3);
+            print(state.outputFiles.eio,
+                  Format_722,
+                  "People",
+                  People(Loop).Name,
+                  GetScheduleName(People(Loop).NumberOfPeoplePtr),
+                  Zone(ZoneNum).Name,
+                  Zone(ZoneNum).FloorArea,
+                  Zone(ZoneNum).TotOccupants);
+
+            print(state.outputFiles.eio, "{:.1R},", People(Loop).NumberOfPeople);
+
+            print_and_divide_if_greater_than_zero(People(Loop).NumberOfPeople, Zone(ZoneNum).FloorArea);
+
+            if (People(Loop).NumberOfPeople > 0.0){
+                print_and_divide_if_greater_than_zero(Zone(ZoneNum).FloorArea, People(Loop).NumberOfPeople);
             } else {
-                StringOut = "N/A";
+                print(state.outputFiles.eio, "N/A,");
             }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            if (People(Loop).NumberOfPeople > 0.0) {
-                if (Zone(ZoneNum).FloorArea > 0.0) {
-                    StringOut = RoundSigDigits(Zone(ZoneNum).FloorArea / People(Loop).NumberOfPeople, 3);
-                } else {
-                    StringOut = "N/A";
-                }
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(People(Loop).FractionRadiant, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(People(Loop).FractionConvected, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
+
+            print(state.outputFiles.eio, "{:.3R},", People(Loop).FractionRadiant);
+            print(state.outputFiles.eio, "{:.3R},", People(Loop).FractionConvected);
             if (People(Loop).UserSpecSensFrac == AutoCalculate) {
-                StringOut = "AutoCalculate";
+                print(state.outputFiles.eio, "AutoCalculate,");
             } else {
-                StringOut = RoundSigDigits(People(Loop).UserSpecSensFrac, 3);
+                print(state.outputFiles.eio, "{:.3R},", People(Loop).UserSpecSensFrac);
             }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = GetScheduleName(People(Loop).ActivityLevelPtr);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
+            print(state.outputFiles.eio, "{},", GetScheduleName(People(Loop).ActivityLevelPtr));
+
             if (People(Loop).Show55Warning) {
-                StringOut = "Yes";
+                print(state.outputFiles.eio, "Yes,");
             } else {
-                StringOut = "No";
+                print(state.outputFiles.eio, "No,");
             }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(People(Loop).CO2RateFactor, 4);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(People(Loop).NomMinNumberPeople, 0);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(People(Loop).NomMaxNumberPeople, 0);
+            print(state.outputFiles.eio, "{:.4R},", People(Loop).CO2RateFactor);
+            print(state.outputFiles.eio, "{:.0R},", People(Loop).NomMinNumberPeople);
+
             if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                }
+                print(state.outputFiles.eio, "{:.0R},", People(Loop).NomMaxNumberPeople);
+
                 if (People(Loop).MRTCalcType == ZoneAveraged) {
-                    StringOut = "Zone Averaged";
+                    print(state.outputFiles.eio, "Zone Averaged,");
                 } else if (People(Loop).MRTCalcType == SurfaceWeighted) {
-                    StringOut = "Surface Weighted";
+                    print(state.outputFiles.eio, "Surface Weighted,");
                 } else if (People(Loop).MRTCalcType == AngleFactor) {
-                    StringOut = "Angle Factor";
+                    print(state.outputFiles.eio, "Angle Factor,");
                 } else {
-                    StringOut = "N/A";
+                    print(state.outputFiles.eio, "N/A,");
                 }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << GetScheduleName(People(Loop).WorkEffPtr) + ',';
-                }
+                print(state.outputFiles.eio, "{},", GetScheduleName(People(Loop).WorkEffPtr));
 
                 if (People(Loop).ClothingType == 1) {
-                    StringOut = "Clothing Insulation Schedule";
+                    print(state.outputFiles.eio, "Clothing Insulation Schedule,");
                 } else if (People(Loop).ClothingType == 2) {
-                    StringOut = "Dynamic Clothing Model ASHRAE55";
+                    print(state.outputFiles.eio, "Dynamic Clothing Model ASHRAE55,");
                 } else if (People(Loop).ClothingType == 3) {
-                    StringOut = "Calculation Method Schedule";
+                    print(state.outputFiles.eio, "Calculation Method Schedule,");
                 } else {
-                    StringOut = "N/A";
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    print(state.outputFiles.eio, "N/A,");
                 }
 
                 if (People(Loop).ClothingType == 3) {
-                    StringOut = GetScheduleName(People(Loop).ClothingMethodPtr);
+                    print(state.outputFiles.eio, "{},", GetScheduleName(People(Loop).ClothingMethodPtr));
                 } else {
-                    StringOut = "N/A";
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    print(state.outputFiles.eio, "N/A,");
                 }
 
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << GetScheduleName(People(Loop).ClothingPtr) + ',';
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << GetScheduleName(People(Loop).AirVelocityPtr) + ',';
-                }
+                print(state.outputFiles.eio, "{},", GetScheduleName(People(Loop).ClothingPtr));
+                print(state.outputFiles.eio, "{},", GetScheduleName(People(Loop).AirVelocityPtr));
+
                 if (People(Loop).Fanger) {
-                    StringOut = "Yes";
+                    print(state.outputFiles.eio, "Yes,");
                 } else {
-                    StringOut = "No";
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    print(state.outputFiles.eio, "No,");
                 }
                 if (People(Loop).Pierce) {
-                    StringOut = "Yes";
+                    print(state.outputFiles.eio, "Yes,");
                 } else {
-                    StringOut = "No";
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    print(state.outputFiles.eio, "No,");
                 }
                 if (People(Loop).KSU) {
-                    StringOut = "Yes";
+                    print(state.outputFiles.eio, "Yes\n");
                 } else {
-                    StringOut = "No";
+                    print(state.outputFiles.eio, "No\n");
                 }
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
             } else {
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+                print(state.outputFiles.eio, "{:.0R}\n", People(Loop).NomMaxNumberPeople);
             }
         }
         for (Loop = 1; Loop <= TotLights; ++Loop) {
-            if (Loop == 1)
-                ObjexxFCL::gio::write(OutputFileInits, Format_723) << "Lights"
-                                                        << "Lighting Level {W},Lights/Floor Area {W/m2},Lights per person {W/person},Fraction Return "
-                                                           "Air,Fraction Radiant,Fraction Short Wave,Fraction Convected,Fraction Replaceable,End-Use "
-                                                           "Category,Nominal Minimum Lighting Level {W},Nominal Maximum Lighting Level {W}";
+            if (Loop == 1) {
+                print(state.outputFiles.eio,
+                      Format_723,
+                      "Lights",
+                      "Lighting Level {W},Lights/Floor Area {W/m2},Lights per person {W/person},Fraction Return "
+                      "Air,Fraction Radiant,Fraction Short Wave,Fraction Convected,Fraction Replaceable,End-Use "
+                      "Category,Nominal Minimum Lighting Level {W},Nominal Maximum Lighting Level {W}\n");
+            }
 
             ZoneNum = Lights(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Lights-Illegal Zone specified" << Lights(Loop).Name;
+                print(state.outputFiles.eio, "Lights-Illegal Zone specified", Lights(Loop).Name);
                 continue;
             }
+            print(state.outputFiles.eio,
+                  Format_722,
+                  "Lights",
+                  Lights(Loop).Name,
+                  GetScheduleName(Lights(Loop).SchedPtr),
+                  Zone(ZoneNum).Name,
+                  Zone(ZoneNum).FloorArea,
+                  Zone(ZoneNum).TotOccupants);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
-                    << "Lights" << Lights(Loop).Name << GetScheduleName(Lights(Loop).SchedPtr) << Zone(ZoneNum).Name
-                    << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
-            }
+            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).DesignLevel);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(Lights(Loop).DesignLevel, 3) + ',';
-            }
-            if (Zone(ZoneNum).FloorArea > 0.0) {
-                StringOut = RoundSigDigits(Lights(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            if (Zone(ZoneNum).TotOccupants > 0.0) {
-                StringOut = RoundSigDigits(Lights(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(Lights(Loop).FractionReturnAir, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(Lights(Loop).FractionRadiant, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(Lights(Loop).FractionShortWave, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(Lights(Loop).FractionConvected, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(Lights(Loop).FractionReplaceable, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << Lights(Loop).EndUseSubcategory + ',';
-            }
-            StringOut = RoundSigDigits(Lights(Loop).NomMinDesignLevel, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(Lights(Loop).NomMaxDesignLevel, 3);
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+            print_and_divide_if_greater_than_zero(Lights(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
+            print_and_divide_if_greater_than_zero(Lights(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
+
+            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).FractionReturnAir);
+            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).FractionRadiant);
+            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).FractionShortWave);
+            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).FractionConvected);
+            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).FractionReplaceable);
+            print(state.outputFiles.eio, "{},", Lights(Loop).EndUseSubcategory);
+            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).NomMinDesignLevel);
+            print(state.outputFiles.eio, "{:.3R}\n", Lights(Loop).NomMaxDesignLevel);
         }
         for (Loop = 1; Loop <= TotElecEquip; ++Loop) {
-            if (Loop == 1)
-                ObjexxFCL::gio::write(OutputFileInits, Format_723)
-                    << "ElectricEquipment"
-                    << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                       "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+            if (Loop == 1) {
+                print(state.outputFiles.eio,
+                      Format_723,
+                      "ElectricEquipment",
+                      "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
+                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
+            }
 
             ZoneNum = ZoneElectric(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Electric Equipment-Illegal Zone specified" << ZoneElectric(Loop).Name;
+                print(state.outputFiles.eio, Format_724, "Electric Equipment-Illegal Zone specified", ZoneElectric(Loop).Name);
                 continue;
             }
+            print(state.outputFiles.eio,
+                  Format_722,
+                  "ElectricEquipment",
+                  ZoneElectric(Loop).Name,
+                  GetScheduleName(ZoneElectric(Loop).SchedPtr),
+                  Zone(ZoneNum).Name,
+                  Zone(ZoneNum).FloorArea,
+                  Zone(ZoneNum).TotOccupants);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
-                    << "ElectricEquipment" << ZoneElectric(Loop).Name << GetScheduleName(ZoneElectric(Loop).SchedPtr) << Zone(ZoneNum).Name
-                    << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
-            }
+            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).DesignLevel);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneElectric(Loop).DesignLevel, 3) + ',';
-            }
-            if (Zone(ZoneNum).FloorArea > 0.0) {
-                StringOut = RoundSigDigits(ZoneElectric(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            if (Zone(ZoneNum).TotOccupants > 0.0) {
-                StringOut = RoundSigDigits(ZoneElectric(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneElectric(Loop).FractionLatent, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneElectric(Loop).FractionRadiant, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneElectric(Loop).FractionLost, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneElectric(Loop).FractionConvected, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneElectric(Loop).EndUseSubcategory + ',';
-            }
-            StringOut = RoundSigDigits(ZoneElectric(Loop).NomMinDesignLevel, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneElectric(Loop).NomMaxDesignLevel, 3);
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+            print_and_divide_if_greater_than_zero(ZoneElectric(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
+            print_and_divide_if_greater_than_zero(ZoneElectric(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
+
+            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).FractionLatent);
+            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).FractionRadiant);
+            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).FractionLost);
+            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).FractionConvected);
+            print(state.outputFiles.eio, "{},", ZoneElectric(Loop).EndUseSubcategory);
+            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).NomMinDesignLevel);
+            print(state.outputFiles.eio, "{:.3R}\n", ZoneElectric(Loop).NomMaxDesignLevel);
         }
         for (Loop = 1; Loop <= TotGasEquip; ++Loop) {
-            if (Loop == 1)
-                ObjexxFCL::gio::write(OutputFileInits, Format_723)
-                    << "GasEquipment"
-                    << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                       "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+            if (Loop == 1) {
+                print(state.outputFiles.eio,
+                      Format_723,
+                      "GasEquipment",
+                      "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
+                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
+            }
 
             ZoneNum = ZoneGas(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Gas Equipment-Illegal Zone specified" << ZoneGas(Loop).Name;
+                print(state.outputFiles.eio, Format_724, "Gas Equipment-Illegal Zone specified", ZoneGas(Loop).Name);
                 continue;
             }
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
-                    << "GasEquipment" << ZoneGas(Loop).Name << GetScheduleName(ZoneGas(Loop).SchedPtr) << Zone(ZoneNum).Name
-                    << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
-            }
+            print(state.outputFiles.eio,
+                  Format_722,
+                  "GasEquipment",
+                  ZoneGas(Loop).Name,
+                  GetScheduleName(ZoneGas(Loop).SchedPtr),
+                  Zone(ZoneNum).Name,
+                  Zone(ZoneNum).FloorArea,
+                  Zone(ZoneNum).TotOccupants);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneGas(Loop).DesignLevel, 3) + ',';
-            }
+            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).DesignLevel);
 
-            if (Zone(ZoneNum).FloorArea > 0.0) {
-                StringOut = RoundSigDigits(ZoneGas(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            if (Zone(ZoneNum).TotOccupants > 0.0) {
-                StringOut = RoundSigDigits(ZoneGas(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneGas(Loop).FractionLatent, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneGas(Loop).FractionRadiant, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneGas(Loop).FractionLost, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneGas(Loop).FractionConvected, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneGas(Loop).EndUseSubcategory + ',';
-            }
-            StringOut = RoundSigDigits(ZoneGas(Loop).NomMinDesignLevel, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneGas(Loop).NomMaxDesignLevel, 3);
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+            print_and_divide_if_greater_than_zero(ZoneGas(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
+            print_and_divide_if_greater_than_zero(ZoneGas(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
+
+            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).FractionLatent);
+            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).FractionRadiant);
+            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).FractionLost);
+            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).FractionConvected);
+            print(state.outputFiles.eio, "{},", ZoneGas(Loop).EndUseSubcategory);
+            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).NomMinDesignLevel);
+            print(state.outputFiles.eio, "{:.3R}\n", ZoneGas(Loop).NomMaxDesignLevel);
         }
 
         for (Loop = 1; Loop <= TotHWEquip; ++Loop) {
-            if (Loop == 1)
-                ObjexxFCL::gio::write(OutputFileInits, Format_723)
-                    << "HotWaterEquipment"
-                    << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                       "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+            if (Loop == 1) {
+                print(state.outputFiles.eio,
+                      Format_723,
+                      "HotWaterEquipment",
+                      "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
+                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
+            }
 
             ZoneNum = ZoneHWEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Hot Water Equipment-Illegal Zone specified" << ZoneHWEq(Loop).Name;
+                print(state.outputFiles.eio, Format_724, "Hot Water Equipment-Illegal Zone specified", ZoneHWEq(Loop).Name);
                 continue;
             }
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
-                    << "HotWaterEquipment" << ZoneHWEq(Loop).Name << GetScheduleName(ZoneHWEq(Loop).SchedPtr) << Zone(ZoneNum).Name
-                    << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
-            }
+            print(state.outputFiles.eio,
+                  Format_722,
+                  "HotWaterEquipment",
+                  ZoneHWEq(Loop).Name,
+                  GetScheduleName(ZoneHWEq(Loop).SchedPtr),
+                  Zone(ZoneNum).Name,
+                  Zone(ZoneNum).FloorArea,
+                  Zone(ZoneNum).TotOccupants);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneHWEq(Loop).DesignLevel, 3) + ',';
-            }
+            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).DesignLevel);
 
-            if (Zone(ZoneNum).FloorArea > 0.0) {
-                StringOut = RoundSigDigits(ZoneHWEq(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            if (Zone(ZoneNum).TotOccupants > 0.0) {
-                StringOut = RoundSigDigits(ZoneHWEq(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneHWEq(Loop).FractionLatent, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneHWEq(Loop).FractionRadiant, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneHWEq(Loop).FractionLost, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneHWEq(Loop).FractionConvected, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneHWEq(Loop).EndUseSubcategory + ',';
-            }
-            StringOut = RoundSigDigits(ZoneHWEq(Loop).NomMinDesignLevel, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneHWEq(Loop).NomMaxDesignLevel, 3);
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+            print_and_divide_if_greater_than_zero(ZoneHWEq(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
+            print_and_divide_if_greater_than_zero(ZoneHWEq(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
+
+            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).FractionLatent);
+            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).FractionRadiant);
+            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).FractionLost);
+            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).FractionConvected);
+            print(state.outputFiles.eio, "{},", ZoneHWEq(Loop).EndUseSubcategory);
+            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).NomMinDesignLevel);
+            print(state.outputFiles.eio, "{:.3R}\n", ZoneHWEq(Loop).NomMaxDesignLevel);
         }
 
         for (Loop = 1; Loop <= TotStmEquip; ++Loop) {
-            if (Loop == 1)
-                ObjexxFCL::gio::write(OutputFileInits, Format_723)
-                    << "SteamEquipment"
-                    << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                       "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+            if (Loop == 1) {
+                print(state.outputFiles.eio,
+                      Format_723,
+                      "SteamEquipment",
+                      "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
+                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
+            }
 
             ZoneNum = ZoneSteamEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Steam Equipment-Illegal Zone specified" << ZoneSteamEq(Loop).Name;
+                print(state.outputFiles.eio, Format_724, "Steam Equipment-Illegal Zone specified", ZoneSteamEq(Loop).Name);
                 continue;
             }
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
-                    << "SteamEquipment" << ZoneSteamEq(Loop).Name << GetScheduleName(ZoneSteamEq(Loop).SchedPtr) << Zone(ZoneNum).Name
-                    << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
-            }
+            print(state.outputFiles.eio,
+                  Format_722,
+                  "SteamEquipment",
+                  ZoneSteamEq(Loop).Name,
+                  GetScheduleName(ZoneSteamEq(Loop).SchedPtr),
+                  Zone(ZoneNum).Name,
+                  Zone(ZoneNum).FloorArea,
+                  Zone(ZoneNum).TotOccupants);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneSteamEq(Loop).DesignLevel, 3) + ',';
-            }
+            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).DesignLevel);
 
-            if (Zone(ZoneNum).FloorArea > 0.0) {
-                StringOut = RoundSigDigits(ZoneSteamEq(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            if (Zone(ZoneNum).TotOccupants > 0.0) {
-                StringOut = RoundSigDigits(ZoneSteamEq(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneSteamEq(Loop).FractionLatent, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneSteamEq(Loop).FractionRadiant, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneSteamEq(Loop).FractionLost, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneSteamEq(Loop).FractionConvected, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneSteamEq(Loop).EndUseSubcategory + ',';
-            }
-            StringOut = RoundSigDigits(ZoneSteamEq(Loop).NomMinDesignLevel, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneSteamEq(Loop).NomMaxDesignLevel, 3);
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+            print_and_divide_if_greater_than_zero(ZoneSteamEq(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
+            print_and_divide_if_greater_than_zero(ZoneSteamEq(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
+
+            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).FractionLatent);
+            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).FractionRadiant);
+            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).FractionLost);
+            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).FractionConvected);
+            print(state.outputFiles.eio, "{},", ZoneSteamEq(Loop).EndUseSubcategory);
+            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).NomMinDesignLevel);
+            print(state.outputFiles.eio, "{:.3R}\n", ZoneSteamEq(Loop).NomMaxDesignLevel);
         }
 
         for (Loop = 1; Loop <= TotOthEquip; ++Loop) {
-            if (Loop == 1)
-                ObjexxFCL::gio::write(OutputFileInits, Format_723)
-                    << "OtherEquipment"
-                    << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                       "Lost,Fraction Convected,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+            if (Loop == 1) {
+                print(state.outputFiles.eio,
+                      Format_723,
+                      "OtherEquipment",
+                      "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
+                      "Lost,Fraction Convected,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
+            }
+
             ZoneNum = ZoneOtherEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Other Equipment-Illegal Zone specified" << ZoneOtherEq(Loop).Name;
+                print(state.outputFiles.eio, Format_724, "Other Equipment-Illegal Zone specified", ZoneOtherEq(Loop).Name);
                 continue;
             }
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
-                    << "OtherEquipment" << ZoneOtherEq(Loop).Name << GetScheduleName(ZoneOtherEq(Loop).SchedPtr) << Zone(ZoneNum).Name
-                    << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
-            }
+            print(state.outputFiles.eio,
+                  Format_722,
+                  "OtherEquipment",
+                  ZoneOtherEq(Loop).Name,
+                  GetScheduleName(ZoneOtherEq(Loop).SchedPtr),
+                  Zone(ZoneNum).Name,
+                  Zone(ZoneNum).FloorArea,
+                  Zone(ZoneNum).TotOccupants);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneOtherEq(Loop).DesignLevel, 3) + ',';
-            }
+            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).DesignLevel);
 
-            if (Zone(ZoneNum).FloorArea > 0.0) {
-                StringOut = RoundSigDigits(ZoneOtherEq(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            if (Zone(ZoneNum).TotOccupants > 0.0) {
-                StringOut = RoundSigDigits(ZoneOtherEq(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneOtherEq(Loop).FractionLatent, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneOtherEq(Loop).FractionRadiant, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneOtherEq(Loop).FractionLost, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneOtherEq(Loop).FractionConvected, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneOtherEq(Loop).NomMinDesignLevel, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneOtherEq(Loop).NomMaxDesignLevel, 3);
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+            print_and_divide_if_greater_than_zero(ZoneOtherEq(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
+            print_and_divide_if_greater_than_zero(ZoneOtherEq(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
+
+            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).FractionLatent);
+            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).FractionRadiant);
+            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).FractionLost);
+            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).FractionConvected);
+            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).NomMinDesignLevel);
+            print(state.outputFiles.eio, "{:.3R}\n", ZoneOtherEq(Loop).NomMaxDesignLevel);
         }
 
         for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
-            if (Loop == 1)
-                ObjexxFCL::gio::write(OutputFileInits, Format_723)
-                    << "ElectricEquipment:ITE:AirCooled"
-                    << "Equipment Level {W},"
-                       "Equipment/Floor Area {W/m2},Equipment per person {W/person},"
-                       "Fraction Convected,CPU End-Use SubCategory,Fan End-Use SubCategory,UPS End-Use SubCategory,"
-                       "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}, Design Air Volume Flow Rate {m3/s}";
+            if (Loop == 1) {
+                print(state.outputFiles.eio,
+                      Format_723,
+                      "ElectricEquipment:ITE:AirCooled",
+                      "Equipment Level {W},"
+                      "Equipment/Floor Area {W/m2},Equipment per person {W/person},"
+                      "Fraction Convected,CPU End-Use SubCategory,Fan End-Use SubCategory,UPS End-Use SubCategory,"
+                      "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}, Design Air Volume Flow Rate {m3/s}\n");
+            }
 
             ZoneNum = ZoneITEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "ElectricEquipment:ITE:AirCooled-Illegal Zone specified" << ZoneITEq(Loop).Name;
+                print(state.outputFiles.eio, Format_724, "ElectricEquipment:ITE:AirCooled-Illegal Zone specified", ZoneITEq(Loop).Name);
                 continue;
             }
+            print(state.outputFiles.eio,
+                  Format_722,
+                  "ElectricEquipment:ITE:AirCooled",
+                  ZoneITEq(Loop).Name,
+                  GetScheduleName(ZoneITEq(Loop).OperSchedPtr),
+                  Zone(ZoneNum).Name,
+                  Zone(ZoneNum).FloorArea,
+                  Zone(ZoneNum).TotOccupants);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
-                    << "ElectricEquipment:ITE:AirCooled" << ZoneITEq(Loop).Name << GetScheduleName(ZoneITEq(Loop).OperSchedPtr) << Zone(ZoneNum).Name
-                    << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
-            }
+            print(state.outputFiles.eio, "{:.3R},", ZoneITEq(Loop).DesignTotalPower);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneITEq(Loop).DesignTotalPower, 3) + ',';
-            }
-            if (Zone(ZoneNum).FloorArea > 0.0) {
-                StringOut = RoundSigDigits(ZoneITEq(Loop).DesignTotalPower / Zone(ZoneNum).FloorArea, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            if (Zone(ZoneNum).TotOccupants > 0.0) {
-                StringOut = RoundSigDigits(ZoneITEq(Loop).DesignTotalPower / Zone(ZoneNum).TotOccupants, 3);
-            } else {
-                StringOut = "N/A";
-            }
-            StringOut = "1.0"; // ElectricEquipment:ITE:AirCooled is 100% convective
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneITEq(Loop).EndUseSubcategoryCPU + ',';
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneITEq(Loop).EndUseSubcategoryFan + ',';
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneITEq(Loop).EndUseSubcategoryUPS + ',';
-            }
-            StringOut = RoundSigDigits(ZoneITEq(Loop).NomMinDesignLevel, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneITEq(Loop).NomMaxDesignLevel, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneITEq(Loop).DesignAirVolFlowRate, 10);
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+            print_and_divide_if_greater_than_zero(ZoneITEq(Loop).DesignTotalPower, Zone(ZoneNum).FloorArea);
+
+            // ElectricEquipment:ITE:AirCooled is 100% convective
+            print(state.outputFiles.eio, "1.0,");
+
+            print(state.outputFiles.eio, "{},", ZoneITEq(Loop).EndUseSubcategoryCPU);
+            print(state.outputFiles.eio, "{},", ZoneITEq(Loop).EndUseSubcategoryFan);
+            print(state.outputFiles.eio, "{},", ZoneITEq(Loop).EndUseSubcategoryUPS);
+            print(state.outputFiles.eio, "{:.3R},", ZoneITEq(Loop).NomMinDesignLevel);
+            print(state.outputFiles.eio, "{:.3R},", ZoneITEq(Loop).NomMaxDesignLevel);
+            print(state.outputFiles.eio, "{:.10R}\n", ZoneITEq(Loop).DesignAirVolFlowRate);
         }
 
         for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
-            if (Loop == 1)
-                ObjexxFCL::gio::write(OutputFileInits, Format_723) << "Outdoor Controlled Baseboard Heat"
-                                                        << "Capacity at Low Temperature {W},Low Temperature {C},Capacity at High Temperature "
-                                                           "{W},High Temperature {C},Fraction Radiant,Fraction Convected,End-Use Subcategory";
+            if (Loop == 1) {
+                print(state.outputFiles.eio,
+                      Format_723,
+                      "Outdoor Controlled Baseboard Heat",
+                      "Capacity at Low Temperature {W},Low Temperature {C},Capacity at High Temperature "
+                      "{W},High Temperature {C},Fraction Radiant,Fraction Convected,End-Use Subcategory\n");
+            }
 
             ZoneNum = ZoneBBHeat(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Outdoor Controlled Baseboard Heat-Illegal Zone specified" << ZoneBBHeat(Loop).Name;
+                print(state.outputFiles.eio, Format_724, "Outdoor Controlled Baseboard Heat-Illegal Zone specified", ZoneBBHeat(Loop).Name);
                 continue;
             }
+            print(state.outputFiles.eio,
+                  Format_722,
+                  "Outdoor Controlled Baseboard Heat",
+                  ZoneBBHeat(Loop).Name,
+                  GetScheduleName(ZoneBBHeat(Loop).SchedPtr),
+                  Zone(ZoneNum).Name,
+                  Zone(ZoneNum).FloorArea,
+                  Zone(ZoneNum).TotOccupants);
 
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
-                    << "Outdoor Controlled Baseboard Heat" << ZoneBBHeat(Loop).Name << GetScheduleName(ZoneBBHeat(Loop).SchedPtr)
-                    << Zone(ZoneNum).Name << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
-            }
-
-            StringOut = RoundSigDigits(ZoneBBHeat(Loop).CapatLowTemperature, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneBBHeat(Loop).LowTemperature, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneBBHeat(Loop).CapatHighTemperature, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneBBHeat(Loop).HighTemperature, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneBBHeat(Loop).FractionRadiant, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            StringOut = RoundSigDigits(ZoneBBHeat(Loop).FractionConvected, 3);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << ZoneBBHeat(Loop).EndUseSubcategory;
+            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).CapatLowTemperature);
+            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).LowTemperature);
+            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).CapatHighTemperature);
+            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).HighTemperature);
+            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).FractionRadiant);
+            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).FractionConvected);
+            print(state.outputFiles.eio, "{}\n", ZoneBBHeat(Loop).EndUseSubcategory);
         }
     }
 
-    void InitInternalHeatGains()
+    void InitInternalHeatGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5622,12 +5137,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine sets up the zone internal heat gains
         // that are independent of the zone air temperature.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using namespace ScheduleManager;
@@ -5738,6 +5247,7 @@ namespace InternalHeatGains {
             e.HWPower = 0.0;
             e.SteamPower = 0.0;
             e.BaseHeatPower = 0.0;
+            e.CO2Rate = 0.0;
         }
 
         //  QSA = 0.0
@@ -6012,14 +5522,14 @@ namespace InternalHeatGains {
 
         if (NumZoneITEqStatements > 0) CalcZoneITEq();
 
-        CalcWaterThermalTankZoneGains();
+        CalcWaterThermalTankZoneGains(state);
         PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
         CalcWaterUseZoneGains();
         FigureFuelCellZoneGains();
         FigureMicroCHPZoneGains();
         initializeElectricPowerServiceZoneGains();
         FigureTDDZoneGains();
-        FigureRefrigerationZoneGains();
+        FigureRefrigerationZoneGains(state);
 
         // store pointer values to hold generic internal gain values constant for entire timestep
         UpdateInternalGainValues();
@@ -6035,7 +5545,7 @@ namespace InternalHeatGains {
 
         // QL is per radiant enclosure (one or more zones if grouped by air boundaries)
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
-            auto & thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+            auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
             QL(enclosureNum) = 0.0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 Real64 zoneQL;
@@ -6062,7 +5572,7 @@ namespace InternalHeatGains {
                 // a small amount to create a "pulse" of heat that is used for the delayed loads
                 adjQL = curQL + DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
                 // ITABSF is the Inside Thermal Absorptance
-                // TMULT is a mulipliter for each zone
+                // TMULT is a multiplier for each zone
                 // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
                 QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                 // store the magnitude and time of the pulse
@@ -6104,21 +5614,12 @@ namespace InternalHeatGains {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M.J. Witte
         //       DATE WRITTEN   October 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the gains and other results for ElectricEquipment:ITE:AirCooled.
         // This broken into a separate subroutine, because the calculations are more detailed than the other
         // types of internal gains.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataZoneEquipment::ZoneEquipConfig;
@@ -6133,11 +5634,6 @@ namespace InternalHeatGains {
         using DataRoomAirModel::IsZoneUI;
         using DataRoomAirModel::TCMF;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C
         // From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
         static Array1D<Real64> const DBMin(7, {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0});           // Minimum dry-bulb temperature [C]
@@ -6145,15 +5641,8 @@ namespace InternalHeatGains {
         static Array1D<Real64> const DPMax(7, {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0});        // Maximum dewpoint temperature [C]
         static Array1D<Real64> const DPMin(7, {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0}); // Minimum dewpoint temperature [C]
         static Array1D<Real64> const RHMin(7, {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0});             // Minimum relative humidity [%]
-        static Array1D<Real64> const RHMax(7, {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0});        // Minimum relative humidity [%]
+        static Array1D<Real64> const RHMax(7, {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0});        // Maximum relative humidity [%]
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("CalcZoneITEq");
         int Loop;
         int NZ;
@@ -6161,14 +5650,14 @@ namespace InternalHeatGains {
         Real64 OperSchedFrac;                             // Operating schedule fraction
         Real64 CPULoadSchedFrac;                          // CPU loading schedule fraction
         Real64 AirConnection;                             // Air connection type
-        Real64 TSupply;                                   // Supply air temperature [C]
-        Real64 WSupply;                                   // Supply air humidity ratio [kgH2O/kgdryair]
+        Real64 TSupply(0.0);                              // Supply air temperature [C]
+        Real64 WSupply;                                   // Supply air humidity ratio [kgWater/kgDryAir]
         Real64 RecircFrac;                                // Recirulation fraction - current
         Real64 TRecirc;                                   // Recirulation air temperature [C]
-        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgH2O/kgdryair]
+        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgWater/kgDryAir]
         Real64 TAirIn;                                    // Entering air dry-bulb temperature [C]
         Real64 TAirInDesign;                              // Design entering air dry-bulb temperature [C]
-        Real64 WAirIn;                                    // Entering air humidity ratio [kgH2O/kgdryair]
+        Real64 WAirIn;                                    // Entering air humidity ratio [kgWater/kgDryAir]
         Real64 TDPAirIn;                                  // Entering air dewpoint temperature [C]
         Real64 RHAirIn;                                   // Entering air relative humidity [%]
         Real64 SupplyHeatIndex;                           // Supply heat index
@@ -6183,8 +5672,6 @@ namespace InternalHeatGains {
         Real64 UPSPartLoadRatio;                          // UPS part load ratio (current total power input / design total power input)
         Real64 UPSHeatGain;                               // UPS convective heat gain to zone [W]
         int EnvClass;                                     // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6)
-        Array1D<Real64> ZoneSumTinMinusTSup(NumOfZones);  // Numerator for zone-level sensible heat index (SHI)
-        Array1D<Real64> ZoneSumToutMinusTSup(NumOfZones); // Denominator for zone-level sensible heat index (SHI)
 
         std::map<int, std::vector<int>> ZoneITEMap;
 
@@ -6260,8 +5747,8 @@ namespace InternalHeatGains {
             ZnRpt(Loop).ITEqTimeAboveRH = 0.0;
             ZnRpt(Loop).ITEqTimeBelowRH = 0.0;
 
-            ZoneSumTinMinusTSup(Loop) = 0.0;
-            ZoneSumToutMinusTSup(Loop) = 0.0;
+            ZnRpt(Loop).SumTinMinusTSup = 0.0;
+            ZnRpt(Loop).SumToutMinusTSup = 0.0;
         } // Zone init loop
 
         for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
@@ -6275,14 +5762,8 @@ namespace InternalHeatGains {
             RecircFrac = 0.0;
             SupplyNodeNum = ZoneITEq(Loop).SupplyAirNodeNum;
             if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                if (SupplyNodeNum != 0) {
-                    TSupply = Node(SupplyNodeNum).Temp;
-                    WSupply = Node(SupplyNodeNum).HumRat;
-                } else {
-                    ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
-                    ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                    ShowFatalError("Program terminates due to above conditions.");
-                }
+                TSupply = Node(SupplyNodeNum).Temp;
+                WSupply = Node(SupplyNodeNum).HumRat;
                 if (ZoneITEq(Loop).SupplyApproachTempSch != 0) {
                     TAirIn = TSupply + GetCurrentScheduleValue(ZoneITEq(Loop).SupplyApproachTempSch);
                 } else {
@@ -6291,14 +5772,8 @@ namespace InternalHeatGains {
                 WAirIn = Node(SupplyNodeNum).HumRat;
             } else {
                 if (AirConnection == ITEInletAdjustedSupply) {
-                    if (SupplyNodeNum != 0) {
-                        TSupply = Node(SupplyNodeNum).Temp;
-                        WSupply = Node(SupplyNodeNum).HumRat;
-                    } else {
-                        ShowSevereError(RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq(Loop).Name);
-                        ShowContinueError("Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                        ShowFatalError("Program terminates due to above conditions.");
-                    }
+                    TSupply = Node(SupplyNodeNum).Temp;
+                    WSupply = Node(SupplyNodeNum).HumRat;
                     if (ZoneITEq(Loop).RecircFLTCurve != 0) {
                         RecircFrac = ZoneITEq(Loop).DesignRecircFrac * CurveValue(ZoneITEq(Loop).RecircFLTCurve, CPULoadSchedFrac, TSupply);
                     } else {
@@ -6309,19 +5784,36 @@ namespace InternalHeatGains {
                     TAirIn = TRecirc * RecircFrac + TSupply * (1.0 - RecircFrac);
                     WAirIn = WRecirc * RecircFrac + WSupply * (1.0 - RecircFrac);
                 } else if (AirConnection == ITEInletRoomAirModel) {
-                    // Room air model option not implemented yet
+                    // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4
                     TAirIn = MAT(NZ);
+                    TSupply = TAirIn;
                     WAirIn = ZoneAirHumRat(NZ);
-                } else { // Default to ITEInletZoneAirNode
+                } else {
+                    // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
+                    int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
+                    TSupply = Node(ZoneAirInletNode).Temp;
                     TAirIn = MAT(NZ);
                     WAirIn = ZoneAirHumRat(NZ);
                 }
             }
             TDPAirIn = PsyTdpFnWPb(WAirIn, StdBaroPress, RoutineName);
-            RHAirIn = PsyRhFnTdbWPb(TAirIn, WAirIn, StdBaroPress, RoutineName);
+            RHAirIn = 100.0 * PsyRhFnTdbWPb(TAirIn, WAirIn, StdBaroPress, RoutineName); // RHAirIn is %
 
             // Calculate power input and airflow
             TAirInDesign = ZoneITEq(Loop).DesignTAirIn;
+
+            if (DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
+
+                TAirInDesign = ZoneITEq(Loop).SizingTAirIn;
+                if (ZoneITEq(Loop).SupplyApproachTempSch != 0) {
+                    TAirInDesign = TAirInDesign + GetCurrentScheduleValue(ZoneITEq(Loop).SupplyApproachTempSch);
+                } else {
+                    TAirInDesign = TAirInDesign + ZoneITEq(Loop).SupplyApproachTemp;
+                }
+                OperSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).OperSchedPtr);
+                CPULoadSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).CPULoadSchedPtr);
+
+            }
 
             CPUPower =
                 max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
@@ -6339,7 +5831,7 @@ namespace InternalHeatGains {
             ZoneITEq(Loop).FanPowerAtDesign =
                 max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
 
-            // Calcaulate UPS net power input (power in less power to ITEquip) and UPS heat gain to zone
+            // Calculate UPS net power input (power in less power to ITEquip) and UPS heat gain to zone
             if (ZoneITEq(Loop).DesignTotalPower > 0.0) {
                 UPSPartLoadRatio = (CPUPower + FanPower) / ZoneITEq(Loop).DesignTotalPower;
             } else {
@@ -6357,7 +5849,7 @@ namespace InternalHeatGains {
 
             AirMassFlowRate = AirVolFlowRate * PsyRhoAirFnPbTdbW(StdBaroPress, TAirIn, WAirIn, RoutineName);
             if (AirMassFlowRate > 0.0) {
-                TAirOut = TAirIn + (CPUPower + FanPower) / AirMassFlowRate / PsyCpAirFnWTdb(WAirIn, TAirIn);
+                TAirOut = TAirIn + (CPUPower + FanPower) / AirMassFlowRate / PsyCpAirFnW(WAirIn);
             } else {
                 TAirOut = TAirIn;
             }
@@ -6383,7 +5875,11 @@ namespace InternalHeatGains {
             if (Zone(ZoneITEq(Loop).ZonePtr).HasAdjustedReturnTempByITE) {
                 ZoneITEMap[ZoneITEq(Loop).ZonePtr].push_back(Loop);
             }
-
+            if (DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
+                if (ZoneITEq(Loop).FanPowerAtDesign + ZoneITEq(Loop).CPUPowerAtDesign > ZoneITEq(Loop).DesignTotalPower) {
+                    ZoneITEq(Loop).ConGainRateToZone = ZoneITEq(Loop).FanPowerAtDesign + ZoneITEq(Loop).CPUPowerAtDesign;
+                }
+            }
             // Object report variables
             ZoneITEq(Loop).CPUPower = CPUPower;
             ZoneITEq(Loop).FanPower = FanPower;
@@ -6428,8 +5924,8 @@ namespace InternalHeatGains {
 
             ZnRpt(NZ).ITEqAirVolFlowStdDensity += ZoneITEq(Loop).AirVolFlowStdDensity;
             ZnRpt(NZ).ITEqAirMassFlow += ZoneITEq(Loop).AirMassFlow;
-            ZoneSumTinMinusTSup(NZ) += (TAirIn - TSupply) * AirVolFlowRate;
-            ZoneSumToutMinusTSup(NZ) += (TAirOut - TSupply) * AirVolFlowRate;
+            ZnRpt(NZ).SumTinMinusTSup += (TAirIn - TSupply) * AirVolFlowRate;
+            ZnRpt(NZ).SumToutMinusTSup += (TAirOut - TSupply) * AirVolFlowRate;
 
             // Check environmental class operating range limits (defined as parameters in this subroutine)
             EnvClass = ZoneITEq(Loop).Class;
@@ -6478,12 +5974,14 @@ namespace InternalHeatGains {
                 }
             }
 
+
         } // ZoneITEq calc loop
 
         // Zone-level sensible heat index
-        for (Loop = 1; Loop <= NumOfZones; ++Loop) {
-            if (ZoneSumToutMinusTSup(Loop) != 0.0) {
-                ZnRpt(Loop).ITEqSHI = ZoneSumTinMinusTSup(Loop) / ZoneSumToutMinusTSup(Loop);
+        for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
+            int ZN = ZoneITEq(Loop).ZonePtr;
+            if (ZnRpt(NZ).SumToutMinusTSup != 0.0) {
+                ZnRpt(ZN).ITEqSHI = ZnRpt(NZ).SumTinMinusTSup / ZnRpt(NZ).SumToutMinusTSup;
             }
         }
 
@@ -6511,6 +6009,7 @@ namespace InternalHeatGains {
             }
             it++;
         }
+
     } // End CalcZoneITEq
 
     void ReportInternalHeatGains()
@@ -6535,19 +6034,6 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using OutputReportTabular::WriteTabularFiles;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -6784,30 +6270,12 @@ namespace InternalHeatGains {
         // Will issue a severe error for illegal zone.
         // Must be called after InternalHeatGains get input.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataHeatBalance;
         using namespace DataGlobals;
 
         // Return value
         Real64 DesignLightingLevelSum; // Sum of design lighting level for this zone
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -6826,20 +6294,20 @@ namespace InternalHeatGains {
 
         return DesignLightingLevelSum;
     }
-    
+
     bool CheckThermalComfortSchedules(bool const WorkEffSch, // Blank work efficiency schedule = true
                                       bool const CloInsSch,  // Blank clothing insulation schedule = true
                                       bool const AirVeloSch) // Blank air velocity schedule = true
     {
         bool TCSchedsPresent = false;
-        
-        if ( !WorkEffSch || !CloInsSch || !AirVeloSch ) {
+
+        if (!WorkEffSch || !CloInsSch || !AirVeloSch) {
             TCSchedsPresent = true;
         }
-        
+
         return TCSchedsPresent;
     }
-    
+
     void CheckLightsReplaceableMinMaxForZone(int const WhichZone) // Zone Number
     {
 
@@ -6859,23 +6327,8 @@ namespace InternalHeatGains {
         // Traverse the LIGHTS structure and get fraction replaceable - min/max as well as lighting
         // level for a zone.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataDaylighting;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -6940,32 +6393,11 @@ namespace InternalHeatGains {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataContaminantBalance::Contaminant;
         using DataContaminantBalance::ZoneGCGain;
         using DataHeatBalFanSys::ZoneLatentGain;
         using DataHeatBalFanSys::ZoneLatentGainExceptPeople; // Added for hybrid model
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -6987,13 +6419,13 @@ namespace InternalHeatGains {
         // store pointer values to hold generic internal gain values constant for entire timestep
         for (NZ = 1; NZ <= NumOfZones; ++NZ) {
             for (Loop = 1; Loop <= ZoneIntGain(NZ).NumberOfDevices; ++Loop) {
-                ZoneIntGain(NZ).Device(Loop).ConvectGainRate = ZoneIntGain(NZ).Device(Loop).PtrConvectGainRate;
-                ZoneIntGain(NZ).Device(Loop).ReturnAirConvGainRate = ZoneIntGain(NZ).Device(Loop).PtrReturnAirConvGainRate;
-                if (DoRadiationUpdate) ZoneIntGain(NZ).Device(Loop).RadiantGainRate = ZoneIntGain(NZ).Device(Loop).PtrRadiantGainRate;
-                ZoneIntGain(NZ).Device(Loop).LatentGainRate = ZoneIntGain(NZ).Device(Loop).PtrLatentGainRate;
-                ZoneIntGain(NZ).Device(Loop).ReturnAirLatentGainRate = ZoneIntGain(NZ).Device(Loop).PtrReturnAirLatentGainRate;
-                ZoneIntGain(NZ).Device(Loop).CarbonDioxideGainRate = ZoneIntGain(NZ).Device(Loop).PtrCarbonDioxideGainRate;
-                ZoneIntGain(NZ).Device(Loop).GenericContamGainRate = ZoneIntGain(NZ).Device(Loop).PtrGenericContamGainRate;
+                ZoneIntGain(NZ).Device(Loop).ConvectGainRate = *ZoneIntGain(NZ).Device(Loop).PtrConvectGainRate;
+                ZoneIntGain(NZ).Device(Loop).ReturnAirConvGainRate = *ZoneIntGain(NZ).Device(Loop).PtrReturnAirConvGainRate;
+                if (DoRadiationUpdate) ZoneIntGain(NZ).Device(Loop).RadiantGainRate = *ZoneIntGain(NZ).Device(Loop).PtrRadiantGainRate;
+                ZoneIntGain(NZ).Device(Loop).LatentGainRate = *ZoneIntGain(NZ).Device(Loop).PtrLatentGainRate;
+                ZoneIntGain(NZ).Device(Loop).ReturnAirLatentGainRate = *ZoneIntGain(NZ).Device(Loop).PtrReturnAirLatentGainRate;
+                ZoneIntGain(NZ).Device(Loop).CarbonDioxideGainRate = *ZoneIntGain(NZ).Device(Loop).PtrCarbonDioxideGainRate;
+                ZoneIntGain(NZ).Device(Loop).GenericContamGainRate = *ZoneIntGain(NZ).Device(Loop).PtrGenericContamGainRate;
             }
             if (ReSumLatentGains) {
                 SumAllInternalLatentGains(NZ, ZoneLatentGain(NZ));
@@ -7024,27 +6456,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumConvGainRate;
@@ -7086,7 +6497,7 @@ namespace InternalHeatGains {
     }
 
     void SumInternalConvectionGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
-                                           Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+                                           const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                            Real64 &SumConvGainRate)
     {
 
@@ -7098,29 +6509,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfTypes;
@@ -7182,7 +6570,7 @@ namespace InternalHeatGains {
     }
 
     void SumReturnAirConvectionGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
-                                            Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+                                            const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                             Real64 &SumReturnAirGainRate)
     {
 
@@ -7194,29 +6582,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfTypes;
@@ -7257,27 +6622,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumRadGainRate;
         int DeviceNum;
@@ -7297,7 +6641,7 @@ namespace InternalHeatGains {
     }
 
     void SumInternalRadiationGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
-                                          Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+                                          const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                           Real64 &SumRadiationGainRate)
     {
 
@@ -7309,29 +6653,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfTypes;
@@ -7372,27 +6693,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumLatentGainRate;
         int DeviceNum;
@@ -7426,8 +6726,8 @@ namespace InternalHeatGains {
         }
     }
 
-    void SumInternalLatentGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
-                                       Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+    void SumInternalLatentGainsByTypes(int const ZoneNum,              // zone index pointer for which zone to sum gains for
+                                       const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                        Real64 &SumLatentGainRate)
     {
 
@@ -7439,29 +6739,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfTypes;
@@ -7504,27 +6781,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumLatentGainRate;
         int DeviceNum;
@@ -7558,27 +6814,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumCO2GainRate;
@@ -7614,8 +6849,8 @@ namespace InternalHeatGains {
         }
     }
 
-    void SumInternalCO2GainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
-                                    Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+    void SumInternalCO2GainsByTypes(int const ZoneNum,              // zone index pointer for which zone to sum gains for
+                                    const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                     Real64 &SumCO2GainRate)
     {
 
@@ -7627,29 +6862,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfTypes;
@@ -7690,27 +6902,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types based on the existing subrotine SumAllInternalCO2Gains
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpSumGCGainRate;
         int DeviceNum;
@@ -7743,11 +6934,6 @@ namespace InternalHeatGains {
         // METHODOLOGY EMPLOYED:
         //   Save sequence of values for report during sizing.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
         using namespace DataHeatBalance;
         using DataGlobals::CompLoadReportIsReq;
@@ -7772,19 +6958,6 @@ namespace InternalHeatGains {
         using OutputReportTabular::refrigRetAirSeq;
         using OutputReportTabular::waterUseInstantSeq;
         using OutputReportTabular::waterUseLatentSeq;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int iZone(0);
@@ -7890,30 +7063,6 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // utility to retrieve index pointer to a specific internal gain
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool Found;
         int DeviceNum;
@@ -7942,8 +7091,8 @@ namespace InternalHeatGains {
 
     void SumInternalConvectionGainsByIndices(
         int const ZoneNum,                 // zone index pointer for which zone to sum gains for
-        Array1S_int const DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
-        Array1A<Real64> const FractionARR, // array of fractional multipliers to apply to devices
+        const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumConvGainRate)
     {
 
@@ -7955,29 +7104,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gains by index
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfIndices;
@@ -8010,9 +7136,9 @@ namespace InternalHeatGains {
     }
 
     void SumInternalLatentGainsByIndices(
-        int const ZoneNum,                 // zone index pointer for which zone to sum gains for
-        Array1S_int const DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
-        Array1A<Real64> const FractionARR, // array of fractional multipliers to apply to devices
+        int const ZoneNum,                  // zone index pointer for which zone to sum gains for
+        const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumLatentGainRate)
     {
 
@@ -8024,29 +7150,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gains by index
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfIndices;
@@ -8079,9 +7182,9 @@ namespace InternalHeatGains {
     }
 
     void SumReturnAirConvectionGainsByIndices(
-        int const ZoneNum,                 // zone index pointer for which zone to sum gains for
-        Array1S_int const DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
-        Array1A<Real64> const FractionARR, // array of fractional multipliers to apply to devices
+        int const ZoneNum,                  // zone index pointer for which zone to sum gains for
+        const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumReturnAirGainRate)
     {
 
@@ -8093,29 +7196,6 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gains by index
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumberOfIndices;

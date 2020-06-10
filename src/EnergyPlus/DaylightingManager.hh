@@ -61,6 +61,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace DaylightingManager {
 
@@ -74,7 +75,6 @@ namespace DaylightingManager {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int TotWindowsWithDayl;    // Total number of exterior windows in all daylit zones
-    extern int OutputFileDFS;         // Unit number for daylight factors
     extern Array1D<Real64> DaylIllum; // Daylight illuminance at reference points (lux)
     extern int maxNumRefPtInAnyZone;  // The most number of reference points that any single zone has
     extern int maxNumRefPtInAnyEncl;  // The most number of reference points that any single enclosure has
@@ -128,7 +128,7 @@ namespace DaylightingManager {
 
     void DayltgAveInteriorReflectance(int &ZoneNum); // Zone number
 
-    void CalcDayltgCoefficients();
+    void CalcDayltgCoefficients(OutputFiles &outputFiles);
 
     void CalcDayltgCoeffsRefMapPoints(int const ZoneNum);
 
@@ -333,9 +333,9 @@ namespace DaylightingManager {
                                                 int const ICtrl // Window control counter
     );
 
-    void GetDaylightingParametersInput();
+    void GetDaylightingParametersInput(OutputFiles &outputFiles);
 
-    void GetInputIlluminanceMap(bool &ErrorsFound);
+    void GetInputIlluminanceMap(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void GetDaylightingControls(int const TotDaylightingControls, // Total daylighting controls inputs
                                 bool &ErrorsFound);
@@ -358,8 +358,8 @@ namespace DaylightingManager {
                      int &ZoneNum    // Zone number
     );
 
-    void DayltgGlareWithIntWins(Array1<Real64> &GLINDX, // Glare index
-                                int const ZoneNum       // Zone number
+    void DayltgGlareWithIntWins(Array1D<Real64> &GLINDX, // Glare index
+                                int const ZoneNum        // Zone number
     );
 
     void DayltgExtHorizIllum(Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
@@ -390,7 +390,7 @@ namespace DaylightingManager {
 
     void DayltgInteriorTDDIllum();
 
-    void DayltgElecLightingControl(int &ZoneNum); // Zone number
+    void DayltgElecLightingControl(OutputFiles &outputFiles, int &ZoneNum); // Zone number
 
     Real64 DayltgGlarePositionFactor(Real64 &X, // Lateral and vertical distance of luminous window element from
                                      Real64 &Y);
@@ -406,9 +406,9 @@ namespace DaylightingManager {
                                        int const NBasis,
                                        int const IHR,
                                        int const iRefPoint,
-                                       Array2<Real64> &ElementLuminanceSky,     // sky related luminance at window element (exterior side)
-                                       Array1<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
-                                       Array1<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
+                                       Array2<Real64> &ElementLuminanceSky,      // sky related luminance at window element (exterior side)
+                                       Array1D<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
+                                       Array1D<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
                                        int const CalledFrom,
                                        Optional_int_const MapNum = _);
 
@@ -463,13 +463,13 @@ namespace DaylightingManager {
 
     void DayltgInteriorMapIllum(int &ZoneNum); // Zone number
 
-    void ReportIllumMap(int const MapNum);
+    void ReportIllumMap(OutputFiles &outputFiles, int const MapNum);
 
-    void CloseReportIllumMaps();
+    void CloseReportIllumMaps(OutputFiles &outputFiles);
 
-    void CloseDFSFile();
+    void CloseDFSFile(OutputFiles &outputFiles);
 
-    void DayltgSetupAdjZoneListsAndPointers();
+    void DayltgSetupAdjZoneListsAndPointers(OutputFiles &outputFiles);
 
     void CreateShadeDeploymentOrder(int &ZoneNum);
 

@@ -49,7 +49,6 @@
 #define ThermalChimney_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2A.hh>
 
@@ -66,6 +65,7 @@ namespace ThermalChimney {
     // Data
     // DERIVED TYPE DEFINITIONS
 
+    extern bool ThermalChimneyGetInputFlag;
     extern int TotThermalChimney; // Total ThermalChimney Statements in input
 
     // Subroutine Specifications for the Heat Balance Module
@@ -89,6 +89,8 @@ namespace ThermalChimney {
         Real64 AirOutletCrossArea;
         Real64 DischargeCoeff;
         int TotZoneToDistrib;
+        bool EMSOverrideOn;         // if true then EMS is requesting to override
+        Real64 EMSAirFlowRateValue; // value EMS is setting for air flow rate
         Array1D_int ZonePtr;
         Array1D_string ZoneName;
         Array1D<Real64> DistanceThermChimInlet;
@@ -96,7 +98,9 @@ namespace ThermalChimney {
         Array1D<Real64> EachAirInletCrossArea;
 
         // Default Constructor
-        ThermalChimneyData() : RealZonePtr(0), SchedPtr(0), AbsorberWallWidth(0.0), AirOutletCrossArea(0.0), DischargeCoeff(0.0), TotZoneToDistrib(0)
+        ThermalChimneyData()
+            : RealZonePtr(0), SchedPtr(0), AbsorberWallWidth(0.0), AirOutletCrossArea(0.0), DischargeCoeff(0.0), TotZoneToDistrib(0),
+              EMSOverrideOn(false), EMSAirFlowRateValue(0)
         {
         }
     };
@@ -136,6 +140,8 @@ namespace ThermalChimney {
 
     // Functions
 
+    void clear_state();
+
     void ManageThermalChimney();
 
     void GetThermalChimney(bool &ErrorsFound); // If errors found in input
@@ -144,7 +150,7 @@ namespace ThermalChimney {
 
     void ReportThermalChimney();
 
-    void GaussElimination(Array2A<Real64> EquaCoef, Array1A<Real64> EquaConst, Array1A<Real64> ThermChimSubTemp, int const NTC);
+    void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC);
 
     //        End of Module Subroutines for ThermalChimney
 

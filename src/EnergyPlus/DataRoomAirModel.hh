@@ -80,7 +80,7 @@ namespace DataRoomAirModel {
     extern int const RoomAirModel_UCSDDV;         // UCSD Displacement Ventilation model
     extern int const RoomAirModel_UCSDCV;         // UCSD-CV
     extern int const RoomAirModel_UCSDUFI;        // UCSD UFAD interior zone model
-    extern int const RoomAirModel_UCSDUFE;        // UCSD UFAD interior zone model
+    extern int const RoomAirModel_UCSDUFE;        // UCSD UFAD exterior zone model
     extern int const RoomAirModel_AirflowNetwork; // RoomAirModel_AirflowNetwork interior zone model
     extern Array1D_string const ChAirModel;
 

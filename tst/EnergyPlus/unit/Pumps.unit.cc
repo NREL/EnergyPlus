@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/SizingManager.hh>
@@ -613,8 +613,6 @@ TEST_F(EnergyPlusFixture, CondensatePumpSizingPowerTest)
 TEST_F(EnergyPlusFixture, VariableSpeedPump_MinFlowGreaterThanMax)
 {
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
-
         "Pump:VariableSpeed,",
         "  supply inlet pump,       !- Name",
         "  Node supply inlet in,    !- Inlet Node Name",

@@ -53,14 +53,13 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
 
 #define EP_cache_GlycolSpecificHeat
 
@@ -387,22 +386,22 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void InterpDefValuesForGlycolConc(int NumOfConcs,              // number of concentrations (dimension of raw data)
-                                      int NumOfTemps,              // number of temperatures (dimension of raw data)
-                                      Array1S<Real64> RawConcData, // concentrations for raw data
-                                      Array2S<Real64> RawPropData, // raw property data (concentration, temperature)
-                                      Real64 Concentration,        // concentration of actual fluid mix
-                                      Array1S<Real64> InterpData         // interpolated output data at proper concentration
+    void InterpDefValuesForGlycolConc(int NumOfConcs,                     // number of concentrations (dimension of raw data)
+                                      int NumOfTemps,                     // number of temperatures (dimension of raw data)
+                                      const Array1D<Real64> &RawConcData, // concentrations for raw data
+                                      Array2S<Real64> RawPropData,        // raw property data (concentration, temperature)
+                                      Real64 Concentration,               // concentration of actual fluid mix
+                                      Array1D<Real64> &InterpData         // interpolated output data at proper concentration
     );
 
     //*****************************************************************************
 
-    void InterpValuesForGlycolConc(int NumOfConcs,              // number of concentrations (dimension of raw data)
-                                   int NumOfTemps,              // number of temperatures (dimension of raw data)
-                                   Array1S<Real64> RawConcData, // concentrations for raw data
-                                   Array2S<Real64> RawPropData, // raw property data (temperature,concentration)
-                                   Real64 Concentration,        // concentration of actual fluid mix
-                                   Array1S<Real64> InterpData         // interpolated output data at proper concentration
+    void InterpValuesForGlycolConc(int NumOfConcs,               // number of concentrations (dimension of raw data)
+                                   int NumOfTemps,               // number of temperatures (dimension of raw data)
+                                   const Array1D<Real64> &RawConcData, // concentrations for raw data
+                                   Array2S<Real64> RawPropData,  // raw property data (temperature,concentration)
+                                   Real64 Concentration,         // concentration of actual fluid mix
+                                   Array1D<Real64> &InterpData   // interpolated output data at proper concentration
     );
 
     //*****************************************************************************
@@ -415,11 +414,11 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void ReportAndTestGlycols();
+    void ReportAndTestGlycols(EnergyPlus::OutputFiles &outputFiles);
 
     //*****************************************************************************
 
-    void ReportAndTestRefrigerants();
+    void ReportAndTestRefrigerants(OutputFiles &outputFiles);
 
     //*****************************************************************************
 
@@ -494,7 +493,7 @@ namespace FluidProperties {
     );
 
     Real64 GetSupHeatTempRefrigResidual(Real64 Temperature, // temperature of the refrigerant
-                                        Array1<Real64> const &Par);
+                                        Array1D<Real64> const &Par);
 
     //*****************************************************************************
 
@@ -705,6 +704,34 @@ namespace FluidProperties {
     void GetFluidDensityTemperatureLimits(int FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit);
 
     void GetFluidSpecificHeatTemperatureLimits(int FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit);
+
+    struct GlycolAPI {
+        std::string glycolName;
+        int glycolIndex;
+        std::string cf;
+        explicit GlycolAPI(std::string const &glycolName);
+        ~GlycolAPI() = default;
+        Real64 specificHeat(Real64 temperature);
+        Real64 density(Real64 temperature);
+        Real64 conductivity(Real64 temperature);
+        Real64 viscosity(Real64 temperature);
+    };
+
+    struct RefrigerantAPI {
+        std::string rName;
+        int rIndex;
+        std::string cf;
+        explicit RefrigerantAPI(std::string const &refrigName);
+        ~RefrigerantAPI() = default;
+        Real64 saturationPressure(Real64 temperature);
+        Real64 saturationTemperature(Real64 pressure);
+        Real64 saturatedEnthalpy(Real64 temperature, Real64 quality);
+        Real64 saturatedDensity(Real64 temperature, Real64 quality);
+        Real64 saturatedSpecificHeat(Real64 temperature, Real64 quality);
+        Real64 superHeatedEnthalpy(Real64 temperature, Real64 pressure);
+        Real64 superHeatedPressure(Real64 temperature, Real64 enthalpy);
+        Real64 superHeatedDensity(Real64 temperature, Real64 pressure);
+    };
 
 } // namespace FluidProperties
 

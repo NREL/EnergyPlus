@@ -59,7 +59,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -678,7 +678,6 @@ namespace PlantPressureSystem {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataPlant::DemandSide;
-        using DataPlant::GenEquipTypes_Pump;
         using DataPlant::PlantLoop;
         using DataPlant::SupplySide;
 
@@ -698,7 +697,7 @@ namespace PlantPressureSystem {
         }
 
         // If the last component on the branch is the pump, then check if a pressure drop is detected and set the flag and leave
-        if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).GeneralEquipType == GenEquipTypes_Pump) {
+        if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).isPump()) {
             PumpFound = true;
             if (TempBranchPressureDrop != 0.0) {
                 ShowSevereError("Error in plant pressure simulation for plant loop: " + PlantLoop(LoopNum).Name);
@@ -730,7 +729,7 @@ namespace PlantPressureSystem {
             for (CompNum = NumCompsOnBranch - 1; CompNum >= 1; --CompNum) {
 
                 // If this component is a pump, stop passing pressure upstream, and set flag to true for calling routine
-                if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).GeneralEquipType == GenEquipTypes_Pump) {
+                if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).isPump()) {
                     PumpFound = true;
                     break;
                 }

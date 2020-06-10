@@ -65,6 +65,70 @@ using namespace EnergyPlus::HeatBalanceIntRadExchange;
 
 namespace EnergyPlus {
 
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_CarrollMRT) {
+    int N;                     // NUMBER OF SURFACES
+    Array1D<Real64> A;         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+    Array1D<Real64> FMRT;      // MRT "VIEW FACTORS"
+    Array1D<Real64> EMISS;     // Gray body emissivities
+    Array1D<Real64> Fp;        // Gray body radiative resistance
+
+    // Three surfaces of equal size
+    N = 3;
+
+    A.allocate(N);
+    A(1) = 1.0;
+    A(2) = 1.0;
+    A(3) = 1.0;
+
+    FMRT.allocate(N);
+    CalcFMRT(N, A, FMRT);
+
+    EMISS.allocate(N);
+    EMISS(1) = 1.0;
+    EMISS(2) = 1.0;
+    EMISS(3) = 1.0;
+
+    Fp.allocate(N);
+    CalcFp(N, EMISS, FMRT, Fp);
+
+    EXPECT_NEAR(FMRT(1), 1.5, 0.001);
+    EXPECT_NEAR(FMRT(2), 1.5, 0.001);
+    EXPECT_NEAR(FMRT(3), 1.5, 0.001);
+
+    // Special case where surfaces are equal area (each 50% of total).
+    N = 2;
+
+    A.redimension(N);
+    A(1) = 1.0;
+    A(2) = 1.0;
+
+    FMRT.redimension(N);
+
+    CalcFMRT(N, A, FMRT);
+
+    EXPECT_NEAR(FMRT(1), 2.0, 0.001);
+    EXPECT_NEAR(FMRT(2), 2.0, 0.001);
+
+    EMISS.redimension(N);
+    EMISS(1) = 1.0;
+    EMISS(2) = 1.0;
+
+    Fp.redimension(N);
+    CalcFp(N, EMISS, FMRT, Fp);
+
+    // Imbalanced areas
+    A(1) = 2.0;
+    A(2) = 1.0;
+
+    CalcFMRT(N, A, FMRT);
+
+    std::string const error_string = delimited_string({"   ** Severe  ** Geometry not compatible with Carroll MRT Zone Radiant Exchange method."});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    CalcFp(N, EMISS, FMRT, Fp);
+
+}
+
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
 {
 

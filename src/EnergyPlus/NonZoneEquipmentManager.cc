@@ -80,7 +80,7 @@ namespace NonZoneEquipmentManager {
 
     // Functions
 
-    void ManageNonZoneEquipment(bool const FirstHVACIteration,
+    void ManageNonZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration,
                                 bool &SimNonZoneEquipment // Simulation convergence flag
     )
     {
@@ -91,7 +91,7 @@ namespace NonZoneEquipmentManager {
         //       RE-ENGINEERED  Richard Liesen
         //       DATE MODIFIED  February 2003
         //       MODIFIED       Hudson, ORNL July 2007
-        //       MODIFIED       B. Grifffith, NREL, April 2008,
+        //       MODIFIED       B. Griffith, NREL, April 2008,
         //                      added calls for just heat recovery part of chillers
         //       MODIFIED       Removed much for plant upgrade, 2011
 
@@ -125,7 +125,7 @@ namespace NonZoneEquipmentManager {
 
         if (!ZoneSizingCalc) {
             for (WaterHeaterNum = 1; WaterHeaterNum <= NumOfWaterHeater; ++WaterHeaterNum) {
-                SimulateWaterHeaterStandAlone(WaterHeaterNum, FirstHVACIteration);
+                SimulateWaterHeaterStandAlone(state, WaterHeaterNum, FirstHVACIteration);
             }
         }
 

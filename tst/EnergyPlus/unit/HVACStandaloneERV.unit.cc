@@ -52,12 +52,15 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -106,7 +109,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-
+    DataEnvironment::StdRhoAir = 1.0;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).ZoneName = "Zone 1";
     ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -141,7 +144,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     StandAloneERV(1).ExhaustAirFanIndex = 2;
     Zone(1).Multiplier = 1.0;
     Zone(1).FloorArea = 1000.0;
-    SizeStandAloneERV(1);
+    SizeStandAloneERV(state, 1);
     EXPECT_EQ(1000.0, StandAloneERV(1).SupplyAirVolFlow);
 
     // size on occupancy
@@ -151,7 +154,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
     Zone(1).Multiplier = 1.0;
     Zone(1).FloorArea = 1000.0;
-    SizeStandAloneERV(1);
+    SizeStandAloneERV(state, 1);
     EXPECT_EQ(3000.0, StandAloneERV(1).SupplyAirVolFlow);
 
     // size on floor area and occupancy
@@ -161,14 +164,14 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
     Zone(1).Multiplier = 1.0;
     Zone(1).FloorArea = 1000.0;
-    SizeStandAloneERV(1);
+    SizeStandAloneERV(state, 1);
     EXPECT_EQ(4000.0, StandAloneERV(1).SupplyAirVolFlow);
 
     // size on floor area and occupancy using zone multiplier
     StandAloneERV(1).SupplyAirVolFlow = AutoSize;
     StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
     Zone(1).Multiplier = 5.0;
-    SizeStandAloneERV(1);
+    SizeStandAloneERV(state, 1);
     EXPECT_EQ(20000.0, StandAloneERV(1).SupplyAirVolFlow);
 }
 
@@ -207,12 +210,13 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    DataEnvironment::StdRhoAir = 1.0;
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(state.outputFiles);  // read schedules
 
-    GetFanInput();
+    GetFanInput(state.fans);
 
     EnergyPlus::DataSizing::CurZoneEqNum = 1;
 
@@ -258,7 +262,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     StandAloneERV(1).AirVolFlowPerOccupant = 0.0;
     StandAloneERV(1).HighRHOAFlowRatio = 1.2;
 
-    SizeStandAloneERV(1);
+    SizeStandAloneERV(state, 1);
 
     EXPECT_EQ(1.0, StandAloneERV(1).SupplyAirVolFlow);
     EXPECT_EQ(1.2, StandAloneERV(1).DesignSAFanVolFlowRate);

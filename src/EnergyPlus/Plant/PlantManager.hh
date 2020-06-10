@@ -53,10 +53,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PlantManager {
 
@@ -77,34 +80,9 @@ namespace PlantManager {
     extern Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
     extern Array1D_int DemandSideInletNode;  // Inlet node on the demand side
 
-    struct TempLoopData
-    {
-        // Members
-        std::string Name; // Name of the component list
-        // Loop connections
-        std::string BranchList;         // Branch list name for the half loop
-        std::string ConnectList;        // Connector list name for the half loop
-        int TotalBranches;              // Total number of branches on the loop
-        Array1D<BranchData> Branch;     // Branch data
-        SplitterData Splitter; // Data for splitter on branch (if any)
-        MixerData Mixer;       // Data for mixer on branch (if any)
-        bool SplitterExists;            // Logical Flag indication splitter exists in the half loop
-        bool MixerExists;               // Logical Flag indication mixer exists in the half loop
-        bool BypassExists;
-        bool LoopHasConnectionComp;
-
-        // Default Constructor
-        TempLoopData() : TotalBranches(0), SplitterExists(false), MixerExists(false), BypassExists(false), LoopHasConnectionComp(false)
-        {
-        }
-    };
-
-    // Object Data
-    extern TempLoopData TempLoop; // =(' ',' ',' ',0, , , ,.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.)
-
     void clear_state();
 
-    void ManagePlantLoops(bool const FirstHVACIteration,
+    void ManagePlantLoops(EnergyPlusData &state, bool FirstHVACIteration,
                           bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                           bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                           bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
@@ -112,13 +90,13 @@ namespace PlantManager {
                           bool &SimElecCircuits      // True when electic circuits need to be (re)simulated
     );
 
-    void GetPlantLoopData();
+    void GetPlantLoopData(EnergyPlusData &state);
 
-    void GetPlantInput();
+    void GetPlantInput(EnergyPlusData &state);
 
     void SetupReports();
 
-    void InitializeLoops(bool const FirstHVACIteration); // true if first iteration of the simulation
+    void InitializeLoops(EnergyPlusData &state, bool FirstHVACIteration); // true if first iteration of the simulation
 
     void ReInitPlantLoopsAtFirstHVACIteration();
 
@@ -126,26 +104,18 @@ namespace PlantManager {
 
     void CheckPlantOnAbort();
 
-    void InitOneTimePlantSizingInfo(int const LoopNum); // loop being initialized for sizing
+    void InitOneTimePlantSizingInfo(int LoopNum); // loop being initialized for sizing
 
-    void SizePlantLoop(int const LoopNum, // Supply side loop being simulated
-                       bool const OkayToFinish);
+    void SizePlantLoop(EnergyPlusData &state, int LoopNum, // Supply side loop being simulated
+                       bool OkayToFinish);
 
-    void ResizePlantLoopLevelSizes(int const LoopNum);
+    void ResizePlantLoopLevelSizes(int LoopNum);
 
     void SetupInitialPlantCallingOrder();
 
     void RevisePlantCallingOrder();
 
-    int FindLoopSideInCallingOrder(int const LoopNum, int const LoopSide);
-
-    void StoreAPumpOnCurrentTempLoop(int const LoopNum,
-                                     int const LoopSideNum,
-                                     int const BranchNum,
-                                     int const CompNum,
-                                     std::string const &PumpName,
-                                     int const PumpOutletNode,
-                                     bool const HasBranchPumps);
+    int FindLoopSideInCallingOrder(int LoopNum, int LoopSide);
 
     void SetupBranchControlTypes();
 

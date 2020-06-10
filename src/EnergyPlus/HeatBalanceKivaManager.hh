@@ -58,6 +58,8 @@
 #include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
+    
 namespace HeatBalanceKivaManager {
 
     const int KIVAZONE_UNCONTROLLED = 0;
@@ -125,7 +127,7 @@ namespace HeatBalanceKivaManager {
         KivaManager();
         virtual ~KivaManager();
         void readWeatherData();
-        bool setupKivaInstances();
+        bool setupKivaInstances(OutputFiles &outputFiles);
         void initKivaInstances();
         void calcKivaInstances();
         void defineDefaultFoundation();

@@ -52,9 +52,9 @@
 
 namespace EnergyPlus {
 
-    struct BaseWaterToWaterHeatPump : PlantComponent {
+    struct BasePlantLoopHeatPump : PlantComponent {
 
-        ~BaseWaterToWaterHeatPump()=default;
+        ~BasePlantLoopHeatPump()=default;
 
         // void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) = 0;
 

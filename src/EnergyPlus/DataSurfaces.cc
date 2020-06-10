@@ -120,7 +120,7 @@ namespace DataSurfaces {
     int const GroundFCfactorMethod(-5);
     int const KivaFoundation(-6);
 
-    Array1D_string const cExtBoundCondition({-5, 0}, {"FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
+    Array1D_string const cExtBoundCondition({-6, 0}, {"KivaFoundation", "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
 
     // Parameters to indicate the first "corner" of a surface
     // Currently, these are used only during input of surfaces
@@ -760,7 +760,7 @@ namespace DataSurfaces {
                 for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
                     Real64 NodeTemp = Node(ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
                     Real64 MassFlowRate = Node(ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
-                    Real64 CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(Zone), NodeTemp);
+                    Real64 CpAir = PsyCpAirFnW(ZoneAirHumRat(Zone));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }

@@ -1,8 +1,8 @@
-/* ------------------------------------------------------------------------- 
+/* -------------------------------------------------------------------------
  * stack.c
- * A stack of pointers. 
- * Copyright 2010 QTronic GmbH. All rights reserved. 
- * -------------------------------------------------------------------------*/ 
+ * A stack of pointers.
+ * Copyright 2010 QTronic GmbH. All rights reserved.
+ * -------------------------------------------------------------------------*/
 
 #ifndef STACK_H
 #define STACK_H
@@ -17,9 +17,9 @@ typedef struct {
 
 Stack* stackNew(int initialSize, int inc);
 int stackIsEmpty(Stack* s);
-int stackPush(Stack* s, void* e);
+int stackPushFMI(Stack *s, void *e);
 void* stackPeek(Stack* s);
-void* stackPop(Stack* s);
+void* stackPopFMI(Stack *s);
 void** stackPopAllAsArray(Stack* s, int *size);
 void** stackLastPopedAsArray0(Stack* s, int n);
 void stackFree(Stack* s);

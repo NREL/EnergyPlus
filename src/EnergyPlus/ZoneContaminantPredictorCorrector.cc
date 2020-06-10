@@ -434,13 +434,13 @@ namespace ZoneContaminantPredictorCorrector {
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericConstant(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  ZoneContamGenericConstant(Loop).GCGenRate);
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  &ZoneContamGenericConstant(Loop).GCGenRate);
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
@@ -561,13 +561,13 @@ namespace ZoneContaminantPredictorCorrector {
                                       "ZoneContaminantSourceAndSink:GenericContaminant",
                                       ZoneContamGenericPDriven(Loop).Name,
                                       IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
-                                      _,
-                                      _,
-                                      _,
-                                      _,
-                                      _,
-                                      _,
-                                      ZoneContamGenericPDriven(Loop).GCGenRate);
+                                      nullptr,
+                                      nullptr,
+                                      nullptr,
+                                      nullptr,
+                                      nullptr,
+                                      nullptr,
+                                      &ZoneContamGenericPDriven(Loop).GCGenRate);
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
@@ -668,13 +668,13 @@ namespace ZoneContaminantPredictorCorrector {
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericCutoff(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  ZoneContamGenericCutoff(Loop).GCGenRate);
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  &ZoneContamGenericCutoff(Loop).GCGenRate);
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
@@ -781,13 +781,13 @@ namespace ZoneContaminantPredictorCorrector {
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericDecay(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  ZoneContamGenericDecay(Loop).GCGenRate);
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  &ZoneContamGenericDecay(Loop).GCGenRate);
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
@@ -895,13 +895,13 @@ namespace ZoneContaminantPredictorCorrector {
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericBLDiff(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  ZoneContamGenericBLDiff(Loop).GCGenRate);
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  &ZoneContamGenericBLDiff(Loop).GCGenRate);
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
@@ -994,13 +994,13 @@ namespace ZoneContaminantPredictorCorrector {
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericDVS(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  ZoneContamGenericDVS(Loop).GCGenRate);
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  &ZoneContamGenericDVS(Loop).GCGenRate);
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
@@ -1094,13 +1094,13 @@ namespace ZoneContaminantPredictorCorrector {
                                   "ZoneContaminantSourceAndSink:GenericContaminant",
                                   ZoneContamGenericDRS(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  ZoneContamGenericDRS(Loop).GCGenRate);
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  &ZoneContamGenericDRS(Loop).GCGenRate);
         }
 
         RepVarSet.deallocate();
@@ -2374,7 +2374,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 zone_M_CO2 = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
                 delta_CO2 = (Zone(ZoneNum).ZoneMeasuredCO2Concentration - OutdoorCO2) / 1000;
-                CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneNum).OutDryBulbTemp);
+                CpAir = PsyCpAirFnW(OutHumRat);
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
 
                 if (Zone(ZoneNum).ZoneMeasuredCO2Concentration == OutdoorCO2) {

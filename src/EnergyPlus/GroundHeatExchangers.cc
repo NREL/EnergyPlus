@@ -64,13 +64,14 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -407,14 +408,14 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEBase::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void GLHEBase::onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initGLHESimVars();
     }
 
     //******************************************************************************
 
-    void GLHEBase::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void GLHEBase::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                             bool const EP_UNUSED(FirstHVACIteration),
                             Real64 &EP_UNUSED(CurLoad),
                             bool const EP_UNUSED(RunFlag))
@@ -431,10 +432,10 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    PlantComponent *GLHEBase::factory(int const objectType, std::string objectName)
+    PlantComponent *GLHEBase::factory(EnergyPlusData &state, int const objectType, std::string objectName)
     {
         if (GetInput) {
-            GetGroundHeatExchangerInput();
+            GetGroundHeatExchangerInput(state);
             GetInput = false;
         }
         if (objectType == DataPlant::TypeOf_GrndHtExchgSystem) {
@@ -2136,7 +2137,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GetGroundHeatExchangerInput()
+    void GetGroundHeatExchangerInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -2600,7 +2601,7 @@ namespace GroundHeatExchangers {
                 prevTimeSteps = 0.0;
 
                 // Initialize ground temperature model and get pointer reference
-                thisGLHE.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5));
+                thisGLHE.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5));
                 if (thisGLHE.groundTempModel) {
                     errorsFound = thisGLHE.groundTempModel->errorsFound;
                 }
@@ -2796,7 +2797,7 @@ namespace GroundHeatExchangers {
                 }
 
                 // Initialize ground temperature model and get pointer reference
-                thisGLHE.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(5), DataIPShortCuts::cAlphaArgs(6));
+                thisGLHE.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(5), DataIPShortCuts::cAlphaArgs(6));
                 if (thisGLHE.groundTempModel) {
                     errorsFound = thisGLHE.groundTempModel->errorsFound;
                 }

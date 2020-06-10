@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -165,7 +166,7 @@ namespace PurchasedAirManager {
         bool EMSOverrideSupplyTempOn;       // if true, then EMS is calling to override supply temperature
         Real64 EMSValueSupplyTemp;          // Value EMS is directing to use for supply temperature [C]
         bool EMSOverrideSupplyHumRatOn;     // if true, then EMS is calling to override supply humidity ratio
-        Real64 EMSValueSupplyHumRat;        // Value EMS is directing to use for supply humidity ratio [kg-H2O/kg-dryair]
+        Real64 EMSValueSupplyHumRat;        // Value EMS is directing to use for supply humidity ratio [kgWater/kgDryAir]
         Real64 MinOAMassFlowRate;           // The minimum required outdoor air mass flow rate [kg/s]
         Real64 OutdoorAirMassFlowRate;      // The outdoor air mass flow rate [kg/s]
         Real64 OutdoorAirVolFlowRateStdRho; //  The outdoor air volume flow rate using standard density  [m3/s]
@@ -173,7 +174,7 @@ namespace PurchasedAirManager {
         Real64 SupplyAirVolFlowRateStdRho;  // supply air volume flow using standard density [m3/s]
         // Intermediate results
         Real64 FinalMixedAirTemp;     // Dry-bulb temperature of the mixed air, saved for system ventilation load reporting [C]
-        Real64 FinalMixedAirHumRat;   // Humidity ratio of the mixed air, saved for system ventilation load reporting [kg-H2O/kg-dryair]
+        Real64 FinalMixedAirHumRat;   // Humidity ratio of the mixed air, saved for system ventilation load reporting [kgWater/kgDryAir]
         Real64 HtRecSenOutput;        // Sensible heating/cooling rate from heat recovery (<0 means cooling) [W]
         Real64 HtRecLatOutput;        // Latent heating/cooling rate from heat recovery (<0 means cooling or dehumidfying) [W]
         Real64 OASenOutput;           // Outdoor air sensible output relative to zone conditions [W], <0 means OA is cooler than zone air
@@ -305,7 +306,7 @@ namespace PurchasedAirManager {
 
     // Functions
 
-    void SimPurchasedAir(std::string const &PurchAirName,
+    void SimPurchasedAir(EnergyPlusData &state, std::string const &PurchAirName,
                          Real64 &SysOutputProvided,
                          Real64 &MoistOutputProvided, // Moisture output provided (kg/s), dehumidification = negative
                          bool const FirstHVACIteration,
@@ -315,12 +316,12 @@ namespace PurchasedAirManager {
 
     void GetPurchasedAir();
 
-    void InitPurchasedAir(int const PurchAirNum,
+    void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum,
                           bool const FirstHVACIteration, // unused1208
                           int const ControlledZoneNum,
                           int const ActualZoneNum);
 
-    void SizePurchasedAir(int const PurchAirNum);
+    void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum);
 
     void CalcPurchAirLoads(int const PurchAirNum,
                            Real64 &SysOutputProvided,   // Sensible output provided [W] cooling = negative
@@ -337,12 +338,12 @@ namespace PurchasedAirManager {
                               Real64 const OAMassFlowRate,     // outside air mass flow rate [kg/s]
                               Real64 const SupplyMassFlowRate, // supply air mass flow rate [kg/s]
                               Real64 &MixedAirTemp,            // Mixed air dry bulb temperature [C]
-                              Real64 &MixedAirHumRat,          // Mixed air humidity ratio [kg H2O/kg Air]
+                              Real64 &MixedAirHumRat,          // Mixed air humidity ratio [kgWater/kgDryAir]
                               Real64 &MixedAirEnthalpy,        // Mixed air enthalpy [J/kg]
                               int const OperatingMode          // current operating mode, Off, Heating, Cooling, or DeadBand
     );
 
-    void UpdatePurchasedAir(int const PurchAirNum, bool const FirstHVACIteration);
+    void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const FirstHVACIteration);
 
     void ReportPurchasedAir(int const PurchAirNum);
 

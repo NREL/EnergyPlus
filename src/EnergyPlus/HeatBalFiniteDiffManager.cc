@@ -64,12 +64,12 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -96,15 +96,12 @@ namespace HeatBalFiniteDiffManager {
     //    involving latent heat, Simulation, Vol 18, No. 2, February 1972
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DayOfSim;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::HourOfDay;
     using DataGlobals::KelvinConv;
     using DataGlobals::NumOfTimeStepInHour;
-    using DataGlobals::OutputFileDebug;
-    using DataGlobals::OutputFileInits;
     using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZoneSec;
@@ -1004,12 +1001,12 @@ namespace HeatBalFiniteDiffManager {
 
         } // End of the Surface Loop for Report Variable Setup
 
-        ReportFiniteDiffInits(); // Report the results from the Finite Diff Inits
+        ReportFiniteDiffInits(OutputFiles::getSingleton()); // Report the results from the Finite Diff Inits
     }
 
-    void relax_array(Array1<Real64> &a,       // Array to relax
-                     Array1<Real64> const &b, // Array to relax towards
-                     Real64 const r           // Relaxation factor [0-1]
+    void relax_array(Array1D<Real64> &a,       // Array to relax
+                     Array1D<Real64> const &b, // Array to relax towards
+                     Real64 const r            // Relaxation factor [0-1]
     )
     {
         assert(equal_dimensions(a, b));
@@ -1020,7 +1017,7 @@ namespace HeatBalFiniteDiffManager {
         }
     }
 
-    Real64 sum_array_diff(Array1<Real64> const &a, Array1<Real64> const &b)
+    Real64 sum_array_diff(Array1D<Real64> const &a, Array1D<Real64> const &b)
     {
         assert(equal_dimensions(a, b));
         Real64 s(0.0);
@@ -1197,7 +1194,7 @@ namespace HeatBalFiniteDiffManager {
         EnthOld = EnthNew;
     }
 
-    void ReportFiniteDiffInits()
+    void ReportFiniteDiffInits(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1219,11 +1216,9 @@ namespace HeatBalFiniteDiffManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtLD("*");
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool DoReport;
-        std::string InodesChar;
         int ThisNum;
         int Layer;
         int OutwardMatLayerNum;
@@ -1231,43 +1226,62 @@ namespace HeatBalFiniteDiffManager {
         int Inodes;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700("(' Construction CondFD,',A,2(',',A),',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_701("(' Material CondFD Summary,',A,',',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_702("(' ConductionFiniteDifference Node,',A,',',A,',',A,',',A,',',A)");
+        static constexpr auto Format_702(" ConductionFiniteDifference Node,{},{:.8R},{},{},{}\n");
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization "
-                                             "Constant,Relaxation Factor,Inside Face Surface Temperature Convergence Criteria";
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << " ConductionFiniteDifference HeatBalanceSettings," + cCondFDSchemeType(CondFDSchemeType) + ',' +
-                                                 RoundSigDigits(SpaceDescritConstant, 2) + ',' + RoundSigDigits(CondFDRelaxFactorInput, 2) + ',' +
-                                                 RoundSigDigits(MaxAllowedDelTempCondFD, 4);
+        print(outputFiles.eio,
+              "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant,Relaxation Factor,Inside Face Surface "
+              "Temperature Convergence Criteria\n");
+        print(outputFiles.eio,
+              " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{:.4R}\n",
+              cCondFDSchemeType(CondFDSchemeType),
+              SpaceDescritConstant,
+              CondFDRelaxFactorInput,
+              MaxAllowedDelTempCondFD);
+
         ScanForReports("Constructions", DoReport, "Constructions");
 
         if (DoReport) {
 
             //                                      Write Descriptions
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X,Layer "
-                                                 "Alpha*Delt/Delx**2,Layer Moisture Stability";
+            print(outputFiles.eio, "{}\n", "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}");
+            print(outputFiles.eio,
+                  "{}\n",
+                  "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X,Layer Alpha*Delt/Delx**2,Layer Moisture "
+                  "Stability");
+
             // HT Algo issue
-            if (DataHeatBalance::AnyCondFD)
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, "
-                                                     "Construction Name, Outward Material Name (or Face), Inward Material Name (or Face)";
+            if (DataHeatBalance::AnyCondFD) {
+                print(outputFiles.eio,
+                      "{}\n",
+                      "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, Construction Name, Outward Material "
+                      "Name (or Face), Inward Material Name (or Face)");
+            }
+
             for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
 
                 if (Construct(ThisNum).TypeIsWindow) continue;
                 if (Construct(ThisNum).TypeIsIRT) continue;
                 if (Construct(ThisNum).TypeIsAirBoundaryIRTSurface) continue;
 
-                ObjexxFCL::gio::write(OutputFileInits, Format_700)
-                    << Construct(ThisNum).Name << RoundSigDigits(ThisNum) << RoundSigDigits(Construct(ThisNum).TotLayers)
-                    << RoundSigDigits(int(ConstructFD(ThisNum).TotNodes + 1)) << RoundSigDigits(ConstructFD(ThisNum).DeltaTime / SecInHour, 6);
+                static constexpr auto Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
+                print(outputFiles.eio,
+                      Format_700,
+                      Construct(ThisNum).Name,
+                      ThisNum,
+                      Construct(ThisNum).TotLayers,
+                      int(ConstructFD(ThisNum).TotNodes + 1),
+                      ConstructFD(ThisNum).DeltaTime / SecInHour);
 
                 for (Layer = 1; Layer <= Construct(ThisNum).TotLayers; ++Layer) {
-                    ObjexxFCL::gio::write(OutputFileInits, Format_701)
-                        << ConstructFD(ThisNum).Name(Layer) << RoundSigDigits(ConstructFD(ThisNum).Thickness(Layer), 4)
-                        << RoundSigDigits(ConstructFD(ThisNum).NodeNumPoint(Layer)) << RoundSigDigits(ConstructFD(ThisNum).DelX(Layer), 8)
-                        << RoundSigDigits(ConstructFD(ThisNum).TempStability(Layer), 8)
-                        << RoundSigDigits(ConstructFD(ThisNum).MoistStability(Layer), 8);
+                    static constexpr auto Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
+                    print(outputFiles.eio,
+                          Format_701,
+                          ConstructFD(ThisNum).Name(Layer),
+                          ConstructFD(ThisNum).Thickness(Layer),
+                          ConstructFD(ThisNum).NodeNumPoint(Layer),
+                          ConstructFD(ThisNum).DelX(Layer),
+                          ConstructFD(ThisNum).TempStability(Layer),
+                          ConstructFD(ThisNum).MoistStability(Layer));
                 }
 
                 // now list each CondFD Node with its X distance from outside face in m along with other identifiers
@@ -1277,34 +1291,48 @@ namespace HeatBalFiniteDiffManager {
                     OutwardMatLayerNum = Layer - 1;
                     for (LayerNode = 1; LayerNode <= ConstructFD(ThisNum).NodeNumPoint(Layer); ++LayerNode) {
                         ++Inodes;
-                        ObjexxFCL::gio::write(InodesChar, fmtLD) << Inodes;
                         if (Inodes == 1) {
-                            ObjexxFCL::gio::write(OutputFileInits, Format_702)
-                                << "Node #" + stripped(InodesChar) << RoundSigDigits(ConstructFD(ThisNum).NodeXlocation(Inodes), 8)
-                                << Construct(ThisNum).Name << "Surface Outside Face" << ConstructFD(ThisNum).Name(Layer);
+                            print(outputFiles.eio,
+                                  Format_702,
+                                  format("Node #{}", Inodes),
+                                  ConstructFD(ThisNum).NodeXlocation(Inodes),
+                                  Construct(ThisNum).Name,
+                                  "Surface Outside Face",
+                                  ConstructFD(ThisNum).Name(Layer));
 
                         } else if (LayerNode == 1) {
 
                             if (OutwardMatLayerNum > 0 && OutwardMatLayerNum <= Construct(ThisNum).TotLayers) {
-                                ObjexxFCL::gio::write(OutputFileInits, Format_702)
-                                    << "Node #" + stripped(InodesChar) << RoundSigDigits(ConstructFD(ThisNum).NodeXlocation(Inodes), 8)
-                                    << Construct(ThisNum).Name << ConstructFD(ThisNum).Name(OutwardMatLayerNum) << ConstructFD(ThisNum).Name(Layer);
+                                print(outputFiles.eio,
+                                      Format_702,
+                                      format("Node #{}", Inodes),
+                                      ConstructFD(ThisNum).NodeXlocation(Inodes),
+                                      Construct(ThisNum).Name,
+                                      ConstructFD(ThisNum).Name(OutwardMatLayerNum),
+                                      ConstructFD(ThisNum).Name(Layer));
                             }
                         } else if (LayerNode > 1) {
                             OutwardMatLayerNum = Layer;
-                            ObjexxFCL::gio::write(OutputFileInits, Format_702)
-                                << "Node #" + stripped(InodesChar) << RoundSigDigits(ConstructFD(ThisNum).NodeXlocation(Inodes), 8)
-                                << Construct(ThisNum).Name << ConstructFD(ThisNum).Name(OutwardMatLayerNum) << ConstructFD(ThisNum).Name(Layer);
+                            print(outputFiles.eio,
+                                  Format_702,
+                                  format("Node #{}", Inodes),
+                                  ConstructFD(ThisNum).NodeXlocation(Inodes),
+                                  Construct(ThisNum).Name,
+                                  ConstructFD(ThisNum).Name(OutwardMatLayerNum),
+                                  ConstructFD(ThisNum).Name(Layer));
                         }
                     }
                 }
 
                 Layer = Construct(ThisNum).TotLayers;
                 ++Inodes;
-                ObjexxFCL::gio::write(InodesChar, fmtLD) << Inodes;
-                ObjexxFCL::gio::write(OutputFileInits, Format_702)
-                    << "Node #" + stripped(InodesChar) << RoundSigDigits(ConstructFD(ThisNum).NodeXlocation(Inodes), 8) << Construct(ThisNum).Name
-                    << ConstructFD(ThisNum).Name(Layer) << "Surface Inside Face";
+                print(outputFiles.eio,
+                      Format_702,
+                      format("Node #{}", Inodes),
+                      ConstructFD(ThisNum).NodeXlocation(Inodes),
+                      Construct(ThisNum).Name,
+                      ConstructFD(ThisNum).Name(Layer),
+                      "Surface Inside Face");
             }
         }
     }
@@ -1368,21 +1396,21 @@ namespace HeatBalFiniteDiffManager {
         }
     }
 
-    void ExteriorBCEqns(int const Delt,                        // Time Increment
-                        int const i,                           // Node Index
-                        int const Lay,                         // Layer Number for Construction
-                        int const Surf,                        // Surface number
-                        Array1<Real64> const &EP_UNUSED(T),    // Old node Temperature in MFD finite difference solution
-                        Array1<Real64> &TT,                    // New node Temperature in MFD finite difference solution.
-                        Array1<Real64> const &EP_UNUSED(Rhov), // MFD Nodal Vapor Density[kg/m3] and is the old or last time step result.
-                        Array1<Real64> &RhoT,                  // MFD vapor density for the new time step.
-                        Array1<Real64> &EP_UNUSED(RH),         // Nodal relative humidity
-                        Array1<Real64> const &TD,              // The old dry Temperature at each node for the CondFD algorithm..
-                        Array1<Real64> &TDT,                   // The current or new Temperature at each node location for the CondFD solution..
-                        Array1<Real64> &EnthOld,               // Old Nodal enthalpy
-                        Array1<Real64> &EnthNew,               // New Nodal enthalpy
-                        int const TotNodes,                    // Total nodes in layer
-                        Real64 const HMovInsul                 // Conductance of movable(transparent) insulation.
+    void ExteriorBCEqns(int const Delt,                         // Time Increment
+                        int const i,                            // Node Index
+                        int const Lay,                          // Layer Number for Construction
+                        int const Surf,                         // Surface number
+                        Array1D<Real64> const &EP_UNUSED(T),    // Old node Temperature in MFD finite difference solution
+                        Array1D<Real64> &TT,                    // New node Temperature in MFD finite difference solution.
+                        Array1D<Real64> const &EP_UNUSED(Rhov), // MFD Nodal Vapor Density[kg/m3] and is the old or last time step result.
+                        Array1D<Real64> &RhoT,                  // MFD vapor density for the new time step.
+                        Array1D<Real64> &EP_UNUSED(RH),         // Nodal relative humidity
+                        Array1D<Real64> const &TD,              // The old dry Temperature at each node for the CondFD algorithm..
+                        Array1D<Real64> &TDT,                   // The current or new Temperature at each node location for the CondFD solution..
+                        Array1D<Real64> &EnthOld,               // Old Nodal enthalpy
+                        Array1D<Real64> &EnthNew,               // New Nodal enthalpy
+                        int const TotNodes,                     // Total nodes in layer
+                        Real64 const HMovInsul                  // Conductance of movable(transparent) insulation.
     )
     {
 
@@ -1638,19 +1666,19 @@ namespace HeatBalFiniteDiffManager {
         } // regular BC part of the ground and Rain check
     }
 
-    void InteriorNodeEqns(int const Delt,                        // Time Increment
-                          int const i,                           // Node Index
-                          int const Lay,                         // Layer Number for Construction
-                          int const Surf,                        // Surface number
-                          Array1<Real64> const &EP_UNUSED(T),    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                          Array1<Real64> &EP_UNUSED(TT),         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                          Array1<Real64> const &EP_UNUSED(Rhov), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                          Array1<Real64> &EP_UNUSED(RhoT),       // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                          Array1<Real64> &EP_UNUSED(RH),         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                          Array1<Real64> const &TD,              // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                          Array1<Real64> &TDT,                   // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                          Array1<Real64> &EnthOld,               // Old Nodal enthalpy
-                          Array1<Real64> &EnthNew                // New Nodal enthalpy
+    void InteriorNodeEqns(int const Delt,                         // Time Increment
+                          int const i,                            // Node Index
+                          int const Lay,                          // Layer Number for Construction
+                          int const Surf,                         // Surface number
+                          Array1D<Real64> const &EP_UNUSED(T),    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                          Array1D<Real64> &EP_UNUSED(TT),         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                          Array1D<Real64> const &EP_UNUSED(Rhov), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                          Array1D<Real64> &EP_UNUSED(RhoT),       // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                          Array1D<Real64> &EP_UNUSED(RH),         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                          Array1D<Real64> const &TD,              // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                          Array1D<Real64> &TDT,                   // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                          Array1D<Real64> &EnthOld,               // Old Nodal enthalpy
+                          Array1D<Real64> &EnthNew                // New Nodal enthalpy
     )
     {
 
@@ -1736,20 +1764,20 @@ namespace HeatBalFiniteDiffManager {
             (Cp * DelX * RhoS) / 2.0; // Save this for computing node flux values, half nodes are the same here
     }
 
-    void IntInterfaceNodeEqns(int const Delt,                           // Time Increment
-                              int const i,                              // Node Index
-                              int const Lay,                            // Layer Number for Construction
-                              int const Surf,                           // Surface number
-                              Array1<Real64> const &EP_UNUSED(T),       // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                              Array1<Real64> &EP_UNUSED(TT),            // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                              Array1<Real64> const &EP_UNUSED(Rhov),    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                              Array1<Real64> &EP_UNUSED(RhoT),          // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                              Array1<Real64> &EP_UNUSED(RH),            // RELATIVE HUMIDITY.
-                              Array1<Real64> const &TD,                 // OLD NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
-                              Array1<Real64> &TDT,                      // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
-                              Array1<Real64> const &EP_UNUSED(EnthOld), // Old Nodal enthalpy
-                              Array1<Real64> &EnthNew,                  // New Nodal enthalpy
-                              int const EP_UNUSED(GSiter)               // Iteration number of Gauss Seidel iteration
+    void IntInterfaceNodeEqns(int const Delt,                            // Time Increment
+                              int const i,                               // Node Index
+                              int const Lay,                             // Layer Number for Construction
+                              int const Surf,                            // Surface number
+                              Array1D<Real64> const &EP_UNUSED(T),       // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                              Array1D<Real64> &EP_UNUSED(TT),            // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                              Array1D<Real64> const &EP_UNUSED(Rhov),    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                              Array1D<Real64> &EP_UNUSED(RhoT),          // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                              Array1D<Real64> &EP_UNUSED(RH),            // RELATIVE HUMIDITY.
+                              Array1D<Real64> const &TD,                 // OLD NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
+                              Array1D<Real64> &TDT,                      // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
+                              Array1D<Real64> const &EP_UNUSED(EnthOld), // Old Nodal enthalpy
+                              Array1D<Real64> &EnthNew,                  // New Nodal enthalpy
+                              int const EP_UNUSED(GSiter)                // Iteration number of Gauss Seidel iteration
     )
     {
 
@@ -2028,20 +2056,20 @@ namespace HeatBalFiniteDiffManager {
         } // End of the CondFD if block
     }
 
-    void InteriorBCEqns(int const Delt,                        // Time Increment
-                        int const i,                           // Node Index
-                        int const Lay,                         // Layer Number for Construction
-                        int const Surf,                        // Surface number
-                        Array1<Real64> const &EP_UNUSED(T),    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
-                        Array1<Real64> &EP_UNUSED(TT),         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
-                        Array1<Real64> const &EP_UNUSED(Rhov), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                        Array1<Real64> &EP_UNUSED(RhoT),       // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                        Array1<Real64> &EP_UNUSED(RH),         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                        Array1<Real64> const &TD,              // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                        Array1<Real64> &TDT,                   // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-                        Array1<Real64> &EnthOld,               // Old Nodal enthalpy
-                        Array1<Real64> &EnthNew,               // New Nodal enthalpy
-                        Array1<Real64> &TDreport               // Temperature value from previous HeatSurfaceHeatManager iteration's value
+    void InteriorBCEqns(int const Delt,                         // Time Increment
+                        int const i,                            // Node Index
+                        int const Lay,                          // Layer Number for Construction
+                        int const Surf,                         // Surface number
+                        Array1D<Real64> const &EP_UNUSED(T),    // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
+                        Array1D<Real64> &EP_UNUSED(TT),         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
+                        Array1D<Real64> const &EP_UNUSED(Rhov), // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                        Array1D<Real64> &EP_UNUSED(RhoT),       // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                        Array1D<Real64> &EP_UNUSED(RH),         // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                        Array1D<Real64> const &TD,              // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                        Array1D<Real64> &TDT,                   // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+                        Array1D<Real64> &EnthOld,               // Old Nodal enthalpy
+                        Array1D<Real64> &EnthNew,               // New Nodal enthalpy
+                        Array1D<Real64> &TDreport               // Temperature value from previous HeatSurfaceHeatManager iteration's value
     )
     {
         // SUBROUTINE INFORMATION:

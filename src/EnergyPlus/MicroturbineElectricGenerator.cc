@@ -59,10 +59,11 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -246,12 +247,6 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum, // Curve index
-                                                            {2},                                                // Valid dimensions
-                                                            "GetMTGeneratorInput: ",                            // Routine name
-                                                            DataIPShortCuts::cCurrentModuleObject,              // Object Type
-                                                            MTGenerator(GeneratorNum).Name,                     // Object Name
-                                                            DataIPShortCuts::cAlphaFieldNames(2));              // Field Name
 
                 if (!ErrorsFound) {
                     // Check electrical power output at reference combustion inlet temp and elevation
@@ -279,12 +274,6 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal types are Quadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ElecEffFTempCurveNum, // Curve index
-                                                            {1},                                            // Valid dimensions
-                                                            "GetMTGeneratorInput: ",                        // Routine name
-                                                            DataIPShortCuts::cCurrentModuleObject,          // Object Type
-                                                            MTGenerator(GeneratorNum).Name,                 // Object Name
-                                                            DataIPShortCuts::cAlphaFieldNames(3));          // Field Name
 
                 if (!ErrorsFound) {
                     // Check electrical efficiency at reference combustion inlet temp
@@ -309,12 +298,6 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal types are Quadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, // Curve index
-                                                            {1},                                           // Valid dimensions
-                                                            "GetMTGeneratorInput: ",                       // Routine name
-                                                            DataIPShortCuts::cCurrentModuleObject,         // Object Type
-                                                            MTGenerator(GeneratorNum).Name,                // Object Name
-                                                            DataIPShortCuts::cAlphaFieldNames(4));         // Field Name
 
                 if (!ErrorsFound) {
                     // Check electrical efficiency at PLR = 1
@@ -335,23 +318,14 @@ namespace MicroturbineElectricGenerator {
                 }
             }
 
-            // Fuel Type case statement
-            {
-                auto const SELECT_CASE_var(AlphArray(5));
-                if (is_blank(SELECT_CASE_var)) { // If blank, then the default is Natural Gas
-                    MTGenerator(GeneratorNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "NATURALGAS") {
-                    MTGenerator(GeneratorNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    MTGenerator(GeneratorNum).FuelType = "Propane";
-
-                } else {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
-                    ErrorsFound = true;
-                }
+            // Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(AlphArray(5), MTGenerator(GeneratorNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
+                ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             MTGenerator(GeneratorNum).FuelHigherHeatingValue = NumArray(8);
@@ -405,12 +379,6 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else if (MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum > 0) {
                 // Verify curve object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum, // Curve index
-                                                            {1},                                                  // Valid dimensions
-                                                            "GetMTGeneratorInput: ",                              // Routine name
-                                                            DataIPShortCuts::cCurrentModuleObject,                // Object Type
-                                                            MTGenerator(GeneratorNum).Name,                       // Object Name
-                                                            DataIPShortCuts::cAlphaFieldNames(6));                // Field Name
 
                 if (!ErrorsFound) {
                     // Fuel mass flow rate at reference conditions (kg/s)
@@ -521,12 +489,6 @@ namespace MicroturbineElectricGenerator {
                     MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum = CurveManager::GetCurveIndex(AlphArray(10));
                     if (MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum != 0) {
                         // Verify curve object, only legal type is BiQuadratic
-                        ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum, // Curve index
-                                                                    {2},                                                   // Valid dimensions
-                                                                    "GetMTGeneratorInput: ",                               // Routine name
-                                                                    DataIPShortCuts::cCurrentModuleObject,                 // Object Type
-                                                                    MTGenerator(GeneratorNum).Name,                        // Object Name
-                                                                    DataIPShortCuts::cAlphaFieldNames(10));                // Field Name
                     }
 
                 } // End of IF (MTGenerator(GeneratorNum)%InternalFlowControl) THEN
@@ -534,12 +496,6 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum = CurveManager::GetCurveIndex(AlphArray(11)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum != 0) {
                     // Verify curve object, only legal types are BiQuadratic and BiCubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum, // Curve index
-                                                                {2},                                                 // Valid dimensions
-                                                                "GetMTGeneratorInput: ",                             // Routine name
-                                                                DataIPShortCuts::cCurrentModuleObject,               // Object Type
-                                                                MTGenerator(GeneratorNum).Name,                      // Object Name
-                                                                DataIPShortCuts::cAlphaFieldNames(11));              // Field Name
 
                     if (!ErrorsFound) {
                         // Output of Thermal Efficiency Modifier Curve (function of temp and elevation)
@@ -555,8 +511,6 @@ namespace MicroturbineElectricGenerator {
                                               General::TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
                             ShowContinueError("... Reference elevation                             = " +
                                               General::TrimSigDigits(MTGenerator(GeneratorNum).RefElevation, 4) + " m");
-                            ShowContinueError("... Curve output                                    = " +
-                                              General::TrimSigDigits(ThermalEffTempElevOutput, 4));
                         }
                     }
                 }
@@ -564,12 +518,6 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum = CurveManager::GetCurveIndex(AlphArray(12)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum, // Curve index
-                                                                {1},                                               // Valid dimensions
-                                                                "GetMTGeneratorInput: ",                           // Routine name
-                                                                DataIPShortCuts::cCurrentModuleObject,             // Object Type
-                                                                MTGenerator(GeneratorNum).Name,                    // Object Name
-                                                                DataIPShortCuts::cAlphaFieldNames(12));            // Field Name
 
                     if (!ErrorsFound) {
                         // Output of Heat Recovery Rate Modifier Curve (function of PLR)
@@ -587,12 +535,6 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum = CurveManager::GetCurveIndex(AlphArray(13)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum != 0) {
                     // Verify curve object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum, // Curve index
-                                                                {1},                                                // Valid dimensions
-                                                                "GetMTGeneratorInput: ",                            // Routine name
-                                                                DataIPShortCuts::cCurrentModuleObject,              // Object Type
-                                                                MTGenerator(GeneratorNum).Name,                     // Object Name
-                                                                DataIPShortCuts::cAlphaFieldNames(13));             // Field Name
 
                     if (!ErrorsFound) {
                         // Output of Heat Recovery Rate Modifier Curve (function of inlet water temp)
@@ -613,12 +555,6 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum = CurveManager::GetCurveIndex(AlphArray(14));
                 if (MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum != 0) {
                     // Verify curve object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum, // Curve index
-                                                                {1},                                                     // Valid dimensions
-                                                                "GetMTGeneratorInput: ",                                 // Routine name
-                                                                DataIPShortCuts::cCurrentModuleObject,                   // Object Type
-                                                                MTGenerator(GeneratorNum).Name,                          // Object Name
-                                                                DataIPShortCuts::cAlphaFieldNames(14));                  // Field Name
 
                     if (!ErrorsFound) {
                         // Output of Heat Recovery Rate Modifier Curve (function of water flow rate)
@@ -739,12 +675,6 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhFlowFTempCurveNum = CurveManager::GetCurveIndex(AlphArray(17));
                 if (MTGenerator(GeneratorNum).ExhFlowFTempCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic and Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ExhFlowFTempCurveNum, // Curve index
-                                                                {1},                                            // Valid dimensions
-                                                                "GetMTGeneratorInput: ",                        // Routine name
-                                                                DataIPShortCuts::cCurrentModuleObject,          // Object Type
-                                                                MTGenerator(GeneratorNum).Name,                 // Object Name
-                                                                DataIPShortCuts::cAlphaFieldNames(17));         // Field Name
 
                     if (!ErrorsFound) {
                         // Output of Exhaust Air Flow Modifier Curve (function of inlet air temp)
@@ -765,12 +695,6 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum = CurveManager::GetCurveIndex(AlphArray(18)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum != 0) {
                     // Verify curve object, legal types are Quadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum, // Curve index
-                                                                {1},                                           // Valid dimensions
-                                                                "GetMTGeneratorInput: ",                       // Routine name
-                                                                DataIPShortCuts::cCurrentModuleObject,         // Object Type
-                                                                MTGenerator(GeneratorNum).Name,                // Object Name
-                                                                DataIPShortCuts::cAlphaFieldNames(18));        // Field Name
 
                     if (!ErrorsFound) {
                         // Output of Exhaust Air Flow Modifier Curve (function of PLR)
@@ -790,12 +714,6 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum = CurveManager::GetCurveIndex(AlphArray(19));
                 if (MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic and Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum, // Curve index
-                                                                {1},                                               // Valid dimensions
-                                                                "GetMTGeneratorInput: ",                           // Routine name
-                                                                DataIPShortCuts::cCurrentModuleObject,             // Object Type
-                                                                MTGenerator(GeneratorNum).Name,                    // Object Name
-                                                                DataIPShortCuts::cAlphaFieldNames(19));            // Field Name
 
                     if (!ErrorsFound) {
                         // Output of Exhaust Air Temperature Modifier Curve (function of inlet air temp)
@@ -816,12 +734,6 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum = CurveManager::GetCurveIndex(AlphArray(20)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum != 0) {
                     // Verify curve object, legal types are Quadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum, // Curve index
-                                                                {1},                                              // Valid dimensions
-                                                                "GetMTGeneratorInput: ",                          // Routine name
-                                                                DataIPShortCuts::cCurrentModuleObject,            // Object Type
-                                                                MTGenerator(GeneratorNum).Name,                   // Object Name
-                                                                DataIPShortCuts::cAlphaFieldNames(20));           // Field Name
 
                     if (!ErrorsFound) {
                         // Output of Exhaust Air Temperature Modifier Curve (function of PLR)
@@ -952,7 +864,7 @@ namespace MicroturbineElectricGenerator {
         }
     }
 
-    void MTGeneratorSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void MTGeneratorSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool EP_UNUSED(FirstHVACIteration),
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool EP_UNUSED(RunFlag))
@@ -1743,8 +1655,7 @@ namespace MicroturbineElectricGenerator {
                 this->ExhaustAirTemperature = ExhaustAirTemp;
                 //       Adjust exhaust air temperature if heat recovery to water is being done
                 if (QHeatRecToWater > 0.0) {
-                    // Heat capacity of air (J/kg-C)
-                    Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(CombustionAirInletW, CombustionAirInletTemp);
+                    Real64 CpAir = Psychrometrics::PsyCpAirFnW(CombustionAirInletW);
                     if (CpAir > 0.0) {
                         this->ExhaustAirTemperature = ExhaustAirTemp - QHeatRecToWater / (CpAir * ExhAirMassFlowRate);
                     }

@@ -15,42 +15,84 @@ endif()
 
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
-set( CMAKE_VERSION_MAJOR 9 )
-set( CMAKE_VERSION_MINOR 3 )
-set( CMAKE_VERSION_PATCH 0 )
+set( CMAKE_POSITION_INDEPENDENT_CODE ON )
 
-set( PREV_RELEASE_SHA "921312f" )
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
+include(cmake/Version.cmake)
 
-string( TIMESTAMP CMAKE_YEAR "%Y")
-
-set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
-find_package(Git)
-
-if(NOT GIT_FOUND)
-  find_program(GIT_EXECUTABLE git HINTS "$ENV{LOCALAPPDATA}/Programs/git/bin")
-  if (NOT GIT_EXECUTABLE_NOTFOUND)
-    set(GIT_FOUND TRUE)
+set( OPENGL_REQUIRED ON CACHE BOOL "Require OpenGL in order to build" )
+if(OPENGL_REQUIRED)
+  # On Linux specifically, OpenGL is complaining about being able to find OpenGL using both the
+  # exported module target or the library variables.  If it has to choose, and doesn't have a user-preference,
+  # a warning is shown on every configure step.  This next line just sets the preference so the warning won't show up.
+  # See this for more info: https://cmake.org/cmake/help/v3.10/module/FindOpenGL.html#linux-specific
+  set(OpenGL_GL_PREFERENCE GLVND)
+  find_package(OpenGL)
+  if(NOT OPENGL_FOUND)
+    set(CMAKE_VERSION_BUILD "${CMAKE_VERSION_BUILD} (No OpenGL)" CACHE STRING "Build number" FORCE) # git sha
+    message(WARNING "OpenGL libraries were not found. EnergyPlus will be compiled without GPU acceleration capabilities.")
   endif()
-endif()
-
-if(GIT_FOUND)
-  execute_process(COMMAND "${GIT_EXECUTABLE}" "rev-parse" "--short=10" "HEAD"
-                  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                  TIMEOUT 10
-                  RESULT_VARIABLE RESULT
-                  OUTPUT_VARIABLE GIT_VERSION
-                  ERROR_QUIET
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  if(${RESULT} EQUAL 0 AND NOT "${GIT_VERSION}" EQUAL "${CMAKE_VERSION_BUILD}")
-    set(CMAKE_VERSION_BUILD ${GIT_VERSION} CACHE STRING "Build number" FORCE) # git sha
-  endif()
-
-  get_filename_component(GIT_DIR "${GIT_EXECUTABLE}" PATH)
 else()
-  set(GIT_DIR "")
+  set( OPENGL_FOUND FALSE )
 endif()
+
+option( BUILD_PACKAGE "Build package" OFF )
+option( BUILD_TESTING "Build testing targets" OFF )
+option( BUILD_FORTRAN "Build Fortran stuff" OFF )
+
+#######################################################################
+
+# TODO: remove at next release
+# Temporary workaround to default the correct DOCUMENTATION_BUILD value if BUILD_DOCS existed in the cache or is passed via the command line
+# This warning will be triggered only once if it's from the Cache since I'm unsetting it
+# (such as when using the GUI or running `cmake .` instead of passing all command line arguments)
+if(DEFINED BUILD_DOCS)
+  if (NOT DEFINED DOCUMENTATION_BUILD)
+    if(BUILD_DOCS)
+      message(AUTHOR_WARNING "BUILD_DOCS (=ON) was deprecated in favor of the 'DOCUMENTATION_BUILD' choice, which was defaulted to 'BuildWithAll'")
+      set(DOCUMENTATION_BUILD "BuildWithAll" CACHE STRING "Build LaTeX-pdf documentation")
+    else()
+      message(AUTHOR_WARNING "BUILD_DOCS (=OFF) was deprecated in favor of the 'DOCUMENTATION_BUILD' choice, which was defaulted to 'DoNotBuild")
+    endif()
+  else()
+    message(AUTHOR_WARNING "DOCUMENTATION_BUILD is already defined and has value '${DOCUMENTATION_BUILD}', ignoring BUILD_DOCS")
+  endif()
+  unset(BUILD_DOCS CACHE)
+endif()
+# END TODO
+
+set(DocumentationBuildValues "DoNotBuild;BuildWithAll;BuildOnlyWithPackage" CACHE INTERNAL
+  "List of possible values for the LaTeX-pdf documentation")
+set(DOCUMENTATION_BUILD "DoNotBuild" CACHE STRING "Build LaTeX-pdf documentation")
+set_property(CACHE DOCUMENTATION_BUILD PROPERTY STRINGS ${DocumentationBuildValues})
+
+if(NOT DOCUMENTATION_BUILD IN_LIST DocumentationBuildValues)
+  message(FATAL_ERROR "DOCUMENTATION_BUILD must be one of ${DocumentationBuildValues}")
+endif()
+
+# Local only variables for ease of use in if blocks
+set(BUILD_DOCS OFF)
+set(BUILD_DOCS_ONLY_WITH_PACKAGE OFF)
+
+if(DOCUMENTATION_BUILD STREQUAL "BuildWithAll")
+  set(BUILD_DOCS ON)
+  set(BUILD_DOCS_ONLY_WITH_PACKAGE OFF)
+elseif(DOCUMENTATION_BUILD STREQUAL "BuildOnlyWithPackage")
+  set(BUILD_DOCS ON)
+  set(BUILD_DOCS_ONLY_WITH_PACKAGE ON)
+endif()
+#######################################################################
+
+option( LINK_WITH_PYTHON "Link with Python Library for Python Plugin Builds" OFF )
+
+# Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
+# Turn this option OFF for automated testing.
+option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
+option( ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON )
+option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
+
+mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -61,20 +103,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "MinSizeRel" "RelWithDebInfo")
 endif()
 
-option( BUILD_PACKAGE "Build package" OFF )
-option( BUILD_TESTING "Build testing targets" OFF )
-option( BUILD_FORTRAN "Build Fortran stuff" OFF )
-option( BUILD_DOCS "Build LaTeX-pdf documentation" OFF )
-
-# Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
-# Turn this option OFF for automated testing.
-option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
-option( ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON )
-option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
-
-mark_as_advanced( ENABLE_INSTALL_REMOTE )
-
-# we are making python a required dependency, so find it here
+# we are making *a Python 3 Interpreter* a required dependency, so find it here
 find_package(PythonInterp 3 REQUIRED)
 
 if( BUILD_TESTING )
@@ -126,39 +155,47 @@ if (MINGW)
   set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif ()
 
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Products" )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Products" )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Products" )
 
 include(cmake/ProjectMacros.cmake)
 include(cmake/CompilerFlags.cmake)
 
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/btwxt/src )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/re2 )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/doj )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/nlohmann )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/valijson )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
-INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/eigen/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Chromogenics/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Common/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Gases/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/MultiLayerOptics/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SingleLayerOptics/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SpectralAveraging/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/src )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/btwxt/src )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/re2 )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/doj )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/nlohmann )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/valijson )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
+INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/third_party/Expat" "${PROJECT_SOURCE_DIR}/third_party/Expat/lib" SYSTEM )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/CLI/ )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/eigen/ )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Chromogenics/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Common/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Gases/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/MultiLayerOptics/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SingleLayerOptics/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SpectralAveraging/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
+if( OPENGL_FOUND )
+    INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/penumbra/include )
+endif()
 
 #### Create interface for JSON for Modern C++ so we can include it in targets
 # add_library( ModernJSON INTERFACE )
-# target_include_directories( ModernJSON INTERFACE "${CMAKE_SOURCE_DIR}/third_party/nlohmann" "${CMAKE_SOURCE_DIR}/third_party/doj" )
+# target_include_directories( ModernJSON INTERFACE "${PROJECT_SOURCE_DIR}/third_party/nlohmann" "${PROJECT_SOURCE_DIR}/third_party/doj" )
 
 set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+
+
+if( OPENGL_FOUND )
+  set(BUILD_PENUMBRA_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
+endif()
 
 if( BUILD_TESTING )
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -166,37 +203,66 @@ if( BUILD_TESTING )
   set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
   enable_testing()
-  include(CTest)
   ADD_SUBDIRECTORY(third_party/gtest)
+  set_target_properties(gtest PROPERTIES FOLDER ThirdParty/gtest)
+  set_target_properties(gtest_main PROPERTIES FOLDER ThirdParty/gtest)
+  set_target_properties(gmock PROPERTIES FOLDER ThirdParty/gtest)
+  set_target_properties(gmock_main PROPERTIES FOLDER ThirdParty/gtest)
 endif()
 
 # E+ required libraries
 ADD_SUBDIRECTORY(idd)
 
 ADD_SUBDIRECTORY(third_party/SQLite)
+set_target_properties(sqlite PROPERTIES FOLDER ThirdParty/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
+set_target_properties(objexx PROPERTIES FOLDER ThirdParty/ObjexxFCL)
 ADD_SUBDIRECTORY(third_party/BCVTB)
+set_target_properties(bcvtb PROPERTIES FOLDER ThirdParty/BCVTB)
 ADD_SUBDIRECTORY(third_party/Expat)
+set_target_properties(epexpat PROPERTIES FOLDER ThirdParty/Expat)
 ADD_SUBDIRECTORY(third_party/FMI)
+set_target_properties(epfmiimport PROPERTIES FOLDER ThirdParty/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
+set_target_properties(miniziplib PROPERTIES FOLDER ThirdParty/zlib)
 ADD_SUBDIRECTORY(third_party/DElight)
+set_target_properties(DElight PROPERTIES FOLDER ThirdParty/DElight)
 ADD_SUBDIRECTORY(third_party/re2)
+set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
+ADD_SUBDIRECTORY(third_party/fmt-6.1.2 )
+set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
 
 ADD_SUBDIRECTORY(scripts/dev/generate_embeddable_epJSON_schema)
+set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
+
 IF( NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
+  set_target_properties(parser PROPERTIES FOLDER ThirdParty/FMI)
 ENDIF()
+
 ADD_SUBDIRECTORY(third_party/Windows-CalcEngine)
+set_target_properties(Windows-CalcEngine PROPERTIES FOLDER ThirdParty/Windows-CalcEngine)
 
 # Btwxt
 INCLUDE_DIRECTORIES( ${gtest_SOURCE_DIR}/include/ SYSTEM )
 set(BUILD_BTWXT_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
 ADD_SUBDIRECTORY(third_party/btwxt)
+set_target_properties(btwxt PROPERTIES FOLDER ThirdParty/Btwxt)
 
 # Kiva
 INCLUDE(third_party/cmake/kiva.cmake)
+set_target_properties(libkiva PROPERTIES FOLDER ThirdParty/Kiva)
 
-execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
+if( OPENGL_FOUND )
+  ADD_SUBDIRECTORY(third_party/penumbra)
+  set_target_properties(awning PROPERTIES FOLDER ThirdParty/Penumbra)
+  set_target_properties(glfw PROPERTIES FOLDER ThirdParty/Penumbra/GLFW)
+  set_target_properties(glad PROPERTIES FOLDER ThirdParty/Penumbra)
+  set_target_properties(penumbra PROPERTIES FOLDER ThirdParty/Penumbra)
+  set_target_properties(tess2 PROPERTIES FOLDER ThirdParty/Penumbra)
+endif()
+
+execute_process( COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
 if( ${generate_epJSON_schema_result} MATCHES ".*timeout.*" )
   message(FATAL_ERROR "Generating epJSON Schema from IDD failed: ${generate_epJSON_schema_result}")
 endif()
@@ -215,6 +281,9 @@ configure_file( "workflows/transition.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/wor
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
+set_target_properties(airflownetworklib PROPERTIES FOLDER "Internal")
+set_target_properties(GenerateEmbeddedEpJSONSchema PROPERTIES FOLDER "Internal")
+set_target_properties(energyplusparser PROPERTIES FOLDER "Internal")
 
 if( BUILD_TESTING )
   ADD_SUBDIRECTORY(testfiles)
@@ -229,6 +298,17 @@ if( BUILD_TESTING )
     endif()
     ADD_SUBDIRECTORY(performance_tests)
   endif()
+  set_target_properties(energyplus_tests PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_DataTransfer_C PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_Runtime_C PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_Functional_C PROPERTIES FOLDER Testing)
+  set_target_properties(TestEnergyPlusCallbacks PROPERTIES FOLDER Testing)
+
+  set_target_properties(btwxt_tests PROPERTIES FOLDER ThirdParty/Btwxt)
+  set_target_properties(kiva_tests PROPERTIES FOLDER ThirdParty/Kiva)
+  if( OPENGL_FOUND )
+    set_target_properties(penumbra_tests PROPERTIES FOLDER ThirdParty/Penumbra)
+  endif()
 endif()
 
 ADD_SUBDIRECTORY(src/ConvertInputFormat)
@@ -239,9 +319,9 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
   set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
   cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
-  file( COPY "idd/V9-1-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
-  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-2-0-Energy+.idd" )
-  file( COPY "src/Transition/SupportFiles/Report Variables 9-1-0 to 9-2-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  file( COPY "idd/V9-2-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-3-0-Energy+.idd" )
+  file( COPY "src/Transition/SupportFiles/Report Variables 9-2-0 to 9-3-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
   cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
@@ -253,26 +333,11 @@ endif()
 
 if( BUILD_PACKAGE )
   # We handle everything in a dedicated cmake file
-  include(cmake/Install.cmake)
+  include(${PROJECT_SOURCE_DIR}/cmake/Install.cmake)
 endif()
 
 if (BUILD_DOCS)
-  # this _should_ find the xelatex compiler, but for some reason it isn't populating for me
-  find_package(LATEX)
-  # so we'll create a cache variable which will be available to the add_subdirectory call below
-  set(XELATEX "XeLaTeX Compiler" CACHE INTERNAL "")
-  # and we'll simply take the found pdflatex compiler path and replace pdflatex with xelatex
-  string(REPLACE pdflatex xelatex XELATEX ${PDFLATEX_COMPILER})
-  # and then verify it actually exists at that location...which it should pretty much every time...
-  if( EXISTS ${XELATEX} )
-    # and if it does, just add the doc/CMakeLists commands
-    add_subdirectory(doc)
-  else()
-    # and if it doesn't, clearly state why it fails
-    message( FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
-  endif()
-  set(TEX_INTERACTION "batchmode" CACHE STRING "Choose the interaction mode for TeX.")
-  set_property(CACHE TEX_INTERACTION PROPERTY STRINGS "nonstopmode" "batchmode")
+  add_subdirectory(doc)
 endif()
 
 # some parameters are simply not needed for everyday building
@@ -288,6 +353,9 @@ mark_as_advanced(KIVA_EXE_BUILD)
 mark_as_advanced(KIVA_GROUND_PLOT)
 mark_as_advanced(KIVA_STATIC_LIB)
 mark_as_advanced(KIVA_TESTING)
+mark_as_advanced(BTWXT_COVERAGE)
+mark_as_advanced(BUILD_BTWXT_TESTING)
+mark_as_advanced(BTWXT_STATIC_LIB)
 mark_as_advanced(RE2_BUILD_TESTING)
 mark_as_advanced(USEPCRE)
 mark_as_advanced(CCACHE_PROGRAM)
@@ -299,3 +367,24 @@ mark_as_advanced(gtest_build_tests)
 mark_as_advanced(gtest_disable_pthreads)
 mark_as_advanced(gtest_force_shared_crt)
 mark_as_advanced(gtest_hide_internal_symbols)
+mark_as_advanced(FMT_CUDA_TEST)
+mark_as_advanced(FMT_DOC)
+mark_as_advanced(FMT_FUZZ)
+mark_as_advanced(FMT_INSTALL)
+mark_as_advanced(FMT_PEDANTIC)
+mark_as_advanced(FMT_TEST)
+mark_as_advanced(FMT_WERROR)
+mark_as_advanced(GLFW_BUILD_DOCS)
+mark_as_advanced(GLFW_BUILD_EXAMPLES)
+mark_as_advanced(GLFW_BUILD_TESTS)
+mark_as_advanced(GLFW_INSTALL)
+mark_as_advanced(GLFW_USE_OSMESA)
+mark_as_advanced(GLFW_USE_WAYLAND)
+mark_as_advanced(GLFW_VULKAN_STATIC)
+mark_as_advanced(BUILD_PENUMBRA_TESTING)
+mark_as_advanced(PENUMBRA_COVERAGE)
+mark_as_advanced(PENUMBRA_STATIC_LIB)
+mark_as_advanced(BUILD_GMOCK)
+mark_as_advanced(BUILD_GTEST)
+mark_as_advanced(gmock_build_tests)
+mark_as_advanced(BUILD_WCE_TESTING)

@@ -1,10 +1,10 @@
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building 1,              !- Name
     ,                        !- North Axis {deg}
     ,                        !- Terrain
-    ,                        !- Loads Convergence Tolerance Value
+    ,                        !- Loads Convergence Tolerance Value {W}
     ,                        !- Temperature Convergence Tolerance Value {deltaC}
     ,                        !- Solar Distribution
     ,                        !- Maximum Number of Warmup Days

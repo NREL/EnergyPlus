@@ -68,6 +68,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
@@ -170,7 +171,6 @@ namespace DaylightingDevices {
     using namespace DataPrecisionGlobals;
     using DataGlobals::DegToRadians;
     using DataGlobals::NumOfZones;
-    using DataGlobals::OutputFileInits;
     using DataGlobals::Pi;
     using DataGlobals::PiOvr2;
     using DataHeatBalance::Construct;
@@ -204,7 +204,7 @@ namespace DaylightingDevices {
 
     // Functions
 
-    void InitDaylightingDevices()
+    void InitDaylightingDevices(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -231,7 +231,6 @@ namespace DaylightingDevices {
 
         // DERIVED TYPE DEFINITIONS:
 
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;   // TDD pipe object number
@@ -351,7 +350,7 @@ namespace DaylightingDevices {
                                           "DaylightingDevice:Tubular",
                                           TDDPipe(PipeNum).Name,
                                           IntGainTypeOf_DaylightingDeviceTubular,
-                                          TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
+                                          &TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
 
                 } // TZoneNum
 
@@ -443,13 +442,17 @@ namespace DaylightingDevices {
 
                 // Report calculated view factor so that user knows what to make the view factor to ground
                 if (!ShelfReported) {
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                        << "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground";
+                    print(outputFiles.eio,
+                        "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground\n");
                     ShelfReported = true;
                 }
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << Shelf(ShelfNum).Name + ',' + RoundSigDigits(Shelf(ShelfNum).ViewFactor, 2) + ',' +
-                                                         Surface(WinSurf).Name + ',' + RoundSigDigits(Surface(WinSurf).ViewFactorSky, 2) + ',' +
-                                                         RoundSigDigits(Surface(WinSurf).ViewFactorGround, 2);
+                print(outputFiles.eio,
+                      "{},{:.2R},{},{:.2R},{:.2R}\n",
+                      Shelf(ShelfNum).Name,
+                      Shelf(ShelfNum).ViewFactor,
+                      Surface(WinSurf).Name,
+                      Surface(WinSurf).ViewFactorSky,
+                      Surface(WinSurf).ViewFactorGround);
                 //      CALL SetupOutputVariable('View Factor To Outside Shelf []', &
                 //        Shelf(ShelfNum)%ViewFactor,'Zone','Average',Shelf(ShelfNum)%Name)
             }
@@ -1324,8 +1327,8 @@ namespace DaylightingDevices {
         return TransTDD;
     }
 
-    Real64 InterpolatePipeTransBeam(Real64 const COSI,              // Cosine of the incident angle
-                                    Array1A<Real64> const transBeam // Table of beam transmittance vs. cosine angle
+    Real64 InterpolatePipeTransBeam(Real64 const COSI,               // Cosine of the incident angle
+                                    const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     )
     {
 
@@ -1348,7 +1351,7 @@ namespace DaylightingDevices {
         Real64 InterpolatePipeTransBeam;
 
         // Argument array dimensioning
-        transBeam.dim(NumOfAngles);
+        EP_SIZE_CHECK(transBeam, NumOfAngles);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:

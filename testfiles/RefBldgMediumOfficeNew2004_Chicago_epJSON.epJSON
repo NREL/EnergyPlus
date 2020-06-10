@@ -9105,8 +9105,9 @@
     },
     "ShadowCalculation": {
         "ShadowCalculation 1": {
-            "calculation_frequency": 7,
-            "calculation_method": "AverageOverDaysInFrequency",
+            "shading_calculation_update_frequency": 7,
+            "shading_calculation_update_frequency_method": "Periodic",
+            "shading_calculation_method": "PolygonClipping",
             "maximum_figures_in_shadow_overlap_calculations": 15000
         }
     },
@@ -9798,7 +9799,7 @@
     },
     "Version": {
         "Version 1": {
-            "version_identifier": "9.3"
+            "version_identifier": "9.4"
         }
     },
     "WaterHeater:Mixed": {

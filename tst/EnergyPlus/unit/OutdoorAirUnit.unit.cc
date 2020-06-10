@@ -52,7 +52,6 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -61,19 +60,22 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::CurveManager;
@@ -302,12 +304,12 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput();   // read schedules
+    ProcessScheduleInput(state.outputFiles);   // read schedules
     GetCurveInput();          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData(); // read equipment list and connections
+    GetZoneEquipmentData(state); // read equipment list and connections
 
     // Test coil sizing
 
@@ -329,7 +331,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
 
-    ZoneInletNode = GetOutdoorAirUnitZoneInletNode(OAUnitNum);
+    ZoneInletNode = GetOutdoorAirUnitZoneInletNode(state, OAUnitNum);
 
     // schedule values will get reset to 0 if initialized before GetInput
     Schedule(1).CurrentValue = 1.0; // enable the VRF condenser
@@ -340,7 +342,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     DataLoopNode::Node(EAFanInletNode).MassFlowRateMaxAvail = 0.60215437; // exhaust fan will not turn on unless max avail is set
 
     SetPredefinedTables();
-    SimOutdoorAirUnit(
+    SimOutdoorAirUnit(state, 
         "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA, OutAirUnit(OAUnitNum).OutAirVolFlow);
@@ -357,7 +359,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     // #6173
     OutAirUnit(OAUnitNum).ExtAirMassFlow = 0.0;
-    CalcOutdoorAirUnit(OAUnitNum, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided);
+    CalcOutdoorAirUnit(state, OAUnitNum, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** Air mass flow between zone supply and exhaust is not balanced. Only the first occurrence is reported.",
@@ -560,12 +562,12 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
 
-    GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
-    Fans::GetFanInput();
+    Fans::GetFanInput(state.fans);
 
-    GetOutdoorAirUnitInputs();
+    GetOutdoorAirUnitInputs(state);
 
     int OAUnitNum(1);
     EXPECT_EQ("OAU SUPPLY FAN", OutAirUnit(OAUnitNum).SFanName);
@@ -656,14 +658,14 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     bool FirstHVACIteration(true);
     int ZoneNum(1);
 
-    InitOutdoorAirUnit(OAUnitNum, ZoneNum, FirstHVACIteration);
+    InitOutdoorAirUnit(state, OAUnitNum, ZoneNum, FirstHVACIteration);
     EXPECT_EQ(WaterCoil(1).MaxWaterVolFlowRate, OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow);
 
     // calculate fan heat to get fan air-side delta T
     DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
     DataSizing::DataFanIndex = 0;
-    DataSizing::DataAirFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+    DataSizing::DataAirFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
+    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
 
     // do water flow rate sizing calculation
     Real64 DesAirMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow;
@@ -866,12 +868,12 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
 
-    GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    GetZoneEquipmentData1(state);
+    ProcessScheduleInput(state.outputFiles);
     ScheduleInputProcessed = true;
-    Fans::GetFanInput();
+    Fans::GetFanInput(state.fans);
 
-    GetOutdoorAirUnitInputs();
+    GetOutdoorAirUnitInputs(state);
 
     int OAUnitNum(1);
     EXPECT_EQ("OAU SUPPLY FAN", OutAirUnit(OAUnitNum).SFanName);
@@ -961,7 +963,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     bool FirstHVACIteration(true);
     int ZoneNum(1);
 
-    InitOutdoorAirUnit(OAUnitNum, ZoneNum, FirstHVACIteration);
+    InitOutdoorAirUnit(state, OAUnitNum, ZoneNum, FirstHVACIteration);
     EXPECT_EQ(SteamCoil(1).MaxSteamVolFlowRate, OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow);
 
     Real64 DesCoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp;
@@ -969,7 +971,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     Real64 DesCoilOutHumRat = FinalZoneSizing(CurZoneEqNum).HeatDesHumRat;
     Real64 DesAirMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
     // DesVolFlow = DesMassFlow / RhoAirStd;
-    Real64 CpAirAvg = PsyCpAirFnWTdb(DesCoilOutHumRat, 0.5 * (DesCoilInTemp + DesCoilOutTemp));
+    Real64 CpAirAvg = PsyCpAirFnW(DesCoilOutHumRat);
     Real64 DesSteamCoilLoad = DesAirMassFlow * CpAirAvg * (DesCoilOutTemp - DesCoilInTemp);
 
     // do steam flow rate sizing calculation
