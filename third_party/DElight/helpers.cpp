@@ -8,24 +8,24 @@
  *           Lawrence Berkeley National Laboratory
  */
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 
@@ -155,7 +155,7 @@ void	LumParam::Dump()
 	cout << "source: " << source << "\n";
 	cout << "filename: " << filename << "\n";
 	cout << "type: " << type << "\n";
-	cout << "BFlux0: " << BFlux0 << "\n"; 
+	cout << "BFlux0: " << BFlux0 << "\n";
 	cout << "phi0: " << phi0 << "\n";
 	cout << "theta0: " << theta0 << "\n";
 	cout << "Dir0: " << Dir0 << "\n";
@@ -678,7 +678,7 @@ HemiSphiral	SkyBTDFIntegration(HemiSphiral& sky0, btdf* pbtdf0, BGL::RHCoordSys3
 		LumMap += lm;
 		skyLumTot += skyLum;
 //		cout << ii << " ";
-//		cout << Trgz0.Theta(ii) << " " << Trgz0.Phi(ii) << " "; 
+//		cout << Trgz0.Theta(ii) << " " << Trgz0.Phi(ii) << " ";
 //		cout << pbtdf0->iisym(ii) << " " << pbtdf0->iidata(ii) << " ";
 //		cout << sky0.interp(dirsky) << " " << skyLum << " " << lm.TotIllum() << "\n";
 //		pbtdf0->HSoutList[pbtdf0->iidata(ii)].plotview(25);
@@ -791,7 +791,7 @@ bool	SecretDecoderRing(LumParam& lp, string InStr)
 				lp.BadName = "missing BTDF:WINDOW Parameters";
 				return false;
 			}
-			lp.visTransNormal = atof(InStrList[1].c_str());	
+			lp.visTransNormal = atof(InStrList[1].c_str());
 			lp.dispersion = atof(InStrList[2].c_str());
 			if (InStrList.size() >= 4) 	{
 				lp.visTransExponent = atof(InStrList[3].c_str());
@@ -805,7 +805,7 @@ bool	SecretDecoderRing(LumParam& lp, string InStr)
 				lp.BadName = "missing BTDF:LIGHTSHELF Parameters";
 				return false;
 			}
-			lp.visTransNormal = atof(InStrList[1].c_str());	
+			lp.visTransNormal = atof(InStrList[1].c_str());
 			lp.dispersion = atof(InStrList[2].c_str());
 			if (InStrList.size() >= 4) 	{
 				lp.LightShelfReflectance = atof(InStrList[3].c_str());
@@ -831,7 +831,7 @@ bool	SecretDecoderRing(LumParam& lp, string InStr)
 		}
 		if (lp.type == "SINGLEPANE") {
 			if (InStrList.size() >= 3) 	{
-				lp.visTransNormal = atof(InStrList[1].c_str());	
+				lp.visTransNormal = atof(InStrList[1].c_str());
 				lp.visTransExponent = atof(InStrList[2].c_str());
 			}
 			else {
@@ -978,12 +978,12 @@ FILE_FLG::FILE_FLG(string sfpflg)
 	}
 	else for (int isfp=0; isfp<(int)sfpflg.size(); isfp++) {
 //		fprintf(ofp,"sfpflg: %d %c\n", isfp, sfpflg[isfp]);
-		if (sfpflg[isfp] == '0') zero = 1; 
-		else if (sfpflg[isfp] == 'o') out = 1; 
-		else if (sfpflg[isfp] == 'l') log = 1; 
-		else if (sfpflg[isfp] == 'd') dbg = 1; 
-		else if (sfpflg[isfp] == 'e') err = 1; 
-		else if (sfpflg[isfp] == 'w') warn = 1; 
+		if (sfpflg[isfp] == '0') zero = 1;
+		else if (sfpflg[isfp] == 'o') out = 1;
+		else if (sfpflg[isfp] == 'l') log = 1;
+		else if (sfpflg[isfp] == 'd') dbg = 1;
+		else if (sfpflg[isfp] == 'e') err = 1;
+		else if (sfpflg[isfp] == 'w') warn = 1;
 	}
 }
 
@@ -1075,7 +1075,7 @@ HemiSphiral	RADdata::convertToHS() {
 	for (int iin1=0; iin1<=limit1; iin1++) {	//	thetaRAD loop
 		if (iin1 == limit1) limit2 = 1;			//	only 1 zenith point
 		for (int iin2=0; iin2<limit2; iin2++) {	//	phiRAD loop
-			//	read data 
+			//	read data
 			qdata = DataArray[iin1][iin2];
 			qdataSum += qdata;
 			iread += 1;
@@ -1104,13 +1104,13 @@ HemiSphiral	RADdata::convertToHS() {
 			//	assign qdata for each direction dir to single nearest sphiral direction
 			hs0.valList[nd[0].indx] += qdata;
 			indxCount[nd[0].indx] += 1;
-			
+
 //			inwgt = hs0.interpwgts(dir,nd);
 //			for (ii=0; ii<inwgt.size(); ii++) {
 //				indxCount[nd[ii].indx] += 1;
 //				hs0.valList[nd[ii].indx] += qdata*inwgt[ii];
 //			}
-			
+
 		}
 	}
 	int ii;
@@ -1261,7 +1261,7 @@ HemiSphiral	IESNAdata::convertToHS() {
 	for (int iin1=0; iin1<nTheta; iin1++) {	//	thetaRAD loop
 		for (int iin2=0; iin2<nPhi-1; iin2++) {	//	phiRAD loop - read only nPhi-1 points
 			if (iin1 == 0 && iin2 > 0) break;	//	read only 1 zenith point
-			//	read data 
+			//	read data
 			qdata = DataArray[iin1][iin2];
 			qdataSum += qdata;
 			iread += 1;
@@ -1285,13 +1285,13 @@ HemiSphiral	IESNAdata::convertToHS() {
 			//	assign qdata for each direction dir to single nearest sphiral direction
 			hs0.valList[nd[0].indx] += qdata;
 			indxCount[nd[0].indx] += 1;
-			
+
 //			inwgt = hs0.interpwgts(dir,nd);
 //			for (ii=0; ii<inwgt.size(); ii++) {
 //				indxCount[nd[ii].indx] += 1;
 //				hs0.valList[nd[ii].indx] += qdata*inwgt[ii];
 //			}
-			
+
 		}
 	}
 

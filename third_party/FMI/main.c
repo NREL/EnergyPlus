@@ -491,8 +491,8 @@ fmiInteger getfmiEPlusVersion(char* fmuWorkingFolder,
 fmiComponent fmiEPlusInstantiateSlave(char* fmuResFolder,
 	fmiInteger *sizefmuResFolder,
 	fmiReal *timeOut, fmiInteger *visible,
-	fmiInteger *interactive, 
-	fmiInteger *loggingOn, 
+	fmiInteger *interactive,
+	fmiInteger *loggingOn,
 	fmiInteger *index) {
 
 		char* trimfmuResFolder;
@@ -510,7 +510,7 @@ fmiComponent fmiEPlusInstantiateSlave(char* fmuResFolder,
 
 		// allocate memory for fmu resources folder
 		trimfmuResFolder = (char*)calloc(sizeof(char),*sizefmuResFolder + 1);
-		
+
 		// write fmuResFolder without blanks
 		strncpy(trimfmuResFolder, fmuResFolder, *sizefmuResFolder);
 

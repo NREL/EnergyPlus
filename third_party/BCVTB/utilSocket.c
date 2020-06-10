@@ -117,10 +117,10 @@ derivative works thereof, in binary and source code form.
 #include "utilXml.h"
 
 
-FILE *f1 = NULL; 
+FILE *f1 = NULL;
 int REQUIRED_READ_LENGTH  = 0;
 int REQUIRED_WRITE_LENGTH = 0;
-int SERVER_VERSION = 0; 
+int SERVER_VERSION = 0;
 
 // Global variable to check for FMUExport case
 int FMUEXPORT = 0;

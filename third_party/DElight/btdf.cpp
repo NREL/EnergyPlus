@@ -21,24 +21,24 @@
  * under contract with Lawrence Berkeley National Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 #pragma warning(disable:4786)
@@ -152,16 +152,16 @@ btdf* btdfLoad(ifstream& infile)
 			return(0);
 		}
 		pbtdf0->Isym = atoi(argList[2].c_str());
-		//	load DataIndx 
+		//	load DataIndx
 		getline(infile,inlinestr);
 		argList = vParseList(inlinestr,",");
-//		cout << "btdfLoad: type: " << type << " Isym: " << pbtdf0->Isym << " argList.size(): " << argList.size() << " DataIndx.size(): " << pbtdf0->DataIndx.size() << "\n"; 
+//		cout << "btdfLoad: type: " << type << " Isym: " << pbtdf0->Isym << " argList.size(): " << argList.size() << " DataIndx.size(): " << pbtdf0->DataIndx.size() << "\n";
 		for (int ii=0; ii<pbtdf0->Trgz0.NTrgz(); ii++) {
 			pbtdf0->DataIndx[ii] = atoi(argList[ii].c_str());
 //			cout << "(" << argList[ii].c_str() << " " << atoi(argList[ii].c_str()) << " " << pbtdf0->DataIndx[ii] << ") ";
 		}
 //		cout << "\n";
-//		cout << " DataIndx.size(): " << pbtdf0->DataIndx.size() << "\n"; 
+//		cout << " DataIndx.size(): " << pbtdf0->DataIndx.size() << "\n";
 		//	load HSoutList in base class
 		pbtdf0->load(infile);
 		return pbtdf0;
@@ -438,9 +438,9 @@ int	Tregenza::nearestc(Double arcdistmax, BGL::vector3 dirext, vector<struct nea
 		IIEND:;
 	}
 	//	"finished" result of searches
-//	cout << "nearestc: \n"; 
+//	cout << "nearestc: \n";
 //	for (int kk=0; kk<tdminindx.size(); kk++) {
-//		cout << tdminindx[kk] << " "; 
+//		cout << tdminindx[kk] << " ";
 //	}
 //	cout << "\n";
 //	return tdminindx;

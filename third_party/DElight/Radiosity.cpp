@@ -19,24 +19,24 @@
  * under contract with Lawrence Berkeley National Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 #pragma warning(disable:4786)
@@ -257,7 +257,7 @@ int surf_interreflect(
 				delf_overcast[inode] += fij * bldg_ptr->zone[iz]->surf[jsurf]->skyolum[jnode];
 
 // rjh debug
-//*pofdmpfile << "Configuration Factor: fij = " << fij << " isurf = " << isurf << " inode = " << inode << " jsurf = " << jsurf << " jnode = " << jnode << "\n"; 
+//*pofdmpfile << "Configuration Factor: fij = " << fij << " isurf = " << isurf << " inode = " << inode << " jsurf = " << jsurf << " jnode = " << jnode << "\n";
 
 				/* for each Sun Position Altitude */
 				for (iphs=0; iphs<sun_ptr->nphs; iphs++) {
@@ -439,7 +439,7 @@ int refpt_total_illum(
 
 	/* calc direction cosine values */
 	/* Note: see calc_dircos() for complete logic for arbitrary surfaces */
-	// RJH - 8/24/03 - Only Z-axis direction cosines are needed for ref pts 
+	// RJH - 8/24/03 - Only Z-axis direction cosines are needed for ref pts
 	// and they are always 0,0,1 since ref pts are assumed to be on horizontal surface facing upward.
 	for (int idircos=0; idircos<NDC; idircos++)
 	{

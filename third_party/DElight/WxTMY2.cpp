@@ -21,24 +21,24 @@
  * Note that the routines in this module are not part of DOE2.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 #pragma warning(disable:4786)
@@ -99,7 +99,7 @@ int	read_wx_tmy2_hdr(
 	int elevation;
 	int timezone;	// TMY2 negative values => behind Universal Time => East of Prime Meridian
 						// DOE2 negative values => West of Prime Meridian
-    
+
     // Read in the header info
     fscanf (wxfile, "%s %s %s %d %s %d %d %s %d %d %d",
             wban,
@@ -120,7 +120,7 @@ int	read_wx_tmy2_hdr(
 	bldg_ptr->lat = (double)lat_deg + ((double)lat_min / 60.0f);
     if (strcmp(lat,"S") == 0)
         bldg_ptr->lat = -(bldg_ptr->lat);
-    
+
     // Longitude
     bldg_ptr->lon = (double)long_deg + ((double)long_min / 60.0f);
     if (strcmp(lon,"E") == 0)
@@ -194,7 +194,7 @@ int read_wx_tmy2_hr(
     // this information.
     char ghr, dnr, dhr, ghi, dni, dhi, zi, tsc, osc, dbt, dpt, rh, ap;
     char ws, wd, vis, ch, pre, aod, sd, dss;
-    
+
     // Dummy variables to hold the uncertainty flag for each data item.
     // We don't used this information either.
     int ughr, udnr, udhr, ughi, udni, udhi, uzi, utsc, uosc, udbt, udpt, urh, uap;
@@ -217,7 +217,7 @@ int read_wx_tmy2_hr(
 
                  &extra_horiz_rad,
                  &extra_direct_norm_rad,
-    
+
                  &global_horiz_rad,	// totl horiz solar rad (Wh/m2)
                  &ghr,
                  &ughr,
@@ -225,11 +225,11 @@ int read_wx_tmy2_hr(
                  &direct_norm_rad,	// direct normal solar rad (Wh/m2)
                  &dnr,
                  &udnr,
-    
+
                  &diffuse_horiz_rad,
                  &dhr,
                  &udhr,
-    
+
                  &global_horiz_illum,
                  &ghi,
                  &ughi,
@@ -237,7 +237,7 @@ int read_wx_tmy2_hr(
                  &direct_norm_illum,
                  &dni,
                  &udni,
-    
+
                  &diffuse_horiz_illum,
                  &dhi,
                  &udhi,
@@ -245,7 +245,7 @@ int read_wx_tmy2_hr(
                  &zenith_illum,
                  &zi,
                  &uzi,
-    
+
                  &total_sky_cover,	// hourly cloud amount (in tenths)
                  &tsc,
                  &utsc,
@@ -253,7 +253,7 @@ int read_wx_tmy2_hr(
                  &opaque_sky_cover,
                  &osc,
                  &uosc,
-    
+
                  &dry_bulb_temp,
                  &dbt,
                  &udbt,
@@ -265,7 +265,7 @@ int read_wx_tmy2_hr(
                  &rel_humidity,
                  &rh,
                  &urh,
-    
+
                  &atm_pressure,
                  &ap,
                  &uap,
@@ -277,7 +277,7 @@ int read_wx_tmy2_hr(
                  &wind_speed,
                  &ws,
                  &uws,
-    
+
                  &visibility,
                  &vis,
                  &uvis,
@@ -285,7 +285,7 @@ int read_wx_tmy2_hr(
                  &ceiling_ht,
                  &ch,
                  &uch,
-    
+
                  // present weather condition
                  &observed,
                  &thunder,
@@ -306,7 +306,7 @@ int read_wx_tmy2_hr(
                  &aerosol_opt_depth,
                  &aod,
                  &uaod,
-    
+
                  &snow_depth,
                  &sd,
                  &usd,
@@ -314,7 +314,7 @@ int read_wx_tmy2_hr(
                  &days_since_snow,
                  &dss,
                  &udss
-               
+
                );//end of fscanf function
     }
     while(!((month == (imon+1)) && (day == iday) && (hour == (ihr+1))));

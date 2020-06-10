@@ -19,24 +19,24 @@
  * under contract with Lawrence Berkeley National Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 
@@ -105,7 +105,7 @@ DllExport int	DElightDaylightFactors4EPlus(
 	FILE *outfile;						/* output file pointer */
 	SUN_DATA sun_data;	/* sun data structure */
 
-    // Init return value  
+    // Init return value
     int iReturnVal = 0;
 
 	/* initialize BLDG and LIB structures */
@@ -219,7 +219,7 @@ DllExport int	DElightDaylightFactors4EPlus(
 
 	/* Dump lib data. */
 	dump_lib(lib_ptr,outfile);
-                        
+
 	/* Close output file. */
 	fclose(outfile);
 
@@ -229,7 +229,7 @@ DllExport int	DElightDaylightFactors4EPlus(
 
 /******************************** subroutine DElightElecLtgCtrl4EPlus *******************************/
 // Called from DElightManagerC.cpp
-/* Calls key daylighting simulation modules necessary for calculating 
+/* Calls key daylighting simulation modules necessary for calculating
 //	Interior Illuminace levels at each Reference Point within a Zone, and
 //	the Power Reduction Factor for the Electric Lighting System defined in EnergyPlus. */
 /******************************** subroutine DElightElecLtgCtrl4EPlus *******************************/
@@ -266,7 +266,7 @@ DllExport int DElightElecLtgCtrl4EPlus(
 	}
 
 	// Calc electric lighting power reduction factor for the given zone
-	// Create a new SUN2_DATA instance and 
+	// Create a new SUN2_DATA instance and
 	// init the fsunup to 1.0 for no correction due to partial timestep sun up
 	SUN2_DATA *sun2_ptr = new SUN2_DATA;
 	sun2_ptr->fsunup = 1.0;
@@ -274,7 +274,7 @@ DllExport int DElightElecLtgCtrl4EPlus(
 	if ((iDltsysRetVal = dltsys(zone_ptr, sun2_ptr, pofdmpfile)) < 0) {
         // If errors were detected then write error and return, else write warning and return
         if (iDltsysRetVal != -10) {
-			*pofdmpfile << "ERROR: DElight error return from dltsys()\n"; 
+			*pofdmpfile << "ERROR: DElight error return from dltsys()\n";
 			return(-7);
         }
         else {
