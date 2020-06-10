@@ -98,6 +98,9 @@ namespace EIRPlantLoopHeatPumps {
         // Call initialize to set flow rates, run flag, and entering temperatures
         this->running = RunFlag;
 
+        this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
+        this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
+
         if (this->waterSource) {
             this->setOperatingFlowRatesWSHP();
             if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
@@ -292,10 +295,6 @@ namespace EIRPlantLoopHeatPumps {
     {
 
         Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-
-        // read inlet temperatures
-        this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
-        this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
 
         // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
         // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
