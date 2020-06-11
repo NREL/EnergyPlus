@@ -125,6 +125,7 @@ namespace DataWater {
     void clear_state()
     {
         WaterSystemGetInputCalled = false;
+        RainFall = {};
     }
 
     // Object Data
