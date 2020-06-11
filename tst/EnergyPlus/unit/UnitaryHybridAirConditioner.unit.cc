@@ -146,7 +146,7 @@ std::vector<std::string> parseLine(std::string line)
 
 TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 {
-    std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
+    std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
     ASSERT_TRUE(process_idf(string));
     // setup environment
