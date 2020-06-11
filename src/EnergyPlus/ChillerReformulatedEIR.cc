@@ -116,10 +116,6 @@ namespace ChillerReformulatedEIR {
     // 1. Hydeman, M., P. Sreedharan, N. Webb, and S. Blanc. 2002. "Development and Testing of a Reformulated
     //    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
-    // chiller part load curve types
-    int const PLR_LeavingCondenserWaterTemperature(1); // Type 1_LeavingCondenserWaterTemperature
-    int const PLR_Lift(2);                             // Type 2_Lift
-
     Real64 condOutletTempMod(0.0);
 
     PlantComponent *ReformulatedEIRChillerSpecs::factory(ChillerReformulatedEIRData &chillers, std::string const &objectName)
@@ -306,10 +302,10 @@ namespace ChillerReformulatedEIR {
             // Check the type of part-load curves implemented: 1_LeavingCondenserWaterTemperature, 2_Lift
             if (UtilityRoutines::SameString(PartLoadCurveType, "LeavingCondenserWaterTemperature") &&
                 CurveManager::PerfCurve(thisChiller.ChillerEIRFPLRIndex).NumDims == 2) {
-                thisChiller.PartLoadCurveType = PLR_LeavingCondenserWaterTemperature;
+                thisChiller.PartLoadCurveType = PLR::LeavingCondenserWaterTemperature;
             } else if (UtilityRoutines::SameString(PartLoadCurveType, "Lift") &&
                        CurveManager::PerfCurve(thisChiller.ChillerEIRFPLRIndex).NumDims == 3) {
-                thisChiller.PartLoadCurveType = PLR_Lift;
+                thisChiller.PartLoadCurveType = PLR::Lift;
             } else {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + DataIPShortCuts::cAlphaArgs(5) + " for " +
@@ -1339,9 +1335,9 @@ namespace ChillerReformulatedEIR {
 
             if (this->ChillerEIRFPLRIndex > 0) {
                 Real64 CurveVal(0.0); // Used to verify EIR-FT/CAP-FT curves = 1 at reference conditions
-                if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
+                if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
                     CurveVal = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, this->TempRefCondOut, 1.0);
-                } else if (this->PartLoadCurveType == PLR_Lift) {
+                } else if (this->PartLoadCurveType == PLR::Lift) {
                     CurveVal = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, 1.0, 1.0, 0.0);
                 }
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
@@ -1350,13 +1346,13 @@ namespace ChillerReformulatedEIR {
                     ShowContinueError("Curve output at reference conditions = " + General::TrimSigDigits(CurveVal, 3));
                 }
 
-                if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
+                if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
                     CurveManager::GetCurveMinMaxValues(this->ChillerEIRFPLRIndex,
                                                        this->ChillerEIRFPLRTempMin,
                                                        this->ChillerEIRFPLRTempMax,
                                                        this->ChillerEIRFPLRPLRMin,
                                                        this->ChillerEIRFPLRPLRMax);
-                } else if (this->PartLoadCurveType == PLR_Lift) {
+                } else if (this->PartLoadCurveType == PLR::Lift) {
                     CurveManager::GetCurveMinMaxValues(this->ChillerEIRFPLRIndex,
                                                        this->ChillerLiftNomMin,
                                                        this->ChillerLiftNomMax,
@@ -1393,7 +1389,7 @@ namespace ChillerReformulatedEIR {
             Real64 DeltaTCond = (CondenserCapacity) / (this->CondVolFlowRate * Density * SpecificHeat);
             this->TempRefCondIn = this->TempRefCondOut - DeltaTCond;
 
-            if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
+            if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
                 //     Check EIRFPLR curve output. Calculate condenser inlet temp based on reference condenser outlet temp,
                 //     chiller capacity, and mass flow rate. Starting with the calculated condenser inlet temp and PLR = 0,
                 //     calculate the condenser outlet temp proportional to PLR and test the EIRFPLR curve output for negative numbers.
@@ -1431,7 +1427,7 @@ namespace ChillerReformulatedEIR {
                     ShowContinueError(format("Cond Temp(C) = {:7.2F}", fmt::join(CondTempArray, " ")));
 
                     ShowContinueError(format("Curve Output = {:7.2F}", fmt::join(CurveValArray, " ")));
-                    
+
                     ErrorsFound = true;
                 }
             }
@@ -1446,13 +1442,13 @@ namespace ChillerReformulatedEIR {
                                                this->ChillerEIRFTXTempMax,
                                                this->ChillerEIRFTYTempMin,
                                                this->ChillerEIRFTYTempMax);
-            if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
+            if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
                 CurveManager::GetCurveMinMaxValues(this->ChillerEIRFPLRIndex,
                                                    this->ChillerEIRFPLRTempMin,
                                                    this->ChillerEIRFPLRTempMax,
                                                    this->ChillerEIRFPLRPLRMin,
                                                    this->ChillerEIRFPLRPLRMax);
-            } else if (this->PartLoadCurveType == PLR_Lift) {
+            } else if (this->PartLoadCurveType == PLR::Lift) {
                 CurveManager::GetCurveMinMaxValues(this->ChillerEIRFPLRIndex,
                                                    this->ChillerLiftNomMin,
                                                    this->ChillerLiftNomMax,
@@ -1505,11 +1501,11 @@ namespace ChillerReformulatedEIR {
             Real64 Tmin(-99); // Minimum condenser leaving temperature allowed by curve objects [C]
 
             Real64 EIRFTYTmin = this->ChillerEIRFTYTempMin;
-            if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
+            if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
                 // Minimum condenser leaving temperature allowed by EIRFPLR curve [C]
                 Real64 EIRFPLRTmin = this->ChillerEIRFPLRTempMin;
                 Tmin = min(CAPFTYTmin, EIRFTYTmin, EIRFPLRTmin);
-            } else if (this->PartLoadCurveType == PLR_Lift) {
+            } else if (this->PartLoadCurveType == PLR::Lift) {
                 Tmin = min(CAPFTYTmin, EIRFTYTmin);
             }
 
@@ -1520,11 +1516,11 @@ namespace ChillerReformulatedEIR {
 
             // Maximum condenser leaving temperature allowed by EIRFT curve [C]
             Real64 EIRFTYTmax = this->ChillerEIRFTYTempMax;
-            if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
+            if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
                 // Maximum condenser leaving temperature allowed by EIRFPLR curve [C]
                 Real64 EIRFPLRTmax = this->ChillerEIRFPLRTempMax;
                 Tmax = max(CAPFTYTmax, EIRFTYTmax, EIRFPLRTmax);
-            } else if (this->PartLoadCurveType == PLR_Lift) {
+            } else if (this->PartLoadCurveType == PLR::Lift) {
                 Tmax = max(CAPFTYTmax, EIRFTYTmax);
             }
 
@@ -2234,9 +2230,9 @@ namespace ChillerReformulatedEIR {
         this->ChillerEIRFT = max(0.0, CurveManager::CurveValue(this->ChillerEIRFTIndex, this->EvapOutletTemp, this->ChillerCondAvgTemp));
 
         // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
-        if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
+        if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
             this->ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(this->ChillerEIRFPLRIndex, this->ChillerCondAvgTemp, PartLoadRat));
-        } else if (this->PartLoadCurveType == PLR_Lift) {
+        } else if (this->PartLoadCurveType == PLR::Lift) {
 
             // Chiller lift
             Real64 ChillerLift = this->ChillerCondAvgTemp - this->EvapOutletTemp;
@@ -2373,7 +2369,7 @@ namespace ChillerReformulatedEIR {
         Real64 EIRFPLRTmin(0.0); // Minimum condenser  leaving temperature allowed by EIRFPLR curve [C]
         Real64 EIRFPLRTmax(0.0); // Maximum condenser  leaving temperature allowed by EIRFPLR curve [C]
 
-        if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
+        if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
             EIRFPLRTmin = this->ChillerEIRFPLRTempMin;
             EIRFPLRTmax = this->ChillerEIRFPLRTempMax;
         }
@@ -2437,7 +2433,7 @@ namespace ChillerReformulatedEIR {
             }
         }
 
-        if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
+        if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
             if (this->CondOutletTemp < EIRFPLRTmin || this->CondOutletTemp > EIRFPLRTmax) {
                 ++this->EIRFPLRTIter;
                 if (this->EIRFPLRTIter == 1) {
@@ -2562,9 +2558,9 @@ namespace ChillerReformulatedEIR {
             }
         }
 
-        if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
+        if (this->PartLoadCurveType == PLR::LeavingCondenserWaterTemperature) {
             this->ChillerEIRFPLR = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, condOutletTempMod, this->ChillerPartLoadRatio);
-        } else if (this->PartLoadCurveType == PLR_Lift) {
+        } else if (this->PartLoadCurveType == PLR::Lift) {
 
             // Chiller lift  [C]
             Real64 ChillerLift = condOutletTempMod - this->EvapOutletTemp;

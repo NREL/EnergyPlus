@@ -66,6 +66,12 @@ struct ChillerReformulatedEIRData;
 
 namespace ChillerReformulatedEIR {
 
+    enum class PLR {
+        Unassigned,
+        LeavingCondenserWaterTemperature,   // Type 1_LeavingCondenserWaterTemperature
+        Lift                                // Type 2_Lift
+    };
+
     struct ReformulatedEIRChillerSpecs : PlantComponent
     {
         // Members
@@ -75,7 +81,7 @@ namespace ChillerReformulatedEIR {
         std::string EIRFTName;            // EIRFT curve name
         std::string EIRFPLRName;          // EIRPLR curve name
         DataPlant::CondenserType CondenserType;   // Type of Condenser. Water Cooled is the only available option for now
-        int PartLoadCurveType;            // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift //zrp
+        PLR PartLoadCurveType;            // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift //zrp
         Real64 RefCap;                    // Reference capacity of the chiller [W]
         bool RefCapWasAutoSized;          // reference capacity was autosized on input
         Real64 RefCOP;                    // Reference coefficient of performance [W/W]
@@ -216,8 +222,8 @@ namespace ChillerReformulatedEIR {
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::NOTSET), PartLoadCurveType(0), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0),
-              FlowMode(DataPlant::FlowMode::NOTSET),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::NOTSET), PartLoadCurveType(PLR::Unassigned), RefCap(0.0), RefCapWasAutoSized(false),
+              RefCOP(0.0), FlowMode(DataPlant::FlowMode::NOTSET),
               ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false),
               EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0),
               CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),

@@ -106,8 +106,8 @@ namespace ChillerAbsorption {
     // to generate the coefficients for the model.
 
     int constexpr waterIndex(1);
-    constexpr auto calcChillerAbsorption("CALC Chiller:Absorption ");
-    constexpr auto moduleObjectType("Chiller:Absorption");
+    const char * calcChillerAbsorption("CALC Chiller:Absorption ");
+    const char * moduleObjectType("Chiller:Absorption");
 
     const char * fluidNameWater = "WATER";
     const char * fluidNameSteam = "STEAM";
