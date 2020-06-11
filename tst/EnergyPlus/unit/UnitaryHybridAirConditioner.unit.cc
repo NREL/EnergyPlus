@@ -344,7 +344,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     // check fan heat calculation in supply air stream if not included in lookup tables
     pZoneHybridUnitaryAirConditioner->FanHeatGain = true;
-    pZoneHybridUnitaryAirConditioner->FanHeatGainLocation = "SupplyAirStream";
+    pZoneHybridUnitaryAirConditioner->FanHeatGainLocation = "SUPPLYAIRSTREAM";
     pZoneHybridUnitaryAirConditioner->FanHeatInAirFrac = 1.0;
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
@@ -360,7 +360,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     // check fan heat calculation in mixed air stream if not included in lookup tables
     pZoneHybridUnitaryAirConditioner->FanHeatGain = true;
-    pZoneHybridUnitaryAirConditioner->FanHeatGainLocation = "MixedAirStream";
+    pZoneHybridUnitaryAirConditioner->FanHeatGainLocation = "MIXEDAIRSTREAM";
     pZoneHybridUnitaryAirConditioner->FanHeatInAirFrac = 1.0;
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
