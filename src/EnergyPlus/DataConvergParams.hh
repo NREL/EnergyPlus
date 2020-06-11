@@ -126,7 +126,7 @@ namespace DataConvergParams {
     extern Real64 MinTimeStepSys;  // =1 minute
     extern Real64 MinTimeStepTol;  // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
     extern Real64 MaxZoneTempDiff; // 0.3 C = (1% OF 300 C) = max allowable difference between
-    extern Real64 MaxAllowedDelTemp; // 0.3 C = (1% OF 300 C) = max allowable difference between
+    extern Real64 MaxAllowedDelTemp; // 0.002 C = max allowable difference between iterations for New Mode07(05a)
     //   zone air temp at Time=T and Time=T-1
     extern Real64 MinSysTimeRemaining; // = 1 second
     extern int MaxIter;                // maximum number of iterations allowed
