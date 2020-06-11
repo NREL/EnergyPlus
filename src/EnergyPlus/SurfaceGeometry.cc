@@ -4091,6 +4091,7 @@ namespace SurfaceGeometry {
             GetVertices(outputFiles, SurfNum, SurfaceTmp(SurfNum).Sides, rNumericArgs({4, _}));
 
             CheckConvexity(SurfNum, SurfaceTmp(SurfNum).Sides);
+            SurfaceTmp(SurfNum).windowShadingControlList.clear();
             SurfaceTmp(SurfNum).activeWindowShadingControl = 0;
             SurfaceTmp(SurfNum).HasShadeControl = false;
 
@@ -4412,6 +4413,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
 
+                SurfaceTmp(SurfNum).windowShadingControlList.clear();
                 SurfaceTmp(SurfNum).activeWindowShadingControl = 0;
                 SurfaceTmp(SurfNum).HasShadeControl = false;
                 InitialAssociateWindowShadingControlFenestration(ErrorsFound, SurfNum);
@@ -7724,6 +7726,7 @@ namespace SurfaceGeometry {
         SurfaceTmp(SurfNum + 1).SchedMovInsulExt = SurfaceTmp(SurfNum).SchedMovInsulExt;
         SurfaceTmp(SurfNum + 1).SchedMovInsulInt = SurfaceTmp(SurfNum).SchedMovInsulInt;
         SurfaceTmp(SurfNum + 1).activeWindowShadingControl = SurfaceTmp(SurfNum).activeWindowShadingControl;
+        SurfaceTmp(SurfNum + 1).windowShadingControlList = SurfaceTmp(SurfNum).windowShadingControlList;
         SurfaceTmp(SurfNum + 1).HasShadeControl = SurfaceTmp(SurfNum).HasShadeControl;
         SurfaceTmp(SurfNum + 1).ShadedConstruction = SurfaceTmp(SurfNum).ShadedConstruction;
         SurfaceTmp(SurfNum + 1).FrameDivider = SurfaceTmp(SurfNum).FrameDivider;
@@ -8569,7 +8572,6 @@ namespace SurfaceGeometry {
         int SurfNum;      // Surface number
         int ConstrNum(0); // Construction number
         int ConstrNumSh;  // Shaded Construction number
-        int WSCPtr;       // Window shading control pointer
         int MatGapFlow;   // Material number of gas in airflow gap of window's construction
         int MatGapFlow1;  // Material number of gas on either side of a between-glass shade/blind
         int MatGapFlow2;
@@ -8742,22 +8744,24 @@ namespace SurfaceGeometry {
                                         Construct(ConstrNum).Name);
                     }
                     // Require that gas be air in airflow gaps on either side of a between glass shade/blind
-                    WSCPtr = Surface(SurfNum).activeWindowShadingControl;
                     if (Surface(SurfNum).HasShadeControl) {
-                        if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
-                            WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
-                            ConstrNumSh = WindowShadingControl(WSCPtr).ShadedConstruction;
-                            if (Construct(ConstrNum).TotGlassLayers == 2) {
-                                MatGapFlow1 = Construct(ConstrNumSh).LayerPoint(2);
-                                MatGapFlow2 = Construct(ConstrNumSh).LayerPoint(4);
-                            } else {
-                                MatGapFlow1 = Construct(ConstrNumSh).LayerPoint(4);
-                                MatGapFlow2 = Construct(ConstrNumSh).LayerPoint(6);
-                            }
-                            if (Material(MatGapFlow1).GasType(1) != 1 || Material(MatGapFlow2).GasType(1) != 1) {
-                                ErrorsFound = true;
-                                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                                "\", gas type must be air on either side of the shade/blind");
+                        for (int WSCPtr : Surface(SurfNum).windowShadingControlList) {
+                            if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
+                                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
+                                ConstrNumSh = WindowShadingControl(WSCPtr).ShadedConstruction;
+                                if (Construct(ConstrNum).TotGlassLayers == 2) {
+                                    MatGapFlow1 = Construct(ConstrNumSh).LayerPoint(2);
+                                    MatGapFlow2 = Construct(ConstrNumSh).LayerPoint(4);
+                                } else {
+                                    MatGapFlow1 = Construct(ConstrNumSh).LayerPoint(4);
+                                    MatGapFlow2 = Construct(ConstrNumSh).LayerPoint(6);
+                                }
+                                if (Material(MatGapFlow1).GasType(1) != 1 || Material(MatGapFlow2).GasType(1) != 1) {
+                                    ErrorsFound = true;
+                                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                                    "\", gas type must be air on either side of the shade/blind");
+                                }
+                                break; // only need the first window shading control sicne they should be the same
                             }
                         }
                     }
@@ -11923,6 +11927,7 @@ namespace SurfaceGeometry {
         SurfaceTmp(TotSurfaces).MaterialMovInsulInt = SurfaceTmp(SurfNum).MaterialMovInsulInt;
         SurfaceTmp(TotSurfaces).SchedMovInsulExt = SurfaceTmp(SurfNum).SchedMovInsulExt;
         SurfaceTmp(TotSurfaces).activeWindowShadingControl = SurfaceTmp(SurfNum).activeWindowShadingControl;
+        SurfaceTmp(TotSurfaces).windowShadingControlList = SurfaceTmp(SurfNum).windowShadingControlList;
         SurfaceTmp(TotSurfaces).HasShadeControl = SurfaceTmp(SurfNum).HasShadeControl;
         SurfaceTmp(TotSurfaces).ShadedConstruction = SurfaceTmp(SurfNum).ShadedConstruction;
         SurfaceTmp(TotSurfaces).FrameDivider = SurfaceTmp(SurfNum).FrameDivider;

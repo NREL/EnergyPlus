@@ -1552,20 +1552,22 @@ namespace SolarShading {
                     // Added TH 5/26/2009 for switchable windows to report switching factor (tinted level)
                     // CurrentModuleObject='Switchable Windows'
                     if (Surface(SurfLoop).HasShadeControl) {
-                        if (WindowShadingControl(Surface(SurfLoop).activeWindowShadingControl).ShadingType == WSC_ST_SwitchableGlazing) {
-                            // IF (SurfaceWindow(SurfLoop)%ShadingFlag == SwitchableGlazing) THEN  !ShadingFlag is not set to SwitchableGlazing yet!
-                            SetupOutputVariable("Surface Window Switchable Glazing Switching Factor",
-                                                OutputProcessor::Unit::None,
-                                                SurfaceWindow(SurfLoop).SwitchingFactor,
-                                                "Zone",
-                                                "Average",
-                                                Surface(SurfLoop).Name);
-                            SetupOutputVariable("Surface Window Switchable Glazing Visible Transmittance",
-                                                OutputProcessor::Unit::None,
-                                                SurfaceWindow(SurfLoop).VisTransSelected,
-                                                "Zone",
-                                                "Average",
-                                                Surface(SurfLoop).Name);
+                        for (int jShadCntrl : Surface(SurfLoop).windowShadingControlList) {
+                            if (WindowShadingControl(jShadCntrl).ShadingType == WSC_ST_SwitchableGlazing) {
+                                SetupOutputVariable("Surface Window Switchable Glazing Switching Factor",
+                                    OutputProcessor::Unit::None,
+                                    SurfaceWindow(SurfLoop).SwitchingFactor,
+                                    "Zone",
+                                    "Average",
+                                    Surface(SurfLoop).Name);
+                                SetupOutputVariable("Surface Window Switchable Glazing Visible Transmittance",
+                                    OutputProcessor::Unit::None,
+                                    SurfaceWindow(SurfLoop).VisTransSelected,
+                                    "Zone",
+                                    "Average",
+                                    Surface(SurfLoop).Name);
+                                break; // we don't need to define these outputs more than once
+                            }
                         }
                     }
 
