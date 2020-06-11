@@ -127,6 +127,8 @@
 #include <WCEMultiLayerOptics.hpp>
 #include <WCESingleLayerOptics.hpp>
 
+#include <EnergyPlus/DataConvergParams.hh>
+
 namespace EnergyPlus {
 
 namespace HeatBalanceSurfaceManager {
@@ -5841,7 +5843,9 @@ namespace HeatBalanceSurfaceManager {
         Real64 const Sigma(5.6697e-08);              // Stefan-Boltzmann constant
         Real64 const IterDampConst(5.0);             // Damping constant for inside surface temperature iterations
         int const ItersReevalConvCoeff(30);          // Number of iterations between inside convection coefficient reevaluations
-        Real64 const MaxAllowedDelTemp(0.002);       // Convergence criteria for inside surface temperatures
+        // Real64 const MaxAllowedDelTemp(0.002);       // Convergence criteria for inside surface temperatures
+        Real64 MaxAllowedDelTemp(0.002);       // Convergence criteria for inside surface temperatures
+
         int const MaxIterations(500);                // Maximum number of iterations allowed for inside surface temps
         int const IterationsForCondFDRelaxChange(5); // number of iterations for inside temps that triggers a change
         Real64 const SmallNumber(0.0001);            // avoid numerical junk causing problems?
@@ -6542,6 +6546,8 @@ namespace HeatBalanceSurfaceManager {
                     MaxDelTemp = max(MaxDelTemp, HeatBalFiniteDiffManager::SurfaceFD(SurfNum).MaxNodeDelTemp);
                 }
             } // ...end of loop to check for convergence
+
+            MaxAllowedDelTemp = DataConvergParams::MaxAllowedDelTemp; 
 
             if (!DataHeatBalance::AnyCondFD) {
                 if (MaxDelTemp <= MaxAllowedDelTemp) Converged = true;
