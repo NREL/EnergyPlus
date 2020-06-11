@@ -174,7 +174,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(outputFiles());
+        SimulationManager::GetProjectData(state.outputFiles);
         EXPECT_FALSE(DataReportingFlags::DebugOutput);
         EXPECT_FALSE(DataReportingFlags::EvenDuringWarmup);
 
@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(outputFiles());
+        SimulationManager::GetProjectData(state.outputFiles);
         EXPECT_TRUE(DataReportingFlags::DebugOutput);
         EXPECT_FALSE(DataReportingFlags::EvenDuringWarmup);
 
@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 
         EXPECT_TRUE(process_idf(idf_objects));
 
-        SimulationManager::GetProjectData(outputFiles());
+        SimulationManager::GetProjectData(state.outputFiles);
         EXPECT_FALSE(DataReportingFlags::DebugOutput);
         EXPECT_TRUE(DataReportingFlags::EvenDuringWarmup);
 
@@ -233,7 +233,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
         // Instead do it here, making sure to reset the stream
         EXPECT_TRUE(compare_err_stream("   ** Severe  ** <root>[Output:DebuggingData] - Object should have no more than 1 properties.\n", true));
 
-        SimulationManager::GetProjectData(outputFiles());
+        SimulationManager::GetProjectData(state.outputFiles);
         EXPECT_FALSE(DataReportingFlags::DebugOutput);
         EXPECT_TRUE(DataReportingFlags::EvenDuringWarmup);
 
@@ -252,7 +252,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.outputFiles);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
@@ -289,7 +289,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_SimpleCase)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.outputFiles);
 
     EXPECT_TRUE(DataGlobals::DisplayAllWarnings);
     EXPECT_TRUE(DataGlobals::DisplayExtraWarnings);
@@ -329,7 +329,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_AllKeys)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.outputFiles);
 
     EXPECT_TRUE(DataGlobals::DisplayAllWarnings);
     EXPECT_TRUE(DataGlobals::DisplayExtraWarnings);
@@ -363,7 +363,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
     // Instead do it here, making sure to reset the stream
     EXPECT_TRUE(compare_err_stream("   ** Severe  ** <root>[Output:Diagnostics] - Object should have no more than 1 properties.\n", true));
 
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.outputFiles);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
@@ -407,7 +407,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
     });
     EXPECT_TRUE(compare_err_stream(expected_warning, true));
 
-    SimulationManager::GetProjectData(outputFiles());
+    SimulationManager::GetProjectData(state.outputFiles);
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
@@ -445,7 +445,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    ASSERT_NO_THROW(SimulationManager::GetProjectData(outputFiles()));
+    ASSERT_NO_THROW(SimulationManager::GetProjectData(state.outputFiles));
 
     EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
     EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
