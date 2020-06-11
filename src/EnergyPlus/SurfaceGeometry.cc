@@ -8311,32 +8311,24 @@ namespace SurfaceGeometry {
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
             for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
                 if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), SurfaceTmp(SurfNum).Name)) {
-                    if (SurfaceTmp(SurfNum).activeWindowShadingControl == 0) {
-                        SurfaceTmp(SurfNum).activeWindowShadingControl = iShadeCtrl;
-                        SurfaceTmp(SurfNum).HasShadeControl = true;
-                        // check to make the window refenced is an exterior window
-                        if (SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
-                            ErrorsFound = true;
-                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: \"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
-                                            " because it is not an exterior window.");
-                            ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
-                        }
-                        // check to make sure the window is not using equivalent layer window construction
-                        if (Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
-                            ErrorsFound = true;
-                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: =\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
-                                            "\".");
-                            ShowContinueError(".. equivalent layer window model does not use shading control object.");
-                            ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
-                            ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
-                            SurfaceTmp(SurfNum).activeWindowShadingControl = 0;
-                        }
-                    } else {
+                    SurfaceTmp(SurfNum).windowShadingControlList.push_back(iShadeCtrl);
+                    SurfaceTmp(SurfNum).HasShadeControl = true;
+                    // check to make the window refenced is an exterior window
+                    if (SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
                         ErrorsFound = true;
-                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: Fenestration surface named \"" + SurfaceTmp(SurfNum).Name +
-                                        "\" appears on more than one WindowShadingControl list.");
-                        ShowContinueError("It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name +
-                                          "\" and another one.");
+                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: \"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
+                                        " because it is not an exterior window.");
+                        ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
+                    }
+                    // check to make sure the window is not using equivalent layer window construction
+                    if (Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
+                        ErrorsFound = true;
+                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: =\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
+                                        "\".");
+                        ShowContinueError(".. equivalent layer window model does not use shading control object.");
+                        ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
+                        ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
+                        SurfaceTmp(SurfNum).activeWindowShadingControl = 0;
                     }
                 }
             }
