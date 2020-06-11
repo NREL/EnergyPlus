@@ -2872,6 +2872,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     InternalHeatGains::GetInternalHeatGainsInput(state);
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
 
+    HeatBalanceManager::InitHeatBalance(state.outputFiles);
     DaylightingDevices::InitDaylightingDevices(state.outputFiles);
     CalcDayltgCoefficients(state.outputFiles);
 
