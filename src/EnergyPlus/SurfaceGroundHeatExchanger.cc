@@ -631,7 +631,6 @@ namespace SurfaceGroundHeatExchanger {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using DataGlobals::BeginTimeStepFlag;
         using DataLoopNode::Node;
         using namespace DataEnvironment;
         using DataPlant::PlantLoop;
