@@ -676,7 +676,7 @@ namespace TARCOGMain {
         Files files;
 
         //  Prepare common debug variables:
-        PrepDebugFilesAndVariables(files, Debug_dir, Debug_file, Debug_mode, win_ID, igu_ID, nperr);
+        PrepDebugFilesAndVariables(files, Debug_dir, Debug_file, Debug_mode, win_ID, igu_ID);
 
         // Check input arguments:
         nperr = ArgCheck(files,

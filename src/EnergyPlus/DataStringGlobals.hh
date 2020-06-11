@@ -62,7 +62,6 @@ namespace DataStringGlobals {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    extern std::string outputEndFileName;
     extern std::string outputErrFileName;
 
     extern std::string outputJsonFileName;

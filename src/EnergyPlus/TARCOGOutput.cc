@@ -206,7 +206,7 @@ namespace TARCOGOutput {
         int j;
 
         // Formats
-        static constexpr auto Format_10001("TARCOG v.{}compiled {}\n");
+        // static constexpr auto Format_10001("TARCOG v.{}compiled {}\n");
         static constexpr auto Format_1000("TARCOG input arguments:\n");
         static constexpr auto Format_1001("TARCOG debug output, {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
         static constexpr auto Format_1002("     WindowID:{:8}  - Not specified\n");
@@ -216,13 +216,11 @@ namespace TARCOGOutput {
         static constexpr auto Format_1005("Simulation parameters:\n");
         static constexpr auto Format_1010("  Tout       =  {:10.6F} K ( {:7.3F} deg C) - Outdoor temperature\n");
         static constexpr auto Format_1015("  Tint       =  {:10.6F} K ( {:7.3F} deg C) - Indoor temperature\n");
-        static constexpr auto Format_1014("Adjusted input arguments:\n");
-        static constexpr auto Format_1013(" Gass coefficients:\n");
-        static constexpr auto Format_1016("  Trmout     =  {:10.6F} K ( {:7.3F} deg C) - Outdoor mean radiant temp.\n");
-        static constexpr auto Format_1017("  Gout       =  {:10.6F} \n");
-        static constexpr auto Format_1018("  Gin        =  {:10.6F} \n");
-        static constexpr auto Format_1019("  Ebsky      =  {:10.6F} \n");
-        static constexpr auto Format_10191("  Ebroom     =  {:10.6F} \n");
+        // static constexpr auto Format_1016("  Trmout     =  {:10.6F} K ( {:7.3F} deg C) - Outdoor mean radiant temp.\n");
+        // static constexpr auto Format_1017("  Gout       =  {:10.6F} \n");
+        // static constexpr auto Format_1018("  Gin        =  {:10.6F} \n");
+        // static constexpr auto Format_1019("  Ebsky      =  {:10.6F} \n");
+        // static constexpr auto Format_10191("  Ebroom     =  {:10.6F} \n");
         static constexpr auto Format_1020("  Trmin      =  {:10.6F} K ( {:7.3F} deg C) - Indoor mean radiant temp.\n");
         static constexpr auto Format_1030("  wso        =  {:7.3F}    - Outdoor wind speed [m/s]\n");
         static constexpr auto Format_1032("  iwd        =    0        - Wind direction - windward\n");
@@ -264,9 +262,6 @@ namespace TARCOGOutput {
         static constexpr auto Format_10809(" Layer{:3} : {:1}              - UNKNOWN TYPE!\n");
         static constexpr auto Format_10810(" Layer{:3} : {:1}              - Vertical Venetian Blind\n");
         static constexpr auto Format_1085("    nslice     = {:3}          - Number of slices\n");
-        static constexpr auto Format_1086("    LaminateA  = {:12.8F} - A coeff.\n");
-        static constexpr auto Format_1087("    LaminateB  = {:12.8F} - B coeff.\n");
-        static constexpr auto Format_1088("    sumsol     = {:12.8F} - Absorbed solar energy [W/m^2]\n");
         static constexpr auto Format_1090("    thick   = {:10.6F}   - Thickness [m]\n");
         static constexpr auto Format_1091("    scon    = {:10.6F}   - Thermal conductivity [W/m-K]\n");
         static constexpr auto Format_1092("    asol    = {:12.8F} - Absorbed solar energy [W/m^2]\n");
@@ -1169,8 +1164,8 @@ namespace TARCOGOutput {
         static constexpr auto Format_1020("    {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, "
                                           "{:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
         static constexpr auto Format_1030("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
-        static constexpr auto Format_1031("    {:24.12F}, {:24.12F}, {:3}, {:24.12F}, {:3}, {:3}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, "
-                                          "{:24.12F}, {:24.12F}, {:2}, {:2}, {:2}, {:2}\n");
+        // static constexpr auto Format_1031("    {:24.12F}, {:24.12F}, {:3}, {:24.12F}, {:3}, {:3}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, "
+        //                                  "{:24.12F}, {:24.12F}, {:2}, {:2}, {:2}, {:2}\n");
         static constexpr auto Format_1034("* <PillarSpacing(i), PillarRadius(i)\n");
         static constexpr auto Format_1035("    {:24.12F}, {:24.12F}\n");
         static constexpr auto Format_1040("    {:1}, {:24.12F}, {:24.12F}, {:1}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}\n");
@@ -1461,13 +1456,8 @@ namespace TARCOGOutput {
         //!!!!!!!!!!!!!!!!!!
     }
 
-    void PrepDebugFilesAndVariables(Files &files,
-                                    std::string const &Debug_dir,
-                                    std::string const &Debug_file,
-                                    int const Debug_mode,
-                                    int const win_ID,
-                                    int const igu_ID,
-                                    int &nperr)
+    void PrepDebugFilesAndVariables(
+        Files &files, std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID)
     {
 
         // Locals

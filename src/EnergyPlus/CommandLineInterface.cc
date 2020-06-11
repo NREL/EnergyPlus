@@ -389,7 +389,7 @@ namespace CommandLineInterface {
         state.outputFiles.bnd.fileName = outputFilePrefix + normalSuffix + ".bnd";
         state.outputFiles.dxf.fileName = outputFilePrefix + normalSuffix + ".dxf";
         state.outputFiles.eio.fileName = outputFilePrefix + normalSuffix + ".eio";
-        outputEndFileName = outputFilePrefix + normalSuffix + ".end";
+        state.outputFiles.endFile.fileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
         state.outputFiles.eso.fileName = outputFilePrefix + normalSuffix + ".eso";
 

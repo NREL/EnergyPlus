@@ -305,13 +305,8 @@ namespace TARCOGOutput {
 
     void FinishDebugOutputFiles(Files &files, int const nperr);
 
-    void PrepDebugFilesAndVariables(Files &files,
-                                    std::string const &Debug_dir,
-                                    std::string const &Debug_file,
-                                    int const Debug_mode,
-                                    int const win_ID,
-                                    int const igu_ID,
-                                    int &nperr);
+    void PrepDebugFilesAndVariables(
+        Files &files, std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID);
 
 } // namespace TARCOGOutput
 

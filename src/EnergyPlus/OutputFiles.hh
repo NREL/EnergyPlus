@@ -71,6 +71,7 @@ public:
     std::vector<std::string> getLines();
     void open_as_stringstream();
     std::string get_output();
+    void flush();
     explicit OutputFile(std::string FileName);
 
 private:
@@ -91,6 +92,11 @@ public:
         OutputFile open(const std::string &caller) {
             OutputFile of{fileName};
             of.ensure_open(caller);
+            return of;
+        }
+        OutputFile try_open() {
+            OutputFile of{fileName};
+            of.open();
             return of;
         }
     };
@@ -135,6 +141,7 @@ public:
     OutputFile shade{"eplusshading.csv"};
 
     OutputFileName screenCsv{"eplusscreen.csv"};
+    OutputFileName endFile{"eplusout.end"};
 
     static OutputFiles &getSingleton();
     static void setSingleton(OutputFiles *newSingleton) noexcept;

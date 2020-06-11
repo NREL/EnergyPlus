@@ -352,7 +352,6 @@ namespace Psychrometrics {
         int EchoInputFile; // found unit number for "eplusout.audit"
         int Loop;
         Real64 AverageIterations;
-        std::string istring;
 
         EchoInputFile = FindUnitNumber(outputAuditFile);
         if (EchoInputFile == 0) return;
@@ -360,8 +359,7 @@ namespace Psychrometrics {
             ObjexxFCL::gio::write(EchoInputFile, fmtA) << "RoutineName,#times Called,Avg Iterations";
             for (Loop = 1; Loop <= NumPsychMonitors; ++Loop) {
                 if (!PsyReportIt(Loop)) continue;
-                ObjexxFCL::gio::write(istring, fmtLD) << NumTimesCalled(Loop);
-                strip(istring);
+                const auto istring = fmt::to_string(NumTimesCalled(Loop));
                 if (NumIterations(Loop) > 0) {
                     AverageIterations = double(NumIterations(Loop)) / double(NumTimesCalled(Loop));
                     ObjexxFCL::gio::write(EchoInputFile, fmtA) << PsyRoutineNames(Loop) + ',' + istring + ',' + RoundSigDigits(AverageIterations, 2);
