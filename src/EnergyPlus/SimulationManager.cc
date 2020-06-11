@@ -1238,7 +1238,7 @@ namespace SimulationManager {
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
                         overrideMaxZoneTempDiff = true;
-                    } else if (overrideModeValue == "MODE05a") {
+                    } else if (overrideModeValue == "MODE07") {
                         // New Mode07 (temporarily named Mode05a in order to keep other parts intact as much as possible
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
