@@ -101,7 +101,7 @@ int	read_wx_tmy2_hdr(
 						// DOE2 negative values => West of Prime Meridian
 
     // Read in the header info
-    fscanf (wxfile, "%s %s %s %d %s %d %d %s %d %d %d",
+    if(fscanf (wxfile, "%s %s %s %d %s %d %d %s %d %d %d",
             wban,
             city,
             state,
@@ -113,7 +113,12 @@ int	read_wx_tmy2_hdr(
             &long_deg,
             &long_min,
             &elevation
-            );
+            ) != 11)
+    {
+      // Not everything was set properly
+      return -1;
+    }
+
 
 	/* Convert to DOE2 expected units and store data in bldg data structure */
     // Latitude
@@ -210,7 +215,7 @@ int read_wx_tmy2_hr(
 	/* read wx hourly data line until matching month/day/hour are found */
     do
     {
-        fscanf ( wxfile, "%2d%2d%2d%2d%4d%4d%4d%1s%1d%4d%1s%1d%4d%1s%1d%4d%1s%1d%4d%1s%1d%4d%1s%1d%4d%1s%1d%2d%1s%1d%2d%1s%1d%4d%1s%1d%4d%1s%1d%3d%1s%1d%4d%1s%1d%3d%1s%1d%3d%1s%1d%4d%1s%1d%5ld%1s%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d%3d%1s%1d%3d%1s%1d%3d%1s%1d%2d%1s%1d",
+        int nset = fscanf ( wxfile, "%2d%2d%2d%2d%4d%4d%4d%1s%1d%4d%1s%1d%4d%1s%1d%4d%1s%1d%4d%1s%1d%4d%1s%1d%4d%1s%1d%2d%1s%1d%2d%1s%1d%4d%1s%1d%4d%1s%1d%3d%1s%1d%4d%1s%1d%3d%1s%1d%3d%1s%1d%4d%1s%1d%5ld%1s%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d%1d%3d%1s%1d%3d%1s%1d%3d%1s%1d%2d%1s%1d",
                  &yr,
                  &month,
                  &day,
@@ -317,6 +322,7 @@ int read_wx_tmy2_hr(
                  &udss
 
                );//end of fscanf function
+        if (nset != 80) {return -1;}
     }
     while(!((month == (imon+1)) && (day == iday) && (hour == (ihr+1))));
 

@@ -171,7 +171,7 @@ int ProcessW4GlassType(
 	do {
 		// Read the first six lines in a W4 library entry to reach the Window ID.
 		for (iInLine = 0; iInLine < 6; iInLine++)
-			fgets(cInputLine, MAX_CHAR_LINE, W4libfile);
+			if (fgets(cInputLine, MAX_CHAR_LINE, W4libfile) == NULL) return -1;;
 
 		// Scan the sixth line to get the Window ID.
 		sscanf(cInputLine,"%*s %*s %*s %d\n",&iW4ID);
@@ -182,7 +182,7 @@ int ProcessW4GlassType(
 
 			// Skip to the Tvis data line
 			for (iInLine = 6; iInLine < 32; iInLine++)
-				fgets(cInputLine, MAX_CHAR_LINE, W4libfile);
+				if (fgets(cInputLine, MAX_CHAR_LINE, W4libfile) == NULL) return -1;;
 
 			// Scan the angular data and Tvis Hemispherical
 			// Tokenize the line label
@@ -223,7 +223,7 @@ int ProcessW4GlassType(
 
 			// Skip to the Rbvis data line
 			for (iInLine = 32; iInLine < 34; iInLine++)
-				fgets(cInputLine, MAX_CHAR_LINE, W4libfile);
+				if (fgets(cInputLine, MAX_CHAR_LINE, W4libfile) == NULL) return -1;;
 
 			// Scan the thirty-fourth line to get the inside hemispherical visible reflectance.
 			sscanf(cInputLine,"%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %d\n",(int*)&lib_ptr->glass[lib_ptr->nglass]->inside_refl);
@@ -236,7 +236,7 @@ int ProcessW4GlassType(
 		}
 		else {	// skip the remaining lines of this entry
 			for (iInLine = 6; iInLine < 55; iInLine++)
-				fgets(cInputLine, MAX_CHAR_LINE, W4libfile);
+				if (fgets(cInputLine, MAX_CHAR_LINE, W4libfile) == NULL) return -1;;
 		}
     }
     while(!iEntryFound);

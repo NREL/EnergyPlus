@@ -121,7 +121,7 @@ DllExport int	DElightDaylightFactors4EPlus(
 
 	// Read the first heading line in the input file to determine input version
 	char cInputLine[MAX_CHAR_LINE+1];	/* Input line */
-	fgets(cInputLine, MAX_CHAR_LINE, infile);
+	if (fgets(cInputLine, MAX_CHAR_LINE, infile) == NULL) return -1;
 	char cInputVersion[MAX_CHAR_UNAME+1];
 	sscanf(cInputLine,"%*s %s\n",cInputVersion); //,_countof(cInputVersion));
 

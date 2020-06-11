@@ -640,7 +640,7 @@ int unpackmz(const char *filNam, char *tmpPat)
 #ifdef _WIN32
   _chdir(dirname); // Command in windows
 #else
-  chdir(dirname); // Command in linux
+  if (chdir(dirname) < 0) return -1; // Command in linux
 #endif
 
   ret_value = do_extract(uf, opt_do_extract_withoutpath, opt_overwrite, password); // Extract all files
@@ -650,7 +650,7 @@ int unpackmz(const char *filNam, char *tmpPat)
 #ifdef _WIN32
   _chdir(cwd); // Command in windows
 #else
-  chdir(cwd); // Command in linux
+  if (chdir(cwd) < 0) return -1; // Command in linux
 #endif
 
   return ret_value;
