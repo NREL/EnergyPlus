@@ -52,8 +52,8 @@ a single windows shading control pointer allowed for each Surface() in EnergyPlu
 of references and all code related to this will be modified to allow multiple window shading controls.
 
 If the schedules enable two different WindowShadingControls to be active at the same time (scheduled or not), and 
-they deploy the same shading material or shading construction they will any being control activation will prompt the 
-deployment of the shading material or shaded construction. In other words, if multiple WindowShadingControls activate the 
+they deploy the same shading material or shading construction, then any control activation will prompt the 
+deployment of either the shading material or shaded construction. In other words, if multiple WindowShadingControls activate the 
 same shade, they will behave in an "OR" fashion where any active WindowShadingControl will deploy the shade. 
 
 The implementation will provide appropriate error checking for, e.g., warnings when two or more shading control schedules that 
