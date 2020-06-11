@@ -177,6 +177,7 @@ set( test_src
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
   SZVAVModel.unit.cc
+  ThermalChimney.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
@@ -190,6 +191,7 @@ set( test_src
   Vector.unit.cc
   VentilatedSlab.unit.cc
   WaterCoils.unit.cc
+  WaterManager.unit.cc
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
