@@ -3240,55 +3240,55 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
     int surfNum = 1;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 2;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 3;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 4;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 1);
     EXPECT_FALSE(Err);
 
     surfNum = 5;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 1);
     EXPECT_FALSE(Err);
 
     surfNum = 6;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 1);
     EXPECT_FALSE(Err);
 
     surfNum = 7;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 8;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 3);
+    EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 3);
     EXPECT_FALSE(Err);
 
     surfNum = 9;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 3);
+    EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 3);
     EXPECT_FALSE(Err);
 }
 
@@ -3335,40 +3335,40 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     Surface.allocate(TotSurfaces);
 
     Surface(1).Name = "Fene-07";
-    Surface(1).WindowShadingControlPtr = 2;
+    Surface(1).activeWindowShadingControl = 2;
 
     Surface(2).Name = "Fene-01";
-    Surface(2).WindowShadingControlPtr = 1;
+    Surface(2).activeWindowShadingControl = 1;
 
     Surface(3).Name = "Fene-08";
-    Surface(3).WindowShadingControlPtr = 3;
+    Surface(3).activeWindowShadingControl = 3;
 
     Surface(4).Name = "Fene-02";
-    Surface(4).WindowShadingControlPtr = 1;
+    Surface(4).activeWindowShadingControl = 1;
 
     Surface(5).Name = "Fene-10";
-    Surface(5).WindowShadingControlPtr = 0;
+    Surface(5).activeWindowShadingControl = 0;
 
     Surface(6).Name = "Fene-03";
-    Surface(6).WindowShadingControlPtr = 1;
+    Surface(6).activeWindowShadingControl = 1;
 
     Surface(7).Name = "Fene-09";
-    Surface(7).WindowShadingControlPtr = 3;
+    Surface(7).activeWindowShadingControl = 3;
 
     Surface(8).Name = "Fene-04";
-    Surface(8).WindowShadingControlPtr = 2;
+    Surface(8).activeWindowShadingControl = 2;
 
     Surface(9).Name = "Fene-10";
-    Surface(9).WindowShadingControlPtr = 0;
+    Surface(9).activeWindowShadingControl = 0;
 
     Surface(10).Name = "Fene-05";
-    Surface(10).WindowShadingControlPtr = 2;
+    Surface(10).activeWindowShadingControl = 2;
 
     Surface(11).Name = "Fene-11";
-    Surface(11).WindowShadingControlPtr = 0;
+    Surface(11).activeWindowShadingControl = 0;
 
     Surface(12).Name = "Fene-06";
-    Surface(12).WindowShadingControlPtr = 2;
+    Surface(12).activeWindowShadingControl = 2;
 
     bool Err = false;
 
