@@ -93,8 +93,8 @@ namespace BranchInputManager {
     using namespace BranchNodeConnections;
 
     // MODULE PARAMETER DEFINITIONS
-    std::string const cMIXER("Connector:Mixer");
-    std::string const cSPLITTER("Connector:Splitter");
+    const char * cMIXER("Connector:Mixer");
+    const char * cSPLITTER("Connector:Splitter");
 
     void ManageBranchInput()
     {
@@ -991,31 +991,12 @@ namespace BranchInputManager {
         //    A6, \field Component 1 Outlet Node Name
         //         \required-field
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetBranchInput: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
 
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //////////// hoisted into namespace changed GetBranchInputOneTimeFlag////////////
-        // static bool GetInputFlag( true ); // Set for first time call
-        ////////////////////////////////////////////////
         int BCount;              // Actual Num of Branches
         bool ErrFound;           // Flag for error detection
         int NumAlphas;           // Used to retrieve names from IDF
