@@ -3946,7 +3946,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     VSTower.calculateVariableSpeedTower();
     EXPECT_DOUBLE_EQ(30.0, VSTower.OutletWaterTemp);
     EXPECT_DOUBLE_EQ(1.0, VSTower.FanCyclingRatio);
-    Real64 TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(WaterFlowRateRatio, VSTower.__AirFlowRateRatio, AirWetBulbTemp);
+    Real64 TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(WaterFlowRateRatio, VSTower.airFlowRateRatio, AirWetBulbTemp);
     EXPECT_NEAR(30.0, TowerOutletWaterTemp, 0.0001);
 
     // test case 2:

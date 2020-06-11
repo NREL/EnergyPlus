@@ -61,6 +61,15 @@ namespace EnergyPlus {
 
 namespace CondenserLoopTowers {
 
+    enum class ModelType{
+        // Empirical Model Type
+        Unassigned,
+        CoolToolsXFModel,
+        CoolToolsUserDefined,
+        YorkCalcModel,
+        YorkCalcUserDefined
+    };
+
     extern int const EvapLossByMoistTheory;
     extern int const BlowdownByConcentration;
     extern int const PIM_UFactor;
@@ -140,7 +149,7 @@ namespace CondenserLoopTowers {
         int WaterInletNodeNum;                  // Node number on the water inlet side of the tower
         int WaterOutletNodeNum;                 // Node number on the water outlet side of the tower
         int OutdoorAirInletNodeNum;             // Node number of outdoor air inlet for the tower
-        int TowerModelType;                     // Type of empirical model (1=CoolTools)
+        ModelType TowerModelType;               // Type of empirical model (1=CoolTools)
         int VSTower;                            // Index to a variable speed tower (otherwise = 0)
         int FanPowerfAirFlowCurve;              // Index to fan power correlation curve for VS Towers
         int BlowDownSchedulePtr;                // Pointer to blow down schedule
@@ -216,7 +225,7 @@ namespace CondenserLoopTowers {
 
         // From module level variables, apparently the module AirFlowRateRatio was used slightly different from the struct's AirFlowRatio variable
         //  so removing this caused diffs that I did not spend time investigating...they might be fine diffs, check some time later
-        Real64 __AirFlowRateRatio;
+        Real64 airFlowRateRatio;
 
         // From TowerInletConds struct
         Real64 WaterTemp;  // Tower water inlet temperature (C)
@@ -324,7 +333,7 @@ namespace CondenserLoopTowers {
               TowerNominalCapacityWasAutoSized(false), TowerLowSpeedNomCap(0.0), TowerLowSpeedNomCapWasAutoSized(false),
               TowerLowSpeedNomCapSizingFactor(0.0), TowerFreeConvNomCap(0.0), TowerFreeConvNomCapWasAutoSized(false),
               TowerFreeConvNomCapSizingFactor(0.0), SizFac(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0), OutdoorAirInletNodeNum(0),
-              TowerModelType(0), VSTower(0), FanPowerfAirFlowCurve(0), BlowDownSchedulePtr(0), BasinHeaterSchedulePtr(0), HighMassFlowErrorCount(0),
+              TowerModelType(ModelType::Unassigned), VSTower(0), FanPowerfAirFlowCurve(0), BlowDownSchedulePtr(0), BasinHeaterSchedulePtr(0), HighMassFlowErrorCount(0),
               HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0),
               SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0),
               WMFRGreaterThanMaxAvailErrIndex(0), CoolingTowerAFRRFailedCount(0), CoolingTowerAFRRFailedIndex(0), SpeedSelected(0),
@@ -336,8 +345,7 @@ namespace CondenserLoopTowers {
               VSMerkelAFRErrorFail(0), VSMerkelAFRErrorFailIndex(0), DesInletWaterTemp(0), DesOutletWaterTemp(0), DesInletAirDBTemp(0),
               DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
               FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
-              FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0),
-              __AirFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0),
+              FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), airFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0),
               OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0), BasinHeaterPower(0.0),
               BasinHeaterConsumption(0.0), WaterUsage(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0), EvaporationVol(0.0),
               DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0), TankSupplyVdot(0.0),
@@ -374,17 +382,17 @@ namespace CondenserLoopTowers {
 
         void calculateVariableSpeedTower();
 
-        Real64 calculateSimpleTowerOutletTemp(Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
+        Real64 calculateSimpleTowerOutletTemp(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
 
         Real64 calculateVariableTowerOutletTemp(Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
-                                                Real64 _AirFlowRateRatio,  // current air flow rate ratio
+                                                Real64 airFlowRateRatioLocal, // current air flow rate ratio
                                                 Real64 Twb                 // current inlet air wet-bulb temperature (C, capped if applicable)
         );
 
         void calculateWaterUsage();
 
         Real64 calculateVariableSpeedApproach(Real64 PctWaterFlow,  // Water flow ratio of cooling tower
-                                              Real64 _AirFlowRatio, // Air flow ratio of cooling tower
+                                              Real64 airFlowRatioLocal, // Air flow ratio of cooling tower
                                               Real64 Twb,           // Inlet air wet-bulb temperature [C]
                                               Real64 Tr             // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
         );
@@ -415,7 +423,7 @@ namespace CondenserLoopTowers {
                           Array1D<Real64> const &Par // par(1) = tower number
         );
 
-        Real64 residualMerkelLoad(Real64 _AirFlowRateRatio,  // fan speed ratio (1.0 is continuous, 0.0 is off)
+        Real64 residualMerkelLoad(Real64 airFlowRateRatioLocal,  // fan speed ratio (1.0 is continuous, 0.0 is off)
                                   Array1D<Real64> const &Par // par(1) = Tower number
         );
 
