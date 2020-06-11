@@ -1156,6 +1156,21 @@ namespace HybridUnitaryAirConditioners {
                                 "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
+            if (ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain) {
+                SetupOutputVariable("Zone Hybrid Unitary HVAC Fan Rise in Air Temperature",
+                                    OutputProcessor::Unit::deltaC,
+                                    ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatTemp,
+                                    "System",
+                                    "Average",
+                                    ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+                SetupOutputVariable("Zone Hybrid Unitary HVAC Fan Heat Gain to Air",
+                                    OutputProcessor::Unit::W,
+                                    ZoneHybridUnitaryAirConditioner(UnitLoop).PowerLossToAir,
+                                    "System",
+                                    "Average",
+                                    ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+            }
+
             int index = 0;
 
             for (auto &thisSetting : ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings) {

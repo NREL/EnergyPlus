@@ -1353,7 +1353,7 @@ namespace HybridEvapCoolingModel {
                         Real64 FanPower = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, SUPPLY_FAN_POWER) * ScalingFactor;
 
                         // calculate power loss to air if in mixed air stream and divide fan heat between outside air stream and return air stream
-                        if (FanHeatGain && FanHeatGainLocation == "MixedAirStream") {
+                        if (FanHeatGain && FanHeatGainLocation == "MIXEDAIRSTREAM") {
                             PowerLossToAir = FanPower * FanHeatInAirFrac;
                         } else {
                             PowerLossToAir = 0.0;
@@ -1371,7 +1371,7 @@ namespace HybridEvapCoolingModel {
                         Wsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, W_CURVE);
 
                         // calculate power loss to supply air stream from fan power determined by curve value and fraction of fan heat in air stream
-                        if (FanHeatGain && FanHeatGainLocation == "SupplyAirStream") {
+                        if (FanHeatGain && FanHeatGainLocation == "SUPPLYAIRSTREAM") {
                             PowerLossToAir = FanPower * FanHeatInAirFrac;
                         } else {
                             PowerLossToAir = 0.0;
