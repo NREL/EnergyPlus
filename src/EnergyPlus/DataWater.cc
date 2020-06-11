@@ -122,6 +122,11 @@ namespace DataWater {
     bool WaterSystemGetInputCalled(false); // set true once input data gotten.
     bool AnyIrrigationInModel(false);      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
 
+    void clear_state()
+    {
+        WaterSystemGetInputCalled = false;
+    }
+
     // Object Data
     SiteRainFallDataStruct
         RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
