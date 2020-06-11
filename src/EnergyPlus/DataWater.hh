@@ -101,7 +101,6 @@ namespace DataWater {
     extern int NumRainCollectors;    // number of rainfall collectors in model
     extern int NumGroundWaterWells;  // number of
     extern int NumSiteRainFall;
-    extern int NumIrrigation;              // DJS PSU Dec 2006 number of irrigation descriptions (1 allowed)
     extern bool AnyWaterSystemsInModel;    // control flag set true if any water systems
     extern bool WaterSystemGetInputCalled; // set true once input data gotten.
     extern bool AnyIrrigationInModel;      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
