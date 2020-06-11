@@ -992,7 +992,7 @@ namespace WaterUse {
             this->setupMyOutputVars = false;
         }
 
-        if (allocated(DataPlant::PlantLoop) && !this->StandAlone) {
+        if (this->plantScanFlag && allocated(DataPlant::PlantLoop) && !this->StandAlone) {
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                                     DataPlant::TypeOf_WaterUseConnection,
@@ -1009,6 +1009,7 @@ namespace WaterUse {
             if (errFlag) {
                 ShowFatalError("InitConnections: Program terminated due to previous condition(s).");
             }
+            this->plantScanFlag = false;
         }
 
         // Set the cold water temperature
