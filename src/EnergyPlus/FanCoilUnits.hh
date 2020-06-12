@@ -390,7 +390,7 @@ namespace FanCoilUnits {
                                   Array1D<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilHeatCoilPLRResidual(EnergyPlusData &state, Real64 const PLR,  // part-load ratio of electric heat capacity
+    Real64 CalcFanCoilHeatCoilPLRResidual(EnergyPlusData &state, Real64 const CyclingR,  // electric heating coil cycling ratio
         Array1D<Real64> const &Par // Function parameters
     );
 
