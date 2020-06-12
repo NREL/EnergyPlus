@@ -3760,10 +3760,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     MixedAir::OAController.allocate(2);
     MixedAir::OAController(1).RelTotalLossRate = 1.0;
     MixedAir::OAController(2).RelTotalLossRate = 1.0;
-    CondenserLoopTowers::NumSimpleTowers = 1;
-    CondenserLoopTowers::towers.allocate(1);
-    CondenserLoopTowers::towers(1).Qactual = 1.0;
-    CondenserLoopTowers::towers(1).FanEnergy = 50.0;
+    dataCondenserLoopTowers.NumSimpleTowers = 1;
+    dataCondenserLoopTowers.towers.allocate(1);
+    dataCondenserLoopTowers.towers(1).Qactual = 1.0;
+    dataCondenserLoopTowers.towers(1).FanEnergy = 50.0;
 
     Real64 TimeStepSysSec = DataHVACGlobals::TimeStepSys * SecInHour;
     Real64 reliefEnergy = 2.0 * TimeStepSysSec;
@@ -3800,10 +3800,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     EXPECT_EQ(2 * reliefEnergy * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
     EXPECT_EQ(condenserReject + coilReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
     EXPECT_EQ(2 * condenserReject * DataGlobals::convertJtoGJ + coilReject * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACReject);
-
-    MixedAir::clear_state();
-    DXCoils::clear_state();
-    CondenserLoopTowers::clear_state();
 }
 
 TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)

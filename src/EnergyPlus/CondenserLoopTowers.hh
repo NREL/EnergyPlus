@@ -48,20 +48,26 @@
 #ifndef CondenserLoopTowers_hh_INCLUDED
 #define CondenserLoopTowers_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace CondenserLoopTowers {
 
-    enum class ModelType{
+    enum class ModelType {
         // Empirical Model Type
         Unassigned,
         CoolToolsXFModel,
@@ -70,11 +76,33 @@ namespace CondenserLoopTowers {
         YorkCalcUserDefined
     };
 
-    extern int const EvapLossByMoistTheory;
-    extern int const BlowdownByConcentration;
-    extern int const PIM_UFactor;
-    extern int NumSimpleTowers; // Number of similar towers
-    extern bool GetInput;       // When TRUE, calls subroutine to read input file
+    enum class EvapLoss {
+        UserFactor,
+        MoistTheory
+    };
+
+    enum class Blowdown {
+        Concentration,
+        Schedule
+    };
+
+    enum class PIM {
+        Unassigned,
+        NominalCapacity,
+        UFactor
+    };
+
+    enum class CapacityControl {
+        Unassigned,
+        FanCycling,
+        FluidBypass
+    };
+
+    enum class CellCtrl {
+        Unassigned,
+        MinCell,
+        MaxCell
+    };
 
     struct CoolingTower : PlantComponent
     {
@@ -82,7 +110,7 @@ namespace CondenserLoopTowers {
         std::string Name;      // User identifier
         std::string TowerType; // Type of cooling tower
         int TowerType_Num;
-        int PerformanceInputMethod_Num; // Method of entering tower performance: UA and Design Water
+        PIM PerformanceInputMethod_Num; // Method of entering tower performance: UA and Design Water
         //  Flow Rate, or Nominal Capacity
         std::string ModelCoeffObjectName;         // Cooling Tower:Variable Speed Model Coefficient Object name
         bool Available;                           // need an array of logicals--load identifiers of available equipment
@@ -168,21 +196,21 @@ namespace CondenserLoopTowers {
         int CoolingTowerAFRRFailedIndex;        // Index for air flow rate ratio out of bounds error
         int SpeedSelected;                      // speed of the two-speed fan selected (0:ON;1:LOW;2:HIGH)
         // fluid bypass
-        int CapacityControl; // Type of capacity control for single speed cooling tower:
+        CapacityControl CapacityControl; // Type of capacity control for single speed cooling tower:
         //  0 - FanCycling, 1 - FluidBypass
         Real64 BypassFraction; // Fraction of fluid bypass as a ratio of total fluid flow
         //  through the tower sump
         // multi cell tower
         int NumCell; // Number of cells in the cooling tower
-        int CellCtrl_Num;
+        CellCtrl CellCtrl_Num;
         int NumCellOn;          // number of cells working
         Real64 MinFracFlowRate; // Minimal fraction of design flow/cell allowable
         Real64 MaxFracFlowRate; // Maximal ratio of design flow/cell allowable
         // begin water system interactions
-        int EvapLossMode;          // sets how tower water evaporation is modeled
+        EvapLoss EvapLossMode;          // sets how tower water evaporation is modeled
         Real64 UserEvapLossFactor; // simple model [%/Delt C]
         Real64 DriftLossFraction;
-        int BlowdownMode;          // sets how tower water blowdown is modeled
+        Blowdown BlowdownMode;          // sets how tower water blowdown is modeled
         Real64 ConcentrationRatio; // ratio of solids in blowdown vs make up water
         int SchedIDBlowdown;       // index "pointer" to schedule of blowdown in [m3/s]
         bool SuppliedByWaterSystem;
@@ -318,7 +346,7 @@ namespace CondenserLoopTowers {
 
         // Default Constructor
         CoolingTower()
-            : TowerType_Num(0), PerformanceInputMethod_Num(0), Available(true), ON(true), DesignWaterFlowRate(0.0),
+            : TowerType_Num(0), PerformanceInputMethod_Num(PIM::Unassigned), Available(true), ON(true), DesignWaterFlowRate(0.0),
               DesignWaterFlowRateWasAutoSized(false), DesignWaterFlowPerUnitNomCap(0.0), DesWaterMassFlowRate(0.0), DesWaterMassFlowRatePerCell(0.0),
               HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), DesignAirFlowPerUnitNomCap(0.0),
               DefaultedDesignAirFlowScalingFactor(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false),
@@ -333,19 +361,22 @@ namespace CondenserLoopTowers {
               TowerNominalCapacityWasAutoSized(false), TowerLowSpeedNomCap(0.0), TowerLowSpeedNomCapWasAutoSized(false),
               TowerLowSpeedNomCapSizingFactor(0.0), TowerFreeConvNomCap(0.0), TowerFreeConvNomCapWasAutoSized(false),
               TowerFreeConvNomCapSizingFactor(0.0), SizFac(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0), OutdoorAirInletNodeNum(0),
-              TowerModelType(ModelType::Unassigned), VSTower(0), FanPowerfAirFlowCurve(0), BlowDownSchedulePtr(0), BasinHeaterSchedulePtr(0), HighMassFlowErrorCount(0),
+              TowerModelType(ModelType::Unassigned), VSTower(0), FanPowerfAirFlowCurve(0), BlowDownSchedulePtr(0), BasinHeaterSchedulePtr(0),
+              HighMassFlowErrorCount(0),
               HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0),
               SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0),
               WMFRGreaterThanMaxAvailErrIndex(0), CoolingTowerAFRRFailedCount(0), CoolingTowerAFRRFailedIndex(0), SpeedSelected(0),
-              CapacityControl(0), BypassFraction(0.0), NumCell(0), CellCtrl_Num(0), NumCellOn(0), MinFracFlowRate(0.0), MaxFracFlowRate(0.0),
-              EvapLossMode(EvapLossByMoistTheory), UserEvapLossFactor(0.0), DriftLossFraction(0.0), BlowdownMode(BlowdownByConcentration),
+              CapacityControl(CapacityControl::Unassigned), BypassFraction(0.0), NumCell(0), CellCtrl_Num(CellCtrl::Unassigned), NumCellOn(0),
+              MinFracFlowRate(0.0), MaxFracFlowRate(0.0),
+              EvapLossMode(EvapLoss::MoistTheory), UserEvapLossFactor(0.0), DriftLossFraction(0.0), BlowdownMode(Blowdown::Concentration),
               ConcentrationRatio(0.0), SchedIDBlowdown(0), SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), LoopNum(0),
               LoopSideNum(0), BranchNum(0), CompNum(0), UAModFuncAirFlowRatioCurvePtr(0), UAModFuncWetBulbDiffCurvePtr(0),
               UAModFuncWaterFlowRatioCurvePtr(0), SetpointIsOnOutlet(false), VSMerkelAFRErrorIter(0), VSMerkelAFRErrorIterIndex(0),
               VSMerkelAFRErrorFail(0), VSMerkelAFRErrorFailIndex(0), DesInletWaterTemp(0), DesOutletWaterTemp(0), DesInletAirDBTemp(0),
               DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
               FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
-              FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), airFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0),
+              FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), airFlowRateRatio(0.0),
+              WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0),
               OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0), BasinHeaterPower(0.0),
               BasinHeaterConsumption(0.0), WaterUsage(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0), EvaporationVol(0.0),
               DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0), TankSupplyVdot(0.0),
@@ -430,15 +461,25 @@ namespace CondenserLoopTowers {
         static PlantComponent *factory(std::string const &objectName);
     };
 
-    // Object Data
-    extern Array1D<CoolingTower> towers; // dimension to number of machines
-
-    // Functions
-    void clear_state();
-
     void GetTowerInput();
 
 } // namespace CondenserLoopTowers
+
+struct CondenserLoopTowersData : BaseGlobalStruct {
+    int NumSimpleTowers = 0; // Number of similar towers
+    bool GetInput = true;
+    Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
+    std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
+
+    void clear_state() override {
+        NumSimpleTowers = 0;
+        GetInput = true;
+        towers.deallocate();
+        UniqueSimpleTowerNames.clear();
+    }
+};
+
+extern CondenserLoopTowersData dataCondenserLoopTowers;
 
 } // namespace EnergyPlus
 

@@ -73,7 +73,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
@@ -142,7 +141,6 @@ namespace EnergyPlus {
         // connections are performed in this module.
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using namespace DataGlobals;
         using namespace DataHVACGlobals;
         using namespace DataPlant;
