@@ -516,7 +516,7 @@ namespace AirflowNetwork {
 
         // Calculate pressure field in a large opening
         PStack();
-        solver.solvzp(IK, AD, AU, ITER);
+        solver.solvzp(ITER);
 
         // Report element flows and zone pressures.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
@@ -582,11 +582,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::solvzp(Array1D_int &IK,     // pointer to the top of column/row "K"
-                Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
-                Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
-                int &ITER           // number of iterations
-    )
+    void Solver::solvzp(int &ITER)  // number of iterations
     {
 
         // SUBROUTINE INFORMATION:
@@ -606,7 +602,7 @@ namespace AirflowNetwork {
         // REFERENCES:
         // na
 
-        // Argument array dimensioning
+        // Argument array dimensioning (these used to be arguments, need to also test newAU and newIK)
         EP_SIZE_CHECK(IK, NetworkNumOfNodes + 1);
         EP_SIZE_CHECK(AD, NetworkNumOfNodes);
         EP_SIZE_CHECK(AU, IK(NetworkNumOfNodes + 1));
@@ -617,7 +613,7 @@ namespace AirflowNetwork {
         // REAL(r64), INTENT(INOUT) :: AU(IK(NetworkNumOfNodes+1)-1) ! the upper triangle of [A] before and after factoring
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
+        //static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

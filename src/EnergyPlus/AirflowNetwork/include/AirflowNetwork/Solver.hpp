@@ -82,11 +82,7 @@ namespace AirflowNetwork {
         void initialize();
         void setsky();
         void airmov();
-        void solvzp(Array1D_int &IK,     // pointer to the top of column/row "K"
-                    Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
-                    Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
-                    int &ITER            // number of iterations
-            );
+        void solvzp(int &ITER);  // number of iterations
         void filjac(int const NNZE,  // number of nonzero entries in the "AU" array.
                     bool const LFLAG // if = 1, use laminar relationship (initialization).
         );
