@@ -856,22 +856,22 @@ Runtime {[}seconds{]} \tabularnewline
 
 1  & FALSE & ScriptF    & NORMAL & 6 & 1 & FALSE & 0.30 & 158.05 \tabularnewline
 2  & FALSE & ScriptF    & MODE01 & 1 & 1 & FALSE & 0.30 & 55.07  \tabularnewline
-3  & FALSE & ScriptF    & MODE02 & 1 & 1 & FALSE & 0.30 & 52.39  \tabularnewline
-4  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 0.30 & 52.42  \tabularnewline
-5  & FALSE & ScriptF    & MODE04 & 1 & 1 & TRUE  & 0.30 & 51.74  \tabularnewline
-6  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 1.00 & 32.74  \tabularnewline
+3  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 0.30 & 52.39  \tabularnewline
+4  & FALSE & ScriptF    & MODE04 & 1 & 1 & FALSE & 0.30 & 52.42  \tabularnewline
+5  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 0.30 & 51.74  \tabularnewline
+6  & FALSE & ScriptF    & MODE06 & 1 & 1 & TRUE  & 1.00 & 32.74  \tabularnewline
 7  & TRUE  & ScriptF    & NORMAL & 6 & 1 & FALSE & 0.30 & 161.89 \tabularnewline
-8  & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 0.30 & 171.00    \tabularnewline
+8  & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 0.30 & 171.00 \tabularnewline
 9  & FALSE & CarrollMRT & MODE01 & 1 & 1 & FALSE & 0.30 & 54.19  \tabularnewline
-10 & FALSE & CarrollMRT & MODE02 & 1 & 1 & FALSE & 0.30 & 53.85  \tabularnewline
-11 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 0.30 & 51.21  \tabularnewline
-12 & FALSE & CarrollMRT & MODE04 & 1 & 1 & TRUE  & 0.30 & 51.14  \tabularnewline
-13 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 1.00 & 32.76  \tabularnewline
+10 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 0.30 & 53.85  \tabularnewline
+11 & FALSE & CarrollMRT & MODE04 & 1 & 1 & FALSE & 0.30 & 51.21  \tabularnewline
+12 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 0.30 & 51.14  \tabularnewline
+13 & FALSE & CarrollMRT & MODE06 & 1 & 1 & TRUE  & 1.00 & 32.76  \tabularnewline
 \bottomrule
 \end{longtable}
 }
 
-This example uses 13 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffsobject, but fewer trials could have been made to reach a similar conclusion. The first run shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 6 are just stepping through the Override Modes. Run 7 employs the Use Coil Direct Solution option, but the time for the simulation went up, so it was not used anymore.  Runs 8 through 13 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. Mode02, Moded03, and Mode04 only save a few seconds compared to Mode01, which takes about one-third of the time of the baseline Run 1 time. Mode05 saves the most time with both ScriptF and CarrollMRT taking about one-fifth of the original time. Mode05 seems like the natural choice, but we need to look at other results in the \_perflog.csv file first before we come to that conclusion.
+This example uses 13 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffsobject, but fewer trials could have been made to reach a similar conclusion. The first run shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 6 are just stepping through the Override Modes. Run 7 employs the Use Coil Direct Solution option, but the time for the simulation went up, so it was not used anymore.  Runs 8 through 13 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. Mode03, Moded04, and Mode05 only save a few seconds compared to Mode01, which takes about one-third of the time of the baseline Run 1 time. Mode06 saves the most time with both ScriptF and CarrollMRT taking about one-fifth of the original time. Mode06 seems like the natural choice, but we need to look at other results in the \_perflog.csv file first before we come to that conclusion.
 
 These example simulations each took three minutes or less to try. If your building takes much longer than a few minutes, you might want to temporarily change your run period to just a  month or even a week to tune the PerformancePrecisionTradeoffs object inputs. If temporarily shortening the run period is necessary, it is best to pick a month or week that has some cooling and some heating. Just remember to set your run period back to a full year before coming to any conclusions about the building or energy efficiency options being considered for the building.
 
@@ -894,17 +894,17 @@ Override Mode &
 
 1  & False & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 158.05 \tabularnewline
 2  & False & ScriptF  & MODE01 & 3,093,683 & 738,559 & 211,747 & 55.07  \tabularnewline
-3  & False & ScriptF  & MODE02 & 3,097,292 & 746,356 & 212,704 & 52.39  \tabularnewline
-4  & False & ScriptF  & MODE03 & 3,097,292 & 746,356 & 212,704 & 52.42  \tabularnewline
-5  & False & ScriptF  & MODE04 & 3,097,292 & 746,356 & 212,704 & 51.74  \tabularnewline
-6  & False & ScriptF  & MODE05 & 3,098,474 & 743,652 & 213,207 & 32.74  \tabularnewline
+3  & False & ScriptF  & MODE03 & 3,097,292 & 746,356 & 212,704 & 52.39  \tabularnewline
+4  & False & ScriptF  & MODE04 & 3,097,292 & 746,356 & 212,704 & 52.42  \tabularnewline
+5  & False & ScriptF  & MODE05 & 3,097,292 & 746,356 & 212,704 & 51.74  \tabularnewline
+6  & False & ScriptF  & MODE06 & 3,098,474 & 743,652 & 213,207 & 32.74  \tabularnewline
 7  & True  & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 161.89 \tabularnewline
 8  & False & CarrollMRT & NORMAL & 3,256,436 & 498,372 & 267,030 & 171.00 \tabularnewline
 9  & False & CarrollMRT & MODE01 & 3,245,912 & 486,067 & 265,166 & 54.19  \tabularnewline
-10 & False & CarrollMRT & MODE02 & 3,243,835 & 492,423 & 265,212 & 53.85  \tabularnewline
-11 & False & CarrollMRT & MODE03 & 3,243,835 & 492,423 & 265,212 & 51.21  \tabularnewline
-12 & False & CarrollMRT & MODE04 & 3,243,835 & 492,423 & 265,212 & 51.14  \tabularnewline
-13 & False & CarrollMRT & MODE05 & 3,244,804 & 490,038 & 265,528 & 32.76  \tabularnewline
+10 & False & CarrollMRT & MODE03 & 3,243,835 & 492,423 & 265,212 & 53.85  \tabularnewline
+11 & False & CarrollMRT & MODE04 & 3,243,835 & 492,423 & 265,212 & 51.21  \tabularnewline
+12 & False & CarrollMRT & MODE05 & 3,243,835 & 492,423 & 265,212 & 51.14  \tabularnewline
+13 & False & CarrollMRT & MODE06 & 3,244,804 & 490,038 & 265,528 & 32.76  \tabularnewline
 \bottomrule
 \end{longtable}
 }
@@ -931,25 +931,25 @@ Override Mode &
 \endfirsthead
 1  & FALSE & ScriptF    & NORMAL & 3.48  & 3.28  & 0.2   & 44 & 158.05 \tabularnewline
 2  & FALSE & ScriptF    & MODE01 & 8.02  & 2.62  & 6.57  & 45 & 55.07  \tabularnewline
-3  & FALSE & ScriptF    & MODE02 & 9.85  & 4.45  & 8.4   & 46 & 52.39  \tabularnewline
-4  & FALSE & ScriptF    & MODE03 & 9.85  & 4.45  & 8.4   & 47 & 52.42  \tabularnewline
-5  & FALSE & ScriptF    & MODE04 & 9.85  & 4.45  & 8.4   & 48 & 51.74  \tabularnewline
-6  & FALSE & ScriptF    & MODE05 & 86.57 & 59.33 & 71.57 & 50 & 32.74  \tabularnewline
+3  & FALSE & ScriptF    & MODE03 & 9.85  & 4.45  & 8.4   & 46 & 52.39  \tabularnewline
+4  & FALSE & ScriptF    & MODE04 & 9.85  & 4.45  & 8.4   & 47 & 52.42  \tabularnewline
+5  & FALSE & ScriptF    & MODE05 & 9.85  & 4.45  & 8.4   & 48 & 51.74  \tabularnewline
+6  & FALSE & ScriptF    & MODE06 & 86.57 & 59.33 & 71.57 & 50 & 32.74  \tabularnewline
 7  & TRUE  & ScriptF    & NORMAL & 3.48  & 3.28  & 0.2   & 45 & 161.89 \tabularnewline
 8  & FALSE & CarrollMRT & NORMAL & 2.92  & 2.72  & 0.2   & 45 & 171.00    \tabularnewline
 9  & FALSE & CarrollMRT & MODE01 & 7.88  & 0.95  & 6.48  & 46 & 54.19  \tabularnewline
-10 & FALSE & CarrollMRT & MODE02 & 10.47 & 3.53  & 7.73  & 47 & 53.85  \tabularnewline
-11 & FALSE & CarrollMRT & MODE03 & 10.47 & 3.53  & 7.73  & 48 & 51.21  \tabularnewline
-12 & FALSE & CarrollMRT & MODE04 & 10.47 & 3.53  & 7.73  & 49 & 51.14  \tabularnewline
-13 & FALSE & CarrollMRT & MODE05 & 88.15 & 62.33 & 74.9  & 50 & 32.76  \tabularnewline
+10 & FALSE & CarrollMRT & MODE03 & 10.47 & 3.53  & 7.73  & 47 & 53.85  \tabularnewline
+11 & FALSE & CarrollMRT & MODE04 & 10.47 & 3.53  & 7.73  & 48 & 51.21  \tabularnewline
+12 & FALSE & CarrollMRT & MODE05 & 10.47 & 3.53  & 7.73  & 49 & 51.14  \tabularnewline
+13 & FALSE & CarrollMRT & MODE06 & 88.15 & 62.33 & 74.9  & 50 & 32.76  \tabularnewline
 \bottomrule
 \end{longtable}
 }
 
 
-The number of hours any zone is oscillating for Run 1 the Normal baseline case using Script F is only 3.48 hours, with almost none of the hours in the dead band and nearly all during occupancy. This changes when considering the other ScriptF cases using Mode01 to Mode05 (Run 2 to Run 5).  For these cases, the oscillating hours increase but are still less than 10 per year, while more than doubling, on an absolute basis, a small change. The change is even more minor when considering the hours with the dead band, which for Run 2 to 6 only increases about an hour. Similar numbers are shown for the CarrollMRT cases for Mode01 to Mode04. The most significant change is Mode05, which for both ScriptF and CarrollMRT raise the oscillating hours to nearly 90. This is a substantial change that does indicate a significant shift in the way the simulation is behaving. It would be easy to eliminate using Mode05 if it wasn’t for the fact that it is also substantially faster than the other modes. No severe errors were reported for any of these simulations, so no column is shown for them, and the column for warnings shows a small increase. After investigating the changes, the change in the count warning messages was not considered important.
+The number of hours any zone is oscillating for Run 1 the Normal baseline case using Script F is only 3.48 hours, with almost none of the hours in the dead band and nearly all during occupancy. This changes when considering the other ScriptF cases using Mode03 to Mode06 (Run 2 to Run 5).  For these cases, the oscillating hours increase but are still less than 10 per year, while more than doubling, on an absolute basis, a small change. The change is even more minor when considering the hours with the dead band, which for Run 2 to 6 only increases about an hour. Similar numbers are shown for the CarrollMRT cases for Mode01 to Mode05. The most significant change is Mode06, which for both ScriptF and CarrollMRT raise the oscillating hours to nearly 90. This is a substantial change that does indicate a significant shift in the way the simulation is behaving. It would be easy to eliminate using Mode05 if it wasn’t for the fact that it is also substantially faster than the other modes. No severe errors were reported for any of these simulations, so no column is shown for them, and the column for warnings shows a small increase. After investigating the changes, the change in the count warning messages was not considered important.
 
-The decision on which mode to use is up to the individual modelers, but for these simulations, Run 3 is recommended. Run 3 does not use direct coil solution, uses ScriptF, and Mode02. This simulation saves some time (a few seconds) compared to Mode01 but doesn’t add any additional overrides, which should be avoided if not adding value. Mode03 and Mode04 for this model were just about the same time as Mode02.  Mode05 was avoided because of the substantially larger oscillating hours.
+The decision on which mode to use is up to the individual modelers, but for these simulations, Run 3 is recommended. Run 3 does not use direct coil solution, uses ScriptF, and Mode03. This simulation saves some time (a few seconds) compared to Mode01 but doesn’t add any additional overrides, which should be avoided if not adding value. Mode03 and Mode04 for this model were just about the same time as Mode03.  Mode06 was avoided because of the substantially larger oscillating hours.
 
 Additional guidance on how to make EnergyPlus faster appears in the "Tips And Tricks for Using EnergyPlus" document that is distributed with EnergyPlus within the section titled "Platforms and Run-Time."
 
@@ -1066,16 +1066,18 @@ Mode & Description \tabularnewline
 
 Normal & no overrides\tabularnewline
 Mode01 & Zone Time step (TimeStep object) will be set to one timestep per hour\tabularnewline
-Mode02 & Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler\tabularnewline
-Mode03 & Mode02 plus Minimum Number of Warmup Days will be set to 1\tabularnewline
-Mode04 & Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets\tabularnewline
-Mode05 & Mode04 MaxZoneTempDiff will be set to 1.00\tabularnewline
+Mode02 & Mode01 plus System Time step will be set to one timestep per hour\tabularnewline
+Mode03 & Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler\tabularnewline
+Mode04 & Mode03 plus Minimum Number of Warmup Days will be set to 1\tabularnewline
+Mode05 & Mode04 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets\tabularnewline
+Mode06 & Mode05 MaxZoneTempDiff will be set to 1.00\tabularnewline
+Mode07 & Mode06 MaxAllowedDelTemp will be set to 0.1\tabularnewline
 Advanced& Allow direct input of convergence field values\tabularnewline
 
 \bottomrule
 \end{longtable}
 
-The increasing mode number roughly corresponds with increased speed. Mode01 to Mode04 are overriding inputs in other parts of the IDF/epJSON file and is equivalent to changing those input directly. Mode05 is changing a convergence parameter previously not available to modified by the user.
+The increasing mode number roughly corresponds with increased speed. Mode01 to Mode05 are overriding inputs in other parts of the IDF/epJSON file and is equivalent to changing those input directly. Mode06 and Mode07 are changing convergence parameters previously not available to modified by the user.
 
 \paragraph{Field: MaxZoneTempDiff}\label{max-zone-temp-diff}
 
@@ -1088,9 +1090,14 @@ An IDF example:
 PerformancePrecisionTradeoffs,
   Yes,                      !- Use Coil Direct Solutions
   CarrollMRT;               !- Zone Radiant Exchange Algorithm
-  Mode05,                   !- Override Mode
+  Mode06,                   !- Override Mode
   0.3;                      !- MaxZoneTempDiff
 \end{lstlisting}
+
+\paragraph{Field: MaxAllowedDelTemp}\label{max-allowed-del-temp}
+
+This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxAllowedDelTemp variable within EnergyPlus. This variable sets the maximum surface temperature change before the HVAC timestep is shortened. Similar to the \textbf{MaxZoneTempDiff} parameter, larger \textbf{MaxAllowedDelTemp} values result in fewer iterations. To understand this input completely, please review the use of the \textbf{MaxAllowedDetTemp} variable in the CalcHeatBalanceInsideSurf2() routine located in the HeatBalanceSurfaceManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.002, which is also the default value. Testing has been done with a value of 0.1, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 0.1 have not been tested.
+
 
 \subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
 
