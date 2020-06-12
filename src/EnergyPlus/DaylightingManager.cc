@@ -172,6 +172,8 @@ namespace DaylightingManager {
     bool DayltgInteriorMapIllum_FirstTimeFlag(true);
     bool ReportIllumMap_firstTime(true);
     bool SQFirstTime(true);
+    bool doSkyReporting(true);
+    bool CreateDFSReportFile(true);
 
     // Surface count crossover for using octree algorithm
     // The octree gives lower computational complexity for much higher performance
@@ -281,6 +283,8 @@ namespace DaylightingManager {
         RefErrIndex.deallocate();
         CheckTDDZone.deallocate();
         mapLine = "";
+        doSkyReporting = true;
+        CreateDFSReportFile = true;
     }
 
     void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
@@ -555,12 +559,6 @@ namespace DaylightingManager {
         Real64 SlatAngle;
         int ISA;
         int ISlatAngle;
-
-        static bool CreateDFSReportFile(true);
-        static bool doSkyReporting(true);
-
-        // Formats
-
 
         // FLOW:
         if (CalcDayltghCoefficients_firstTime) {
