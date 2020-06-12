@@ -1275,6 +1275,14 @@ namespace SimulationManager {
                         DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
                         DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
                     }
+                    if (overrideSystemTimestep) {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the lower limit of System TimeSteps has been changed to 1 hr.");
+                        // DataGlobals::NumOfTimeStepInHour = 1;
+                        // DataGlobals::TimeStepZone = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
+                        // DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
+                        // DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
+                        // To do: Add code here for linking the Convergency Limit min system timestep
+                    }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(
                             "Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
