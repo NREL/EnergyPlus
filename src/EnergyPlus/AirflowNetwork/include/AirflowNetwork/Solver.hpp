@@ -75,7 +75,7 @@ namespace AirflowNetwork {
 
     struct Solver
     {
-        Solver() : PB(0.0), LIST(0)
+        Solver() : PB(0.0)
         {}
 
         void allocate();
@@ -94,7 +94,7 @@ namespace AirflowNetwork {
         void clear()
         {
             PB = 0.0;
-            LIST = 0;
+            //LIST = 0;
             elements.clear();
             compnum.clear();
             properties.clear();
@@ -136,7 +136,7 @@ namespace AirflowNetwork {
 
         // Common block CONTRL
         Real64 PB;
-        int LIST;
+        //int LIST;
 
         // Common block ZONL
         //Array1D<Real64> RHOZ;
@@ -170,42 +170,6 @@ namespace AirflowNetwork {
 
     extern int const NrInt; // Number of intervals for a large opening
 
-    // Common block AFEDAT
-    //extern Array1D<Real64> AFECTL;
-    //extern Array1D<Real64> AFLOW2;
-    //extern Array1D<Real64> AFLOW;
-    //extern Array1D<Real64> PS;
-    //extern Array1D<Real64> PW;
-
-    // Common block CONTRL
-    //extern Real64 PB;
-    //extern int LIST;
-
-    // Common block ZONL
-    // extern Array1D<Real64> RHOZ;
-    // extern Array1D<Real64> SQRTDZ;
-    // extern Array1D<Real64> VISCZ;
-    //extern Array1D<Real64> SUMAF;
-    // extern Array1D<Real64> TZ; // Temperature [C]
-    // extern Array1D<Real64> WZ; // Humidity ratio [kg/kg]
-    //extern Array1D<Real64> PZ; // Pressure [Pa]
-
-    // Other array variables
-    //extern Array1D_int ID;
-    //extern Array1D_int IK;
-    //extern Array1D<Real64> AD;
-    //extern Array1D<Real64> AU;
-
-#ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-    //extern Array1D_int newIK;     // noel
-    //extern Array1D<Real64> newAU; // noel
-#endif
-
-    // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-    //extern Array1D<Real64> SUMF;
-    extern int Unit11;
-    extern int Unit21;
-
     // Large opening variables
     extern Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
     extern Array1D<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
@@ -213,58 +177,6 @@ namespace AirflowNetwork {
     extern Array2D<Real64> DpL;      // Array of stack pressures in link
 
     // Functions
-
-    //void AllocateAirflowNetworkData();
-
-    //void InitAirflowNetworkData();
-
-    //void SETSKY();
-
-    //void AIRMOV();
-
-    //void SOLVZP(Array1D_int &IK,     // pointer to the top of column/row "K"
-    //            Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
-    //            Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
-    //            int &ITER            // number of iterations
-    //);
-
-    //void FILJAC(int const NNZE,  // number of nonzero entries in the "AU" array.
-    //            bool const LFLAG // if = 1, use laminar relationship (initialization).
-    //);
-
-    //int AFEFAN(int const JA,               // Component number
-    //           bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-    //           Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-    //           int const i,                // Linkage number
-    //           const AirProperties &propN, // Node 1 properties
-    //           const AirProperties &propM, // Node 2 properties
-    //           std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-    //           std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
-    //);
-
-    // The above subroutine is not used. Leave it for the time being and revise later.
-
-    //int AFECPF(int const j,                // Component number
-    //           bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-    //           Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-    //           int const i,                // Linkage number
-    //           const AirProperties &propN, // Node 1 properties
-    //           const AirProperties &propM, // Node 2 properties
-    //           std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-    //           std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
-    //);
-
-    // Leave it for the time being and revise later. Or drop this component ???????????
-
-    //int AFEREL(int const j,                // Component number
-    //           bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-    //           Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-    //           int const i,                // Linkage number
-    //           const AirProperties &propN, // Node 1 properties
-    //           const AirProperties &propM, // Node 2 properties
-    //           std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-    //           std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
-    //);
 
     int GenericCrack(Real64 &coef,               // Flow coefficient
                      Real64 const expn,          // Flow exponent
@@ -321,16 +233,6 @@ namespace AirflowNetwork {
                 const Array1D<Real64> &V, // Output values
                 int const n,              // Array size
                 int const UOUT            // Output file unit
-    );
-
-    int AFEDOP(int const j,                // Component number
-               bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-               Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-               int const IL,               // Linkage number
-               const AirProperties &propN, // Node 1 properties
-               const AirProperties &propM, // Node 2 properties
-               std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-               std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     );
 
     void PresProfile(int const il,                  // Linkage number
