@@ -5580,8 +5580,7 @@ namespace WaterThermalTanks {
         static std::string const GetWaterThermalTankInput("GetWaterThermalTankInput");
         static std::string const SizeTankForDemand("SizeTankForDemandSide");
 
-        if (this->SetLoopIndexFlag && allocated(DataPlant::PlantLoop)) {
-
+        if (this->scanPlantLoopsFlag && allocated(DataPlant::PlantLoop)) {
             if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(this->Name,
@@ -5597,17 +5596,6 @@ namespace WaterThermalTanks {
                                                         this->UseInletNode,
                                                         _);
                 if (errFlag) {
-                    ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
-                }
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
-                                                               DataGlobals::InitConvTemp,
-                                                               DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
-                                                               GetWaterThermalTankInput);
-                this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
-                this->Mass = this->Volume * rho;
-                this->UseSidePlantSizNum = DataPlant::PlantLoop(this->UseSide.loopNum).PlantSizNum;
-                if ((this->UseDesignVolFlowRateWasAutoSized) && (this->UseSidePlantSizNum == 0)) {
-                    ShowSevereError("InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + this->Name);
                     ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
                 }
             }
@@ -5630,17 +5618,6 @@ namespace WaterThermalTanks {
                 if (errFlag) {
                     ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
                 }
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
-                                                               DataGlobals::InitConvTemp,
-                                                               DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
-                                                               GetWaterThermalTankInput);
-                this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
-                this->Mass = this->Volume * rho;
-                this->UseSidePlantSizNum = DataPlant::PlantLoop(this->UseSide.loopNum).PlantSizNum;
-                if ((this->UseDesignVolFlowRateWasAutoSized) && (this->UseSidePlantSizNum == 0)) {
-                    ShowSevereError("InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + this->Name);
-                    ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
-                }
             }
             if ((this->SourceInletNode > 0) && (this->DesuperheaterNum == 0) && (this->HeatPumpNum == 0)) {
                 bool errFlag = false;
@@ -5658,12 +5635,43 @@ namespace WaterThermalTanks {
                                                         _);
                 if (this->UseInletNode > 0) {
                     PlantUtilities::InterConnectTwoPlantLoopSides(
-                        this->UseSide.loopNum, this->UseSide.loopSideNum, this->SrcSide.loopNum, this->SrcSide.loopSideNum, this->TypeNum, true);
+                            this->UseSide.loopNum, this->UseSide.loopSideNum, this->SrcSide.loopNum, this->SrcSide.loopSideNum, this->TypeNum, true);
                 }
-
                 if (errFlag) {
                     ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
                 }
+            }
+            this->scanPlantLoopsFlag = false;
+        }
+        
+        if (this->SetLoopIndexFlag && allocated(DataPlant::PlantLoop)) {
+            if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {
+                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                                                               DataGlobals::InitConvTemp,
+                                                               DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
+                                                               GetWaterThermalTankInput);
+                this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
+                this->Mass = this->Volume * rho;
+                this->UseSidePlantSizNum = DataPlant::PlantLoop(this->UseSide.loopNum).PlantSizNum;
+                if ((this->UseDesignVolFlowRateWasAutoSized) && (this->UseSidePlantSizNum == 0)) {
+                    ShowSevereError("InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + this->Name);
+                    ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
+                }
+            }
+            if ((this->UseInletNode > 0) && (this->HeatPumpNum > 0)) {
+                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                                                               DataGlobals::InitConvTemp,
+                                                               DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
+                                                               GetWaterThermalTankInput);
+                this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
+                this->Mass = this->Volume * rho;
+                this->UseSidePlantSizNum = DataPlant::PlantLoop(this->UseSide.loopNum).PlantSizNum;
+                if ((this->UseDesignVolFlowRateWasAutoSized) && (this->UseSidePlantSizNum == 0)) {
+                    ShowSevereError("InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + this->Name);
+                    ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
+                }
+            }
+            if ((this->SourceInletNode > 0) && (this->DesuperheaterNum == 0) && (this->HeatPumpNum == 0)) {
                 Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
                                                                DataGlobals::InitConvTemp,
                                                                DataPlant::PlantLoop(this->SrcSide.loopNum).FluidIndex,
@@ -5678,13 +5686,11 @@ namespace WaterThermalTanks {
             if (((this->SourceInletNode > 0) && (this->DesuperheaterNum > 0)) || (this->HeatPumpNum > 0)) {
                 this->SetLoopIndexFlag = false;
             }
-
             if (DataPlant::PlantFirstSizesOkayToFinalize) this->SetLoopIndexFlag = false;
             if (this->StandAlone) {
                 this->SizeStandAloneWaterHeater();
                 this->SetLoopIndexFlag = false;
             }
-
         } else if (this->SetLoopIndexFlag && !DataGlobals::AnyPlantInModel) {
             if (this->StandAlone) {
                 this->SizeStandAloneWaterHeater();
