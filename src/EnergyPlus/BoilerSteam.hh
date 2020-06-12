@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -152,6 +153,18 @@ namespace BoilerSteam {
     void GetBoilerInput(BoilerSteamData &boilers);
 
 } // namespace BoilerSteam
+
+    struct BoilerSteamData : BaseGlobalStruct {
+        int numBoilers = 0;
+        bool getSteamBoilerInput = true;
+        Array1D<BoilerSteam::BoilerSpecs> Boiler;
+        void clear_state() override
+        {
+            numBoilers = 0;
+            getSteamBoilerInput = true;
+            Boiler.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

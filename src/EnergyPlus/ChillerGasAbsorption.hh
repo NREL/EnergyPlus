@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -238,6 +239,16 @@ namespace ChillerGasAbsorption {
     void GetGasAbsorberInput(ChillerGasAbsorptionData &chillers);
 
 } // namespace ChillerGasAbsorption
+
+    struct ChillerGasAbsorptionData : BaseGlobalStruct {
+        bool getGasAbsorberInputs = true;
+        Array1D<ChillerGasAbsorption::GasAbsorberSpecs> GasAbsorber;
+        void clear_state() override
+        {
+            getGasAbsorberInputs = true;
+            GasAbsorber.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

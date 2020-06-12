@@ -4081,8 +4081,13 @@ namespace VariableSpeedCoils {
                     }
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
                     // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
+                    if (VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
+                        RatedSourceTempCool = RatedInletWaterTemp;
+                    } else {
+                        RatedSourceTempCool = OutTemp;
+                    }
                     TotCapTempModFac =
-                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
+                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedSourceTempCool);
 
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
@@ -4153,8 +4158,13 @@ namespace VariableSpeedCoils {
 
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
                     // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
+                    if (VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
+                        RatedSourceTempCool = RatedInletWaterTemp;
+                    } else {
+                        RatedSourceTempCool = OutTemp;
+                    }
                     TotCapTempModFac =
-                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
+                        CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedSourceTempCool);
 
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
@@ -4322,7 +4332,7 @@ namespace VariableSpeedCoils {
             }
         }
 
-        // FORCE BACK TO THE RATED AIR FLOW RATE WITH THE SAME RATIO DEFINED BY THE CATLOG DATA
+        // FORCE BACK TO THE RATED AIR FLOW RATE WITH THE SAME RATIO DEFINED BY THE CATALOG DATA
         if (!HardSizeNoDesRunAirFlow) {
             if ((RatedCapCoolTotalAutoSized) && (RatedAirFlowAutoSized)) {
                 RatedAirVolFlowRateDes =
@@ -4643,18 +4653,17 @@ namespace VariableSpeedCoils {
         if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ||
             VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit) {
 
-            RatedSourceTempCool = RatedInletWaterTemp;
+            if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit) {
+                RatedSourceTempCool = RatedInletWaterTemp;
+            } else {
+                RatedSourceTempCool = RatedInletWaterTempHeat;
+            }
 
             if (PltSizNum > 0) {
                 rhoW = rho;
-            } else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit) {
-                rhoW = GetDensityGlycol(PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
-                                        RatedInletWaterTemp,
-                                        PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
-                                        RoutineName);
             } else {
                 rhoW = GetDensityGlycol(PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
-                                        RatedInletWaterTempHeat,
+                                        RatedSourceTempCool,
                                         PlantLoop(VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                         RoutineName);
             }

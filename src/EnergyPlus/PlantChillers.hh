@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -470,6 +471,40 @@ namespace PlantChillers {
     };
 
 } // namespace PlantChillers
+
+    struct PlantChillersData : BaseGlobalStruct {
+
+        int NumElectricChillers = 0;
+        int NumEngineDrivenChillers = 0;
+        int NumGTChillers = 0;
+        int NumConstCOPChillers = 0;
+
+        bool GetEngineDrivenInput = true;
+        bool GetElectricInput = true;
+        bool GetGasTurbineInput = true;
+        bool GetConstCOPInput = true;
+
+        Array1D<PlantChillers::ElectricChillerSpecs> ElectricChiller;
+        Array1D<PlantChillers::EngineDrivenChillerSpecs> EngineDrivenChiller;
+        Array1D<PlantChillers::GTChillerSpecs> GTChiller;
+        Array1D<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
+
+        void clear_state() override
+        {
+            NumElectricChillers = 0;
+            NumEngineDrivenChillers = 0;
+            NumGTChillers = 0;
+            NumConstCOPChillers = 0;
+            GetEngineDrivenInput = true;
+            GetElectricInput = true;
+            GetGasTurbineInput = true;
+            GetConstCOPInput = true;
+            ElectricChiller.deallocate();
+            EngineDrivenChiller.deallocate();
+            GTChiller.deallocate();
+            ConstCOPChiller.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 
