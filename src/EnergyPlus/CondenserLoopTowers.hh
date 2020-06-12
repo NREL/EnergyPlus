@@ -92,7 +92,8 @@ namespace CondenserLoopTowers {
         UFactor
     };
 
-    enum class CapacityControl {
+    enum class CapacityCtrlEnum
+    {
         Unassigned,
         FanCycling,
         FluidBypass
@@ -196,7 +197,7 @@ namespace CondenserLoopTowers {
         int CoolingTowerAFRRFailedIndex;        // Index for air flow rate ratio out of bounds error
         int SpeedSelected;                      // speed of the two-speed fan selected (0:ON;1:LOW;2:HIGH)
         // fluid bypass
-        CapacityControl CapacityControl; // Type of capacity control for single speed cooling tower:
+        CapacityCtrlEnum CapacityControl; // Type of capacity control for single speed cooling tower:
         //  0 - FanCycling, 1 - FluidBypass
         Real64 BypassFraction; // Fraction of fluid bypass as a ratio of total fluid flow
         //  through the tower sump
@@ -366,7 +367,7 @@ namespace CondenserLoopTowers {
               HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0),
               SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0),
               WMFRGreaterThanMaxAvailErrIndex(0), CoolingTowerAFRRFailedCount(0), CoolingTowerAFRRFailedIndex(0), SpeedSelected(0),
-              CapacityControl(CapacityControl::Unassigned), BypassFraction(0.0), NumCell(0), CellCtrl_Num(CellCtrl::Unassigned), NumCellOn(0),
+              CapacityControl(CapacityCtrlEnum::Unassigned), BypassFraction(0.0), NumCell(0), CellCtrl_Num(CellCtrl::Unassigned), NumCellOn(0),
               MinFracFlowRate(0.0), MaxFracFlowRate(0.0),
               EvapLossMode(EvapLoss::MoistTheory), UserEvapLossFactor(0.0), DriftLossFraction(0.0), BlowdownMode(Blowdown::Concentration),
               ConcentrationRatio(0.0), SchedIDBlowdown(0), SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), LoopNum(0),

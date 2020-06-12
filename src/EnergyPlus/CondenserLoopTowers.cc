@@ -473,16 +473,16 @@ namespace CondenserLoopTowers {
 
             //   fluid bypass for single speed tower
             if (lAlphaFieldBlanks(11) || AlphArray(11).empty()) {
-                dataCondenserLoopTowers.towers(TowerNum).CapacityControl = CapacityControl::FanCycling; // FanCycling
+                dataCondenserLoopTowers.towers(TowerNum).CapacityControl = CapacityCtrlEnum::FanCycling; // FanCycling
             } else {
                 {
                     auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(AlphArray(11)));
                     if (SELECT_CASE_var == "FANCYCLING") {
-                        dataCondenserLoopTowers.towers(TowerNum).CapacityControl = CapacityControl::FanCycling;
+                        dataCondenserLoopTowers.towers(TowerNum).CapacityControl = CapacityCtrlEnum::FanCycling;
                     } else if (SELECT_CASE_var == "FLUIDBYPASS") {
-                        dataCondenserLoopTowers.towers(TowerNum).CapacityControl = CapacityControl::FluidBypass;
+                        dataCondenserLoopTowers.towers(TowerNum).CapacityControl = CapacityCtrlEnum::FluidBypass;
                     } else {
-                        dataCondenserLoopTowers.towers(TowerNum).CapacityControl = CapacityControl::FanCycling;
+                        dataCondenserLoopTowers.towers(TowerNum).CapacityControl = CapacityCtrlEnum::FanCycling;
                         ShowWarningError(cCurrentModuleObject + ", \"" + dataCondenserLoopTowers.towers(TowerNum).Name +
                                          "\" The Capacity Control is not specified correctly. The default Fan Cycling is used.");
                     }
@@ -4116,7 +4116,7 @@ namespace CondenserLoopTowers {
                 this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(WaterMassFlowRatePerCell, AirFlowRate, UAdesign);
 
                 if (this->OutletWaterTemp <= TempSetPoint) {
-                    if (this->CapacityControl == CapacityControl::FanCycling || this->OutletWaterTemp <= OWTLowerLimit) {
+                    if (this->CapacityControl == CapacityCtrlEnum::FanCycling || this->OutletWaterTemp <= OWTLowerLimit) {
                         //           Setpoint was met with pump ON and fan ON, calculate run-time fraction
                         FanModeFrac = (TempSetPoint - OutletWaterTempOFF) / (this->OutletWaterTemp - OutletWaterTempOFF);
                         this->FanPower = FanModeFrac * FanPowerOn;
@@ -4140,7 +4140,7 @@ namespace CondenserLoopTowers {
                 }
             } else if (OutletWaterTempOFF < TempSetPoint) {
                 // Need to bypass in free convection cooling mode if bypass is allowed
-                if (this->CapacityControl == CapacityControl::FluidBypass) {
+                if (this->CapacityControl == CapacityCtrlEnum::FluidBypass) {
                     if (OutletWaterTempOFF > OWTLowerLimit) {
                         BypassFlag = 1;
                     }
@@ -5780,7 +5780,7 @@ namespace CondenserLoopTowers {
         }
 
         // Added for fluid bypass
-        if (this->CapacityControl == CapacityControl::FluidBypass) {
+        if (this->CapacityControl == CapacityCtrlEnum::FluidBypass) {
             if (this->EvapLossMode == EvapLoss::UserFactor) EvapVdot *= (1 - this->BypassFraction);
             driftVdot *= (1 - this->BypassFraction);
             BlowDownVdot *= (1 - this->BypassFraction);
