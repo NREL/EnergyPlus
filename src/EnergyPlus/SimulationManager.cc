@@ -1208,7 +1208,7 @@ namespace SimulationManager {
                     } else if (overrideModeValue == "MODE01") {
                         // Zone Time step (TimeStep object) will be set to one timestep per hour
                         overrideTimestep = true;
-                    } else if (overrideModeValue == "MODE01a") {
+                    } else if (overrideModeValue == "MODE02") {
                         // Zone Time step (TimeStep object) will be set to one timestep per hour
                         overrideTimestep = true;
                         // Here add flags related to setting the System Timesteps: (to be implemented)
@@ -1216,22 +1216,22 @@ namespace SimulationManager {
                         overrideSystemTimestep = true;
                         // Set flags related to limiting system time step to 1 hr (via ConvergenceLimits)
                         ///////////////
-                    } else if (overrideModeValue == "MODE02") {
+                    } else if (overrideModeValue == "MODE03") {
                         // Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
-                    } else if (overrideModeValue == "MODE03") {
+                    } else if (overrideModeValue == "MODE04") {
                         // Mode02 plus Minimum Number of Warmup Days will be set to 1
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
-                    } else if (overrideModeValue == "MODE04") {
+                    } else if (overrideModeValue == "MODE05") {
                         // Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
-                    } else if (overrideModeValue == "MODE05") {
+                    } else if (overrideModeValue == "MODE06") {
                         // Mode04 plus internal variable MaxZoneTempDiff will be set to 1.00
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
