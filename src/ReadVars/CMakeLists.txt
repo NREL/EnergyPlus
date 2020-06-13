@@ -33,6 +33,7 @@ endif()
 
 set(SKIP_BUILD_RPATH true)
 add_executable( ReadVarsESO ${SRC} )
+set_target_properties(ReadVarsESO PROPERTIES FOLDER Auxiliary)
 
 install( TARGETS ReadVarsESO DESTINATION PostProcess )
 if(NOT ${STATIC_EXE})

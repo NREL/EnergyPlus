@@ -55,6 +55,40 @@ namespace EnergyPlus {
 
 namespace AirflowNetwork {
 
+    enum VentCtrEnum  // TODO: make enum class
+    {
+        NONE = 0,           // Wrong input
+        TEMP = 1,           // Temperature venting control
+        ENTH = 2,           // Enthalpy venting control
+        CONST = 3,          // Constant venting control
+        ASH55 = 4,
+        CEN15251 = 5,
+        NOVENT = 6,         // No venting
+        ZONELEVEL = 7,      // ZoneLevel control for a heat transfer subsurface
+        ADJTEMP = 8,        // Temperature venting control based on adjacent zone conditions
+        ADJENTH = 9         // Enthalpy venting control based on adjacent zone conditions
+    };
+
+    enum OpenStatus  // TODO: make enum class
+    {
+        FREEOPERATION = 0,           // Free operation
+        MINCHECKFORCEOPEN = 1,      // Force open when opening elapsed time is less than minimum opening time
+        MINCHECKFORCECLOSE = 2      // Force open when closing elapsed time is less than minimum closing time
+    };
+
+    enum ProbabilityCheck  // TODO: make enum class
+    {
+        NOACTION = 0,               // No action from probability check
+        FORCECHANGE = 1,            // Force open or close from probability check
+        KEEPSTATUS = 2              // Keep status at the previous time step from probability check
+    };
+
+    enum class EquivRec {
+        HEIGHT,             // Effective rectangle polygonal height selection
+        BASEASPECTRATIO,    // Effective rectangle base surface aspect ratio selection
+        USERASPECTRATIO     // Effective rectangle user input aspect ratio selection
+    };
+
     // Using/Aliasing
 
     // Data
@@ -284,8 +318,8 @@ namespace AirflowNetwork {
         // Default Constructor
         MultizoneZoneProp()
             : VentControl("NoVent"), Height(0.0), OpenFactor(1.0), LowValueTemp(0.0), UpValueTemp(100.0), LowValueEnth(0.0), UpValueEnth(300000.0),
-              ZoneNum(0), VentSchNum(0), VentCtrNum(0), VentingSchNum(0), SingleSidedCpType("STANDARD"), BuildWidth(10.0), ASH55PeopleInd(0),
-              CEN15251PeopleInd(0), OccupantVentilationControlNum(0), RAFNNodeNum(0)
+              ZoneNum(0), VentSchNum(0), VentCtrNum(VentCtrEnum::NONE), VentingSchNum(0), SingleSidedCpType("STANDARD"),
+              BuildWidth(10.0), ASH55PeopleInd(0), CEN15251PeopleInd(0), OccupantVentilationControlNum(0), RAFNNodeNum(0)
         {
         }
     };
@@ -319,7 +353,7 @@ namespace AirflowNetwork {
         // Modulating the Venting Open Factor with Enthalpic control
         std::string VentingSchName;                 // Name of ventilation temperature control schedule
         int VentSchNum;                             // Zone ventilation schedule number associated with ventilation schedule name
-        int VentSurfCtrNum;                         // Ventilation control mode number: 1 "Temperature", 2 "ENTHALPIC", 3 "CONSTANT", 4 "NOVENT"
+        VentCtrEnum VentSurfCtrNum;                 // Ventilation control mode number: 1 "Temperature", 2 "ENTHALPIC", 3 "CONSTANT", 4 "NOVENT"
         int VentingSchNum;                          // Ventilation schedule number
         int ZonePtr;                                // Pointer to inside face zone
         bool IndVentControl;                        // Individual surface venting control
@@ -342,18 +376,20 @@ namespace AirflowNetwork {
         int OpeningProbStatus;                      // Opening probability status
         bool RAFNflag;                              // True if this surface is used in AirflowNetwork:IntraZone:Linkage
         bool NonRectangular;                        // True if this surface is not rectangular
-        int EquivRecMethod;             // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
-        Real64 EquivRecUserAspectRatio; // user input value when EquivRecMethod = 3
+        EquivRec EquivRecMethod;                    // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
+        Real64 EquivRecUserAspectRatio;             // user input value when EquivRecMethod = 3
 
         // Default Constructor
         MultizoneSurfaceProp()
             : Factor(0.0), SurfNum(0), NodeNums{{0, 0}}, OpenFactor(0.0), OpenFactorLast(0.0), EMSOpenFactorActuated(false), EMSOpenFactor(0.0),
               Height(0.0), Width(0.0), CHeight(0.0), VentControl("ZONELEVEL"), ModulateFactor(0.0), LowValueTemp(0.0), UpValueTemp(100.0),
-              LowValueEnth(0.0), UpValueEnth(300000.0), VentSchNum(0), VentSurfCtrNum(0), VentingSchNum(0), ZonePtr(0), IndVentControl(false),
-              ExtLargeOpeningErrCount(0), ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0), Multiplier(1.0),
+              LowValueEnth(0.0), UpValueEnth(300000.0), VentSchNum(0), VentSurfCtrNum(VentCtrEnum::NONE), VentingSchNum(0), ZonePtr(0),
+              IndVentControl(false), ExtLargeOpeningErrCount(0), ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0), Multiplier(1.0),
               HybridVentClose(false), HybridCtrlGlobal(false), HybridCtrlMaster(false), WindModifier(1.0), OccupantVentilationControlNum(0),
-              OpeningStatus(0), PrevOpeningstatus(0), CloseElapsedTime(0.0), OpenElapsedTime(0.0), ClosingProbStatus(0), OpeningProbStatus(0),
-              RAFNflag(false), NonRectangular(false), EquivRecMethod(1), EquivRecUserAspectRatio(1.0)
+              OpeningStatus(OpenStatus::FREEOPERATION), PrevOpeningstatus(OpenStatus::FREEOPERATION),
+              CloseElapsedTime(0.0), OpenElapsedTime(0.0), ClosingProbStatus(ProbabilityCheck::NOACTION),
+              OpeningProbStatus(ProbabilityCheck::NOACTION), RAFNflag(false), NonRectangular(false),
+              EquivRecMethod(EquivRec::HEIGHT), EquivRecUserAspectRatio(1.0)
         {
         }
     };

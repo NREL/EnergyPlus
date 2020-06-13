@@ -43,6 +43,7 @@ endif()
 
 set(SKIP_BUILD_RPATH TRUE)
 add_executable( AppGPostProcess ${SRC} )
+set_target_properties(AppGPostProcess PROPERTIES FOLDER Auxiliary)
 
 install( TARGETS AppGPostProcess DESTINATION PostProcess )
 if(NOT ${STATIC_EXE})

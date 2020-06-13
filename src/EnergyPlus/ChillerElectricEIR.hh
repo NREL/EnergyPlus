@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -257,6 +258,18 @@ namespace ChillerElectricEIR {
     void GetElectricEIRChillerInput(ChillerElectricEIRData &chillers);
 
 } // namespace ChillerElectricEIR
+
+    struct ChillerElectricEIRData : BaseGlobalStruct {
+        int NumElectricEIRChillers = 0;
+        bool getInputFlag = true;
+        Array1D<ChillerElectricEIR::ElectricEIRChillerSpecs> ElectricEIRChiller;
+        void clear_state() override
+        {
+            NumElectricEIRChillers = 0;
+            getInputFlag = true;
+            ElectricEIRChiller.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 
