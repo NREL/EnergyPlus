@@ -133,27 +133,6 @@ namespace HVACControllers {
 
     // Types
 
-    class TraceFileHandle
-    {
-        std::shared_ptr<OutputFile> file;
-        OutputFile *ptr() {
-            if (!file) {
-                file = std::make_shared<OutputFile>("");
-            }
-
-            return file.get();
-        }
-
-    public:
-        OutputFile &operator*() {
-            return *ptr();
-        }
-
-        OutputFile *operator->() {
-            return ptr();
-        }
-
-    };
 
     struct SolutionTrackerType
     {
@@ -244,7 +223,7 @@ namespace HVACControllers {
         // --------------------
         // Trace mechanism
         // --------------------
-        TraceFileHandle TraceFile;
+        SharedFileHandle TraceFile;
         bool FirstTraceFlag;   // To detect first individual write operation to individual controller trace file
         int BadActionErrCount; // Counts number of incorrect action errors
         int BadActionErrIndex; // index to recurring error structure for bad action error
@@ -291,7 +270,7 @@ namespace HVACControllers {
 
         // Shared_ptr because we need to put this into an Array1D which is not
         // friendly with move-only types
-        TraceFileHandle TraceFile;
+        SharedFileHandle TraceFile;
         // Used only if > 0. Same size as NumPrimaryAirSys
         bool FirstTraceFlag;                          // To detect first trace to air loop trace file
         int NumCalls;                                 // Number of times air loop is simulated (number of calls to SimAirLoop)

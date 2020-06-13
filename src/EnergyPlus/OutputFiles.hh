@@ -150,6 +150,30 @@ private:
     static OutputFiles *&getSingletonInternal();
 };
 
+class SharedFileHandle
+{
+    std::shared_ptr<OutputFile> file;
+    OutputFile *ptr()
+    {
+        if (!file) {
+            file = std::make_shared<OutputFile>("");
+        }
+
+        return file.get();
+    }
+
+public:
+    OutputFile &operator*()
+    {
+        return *ptr();
+    }
+
+    OutputFile *operator->()
+    {
+        return ptr();
+    }
+};
+
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);
 std::string vprint(fmt::string_view format_str, fmt::format_args args, const std::size_t count);
 

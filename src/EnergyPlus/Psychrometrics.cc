@@ -313,7 +313,11 @@ namespace Psychrometrics {
 #endif
     }
 
-    void ShowPsychrometricSummary()
+#ifdef EP_psych_stats
+    void ShowPsychrometricSummary(OutputFile &auditFile)
+#else
+    void ShowPsychrometricSummary(OutputFile &)
+#endif
     {
 
         // SUBROUTINE INFORMATION:
@@ -349,22 +353,20 @@ namespace Psychrometrics {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 #ifdef EP_psych_stats
-        int EchoInputFile; // found unit number for "eplusout.audit"
         int Loop;
         Real64 AverageIterations;
 
-        EchoInputFile = FindUnitNumber(outputAuditFile);
-        if (EchoInputFile == 0) return;
+        if (!auditFile.good()) return;
         if (any_gt(NumTimesCalled, 0)) {
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "RoutineName,#times Called,Avg Iterations";
+            print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
             for (Loop = 1; Loop <= NumPsychMonitors; ++Loop) {
                 if (!PsyReportIt(Loop)) continue;
                 const auto istring = fmt::to_string(NumTimesCalled(Loop));
                 if (NumIterations(Loop) > 0) {
                     AverageIterations = double(NumIterations(Loop)) / double(NumTimesCalled(Loop));
-                    ObjexxFCL::gio::write(EchoInputFile, fmtA) << PsyRoutineNames(Loop) + ',' + istring + ',' + RoundSigDigits(AverageIterations, 2);
+                    print(auditFile, "{},{},{:.2R}\n", PsyRoutineNames(Loop), istring, AverageIterations);
                 } else {
-                    ObjexxFCL::gio::write(EchoInputFile, fmtA) << PsyRoutineNames(Loop) + ',' + istring;
+                    print(auditFile, "{},{}\n", PsyRoutineNames(Loop), istring);
                 }
             }
         }

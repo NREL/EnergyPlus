@@ -786,7 +786,7 @@ namespace UtilityRoutines {
         }
 
 #ifdef EP_Detailed_Timings
-        epSummaryTimes(Time_Finish - Time_Start);
+        epSummaryTimes(state.outputFiles.audit, Time_Finish - Time_Start);
 #endif
         std::cerr << "Program terminated: "
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
