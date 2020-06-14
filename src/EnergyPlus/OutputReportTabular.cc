@@ -294,6 +294,7 @@ namespace OutputReportTabular {
     bool displayEconomicResultSummary(false);
     bool displayHeatEmissionsSummary(false);
     bool displayEioSummary(false);
+    bool displayThermalResilienceSummary(false);
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
@@ -585,6 +586,7 @@ namespace OutputReportTabular {
         displayTariffReport = false;
         displayEconomicResultSummary = false;
         displayHeatEmissionsSummary = false;
+        displayThermalResilienceSummary = false;
         displayEioSummary = false;
         meterNumTotalsBEPS = Array1D_int(numResourceTypes, 0);
         meterNumTotalsSource = Array1D_int(numSourceTypes, 0);
@@ -2062,6 +2064,10 @@ namespace OutputReportTabular {
                     displayHeatEmissionsSummary = true;
                     WriteTabularFiles = true;
                     nameFound = true;
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "ThermalResilienceSummary")) {
+                    displayThermalResilienceSummary = true;
+                    WriteTabularFiles = true;
+                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2085,6 +2091,7 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
+                    displayThermalResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2105,6 +2112,7 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
+                    displayThermalResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2135,6 +2143,7 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
+                    displayThermalResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2158,6 +2167,7 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
+                    displayThermalResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -3734,6 +3744,7 @@ namespace OutputReportTabular {
         static std::string const Adaptive_Comfort_Summary("Adaptive Comfort Summary");
         static std::string const Initialization_Summary("Initialization Summary");
         static std::string const Annual_Heat_Emissions_Summary("Annual Heat Emissions Summary");
+        static std::string const Annual_Thermal_Resilience_Summary("Annual Thermal Resilience Summary");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -3804,6 +3815,10 @@ namespace OutputReportTabular {
                 if (displayHeatEmissionsSummary) {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Heat_Emissions_Summary, Entire_Facility)
                                << "\">Annual Heat Emissions Summary</a>\n";
+                }
+                if (displayThermalResilienceSummary) {
+                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Thermal_Resilience_Summary, Entire_Facility)
+                               << "\">Annual Thermal Resilience Summary</a>\n";
                 }
                 for (kReport = 1; kReport <= numReportName; ++kReport) {
                     if (reportName(kReport).show) {

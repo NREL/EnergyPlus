@@ -232,6 +232,9 @@ namespace DataHeatBalFanSys {
     extern Array1D_int TempControlType;
     extern Array1D_int ComfortControlType;
 
+    extern Array1D<Real64> ZoneHeatIndex;
+    extern Array1D<Real64> ZoneHumidex;
+
     // Types
 
     struct ZoneComfortControlsFangerData

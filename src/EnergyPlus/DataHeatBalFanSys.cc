@@ -240,6 +240,9 @@ namespace DataHeatBalFanSys {
     Array1D_int TempControlType;
     Array1D_int ComfortControlType;
 
+    Array1D<Real64> ZoneHeatIndex;
+    Array1D<Real64> ZoneHumidex;
+
     // Object Data
     Array1D<ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
 
@@ -360,6 +363,8 @@ namespace DataHeatBalFanSys {
         ZoneW1.deallocate();
         TempControlType.deallocate();
         ComfortControlType.deallocate();
+        ZoneHeatIndex.deallocate();
+        ZoneHumidex.deallocate();
         ZoneComfortControlsFanger.deallocate();
     }
 

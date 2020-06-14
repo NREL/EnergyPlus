@@ -5517,6 +5517,8 @@ namespace HeatBalanceManager {
         LoadZoneRptStdDev.allocate(NumOfTimeStepInHour * 24);
         // MassConservation.allocate( NumOfZones );
 
+        ZoneHeatIndex.dimension(NumOfZones, 0.0);
+        ZoneHumidex.dimension(NumOfZones, 0.0);
         CountWarmupDayPoints = 0;
     }
 

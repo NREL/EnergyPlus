@@ -274,6 +274,8 @@ namespace HeatBalanceSurfaceManager {
         ReportSurfaceHeatBalance();
         if (ZoneSizingCalc) GatherComponentLoadsSurface();
 
+        ReportThermalResilience();
+
         ManageSurfaceHeatBalancefirstTime = false;
     }
 
@@ -4865,6 +4867,54 @@ namespace HeatBalanceSurfaceManager {
 
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
+
+    void ReportThermalResilience() {
+
+        double c1 = -8.78469475556;
+        double c2 = 1.61139411;
+        double c3 = 2.33854883889;
+        double c4 = -0.14611605;
+        double c5 = -0.012308094;
+        double c6 = -0.0164248277778;
+        double c7 = 0.002211732;
+        double c8 = 0.00072546;
+        double c9 = -0.000003582;
+
+        if (ManageSurfaceHeatBalancefirstTime) {
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                SetupOutputVariable("Zone Heat Index",
+                                    OutputProcessor::Unit::C,
+                                    DataHeatBalFanSys::ZoneHeatIndex(ZoneNum),
+                                    "Zone",
+                                    "State",
+                                    Zone(ZoneNum).Name);
+                SetupOutputVariable("Zone Humidity Index ",
+                                    OutputProcessor::Unit::None,
+                                    DataHeatBalFanSys::ZoneHumidex(ZoneNum),
+                                    "Zone",
+                                    "State",
+                                    Zone(ZoneNum).Name);
+            }
+
+        }
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            double ZoneT = DataHeatBalFanSys::ZTAV(ZoneNum);
+            double ZoneW = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
+            double ZoneRH = Psychrometrics::PsyRhFnTdbWPb(ZoneT, ZoneW, OutBaroPress);
+            double HI = c1 + c2 * ZoneT + c3 * ZoneRH + c4 * ZoneT * ZoneRH +
+                        c5 * ZoneT * ZoneT + c6 * ZoneRH * ZoneRH +
+                        c7 * ZoneT * ZoneT * ZoneRH + c8 * ZoneT * ZoneRH * ZoneRH +
+                        c9 * ZoneT * ZoneT * ZoneRH * ZoneRH;
+            double TDewPointK = Psychrometrics::PsyTdpFnWPb(ZoneW, OutBaroPress) + KelvinConv;
+            double e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
+            double h = 5.0 / 9.0 * (e - 10.0);
+            double Humidex = ZoneT + h;
+
+            DataHeatBalFanSys::ZoneHeatIndex(ZoneNum) = HI;
+            DataHeatBalFanSys::ZoneHumidex(ZoneNum) = Humidex;
+        } // loop over zones
+
+    }
 
     void ReportSurfaceHeatBalance()
     {

@@ -144,6 +144,8 @@ namespace HeatBalanceSurfaceManager {
     
     void ReportIntMovInsInsideSurfTemp();
 
+    void ReportThermalResilience();
+
     // End of Reporting subroutines for the HB Module
     // *****************************************************************************
 

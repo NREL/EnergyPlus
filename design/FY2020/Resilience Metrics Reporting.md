@@ -341,13 +341,10 @@ To be developed.
 
 ## Input Description ##
 
-The `Output:Table:SummaryReports` object will be modified to take six new keys as the choice:
-- **ThermalResilienceHoursSummary** for indoor thermal resilience unmet hours summary report
-- **ThermalResilienceOccupantHoursSummary** for indoor thermal resilience unmet occupant·hours summary report
-- **IAQResilienceHoursSummary** for indoor air quality resilience unmet hours summary report
-- **IAQResilienceOccupantHoursSummary** for indoor air quality resilience unmet occupant·hours summary report
-- **VisualResilienceHoursSummary** for indoor illuminance resilience unmet hours summary report
-- **VisualResilienceOccupantHoursSummary** for indoor illuminance resilience unmet occupant·hours summary report
+The `Output:Table:SummaryReports` object will be modified to take three new keys as the choice:
+- **ThermalResilienceSummary** for indoor thermal resilience unmet hours & occupant·hours summary report
+- **IAQResilienceHoursSummary** for indoor air quality resilience unmet hours & occupant·hours summary report
+- **VisualResilienceHoursSummary** for indoor illuminance resilience unmet hours & occupant·hours summary report
 
 ## Outputs Description ##
 
