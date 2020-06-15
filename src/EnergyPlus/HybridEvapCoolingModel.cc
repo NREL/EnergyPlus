@@ -361,7 +361,7 @@ namespace HybridEvapCoolingModel {
         }
     }
 
-    bool CMode::GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA)
+    void CMode::GenerateSolutionSpace()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Maxwell Dutton
@@ -385,24 +385,26 @@ namespace HybridEvapCoolingModel {
         // na
 
         // Using/Aliasing
-        Real64 deltaMsa = Max_Msa - Min_Msa;
-        Real64 deltaOAF = Max_OAF - Min_OAF;
-        if (deltaMsa < ResolutionMsa) {
-            deltaMsa = ResolutionMsa;
-        }
-        if (deltaOAF < ResolutionOSA) {
-            deltaOAF = ResolutionOSA;
-        }
-        Real64 Msastep_size = (deltaMsa * ResolutionMsa);
-        Real64 OAFsteps_size = (deltaOAF * ResolutionOSA);
 
-        for (Real64 Msa_val = Max_Msa; Msa_val >= Min_Msa; Msa_val = Msa_val - Msastep_size) {
-            for (Real64 OAF_val = Max_OAF; OAF_val >= Min_OAF; OAF_val = OAF_val - OAFsteps_size) {
-                sol.AddItem(Msa_val, OAF_val);
+        if (Min_Msa == Max_Msa){
+            sol.MassFlowRatio.push_back(Max_Msa);
+        } else {
+            Real64 ResolutionMsa = (Max_Msa-Min_Msa)/5;
+            for (Real64 Msa_val = Min_Msa; Msa_val <= Max_Msa; Msa_val += ResolutionMsa) {
+                sol.MassFlowRatio.push_back(Msa_val);
             }
         }
-        return true;
+
+        if (Min_OAF == Max_OAF){
+            sol.OutdoorAirFraction.push_back(Max_Msa);
+        } else {
+            Real64 ResolutionOSA = (Max_OAF-Min_OAF)/5;
+            for (Real64 OAF_val = Min_OAF; OAF_val <= Max_OAF; OAF_val += ResolutionOSA) {
+                sol.OutdoorAirFraction.push_back(OAF_val);
+            }
+        }
     }
+
     bool CMode::ValidateArrays(Array1D_string Alphas,
                                Array1D_string EP_UNUSED(cAlphaFields),
                                Array1D<Real64> Numbers,
@@ -968,13 +970,10 @@ namespace HybridEvapCoolingModel {
             return;
         }
         Initialized = true;
-        // this variable, at this point hard coded, sets the fidelity of the matrix of possible OSAF and Msa combinations.
-        ResolutionMsa = 0.2; // msa/msaRATED
-        ResolutionOSA = 0.2; // OSAF as absolute fraction (not %)
 
         // Iterate through modes of operation generating a matrix of OSAF and Msa to test in the algorithm.
         for (auto &thisOperatingMode : OperatingModes) {
-            thisOperatingMode.GenerateSolutionSpace(ResolutionMsa, ResolutionOSA);
+            thisOperatingMode.GenerateSolutionSpace();
         }
 
         Initialized = true;

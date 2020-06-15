@@ -87,11 +87,6 @@ namespace HybridEvapCoolingModel {
     public:
         std::vector<Real64> MassFlowRatio;
         std::vector<Real64> OutdoorAirFraction;
-        void AddItem(Real64 X, Real64 Y)
-        {
-            MassFlowRatio.push_back(X);
-            OutdoorAirFraction.push_back(Y);
-        }
     };
 
     class CMode
@@ -159,7 +154,7 @@ namespace HybridEvapCoolingModel {
         bool InitializeReturnAirTemperatureConstraints(Real64 min, Real64 max);
         bool InitializeReturnAirHumidityRatioConstraints(Real64 min, Real64 max);
         bool InitializeReturnAirRelativeHumidityConstraints(Real64 min, Real64 max);
-        bool GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA);
+        void GenerateSolutionSpace();
         bool MeetsOAEnvConstraints(Real64 Tosa, Real64 Wosa, Real64 RHos);
 
     private:
@@ -400,8 +395,7 @@ namespace HybridEvapCoolingModel {
         std::vector<int> SAT_OC_MetinMode_v;
         std::vector<int> SAHR_OC_MetinMode_v;
         bool WarnOnceFlag;
-        Real64 ResolutionMsa;
-        Real64 ResolutionOSA;
+
         int count_EnvironmentConditionsNotMet;
         int count_EnvironmentConditionsMetOnce;
         int count_SAHR_OC_MetOnce;

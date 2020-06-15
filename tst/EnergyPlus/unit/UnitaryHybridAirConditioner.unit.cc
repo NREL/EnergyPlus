@@ -1212,12 +1212,6 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ModelOperatingSetting
     pZoneHybridUnitaryAirConditioner->SecInletPressure = 101325;
     pZoneHybridUnitaryAirConditioner->SecInletRH = RHosa / 1000;
 
-
-    Real64 test = PsyWFnTdbRhPb(Tosa/10000, RHosa / 1000, 0);
-
-    //Real64 test1 = PsyWFnTdbRhPb(Tosa / 100, RHosa / 100, 0);
-
-
     Real64 Requestedheating = -122396.255;  // Watts (Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate
     Real64 RequestedCooling = -58469.99445; // Watts (Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate
     Real64 Requested_Humidification = 0;
@@ -1228,8 +1222,13 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ModelOperatingSetting
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
 
-    int sizeSettings = pZoneHybridUnitaryAirConditioner->Settings.size();
-    EXPECT_EQ(864, sizeSettings);
+    for(size_t i = 0; i < pZoneHybridUnitaryAirConditioner->Settings.size(); i++){
+        int MassFlowSolutionSize = pZoneHybridUnitaryAirConditioner->Settings[i].oMode.sol.MassFlowRatio.size();
+        int OutdoorAirFractionSolutionSize = pZoneHybridUnitaryAirConditioner->Settings[i].oMode.sol.OutdoorAirFraction.size();
+
+        EXPECT_EQ(6, MassFlowSolutionSize);
+        EXPECT_EQ(6, OutdoorAirFractionSolutionSize);
+    }
 }
 
 } // namespace EnergyPlus
