@@ -951,7 +951,7 @@ The number of hours any zone is oscillating for Run 1 the Normal baseline case u
 
 The decision on which mode to use is up to the individual modelers, but for these simulations, Run 3 is recommended. Run 3 does not use direct coil solution, uses ScriptF, and Mode03. This simulation saves some time (a few seconds) compared to Mode01 but doesn’t add any additional overrides, which should be avoided if not adding value. Mode04 and Mode05 for this model were just about the same time as Mode03.  Mode06 was avoided because of the substantially larger oscillating hours.
 
-Additional guidance on how to make EnergyPlus faster appears in the "Tips And Tricks for Using EnergyPlus" document that is distributed with EnergyPlus within the section titled "Platforms and Run-Time."
+Additional guidance on how to make EnergyPlus faster appears in the ``Tips And Tricks for Using EnergyPlus'' document that is distributed with EnergyPlus within the section titled ``Platforms and Run-Time.''
 
 
 \paragraph{Field: Use Coil Direct Solutions}\label{use-coil-direct-solutions}
@@ -1081,7 +1081,7 @@ The increasing mode number roughly corresponds with increased speed. Mode01 to M
 
 \paragraph{Field: MaxZoneTempDiff}\label{max-zone-temp-diff}
 
-This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxZoneTempDiff variable within EnergyPlus. This variable sets the maximum zone temperature change before the HVAC timestep is shortened. Larger values result in fewer iterations. To understand this input completely, please review the use of the MaxZoneTempDiff variable in the ManageHVAC() routine located in the HVACManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.3, which is also the default value. Testing has been done with a value of 1.0, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 1.0 have not been tested.
+This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxZoneTempDiff variable within EnergyPlus. This variable sets the maximum zone temperature change before the HVAC timestep is shortened. Larger values result in fewer iterations. To understand this input completely, please review the use of the MaxZoneTempDiff variable in the ManageHVAC() routine located in the HVACManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.3 ($^\circ$C), which is also the default value. Testing has been done with a value of 1.0, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 1.0 have not been tested.
 
 
 An IDF example:
@@ -1096,7 +1096,7 @@ PerformancePrecisionTradeoffs,
 
 \paragraph{Field: MaxAllowedDelTemp}\label{max-allowed-del-temp}
 
-This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxAllowedDelTemp variable within EnergyPlus. This variable sets the maximum surface temperature change before the HVAC timestep is shortened. Similar to the \textbf{MaxZoneTempDiff} parameter, larger \textbf{MaxAllowedDelTemp} values result in fewer iterations. To understand this input completely, please review the use of the \textbf{MaxAllowedDetTemp} variable in the CalcHeatBalanceInsideSurf2() routine located in the HeatBalanceSurfaceManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.002, which is also the default value. Testing has been done with a value of 0.1, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 0.1 have not been tested.
+This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxAllowedDelTemp variable within EnergyPlus. This variable sets the maximum surface temperature change before the HVAC timestep is shortened. Similar to the \textbf{MaxZoneTempDiff} parameter, larger \textbf{MaxAllowedDelTemp} values result in fewer iterations. To understand this input completely, please review the use of the \textbf{MaxAllowedDetTemp} variable in the CalcHeatBalanceInsideSurf2() routine located in the HeatBalanceSurfaceManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.002 ($^\circ$C), which is also the default value. Testing has been done with a value of 0.1, which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 0.1 have not been tested.
 
 
 \subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
