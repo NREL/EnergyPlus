@@ -1257,6 +1257,12 @@ namespace SimulationManager {
                                              RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 4));
                             advancedModeUsed = true;
                         }
+                        if (fields.find("maxalloweddeltemp") != fields.end()) { // not required field, has default value
+                            DataConvergParams::MaxAllowedDelTempOverrideValue = fields.at("maxalloweddeltemp");
+                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: " +
+                                             RoundSigDigits(DataConvergParams::MaxAllowedDelTempOverrideValue, 4));
+                            advancedModeUsed = true;
+                        }
                         if (advancedModeUsed) {
                             ShowContinueError("...Care should be used when using the Advanced Overrude Mode. Results may be signficantly different "
                                               "than a simulation not using this mode.");
