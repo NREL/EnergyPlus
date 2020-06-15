@@ -103,8 +103,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "MinSizeRel" "RelWithDebInfo")
 endif()
 
-# we are making *a Python 3 Interpreter* a required dependency, so find it here
-find_package(PythonInterp 3 REQUIRED)
+# we are making *a Python 3.6 Interpreter* a required dependency, so find it here
+find_package(PythonInterp 3.6 REQUIRED)
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
@@ -337,6 +337,7 @@ if( BUILD_PACKAGE )
 endif()
 
 if (BUILD_DOCS)
+  set(DOCS_TESTING ${BUILD_TESTING} CACHE INTERNAL "" FORCE)
   add_subdirectory(doc)
 endif()
 
