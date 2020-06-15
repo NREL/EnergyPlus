@@ -207,8 +207,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     HybridModelZone(1).InfiltrationCalc_C = false;
     HybridModelZone(1).PeopleCountCalc_C = false;
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    dataZonePlenum.NumZoneReturnPlenums = 0;
+    dataZonePlenum.NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(1);
     VAMFL.allocate(1);
@@ -364,8 +364,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     HybridModelZone(1).InfiltrationCalc_C = false;
     HybridModelZone(1).PeopleCountCalc_C = false;
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    dataZonePlenum.NumZoneReturnPlenums = 0;
+    dataZonePlenum.NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(1);
     VAMFL.allocate(1);
@@ -548,8 +548,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     OutBaroPress = 101325.0;
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    dataZonePlenum.NumZoneReturnPlenums = 0;
+    dataZonePlenum.NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(3);
     VAMFL.allocate(3);
@@ -756,8 +756,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     OutBaroPress = 101325.0;
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    dataZonePlenum.NumZoneReturnPlenums = 0;
+    dataZonePlenum.NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(3);
     VAMFL.allocate(3);

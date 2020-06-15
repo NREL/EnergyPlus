@@ -53,28 +53,16 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace ZonePlenum {
-
-    // Using/Aliasing
-
-    // Data
-    // DERIVED TYPE DEFINITIONS
-
-    extern int NumZonePlenums;       // The Number of ZonePlenums found in the Input
-    extern int NumZoneReturnPlenums; // The Number of ZoneReturnPlenums found in the Input
-    extern int NumZoneSupplyPlenums; // The Number of ZoneSupplyPlenums found in the Input
-    extern Array1D_bool CheckRetEquipName;
-    extern Array1D_bool CheckSupEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ZONEPLENUM
-
-    // Types
 
     struct ZoneReturnPlenumConditions
     {
@@ -168,10 +156,6 @@ namespace ZonePlenum {
         }
     };
 
-    // Object Data
-    extern Array1D<ZoneReturnPlenumConditions> ZoneRetPlenCond;
-    extern Array1D<ZoneSupplyPlenumConditions> ZoneSupPlenCond;
-
     // Functions
 
     void clear_state();
@@ -245,6 +229,37 @@ namespace ZonePlenum {
     // *****************************************************************************
 
 } // namespace ZonePlenum
+
+struct ZonePlenumData : BaseGlobalStruct {
+
+    bool GetInputFlag = true; // Flag set to make sure you get input once
+    bool InitAirZoneReturnPlenumEnvrnFlag = true;
+    bool InitAirZoneReturnPlenumOneTimeFlag = true;
+
+    int NumZonePlenums;       // The Number of ZonePlenums found in the Input
+    int NumZoneReturnPlenums; // The Number of ZoneReturnPlenums found in the Input
+    int NumZoneSupplyPlenums; // The Number of ZoneSupplyPlenums found in the Input
+    Array1D_bool CheckRetEquipName;
+    Array1D_bool CheckSupEquipName;
+
+    // Object Data
+    Array1D<ZonePlenum::ZoneReturnPlenumConditions> ZoneRetPlenCond;
+    Array1D<ZonePlenum::ZoneSupplyPlenumConditions> ZoneSupPlenCond;
+
+    void clear_state() override
+    {
+        GetInputFlag = true;
+        InitAirZoneReturnPlenumEnvrnFlag = true;
+        InitAirZoneReturnPlenumOneTimeFlag = true;
+        NumZonePlenums = 0;
+        NumZoneReturnPlenums = 0;
+        NumZoneSupplyPlenums = 0;
+        ZoneRetPlenCond.deallocate();
+        ZoneSupPlenCond.deallocate();
+    }
+};
+
+extern ZonePlenumData dataZonePlenum;
 
 } // namespace EnergyPlus
 

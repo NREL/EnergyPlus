@@ -257,6 +257,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
     dataAirflowNetworkBalanceManager.clear_state();
+    dataZonePlenum.clear_state();
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
@@ -304,7 +305,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     EMSManager::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
-    //ExteriorEnergyUse::clear_state();
     FanCoilUnits::clear_state();
     Fans::clear_state();
     FaultsManager::clear_state();
@@ -420,7 +420,6 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     ZoneContaminantPredictorCorrector::clear_state();
     ZoneDehumidifier::clear_state();
     ZoneEquipmentManager::clear_state();
-    ZonePlenum::clear_state();
     ZoneTempPredictorCorrector::clear_state();
     ResultsFramework::clear_state();
 }

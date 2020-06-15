@@ -243,8 +243,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     // Parameter setup
     NumOfZones = 1;
     CurZoneEqNum = 1;
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    dataZonePlenum.NumZoneReturnPlenums = 0;
+    dataZonePlenum.NumZoneSupplyPlenums = 0;
     AirflowNetwork::SimulateAirflowNetwork = 0;
     Zone(1).IsControlled = true;
     Zone(1).ZoneEqNum = 1;
@@ -737,8 +737,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     // Parameter setup
     NumOfZones = 1;
     CurZoneEqNum = 1;
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    dataZonePlenum.NumZoneReturnPlenums = 0;
+    dataZonePlenum.NumZoneSupplyPlenums = 0;
     AirflowNetwork::SimulateAirflowNetwork = 0;
     Zone(1).IsControlled = true;
     Zone(1).ZoneEqNum = 1;

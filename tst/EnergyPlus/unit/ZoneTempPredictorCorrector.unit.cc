@@ -150,8 +150,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     Zone(1).SurfaceLast = 2;
     Surface.allocate(2);
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    dataZonePlenum.NumZoneReturnPlenums = 0;
+    dataZonePlenum.NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(1);
     VAMFL.allocate(1);
@@ -1045,8 +1045,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     HConvIn(2) = 0.5;
     HConvIn(3) = 0.5;
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    dataZonePlenum.NumZoneReturnPlenums = 0;
+    dataZonePlenum.NumZoneSupplyPlenums = 0;
 
     CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
     EXPECT_EQ(5.0, SumHA);

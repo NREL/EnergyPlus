@@ -2478,10 +2478,10 @@ namespace ZoneContaminantPredictorCorrector {
         using DataEnvironment::DayOfYear;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
-        using ZonePlenum::NumZoneReturnPlenums;
-        using ZonePlenum::NumZoneSupplyPlenums;
-        using ZonePlenum::ZoneRetPlenCond;
-        using ZonePlenum::ZoneSupPlenCond;
+        //using ZonePlenum::NumZoneReturnPlenums;
+        //using ZonePlenum::NumZoneSupplyPlenums;
+        //using ZonePlenum::ZoneRetPlenCond;
+        //using ZonePlenum::ZoneSupPlenCond;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2616,14 +2616,14 @@ namespace ZoneContaminantPredictorCorrector {
 
             // Check to see if this is a plenum zone
             ZoneRetPlenumAirFlag = false;
-            for (ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= NumZoneReturnPlenums; ++ZoneRetPlenumNum) {
-                if (ZoneRetPlenCond(ZoneRetPlenumNum).ActualZoneNum != ZoneNum) continue;
+            for (ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= dataZonePlenum.NumZoneReturnPlenums; ++ZoneRetPlenumNum) {
+                if (dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ActualZoneNum != ZoneNum) continue;
                 ZoneRetPlenumAirFlag = true;
                 break;
             } // ZoneRetPlenumNum
             ZoneSupPlenumAirFlag = false;
-            for (ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= NumZoneSupplyPlenums; ++ZoneSupPlenumNum) {
-                if (ZoneSupPlenCond(ZoneSupPlenumNum).ActualZoneNum != ZoneNum) continue;
+            for (ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= dataZonePlenum.NumZoneSupplyPlenums; ++ZoneSupPlenumNum) {
+                if (dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).ActualZoneNum != ZoneNum) continue;
                 ZoneSupPlenumAirFlag = true;
                 break;
             } // ZoneSupPlenumNum
@@ -2648,23 +2648,23 @@ namespace ZoneContaminantPredictorCorrector {
 
                 // Do the calculations for the plenum zone
             } else if (ZoneRetPlenumAirFlag) {
-                for (NodeNum = 1; NodeNum <= ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
+                for (NodeNum = 1; NodeNum <= dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
 
                     if (Contaminant.CO2Simulation) {
-                        CO2MassFlowRate += (Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate *
-                                            Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).CO2) /
+                        CO2MassFlowRate += (Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate *
+                                            Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).CO2) /
                                            ZoneMult;
                     }
                     if (Contaminant.GenericContamSimulation) {
-                        GCMassFlowRate += (Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate *
-                                           Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).GenContam) /
+                        GCMassFlowRate += (Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate *
+                                           Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).GenContam) /
                                           ZoneMult;
                     }
-                    ZoneMassFlowRate += Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
+                    ZoneMassFlowRate += Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
                 } // NodeNum
                   // add in the leak flow
-                for (ADUListIndex = 1; ADUListIndex <= ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
-                    ADUNum = ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
+                for (ADUListIndex = 1; ADUListIndex <= dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
+                    ADUNum = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                     if (AirDistUnit(ADUNum).UpStreamLeak) {
                         ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                         if (Contaminant.CO2Simulation) {
@@ -2691,15 +2691,15 @@ namespace ZoneContaminantPredictorCorrector {
 
                 if (Contaminant.CO2Simulation) {
                     CO2MassFlowRate +=
-                        (Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate * Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).CO2) /
+                        (Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate * Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).CO2) /
                         ZoneMult;
                 }
                 if (Contaminant.GenericContamSimulation) {
-                    GCMassFlowRate += (Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate *
-                                       Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).GenContam) /
+                    GCMassFlowRate += (Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate *
+                                       Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).GenContam) /
                                       ZoneMult;
                 }
-                ZoneMassFlowRate += Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate / ZoneMult;
+                ZoneMassFlowRate += Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate / ZoneMult;
             }
 
             SysTimeStepInSeconds = SecInHour * TimeStepSys;
