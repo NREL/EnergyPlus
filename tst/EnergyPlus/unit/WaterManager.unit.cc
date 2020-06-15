@@ -45,55 +45,79 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+
+// Google Test Headers
+#include <gtest/gtest.h>
+
 // EnergyPlus Headers
-#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
-namespace EnergyPlus {
+#include "Fixtures/EnergyPlusFixture.hh"
 
-namespace DataReportingFlags {
 
-    // Module containing the data and routines dealing with Reporting Flags
+using namespace EnergyPlus;
 
-    // MODULE INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   December 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
+{
+    // This unit test ensures that the WaterManager correctly calculates the Rainfall CurrentRate
+    std::string const idf_objects = delimited_string({
+        "Site:Precipitation,",
+        "ScheduleAndDesignLevel,  !- Precipitation Model Type",
+        "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
+        "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
+        "0.80771;                 !- Average Total Annual Precipitation {m/yr}",
 
-    // PURPOSE OF THIS MODULE:
-    // The module contains various reporting flags and character strings
-    // that are used in a small number of modules.
+        "Schedule:Constant,",
+        "PrecipitationSchd,",
+        ",",
+        "1;",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
 
-    // METHODOLOGY EMPLOYED:
-    // na
+    WaterManager::GetWaterManagerInput();
 
-    // REFERENCES:
-    // na
+    ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    // OTHER NOTES:
-    // na
+    WaterManager::UpdatePrecipitation();
 
-    // USE STATEMENTS:
-    // na
+    Real64 ExpectedNomAnnualRain = 0.80771;
+    Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobals::SecInHour;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    Real64 NomAnnualRain = DataWater::RainFall.NomAnnualRain;
+    EXPECT_NEAR(NomAnnualRain, ExpectedNomAnnualRain, 0.000001);
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+    Real64 CurrentRate = DataWater::RainFall.CurrentRate;
+    EXPECT_NEAR(CurrentRate, ExpectedCurrentRate, 0.000001);
+}
 
-    // MODULE VARIABLE DECLARATIONS:
-    int NumOfWarmupDays(0); // reinitialized for each environment.
-    std::string cWarmupDay;
-    bool DisplayPerfSimulationFlag(false);        // True when "Performing Simulation" should be displayed
-    bool DoWeatherInitReporting(false);           // Init reporting -- items that go onto OutputFileInits (eio)
-    bool PrintEndDataDictionary(false);           // Flag for printing "End of Data Dictionary" on output files
-    bool MakeMirroredDetachedShading(true);       // True (default) when Detached Shading Surfaces should be "mirrored"
-    bool MakeMirroredAttachedShading(true);       // True (default) when Attached Shading Surfaces should be "mirrored"
-    bool DebugOutput(false);
-    bool EvenDuringWarmup(false);
+TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
+{
+    // This unit test ensures that the WaterManager does not attempt a divide by zero error when
+    // the average total annual precipitation input is zero.
+    std::string const idf_objects = delimited_string({
+        "Site:Precipitation,",
+        "ScheduleAndDesignLevel,  !- Precipitation Model Type",
+        "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
+        "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
+        "0.0;                     !- Average Total Annual Precipitation {m/yr}",
 
-} // namespace DataReportingFlags
+        "Schedule:Constant,",
+        "PrecipitationSchd,",
+        ",",
+        "1;",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+    WaterManager::GetWaterManagerInput();
 
-} // namespace EnergyPlus
+    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+
+    WaterManager::UpdatePrecipitation();
+
+    Real64 NomAnnualRain = DataWater::RainFall.NomAnnualRain;
+    EXPECT_NEAR(NomAnnualRain, 0.0, 0.000001);
+
+    Real64 CurrentRate = DataWater::RainFall.CurrentRate;
+    EXPECT_NEAR(CurrentRate, 0.0, 0.000001);
+}
