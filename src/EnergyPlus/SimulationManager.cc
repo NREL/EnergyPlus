@@ -1310,7 +1310,7 @@ namespace SimulationManager {
                         ShowWarningError(
                             "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxAllowedDelTemp will be set to 0.1 .");
                         // To do: override MaxAllowDelTemp, some local to global propagations are needed.
-                        DataConvergParams::MaxAllowedDelTemp = 0.1;
+                        DataConvergParams::MaxAllowedDelTempOverrideValue = 0.1;
                         ///////
                     }
                 }

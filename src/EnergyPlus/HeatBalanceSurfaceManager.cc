@@ -6547,7 +6547,7 @@ namespace HeatBalanceSurfaceManager {
                 }
             } // ...end of loop to check for convergence
 
-            MaxAllowedDelTemp = DataConvergParams::MaxAllowedDelTemp; 
+            MaxAllowedDelTemp = DataConvergParams::MaxAllowedDelTempOverrideValue; 
 
             if (!DataHeatBalance::AnyCondFD) {
                 if (MaxDelTemp <= MaxAllowedDelTemp) Converged = true;
