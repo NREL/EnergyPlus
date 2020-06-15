@@ -101,7 +101,7 @@ void EnergyPlusFixture::SetUp()
     show_message();
 
     openOutputFiles(state.outputFiles);
-    
+
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
 
@@ -228,6 +228,15 @@ bool EnergyPlusFixture::compare_cerr_stream(std::string const &expected_string, 
     return are_equal;
 }
 
+bool EnergyPlusFixture::compare_dfs_stream(std::string const &expected_string, bool reset_stream)
+{
+    auto const stream_str = state.outputFiles.dfs.get_output();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) state.outputFiles.dfs.open_as_stringstream();
+    return are_equal;
+}
+
 bool EnergyPlusFixture::has_json_output(bool reset_stream)
 {
     auto const has_output = this->json_stream->str().size() > 0;
@@ -274,6 +283,13 @@ bool EnergyPlusFixture::has_cerr_output(bool reset_stream)
 {
     auto const has_output = this->m_cerr_buffer->str().size() > 0;
     if (reset_stream) this->m_cerr_buffer->str(std::string());
+    return has_output;
+}
+
+bool EnergyPlusFixture::has_dfs_output(bool reset_stream)
+{
+    auto const has_output = !state.outputFiles.dfs.get_output().empty();
+    if (reset_stream) state.outputFiles.dfs.open_as_stringstream();
     return has_output;
 }
 

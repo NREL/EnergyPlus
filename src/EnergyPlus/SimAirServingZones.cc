@@ -3018,8 +3018,9 @@ namespace SimAirServingZones {
                                 ErrEnvironmentName = EnvironmentName;
                                 const auto CharErrOut = fmt::to_string(MaxIter);
                                 ShowWarningError("SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
-                                                 PrimaryAirSystem(AirLoopNum).Name + ", at " + EnvironmentName + ", " + CurMnDy + ' ' +
-                                                 CreateSysTimeIntervalString());
+                                                 PrimaryAirSystem(AirLoopNum).Name + ", " +
+                                                 PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum) + ", at " + EnvironmentName + ", " +
+                                                 CurMnDy + ' ' + CreateSysTimeIntervalString());
                             } else {
                                 if (EnvironmentName != ErrEnvironmentName) {
                                     MaxErrCount = 0;
