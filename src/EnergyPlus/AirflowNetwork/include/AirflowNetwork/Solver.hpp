@@ -158,8 +158,6 @@ namespace AirflowNetwork {
         Array1D<Real64> SUMF;
     };
 
-    //extern std::vector<AirProperties> properties;
-
     // Data
     extern int NetworkNumOfLinks;
     extern int NetworkNumOfNodes;
