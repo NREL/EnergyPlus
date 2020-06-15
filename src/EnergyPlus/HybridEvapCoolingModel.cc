@@ -396,7 +396,7 @@ namespace HybridEvapCoolingModel {
         }
 
         if (Min_OAF == Max_OAF){
-            sol.OutdoorAirFraction.push_back(Max_Msa);
+            sol.OutdoorAirFraction.push_back(Max_OAF);
         } else {
             Real64 ResolutionOSA = (Max_OAF-Min_OAF)/5;
             for (Real64 OAF_val = Min_OAF; OAF_val <= Max_OAF; OAF_val += ResolutionOSA) {
