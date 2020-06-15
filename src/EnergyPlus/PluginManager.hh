@@ -158,7 +158,7 @@ namespace PluginManagement {
         static size_t getTrendVariableHistorySize(int handle);
         static Real64 getTrendVariableAverage(int handle, int count);
         static Real64 getTrendVariableMin(int handle, int count);
- static        Real64 getTrendVariableMax(int handle, int count);
+        static Real64 getTrendVariableMax(int handle, int count);
         static Real64 getTrendVariableSum(int handle, int count);
         static Real64 getTrendVariableDirection(int handle, int count);
 
