@@ -2623,7 +2623,7 @@ namespace WaterCoils {
                     sizer.initializeWithinEP(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), WaterCoil(CoilNum).Name, false);
                     AutoSizingResultType result = sizer.size(state, DataSizing::AutoSize);
                     WaterCoil(CoilNum).InletAirTemp = sizer.autoSizedValue;
-                    coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, WaterCoil(CoilNum).InletAirTemp, CurSysNum, CurZoneEqNum);
+                    if (CurSysNum <= sizer.numPrimaryAirSys) coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, WaterCoil(CoilNum).InletAirTemp, CurSysNum, CurZoneEqNum);
                     if (result != AutoSizingResultType::NoError) {
                         ShowSevereError("Developer Error: autosizing of water heating coil design air inlet temperature failed.");
                         ShowContinueError("Occurs in water heating coil object= " + WaterCoil(CoilNum).Name);
