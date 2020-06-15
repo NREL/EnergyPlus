@@ -22,7 +22,7 @@ The EnergyPlus connection methodology is shown as dashed and greyed arrows in Fi
 
 \begin{itemize}
 \item
- For zone equipment the zone inlet and zone exhaust node names are defined in a \emph{\hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}} object (bottom of figure) and the terminal unit type and name are specified in a \emph{\hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}} object. For air loop equipment the terminal unit type and name and inlet and outlet node names are defined in the AirloopHVAC branch (top left of figure). For outside air system equipment the terminal unit type and name are defined in the \emph{\hyperef[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList}} (top right of figure) and the terminal unit inlet node will typically (but not necessarily) be an outside air node and the terminal unit outlet node will typically connect to the \emph{\hyperef[outdoorairmixer]{OutdoorAir:Mixer}} object.
+ For zone equipment the zone inlet and zone exhaust node names are defined in a \emph{\hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}} object (bottom of figure) and the terminal unit type and name are specified in a \emph{\hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}} object. For air loop equipment the terminal unit type and name and inlet and outlet node names are defined in the AirloopHVAC branch (top left of figure). For outside air system equipment the terminal unit type and name are defined in the \emph{\hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList}} (top right of figure) and the terminal unit inlet node will typically (but not necessarily) be an outside air node and the terminal unit outlet node will typically connect to the \emph{\hyperref[outdoorairmixer]{OutdoorAir:Mixer}} object.
 \item
   A \emph{\hyperref[zonehvacterminalunitvariablerefrigerantflow]{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow}} object will specify the terminal unit's air inlet and air outlet node names. For zone equipment the zone exhaust node is the terminal unit inlet node and the zone inlet node is the terminal unit outlet node. For air loop and outdoor air system equipment the terminal unit inlet and outlet node names identify the order of the equipment in the air loop.
 \item
@@ -47,9 +47,9 @@ EnergyPlus object type and object name, and node name relationships are also sho
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics{media/image311.png}
+\includegraphics[width=0.5\linewidth]{media/image311.png}
 \emph{(a) VRF model based on system curves (VRF-SysCurve)}
-\includegraphics{media/image312.png}
+\includegraphics[width=0.5\linewidth]{media/image312.png}
 \emph{(b) VRF model based on physics (VRF-FluidTCtrl)}
 \caption{Variable Refrigerant Flow Object Links \protect \label{fig:variable-refrigerant-flow-object-links}}
 \end{figure}
