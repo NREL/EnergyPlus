@@ -170,6 +170,9 @@ namespace HeatPumpWaterToWaterSimple {
         bool MyPlantScanFlag;
         bool MyEnvrnFlag;
 
+        bool myCoolingSizesReported;
+        bool myHeatingSizesReported;
+
         // Default Constructor
         GshpSpecs()
             : checkEquipName(true), WWHPPlantTypeOfNum(0), Available(false), ON(false), IsOn(false), MustRun(false), SourceSideDesignMassFlow(0.0),
@@ -187,7 +190,7 @@ namespace HeatPumpWaterToWaterSimple {
               companionIdentified(false), reportPower(0.0), reportEnergy(0.0), reportQLoad(0.0), reportQLoadEnergy(0.0), reportQSource(0.0),
               reportQSourceEnergy(0.0), reportLoadSideMassFlowRate(0.0), reportLoadSideInletTemp(0.0), reportLoadSideOutletTemp(0.0),
               reportSourceSideMassFlowRate(0.0), reportSourceSideInletTemp(0.0), reportSourceSideOutletTemp(0.0), MyPlantScanFlag(true),
-              MyEnvrnFlag(true)
+              MyEnvrnFlag(true), myCoolingSizesReported(false), myHeatingSizesReported(false)
         {
         }
 
