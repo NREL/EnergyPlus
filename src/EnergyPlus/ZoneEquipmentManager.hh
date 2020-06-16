@@ -81,7 +81,6 @@ namespace ZoneEquipmentManager {
     };
 
     // Functions
-    void clear_state();
 
     void ManageZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration,
                              bool &SimZone,                     // Set to false at the end of the routine
