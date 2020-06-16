@@ -54,10 +54,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
 
 namespace WaterUse {
 
@@ -230,7 +233,7 @@ namespace WaterUse {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitConnections();
+        void InitConnections(BranchInputManagerData &state);
 
         void CalcConnectionsFlowRates(bool FirstHVACIteration);
 
@@ -247,7 +250,7 @@ namespace WaterUse {
 
     void clear_state();
 
-    void SimulateWaterUse(bool FirstHVACIteration);
+    void SimulateWaterUse(BranchInputManagerData &data, bool FirstHVACIteration);
 
     void GetWaterUseInput();
 

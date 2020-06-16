@@ -154,12 +154,12 @@ namespace SwimmingPool {
         ReportSwimmingPool();
     }
 
-    void SwimmingPoolData::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SwimmingPoolData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool FirstHVACIteration,
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool EP_UNUSED(RunFlag))
     {
-        this->initialize(FirstHVACIteration);
+        this->initialize(state.dataBranchInputManager, FirstHVACIteration);
 
         this->calculate();
 
@@ -255,7 +255,7 @@ namespace SwimmingPool {
             }
 
             Pool(Item).ErrorCheckSetupPoolSurface(Alphas(1),Alphas(2),cAlphaFields(2),ErrorsFound);
-            
+
             Pool(Item).AvgDepth = Numbers(1);
             if (Pool(Item).AvgDepth < MinDepth) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too small.");
@@ -422,10 +422,10 @@ namespace SwimmingPool {
                                                       bool &ErrorsFound
     )
     {
-    
+
         static std::string const RoutineName("ErrorCheckSetupPoolSurface: "); // include trailing blank space
         static std::string const CurrentModuleObject("SwimmingPool:Indoor");
-        
+
         if (this->SurfacePtr <= 0) {
             ShowSevereError(RoutineName + "Invalid " + cAlphaField2 + " = " + Alpha2);
             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alpha1);
@@ -469,7 +469,7 @@ namespace SwimmingPool {
         }
     }
 
-    void SwimmingPoolData::initialize(bool const FirstHVACIteration // true during the first HVAC iteration
+    void SwimmingPoolData::initialize(BranchInputManagerData &data, bool const FirstHVACIteration // true during the first HVAC iteration
     )
     {
         // SUBROUTINE INFORMATION:
@@ -507,7 +507,7 @@ namespace SwimmingPool {
             this->MyOneTimeFlag = false;
         }
 
-        SwimmingPoolData::initSwimmingPoolPlantLoopIndex();
+        SwimmingPoolData::initSwimmingPoolPlantLoopIndex(data);
 
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
             this->ZeroSourceSumHATsurf = 0.0;
@@ -712,7 +712,7 @@ namespace SwimmingPool {
             "Indoor Pool Current Cover LW Radiation Factor", OutputProcessor::Unit::None, this->CurCoverLWRadFac, "System", "Average", this->Name);
     }
 
-    void SwimmingPoolData::initSwimmingPoolPlantLoopIndex()
+    void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(BranchInputManagerData &data)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -724,7 +724,8 @@ namespace SwimmingPool {
         if (MyPlantScanFlagPool && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
             if (this->WaterInletNode > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(data,
+                                                        this->Name,
                                                         DataPlant::TypeOf_SwimmingPool_Indoor,
                                                         this->HWLoopNum,
                                                         this->HWLoopSide,

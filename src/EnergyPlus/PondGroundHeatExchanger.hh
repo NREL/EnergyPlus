@@ -124,7 +124,7 @@ namespace PondGroundHeatExchanger {
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void InitPondGroundHeatExchanger(bool FirstHVACIteration);
+        void InitPondGroundHeatExchanger(BranchInputManagerData &data, bool FirstHVACIteration);
 
         void setupOutputVars();
 
@@ -141,6 +141,9 @@ namespace PondGroundHeatExchanger {
         Real64 CalcSolarFlux() const;
 
         void UpdatePondGroundHeatExchanger();
+
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
     };
 
     // Object Data

@@ -191,7 +191,7 @@ namespace BranchInputManager {
                        std::string const &LoopType        // Type of Loop Branch list is on
     );
 
-    int NumBranchesInBranchList(std::string const &BranchListName);
+    int NumBranchesInBranchList(BranchInputManagerData &data, std::string const &BranchListName);
 
     void GetBranchData(BranchInputManagerData &data,
                        std::string const &LoopName,         // Loop Name of this Branch

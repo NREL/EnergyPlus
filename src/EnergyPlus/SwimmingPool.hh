@@ -54,10 +54,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
 
 namespace SwimmingPool {
 
@@ -161,19 +164,19 @@ namespace SwimmingPool {
         }
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
-        
+
         void ErrorCheckSetupPoolSurface(std::string const Alpha1,
                                         std::string const Alpha2,
                                         std::string const cAlphaField2,
                                         bool &ErrorsFound
         );
 
-        void initialize(bool FirstHVACIteration // true during the first HVAC iteration
+        void initialize(BranchInputManagerData &data, bool FirstHVACIteration // true during the first HVAC iteration
         );
 
         void setupOutputVars();
 
-        void initSwimmingPoolPlantLoopIndex();
+        void initSwimmingPoolPlantLoopIndex(BranchInputManagerData &data);
 
         void initSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
         );

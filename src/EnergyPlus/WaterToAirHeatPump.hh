@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct BranchInputManagerData;
+
 namespace WaterToAirHeatPump {
 
     // Using/Aliasing
@@ -191,7 +194,8 @@ namespace WaterToAirHeatPump {
 
     // Functions
 
-    void SimWatertoAirHP(std::string const &CompName,   // component name
+    void SimWatertoAirHP(BranchInputManagerData &data,
+                         std::string const &CompName,   // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
                          int const CyclingScheme,       // cycling scheme--either continuous fan/cycling compressor or
@@ -217,7 +221,8 @@ namespace WaterToAirHeatPump {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWatertoAirHP(int const HPNum, // index to main heat pump data structure
+    void InitWatertoAirHP(BranchInputManagerData &data,
+                          int const HPNum, // index to main heat pump data structure
                           bool const InitFlag,
                           Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                           Real64 const HPTimeConstant,        // Heat pump time constant [s]

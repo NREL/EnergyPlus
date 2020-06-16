@@ -175,7 +175,7 @@ namespace EnergyPlus {
             return nullptr; // LCOV_EXCL_LINE
         }
 
-        void Circuit::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+        void Circuit::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                bool const EP_UNUSED(FirstHVACIteration),
                                Real64 &EP_UNUSED(CurLoad),
                                bool const EP_UNUSED(RunFlag)) {
@@ -183,7 +183,7 @@ namespace EnergyPlus {
             auto &thisDomain(domains[this->ParentDomainIndex]);
 
             // Do any initialization here
-            thisDomain.InitPipingSystems(this);
+            thisDomain.InitPipingSystems(state.dataBranchInputManager, this);
 
             // Update the temperature field
             thisDomain.PerformIterationLoop(this);
@@ -1476,7 +1476,7 @@ namespace EnergyPlus {
 
         bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
                                             int const MaterialNum) {
-            
+
             if ( (MaterialThickness <= 0.0) || (DataHeatBalance::Material(MaterialNum).ROnly) ) {
                 return true;
             } else {
@@ -1484,7 +1484,7 @@ namespace EnergyPlus {
             }
 
         }
-        
+
         void SiteGroundDomainNoMassMatError(std::string const &FieldName,
                                             std::string const &UserInputField,
                                             std::string const &ObjectName) {
@@ -1496,7 +1496,7 @@ namespace EnergyPlus {
 
         }
 
-        
+
         void ReadPipeCircuitInputs(bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
@@ -2106,7 +2106,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::InitPipingSystems(Circuit * thisCircuit) {
+        void Domain::InitPipingSystems(BranchInputManagerData &data, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2128,7 +2128,8 @@ namespace EnergyPlus {
                 }
 
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(thisCircuit->Name,
+                PlantUtilities::ScanPlantLoopsForObject(data,
+                                                        thisCircuit->Name,
                                                         TypeToLookFor,
                                                         thisCircuit->LoopNum,
                                                         thisCircuit->LoopSideNum,

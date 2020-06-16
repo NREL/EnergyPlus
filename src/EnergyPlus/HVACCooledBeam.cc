@@ -60,8 +60,8 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -107,7 +107,6 @@ namespace HVACCooledBeam {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
@@ -593,7 +592,7 @@ namespace HVACCooledBeam {
 
         if (!SysSizingCalc && MySizeFlag(CBNum) && !PlantLoopScanFlag(CBNum)) {
 
-            SizeCoolBeam(data, CBNum);
+            SizeCoolBeam( CBNum);
 
             InWaterNode = CoolBeam(CBNum).CWInNode;
             OutWaterNode = CoolBeam(CBNum).CWOutNode;

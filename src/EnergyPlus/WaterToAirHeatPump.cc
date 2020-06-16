@@ -152,7 +152,8 @@ namespace WaterToAirHeatPump {
 
     // Functions
 
-    void SimWatertoAirHP(std::string const &CompName,   // component name
+    void SimWatertoAirHP(BranchInputManagerData &data,
+                         std::string const &CompName,   // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
                          int const CyclingScheme,       // cycling scheme--either continuous fan/cycling compressor or
@@ -219,14 +220,14 @@ namespace WaterToAirHeatPump {
         // Calculate the Correct Water to Air HP Model with the current HPNum
 
         if (WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingParamEst) {
-            InitWatertoAirHP(
+            InitWatertoAirHP(data,
                 HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
             CalcWatertoAirHPCooling(HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
 
             UpdateWatertoAirHP(HPNum);
 
         } else if (WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingParamEst) {
-            InitWatertoAirHP(
+            InitWatertoAirHP(data,
                 HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
             CalcWatertoAirHPHeating(HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
 
@@ -815,7 +816,8 @@ namespace WaterToAirHeatPump {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWatertoAirHP(int const HPNum, // index to main heat pump data structure
+    void InitWatertoAirHP(BranchInputManagerData &data,
+                          int const HPNum, // index to main heat pump data structure
                           bool const InitFlag,
                           Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                           Real64 const HPTimeConstant,        // Heat pump time constant [s]
@@ -888,7 +890,8 @@ namespace WaterToAirHeatPump {
 
         if (MyPlantScanFlag(HPNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(WatertoAirHP(HPNum).Name,
+            ScanPlantLoopsForObject(data,
+                                    WatertoAirHP(HPNum).Name,
                                     WatertoAirHP(HPNum).WAHPPlantTypeOfNum,
                                     WatertoAirHP(HPNum).LoopNum,
                                     WatertoAirHP(HPNum).LoopSide,

@@ -160,20 +160,22 @@ namespace PlantCentralGSHP {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void WrapperSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
-        this->initialize(0.0, calledFromLocation.loopNum);
+        this->initialize(state.dataBranchInputManager, 0.0, calledFromLocation.loopNum);
+        this->SizeWrapper();
+    }
+
+void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
         MinLoad = 0.0;
         MaxLoad = 0.0;
         OptLoad = 0.0;
         if (calledFromLocation.loopNum == this->CWLoopNum) { // Chilled water loop
-            this->SizeWrapper();
             if (this->ControlMode == SmartMixing) { // control mode is SmartMixing
                 for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
                     MaxLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling * this->ChillerHeater(NumChillerHeater).MaxPartLoadRatCooling;
-
                     OptLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling * this->ChillerHeater(NumChillerHeater).OptPartLoadRatCooling;
-
                     MinLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling * this->ChillerHeater(NumChillerHeater).MinPartLoadRatCooling;
                 }
             }
@@ -181,9 +183,7 @@ namespace PlantCentralGSHP {
             if (this->ControlMode == SmartMixing) {                 // control mode is SmartMixing
                 for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
                     MaxLoad += this->ChillerHeater(NumChillerHeater).RefCapClgHtg * this->ChillerHeater(NumChillerHeater).MaxPartLoadRatClgHtg;
-
                     OptLoad += this->ChillerHeater(NumChillerHeater).RefCapClgHtg * this->ChillerHeater(NumChillerHeater).OptPartLoadRatClgHtg;
-
                     MinLoad += this->ChillerHeater(NumChillerHeater).RefCapClgHtg * this->ChillerHeater(NumChillerHeater).MinPartLoadRatClgHtg;
                 }
             } // End of control mode determination

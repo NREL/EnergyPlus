@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct BranchInputManagerData;
+
 namespace Pumps {
 
     // Using/Aliasing
@@ -252,7 +255,8 @@ namespace Pumps {
     // Functions
     void clear_state();
 
-    void SimPumps(std::string const &PumpName, // Name of pump to be managed
+    void SimPumps(BranchInputManagerData &data,
+                  std::string const &PumpName, // Name of pump to be managed
                   int const LoopNum,           // Plant loop number
                   Real64 const FlowRequest,    // requested flow from adjacent demand side
                   bool &PumpRunning,           // .TRUE. if the loop pump is actually operating
@@ -269,7 +273,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void InitializePumps(int const PumpNum);
+    void InitializePumps(BranchInputManagerData &data, int const PumpNum);
 
     //*************************************************************************!
 

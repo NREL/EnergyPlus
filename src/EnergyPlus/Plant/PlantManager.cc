@@ -73,7 +73,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
@@ -142,7 +141,6 @@ namespace EnergyPlus {
         // connections are performed in this module.
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using namespace DataGlobals;
         using namespace DataHVACGlobals;
         using namespace DataPlant;
@@ -824,7 +822,7 @@ namespace EnergyPlus {
                     }
 
                     // Get the branch list and size the Branch portion of the Loop derived type
-                    loopSide.TotalBranches = NumBranchesInBranchList(loopSide.BranchList);
+                    loopSide.TotalBranches = NumBranchesInBranchList(state.dataBranchInputManager, loopSide.BranchList);
                     BranchNames.allocate(loopSide.TotalBranches);
                     BranchNames = "";
                     GetBranchList(state.dataBranchInputManager, plantLoop.Name, loopSide.BranchList, loopSide.TotalBranches, BranchNames, LoopIdentifier);
@@ -2251,7 +2249,7 @@ namespace EnergyPlus {
                         SizePlantLoop(state, LoopNum, FinishSizingFlag);
                     }
                     // pumps are special so call them directly
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps();
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state.dataBranchInputManager);
                     for (BranchNum = 1;
                          BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
@@ -2313,7 +2311,7 @@ namespace EnergyPlus {
                         } //-CompNum
                     }     //-BranchNum
                     // pumps are special so call them directly
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps();
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state.dataBranchInputManager);
                 }
 
                 PlantReSizingCompleted = true;

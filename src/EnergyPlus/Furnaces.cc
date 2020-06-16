@@ -8745,7 +8745,8 @@ namespace Furnaces {
                 SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             }
             //    Simulate the cooling and heating coils
-            SimWatertoAirHP(BlankString,
+            SimWatertoAirHP(state.dataBranchInputManager,
+                            BlankString,
                             Furnace(FurnaceNum).CoolingCoilIndex,
                             Furnace(FurnaceNum).DesignMassFlowRate,
                             FanOpMode,
@@ -8760,7 +8761,8 @@ namespace Furnaces {
                             CompOp,
                             CoolPartLoadRatio);
             Dummy = 0.0;
-            SimWatertoAirHP(BlankString,
+            SimWatertoAirHP(state.dataBranchInputManager,
+                            BlankString,
                             Furnace(FurnaceNum).HeatingCoilIndex,
                             Furnace(FurnaceNum).DesignMassFlowRate,
                             FanOpMode,
