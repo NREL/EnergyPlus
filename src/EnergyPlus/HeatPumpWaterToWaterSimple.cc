@@ -208,7 +208,11 @@ namespace HeatPumpWaterToWaterSimple {
         Real64 initCurLoad = 0.0;
 
         this->InitWatertoWaterHP(state.dataBranchInputManager, this->WWHPPlantTypeOfNum, this->Name, initFirstHVAC, initCurLoad);
-        this->sizeCoolingWaterToWaterHP();
+        if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
+            this->sizeCoolingWaterToWaterHP();
+        } else if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFHeating) {
+            this->sizeHeatingWaterToWaterHP();
+        }
     }
 
     void GshpSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
