@@ -909,7 +909,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     ThermalComfortInASH55(1).ZoneIsOccupied = true;
     TimeStepZone = 0.25;
     Zone.allocate(NumOfZones);
-    ZoneTempPredictorCorrector::NumOnOffCtrZone = 1;
+    dataZoneTempPredictorCorrector.NumOnOffCtrZone = 1;
 
     TempControlType(1) = DualSetPointWithDeadBand;
 

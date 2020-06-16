@@ -257,6 +257,7 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
     dataAirflowNetworkBalanceManager.clear_state();
+    dataZoneTempPredictorCorrector.clear_state();
     DataAirLoop::clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
@@ -421,6 +422,5 @@ void EnergyPlus::clearAllStates(OutputFiles &outputFiles)
     ZoneDehumidifier::clear_state();
     ZoneEquipmentManager::clear_state();
     ZonePlenum::clear_state();
-    ZoneTempPredictorCorrector::clear_state();
     ResultsFramework::clear_state();
 }

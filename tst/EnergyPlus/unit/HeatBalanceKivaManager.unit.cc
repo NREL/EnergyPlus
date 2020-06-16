@@ -227,8 +227,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 100C/-100C
 
-    ZoneTempPredictorCorrector::SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
-    ZoneTempPredictorCorrector::SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
+    dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
+    dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
 
     Real64 coolingSetpoint3 = 100.0;
     Real64 zoneAssumedTemperature3 = -9999;
@@ -245,8 +245,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 100C/-100C
 
-    ZoneTempPredictorCorrector::SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
-    ZoneTempPredictorCorrector::SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
+    dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
+    dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
 
     Real64 zoneAssumedTemperature4 = 15.0;
     HeatBalanceKivaManager::KivaInstanceMap kv4(fnd, 0, {}, 0, zoneAssumedTemperature4, 1.0, 0, &km);

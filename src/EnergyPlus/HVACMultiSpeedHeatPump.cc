@@ -569,7 +569,7 @@ namespace HVACMultiSpeedHeatPump {
         using DXCoils::SetMSHPDXCoilHeatRecoveryFlag;
         using FluidProperties::GetSatDensityRefrig;
         using SteamCoils::GetTypeOfCoil;
-        using ZoneTempPredictorCorrector::NumStageCtrZone;
+        //using ZoneTempPredictorCorrector::NumStageCtrZone;
 
         // Locals
         // PARAMETERS
@@ -732,7 +732,7 @@ namespace HVACMultiSpeedHeatPump {
                                 if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumStageCtrZone; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= dataZoneTempPredictorCorrector.NumStageCtrZone; ++TstatZoneNum) {
                                 if (StageControlledZone(TstatZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
