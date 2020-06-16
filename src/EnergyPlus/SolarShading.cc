@@ -5601,16 +5601,16 @@ namespace SolarShading {
         shd_stream << "..In the following, only the first 10 reference surfaces will be shown.\n";
         shd_stream << "..But all surfaces are used in the calculations.\n";
 
-        for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
+        for (int HTSnum : DataSurfaces::AllSurfaceListReportOrder) {
             shd_stream << "==================================\n";
-            if (ShadowComb(HTS).UseThisSurf) {
-                if (Surface(HTS).IsConvex) {
-                    shd_stream << "Surface=" << Surface(HTS).Name << " is used as Receiving Surface in calculations and is convex.\n";
+            if (ShadowComb(HTSnum).UseThisSurf) {
+                if (Surface(HTSnum).IsConvex) {
+                    shd_stream << "Surface=" << Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is convex.\n";
                 } else {
-                    shd_stream << "Surface=" << Surface(HTS).Name << " is used as Receiving Surface in calculations and is non-convex.\n";
-                    if (ShadowComb(HTS).NumGenSurf > 0) {
+                    shd_stream << "Surface=" << Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is non-convex.\n";
+                    if (ShadowComb(HTSnum).NumGenSurf > 0) {
                         if (DisplayExtraWarnings) {
-                            ShowWarningError("DetermineShadowingCombinations: Surface=\"" + Surface(HTS).Name +
+                            ShowWarningError("DetermineShadowingCombinations: Surface=\"" + Surface(HTSnum).Name +
                                              "\" is a receiving surface and is non-convex.");
                             ShowContinueError("...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
                         } else {
@@ -5619,20 +5619,20 @@ namespace SolarShading {
                     }
                 }
             } else {
-                shd_stream << "Surface=" << Surface(HTS).Name << " is not used as Receiving Surface in calculations.\n";
+                shd_stream << "Surface=" << Surface(HTSnum).Name << " is not used as Receiving Surface in calculations.\n";
             }
-            shd_stream << "Number of general casting surfaces=" << ShadowComb(HTS).NumGenSurf << '\n';
-            for (NGSS = 1; NGSS <= ShadowComb(HTS).NumGenSurf; ++NGSS) {
-                if (NGSS <= 10) shd_stream << "..Surface=" << Surface(ShadowComb(HTS).GenSurf(NGSS)).Name << '\n';
-                CastingSurface(ShadowComb(HTS).GenSurf(NGSS)) = true;
+            shd_stream << "Number of general casting surfaces=" << ShadowComb(HTSnum).NumGenSurf << '\n';
+            for (NGSS = 1; NGSS <= ShadowComb(HTSnum).NumGenSurf; ++NGSS) {
+                if (NGSS <= 10) shd_stream << "..Surface=" << Surface(ShadowComb(HTSnum).GenSurf(NGSS)).Name << '\n';
+                CastingSurface(ShadowComb(HTSnum).GenSurf(NGSS)) = true;
             }
-            shd_stream << "Number of back surfaces=" << ShadowComb(HTS).NumBackSurf << '\n';
-            for (NGSS = 1; NGSS <= min(10, ShadowComb(HTS).NumBackSurf); ++NGSS) {
-                shd_stream << "...Surface=" << Surface(ShadowComb(HTS).BackSurf(NGSS)).Name << '\n';
+            shd_stream << "Number of back surfaces=" << ShadowComb(HTSnum).NumBackSurf << '\n';
+            for (NGSS = 1; NGSS <= min(10, ShadowComb(HTSnum).NumBackSurf); ++NGSS) {
+                shd_stream << "...Surface=" << Surface(ShadowComb(HTSnum).BackSurf(NGSS)).Name << '\n';
             }
-            shd_stream << "Number of receiving sub surfaces=" << ShadowComb(HTS).NumSubSurf << '\n';
-            for (NGSS = 1; NGSS <= min(10, ShadowComb(HTS).NumSubSurf); ++NGSS) {
-                shd_stream << "....Surface=" << Surface(ShadowComb(HTS).SubSurf(NGSS)).Name << '\n';
+            shd_stream << "Number of receiving sub surfaces=" << ShadowComb(HTSnum).NumSubSurf << '\n';
+            for (NGSS = 1; NGSS <= min(10, ShadowComb(HTSnum).NumSubSurf); ++NGSS) {
+                shd_stream << "....Surface=" << Surface(ShadowComb(HTSnum).SubSurf(NGSS)).Name << '\n';
             }
         }
 

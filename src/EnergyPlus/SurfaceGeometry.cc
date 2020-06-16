@@ -572,7 +572,7 @@ namespace SurfaceGeometry {
             } // surfaces
         }     // zones
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(SurfNum).Construction > 0 && Surface(SurfNum).Construction <= TotConstructs) {
                 NominalUwithConvCoeffs = ComputeNominalUwithConvCoeffs(SurfNum, isWithConvCoefValid);
                 if (isWithConvCoefValid) {

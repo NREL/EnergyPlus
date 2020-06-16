@@ -948,7 +948,7 @@ namespace HeatBalanceSurfaceManager {
         computedNetArea.allocate(TotSurfaces);
         computedNetArea = 0.0; // start at zero, add wall area and subtract window and door area
 
-        for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
+        for (int iSurf : DataSurfaces::AllSurfaceListReportOrder) {
             zonePt = Surface(iSurf).Zone;
             // only exterior surfaces including underground
             if ((Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == Ground) ||
@@ -1228,7 +1228,7 @@ namespace HeatBalanceSurfaceManager {
         numSurfaces(SurfaceClass_Fin) = totFins;
         numExtSurfaces(SurfaceClass_Fin) = totFins;
         // go through all the surfaces again and this time insert the net area results
-        for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
+        for (int iSurf : DataSurfaces::AllSurfaceListReportOrder) {
             zonePt = Surface(iSurf).Zone;
             // only exterior surfaces including underground
             if ((Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == Ground) ||
