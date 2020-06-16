@@ -4318,8 +4318,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
     zSysEDemand.RemainingOutputReqToCoolSP = 2000.0;
     zSysEDemand.RemainingOutputReqToHeatSP = 2000.0;
     zSysEDemand.RemainingOutputRequired = 2000.0;
-    int OutletNode = thisFanCoil.AirInNode;
-    int InletNode = thisFanCoil.AirOutNode;
+    int InletNode = thisFanCoil.AirInNode;
     Real64 QUnitOutMaxLS = 0.0; // low speed maximum output
 
     InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
