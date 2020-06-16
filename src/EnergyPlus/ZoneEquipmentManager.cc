@@ -140,14 +140,6 @@ namespace ZoneEquipmentManager {
     // PURPOSE OF THIS MODULE:
     // This module manages the zone equipment.
 
-    // METHODOLOGY EMPLOYED: none
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::BeginDayFlag;
@@ -191,30 +183,6 @@ namespace ZoneEquipmentManager {
         // (water-air, refrigerant-air, steam-air, electric-electric,
         // water-water, etc)
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (dataZoneEquipmentManager.GetZoneEquipmentInputFlag) {
             GetZoneEquipment(state);
             dataZoneEquipmentManager.GetZoneEquipmentInputFlag = false;
@@ -232,8 +200,6 @@ namespace ZoneEquipmentManager {
 
         UpdateZoneEquipment(SimAir);
 
-        ReportZoneEquipment();
-
         SimZone = false;
     }
 
@@ -249,28 +215,6 @@ namespace ZoneEquipmentManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Get all the system related equipment which may be attached to
         // a zone
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Counter;
@@ -303,12 +247,6 @@ namespace ZoneEquipmentManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the zone equipment prior to simulation.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataAirLoop::AirLoopFlow;
         using DataContaminantBalance::Contaminant;
@@ -323,18 +261,6 @@ namespace ZoneEquipmentManager {
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNodeNum;
         int InNodeNum;
@@ -342,15 +268,11 @@ namespace ZoneEquipmentManager {
         int ZoneInNode;
         int ZoneExhNode;
         int ControlledZoneNum;
-        /////////// hoisted into namespace ////////////
-        // static bool MyOneTimeFlag( true ); // InitZoneEquipmentOneTimeFlag
-        // static bool MyEnvrnFlag( true ); // InitZoneEquipmentEnvrnFlag
-        ///////////////////////////
+
         int ZoneEquipType; // Type of zone equipment
         int TotalNumComp;  // Total number of zone components of ZoneEquipType
         int ZoneCompNum;   // Number/index of zone equipment component
         int ZoneEquipCount;
-        // Flow
 
         if (dataZoneEquipmentManager.InitZoneEquipmentOneTimeFlag) {
             dataZoneEquipmentManager.InitZoneEquipmentOneTimeFlag = false;
@@ -525,9 +447,6 @@ namespace ZoneEquipmentManager {
         // for each controlled zone this subroutine performs a "purchased air" calculation
         // and saves the results in the zone sizing data arrays.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataEnvironment::StdBaroPress;
         using DataHeatBalFanSys::NonAirSystemResponse;
@@ -544,19 +463,6 @@ namespace ZoneEquipmentManager {
 
         // Parameters
         static std::string const RoutineName("SizeZoneEquipment");
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControlledZoneNum;                // controlled zone index
@@ -881,9 +787,6 @@ namespace ZoneEquipmentManager {
         // METHODOLOGY EMPLOYED:
         // Obtains data from Zone Sizing and Zone Equipment objects already input.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::isPulseZoneSizing;
@@ -897,18 +800,6 @@ namespace ZoneEquipmentManager {
 
         // Locals
         int NumOfTimeStepInDay; // number of zone time steps in a day
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DesDayNum; // design day index
@@ -1537,9 +1428,6 @@ namespace ZoneEquipmentManager {
         // CallIndicator = 3 (EndDay) calculate daily maxima
         // CallIndicator = 4 (EndZoneSizingCalc) write out results
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataEnvironment::StdBaroPress;
         using DataEnvironment::StdRhoAir;
@@ -1563,19 +1451,10 @@ namespace ZoneEquipmentManager {
         using General::MovingAvg;
         using General::RoundSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         static std::string const RoutineName("UpdateZoneSizing");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DesDayNum;     // design day index
@@ -1583,7 +1462,6 @@ namespace ZoneEquipmentManager {
         int CtrlZoneNum;   // controlled zone index
         int TimeStepInDay; // zone time step in day
         int I;             // write statement index
-        //  REAL(r64)    :: HourFrac           ! fractional hour
         int HourCounter;         // Hour Counter
         int TimeStepCounter;     // Time Step Counter
         int Minutes;             // Current Minutes Counter
@@ -2735,9 +2613,6 @@ namespace ZoneEquipmentManager {
         //     the type of system being simulated.
         // 3.  Calculate zone energy requirements
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataHVACGlobals;
         using BaseboardElectric::SimElectricBaseboard;
@@ -2775,18 +2650,6 @@ namespace ZoneEquipmentManager {
         using ZoneAirLoopEquipmentManager::ManageZoneAirLoopEquipment;
         using ZoneDehumidifier::SimZoneDehumidifier;
         using ZonePlenum::SimAirZonePlenum;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActualZoneNum;
@@ -3354,26 +3217,8 @@ namespace ZoneEquipmentManager {
         // Set simulation priorities based on user specified priorities and
         // required conditions (heating or cooling).
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CurEqHeatingPriority; // Used to make sure "optimization features" on compilers don't defeat purpose of this routine
@@ -3830,12 +3675,6 @@ namespace ZoneEquipmentManager {
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Unknown
         //       MODIFIED       B. Griffith Sept 2011, add storage of requirements by sequence
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
 
         using DataHeatBalFanSys::TempControlType;
         using DataHVACGlobals::DualSetPointWithDeadBand;
@@ -4532,9 +4371,6 @@ namespace ZoneEquipmentManager {
         // METHODOLOGY EMPLOYED:
         // Energy Balance.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataContaminantBalance::Contaminant;
         using DataEnvironment::OutBaroPress;
@@ -4555,19 +4391,6 @@ namespace ZoneEquipmentManager {
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using InternalHeatGains::SumAllReturnAirLatentGains;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QRetAir;         // Heat to return air from lights
@@ -4735,29 +4558,11 @@ namespace ZoneEquipmentManager {
         // Specifically, it transfers the conditions from the zone equipment return air nodes across
         // to the air loop side, allowing for multiple return air nodes
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataAirLoop::AirToZoneNodeInfo;
         using DataConvergParams::CalledFromAirSystemDemandSide;
         using DataHVACGlobals::NumPrimaryAirSys;
         using HVACInterfaceManager::UpdateHVACInterface;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneGroupNum;
@@ -4774,42 +4579,6 @@ namespace ZoneEquipmentManager {
                                     SimAir);
             }
         }
-    }
-
-    void ReportZoneEquipment()
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Russ Taylor
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is left for Module format consistency -- not needed in this module.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
     }
 
     void CalcAirFlowSimple(EnergyPlusData &state, int const SysTimestepLoop,        // System time step index
@@ -5820,9 +5589,6 @@ namespace ZoneEquipmentManager {
         // METHODOLOGY EMPLOYED:
         // Uses program data structures ZoneEquipInfo
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalance::AirBalanceQuadrature;
         using DataHeatBalance::ZoneAirBalance;
@@ -5830,18 +5596,6 @@ namespace ZoneEquipmentManager {
         using DataZoneEquipment::ZoneEquipList;
         using HVACStandAloneERV::GetStandAloneERVOutAirNode;
         using HVACStandAloneERV::GetStandAloneERVReturnAirNode;
-
-        // Locals
-        // SUBROUTINE ARGUMENTS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //  INTEGER      :: ERVNum=0                   ! the stand alone ERV index
@@ -5887,35 +5641,12 @@ namespace ZoneEquipmentManager {
         // This subroutine updates the receiving zone mixing flow rate to ensures the zone
         // air mass balance.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-        //
-
         // Using/Aliasing
         using DataHeatBalance::MassConservation;
         using DataHeatBalance::Mixing;
         using DataHeatBalance::TotMixing;
         using DataHeatBalFanSys::MixingMassFlowZone;
         using DataZoneEquipment::ZoneEquipConfig;
-
-        // Enforce explicit typing of all variables in this routine
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int Loop;
         int MixingNum;
@@ -5950,13 +5681,6 @@ namespace ZoneEquipmentManager {
         // This subroutine calculates the zone mixing flow rate such that it ensures the zone
         // air mass balance.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-        //
-
         // Using/Aliasing
         using DataHeatBalance::MassConservation;
         using DataHeatBalance::Mixing;
@@ -5965,21 +5689,6 @@ namespace ZoneEquipmentManager {
         using DataHeatBalFanSys::MixingMassFlowZone;
         using DataZoneEquipment::ZoneEquipConfig;
 
-        // Enforce explicit typing of all variables in this routine
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int MixingNum;
         int ZoneMixingNum;
@@ -6016,7 +5725,6 @@ namespace ZoneEquipmentManager {
         // REFERENCES:
         // See IO Ref for suggested values
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int ZoneSizIndex;
         bool ErrorsFound;
 
@@ -6094,12 +5802,6 @@ namespace ZoneEquipmentManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine writes the DOAS Sizing:Zone input for 1 zone to the eio file
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using namespace DataPrecisionGlobals;
