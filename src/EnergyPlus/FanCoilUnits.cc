@@ -3672,9 +3672,10 @@ namespace FanCoilUnits {
                 if (Node(FanCoil(FanCoilNum).CoolCoilFluidInletNode).MassFlowRate > 0.0) ElecHeaterControl = 0.0;
                 Real64 QZnReq = 0.0;
                 if (FanCoil(FanCoilNum).FanOpMode == ContFanCycCoil) {
-                    QZnReq = FanCoil(FanCoilNum).DesignHeatingCapacity * eHeatCoilCyclingR * ElecHeaterControl;
+                    QZnReq = FanCoil(FanCoilNum).DesignHeatingCapacity * FanFlowRatio * eHeatCoilCyclingR * ElecHeaterControl;
                 } else {
-                    QZnReq = FanCoil(FanCoilNum).DesignHeatingCapacity * PartLoad * ElecHeaterControl;
+                    // proportionally reduce the full flow capacity based on fan flow fraction 
+                    QZnReq = FanCoil(FanCoilNum).DesignHeatingCapacity * FanFlowRatio * PartLoad * eHeatCoilCyclingR * ElecHeaterControl;
                 }
                 SimulateHeatingCoilComponents(state,
                                               FanCoil(FanCoilNum).HCoilName,
@@ -4412,7 +4413,19 @@ namespace FanCoilUnits {
                                                                    FanCoil(FanCoilNum).Name,
                                                                FanCoil(FanCoilNum).MaxIterIndexH);
                             }
+                        } else if (SolFlag == -2) {
+                            ++FanCoil(FanCoilNum).LimitErrCountH;
+                            if (FanCoil(FanCoilNum).LimitErrCountH < 2) {
+                                ShowWarningError("Cycling ratio heating control failed in fan coil unit " + FanCoil(FanCoilNum).Name);
+                                ShowContinueError("  Bad cycling ratio limits");
+                                ShowContinueErrorTimeStamp("..Cycling ratio set to 0");
+                            } else {
+                                ShowRecurringWarningErrorAtEnd("Cycling ratio heating control failed in fan coil unit " +
+                                    FanCoil(FanCoilNum).Name,
+                                    FanCoil(FanCoilNum).BadMassFlowLimIndexH);
+                            }
                         }
+
                     } else {
                         eHeatCoilCyclingR = 1.0;
                     }
