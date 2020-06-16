@@ -59,6 +59,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace ICEngineElectricGenerator {
 
     using DataGlobalConstants::iGeneratorICEngine;
@@ -153,7 +157,7 @@ namespace ICEngineElectricGenerator {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitICEngineGenerators(bool RunFlag, bool FirstHVACIteration);
+        void InitICEngineGenerators(BranchInputManagerData &data, bool RunFlag, bool FirstHVACIteration);
 
         void CalcICEngineGeneratorModel(bool RunFlag, Real64 MyLoad);
 

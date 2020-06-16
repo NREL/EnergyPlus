@@ -517,16 +517,17 @@ namespace AirLoopHVACDOAS {
                             errorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "COIL:COOLING:WATER") {
-                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = WaterCoils::GetCoilInletNode(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = WaterCoils::GetCoilInletNode(state,
                             SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
-                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = WaterCoils::GetCoilOutletNode(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = WaterCoils::GetCoilOutletNode(state,
                             SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                         thisDOAS.CWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode("COIL:COOLING:WATER", CompName, errorsFound);
                         if (errorsFound) {
                             ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
                                               OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                        PlantUtilities::ScanPlantLoopsForObject(CompName,
+                        PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                                CompName,
                                                                 DataPlant::TypeOf_CoilWaterCooling,
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
@@ -542,16 +543,17 @@ namespace AirLoopHVACDOAS {
                             ShowFatalError("GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
                     } else if (SELECT_CASE_var == "COIL:HEATING:WATER") {
-                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = WaterCoils::GetCoilInletNode(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = WaterCoils::GetCoilInletNode(state,
                             SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
-                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = WaterCoils::GetCoilOutletNode(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = WaterCoils::GetCoilOutletNode(state,
                             SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                         thisDOAS.HWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode("Coil:Heating:Water", CompName, errorsFound);
                         if (errorsFound) {
                             ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
                                               OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                        PlantUtilities::ScanPlantLoopsForObject(CompName,
+                        PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                                CompName,
                                                                 DataPlant::TypeOf_CoilWaterSimpleHeating,
                                                                 thisDOAS.HWLoopNum,
                                                                 thisDOAS.HWLoopSide,
@@ -573,16 +575,17 @@ namespace AirLoopHVACDOAS {
                         OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
                             SteamCoils::GetCoilSteamOutletNode(CompType, CompName, OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
-                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = WaterCoils::GetCoilInletNode(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = WaterCoils::GetCoilInletNode(state,
                             SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
-                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = WaterCoils::GetCoilOutletNode(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = WaterCoils::GetCoilOutletNode(state,
                             SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                         thisDOAS.CWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode("Coil:Cooling:Water:DetailedGeometry", CompName, errorsFound);
                         if (errorsFound) {
                             ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
                                               OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                        PlantUtilities::ScanPlantLoopsForObject(CompName,
+                        PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                                CompName,
                                                                 DataPlant::TypeOf_CoilWaterDetailedFlatCooling,
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
@@ -598,14 +601,14 @@ namespace AirLoopHVACDOAS {
                             ShowFatalError("GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
                     } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
-                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HeatingCoils::GetCoilInletNode(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HeatingCoils::GetCoilInletNode(state,
                             SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
-                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HeatingCoils::GetCoilOutletNode(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HeatingCoils::GetCoilOutletNode(state,
                             SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
-                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HeatingCoils::GetCoilInletNode(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HeatingCoils::GetCoilInletNode(state,
                             SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
-                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HeatingCoils::GetCoilOutletNode(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HeatingCoils::GetCoilOutletNode(state,
                             SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
@@ -658,14 +661,14 @@ namespace AirLoopHVACDOAS {
                             HeatRecovery::GetSupplyOutletNode(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                         // Desiccant Dehumidifier
                     } else if (SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:NOFANS") {
-                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirInletNodeNum(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirInletNodeNum(state,
                             OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
-                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirOutletNodeNum(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirOutletNodeNum(state,
                             OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:SYSTEM") {
-                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirInletNodeNum(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirInletNodeNum(state,
                             OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
-                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirOutletNodeNum(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirOutletNodeNum(state,
                             OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                         // Humidifiers: Humidifier:Steam:Electric and Humidifier:Steam:Gas
                     } else if (SELECT_CASE_var == "HUMIDIFIER:STEAM:ELECTRIC") {
@@ -717,9 +720,9 @@ namespace AirLoopHVACDOAS {
                         OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
                             EvaporativeCoolers::GetOutletNodeNum(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW") {
-                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUInAirNodeFromName(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUInAirNodeFromName(state,
                             OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
-                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUOutAirNodeFromName(state, 
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUOutAirNodeFromName(state,
                             OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                     } else {
                         ShowSevereError(CurrentModuleObject + " = \"" + CompName + "\" invalid Outside Air Component=\"" +

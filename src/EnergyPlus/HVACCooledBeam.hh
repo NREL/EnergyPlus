@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct BranchInputManagerData;
+
 namespace HVACCooledBeam {
 
     // Using/Aliasing
@@ -166,11 +169,13 @@ namespace HVACCooledBeam {
 
     void GetCoolBeams();
 
-    void InitCoolBeam(int const CBNum,              // number of the current cooled beam unit being simulated
+    void InitCoolBeam(BranchInputManagerData &data,
+                      int const CBNum,              // number of the current cooled beam unit being simulated
                       bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     );
 
-    void SizeCoolBeam(int const CBNum);
+    void SizeCoolBeam(BranchInputManagerData &data,
+                      int const CBNum);
 
     void ControlCoolBeam(int const CBNum,               // number of the current unit being simulated
                          int const ZoneNum,             // number of zone being served

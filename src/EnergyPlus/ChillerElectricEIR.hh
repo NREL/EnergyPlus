@@ -62,6 +62,7 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+struct BranchInputManagerData;
 struct ChillerElectricEIRData;
 
 namespace ChillerElectricEIR {
@@ -240,7 +241,7 @@ namespace ChillerElectricEIR {
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void initialize(bool RunFlag, Real64 MyLoad);
+        void initialize(BranchInputManagerData &data, bool RunFlag, Real64 MyLoad);
 
         void size(EnergyPlusData &state);
 

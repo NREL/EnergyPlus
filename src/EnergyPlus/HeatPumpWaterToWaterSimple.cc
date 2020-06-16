@@ -157,11 +157,11 @@ namespace HeatPumpWaterToWaterSimple {
         return nullptr;
     }
 
-    void GshpSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const EP_UNUSED(RunFlag))
+    void GshpSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const EP_UNUSED(RunFlag))
     {
         if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
-                this->InitWatertoWaterHP(this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
+                this->InitWatertoWaterHP(state.dataBranchInputManager, this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
                 this->CalcWatertoWaterHPCooling(CurLoad);
                 this->UpdateGSHPRecords();
             } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
@@ -180,7 +180,7 @@ namespace HeatPumpWaterToWaterSimple {
             }
         } else if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFHeating) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
-                this->InitWatertoWaterHP(this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
+                this->InitWatertoWaterHP(state.dataBranchInputManager, this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
                 this->CalcWatertoWaterHPHeating(CurLoad);
                 this->UpdateGSHPRecords();
             } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
@@ -202,19 +202,23 @@ namespace HeatPumpWaterToWaterSimple {
         } // TypeOfEquip
     }
 
-    void GshpSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void GshpSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         bool initFirstHVAC = true;
         Real64 initCurLoad = 0.0;
-        this->InitWatertoWaterHP(this->WWHPPlantTypeOfNum, this->Name, initFirstHVAC, initCurLoad);
+
+        this->InitWatertoWaterHP(state.dataBranchInputManager, this->WWHPPlantTypeOfNum, this->Name, initFirstHVAC, initCurLoad);
+        this->sizeCoolingWaterToWaterHP();
+    }
+
+    void GshpSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
         if (calledFromLocation.loopNum == this->LoadLoopNum) {
             if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
-                this->sizeCoolingWaterToWaterHP();
                 MinLoad = 0.0;
                 MaxLoad = this->RatedCapCool;
                 OptLoad = this->RatedCapCool;
             } else if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFHeating) {
-                this->sizeHeatingWaterToWaterHP();
                 MinLoad = 0.0;
                 MaxLoad = this->RatedCapHeat;
                 OptLoad = this->RatedCapHeat;
@@ -649,7 +653,8 @@ namespace HeatPumpWaterToWaterSimple {
         }
     }
 
-    void GshpSpecs::InitWatertoWaterHP(int const GSHPTypeNum,                  // Type of GSHP
+    void GshpSpecs::InitWatertoWaterHP(BranchInputManagerData &data,
+                                       int const GSHPTypeNum,                  // Type of GSHP
                                        std::string const &EP_UNUSED(GSHPName), // User Specified Name of GSHP
                                        bool const EP_UNUSED(FirstHVACIteration),
                                        Real64 const MyLoad // Demand Load
@@ -709,7 +714,8 @@ namespace HeatPumpWaterToWaterSimple {
 
         if (this->MyPlantScanFlag) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(data,
+                                                    this->Name,
                                                     this->WWHPPlantTypeOfNum,
                                                     this->SourceLoopNum,
                                                     this->SourceLoopSideNum,
@@ -721,7 +727,8 @@ namespace HeatPumpWaterToWaterSimple {
                                                     _,
                                                     this->SourceSideInletNodeNum,
                                                     _);
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(data,
+                                                    this->Name,
                                                     this->WWHPPlantTypeOfNum,
                                                     this->LoadLoopNum,
                                                     this->LoadLoopSideNum,

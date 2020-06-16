@@ -401,7 +401,8 @@ namespace PlantCentralGSHP {
 
         void setupOutputVars();
 
-        void initialize(Real64 MyLoad, // Demand Load
+        void initialize(BranchInputManagerData &data,
+                        Real64 MyLoad, // Demand Load
                         int LoopNum    // Loop Number Index
         );
 

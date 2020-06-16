@@ -63,6 +63,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 struct ChillerAbsorberData;
+struct BranchInputManagerData;
 
 namespace ChillerAbsorption {
 
@@ -206,7 +207,7 @@ namespace ChillerAbsorption {
 
         void getSizingFactor(Real64 &sizFac) override;
 
-        void initialize(bool RunFlag, Real64 MyLoad);
+        void initialize(BranchInputManagerData &data, bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars();
 

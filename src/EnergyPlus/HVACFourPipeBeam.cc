@@ -491,13 +491,13 @@ namespace FourPipeBeam {
         return termUnitSizingNum;
     }
 
-    void HVACFourPipeBeam::simulate(bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
+    void HVACFourPipeBeam::simulate(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                                     Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
     )
     {
 
         // initialize the unit
-        this->init(FirstHVACIteration);
+        this->init(state.dataBranchInputManager, FirstHVACIteration);
 
         // control and simulate the beam
         if (!this->mySizeFlag) {
@@ -511,7 +511,8 @@ namespace FourPipeBeam {
         }
     }
 
-    void HVACFourPipeBeam::init(bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
+    void HVACFourPipeBeam::init(BranchInputManagerData &data,
+                                bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
     {
 
@@ -536,7 +537,8 @@ namespace FourPipeBeam {
         if (this->plantLoopScanFlag && allocated(PlantLoop)) {
             errFlag = false;
             if (this->beamCoolingPresent) {
-                ScanPlantLoopsForObject(this->name,
+                ScanPlantLoopsForObject(data,
+                                        this->name,
                                         TypeOf_FourPipeBeamAirTerminal,
                                         this->cWLocation.loopNum,
                                         this->cWLocation.loopSideNum,
@@ -553,7 +555,8 @@ namespace FourPipeBeam {
                 }
             }
             if (this->beamHeatingPresent) {
-                ScanPlantLoopsForObject(this->name,
+                ScanPlantLoopsForObject(data,
+                                        this->name,
                                         TypeOf_FourPipeBeamAirTerminal,
                                         this->hWLocation.loopNum,
                                         this->hWLocation.loopSideNum,

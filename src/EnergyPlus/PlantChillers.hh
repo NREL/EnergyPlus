@@ -185,7 +185,7 @@ namespace PlantChillers {
 
         void getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut)) override;
 
-        virtual void initialize(bool RunFlag, Real64 MyLoad) = 0;
+        virtual void initialize(BranchInputManagerData &data, bool RunFlag, Real64 MyLoad) = 0;
 
         virtual void size() = 0;
     };
@@ -240,7 +240,7 @@ namespace PlantChillers {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void initialize(bool RunFlag, Real64 MyLoad) override;
+        void initialize(BranchInputManagerData &data, bool RunFlag, Real64 MyLoad) override;
 
         void size() override;
 
@@ -337,7 +337,7 @@ namespace PlantChillers {
 
         void setupOutputVariables();
 
-        void initialize(bool RunFlag, Real64 MyLoad) override;
+        void initialize(BranchInputManagerData &data, bool RunFlag, Real64 MyLoad) override;
 
         void size() override;
 
@@ -429,7 +429,7 @@ namespace PlantChillers {
 
         void setupOutputVariables();
 
-        void initialize(bool RunFlag, Real64 MyLoad) override;
+        void initialize(BranchInputManagerData &data, bool RunFlag, Real64 MyLoad) override;
 
         void size() override;
 
@@ -461,7 +461,7 @@ namespace PlantChillers {
 
         void setupOutputVariables();
 
-        void initialize(bool RunFlag, Real64 MyLoad) override;
+        void initialize(BranchInputManagerData &data, bool RunFlag, Real64 MyLoad) override;
 
         void size() override;
 

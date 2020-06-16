@@ -195,11 +195,11 @@ namespace PlantCentralGSHP {
         SizFac = 1.0;
     }
 
-    void WrapperSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+    void WrapperSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
     {
         if (calledFromLocation.loopNum != this->GLHELoopNum) {
 
-            this->initialize(CurLoad, calledFromLocation.loopNum);
+            this->initialize(state.dataBranchInputManager, CurLoad, calledFromLocation.loopNum);
             this->CalcWrapperModel(CurLoad, calledFromLocation.loopNum);
 
         } else if (calledFromLocation.loopNum == this->GLHELoopNum) {
@@ -1393,7 +1393,8 @@ namespace PlantCentralGSHP {
         }
     }
 
-    void WrapperSpecs::initialize(Real64 MyLoad, // Demand Load
+    void WrapperSpecs::initialize(BranchInputManagerData &data,
+                                  Real64 MyLoad, // Demand Load
                                   int LoopNum    // Loop Number Index
     )
     {
@@ -1419,7 +1420,8 @@ namespace PlantCentralGSHP {
         if (this->MyWrapperFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(data,
+                                                    this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
@@ -1432,7 +1434,8 @@ namespace PlantCentralGSHP {
                                                     this->CHWInletNodeNum,
                                                     _);
 
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(data,
+                                                    this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->HWLoopNum,
                                                     this->HWLoopSideNum,
@@ -1445,7 +1448,8 @@ namespace PlantCentralGSHP {
                                                     this->HWInletNodeNum,
                                                     _);
 
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(data,
+                                                    this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->GLHELoopNum,
                                                     this->GLHELoopSideNum,
