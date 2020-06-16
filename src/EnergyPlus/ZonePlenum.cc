@@ -92,12 +92,6 @@ namespace ZonePlenum {
     // METHODOLOGY EMPLOYED:
     // The Zone Plenum
 
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::BeginDayFlag;
@@ -109,9 +103,6 @@ namespace ZonePlenum {
     using DataEnvironment::OutHumRat;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyTdbFnHW;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
 
     // Functions
 
@@ -135,36 +126,13 @@ namespace ZonePlenum {
         // return and supply plenums.
         // It is called from the SimAirLoopComponent at the system time step.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataZoneEquipment::ZoneReturnPlenum_Type;
         using DataZoneEquipment::ZoneSupplyPlenum_Type;
         using General::TrimSigDigits;
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZonePlenumNum; // The ZonePlenum that you are currently loading input into
-
-        // FLOW:
 
         // Obtains and Allocates ZonePlenum related parameters from input file
         if (dataZonePlenum.GetInputFlag) { // First time subroutine has been entered
@@ -203,8 +171,6 @@ namespace ZonePlenum {
 
             UpdateAirZoneReturnPlenum(ZonePlenumNum); // Update the current ZonePlenum to the outlet nodes
 
-            ReportZoneReturnPlenum(ZonePlenumNum);
-
         } else if (iCompType == ZoneSupplyPlenum_Type) { // 'AirLoopHVAC:SupplyPlenum'
             // Find the correct ZonePlenumNumber
             if (CompIndex == 0) {
@@ -236,17 +202,12 @@ namespace ZonePlenum {
             // Update the current ZonePlenum to the outlet nodes
             UpdateAirZoneSupplyPlenum(ZonePlenumNum, PlenumInletChanged, FirstCall);
 
-            ReportZoneSupplyPlenum(ZonePlenumNum);
-
         } else {
             ShowSevereError("SimAirZonePlenum: Errors in Plenum=" + CompName);
             ShowContinueError("ZonePlenum: Unhandled plenum type found:" + TrimSigDigits(iCompType));
             ShowFatalError("Preceding conditions cause termination.");
         }
     }
-
-    // Get Input Section of the Module
-    //******************************************************************************
 
     void GetZonePlenumInput(EnergyPlusData &state)
     {
@@ -265,9 +226,6 @@ namespace ZonePlenum {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataZoneEquipment::EquipConfiguration;
@@ -280,19 +238,6 @@ namespace ZonePlenum {
         using namespace DataIPShortCuts;
         using PoweredInductionUnits::PIUInducesPlenumAir;
         using PurchasedAirManager::CheckPurchasedAirForReturnPlenum;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZonePlenumNum; // The ZonePlenum that you are currently loading input into
@@ -320,7 +265,6 @@ namespace ZonePlenum {
         static std::string const RoutineName("GetZonePlenumInput: "); // include trailing blank space
         std::string InducedNodeListName;
 
-        // Flow
         inputProcessor->getObjectDefMaxArgs("AirLoopHVAC:ReturnPlenum", NumArgs, NumAlphas, NumNums);
         MaxNums = NumNums;
         MaxAlphas = NumAlphas;
@@ -651,12 +595,6 @@ namespace ZonePlenum {
         }
     }
 
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
     void InitAirZoneReturnPlenum(int const ZonePlenumNum)
     {
 
@@ -672,26 +610,11 @@ namespace ZonePlenum {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataContaminantBalance::Contaminant;
         using DataDefineEquip::AirDistUnit;
         using DataDefineEquip::NumAirDistUnits;
         using DataZoneEquipment::ZoneEquipConfig;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
@@ -705,12 +628,6 @@ namespace ZonePlenum {
         int ADUNum;              // air distribution unit index
         int NumADUsToPlen;       // number of ADUs that might leak to this plenum
         int ADUsToPlenIndex;     // index of an ADU that might leak to this plenum in the plenum ADU list
-
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool MyEnvrnFlag( true ); // InitAirZoneReturnPlenumEnvrnFlag
-        // static bool MyOneTimeFlag( true ); // InitAirZoneReturnPlenumOneTimeFlag
-        ////////////////////////////////////////////////////////////////////////////////////
-        // FLOW:
 
         // Do the one time initializations
         if (dataZonePlenum.InitAirZoneReturnPlenumOneTimeFlag) {
@@ -864,24 +781,6 @@ namespace ZonePlenum {
         // METHODOLOGY EMPLOYED:
         // Similar to the Zone Splitter component but with interactions to the plenum zone.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
         int OutletNode;
@@ -890,7 +789,6 @@ namespace ZonePlenum {
         int NodeIndex;
 
         static bool MyEnvrnFlag(true);
-        // FLOW:
 
         // Do the Begin Environment initializations
         if (MyEnvrnFlag && BeginEnvrnFlag) {
@@ -992,12 +890,6 @@ namespace ZonePlenum {
         } // For FirstCall
     }
 
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
     void CalcAirZoneReturnPlenum(int const ZonePlenumNum)
     {
 
@@ -1007,30 +899,9 @@ namespace ZonePlenum {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataDefineEquip::AirDistUnit;
         using DataDefineEquip::NumAirDistUnits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNodeNum(0);            // inlet node number
@@ -1106,29 +977,8 @@ namespace ZonePlenum {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
         // METHODOLOGY EMPLOYED:
         // Similar to the Zone Splitter component but with interactions to the plenum zone.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeIndex;
@@ -1179,29 +1029,8 @@ namespace ZonePlenum {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataContaminantBalance::Contaminant;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;
@@ -1288,29 +1117,14 @@ namespace ZonePlenum {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
         // METHODOLOGY EMPLOYED:
         // Similar to the Zone Splitter component but with interactions to the plenum zone.
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using DataContaminantBalance::Contaminant;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const FlowRateToler(0.01); // Tolerance for mass flow rate convergence (in kg/s)
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;
@@ -1363,97 +1177,6 @@ namespace ZonePlenum {
 
         } // For FirstCall
     }
-
-    //        End of Update subroutines for the ZonePlenum Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the ZonePlenum Module
-    // *****************************************************************************
-
-    void ReportZoneReturnPlenum(int const EP_UNUSED(ZonePlenumNum)) // unused1208
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   November 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // Write(*,*)=ZoneRetPlenCond(ZonePlenumNum)%ZonePlenumPower    Still needs to report the ZonePlenum power from this component
-
-        // ZoneRetPlenCond(ZonePlenumNum)% =
-    }
-
-    void ReportZoneSupplyPlenum(int const EP_UNUSED(ZonePlenumNum)) // unused1208
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   November 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // Write(*,*)=dataZonePlenum.ZoneSupPlenCond(ZonePlenumNum)%ZonePlenumPower    Still needs to report the ZonePlenum power from this component
-
-        // dataZonePlenum.ZoneSupPlenCond(ZonePlenumNum)% =
-    }
-
-    //        End of Reporting subroutines for the ZonePlenum Module
-    // *****************************************************************************
 
     int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum)
     {

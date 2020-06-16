@@ -166,65 +166,25 @@ namespace ZonePlenum {
                           Optional_bool PlenumInletChanged = _        // Autodesk:OPTIONAL Used without PRESENT check
     );
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetZonePlenumInput(EnergyPlusData &state);
-
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
 
     void InitAirZoneReturnPlenum(int const ZonePlenumNum);
 
     void InitAirZoneSupplyPlenum(int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
 
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
     void CalcAirZoneReturnPlenum(int const ZonePlenumNum);
 
     void CalcAirZoneSupplyPlenum(int const ZonePlenumNum, bool const FirstCall);
 
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the ZonePlenum Module
-    // *****************************************************************************
-
     void UpdateAirZoneReturnPlenum(int const ZonePlenumNum);
 
     void UpdateAirZoneSupplyPlenum(int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
-
-    //        End of Update subroutines for the ZonePlenum Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the ZonePlenum Module
-    // *****************************************************************************
-
-    void ReportZoneReturnPlenum(int const ZonePlenumNum); // unused1208
-
-    void ReportZoneSupplyPlenum(int const ZonePlenumNum); // unused1208
-
-    //        End of Reporting subroutines for the ZonePlenum Module
-    // *****************************************************************************
-
-    // Beginning of mining functions for the ZonePlenum Module
-    // *****************************************************************************
 
     int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum);
 
     void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
 
     int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
-
-    //        End of mining functions for the ZonePlenum Module
-    // *****************************************************************************
 
 } // namespace ZonePlenum
 
