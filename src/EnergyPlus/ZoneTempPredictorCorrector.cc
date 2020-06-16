@@ -188,10 +188,7 @@ namespace ZoneTempPredictorCorrector {
                                                     "AdaptiveCEN15251CategoryIIUpperLine",
                                                     "AdaptiveCEN15251CategoryIIIUpperLine"});
 
-    static std::string const BlankString;
-
-    // Object Data
-    Array1D<Real64> AdapComfortSetPointSummerDesDay(7, -1);
+    Array1D<Real64> dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(7, -1);
 
     // Functions
     void ManageZoneAirUpdates(EnergyPlusData &state, int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
@@ -212,12 +209,6 @@ namespace ZoneTempPredictorCorrector {
         // This subroutine predicts or corrects the zone air temperature
         // depending on the simulation status and determines the correct
         // temperature setpoint for each zone from the schedule manager.
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // unused1208  INTEGER :: zoneloop
 
         if (GetZoneAirStatsInputFlag) {
             GetZoneAirSetPoints(state.outputFiles);
@@ -291,8 +282,6 @@ namespace ZoneTempPredictorCorrector {
         int DualTempHeatCoolControlNum;
         int ControlTypeNum;
         int IOStat;
-        // unused1208  REAL(r64), DIMENSION(2) :: NumArray
-        // unused1208  CHARACTER(len=MaxNameLength), DIMENSION(29) :: AlphArray
         static bool ErrorsFound(false);
         bool errFlag;
         int CTIndex;
@@ -2380,9 +2369,6 @@ namespace ZoneTempPredictorCorrector {
         using OutputReportTabular::StrToReal;
         using WeatherManager::NumDaysInYear;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
@@ -2520,11 +2506,6 @@ namespace ZoneTempPredictorCorrector {
         using WeatherManager::DesDayInput;
         using WeatherManager::NumDaysInYear;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int const summerDesignDayTypeIndex(9);
         Real64 GrossApproxAvgDryBulbDesignDay(0.0);
@@ -2534,17 +2515,17 @@ namespace ZoneTempPredictorCorrector {
             if (DesDayInput(i).DayType == summerDesignDayTypeIndex) {
                 GrossApproxAvgDryBulbDesignDay = (DesDayInput(i).MaxDryBulb + (DesDayInput(i).MaxDryBulb - DesDayInput(i).DailyDBRange)) / 2.0;
                 if (GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 33.5) {
-                    AdapComfortSetPointSummerDesDay(1) = 0.31 * GrossApproxAvgDryBulbDesignDay + 17.8;
-                    AdapComfortSetPointSummerDesDay(2) = 0.31 * GrossApproxAvgDryBulbDesignDay + 20.3;
-                    AdapComfortSetPointSummerDesDay(3) = 0.31 * GrossApproxAvgDryBulbDesignDay + 21.3;
+                    dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(1) = 0.31 * GrossApproxAvgDryBulbDesignDay + 17.8;
+                    dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(2) = 0.31 * GrossApproxAvgDryBulbDesignDay + 20.3;
+                    dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(3) = 0.31 * GrossApproxAvgDryBulbDesignDay + 21.3;
                 }
                 if (GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 30) {
-                    AdapComfortSetPointSummerDesDay(4) = 0.33 * GrossApproxAvgDryBulbDesignDay + 18.8;
-                    AdapComfortSetPointSummerDesDay(5) = 0.33 * GrossApproxAvgDryBulbDesignDay + 20.8;
+                    dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(4) = 0.33 * GrossApproxAvgDryBulbDesignDay + 18.8;
+                    dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(5) = 0.33 * GrossApproxAvgDryBulbDesignDay + 20.8;
                     ;
-                    AdapComfortSetPointSummerDesDay(6) = 0.33 * GrossApproxAvgDryBulbDesignDay + 21.8;
+                    dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(6) = 0.33 * GrossApproxAvgDryBulbDesignDay + 21.8;
                     ;
-                    AdapComfortSetPointSummerDesDay(7) = 0.33 * GrossApproxAvgDryBulbDesignDay + 22.8;
+                    dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(7) = 0.33 * GrossApproxAvgDryBulbDesignDay + 22.8;
                     ;
                 }
             }
@@ -2603,8 +2584,6 @@ namespace ZoneTempPredictorCorrector {
         // Using/Aliasing
         using DataSurfaces::Surface;
         using DataZoneEquipment::ZoneEquipInputsFilled;
-
-        // Locals
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitZoneAirSetpoints: ");
@@ -3263,7 +3242,6 @@ namespace ZoneTempPredictorCorrector {
         Real64 TempDepCoef; // Formerly CoefSumha
         Real64 TempIndCoef; // Formerly CoefSumhat
         Real64 AirCap;      // Formerly CoefAirrat
-        // unused1208  REAL(r64)      :: TimeStepSeconds
         Real64 TempHistoryTerm;
         int ZoneNum;
         Real64 ZoneT; // Zone temperature at previous time step
@@ -3758,8 +3736,6 @@ namespace ZoneTempPredictorCorrector {
         using General::TrimSigDigits;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleValuesForDay;
-
-        // Locals
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RelativeZoneNum;
@@ -4373,9 +4349,6 @@ namespace ZoneTempPredictorCorrector {
         using General::RoundSigDigits;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcPredictedHumidityRatio");
 
@@ -4775,9 +4748,6 @@ namespace ZoneTempPredictorCorrector {
         using ScheduleManager::GetScheduleMaxValue;
         using ScheduleManager::GetScheduleMinValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CorrectZoneAirTemp");
 
@@ -4800,12 +4770,9 @@ namespace ZoneTempPredictorCorrector {
         static int ZoneNum(0);
         static int ZoneNodeNum(0); // System node number for air flow through zone either by system or as a plenum
 
-        //  LOGICAL,SAVE   :: OneTimeFlag = .TRUE.
-        // unusd1208  LOGICAL,SAVE   :: MyEnvrnFlag = .TRUE.
         Real64 TempSupplyAir;
         Real64 ZoneMult;
         int LoopNode;
-        // unused1208  REAL(r64)           :: TimeStepSeconds  ! dt term for denominator under Cz in Seconds
 
         // FLOW:
         // Initializations
@@ -5181,10 +5148,6 @@ namespace ZoneTempPredictorCorrector {
         // PURPOSE OF THIS SUBROUTINE:
         // push histories for timestep advancing
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         static std::string const CorrectZoneAirTemp("CorrectZoneAirTemp");
 
@@ -5289,9 +5252,6 @@ namespace ZoneTempPredictorCorrector {
         // PURPOSE OF THIS SUBROUTINE:
         // push histories
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
         int LoopNode;
@@ -5383,9 +5343,6 @@ namespace ZoneTempPredictorCorrector {
         // PURPOSE OF THIS SUBROUTINE:
         // rewind histories to undo inadvertent pushing
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
         int LoopNode;
@@ -5464,9 +5421,6 @@ namespace ZoneTempPredictorCorrector {
         using DataGlobals::TimeStepZone;
 
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CorrectZoneHumRat");
@@ -6193,9 +6147,6 @@ namespace ZoneTempPredictorCorrector {
         using ZonePlenum::ZoneRetPlenCond;
         using ZonePlenum::ZoneSupPlenCond;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 NodeTemp(0.0); // System node temperature //Autodesk:Init Initialization added to elim poss of use uninitialized
         Real64 MassFlowRate;  // System node mass flow rate
@@ -6485,9 +6436,6 @@ namespace ZoneTempPredictorCorrector {
         using ZonePlenum::ZoneRetPlenCond;
         using ZonePlenum::ZoneSupPlenCond;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;          // System node number
         Real64 NodeTemp(0.0); // System node temperature //Autodesk:Init Initialization added to elim poss of use uninitialized
@@ -6501,12 +6449,8 @@ namespace ZoneTempPredictorCorrector {
         Real64 RhoAir;
         Real64 CpAir; // Specific heat of air
         int SurfNum;  // Surface number
-        // unused  REAL(r64)           :: HA                    ! Hc*Area
         Real64 Area;       // Effective surface area
         Real64 RefAirTemp; // Reference air temperature for surface convection calculations
-        // unused  LOGICAL             :: FirstTimeFlag
-        // unused  INTEGER             :: Tref           ! Used to check if reference air temp for all surfaces in the zone are the same
-        // unused  REAL(r64)           :: ZoneMult
         int ADUListIndex;
         int ADUNum;
         int ADUInNode;
@@ -6862,9 +6806,6 @@ namespace ZoneTempPredictorCorrector {
         Real64 Diff12;
         Real64 Diff23;
         Real64 Diff34;
-        /////////// hoisted into namespace ////////////
-        // static bool SetupOscillationOutputFlag( true );
-        /////////////////////////////////////////////////
         bool isAnyZoneOscillating;
         bool isAnyZoneOscillatingDuringOccupancy;
         bool isAnyZoneOscillatingInDeadband;
@@ -7080,7 +7021,7 @@ namespace ZoneTempPredictorCorrector {
             int const summerDesignDayTypeIndex(9);
             // Adjust summer design day set point
             if (DesDayInput(envrnDayNum).DayType == summerDesignDayTypeIndex) {
-                ZoneAirSetPoint = AdapComfortSetPointSummerDesDay(AdaptiveComfortModelTypeIndex - 1);
+                ZoneAirSetPoint = dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(AdaptiveComfortModelTypeIndex - 1);
             }
         }
         // If adaptive operative temperature not applicable, set back
@@ -7110,8 +7051,6 @@ namespace ZoneTempPredictorCorrector {
         using General::TrimSigDigits;
         using ScheduleManager::GetCurrentScheduleValue;
         using ThermalComfort::ManageThermalComfort;
-
-        // Locals
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RelativeZoneNum;
@@ -7470,7 +7409,6 @@ namespace ZoneTempPredictorCorrector {
         using General::SolveRoot;
         using ThermalComfort::CalcThermalComfortFanger;
 
-        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // 0 = Solution; 1 = Set to Min; 2 Set to Max
 
@@ -7555,27 +7493,11 @@ namespace ZoneTempPredictorCorrector {
         //  Calls CalcThermalComfortFanger to get PMV value at the given zone and people conditions
         //  and calculates the residual as defined above
 
-        // REFERENCES:
-
         // Using/Aliasing
         using ThermalComfort::CalcThermalComfortFanger;
 
         // Return value
         Real64 PMVResidual;
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int PeopleNum;    // index of people object
@@ -7604,22 +7526,8 @@ namespace ZoneTempPredictorCorrector {
         //  Alter the zone air cooling setpoint if the zone air relative humidity value exceeds the
         //  the zone dehumidifying relative humidity setpoint.
 
-        // REFERENCES:
-
         // Using/Aliasing
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MaxAllowedOvercoolRange; // Maximum allowed zone overcool range [DeltaC]
@@ -7665,8 +7573,6 @@ namespace ZoneTempPredictorCorrector {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine overrides the air temperature setpoint based on EMS
-
-        // Locals
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;    // index of temp control

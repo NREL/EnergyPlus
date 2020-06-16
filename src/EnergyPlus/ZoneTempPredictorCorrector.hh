@@ -399,9 +399,8 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct {
     Array1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
     Array1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
     ZoneTempPredictorCorrector::AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
-    Array1D<Real64> AdapComfortSetPointSummerDesDay;
 
-    //ZoneTempPredictorCorrector::ZControlTypes iZControlTypes;
+    Array1D<Real64> AdapComfortSetPointSummerDesDay;
 
     void clear_state() override
     {
