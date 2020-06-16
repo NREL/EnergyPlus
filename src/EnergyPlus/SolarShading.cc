@@ -11763,7 +11763,9 @@ namespace SolarShading {
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).HasShadeControl) {
-                WinShadeCtrlNum = Surface(SurfNum).activeWindowShadingControl;
+                // DEV NOTE: maybe need to use this: WinShadeCtrlNum = Surface(SurfNum).activeWindowShadingControl;
+                // DEV NOTE: or all a new routine here to determine which is active.
+                WinShadeCtrlNum = Surface(SurfNum).windowShadingControlList.front();
                 if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
                     WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||
                     WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {

@@ -955,7 +955,7 @@ namespace SurfaceGeometry {
         int iTmp2;
         // unused  INTEGER :: SchID
         int BlNumNew;
-        int WinShadingControlPtr;
+        int WinShadingControlPtr(0);
         int ShadingType;
         int ErrCount;
         Real64 diffp;
@@ -1847,8 +1847,8 @@ namespace SurfaceGeometry {
                 //      SurfaceWindow(SurfNum)%MovableSlats = .FALSE.
 
                 // TH 2/9/2010. Fixed for CR 8010 for speed up purpose rather than fixing the problem
-                WinShadingControlPtr = Surface(SurfNum).activeWindowShadingControl;
                 if (Surface(SurfNum).HasShadeControl) {
+                    WinShadingControlPtr = Surface(SurfNum).windowShadingControlList.front(); // use first item since others should be identical
                     if (WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle)
                         SurfaceWindow(SurfNum).MovableSlats = true;
                 }
@@ -4481,7 +4481,7 @@ namespace SurfaceGeometry {
         // Otherwise, create shaded construction if WindowShadingControl for this window has
         // interior or exterior shade/blind (but not between-glass shade/blind) specified.
 
-        WSCPtr = SurfaceTmp(SurfNum).activeWindowShadingControl;
+        WSCPtr = SurfaceTmp(SurfNum).windowShadingControlList.front(); // only need to do the first since the rest should have the same shading type and construction
         ConstrNumSh = 0;
         if (!ErrorsFound && SurfaceTmp(SurfNum).HasShadeControl) {
             ConstrNumSh = WindowShadingControl(WSCPtr).ShadedConstruction;
@@ -4501,6 +4501,7 @@ namespace SurfaceGeometry {
                 }
             }
         }
+        
 
         // Error checks for shades and blinds
 
@@ -8343,7 +8344,8 @@ namespace SurfaceGeometry {
             for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
                 int fenestrationIndex =
                     UtilityRoutines::FindItemInList(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), Surface, TotSurfaces);
-                if (Surface(fenestrationIndex).activeWindowShadingControl == iShadeCtrl) {
+                if (std::find(Surface(fenestrationIndex).windowShadingControlList.begin(), Surface(fenestrationIndex).windowShadingControlList.end(), 
+                      iShadeCtrl) != Surface(fenestrationIndex).windowShadingControlList.end()) {
                     WindowShadingControl(iShadeCtrl).FenestrationIndex(jFeneRef) = fenestrationIndex;
                 } else {
                     // this error condition should not occur since the rearrangement of Surface() from SurfureTmp() is reliable.
