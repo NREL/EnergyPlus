@@ -289,7 +289,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     Zone(1).ListMultiplier = 1;
     Zone(2).ListMultiplier = 1;
 
-    SizeZoneEquipmentOneTimeFlag = false;
+    dataZoneEquipmentManager.SizeZoneEquipmentOneTimeFlag = false;
     SizeZoneEquipment(state.outputFiles);
 
     EXPECT_DOUBLE_EQ(12.2, CalcZoneSizing(1, 1).DOASSupTemp);

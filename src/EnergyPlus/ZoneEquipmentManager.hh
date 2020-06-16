@@ -53,31 +53,16 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace ZoneEquipmentManager {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D<Real64> AvgData; // scratch array for storing averaged data
-    extern int NumOfTimeStepInDay; // number of zone time steps in a day
-    extern bool GetZoneEquipmentInputFlag;
-    extern bool SizeZoneEquipmentOneTimeFlag;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ZoneEquipmentManager
-
-    // Types
 
     struct SimulationOrder
     {
@@ -94,9 +79,6 @@ namespace ZoneEquipmentManager {
         {
         }
     };
-
-    // Object Data
-    extern Array1D<SimulationOrder> PrioritySimOrder;
 
     // Functions
     void clear_state();
@@ -176,6 +158,36 @@ namespace ZoneEquipmentManager {
     );
 
 } // namespace ZoneEquipmentManager
+
+struct ZoneEquipmentManagerData : BaseGlobalStruct {
+
+    Array1D<Real64> AvgData; // scratch array for storing averaged data
+    int NumOfTimeStepInDay; // number of zone time steps in a day
+    bool GetZoneEquipmentInputFlag = true;
+    bool SizeZoneEquipmentOneTimeFlag = true;
+
+    Array1D<ZoneEquipmentManager::SimulationOrder> PrioritySimOrder;
+
+    bool reportDOASZoneSizingHeader = true;
+    bool InitZoneEquipmentOneTimeFlag = true;
+    bool InitZoneEquipmentEnvrnFlag = true;
+    bool FirstPassZoneEquipFlag = true; // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
+
+    void clear_state() override
+    {
+        SizeZoneEquipmentOneTimeFlag = true;
+        InitZoneEquipmentOneTimeFlag = true;
+        InitZoneEquipmentEnvrnFlag = true;
+        AvgData.deallocate();   // scratch array for storing averaged data
+        NumOfTimeStepInDay = 0; // number of zone time steps in a day
+        GetZoneEquipmentInputFlag = true;
+        PrioritySimOrder.deallocate();
+        FirstPassZoneEquipFlag = true;
+        reportDOASZoneSizingHeader = true;
+    }
+};
+
+extern ZoneEquipmentManagerData dataZoneEquipmentManager;
 
 } // namespace EnergyPlus
 

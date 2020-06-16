@@ -956,7 +956,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
-    ZoneEquipmentManager::PrioritySimOrder.allocate(3);
+    dataZoneEquipmentManager.PrioritySimOrder.allocate(3);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
@@ -1865,7 +1865,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
-    ZoneEquipmentManager::PrioritySimOrder.allocate(NumEquip);
+    dataZoneEquipmentManager.PrioritySimOrder.allocate(NumEquip);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
@@ -2091,7 +2091,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
-    ZoneEquipmentManager::PrioritySimOrder.allocate(NumEquip);
+    dataZoneEquipmentManager.PrioritySimOrder.allocate(NumEquip);
 
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("AIR TERMINAL 1 ADU HEATING FRACTION")).CurrentValue = 0.4;
@@ -2171,7 +2171,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
     DataEnvironment::TotRunDesPersDays = 3;
     int totDesDays = DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays;
     DataGlobals::NumOfZones = 5;
-    ZoneEquipmentManager::NumOfTimeStepInDay = 4;
+    dataZoneEquipmentManager.NumOfTimeStepInDay = 4;
     DataSizing::ZoneSizing.allocate(totDesDays, DataGlobals::NumOfZones);
     DataSizing::CalcZoneSizing.allocate(totDesDays, DataGlobals::NumOfZones);
     DataSizing::FinalZoneSizing.allocate(DataGlobals::NumOfZones);
@@ -2316,36 +2316,36 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             thisSizingType.DOASSupHumRat = 1.0;
             thisSizingType.DOASTotCoolLoad = 1.0;
 
-            thisSizingType.DOASHeatLoadSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.DOASCoolLoadSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.DOASHeatAddSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.DOASLatAddSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.DOASSupMassFlowSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.DOASSupTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.DOASSupHumRatSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.DOASTotCoolLoadSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.HeatFlowSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.HeatFlowSeqNoOA.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.CoolFlowSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.CoolFlowSeqNoOA.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.HeatLoadSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.CoolLoadSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.HeatZoneTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.HeatOutTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.HeatZoneRetTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.HeatTstatTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.DesHeatSetPtSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.CoolZoneTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.CoolOutTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.CoolZoneRetTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.CoolTstatTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.DesCoolSetPtSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.HeatZoneHumRatSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.CoolZoneHumRatSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.HeatOutHumRatSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType.CoolOutHumRatSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
+            thisSizingType.DOASHeatLoadSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.DOASCoolLoadSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.DOASHeatAddSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.DOASLatAddSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.DOASSupMassFlowSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.DOASSupTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.DOASSupHumRatSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.DOASTotCoolLoadSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.HeatFlowSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.HeatFlowSeqNoOA.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.CoolFlowSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.CoolFlowSeqNoOA.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.HeatLoadSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.CoolLoadSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.HeatZoneTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.HeatOutTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.HeatZoneRetTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.HeatTstatTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.DesHeatSetPtSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.CoolZoneTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.CoolOutTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.CoolZoneRetTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.CoolTstatTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.DesCoolSetPtSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.HeatZoneHumRatSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.CoolZoneHumRatSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.HeatOutHumRatSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.CoolOutHumRatSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
 
-            for (int TimeStepIndex = 1; TimeStepIndex <= ZoneEquipmentManager::NumOfTimeStepInDay; ++TimeStepIndex) {
+            for (int TimeStepIndex = 1; TimeStepIndex <= dataZoneEquipmentManager.NumOfTimeStepInDay; ++TimeStepIndex) {
                 thisSizingType.DOASHeatLoadSeq(TimeStepIndex) = 1.0;
                 thisSizingType.DOASCoolLoadSeq(TimeStepIndex) = 1.0;
                 thisSizingType.DOASHeatAddSeq(TimeStepIndex) = 1.0;
@@ -2513,36 +2513,36 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             thisSizingType2.DOASSupHumRat = 1.0;
             thisSizingType2.DOASTotCoolLoad = 1.0;
 
-            thisSizingType2.DOASHeatLoadSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.DOASCoolLoadSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.DOASHeatAddSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.DOASLatAddSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.DOASSupMassFlowSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.DOASSupTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.DOASSupHumRatSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.DOASTotCoolLoadSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.HeatFlowSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.HeatFlowSeqNoOA.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.CoolFlowSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.CoolFlowSeqNoOA.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.HeatLoadSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.CoolLoadSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.HeatZoneTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.HeatOutTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.HeatZoneRetTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.HeatTstatTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.DesHeatSetPtSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.CoolZoneTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.CoolOutTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.CoolZoneRetTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.CoolTstatTempSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.DesCoolSetPtSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.HeatZoneHumRatSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.CoolZoneHumRatSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.HeatOutHumRatSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
-            thisSizingType2.CoolOutHumRatSeq.allocate(ZoneEquipmentManager::NumOfTimeStepInDay);
+            thisSizingType2.DOASHeatLoadSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.DOASCoolLoadSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.DOASHeatAddSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.DOASLatAddSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.DOASSupMassFlowSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.DOASSupTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.DOASSupHumRatSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.DOASTotCoolLoadSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.HeatFlowSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.HeatFlowSeqNoOA.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.CoolFlowSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.CoolFlowSeqNoOA.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.HeatLoadSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.CoolLoadSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.HeatZoneTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.HeatOutTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.HeatZoneRetTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.HeatTstatTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.DesHeatSetPtSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.CoolZoneTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.CoolOutTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.CoolZoneRetTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.CoolTstatTempSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.DesCoolSetPtSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.HeatZoneHumRatSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.CoolZoneHumRatSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.HeatOutHumRatSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.CoolOutHumRatSeq.allocate(dataZoneEquipmentManager.NumOfTimeStepInDay);
 
-            for ( int TimeStepIndex = 1; TimeStepIndex <= ZoneEquipmentManager::NumOfTimeStepInDay; ++TimeStepIndex ) {
+            for ( int TimeStepIndex = 1; TimeStepIndex <= dataZoneEquipmentManager.NumOfTimeStepInDay; ++TimeStepIndex ) {
                 thisSizingType2.DOASHeatLoadSeq(TimeStepIndex) = 1.0;
                 thisSizingType2.DOASCoolLoadSeq(TimeStepIndex) = 1.0;
                 thisSizingType2.DOASHeatAddSeq(TimeStepIndex) = 1.0;
@@ -2716,7 +2716,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             EXPECT_EQ(thisSizingType.DOASSupHumRat, 0.0);
             EXPECT_EQ(thisSizingType.DOASTotCoolLoad, 0.0);
 
-            for ( int TimeStepIndex = 1; TimeStepIndex <= ZoneEquipmentManager::NumOfTimeStepInDay; ++TimeStepIndex ) {
+            for ( int TimeStepIndex = 1; TimeStepIndex <= dataZoneEquipmentManager.NumOfTimeStepInDay; ++TimeStepIndex ) {
                 EXPECT_EQ(thisSizingType.DOASHeatLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType.DOASCoolLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType.DOASHeatAddSeq(TimeStepIndex), 0.0);
@@ -2884,7 +2884,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             EXPECT_EQ(thisSizingType2.DOASSupHumRat, 0.0);
             EXPECT_EQ(thisSizingType2.DOASTotCoolLoad, 0.0);
 
-            for ( int TimeStepIndex = 1; TimeStepIndex <= ZoneEquipmentManager::NumOfTimeStepInDay; ++TimeStepIndex ) {
+            for ( int TimeStepIndex = 1; TimeStepIndex <= dataZoneEquipmentManager.NumOfTimeStepInDay; ++TimeStepIndex ) {
                 EXPECT_EQ(thisSizingType2.DOASHeatLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.DOASCoolLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.DOASHeatAddSeq(TimeStepIndex), 0.0);
